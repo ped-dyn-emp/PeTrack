@@ -1,0 +1,111 @@
+#include <QtWidgets>
+
+#include "petrack.h"
+#include "view.h"
+#include "colorMarkerItem.h"
+#include "colorMarkerWidget.h"
+#include "tracker.h"
+#include "animation.h"
+
+// in x und y gleichermassen skaliertes koordinatensystem,
+// da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,
+// so dass pixel quadratisch 
+ColorMarkerItem::ColorMarkerItem(QWidget *wParent, QGraphicsItem * parent)
+    : QGraphicsItem(parent)
+{
+    mMainWindow = (class Petrack*) wParent;
+    mImage = NULL;
+//    mMask = NULL;
+    //setAcceptsHoverEvents(true);
+
+    //    setEnabled(false); // all mouse events connot access this item, but it will be seen
+    // einzig move koennte interessant sein, um grid zu verschieben?!
+//     setAcceptsHoverEvents(true);
+}
+// // bounding box wird durch linke obere ecke und breite/hoehe angegeben
+// // wenn an den rand gescrollt wurde im view, dann wird durch das dynamische anpassen
+// // bei trans und scale zwar zuerst alles neu gezeichnet durch update, 
+// // aber beim verkleinern des scrollbereichs nur der teil von tracker neu gezeichnet
+QRectF ColorMarkerItem::boundingRect() const
+{
+    if (mMainWindow->getImage())
+        return QRectF(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize(), mMainWindow->getImage()->width(), mMainWindow->getImage()->height());
+//         return QRectF(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize(), mImage->width(), mImage->height());
+    else
+        return QRectF(0, 0, 0, 0);
+//     // bounding box wird in lokalen koordinaten angegeben!!! (+-10 wegen zahl "1")
+//     if (mControlWidget->getCalibCoordShow())
+//         return QRectF(-110., -110., 220., 220.);
+//     else                    ;
+
+//         return QRectF(0., 0., 0., 0.);
+
+//     // sicher ware diese boundingbox, da alles
+//     //     return QRectF(xMin, yMin, xMax-xMin, yMax-yMin);
+//     // eigentlich muesste folgende Zeile reichen, aber beim ranzoomen verschwindet dann koord.sys.
+//     //     return QRectF(mControlWidget->getCalibCoordTransX()/10.-scale, mControlWidget->getCalibCoordTransY()/10.-scale, 2*scale, 2*scale);
+}
+
+void ColorMarkerItem::setRect(Vec2F& v)
+{
+    mUlc = v; // upper left corner to draw
+}
+
+void ColorMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    if (!mMask.empty())
+    {
+        if ((mImage != NULL) && ((mImage->width() != mMask.cols) || (mImage->height() != mMask.rows)))
+        {
+            delete mImage; // delete null pointer is ok
+            mImage = NULL; // is not been done by delete
+        }
+        if (mImage == NULL) // zu Beginn oder wenn sich die Groesse aendert
+            mImage = new QImage(mMask.cols, mMask.rows, QImage::Format_ARGB32);
+
+        int x,y;
+        char* data = ((char*) mMask.data);//->imageData);
+        char* yData = data;
+        char *p;
+        int notMaskMask = ((int) !mMainWindow->getColorMarkerWidget()->maskMask->isChecked())*255; // 255 oder 0
+
+        for (y = 0; y < mMask.rows; y++)
+        {
+            // Pointer to the data information in the QImage for just one column
+            // set pointer to value before, because ++p is faster than p++
+            p = ((char*)mImage->scanLine(y))-1;
+            for (x = 0; x < mMask.cols; x++)
+            {
+                *(++p) = *data; // color.blue();
+                *(++p) = *data; // color.green();
+                *(++p) = *data; // color.red();
+                *(++p) = *data ? notMaskMask : 255; // color.alpha(); // 255;
+                ++data;
+            }
+            data = (yData += mMask.cols/sizeof(char)); // because sometimes widthStep != width
+        }
+        painter->setOpacity(mMainWindow->getColorMarkerWidget()->opacity->value()/100.);
+        //painter->drawImage(mMainWindow->getRecoRoiItem()->rect().x(),mMainWindow->getRecoRoiItem()->rect().y(), *mImage); // during hoverMoveEvent of recognitionRect the painting moves with rect
+        painter->drawImage(mUlc.x(),mUlc.y(), *mImage);
+
+    }
+}
+
+// only pointer is set, no copy of data
+void ColorMarkerItem::setMask(Mat &mask)
+{
+    mMask = mask;
+}
+
+// original width w and height h must be given
+Mat ColorMarkerItem::createMask(int w, int h)
+{
+    if (w>0 && h>0 && (mMask.empty() || (!mMask.empty() && (w != mMask.cols || h != mMask.rows))))
+    {
+//        cvReleaseImage(&mMask);
+//        mMask = cvCreateImage(cvSize(w, h), 8, 1);
+
+        mMask.create(h,w,CV_8UC1);
+    }
+    return mMask;
+}

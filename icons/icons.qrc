@@ -1,0 +1,27 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="zoomin">zoomin.png</file>
+        <file alias="zoomout">zoomout.png</file>
+        <file alias="rotleft">rotateleft.png</file>
+        <file alias="rotright">rotateright.png</file>
+        <file alias="fileprt">fileprint.png</file>
+        <file alias="playF">player_playF.png</file>
+        <file alias="playB">player_playB.png</file>
+        <file alias="skipF">player_skipF.png</file>
+        <file alias="skipB">player_skipB.png</file>
+        <file alias="pause">player_pause.png</file>
+        <file alias="icon">icon.png</file>
+        <file alias="icon_small">icon_small.png</file>
+        <file alias="icon_smaller">icon_smaller.png</file>
+        <file alias="icon_smallest">icon_smallest.png</file>
+        <file alias="logo">logo.png</file>
+        <file alias="calibCam1">calib/cam1_7280765.cal</file>
+        <file alias="calibCam2">calib/cam2_7280791.cal</file>
+        <file alias="calibCam1New">calib/new/cam1_7280765.cal</file>
+        <file alias="calibCam2New">calib/new/cam2_7280791.cal</file>
+        <file alias="arrowLeft">arrow_left.png</file>
+        <file alias="arrowRight">arrow_right.png</file>
+        <file>record.png</file>
+        <file>stop-record.png</file>
+    </qresource>
+</RCC>

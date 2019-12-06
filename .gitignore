@@ -1,0 +1,12 @@
+petrack.pro.user*
+/dist
+/3rdparty
+/installer
+/installerSetupErstellung
+/debug
+/release
+/build
+/moc
+Makefile*
+object_script*
+.qmake.stash

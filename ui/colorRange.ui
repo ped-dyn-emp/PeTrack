@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ColorRange</class>
+ <widget class="QWidget" name="ColorRange">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>267</width>
+    <height>287</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>HSV color range</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="fromColor">
+        <property name="text">
+         <string>from</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="toColor">
+        <property name="text">
+         <string>to</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QtColorTriangle" name="fromTriangle"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QtColorTriangle" name="toTriangle"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="inversHue">
+        <property name="text">
+         <string>invers hue</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QtColorTriangle</class>
+   <extends>QFrame</extends>
+   <header>qtColorTriangle.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
