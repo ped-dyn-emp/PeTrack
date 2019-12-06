@@ -1,0 +1,3 @@
+[submodule "3rdparty"]
+	path = petrack-binaries
+	url = git@gitlab.fz-juelich.de:ped-dyn-emp/petrack-binaries
