@@ -278,12 +278,12 @@ contains(hostname, [zZ][aA][mM]852) {
   # Deniz 64-Bit
 
   # PointGray
-  PGRPATH = "../trunk/3rdparty/windows/triclops-3.4"
+  PGRPATH = "../petrack/3rdparty/windows/triclops-3.4"
   #PGRPATH = "C:/Program Files (x86)/Point Grey Research/Triclops Stereo Vision SDK"
   # OpenCV
   #CVPATH = "C:/OpenCV/opencv300/build/install"
   #CVPATH = "3rdparty/windows/opencv-3.1.0"
-  CVPATH = "../trunk/3rdparty/windows/opencv-3.1.0"
+  CVPATH = "../petrack/3rdparty/windows/opencv-3.1.0"
   CVVERSION = "310"
   CV_MAJOR_VERSION = "3"
 
