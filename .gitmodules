@@ -1,4 +1,4 @@
 [submodule "3rdparty"]
 	path = 3rdparty
-	url = git@gitlab.fz-juelich.de:ped-dyn-emp/petrack-binaries
+	url = ../petrack-binaries
 	shallow = true
