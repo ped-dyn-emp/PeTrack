@@ -274,8 +274,8 @@ contains(hostname, [zZ][aA][mM]852) {
       LIBS += -lopencv_legacy$${CVVERSION}
 
     }
-} else:contains(hostname, ias7176) {
-  # Deniz 64-Bit
+} else:contains(hostname, ias7185) {
+  # imotion laptop
 
   # PointGray
   PGRPATH = "../petrack/3rdparty/windows/triclops-3.4"
@@ -319,8 +319,8 @@ contains(hostname, [zZ][aA][mM]852) {
     message("Build with OpenCV 2.x.x")
     LIBS += -lopencv_legacy$${CVVERSION}
   }
-} else:contains(hostname, ias7185) {
-  # imotion laptop
+} else:contains(hostname, ias7176) {
+  # Deniz 32-Bit
 
   # PointGray
   PGRPATH = "../petrack/3rdparty/windows/triclops-3.4"
@@ -338,7 +338,7 @@ contains(hostname, [zZ][aA][mM]852) {
   INCLUDEPATH += $${CVPATH}/include/opencv
   INCLUDEPATH += $${CVPATH}/include/opencv2
 
-  QWTPATH = "C:/Qwt-6.1.4"
+  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4"
   #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
   INCLUDEPATH += $${QWTPATH}/include
 
