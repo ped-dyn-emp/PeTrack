@@ -364,6 +364,51 @@ contains(hostname, [zZ][aA][mM]852) {
     message("Build with OpenCV 2.x.x")
     LIBS += -lopencv_legacy$${CVVERSION}
   }
+} else:contains(hostname, ias7171) {
+  # Deniz 32-Bit
+
+  # PointGray
+  PGRPATH = "../petrack/3rdparty/windows/triclops-3.4"
+  #PGRPATH = "C:/Program Files (x86)/Point Grey Research/Triclops Stereo Vision SDK"
+  # OpenCV
+  #CVPATH = "C:/OpenCV/opencv300/build/install"
+  #CVPATH = "3rdparty/windows/opencv-3.1.0"
+  CVPATH = "../petrack/3rdparty/windows/opencv-3.1.0"
+  CVVERSION = "310"
+  CV_MAJOR_VERSION = "3"
+
+  # to switch between version 2.4.10 and 3.0.0 you have to update your OPENCV_DIR environment variable to the specific path
+
+  INCLUDEPATH += $${CVPATH}/include
+  INCLUDEPATH += $${CVPATH}/include/opencv
+  INCLUDEPATH += $${CVPATH}/include/opencv2
+
+  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4"
+  #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
+  INCLUDEPATH += $${QWTPATH}/include
+
+  STEREO = true # true / false
+  AVI = false # true / false
+  #QWT = false # true / false
+  #LIBELAS = false
+
+  # fuer 64 bit -lopencv_ffmpeg_64
+  LIBS += -lopencv_core$${CVVERSION} \
+          -lopencv_highgui$${CVVERSION} \
+          -lopencv_imgproc$${CVVERSION} \
+          -lopencv_calib3d$${CVVERSION} \
+          -lopencv_video$${CVVERSION} \
+          -lopencv_ffmpeg$${CVVERSION}\
+          -lopencv_aruco$${CVVERSION}
+  contains(CV_MAJOR_VERSION,3){
+    message("Build with OpenCV 3.0.0")
+    LIBS += -lopencv_videoio$${CVVERSION} \
+            -lopencv_imgcodecs$${CVVERSION}
+    QMAKE_CXXFLAGS += -march=i686
+  }else {
+    message("Build with OpenCV 2.x.x")
+    LIBS += -lopencv_legacy$${CVVERSION}
+  }
 }else {
   message(Host unknown for configuration!)
 }
