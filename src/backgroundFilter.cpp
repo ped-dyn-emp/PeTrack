@@ -2,7 +2,7 @@
 #include "stereoContext.h"
 
 // nur temporaer fuer anzeige
-#include "highgui.h"
+#include "highgui.hpp"
 #include "helper.h"
 
 // spaeter entfernen naechsten beiden zeilen
@@ -102,6 +102,7 @@ void BackgroundFilter::setFilename(const QString &fn)
 // rueckgabe, ob speichern geklappt hat
 bool BackgroundFilter::save(QString dest) //default = ""
 {
+#ifndef STEREO_DISABLED
     if (*stereoContext() && !mBgPointCloud.empty())
     {
         // if no destination file or folder is given
@@ -198,6 +199,7 @@ bool BackgroundFilter::save(QString dest) //default = ""
     {
         ;
     }
+#endif
     return true;
 }
 
@@ -360,6 +362,7 @@ waitKey();
 
     if (mBgPointCloud.empty() && mBgModel.empty() || mForeground.empty() || mForeground.size != img.size) // initialisierung wenn entwerder stereo oder model
     {
+#ifndef STEREO_DISABLED
 // For StereoImaging use heightfiled for foreground extraction -------------------------------------------------------------------------------
         if (*stereoContext())
         {
@@ -430,7 +433,9 @@ waitKey();
             mForeground.create(Size(img.cols,img.rows),CV_8UC1);
 //            mForeground = cvCreateImage(cvSize(img->width, img->height), IPL_DEPTH_8U, 1); // CV_8UC1 8, 1
         }
+
         else // nicht stereo
+#endif // STEREO_DISABLED
         {
 
 // GaussBGStatModel ---------------------------------------------------------------------------------------------------------------------
@@ -547,6 +552,7 @@ waitKey();
 // SteroBild beruecksichtigen nur disparity --------------------------------------------------------------------------------------------------------
             if (*stereoContext())
             {
+#ifndef STEREO_DISABLED
 // fuer update waere bei stereo denkbar: mittelwert der disp/zwerte, aber Achtung: invalidDisp beruecksichtigen!
 
 
@@ -612,7 +618,7 @@ waitKey();
                     bgPcData = (bgyPcData += mBgPointCloud.cols/sizeof(float));
                 }
 
-
+#endif
            }
 else // nicht stereo
             {
@@ -707,7 +713,7 @@ waitKey();
 //             CvPoint* pointArray;
              // find contours and store them all as a list
 //             CvMemStorage *storage = cvCreateMemStorage(0);
-             cv::findContours(mForeground,contours,CV_RETR_LIST,CV_CHAIN_APPROX_SIMPLE);
+             cv::findContours(mForeground,contours,cv::RETR_LIST,cv::CHAIN_APPROX_SIMPLE);
 //             cvFindContours(mForeground, storage, &contour, sizeof(CvContour),
 //                            CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE); // foreground wird auch veraendert???
              // test each contour

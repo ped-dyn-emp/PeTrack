@@ -1,4 +1,9 @@
+#if not CV_MAJOR_VERSION == 4
 #include <cv.h>
+#else
+#include "opencv.hpp"
+#include "opencv2/video/legacy/constants_c.h"
+#endif
 
 #include <time.h>
 #include <iomanip>
@@ -11,6 +16,7 @@
 #include "stereoWidget.h"
 #include "multiColorMarkerWidget.h"
 
+using namespace::cv;
 
 // Measure Time spending in functions
 //#define TIME_MEASUREMENT
@@ -1009,6 +1015,7 @@ int Tracker::calcPosition(int frame)
 
     if (sc)
     {
+#ifndef STEREO_DISABLED
         // for every point of a person, which has already identified at this frame
         for (int i = 0; i < size(); ++i) // ueber TrackPerson
         {
@@ -1036,6 +1043,7 @@ int Tracker::calcPosition(int frame)
         //if (notFoundDisp>0) // Meldung zu haeufig
         //    debout << "Warning: No disparity information found for " << (100.*notFoundDisp)/anz << " percent of points." << endl;
         return anz;
+#endif
     }
     else
         return -1;
@@ -1052,6 +1060,7 @@ bool Tracker::addPoint(TrackPoint &p, int frame, QSet<int> onlyVisible, int *per
     float scaleHead;
     float dist, minDist = 1000000.;
 
+#ifndef STEREO_DISABLED
     // ACHTUNG: BORDER NICHT BEACHTET bei p.x()...
     // hier wird farbe nur bei reco bestimmt gegebenfalls auch beim tracken interessant
     // calculate height with disparity map
@@ -1066,7 +1075,7 @@ bool Tracker::addPoint(TrackPoint &p, int frame, QSet<int> onlyVisible, int *per
         //if (i == 10)
         //    debout << i << " " << mMainWindow->getControlWidget()->coordAltitude->value() - z << " " << z << " " << (*this)[i].height() << endl;
     }
-
+#endif
     // skalierungsfaktor fuer kopfgroesse
     // fuer multicolor marker groesser, da der schwarze punkt weit am rand liegen kann
     bool multiColorWithDot = false;
@@ -1331,6 +1340,7 @@ int Tracker::insertFeaturePoints(int frame, int count, Mat &img, int borderSize,
                     // set position relative to original image size
                     v += borderSize2F;
 
+#ifndef STEREO_DISABLED
                     // ACHTUNG: BORDER NICHT BEACHTET bei p.x()...
                     // calculate height with disparity map
                     if (mMainWindow->getStereoContext() && mMainWindow->getStereoWidget()->stereoUseForHeight->isChecked())
@@ -1341,6 +1351,7 @@ int Tracker::insertFeaturePoints(int frame, int count, Mat &img, int borderSize,
                         }
                         //(*this)[i].setHeight(z, mMainWindow->getControlWidget()->coordAltitude->value(), frame);
                     }
+#endif
                     
 //                     // wenn bei punkten, die nicht am rand liegen, der fehler gross ist,
 //                     // wird geguckt, ob der sprung sich zur vorherigen richtung stark veraendert hat
@@ -1497,7 +1508,7 @@ int Tracker::track(Mat &img,Rect &rect, int frame, bool reTrack, int reQual, int
         //if (mGrey) debout << "mGrey: " << mGrey << " " << (void *) mGrey->imageData<<endl;
         //if (img) debout << "img: " << img << " " << (void *) img->imageData<<endl;
 //        cvCvtColor(img, mGrey, CV_BGR2GRAY);
-        cvtColor(img,mGrey,CV_BGR2GRAY);
+        cvtColor(img,mGrey,COLOR_BGR2GRAY);
     }
     else if (img.channels() == 1)
         img.copyTo(mGrey);//cvCopy(img, mGrey); //mGrey = cvCloneImage(img); // es waere auch denkbar, dass gar nicht kopiert wird, sondern mit mGrey=img gearbeitet wird, nur bei obigen fkt muesste bei release etc aufgepasst werden

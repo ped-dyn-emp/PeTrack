@@ -31,6 +31,8 @@
 
 #endif
 
+using namespace::cv;
+
 //#define TIME_MEASUREMENT
 
 pet::StereoContext::StereoContext(Petrack* main)
@@ -148,13 +150,13 @@ pet::StereoContext::StereoContext(Petrack* main)
 #endif
     mMin = USHRT_MAX;
     mMax = 0;
-
+#ifndef STEREO_DISABLED
     mBMState = NULL;
 #if CV_MAJOR_VERSION == 2
     mSgbm = NULL;
 #endif
     mBMdisparity16 = NULL;
-
+#endif
 //    unsigned char value;
 //    triclopsGetSurfaceValidationMapping(mTriclopsContext, &value);
 //    debout << (int) value <<endl;
@@ -183,6 +185,7 @@ pet::StereoContext::~StereoContext()
       //delete [] m_pTempBuffer;
 }
 
+#ifndef STEREO_DISABLED
 // wenn viewImg NULL dann werden die nativ eingelesenen stereobilder genommen
 // default: IplImage *viewImg = NULL
 void pet::StereoContext::init(Mat &viewImg) //  = NULL
@@ -886,7 +889,7 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
             mSgbm->speckleWindowSize = 3;
             mSgbm->speckleRange = 3;
             mSgbm->disp12MaxDiff = 1;
-#elif CV_MAJOR_VERSION == 3
+#elif CV_MAJOR_VERSION == 3 || CV_MAJOR_VERSION == 4
             int SADWindowSize = 11;
             int nDisparities = ( mMain->getStereoWidget()->maxDisparity->value() - mMain->getStereoWidget()->minDisparity->value() ) / 16;
             //mSgbm = StereoSGBM::create(nDisparities, SADWindowSize);
@@ -915,7 +918,7 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
             cv::Mat ML(getRectified(cameraLeft));
             cv::Mat MD(mBMdisparity16);
             (*mSgbm)(MR, ML, MD);
-#elif CV_MAJOR_VERSION == 3
+#elif CV_MAJOR_VERSION == 3 || CV_MAJOR_VERSION == 4
 
             cv::Mat MR(cvarrToMat(getRectified(cameraRight)));
             cv::Mat ML(cvarrToMat(getRectified(cameraLeft)));
@@ -946,7 +949,7 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
                         (-*data16 > (mMain->getStereoWidget()->maxDisparity->value())*16) ||  // laesst nur den Teil ueber, der in gui eingestellt wurde
 #if CV_MAJOR_VERSION == 2
                             (*data16 <= (mSgbm->minDisparity)*16))// enthaelt auch: (*data16 == (mBMState->minDisparity-1)*16)) // marker fuer nicht berechneten wert
-#elif CV_MAJOR_VERSION == 3
+#elif CV_MAJOR_VERSION == 3 || CV_MAJOR_VERSION == 4
                             (*data16 <= (-(mMain->getStereoWidget()->maxDisparity->value())+1)*16))
 #endif
                     {
@@ -1647,3 +1650,5 @@ bool pet::StereoContext::exportPointCloud(QString dest) //default = ""
         return false;
     }
 }
+
+#endif

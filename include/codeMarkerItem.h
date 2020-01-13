@@ -16,7 +16,7 @@ private:
 //    QImage *mImage;
 
     vector<int> mIds;
-    vector<vector<Point2f> > mCorners, mRejected;
+    vector<vector<cv::Point2f> > mCorners, mRejected;
     Vec2F mUlc;  // upper left corner to draw
 
 public:
@@ -24,8 +24,8 @@ public:
     QRectF boundingRect() const;
     void setRect(Vec2F& v);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    void setDetectedMarkers(vector<vector<Point2f> > corners, vector<int> ids);
-    void setRejectedMarkers(vector<vector<Point2f> > rejected);
+    void setDetectedMarkers(vector<vector<cv::Point2f> > corners, vector<int> ids);
+    void setRejectedMarkers(vector<vector<cv::Point2f> > rejected);
 };
 
 #endif

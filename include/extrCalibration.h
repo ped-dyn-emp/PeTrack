@@ -2,6 +2,10 @@
 #define EXTRCALIBRATION_H
 
 #include <iostream>
+#include <vector>
+
+#include <QString>
+#include <QVector>
 
 //#include <opencv.hpp>
 
@@ -12,16 +16,15 @@
 
 #include <opencv.hpp>
 
+#ifndef STEREO_DISABLED
 #include "cxcore.h"
 #include "cvaux.h"
+#endif
 #include "opencv.hpp"
 
 class Petrack;
 class Control;
 
-
-using namespace cv;
-using namespace std;
 
 class ExtrCalibration
 {
@@ -30,8 +33,8 @@ private:
     Petrack *mMainWindow;
     Control *mControlWidget;
 
-    vector<Point3f> points3D;
-    vector<Point2f> points2D;
+    std::vector<cv::Point3f> points3D;
+    std::vector<cv::Point2f> points2D;
 
 //    Mat mRotation;
 //    Mat mTranslation;
@@ -66,27 +69,27 @@ public:
     bool fetch2DPoints();
     void calibExtrParams();
     bool calcReprojectionError();
-    Point2f getImagePoint(Point3f p3d);
-    Point3f get3DPoint(Point2f p2d, double h);
-    Point3f transformRT(Point3f p);
-    bool isOutsideImage(Point2f p2d);
-    inline bool isOutsideImage(Point3f p3d)
+    cv::Point2f getImagePoint(cv::Point3f p3d);
+    cv::Point3f get3DPoint(cv::Point2f p2d, double h);
+    cv::Point3f transformRT(cv::Point3f p);
+    bool isOutsideImage(cv::Point2f p2d);
+    inline bool isOutsideImage(cv::Point3f p3d)
     {
         return isOutsideImage(getImagePoint(p3d));
     }
-    inline vector<Point3f> get3DList()
+    inline std::vector<cv::Point3f> get3DList()
     {
         return points3D;
     }
-    inline void set3DList(vector<Point3f> list3D)
+    inline void set3DList(std::vector<cv::Point3f> list3D)
     {
         this->points3D = list3D;
     }
-    inline vector<Point2f> get2DList()
+    inline std::vector<cv::Point2f> get2DList()
     {
         return points2D;
     }
-    inline void set2DList(vector<Point2f> list2D)
+    inline void set2DList(std::vector<cv::Point2f> list2D)
     {
         this->points2D = list2D;
     }

@@ -10,8 +10,9 @@ private:
 
 public:
     BrightFilter();
-
+#ifndef STEREO_DISABLED
     IplImage* act(IplImage *img, IplImage *res);
+#endif
 
 //     bool changed();
 

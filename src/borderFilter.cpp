@@ -1,6 +1,8 @@
 #include "borderFilter.h"
 #include "helper.h"
 
+using namespace::cv;
+
 BorderFilter::BorderFilter()
     :Filter()
 {

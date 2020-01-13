@@ -1,6 +1,8 @@
 #include "swapFilter.h"
 #include "helper.h"
 
+using namespace::cv;
+
 SwapFilter::SwapFilter()
     :Filter()
 {

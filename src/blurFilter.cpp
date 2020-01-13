@@ -1,5 +1,9 @@
 #include "blurFilter.h"
+#if CV_MAJOR_VERSION == 4
+#include "opencv.hpp"
+#else
 #include "cv.h"
+#endif
 #include "opencv2/opencv.hpp"
 
 using namespace::cv;

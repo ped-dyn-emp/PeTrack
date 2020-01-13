@@ -101,11 +101,11 @@ QPointF ImageItem::getCmPerPixel(float px, float py, float h){
 
     bool debug = false;
 
-    Point3f p3x1 = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(px-0.5,py),h);
-    Point3f p3x2 = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(px+0.5,py),h);
+    cv::Point3f p3x1 = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(px-0.5,py),h);
+    cv::Point3f p3x2 = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(px+0.5,py),h);
 
-    Point3f p3y1 = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(px,py-0.5),h);
-    Point3f p3y2 = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(px,py+0.5),h);
+    cv::Point3f p3y1 = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(px,py-0.5),h);
+    cv::Point3f p3y2 = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(px,py+0.5),h);
 
     if( debug ) debout << "Punkte: " << p3x1.x << ", " << p3x1.y << ", " << p3x1.z << endl;
     if( debug ) debout << "Punkte: " << p3x2.x << ", " << p3x2.y << ", " << p3x2.z << endl;
@@ -133,16 +133,16 @@ double ImageItem::getAngleToGround(float px, float py, float height){
 
     bool debug = false;
 
-    Point3f cam( - mControlWidget->getCalibCoord3DTransX() - mControlWidget->getCalibExtrTrans1(),
+    cv::Point3f cam( - mControlWidget->getCalibCoord3DTransX() - mControlWidget->getCalibExtrTrans1(),
                  - mControlWidget->getCalibCoord3DTransY() - mControlWidget->getCalibExtrTrans2(),
                  - mControlWidget->getCalibCoord3DTransZ() - mControlWidget->getCalibExtrTrans3() );
 
-    Point3f posInImage = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(px-mMainWindow->getImageBorderSize(),py-mMainWindow->getImageBorderSize()),height);
+    cv::Point3f posInImage = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(px-mMainWindow->getImageBorderSize(),py-mMainWindow->getImageBorderSize()),height);
 
     if( debug ) debout << "Camera:          " << cam.x << ", " << cam.y << ", " << cam.z << endl;
     if( debug ) debout << "posInImage:      " << posInImage.x << ", " << posInImage.y << ", " << posInImage.z << endl;
 
-    Point3f a(cam.x-posInImage.x,cam.y-posInImage.y,cam.z-posInImage.z),
+    cv::Point3f a(cam.x-posInImage.x,cam.y-posInImage.y,cam.z-posInImage.z),
             b(0,0,1);
 
     if( debug ) debout << "a: (" << a.x << ", " << a.y << ", " << a.z << ")" << endl;
@@ -155,12 +155,12 @@ QPointF ImageItem::getPosImage(QPointF pos, float height)
 //QPointF ImageItem::getPosImage(QPointF pos)
 {
     bool debug = false;
-    Point2f p2d;
+    cv::Point2f p2d;
     if( mImage )
     {
         if( mControlWidget->getCalibCoordDimension() == 0 )
         {
-            p2d = mMainWindow->getExtrCalibration()->getImagePoint(Point3f(pos.x(),pos.y(),height));
+            p2d = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(pos.x(),pos.y(),height));
             pos.setX(p2d.x);
             pos.setY(p2d.y);
         }else
@@ -233,9 +233,9 @@ QPointF ImageItem::getPosReal(QPointF pos, double height)
         if( mControlWidget->getCalibCoordDimension() == 0 )
         {
             // New 3D mapping of Pixelpoints to RealPositions
-            Point3f p3d = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(pos.x()-bS,pos.y()-bS),height);
+            cv::Point3f p3d = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(pos.x()-bS,pos.y()-bS),height);
 
-            Point2f p2d = debug ? mMainWindow->getExtrCalibration()->getImagePoint(p3d) : Point2f(0,0);
+            cv::Point2f p2d = debug ? mMainWindow->getExtrCalibration()->getImagePoint(p3d) : cv::Point2f(0,0);
 
             if( debug ) debout << "########## INFO ###############" << endl;
             if( debug ) debout << "Org. 2D Point: (" << pos.x() << ", " << pos.y() << ") Hoehe: "<< height << endl;
@@ -330,7 +330,7 @@ void ImageItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 
         debout << "Pixel unter der Camera: " << pixUnderCam.x() << ", " << pixUnderCam.y() << endl;
 
-        Point2f pixUnderCam2f = mMainWindow->getExtrCalibration()->getImagePoint(Point3f(
+        cv::Point2f pixUnderCam2f = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(
                                                                                 -mControlWidget->getCalibCoord3DTransX()-mControlWidget->getCalibExtrTrans1(),
                                                                                 -mControlWidget->getCalibCoord3DTransY()-mControlWidget->getCalibExtrTrans2(),
                                                                                 0));

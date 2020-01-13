@@ -1,3 +1,4 @@
+#ifndef STEREO_DISABLED
 #include <stdio.h>
 
 //=============================================================================
@@ -161,3 +162,4 @@ void StereoAviFile::setCamera(enum Camera c)
     //    }
 }
 
+#endif

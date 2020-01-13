@@ -8,7 +8,7 @@ ContrastFilter::ContrastFilter()
     mC.setValue(0.);
     mC.setFilter(this);
 }
-
+#ifndef STEREO_DISABLED
 IplImage* ContrastFilter::act(IplImage *img, IplImage *res)
 {
     int x, y;
@@ -62,7 +62,7 @@ IplImage* ContrastFilter::act(IplImage *img, IplImage *res)
 
     return res;
 }
-
+#endif
 Parameter* ContrastFilter::getContrast()
 {
     return &mC;

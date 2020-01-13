@@ -41,10 +41,11 @@ public:
     void init(cv::Mat &viewImg);
 
     void preprocess();
-
+#ifndef STEREO_DISABLED
     IplImage *getRectified(enum Camera camera=cameraRight);
 
     IplImage *getDisparity(bool *dispNew = NULL);
+#endif
 
     // von person.cpp benoetigt, um frame nummer zu erhalten
     inline Animation *getAnimation()
@@ -124,13 +125,16 @@ protected:
 #endif
     BackgroundFilter   *mBackgroundFilterLeft;
     BackgroundFilter   *mBackgroundFilterRight;
+#ifndef STEREO_DISABLED
     IplImage           mRectLeft;
     IplImage           mRectRight;
     IplImage           mDisparity;
     CvStereoBMState   *mBMState;
+#endif
+
 #if CV_MAJOR_VERSION == 2
     cv::StereoSGBM    *mSgbm;
-#elif CV_MAJOR_VERSION == 3
+#elif CV_MAJOR_VERSION == 3 || CV_MAJOR_VERSION == 4
     cv::Ptr<cv::StereoSGBM>    mSgbm;
 #endif
     CvMat             *mBMdisparity16;

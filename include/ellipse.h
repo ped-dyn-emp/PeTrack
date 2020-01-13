@@ -1,7 +1,11 @@
 #ifndef ELLIPSE_H
 #define ELLIPSE_H
 
+#ifndef STEREO_DISABLED
 #include <cxcore.h>
+#else
+#include "opencv.hpp"
+#endif
 
 #include "vector.h"
 

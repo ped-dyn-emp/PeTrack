@@ -3,7 +3,6 @@
 
 #include "filter.h"
 
-using namespace::cv;
 
 class SwapFilter : public Filter
 {

@@ -942,7 +942,7 @@ void Control::on_trackReset_clicked()
 {
     if (mMainWindow->getImage())
     {
-        Size size;
+        cv::Size size;
         size.width = mMainWindow->getTrackRoiItem()->rect().width();
         size.height = mMainWindow->getTrackRoiItem()->rect().height();
         mMainWindow->setTrackChanged(true);// flag changes of track parameters

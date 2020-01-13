@@ -4,7 +4,6 @@
 #include "filter.h"
 #include "helper.h"
 
-using namespace::cv;
 
 class BrightContrastFilter : public Filter
 {

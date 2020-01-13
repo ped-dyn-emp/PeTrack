@@ -43,6 +43,8 @@
 
 #include <iomanip>
 
+#include "opencv.hpp"
+
 // Zeitausgabe aktivieren
 //#define TIME_MEASUREMENT
 
@@ -678,7 +680,11 @@ void Petrack::saveXml(QDomDocument &doc)
     // kein rect oder so gefunden, was den sichtbaren bereich in viewport angibt
     //        elem.setAttribute("TRANSFORMATION", QString("%1 %2 %3 %4 %5 %6").arg(mat.m11()).arg(mat.m12()).arg(mat.m21()).arg(mat.m22()).arg(mat.dx()).arg(mat.dy()));
     elem.setAttribute("TRANSFORMATION", QString("%1 %2 %3 %4").arg(mViewWidget->getZoomLevel()).arg(mViewWidget->getRotateLevel()).arg(mView->horizontalScrollBar()->value()).arg(mView->verticalScrollBar()->value()));
+#ifndef STEREO_DISABLED
     elem.setAttribute("CAMERA", mAnimation->getCamera());
+#else
+    elem.setAttribute("CAMERA", cameraUnset);
+#endif
     elem.setAttribute("HIDE_CONTROLS", mHideControlsAct->isChecked());
     root.appendChild(elem);
 
@@ -1144,7 +1150,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 if ((mImgFiltered.channels() == 1) /* && convert8To24bit*/)
                 {
                     //cvCvtColor(mIplImgFiltered, iplImgFilteredBGR, CV_GRAY2BGR);
-                    cvtColor(mImg, iplImgFilteredBGR, CV_GRAY2BGR);
+                    cvtColor(mImg, iplImgFilteredBGR, COLOR_GRAY2BGR);
                     if( saveView )
                         writeFrameRet = aviFile.appendFrame((const unsigned char*) viewImage->bits(), true); // 2. param besagt, ob vertikal gespiegel werden soll
                     else
@@ -1569,6 +1575,7 @@ void Petrack::showHideControlWidget()
 
 void Petrack::setCamera()
 {
+#ifndef STEREO_DISABLED
     if (mAnimation)
     {
         if (mCameraLeftViewAct->isChecked())
@@ -1595,6 +1602,8 @@ void Petrack::setCamera()
         //mPlayerWidget->skipToFrame(mPlayerWidget->getPos()); // machtpasue!!
         //updateImage(true); // nur dies aufrufen, wenn nicht links rechts gleichzeitig gehalten wird
     }
+
+#endif
 }
 
 void Petrack::createActions()
@@ -3455,12 +3464,13 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 #endif
         if (borderChanged)
             updateControlImage(mImgFiltered);
-
+#ifndef STEREO_DISABLED
         if (imageChanged || swapChanged || brightContrastChanged || borderChanged || calibChanged)
         {
             if (mStereoContext)
                 mStereoContext->init(mImgFiltered);
         }
+#endif
 
 #ifdef TIME_MEASUREMENT
     //        "==========: "
@@ -3513,6 +3523,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         }
         else
         {
+#ifndef STEREO_DISABLED
             // calculate position in 3D space and height of person for "old" trackPoints, if checked "even"
             if (mStereoContext && mStereoWidget->stereoUseForHeightEver->isChecked() && mStereoWidget->stereoUseForHeight->isChecked())
             {
@@ -3521,6 +3532,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
                 mTracker->calcPosition(frameNum);
             }
+#endif
         }
         if (borderChanged)
             borderChangedForTracking = true;
@@ -3544,10 +3556,11 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
                 mTrackingRoiItem->checkRect();
             }
+#ifndef STEREO_DISABLED
             // buildt disparity picture if it should be used for height detection
             if (mStereoContext && mStereoWidget->stereoUseForHeight->isChecked())
                 mStereoContext->getDisparity();
-
+#endif
 
             Rect rect;
             getRoi(mImgFiltered, roi, rect);
@@ -3584,10 +3597,11 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
               ((lastRecoFrame-mControlWidget->recoStep->value()) >= frameNum)) &&
              imageChanged) || mAnimation->isCameraLiveStream() || swapChanged || brightContrastChanged || borderChanged || calibChanged || recognitionChanged())
         {
+#ifndef STEREO_DISABLED
             // buildt disparity picture if it should be used for height detection or recognition
             if (mStereoContext && (mStereoWidget->stereoUseForHeight->isChecked() || mStereoWidget->stereoUseForReco->isChecked()))
                 mStereoContext->getDisparity(); // wird nicht neu berechnet, wenn vor tracking schon berechnet wurde
-
+#endif
             if (borderChanged)
                 mRecognitionRoiItem->checkRect();
             //#cvReleaseImage(&tempImg);
@@ -3621,11 +3635,13 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 //                        cout << persList.at(i) << endl;
 //                    }
                 }
+#ifndef STEREO_DISABLED
                 if (mStereoContext && mStereoWidget->stereoUseForReco->isChecked())
                 {
                     PersonList pl;
                     pl.calcPersonPos(mImgFiltered, rect, persList, mStereoContext, getBackgroundFilter(), markerLess);
                 }
+#endif
 #ifdef TIME_MEASUREMENT
                 //        "==========: "
                 debout << "nach  reco: " << getElapsedTime() <<endl;

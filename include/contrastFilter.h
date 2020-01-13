@@ -11,8 +11,9 @@ private:
 
 public:
     ContrastFilter();
-
+#ifndef STEREO_DISABLED
     IplImage* act(IplImage *img, IplImage *res);
+#endif
 
 //     bool changed();
 

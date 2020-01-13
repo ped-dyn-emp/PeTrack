@@ -1,8 +1,12 @@
 #ifndef FILTER_H
 #define FILTER_H
 
+#ifndef STEREO_DISABLED
 #include "cv.h"
 #include "opencv/cv.h"
+#else
+#include "opencv2/opencv.hpp"
+#endif
 
 class Filter;
 

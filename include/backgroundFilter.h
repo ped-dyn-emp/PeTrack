@@ -3,8 +3,12 @@
 
 #include "filter.h"
 
+#ifndef STEREO_DISABLED
 #include "cvaux.h"
 #include "opencv/cvaux.h"
+#else
+#include "opencv2/opencv.hpp"
+#endif
 #include "opencv2/video/background_segm.hpp"
 
 
@@ -20,7 +24,7 @@ class BackgroundFilter : public Filter
 private:
 #if CV_MAJOR_VERSION == 2
     CvBGStatModel* mBgModel;
-#elif CV_MAJOR_VERSION == 3
+#elif CV_MAJOR_VERSION == 3 || CV_MAJOR_VERSION == 4
     cv::Ptr<cv::BackgroundSubtractorMOG2> mBgModel;
     //Ptr<BackgroundSubtractor> mBgModel;
 #endif

@@ -7,6 +7,8 @@
 #include "tracker.h"
 #include "animation.h"
 
+using namespace::cv;
+
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,
 // so dass pixel quadratisch 

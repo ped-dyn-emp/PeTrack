@@ -1,6 +1,8 @@
 #include "calibFilter.h"
 #include "helper.h"
 
+using namespace::cv;
+
 CalibFilter::CalibFilter()
     :Filter()
 {

@@ -7,7 +7,9 @@
 
 //#include <opencv2/core/core.hpp>
 
+#ifndef STEREO_DISABLED
 #include "cxcore.h"
+#endif
 
 #include "vector.h"
 
@@ -412,10 +414,10 @@ private:
     Petrack *mMainWindow;
     //int mNr;
     //double mFps;
-    Mat mGrey, mPrevGrey;//, mPyramid, mPrevPyramid;
+    cv::Mat mGrey, mPrevGrey;//, mPyramid, mPrevPyramid;
 //    IplImage *mGrey, *mPrevGrey, *mPyramid, *mPrevPyramid;
 //    CvPoint2D32f* mPrevFeaturePoints, *mFeaturePoints;
-    vector<Point2f> mPrevFeaturePoints, mFeaturePoints;
+    vector<cv::Point2f> mPrevFeaturePoints, mFeaturePoints;
 //    CvPoint2D32f* mPrevColorFeaturePoints, *mColorFeaturePoints;
     vector<uchar> mStatus; //, *mColorStatus;
     int mFlags;
@@ -433,11 +435,11 @@ public:
     ~Tracker();
 
     // neben loeschen der liste muessen auch ...
-    void init(Size size);
+    void init(cv::Size size);
 
     void reset();
 
-    void resize(Size size);
+    void resize(cv::Size size);
 
     void splitPerson(int pers, int frame);
     bool splitPersonAt(const Vec2F& p, int frame, QSet<int> onlyVisible);

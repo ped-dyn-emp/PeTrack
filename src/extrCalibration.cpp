@@ -7,6 +7,9 @@
 #include "petrack.h"
 #include "control.h"
 
+using namespace std;
+using namespace cv;
+
 #define MAX_AV_ERROR 20
 
 ExtrCalibration::ExtrCalibration()
@@ -906,7 +909,7 @@ Point3f ExtrCalibration::get3DPoint(Point2f p2d, double h)
         pointBeforeCam.z = 50;
         if( debug ) cout << "Point before Camera: [" << pointBeforeCam.x << ", " << pointBeforeCam.y << ", " << pointBeforeCam.z << "]" << endl;
         // 3D-Punkt vor Kamera in Weltkoordinaten
-        CvPoint3D32f pBCInWorld = transformRT(pointBeforeCam);
+        Point3f pBCInWorld = transformRT(pointBeforeCam);
         if( debug ) cout << "Point before Camera in World-Coordinatesystem: [" << pBCInWorld.x << ", " << pBCInWorld.y << ", " << pBCInWorld.z << "]" << endl;
         if( debug ) cout << "Camera in World-Coordinatesystem: [" << camInWorld.x << ", " << camInWorld.y << ", " << camInWorld.z << "]" << endl;
         // Berechnung des Richtungsvektors der Gerade von der Kamera durch den Pixel
