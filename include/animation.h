@@ -23,12 +23,8 @@ they can be represented in QT.
 #include <QStringList>
 #include <QTime>
 
-#ifndef STEREO_DISABLED
-#include "opencv/cv.h"
-#include "opencv/highgui.h"
-#else
+
 #include "opencv.hpp"
-#endif
 
 #include "filter.h"
 #include "helper.h"
@@ -260,13 +256,10 @@ private:
     // Free's the video data 
     void freeVideo();
 
-#if CV_MAJOR_VERSION == 2
-    // Capture structure from OpenCV 2
-    CvCapture *mCapture;
-#else
+
     // Capture structure from OpenCV 3/4
     cv::VideoCapture mVideoCapture;
-#endif
+
 
 #ifndef STEREO_DISABLED
     // Capture structure from pgrAviFile for Stereo Videos

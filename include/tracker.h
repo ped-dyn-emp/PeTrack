@@ -7,9 +7,6 @@
 
 //#include <opencv2/core/core.hpp>
 
-#ifndef STEREO_DISABLED
-#include "cxcore.h"
-#endif
 
 #include "vector.h"
 

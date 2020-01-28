@@ -6,10 +6,6 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 
-#ifndef STEREO_DISABLED
-#include "cvaux.h"
-#include "cxcore.h"
-#endif
 
 #include <opencv.hpp>
 //#include "opencv2/cxcore.h"

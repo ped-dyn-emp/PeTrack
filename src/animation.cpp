@@ -33,12 +33,8 @@ they can be represented in QT.
 #include <cstdlib>
 #include <iomanip>
 
-#ifndef STEREO_DISABLED
-#include "cv.h"
-#include "highgui.h"
-#else
+
 #include "opencv.hpp"
-#endif
 
 #include "animation.h"
 

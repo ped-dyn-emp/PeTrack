@@ -1,9 +1,5 @@
-#if not CV_MAJOR_VERSION == 4
-#include <cv.h>
-#else
 #include "opencv.hpp"
 #include "opencv2/video/legacy/constants_c.h"
-#endif
 
 #include <time.h>
 #include <iomanip>

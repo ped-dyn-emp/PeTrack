@@ -9,11 +9,8 @@
 #else
 #include "aviFileWriter.h"
 #endif
-#ifndef STEREO_DISABLED
-#include "cv.h"
-#else
+
 #include "opencv.hpp"
-#endif
 
 class QLabel;
 class QSlider;

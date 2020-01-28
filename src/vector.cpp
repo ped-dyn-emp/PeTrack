@@ -1,8 +1,4 @@
-#ifndef STEREO_DISABLED
-#include "cxcore.h"
-#else
 #include "opencv.hpp"
-#endif
 
 #include <QPointF>
 #include <QPoint>

@@ -283,11 +283,8 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
     int i, j, x, y;
     bool atEdge;
     int threshold;
-#if CV_MAJOR_VERSION == 2
-    CvBox2D32f subBox;
-#elif CV_MAJOR_VERSION == 3 || CV_MAJOR_VERSION == 4
+
     RotatedRect subBox;
-#endif
 
     int cx, cy, add;
     int nr;
@@ -670,15 +667,10 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
                                 if (subRatio < 1.8 && subMaxExpansion < markerSize*1.5 && subMaxExpansion > markerSize/2)//1.5
                                 {
                                     // IN OPENCV2.1 liefert cvContourArea KEIN VORZEICHEN ZUM ERKENNEN DER DREHRICHTUNG!!!! es ist ein optionaler paramter hinzugefuegt worden!!!!
-    #if ((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 1)))
-                                    //if  ((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 1)))
-//                                    subContourArea = cvContourArea(subContours,CV_WHOLE_SEQ);
-                                    subContourArea = cv::contourArea(subContour);
-    #else
+
                                     //else
                                     subContourArea = cv::contourArea(subContour,true);
 //                                    subContourArea = cvContourArea(subContours,CV_WHOLE_SEQ, true);
-    #endif
                                     cx = myRound(subBox.center.x);
                                     cy = myRound(subBox.center.y);
 
@@ -1173,14 +1165,11 @@ void findContourMarker(Mat &img, QList<TrackPoint> *crossList, int markerBrightn
     vector<vector<Point> > contours;
 //    CvSeq *contours;
 //    CvSeq *firstContour;
-#if CV_MAJOR_VERSION == 2
-    CvPoint2D32f* PointArray2D32f;
-    CvBox2D32f box;
-#elif CV_MAJOR_VERSION == 3 || CV_MAJOR_VERSION == 4
+
+
 //    Mat PointArray2D32f;
     RotatedRect box;
     //CvBox2D box;
-#endif
 //     CvPoint center;
     int expansion;
     double contourArea;
@@ -1356,35 +1345,7 @@ cvWaitKey();
 ////// in weiss alle konturen - behindern jedoch weitere untersuchungen
 ////cvDrawContours(img,contours,CV_RGB(255,255,255),CV_RGB(255,255,255),0,1,8,cvPoint(0,0));
 #endif
-#if CV_MAJOR_VERSION == 2
-//debout << "PointArray malloc" << endl;
-                // Alloc memory for contour point set.    
-                PointArray = (CvPoint*)malloc(count*sizeof(CvPoint));
 
-                //cv::Mat PointMat = cv::Mat(1, count, CV_32SC2, contours);
-                //debout << cv::contourArea(PointMat) <<endl;
-                //debout << cv::isContourConvex(PointMat) <<endl;
-                //HoughCircles: Finds circles in a grayscale image using a Hough transform.
-                //debout << "seqToArray" << endl;
-                // Get contour point set.
-                cvCvtSeqToArray(contours, PointArray, CV_WHOLE_SEQ);
-
-
-
-                PointArray2D32f = (CvPoint2D32f*)malloc(count*sizeof(CvPoint2D32f));
-
-                // Convert CvPoint set to CvBox2D32f set.
-                for(i=0; i<count; i++)
-                {
-                    PointArray2D32f[i].x = (float)PointArray[i].x;
-                    PointArray2D32f[i].y = (float)PointArray[i].y;
-                    //debout << "[" << i << "]" << PointArray2D32f[i].x << ", " << PointArray2D32f[i].y << endl;
-                }
-                //debout << "FitEllipse" << endl;
-                // Fits ellipse to current contour.
-                //debout << "count: " << count << endl;
-                cvFitEllipse(PointArray2D32f, count, &box);
-#elif CV_MAJOR_VERSION == 3 || CV_MAJOR_VERSION == 4
 
 //                PointArray2D32f.create(count,2, CV_32F);
 //                //Mat(cvarrToMat(contours)).convertTo(PointArray2D32f.at(i), CV_32F);
@@ -1405,7 +1366,7 @@ cvWaitKey();
                 box = fitEllipse(pointsf);
 
 //                box = fitEllipse(PointArray2D32f);//, count, &box);
-#endif
+
                 // neuer:
                 //// Fits ellipse to current contour.
                 //CvBox2D box = cvFitEllipse2(PointArray2D32f);
@@ -1428,14 +1389,10 @@ cvWaitKey();
                     //debout << "contourArea" << endl;
                     //cvContourArea(contours,CV_WHOLE_SEQ) koennte mit MyEllipse.are() verglichen werden und bei grossen abweichungen verworfenwerden!!!
                     // IN OPENCV2.1 liefert cvContourArea KEIN VORZEICHEN ZUM ERKENNEN DER DREHRICHTUNG!!!! es ist ein optionaler paramter hinzugefuegt worden!!!!
-#if ((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 1)))
-                    //if  ((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 1)))
-                        contourArea = cv:contourArea(contours,true);
-#else
+
                     //else
                         contourArea = cv::contourArea(contour,true);
 //                        contourArea = cvContourArea(contours,CV_WHOLE_SEQ, true);
-#endif
 
                         //contourArea koennte mit MyEllipse.area() verglichen werden und bei grossen abweichungen verworfenwerden!!!
                         //debout << contourArea << " " << box.center.x << " " << box.center.y << " " << box.size.width <<" " << box.size.height <<endl;
@@ -1505,11 +1462,8 @@ imShow("img2", tmpAusgabe2);
                 }
                 //debout << "FreePointArray" << endl;
 //                free(PointArray);
-#if CV_MAJOR_VERSION == 2
-                free(PointArray2D32f);
-#elif CV_MAJOR_VERSION == 3
+
 //                PointArray2D32f.release();
-#endif
             }
             //debout << "Free PointArray" << endl;
 

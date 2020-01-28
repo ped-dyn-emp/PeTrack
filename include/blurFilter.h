@@ -2,11 +2,7 @@
 #define BLURFILTER_H
 
 #include "filter.h"
-#if not CV_MAJOR_VERSION == 4
-#include "cv.h" 
-#else
 #include "opencv.hpp"
-#endif
 
 class BlurFilter : public Filter
 {

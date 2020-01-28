@@ -14,13 +14,7 @@
 #include "opencv2/opencv.hpp"
 
 
-#include <opencv.hpp>
 
-#ifndef STEREO_DISABLED
-#include "cxcore.h"
-#include "cvaux.h"
-#endif
-#include "opencv.hpp"
 
 class Petrack;
 class Control;

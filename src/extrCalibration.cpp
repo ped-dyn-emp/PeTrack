@@ -393,10 +393,7 @@ void ExtrCalibration::calibExtrParams()
         Mat rvec(3,1,CV_64F),/*,0),*/ tvec(3,1,CV_64F);//,0);
 
         // Solve the PnP-Problem to calibrate the camera to its environment
-#if ((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 3)))
-        bool solvePNPsuccess = true;
-        solvePnP(op,ip,camMat,distMat,rvec,tvec,false);
-#else
+
         bool solvePNPsuccess = solvePnP(op,ip,camMat,distMat,rvec,tvec,false,SOLVEPNP_ITERATIVE);
         //bool solvePNPsuccess = solvePnP(op,ip,camMat,distMat,rvec,tvec,false,SOLVEPNP_P3P); // Requires exactly 4 points
         //bool solvePNPsuccess = solvePnP(op,ip,camMat,distMat,rvec,tvec,false,SOLVEPNP_EPNP);
@@ -404,7 +401,7 @@ void ExtrCalibration::calibExtrParams()
         //bool solvePNPsuccess = solvePnP(op,ip,camMat,distMat,rvec,tvec,false,SOLVEPNP_UPNP);
         //bool solvePNPsuccess = true;
         //solvePnPRansac(op,ip,camMat,distMat,rvec,tvec);
-#endif
+
 
 
 //        debout << "The solvePNP-Method " << (solvePNPsuccess ? "" : "doesn't ") << "worked. " << solvePNPsuccess << endl;

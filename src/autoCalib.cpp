@@ -94,11 +94,8 @@ void AutoCalib::autoCalib()
             QMessageBox::information(mMainWindow, Petrack::tr("Petrack"), Petrack::tr("At first you have to select files."));
             return;
         }
-#if CV_MAJOR_VERSION == 2
-        CvSize board_size = {mBoardSizeX, mBoardSizeY};  //{6, 9};  //{6, 8}; // passt zu meinem Schachbrett, was ich ausgedruckt habe
-#elif CV_MAJOR_VERSION == 3 || CV_MAJOR_VERSION == 4
-        Size board_size(mBoardSizeX, mBoardSizeY);
-#endif
+
+        Size board_size(mBoardSizeX, mBoardSizeY); //{6, 9};  //{6, 8}; // passt zu meinem Schachbrett, was ich ausgedruckt habe
         float square_size = mSquareSize; //5.25f; // 3.f;   // da 3x3cm hat Schachbrett, was ich ausgedruckt habe
         float aspect_ratio = 1.f;
         int flags = 0;
