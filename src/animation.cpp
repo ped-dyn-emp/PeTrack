@@ -968,7 +968,7 @@ bool Animation::openAnimationVideo(QString fileName)
     ////if(capture == NULL)
     if(!mVideoCapture.isOpened())
     {
-#ifdef STEREO
+#if  STEREO && not STEREO_DISABLED
 
 
          // untersuchen, ob Stereodaten von Arena/Messe-Versuchen

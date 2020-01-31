@@ -37,7 +37,8 @@ LIBELAS = true
 
 contains(hostname, [zZ][aA][mM]852) {
 #Hermes rechner #########################################################################################
-  STEREO = true # true / false
+  STEREO = false # true / false
+  DEFINES += STEREO_DISABLED
   AVI = true # true / false
   #CVPATH = "C:/OpenCV-2.2.0/bin"
   CVPATH = "C:/opencv/build"
@@ -93,7 +94,8 @@ contains(hostname, [zZ][aA][mM]852) {
        #   -lopencv_legacy
 } else:contains(hostname, arne-laptop) {
 # Laptop Daniel ##########################################################################################
-  STEREO = true # true / false
+  STEREO = false # true / false
+  DEFINES += STEREO_DISABLED
 
   #PGRPATH = "C:/Program Files/Point Grey Research/Triclops Stereo Vision SDK"
 
@@ -140,21 +142,15 @@ contains(hostname, [zZ][aA][mM]852) {
           -lopencv_imgproc$${CVVERSION} \
           -lopencv_calib3d$${CVVERSION} \
           -lopencv_video$${CVVERSION} \
-          -lopencv_ffmpeg$${CVVERSION} \
-          -lopencv_aruco$${CVVERSION}
-    contains(CV_MAJOR_VERSION,3){
-      message("Build with OpenCV $${CVVERSION}")
-      LIBS += -lopencv_videoio$${CVVERSION} \
-              -lopencv_imgcodecs$${CVVERSION}
-      QMAKE_CXXFLAGS += -march=i686
-    }else {
-      message("Build with OpenCV 2.x.x")
-      LIBS += -lopencv_legacy$${CVVERSION}
-
-    }
+          -lopencv_videoio_ffmpeg$${CVVERSION}\
+          -lopencv_aruco$${CVVERSION} \
+          -lopencv_videoio$${CVVERSION} \
+          -lopencv_imgcodecs$${CVVERSION}
+  QMAKE_CXXFLAGS += -march=i686
 } else:contains(hostname, [zZ][aA][mM]197) {
 # Laptop Daniel ##########################################################################################
-  STEREO = true # true / false
+  STEREO = false # true / false
+  DEFINES += STEREO_DISABLED
 
   #PGRPATH = "C:/Program Files/Point Grey Research/Triclops Stereo Vision SDK"
 
@@ -201,20 +197,14 @@ contains(hostname, [zZ][aA][mM]852) {
           -lopencv_imgproc$${CVVERSION} \
           -lopencv_calib3d$${CVVERSION} \
           -lopencv_video$${CVVERSION} \
-          -lopencv_ffmpeg$${CVVERSION} \
-          -lopencv_aruco$${CVVERSION}
-    contains(CV_MAJOR_VERSION,3){
-      message("Build with OpenCV $${CVVERSION}")
-      LIBS += -lopencv_videoio$${CVVERSION} \
-              -lopencv_imgcodecs$${CVVERSION}
-      QMAKE_CXXFLAGS += -march=i686
-    }else {
-      message("Build with OpenCV 2.x.x")
-      LIBS += -lopencv_legacy$${CVVERSION}
-
-    }
+          -lopencv_videoio_ffmpeg$${CVVERSION}\
+          -lopencv_aruco$${CVVERSION} \
+          -lopencv_videoio$${CVVERSION} \
+          -lopencv_imgcodecs$${CVVERSION}
+  QMAKE_CXXFLAGS += -march=i686
 } else:contains(hostname, ias7185) {
   # imotion laptop
+  DEFINES += STEREO_DISABLED
 
   # PointGray
   PGRPATH = "../petrack/3rdparty/windows/triclops-3.4"
@@ -236,7 +226,7 @@ contains(hostname, [zZ][aA][mM]852) {
   #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
   INCLUDEPATH += $${QWTPATH}/include
 
-  STEREO = true # true / false
+  STEREO = false # true / false
   AVI = false # true / false
   #QWT = false # true / false
   #LIBELAS = false
@@ -248,17 +238,11 @@ contains(hostname, [zZ][aA][mM]852) {
           -lopencv_imgproc$${CVVERSION} \
           -lopencv_calib3d$${CVVERSION} \
           -lopencv_video$${CVVERSION} \
-          -lopencv_ffmpeg$${CVVERSION}\
-          -lopencv_aruco$${CVVERSION}
-  contains(CV_MAJOR_VERSION,3){
-    message("Build with OpenCV 3.0.0")
-    LIBS += -lopencv_videoio$${CVVERSION} \
-            -lopencv_imgcodecs$${CVVERSION}
-    QMAKE_CXXFLAGS += -march=i686
-  }else {
-    message("Build with OpenCV 2.x.x")
-    LIBS += -lopencv_legacy$${CVVERSION}
-  }
+          -lopencv_videoio_ffmpeg$${CVVERSION}\
+          -lopencv_aruco$${CVVERSION} \
+          -lopencv_videoio$${CVVERSION} \
+          -lopencv_imgcodecs$${CVVERSION}
+  QMAKE_CXXFLAGS += -march=i686
 } else:contains(hostname, ias7176) {
   # Deniz 32-Bit
   DEFINES += STEREO_DISABLED
@@ -296,22 +280,13 @@ contains(hostname, [zZ][aA][mM]852) {
           -lopencv_calib3d$${CVVERSION} \
           -lopencv_video$${CVVERSION} \
           -lopencv_videoio_ffmpeg$${CVVERSION}\
-          -lopencv_aruco$${CVVERSION}
-  contains(CV_MAJOR_VERSION,3){
-    message("Build with OpenCV 3.0.0")
-    LIBS += -lopencv_videoio$${CVVERSION} \
-            -lopencv_imgcodecs$${CVVERSION}
-    QMAKE_CXXFLAGS += -march=i686
-  }else:contains(CV_MAJOR_VERSION,4) {
-    message("Build with OpenCV 4.x")
-    LIBS += -lopencv_videoio$${CVVERSION} \
-            -lopencv_imgcodecs$${CVVERSION}
-   }else{
-    message("Build with OpenCV 2.x.x")
-    LIBS += -lopencv_legacy$${CVVERSION}
-  }
+          -lopencv_aruco$${CVVERSION} \
+          -lopencv_videoio$${CVVERSION} \
+          -lopencv_imgcodecs$${CVVERSION}
+  QMAKE_CXXFLAGS += -march=i686
 } else:contains(hostname, ias7171) {
   # Ann Katrin 32-Bit
+  DEFINES += STEREO_DISABLED
 
   # PointGray
   PGRPATH = "../petrack/3rdparty/windows/triclops-3.4"
@@ -333,7 +308,7 @@ contains(hostname, [zZ][aA][mM]852) {
   #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
   INCLUDEPATH += $${QWTPATH}/include
 
-  STEREO = true # true / false
+  STEREO = false # true / false
   AVI = false # true / false
   #QWT = false # true / false
   #LIBELAS = false
@@ -345,17 +320,53 @@ contains(hostname, [zZ][aA][mM]852) {
           -lopencv_imgproc$${CVVERSION} \
           -lopencv_calib3d$${CVVERSION} \
           -lopencv_video$${CVVERSION} \
-          -lopencv_ffmpeg$${CVVERSION}\
-          -lopencv_aruco$${CVVERSION}
-  contains(CV_MAJOR_VERSION,3){
-    message("Build with OpenCV 3.0.0")
-    LIBS += -lopencv_videoio$${CVVERSION} \
-            -lopencv_imgcodecs$${CVVERSION}
-    QMAKE_CXXFLAGS += -march=i686
-  }else {
-    message("Build with OpenCV 2.x.x")
-    LIBS += -lopencv_legacy$${CVVERSION}
-  }
+          -lopencv_videoio_ffmpeg$${CVVERSION}\
+          -lopencv_aruco$${CVVERSION} \
+          -lopencv_videoio$${CVVERSION} \
+          -lopencv_imgcodecs$${CVVERSION}
+  QMAKE_CXXFLAGS += -march=i686
+}else:contains(hostname, ias7160) {
+  # Test Laptop 32-Bit
+  DEFINES += STEREO_DISABLED
+
+  # PointGray
+  PGRPATH = "../petrack/3rdparty/windows/triclops-3.4"
+  #PGRPATH = "C:/Program Files (x86)/Point Grey Research/Triclops Stereo Vision SDK"
+  # OpenCV
+  #CVPATH = "C:/OpenCV/opencv300/build/install"
+  #CVPATH = "3rdparty/windows/opencv-3.1.0"
+  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0"
+  CVVERSION = "420"
+  CV_MAJOR_VERSION = "4"
+
+  # to switch between version 2.4.10 and 3.0.0 you have to update your OPENCV_DIR environment variable to the specific path
+
+  INCLUDEPATH += $${CVPATH}/include
+  INCLUDEPATH += $${CVPATH}/include/opencv
+  INCLUDEPATH += $${CVPATH}/include/opencv2
+
+  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4"
+  #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
+  INCLUDEPATH += $${QWTPATH}/include
+
+  STEREO = false # true / false
+  AVI = false # true / false
+  #QWT = false # true / false
+  #LIBELAS = false
+
+  # fuer 64 bit -lopencv_ffmpeg_64
+  LIBS += -L$${CVPATH}/x64/mingw/bin \
+          -lopencv_core$${CVVERSION} \
+          -lopencv_highgui$${CVVERSION} \
+          -lopencv_imgproc$${CVVERSION} \
+          -lopencv_calib3d$${CVVERSION} \
+          -lopencv_video$${CVVERSION} \
+          -lopencv_videoio_ffmpeg$${CVVERSION}\
+          -lopencv_aruco$${CVVERSION} \
+          -lopencv_videoio$${CVVERSION} \
+          -lopencv_imgcodecs$${CVVERSION}
+  QMAKE_CXXFLAGS += -march=i686
+
 }else {
   message(Host unknown for configuration!)
 }
