@@ -1,3 +1,4 @@
-before_script:
-  - C:\Qt\5.14.1\mingw73_64\bin\qmake.exe C:\Users\Deniz\Documents\petrack\petrack.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug"
-  - mingw32-make.exe -j6
+build_windows:
+  script:
+    - C:\Qt\5.14.1\mingw73_64\bin\qmake.exe C:\Users\Deniz\Documents\petrack\petrack.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug"
+    - mingw32-make.exe -j6
