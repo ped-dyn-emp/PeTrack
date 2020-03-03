@@ -253,7 +253,7 @@ contains(hostname, [zZ][aA][mM]852) {
   # OpenCV
   #CVPATH = "C:/OpenCV/opencv300/build/install"
   #CVPATH = "3rdparty/windows/opencv-3.1.0"
-  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0"
+  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
   CVVERSION = "420"
   CV_MAJOR_VERSION = "4"
 
@@ -263,7 +263,7 @@ contains(hostname, [zZ][aA][mM]852) {
   INCLUDEPATH += $${CVPATH}/include/opencv
   INCLUDEPATH += $${CVPATH}/include/opencv2
 
-  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4"
+  QWTPATH = "..\petrack\3rdparty\windows\Qwt-6.1.4_64bit"
   #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
   INCLUDEPATH += $${QWTPATH}/include
 
@@ -272,18 +272,39 @@ contains(hostname, [zZ][aA][mM]852) {
   #QWT = false # true / false
   #LIBELAS = false
 
-  # fuer 64 bit -lopencv_ffmpeg_64
-  LIBS += -L$${CVPATH}/x64/mingw/bin \
-          -lopencv_core$${CVVERSION} \
-          -lopencv_highgui$${CVVERSION} \
-          -lopencv_imgproc$${CVVERSION} \
-          -lopencv_calib3d$${CVVERSION} \
-          -lopencv_video$${CVVERSION} \
-          -lopencv_videoio_ffmpeg$${CVVERSION}\
-          -lopencv_aruco$${CVVERSION} \
-          -lopencv_videoio$${CVVERSION} \
-          -lopencv_imgcodecs$${CVVERSION}
-  QMAKE_CXXFLAGS += -march=i686
+
+
+#  CONFIG(debug, debug|release){
+#      # fuer 64 bit -lopencv_ffmpeg_64
+#      LIBS += -L$${CVPATH}/x64/mingw/bin \
+#              -lopencv_core$${CVVERSION}d \
+#              -lopencv_highgui$${CVVERSION}d \
+#              -lopencv_imgproc$${CVVERSION}d \
+#              -lopencv_calib3d$${CVVERSION}d \
+#              -lopencv_video$${CVVERSION}d \
+#              -lopencv_videoio_ffmpeg$${CVVERSION}\
+#              -lopencv_aruco$${CVVERSION}d \
+#              -lopencv_videoio$${CVVERSION}d \
+#              -lopencv_imgcodecs$${CVVERSION}d
+#      QMAKE_CXXFLAGS += -march=i686
+#  } else{
+      # fuer 64 bit -lopencv_ffmpeg_64
+      LIBS += -L$${CVPATH}/x64/mingw/bin \
+              -lopencv_core$${CVVERSION} \
+              -lopencv_highgui$${CVVERSION} \
+              -lopencv_imgproc$${CVVERSION} \
+              -lopencv_calib3d$${CVVERSION} \
+              -lopencv_video$${CVVERSION} \
+              -lopencv_videoio_ffmpeg$${CVVERSION}_64\
+              -lopencv_aruco$${CVVERSION} \
+              -lopencv_videoio$${CVVERSION} \
+              -lopencv_imgcodecs$${CVVERSION}
+      #QMAKE_CXXFLAGS += -march=i686
+QMAKE_CXXFLAGS += -fpermissive
+#  }
+
+
+
 } else:contains(hostname, ias7171) {
   # Ann Katrin 32-Bit
   DEFINES += STEREO_DISABLED
