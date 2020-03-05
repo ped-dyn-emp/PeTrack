@@ -740,6 +740,8 @@ bool Tracker::delPointOf(int pers, int direction, int frame)
             (*this)[pers].removeLast();
         (*this)[pers].setLastFrame(frame);
     }
+
+    return true;
 }
 
 // gibt true zurueck, wenn punkt geloescht werden konnte

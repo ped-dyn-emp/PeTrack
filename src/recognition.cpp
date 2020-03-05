@@ -1057,7 +1057,7 @@ void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidg
     // No refinement is default value
     // TODO Check if this is the best MEthod for our usecase
     if(codeMarkerWidget->doCornerRefinement->isChecked()){
-        detectorParams->cornerRefinementMethod            = cv::aruco::CornerRefineMethod::CORNER_REFINE_CONTOUR;
+        detectorParams->cornerRefinementMethod            = cv::aruco::CornerRefineMethod::CORNER_REFINE_SUBPIX;
     }
     //detectorParams->cornerRefinementMethod                = codeMarkerWidget->doCornerRefinement->isChecked();
     detectorParams->cornerRefinementWinSize               = codeMarkerWidget->cornerRefinementWinSize->value();
