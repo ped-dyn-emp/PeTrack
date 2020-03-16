@@ -1756,7 +1756,7 @@ int Tracker::track(Mat &img,Rect &rect, int frame, bool reTrack, int reQual, int
                     xMin = ((0 > (x-regionSize)) ? 0 : (x-regionSize));
                     yMin = ((0 > (y-regionSize)) ? 0 : (y-regionSize));
                     xMax = ((mGrey.cols  < (x+regionSize+1)) ? mGrey.cols  : (x+regionSize+1));
-                    yMax = ((mGrey.rows < (y+regionSize+1)) ? mGrey.cols : (y+regionSize+1));
+                    yMax = ((mGrey.rows < (y+regionSize+1)) ? mGrey.rows : (y+regionSize+1));
 
                     darkest = 255;
                     //              brightest = 0;
