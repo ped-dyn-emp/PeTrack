@@ -17,7 +17,7 @@ regression test windows:
     - windows
   script:
     - cd tests/regression_test/tests
-    - pytest --junitxml=pytest_report.xml | Tee-Object -FilePath "RegressionTestLog.txt"
+    - python -m pytest --junitxml=pytest_report.xml | Tee-Object -FilePath "RegressionTestLog.txt"
   artifacts:
     when: on_failure
     paths:
