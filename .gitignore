@@ -11,3 +11,4 @@ Makefile*
 object_script*
 .qmake.stash
 *vcxproj*
+__pycache__

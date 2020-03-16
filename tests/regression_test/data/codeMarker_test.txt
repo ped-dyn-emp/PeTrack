@@ -1,0 +1,5 @@
+# PeTrack project: codeMarker.pet
+# raw trajectory file: codeMarker_test.trc
+# framerate: 25 fps
+# z: can be 3d position or height of person (alternating or not)
+# id frame x/cm y/cm z/cm
