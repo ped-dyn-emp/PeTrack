@@ -10,5 +10,12 @@ petrack.pro.user*
 Makefile*
 object_script*
 .qmake.stash
-*vcxproj*
 __pycache__
+*_test.trc
+*_test.txt
+
+# MSVC Stuff
+/x64 
+/.vs
+*vcxproj*
+petrack.sln
