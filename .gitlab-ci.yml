@@ -2,6 +2,11 @@ stages:
   - build
   - test
 
+cache:
+  paths:
+    - ./*
+
+
 build_windows:
   stage: build
   tags:
