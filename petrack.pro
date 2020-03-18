@@ -41,7 +41,7 @@ contains(hostname, [zZ][aA][mM]852) {
   DEFINES += STEREO_DISABLED
   AVI = true # true / false
   #CVPATH = "C:/OpenCV-2.2.0/bin"
-  CVPATH = "C:/opencv/build"
+  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
   CVVERSION = "240"
   LIBS += -llibopencv_core$${CVVERSION} -llibopencv_highgui$${CVVERSION} -llibopencv_imgproc$${CVVERSION} -llibopencv_calib3d$${CVVERSION} -llibopencv_video$${CVVERSION} -llibopencv_legacy$${CVVERSION} # -lcv$${CVVERSION} -lcvaux$${CVVERSION}
 #  CVPATH = "C:/Programme/OpenCV1.2"
@@ -102,14 +102,14 @@ contains(hostname, [zZ][aA][mM]852) {
   CONFIG(debug, debug|release) {
       # only debug
         PGRPATH = "../trunk/3rdparty/windows/triclops-3.4"
-        CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0"
-        QWTPATH = "../trunk/3rdparty/windows/qwt-6.1.2"
+        CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
+        QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
 
     } else {
         # only release
         PGRPATH = "../trunk/3rdparty/windows/triclops-3.4"
-        CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0"
-        QWTPATH = "../trunk/3rdparty/windows/qwt-6.1.2"
+        CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
+        QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
     }
   #CVPATH = "%OPENCV_DIR%"
   #CVPATH = "C:\Program Files (x86)\OpenCV\3.0.0\build4qt5\install"
@@ -157,14 +157,14 @@ contains(hostname, [zZ][aA][mM]852) {
   CONFIG(debug, debug|release) {
       # only debug
         PGRPATH = "../trunk/3rdparty/windows/triclops-3.4"
-        CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0"
-        QWTPATH = "../trunk/3rdparty/windows/qwt-6.1.2"
+        CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
+        QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
 
     } else {
         # only release
         PGRPATH = "../trunk/3rdparty/windows/triclops-3.4"
-        CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0"
-        QWTPATH = "../trunk/3rdparty/windows/qwt-6.1.2"
+        CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
+        QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
     }
   #CVPATH = "%OPENCV_DIR%"
   #CVPATH = "C:\Program Files (x86)\OpenCV\3.0.0\build4qt5\install"
@@ -212,7 +212,7 @@ contains(hostname, [zZ][aA][mM]852) {
   # OpenCV
   #CVPATH = "C:/OpenCV/opencv300/build/install"
   #CVPATH = "3rdparty/windows/opencv-3.1.0"
-  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0"
+  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
   CVVERSION = "420"
   CV_MAJOR_VERSION = "4"
 
@@ -222,7 +222,7 @@ contains(hostname, [zZ][aA][mM]852) {
   INCLUDEPATH += $${CVPATH}/include/opencv
   INCLUDEPATH += $${CVPATH}/include/opencv2
 
-  QWTPATH = "C:/Qwt-6.1.4"
+  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
   #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
   INCLUDEPATH += $${QWTPATH}/include
 
@@ -263,7 +263,7 @@ contains(hostname, [zZ][aA][mM]852) {
   INCLUDEPATH += $${CVPATH}/include/opencv
   INCLUDEPATH += $${CVPATH}/include/opencv2
 
-  QWTPATH = "..\petrack\3rdparty\windows\Qwt-6.1.4_64bit"
+  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
   #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
   INCLUDEPATH += $${QWTPATH}/include
 
@@ -315,7 +315,7 @@ QMAKE_CXXFLAGS += -fpermissive
   # OpenCV
   #CVPATH = "C:/OpenCV/opencv300/build/install"
   #CVPATH = "3rdparty/windows/opencv-3.1.0"
-  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0"
+  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
   CVVERSION = "420"
   CV_MAJOR_VERSION = "4"
 
@@ -325,7 +325,7 @@ QMAKE_CXXFLAGS += -fpermissive
   INCLUDEPATH += $${CVPATH}/include/opencv
   INCLUDEPATH += $${CVPATH}/include/opencv2
 
-  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4"
+  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
   #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
   INCLUDEPATH += $${QWTPATH}/include
 
@@ -356,7 +356,7 @@ QMAKE_CXXFLAGS += -fpermissive
   # OpenCV
   #CVPATH = "C:/OpenCV/opencv300/build/install"
   #CVPATH = "3rdparty/windows/opencv-3.1.0"
-  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0"
+  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
   CVVERSION = "420"
   CV_MAJOR_VERSION = "4"
 
@@ -366,7 +366,7 @@ QMAKE_CXXFLAGS += -fpermissive
   INCLUDEPATH += $${CVPATH}/include/opencv
   INCLUDEPATH += $${CVPATH}/include/opencv2
 
-  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4"
+  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
   #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
   INCLUDEPATH += $${QWTPATH}/include
 
