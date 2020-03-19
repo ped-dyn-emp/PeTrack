@@ -53,6 +53,8 @@ contains(hostname, [zZ][aA][mM]852) {
   PGRPATH = "C:/Programme/Point Grey Research/Triclops Stereo Vision SDK"
   # noetig fuer qt 5 um u.a. qprinter zu finden
   QT += printsupport
+QMAKE_CXXFLAGS += -fpermissive
+
 } else:contains(hostname, [zZ][aA][mM]460) {  #.zam.kfa-juelich.de
 # Mac Maik #########################################################################################
   QMAKE_MAC_SDK = macosx10.12
@@ -92,6 +94,7 @@ contains(hostname, [zZ][aA][mM]852) {
           -lopencv_video #\
        #   -l opencv_ffmpeg \
        #   -lopencv_legacy
+QMAKE_CXXFLAGS += -fpermissive
 } else:contains(hostname, arne-laptop) {
 # Laptop Daniel ##########################################################################################
   STEREO = false # true / false
@@ -142,11 +145,13 @@ contains(hostname, [zZ][aA][mM]852) {
           -lopencv_imgproc$${CVVERSION} \
           -lopencv_calib3d$${CVVERSION} \
           -lopencv_video$${CVVERSION} \
-          -lopencv_videoio_ffmpeg$${CVVERSION}\
+          -lopencv_videoio_ffmpeg$${CVVERSION}_64\
           -lopencv_aruco$${CVVERSION} \
           -lopencv_videoio$${CVVERSION} \
           -lopencv_imgcodecs$${CVVERSION}
-  QMAKE_CXXFLAGS += -march=i686
+  # QMAKE_CXXFLAGS += -march=i686
+QMAKE_CXXFLAGS += -fpermissive
+
 } else:contains(hostname, [zZ][aA][mM]197) {
 # Laptop Daniel ##########################################################################################
   STEREO = false # true / false
@@ -197,11 +202,13 @@ contains(hostname, [zZ][aA][mM]852) {
           -lopencv_imgproc$${CVVERSION} \
           -lopencv_calib3d$${CVVERSION} \
           -lopencv_video$${CVVERSION} \
-          -lopencv_videoio_ffmpeg$${CVVERSION}\
+          -lopencv_videoio_ffmpeg$${CVVERSION}_64\
           -lopencv_aruco$${CVVERSION} \
           -lopencv_videoio$${CVVERSION} \
           -lopencv_imgcodecs$${CVVERSION}
-  QMAKE_CXXFLAGS += -march=i686
+  # QMAKE_CXXFLAGS += -march=i686
+QMAKE_CXXFLAGS += -fpermissive
+
 } else:contains(hostname, ias7185) {
   # imotion laptop
   DEFINES += STEREO_DISABLED
@@ -238,11 +245,13 @@ contains(hostname, [zZ][aA][mM]852) {
           -lopencv_imgproc$${CVVERSION} \
           -lopencv_calib3d$${CVVERSION} \
           -lopencv_video$${CVVERSION} \
-          -lopencv_videoio_ffmpeg$${CVVERSION}\
+          -lopencv_videoio_ffmpeg$${CVVERSION}_64\
           -lopencv_aruco$${CVVERSION} \
           -lopencv_videoio$${CVVERSION} \
           -lopencv_imgcodecs$${CVVERSION}
-  QMAKE_CXXFLAGS += -march=i686
+  # QMAKE_CXXFLAGS += -march=i686
+QMAKE_CXXFLAGS += -fpermissive
+
 } else:contains(hostname, ias7176) {
   # Deniz 32-Bit
   DEFINES += STEREO_DISABLED
@@ -282,11 +291,11 @@ contains(hostname, [zZ][aA][mM]852) {
 #              -lopencv_imgproc$${CVVERSION}d \
 #              -lopencv_calib3d$${CVVERSION}d \
 #              -lopencv_video$${CVVERSION}d \
-#              -lopencv_videoio_ffmpeg$${CVVERSION}\
+#              -lopencv_videoio_ffmpeg$${CVVERSION}_64\
 #              -lopencv_aruco$${CVVERSION}d \
 #              -lopencv_videoio$${CVVERSION}d \
 #              -lopencv_imgcodecs$${CVVERSION}d
-#      QMAKE_CXXFLAGS += -march=i686
+#      # QMAKE_CXXFLAGS += -march=i686
 #  } else{
       # fuer 64 bit -lopencv_ffmpeg_64
       LIBS += -L$${CVPATH}/x64/mingw/bin \
@@ -295,15 +304,13 @@ contains(hostname, [zZ][aA][mM]852) {
               -lopencv_imgproc$${CVVERSION} \
               -lopencv_calib3d$${CVVERSION} \
               -lopencv_video$${CVVERSION} \
-              -lopencv_videoio_ffmpeg$${CVVERSION}_64\
+              -lopencv_videoio_ffmpeg$${CVVERSION}_64_64\
               -lopencv_aruco$${CVVERSION} \
               -lopencv_videoio$${CVVERSION} \
               -lopencv_imgcodecs$${CVVERSION}
-      #QMAKE_CXXFLAGS += -march=i686
+      ## QMAKE_CXXFLAGS += -march=i686
 QMAKE_CXXFLAGS += -fpermissive
 #  }
-
-
 
 } else:contains(hostname, ias7171) {
   # Ann Katrin 32-Bit
@@ -341,11 +348,13 @@ QMAKE_CXXFLAGS += -fpermissive
           -lopencv_imgproc$${CVVERSION} \
           -lopencv_calib3d$${CVVERSION} \
           -lopencv_video$${CVVERSION} \
-          -lopencv_videoio_ffmpeg$${CVVERSION}\
+          -lopencv_videoio_ffmpeg$${CVVERSION}_64\
           -lopencv_aruco$${CVVERSION} \
           -lopencv_videoio$${CVVERSION} \
           -lopencv_imgcodecs$${CVVERSION}
-  QMAKE_CXXFLAGS += -march=i686
+  # QMAKE_CXXFLAGS += -march=i686
+QMAKE_CXXFLAGS += -fpermissive
+
 }else:contains(hostname, ias7160) {
   # Test Laptop 32-Bit
   DEFINES += STEREO_DISABLED
@@ -382,11 +391,55 @@ QMAKE_CXXFLAGS += -fpermissive
           -lopencv_imgproc$${CVVERSION} \
           -lopencv_calib3d$${CVVERSION} \
           -lopencv_video$${CVVERSION} \
-          -lopencv_videoio_ffmpeg$${CVVERSION}\
+          -lopencv_videoio_ffmpeg$${CVVERSION}_64\
           -lopencv_aruco$${CVVERSION} \
           -lopencv_videoio$${CVVERSION} \
           -lopencv_imgcodecs$${CVVERSION}
-  QMAKE_CXXFLAGS += -march=i686
+  # QMAKE_CXXFLAGS += -march=i686
+QMAKE_CXXFLAGS += -fpermissive
+
+}else:contains(hostname, ias7169) {
+  # Deniz Laptop
+  DEFINES += STEREO_DISABLED
+
+  # PointGray
+  PGRPATH = "../petrack/3rdparty/windows/triclops-3.4"
+  #PGRPATH = "C:/Program Files (x86)/Point Grey Research/Triclops Stereo Vision SDK"
+  # OpenCV
+  #CVPATH = "C:/OpenCV/opencv300/build/install"
+  #CVPATH = "3rdparty/windows/opencv-3.1.0"
+  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
+  CVVERSION = "420"
+  CV_MAJOR_VERSION = "4"
+
+  # to switch between version 2.4.10 and 3.0.0 you have to update your OPENCV_DIR environment variable to the specific path
+
+  INCLUDEPATH += $${CVPATH}/include
+  INCLUDEPATH += $${CVPATH}/include/opencv
+  INCLUDEPATH += $${CVPATH}/include/opencv2
+
+  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
+  #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
+  INCLUDEPATH += $${QWTPATH}/include
+
+  STEREO = false # true / false
+  AVI = false # true / false
+  #QWT = false # true / false
+  #LIBELAS = false
+
+  # fuer 64 bit -lopencv_ffmpeg_64
+  LIBS += -L$${CVPATH}/x64/mingw/bin \
+          -lopencv_core$${CVVERSION} \
+          -lopencv_highgui$${CVVERSION} \
+          -lopencv_imgproc$${CVVERSION} \
+          -lopencv_calib3d$${CVVERSION} \
+          -lopencv_video$${CVVERSION} \
+          -lopencv_videoio_ffmpeg$${CVVERSION}_64\
+          -lopencv_aruco$${CVVERSION} \
+          -lopencv_videoio$${CVVERSION} \
+          -lopencv_imgcodecs$${CVVERSION}
+  # QMAKE_CXXFLAGS += -march=i686
+QMAKE_CXXFLAGS += -fpermissive
 
 }else {
   message(Host unknown for configuration!)
@@ -440,7 +493,7 @@ unix:!macx {
 #      message("Build with OpenCV 3.0.0")
 #      LIBS += -lopencv_videoio$${CVVERSION} \
 #              -lopencv_imgcodecs$${CVVERSION}
-#      QMAKE_CXXFLAGS += -march=i686
+#      # QMAKE_CXXFLAGS += -march=i686
 #    }else {
 #      message("Build with OpenCV 2.x.x")
 #      LIBS += -lopencv_legacy$${CVVERSION}
