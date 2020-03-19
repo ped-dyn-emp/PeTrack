@@ -304,7 +304,7 @@ QMAKE_CXXFLAGS += -fpermissive
               -lopencv_imgproc$${CVVERSION} \
               -lopencv_calib3d$${CVVERSION} \
               -lopencv_video$${CVVERSION} \
-              -lopencv_videoio_ffmpeg$${CVVERSION}_64_64\
+              -lopencv_videoio_ffmpeg$${CVVERSION}_64\
               -lopencv_aruco$${CVVERSION} \
               -lopencv_videoio$${CVVERSION} \
               -lopencv_imgcodecs$${CVVERSION}
