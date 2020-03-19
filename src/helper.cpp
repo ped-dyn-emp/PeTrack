@@ -172,12 +172,15 @@ void copyToQImage(QImage *qImg, cv::Mat &img) // war static functin in animatiol
 
 //    debout << "copyImage ende" << endl;
 }
+#ifndef STEREO_DISABLED
 void copyToQImage(QImage *qImg, IplImage *iplImg)
 {
     Mat tempMat = cvarrToMat(iplImg);
     copyToQImage(qImg,tempMat);
 }
+#endif
 
+#ifndef STEREO_DISABLED
 void showImg(QLabel *l, IplImage *i)
 {
     QImage qImg(i->width, i->height, QImage::Format_RGB32);
@@ -185,6 +188,7 @@ void showImg(QLabel *l, IplImage *i)
     l->setPixmap(QPixmap::fromImage(qImg));
     l->show();
 }
+#endif
 
 // get roi
 // no copy of data, only new header which allows to access rect

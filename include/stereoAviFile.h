@@ -1,4 +1,4 @@
-
+#ifndef STEREO_DISABLED
 #ifndef STEREOAVIFILE_H
 #define STEREOAVIFILE_H
 #undef UNICODE
@@ -117,3 +117,4 @@ private:
 };
 
 #endif // STEREOAVIFILE_H
+#endif // STEREO_DISABLED

@@ -4,6 +4,7 @@
 #include "helper.h"
 
 #include <QVector3D>
+#include "opencv2/core/types_c.h"
 #include <QMatrix4x4>
 
 struct CvPoint;

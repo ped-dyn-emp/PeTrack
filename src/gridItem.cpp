@@ -7,6 +7,8 @@
 #include "view.h"
 #include "gridItem.h"
 
+using namespace::cv;
+
 GridItem::GridItem(QWidget *wParent, QGraphicsItem * parent)
     : QGraphicsItem(parent)
 {

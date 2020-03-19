@@ -7,6 +7,8 @@
 #include "tracker.h"
 #include "animation.h"
 
+using namespace::cv;
+
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,
 // so dass pixel quadratisch 
@@ -77,6 +79,7 @@ void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
                 painter->drawLine(QPointF(mUlc.x()+p0.x,mUlc.y()+p0.y),QPointF(mUlc.x()+p1.x,mUlc.y()+p1.y));
             }
             painter->setPen(cornerColor);
+            painter->drawText(QPointF(mUlc.x()+currentMarker.at(0).x+10,mUlc.y()+currentMarker.at(0).y+10 ), QString::number(mIds.at(i)));
             painter->drawRect(QRectF(mUlc.x()+currentMarker.at(0).x-3.0,mUlc.y()+currentMarker.at(0).y-3.0,6.0,6.0));
         }
         for(int i = 0; i < nRejected; i++)

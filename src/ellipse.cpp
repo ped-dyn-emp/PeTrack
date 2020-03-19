@@ -95,8 +95,10 @@ void MyEllipse::draw(cv::Mat &img, int r, int g, int b) const
 //    CvSize size;
     size.width = myRound(mR1);
     size.height = myRound(mR2);
+    Vec2F centerVec = center();
+    cv::Point centerPoint(centerVec.x(), centerVec.y());
 //    cvEllipse(img, center().toCvPoint(), size, 180*mAngle/PI, 0, 360, CV_RGB(r, g, b), 1, CV_AA, 0);
-    cv::ellipse(img, center().toCvPoint(), size, 180*mAngle/PI, 0, 360, CvScalar(r,g,b), 1, CV_AA, 0);
+    cv::ellipse(img, centerPoint, size, 180*mAngle/PI, 0, 360, cv::Scalar(r,g,b), 1, cv::LINE_AA, 0);
 }
 
 

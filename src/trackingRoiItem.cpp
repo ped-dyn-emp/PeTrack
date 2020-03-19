@@ -5,6 +5,8 @@
 #include "view.h"
 #include "trackingRoiItem.h"
 
+using namespace::cv;
+
 TrackingRoiItem::TrackingRoiItem(QWidget *wParent, QGraphicsItem *parent)
     : QGraphicsRectItem(parent)
 {

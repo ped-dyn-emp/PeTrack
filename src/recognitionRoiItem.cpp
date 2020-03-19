@@ -247,7 +247,7 @@ void RecognitionRoiItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 // check rect because bordersize changes and without mouse event nothing changes the rect
 void RecognitionRoiItem::checkRect()
 {
-    Mat img = mMainWindow->getImageFiltered();
+    cv::Mat img = mMainWindow->getImageFiltered();
     // nicht QImage *img = mMainWindow->getImage(); da groesse noch nicht angepasst
     if (!img.empty())
     {

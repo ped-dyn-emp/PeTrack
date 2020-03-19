@@ -9,6 +9,7 @@ BrightFilter::BrightFilter()
     mB.setFilter(this);
 }
 
+#ifndef STEREO_DISABLED
 IplImage* BrightFilter::act(IplImage *img, IplImage *res)
 {
     int x, y;
@@ -54,7 +55,7 @@ IplImage* BrightFilter::act(IplImage *img, IplImage *res)
 // {
 //     return Filter::changed() || mB.changed();   
 // }
-
+#endif
 Parameter* BrightFilter::getBrightness()
 {
     return &mB;

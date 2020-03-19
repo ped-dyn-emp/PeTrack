@@ -8,9 +8,12 @@ CalibStereoFilter::CalibStereoFilter()
     setOnCopy(false); // da in stereoContext der Speicherplatz fuer res liegt
 }
 
+
+
 Mat CalibStereoFilter::act(Mat &img, Mat &res)
 {
-    return cvarrToMat(mStereoContext->getRectified(cameraUnset)); // kein Zugriff auf mAnimation->getCaptureStereo()->getCamera()
+    return Mat();
+
 }
 void CalibStereoFilter::setStereoContext(pet::StereoContext* stereoContext)
 {

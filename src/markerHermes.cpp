@@ -1,5 +1,5 @@
 ﻿//folgende zeile spaeter raus
-#include <highgui.h>
+#include <highgui.hpp>
 
 // spaeter entfernen naechsten beiden zeilen
 //#include "control.h"
@@ -16,6 +16,8 @@
 #include "markerHermes.h"
 #include "helper.h"
 #include "tracker.h"
+
+using namespace::cv;
 
 // bei marker koennnte sich fuer jeden spot eine liste gemerkt werden und spaeter ausgleich 
 // regressionsgrade legen um optimale linie durch marker zu erhalten

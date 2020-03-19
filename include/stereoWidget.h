@@ -21,7 +21,7 @@ public:
     void getXml(QDomElement &elem);
 
 private slots:
-
+#ifndef STEREO_DISABLED
     void on_stereoUseForHeight_stateChanged(int i)
     {
         if (stereoUseForHeightEver->isChecked() && stereoUseForHeight->isChecked())  
@@ -123,6 +123,7 @@ private slots:
     {
         mMainWindow->getStereoContext()->exportPointCloud();
     }
+#endif
 
 private:
     Petrack *mMainWindow;

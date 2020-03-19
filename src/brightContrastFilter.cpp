@@ -1,5 +1,7 @@
 #include "brightContrastFilter.h"
 
+using namespace::cv;
+
 BrightContrastFilter::BrightContrastFilter()
     :Filter()
 {

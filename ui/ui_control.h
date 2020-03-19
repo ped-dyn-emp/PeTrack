@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'control.ui'
 **
-** Created by: Qt User Interface Compiler version 5.5.0
+** Created by: Qt User Interface Compiler version 5.14.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,16 +10,13 @@
 #define UI_CONTROL_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
@@ -450,7 +447,7 @@ public:
     void setupUi(QWidget *Control)
     {
         if (Control->objectName().isEmpty())
-            Control->setObjectName(QStringLiteral("Control"));
+            Control->setObjectName(QString::fromUtf8("Control"));
         Control->resize(380, 357);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(1);
@@ -460,10 +457,10 @@ public:
         Control->setMinimumSize(QSize(375, 350));
         Control->setMaximumSize(QSize(380, 16777215));
         horizontalLayout_19 = new QHBoxLayout(Control);
-        horizontalLayout_19->setObjectName(QStringLiteral("horizontalLayout_19"));
+        horizontalLayout_19->setObjectName(QString::fromUtf8("horizontalLayout_19"));
         horizontalLayout_19->setContentsMargins(0, 0, 0, 0);
         tabs = new QTabWidget(Control);
-        tabs->setObjectName(QStringLiteral("tabs"));
+        tabs->setObjectName(QString::fromUtf8("tabs"));
         tabs->setEnabled(true);
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy1.setHorizontalStretch(1);
@@ -476,30 +473,30 @@ public:
         tabs->setTabsClosable(false);
         tabs->setMovable(false);
         calib = new QWidget();
-        calib->setObjectName(QStringLiteral("calib"));
+        calib->setObjectName(QString::fromUtf8("calib"));
         QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Expanding);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
         sizePolicy2.setHeightForWidth(calib->sizePolicy().hasHeightForWidth());
         calib->setSizePolicy(sizePolicy2);
         horizontalLayout_11 = new QHBoxLayout(calib);
-        horizontalLayout_11->setObjectName(QStringLiteral("horizontalLayout_11"));
+        horizontalLayout_11->setObjectName(QString::fromUtf8("horizontalLayout_11"));
         scrollArea = new QScrollArea(calib);
-        scrollArea->setObjectName(QStringLiteral("scrollArea"));
+        scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
         scrollArea->setMaximumSize(QSize(16777215, 16777215));
         scrollArea->setAutoFillBackground(true);
-        scrollArea->setStyleSheet(QStringLiteral(""));
+        scrollArea->setStyleSheet(QString::fromUtf8(""));
         scrollArea->setFrameShape(QFrame::StyledPanel);
         scrollArea->setLineWidth(1);
         scrollArea->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
-        scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
+        scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
         scrollAreaWidgetContents->setGeometry(QRect(0, 0, 337, 1028));
         verticalLayout_13 = new QVBoxLayout(scrollAreaWidgetContents);
-        verticalLayout_13->setObjectName(QStringLiteral("verticalLayout_13"));
+        verticalLayout_13->setObjectName(QString::fromUtf8("verticalLayout_13"));
         groupBox = new QGroupBox(scrollAreaWidgetContents);
-        groupBox->setObjectName(QStringLiteral("groupBox"));
+        groupBox->setObjectName(QString::fromUtf8("groupBox"));
         QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Minimum);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
@@ -512,12 +509,12 @@ public:
         groupBox->setCheckable(false);
         gridLayout = new QGridLayout(groupBox);
         gridLayout->setSpacing(4);
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(5, 5, 5, 5);
         horizontalLayout_8 = new QHBoxLayout();
-        horizontalLayout_8->setObjectName(QStringLiteral("horizontalLayout_8"));
+        horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
         filterBorderParamSize = new QScrollBar(groupBox);
-        filterBorderParamSize->setObjectName(QStringLiteral("filterBorderParamSize"));
+        filterBorderParamSize->setObjectName(QString::fromUtf8("filterBorderParamSize"));
         filterBorderParamSize->setMinimumSize(QSize(100, 0));
         filterBorderParamSize->setMaximum(500);
         filterBorderParamSize->setSingleStep(1);
@@ -526,7 +523,7 @@ public:
         horizontalLayout_8->addWidget(filterBorderParamSize);
 
         filterBorderParamCol = new QPushButton(groupBox);
-        filterBorderParamCol->setObjectName(QStringLiteral("filterBorderParamCol"));
+        filterBorderParamCol->setObjectName(QString::fromUtf8("filterBorderParamCol"));
         filterBorderParamCol->setMaximumSize(QSize(40, 18));
 
         horizontalLayout_8->addWidget(filterBorderParamCol);
@@ -535,16 +532,16 @@ public:
         gridLayout->addLayout(horizontalLayout_8, 2, 1, 1, 1);
 
         verticalLayout_8 = new QVBoxLayout();
-        verticalLayout_8->setObjectName(QStringLiteral("verticalLayout_8"));
+        verticalLayout_8->setObjectName(QString::fromUtf8("verticalLayout_8"));
         horizontalLayout_15 = new QHBoxLayout();
-        horizontalLayout_15->setObjectName(QStringLiteral("horizontalLayout_15"));
+        horizontalLayout_15->setObjectName(QString::fromUtf8("horizontalLayout_15"));
         filterBgShow = new QCheckBox(groupBox);
-        filterBgShow->setObjectName(QStringLiteral("filterBgShow"));
+        filterBgShow->setObjectName(QString::fromUtf8("filterBgShow"));
 
         horizontalLayout_15->addWidget(filterBgShow);
 
         filterBgUpdate = new QCheckBox(groupBox);
-        filterBgUpdate->setObjectName(QStringLiteral("filterBgUpdate"));
+        filterBgUpdate->setObjectName(QString::fromUtf8("filterBgUpdate"));
 
         horizontalLayout_15->addWidget(filterBgUpdate);
 
@@ -557,9 +554,9 @@ public:
 
         horizontalLayout_13 = new QHBoxLayout();
         horizontalLayout_13->setSpacing(0);
-        horizontalLayout_13->setObjectName(QStringLiteral("horizontalLayout_13"));
+        horizontalLayout_13->setObjectName(QString::fromUtf8("horizontalLayout_13"));
         filterBgReset = new QPushButton(groupBox);
-        filterBgReset->setObjectName(QStringLiteral("filterBgReset"));
+        filterBgReset->setObjectName(QString::fromUtf8("filterBgReset"));
         filterBgReset->setEnabled(true);
         QSizePolicy sizePolicy4(QSizePolicy::Minimum, QSizePolicy::Fixed);
         sizePolicy4.setHorizontalStretch(0);
@@ -571,14 +568,14 @@ public:
         horizontalLayout_13->addWidget(filterBgReset);
 
         filterBgLoad = new QPushButton(groupBox);
-        filterBgLoad->setObjectName(QStringLiteral("filterBgLoad"));
+        filterBgLoad->setObjectName(QString::fromUtf8("filterBgLoad"));
         filterBgLoad->setEnabled(true);
         filterBgLoad->setMaximumSize(QSize(36, 18));
 
         horizontalLayout_13->addWidget(filterBgLoad);
 
         filterBgSave = new QPushButton(groupBox);
-        filterBgSave->setObjectName(QStringLiteral("filterBgSave"));
+        filterBgSave->setObjectName(QString::fromUtf8("filterBgSave"));
         filterBgSave->setEnabled(true);
         filterBgSave->setMaximumSize(QSize(36, 18));
 
@@ -592,22 +589,22 @@ public:
         verticalLayout_8->addLayout(horizontalLayout_13);
 
         horizontalLayout_14 = new QHBoxLayout();
-        horizontalLayout_14->setObjectName(QStringLiteral("horizontalLayout_14"));
+        horizontalLayout_14->setObjectName(QString::fromUtf8("horizontalLayout_14"));
         filterBgDeleteTrj = new QCheckBox(groupBox);
-        filterBgDeleteTrj->setObjectName(QStringLiteral("filterBgDeleteTrj"));
+        filterBgDeleteTrj->setObjectName(QString::fromUtf8("filterBgDeleteTrj"));
         filterBgDeleteTrj->setChecked(true);
 
         horizontalLayout_14->addWidget(filterBgDeleteTrj);
 
         label_63 = new QLabel(groupBox);
-        label_63->setObjectName(QStringLiteral("label_63"));
+        label_63->setObjectName(QString::fromUtf8("label_63"));
         sizePolicy4.setHeightForWidth(label_63->sizePolicy().hasHeightForWidth());
         label_63->setSizePolicy(sizePolicy4);
 
         horizontalLayout_14->addWidget(label_63);
 
         filterBgDeleteNumber = new QSpinBox(groupBox);
-        filterBgDeleteNumber->setObjectName(QStringLiteral("filterBgDeleteNumber"));
+        filterBgDeleteNumber->setObjectName(QString::fromUtf8("filterBgDeleteNumber"));
         filterBgDeleteNumber->setMinimum(1);
         filterBgDeleteNumber->setValue(3);
 
@@ -624,14 +621,14 @@ public:
         gridLayout->addLayout(verticalLayout_8, 3, 1, 1, 1);
 
         horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         filterSwapH = new QCheckBox(groupBox);
-        filterSwapH->setObjectName(QStringLiteral("filterSwapH"));
+        filterSwapH->setObjectName(QString::fromUtf8("filterSwapH"));
 
         horizontalLayout_3->addWidget(filterSwapH);
 
         filterSwapV = new QCheckBox(groupBox);
-        filterSwapV->setObjectName(QStringLiteral("filterSwapV"));
+        filterSwapV->setObjectName(QString::fromUtf8("filterSwapV"));
         filterSwapV->setChecked(true);
 
         horizontalLayout_3->addWidget(filterSwapV);
@@ -644,17 +641,17 @@ public:
         gridLayout->addLayout(horizontalLayout_3, 4, 1, 1, 1);
 
         filterSwap = new QCheckBox(groupBox);
-        filterSwap->setObjectName(QStringLiteral("filterSwap"));
+        filterSwap->setObjectName(QString::fromUtf8("filterSwap"));
 
         gridLayout->addWidget(filterSwap, 4, 0, 1, 1);
 
         filterBorder = new QCheckBox(groupBox);
-        filterBorder->setObjectName(QStringLiteral("filterBorder"));
+        filterBorder->setObjectName(QString::fromUtf8("filterBorder"));
 
         gridLayout->addWidget(filterBorder, 2, 0, 1, 1);
 
         filterContrastParam = new QScrollBar(groupBox);
-        filterContrastParam->setObjectName(QStringLiteral("filterContrastParam"));
+        filterContrastParam->setObjectName(QString::fromUtf8("filterContrastParam"));
         filterContrastParam->setMinimumSize(QSize(100, 0));
         filterContrastParam->setMinimum(-100);
         filterContrastParam->setMaximum(100);
@@ -663,12 +660,12 @@ public:
         gridLayout->addWidget(filterContrastParam, 1, 1, 1, 1);
 
         filterBrightContrast = new QCheckBox(groupBox);
-        filterBrightContrast->setObjectName(QStringLiteral("filterBrightContrast"));
+        filterBrightContrast->setObjectName(QString::fromUtf8("filterBrightContrast"));
 
         gridLayout->addWidget(filterBrightContrast, 0, 0, 1, 1);
 
         filterBrightParam = new QScrollBar(groupBox);
-        filterBrightParam->setObjectName(QStringLiteral("filterBrightParam"));
+        filterBrightParam->setObjectName(QString::fromUtf8("filterBrightParam"));
         filterBrightParam->setMinimumSize(QSize(100, 0));
         filterBrightParam->setMinimum(-100);
         filterBrightParam->setMaximum(100);
@@ -677,13 +674,13 @@ public:
         gridLayout->addWidget(filterBrightParam, 0, 1, 1, 1);
 
         filterBg = new QCheckBox(groupBox);
-        filterBg->setObjectName(QStringLiteral("filterBg"));
+        filterBg->setObjectName(QString::fromUtf8("filterBg"));
         filterBg->setChecked(false);
 
         gridLayout->addWidget(filterBg, 3, 0, 1, 1);
 
         label_18 = new QLabel(groupBox);
-        label_18->setObjectName(QStringLiteral("label_18"));
+        label_18->setObjectName(QString::fromUtf8("label_18"));
         sizePolicy4.setHeightForWidth(label_18->sizePolicy().hasHeightForWidth());
         label_18->setSizePolicy(sizePolicy4);
 
@@ -694,55 +691,55 @@ public:
         verticalLayout_13->addWidget(groupBox);
 
         intr = new QGroupBox(scrollAreaWidgetContents);
-        intr->setObjectName(QStringLiteral("intr"));
+        intr->setObjectName(QString::fromUtf8("intr"));
         sizePolicy3.setHeightForWidth(intr->sizePolicy().hasHeightForWidth());
         intr->setSizePolicy(sizePolicy3);
         intr->setMinimumSize(QSize(300, 0));
         intr->setMaximumSize(QSize(16777215, 16777215));
         verticalLayout_12 = new QVBoxLayout(intr);
-        verticalLayout_12->setObjectName(QStringLiteral("verticalLayout_12"));
+        verticalLayout_12->setObjectName(QString::fromUtf8("verticalLayout_12"));
         verticalLayout_12->setContentsMargins(5, 5, 5, 5);
         apply = new QCheckBox(intr);
-        apply->setObjectName(QStringLiteral("apply"));
+        apply->setObjectName(QString::fromUtf8("apply"));
 
         verticalLayout_12->addWidget(apply);
 
         gridLayout1 = new QGridLayout();
         gridLayout1->setSpacing(4);
-        gridLayout1->setObjectName(QStringLiteral("gridLayout1"));
+        gridLayout1->setObjectName(QString::fromUtf8("gridLayout1"));
         gridLayout1->setContentsMargins(0, 0, 0, 0);
         fx = new QDoubleSpinBox(intr);
-        fx->setObjectName(QStringLiteral("fx"));
+        fx->setObjectName(QString::fromUtf8("fx"));
         fx->setAlignment(Qt::AlignRight);
         fx->setDecimals(2);
-        fx->setMinimum(500);
-        fx->setMaximum(5000);
-        fx->setValue(1000);
+        fx->setMinimum(500.000000000000000);
+        fx->setMaximum(5000.000000000000000);
+        fx->setValue(1000.000000000000000);
 
         gridLayout1->addWidget(fx, 0, 1, 1, 1);
 
         ty = new QDoubleSpinBox(intr);
-        ty->setObjectName(QStringLiteral("ty"));
+        ty->setObjectName(QString::fromUtf8("ty"));
         ty->setAlignment(Qt::AlignRight);
         ty->setDecimals(6);
-        ty->setMinimum(-5);
-        ty->setMaximum(5);
-        ty->setSingleStep(0.001);
+        ty->setMinimum(-5.000000000000000);
+        ty->setMaximum(5.000000000000000);
+        ty->setSingleStep(0.001000000000000);
 
         gridLayout1->addWidget(ty, 4, 3, 1, 1);
 
         r2 = new QDoubleSpinBox(intr);
-        r2->setObjectName(QStringLiteral("r2"));
+        r2->setObjectName(QString::fromUtf8("r2"));
         r2->setAlignment(Qt::AlignRight);
         r2->setDecimals(6);
-        r2->setMinimum(-5);
-        r2->setMaximum(5);
-        r2->setSingleStep(0.01);
+        r2->setMinimum(-5.000000000000000);
+        r2->setMaximum(5.000000000000000);
+        r2->setSingleStep(0.010000000000000);
 
         gridLayout1->addWidget(r2, 2, 1, 1, 1);
 
         label_7 = new QLabel(intr);
-        label_7->setObjectName(QStringLiteral("label_7"));
+        label_7->setObjectName(QString::fromUtf8("label_7"));
         QFont font;
         font.setPointSize(8);
         label_7->setFont(font);
@@ -752,56 +749,56 @@ public:
         gridLayout1->addWidget(label_7, 4, 0, 1, 1);
 
         tx = new QDoubleSpinBox(intr);
-        tx->setObjectName(QStringLiteral("tx"));
+        tx->setObjectName(QString::fromUtf8("tx"));
         tx->setAlignment(Qt::AlignRight);
         tx->setDecimals(6);
-        tx->setMinimum(-5);
-        tx->setMaximum(5);
-        tx->setSingleStep(0.001);
+        tx->setMinimum(-5.000000000000000);
+        tx->setMaximum(5.000000000000000);
+        tx->setSingleStep(0.001000000000000);
 
         gridLayout1->addWidget(tx, 4, 1, 1, 1);
 
         label_3 = new QLabel(intr);
-        label_3->setObjectName(QStringLiteral("label_3"));
+        label_3->setObjectName(QString::fromUtf8("label_3"));
         label_3->setLayoutDirection(Qt::LeftToRight);
         label_3->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout1->addWidget(label_3, 1, 0, 1, 1);
 
         label_6 = new QLabel(intr);
-        label_6->setObjectName(QStringLiteral("label_6"));
+        label_6->setObjectName(QString::fromUtf8("label_6"));
         label_6->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout1->addWidget(label_6, 2, 2, 1, 1);
 
         label_8 = new QLabel(intr);
-        label_8->setObjectName(QStringLiteral("label_8"));
+        label_8->setObjectName(QString::fromUtf8("label_8"));
         label_8->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout1->addWidget(label_8, 4, 2, 1, 1);
 
         r4 = new QDoubleSpinBox(intr);
-        r4->setObjectName(QStringLiteral("r4"));
+        r4->setObjectName(QString::fromUtf8("r4"));
         r4->setAlignment(Qt::AlignRight);
         r4->setDecimals(6);
-        r4->setMinimum(-5);
-        r4->setMaximum(5);
-        r4->setSingleStep(0.01);
+        r4->setMinimum(-5.000000000000000);
+        r4->setMaximum(5.000000000000000);
+        r4->setSingleStep(0.010000000000000);
 
         gridLayout1->addWidget(r4, 2, 3, 1, 1);
 
         cx = new QDoubleSpinBox(intr);
-        cx->setObjectName(QStringLiteral("cx"));
+        cx->setObjectName(QString::fromUtf8("cx"));
         cx->setAlignment(Qt::AlignRight);
         cx->setDecimals(2);
-        cx->setMinimum(1);
-        cx->setMaximum(1920);
-        cx->setValue(960);
+        cx->setMinimum(1.000000000000000);
+        cx->setMaximum(1920.000000000000000);
+        cx->setValue(960.000000000000000);
 
         gridLayout1->addWidget(cx, 1, 1, 1, 1);
 
         label = new QLabel(intr);
-        label->setObjectName(QStringLiteral("label"));
+        label->setObjectName(QString::fromUtf8("label"));
         label->setFont(font);
         label->setLayoutDirection(Qt::LeftToRight);
         label->setScaledContents(false);
@@ -810,39 +807,39 @@ public:
         gridLayout1->addWidget(label, 0, 0, 1, 1);
 
         label_4 = new QLabel(intr);
-        label_4->setObjectName(QStringLiteral("label_4"));
+        label_4->setObjectName(QString::fromUtf8("label_4"));
         label_4->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout1->addWidget(label_4, 1, 2, 1, 1);
 
         cy = new QDoubleSpinBox(intr);
-        cy->setObjectName(QStringLiteral("cy"));
+        cy->setObjectName(QString::fromUtf8("cy"));
         cy->setAlignment(Qt::AlignRight);
         cy->setDecimals(2);
-        cy->setMinimum(1);
-        cy->setMaximum(1080);
-        cy->setValue(540);
+        cy->setMinimum(1.000000000000000);
+        cy->setMaximum(1080.000000000000000);
+        cy->setValue(540.000000000000000);
 
         gridLayout1->addWidget(cy, 1, 3, 1, 1);
 
         fy = new QDoubleSpinBox(intr);
-        fy->setObjectName(QStringLiteral("fy"));
+        fy->setObjectName(QString::fromUtf8("fy"));
         fy->setAlignment(Qt::AlignRight);
         fy->setDecimals(2);
-        fy->setMinimum(500);
-        fy->setMaximum(5000);
-        fy->setValue(1000);
+        fy->setMinimum(500.000000000000000);
+        fy->setMaximum(5000.000000000000000);
+        fy->setValue(1000.000000000000000);
 
         gridLayout1->addWidget(fy, 0, 3, 1, 1);
 
         label_2 = new QLabel(intr);
-        label_2->setObjectName(QStringLiteral("label_2"));
+        label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout1->addWidget(label_2, 0, 2, 1, 1);
 
         label_5 = new QLabel(intr);
-        label_5->setObjectName(QStringLiteral("label_5"));
+        label_5->setObjectName(QString::fromUtf8("label_5"));
         label_5->setFont(font);
         label_5->setLayoutDirection(Qt::LeftToRight);
         label_5->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
@@ -850,17 +847,17 @@ public:
         gridLayout1->addWidget(label_5, 2, 0, 1, 1);
 
         r6 = new QDoubleSpinBox(intr);
-        r6->setObjectName(QStringLiteral("r6"));
+        r6->setObjectName(QString::fromUtf8("r6"));
         r6->setAlignment(Qt::AlignRight);
         r6->setDecimals(6);
-        r6->setMinimum(-5);
-        r6->setMaximum(5);
-        r6->setSingleStep(0.01);
+        r6->setMinimum(-5.000000000000000);
+        r6->setMaximum(5.000000000000000);
+        r6->setSingleStep(0.010000000000000);
 
         gridLayout1->addWidget(r6, 3, 1, 1, 1);
 
         label_64 = new QLabel(intr);
-        label_64->setObjectName(QStringLiteral("label_64"));
+        label_64->setObjectName(QString::fromUtf8("label_64"));
         label_64->setLayoutDirection(Qt::LeftToRight);
         label_64->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
@@ -873,20 +870,20 @@ public:
 
         gridLayout2 = new QGridLayout();
         gridLayout2->setSpacing(4);
-        gridLayout2->setObjectName(QStringLiteral("gridLayout2"));
+        gridLayout2->setObjectName(QString::fromUtf8("gridLayout2"));
         gridLayout2->setContentsMargins(0, 0, 0, 0);
         fixCenter = new QCheckBox(intr);
-        fixCenter->setObjectName(QStringLiteral("fixCenter"));
+        fixCenter->setObjectName(QString::fromUtf8("fixCenter"));
 
         gridLayout2->addWidget(fixCenter, 0, 1, 1, 1);
 
         quadAspectRatio = new QCheckBox(intr);
-        quadAspectRatio->setObjectName(QStringLiteral("quadAspectRatio"));
+        quadAspectRatio->setObjectName(QString::fromUtf8("quadAspectRatio"));
 
         gridLayout2->addWidget(quadAspectRatio, 0, 0, 1, 1);
 
         tangDist = new QCheckBox(intr);
-        tangDist->setObjectName(QStringLiteral("tangDist"));
+        tangDist->setObjectName(QString::fromUtf8("tangDist"));
         tangDist->setChecked(true);
 
         gridLayout2->addWidget(tangDist, 0, 2, 1, 1);
@@ -896,16 +893,16 @@ public:
 
         gridLayout3 = new QGridLayout();
         gridLayout3->setSpacing(4);
-        gridLayout3->setObjectName(QStringLiteral("gridLayout3"));
+        gridLayout3->setObjectName(QString::fromUtf8("gridLayout3"));
         gridLayout3->setContentsMargins(0, 0, 0, 0);
         autoCalib = new QPushButton(intr);
-        autoCalib->setObjectName(QStringLiteral("autoCalib"));
+        autoCalib->setObjectName(QString::fromUtf8("autoCalib"));
         autoCalib->setEnabled(false);
 
         gridLayout3->addWidget(autoCalib, 0, 0, 1, 1);
 
         calibFiles = new QPushButton(intr);
-        calibFiles->setObjectName(QStringLiteral("calibFiles"));
+        calibFiles->setObjectName(QString::fromUtf8("calibFiles"));
 
         gridLayout3->addWidget(calibFiles, 0, 1, 1, 1);
 
@@ -916,77 +913,77 @@ public:
         verticalLayout_13->addWidget(intr);
 
         extr = new QGroupBox(scrollAreaWidgetContents);
-        extr->setObjectName(QStringLiteral("extr"));
+        extr->setObjectName(QString::fromUtf8("extr"));
         sizePolicy3.setHeightForWidth(extr->sizePolicy().hasHeightForWidth());
         extr->setSizePolicy(sizePolicy3);
         extr->setMinimumSize(QSize(300, 0));
         extr->setMaximumSize(QSize(16777215, 16777215));
         verticalLayout_7 = new QVBoxLayout(extr);
-        verticalLayout_7->setObjectName(QStringLiteral("verticalLayout_7"));
+        verticalLayout_7->setObjectName(QString::fromUtf8("verticalLayout_7"));
         verticalLayout_7->setContentsMargins(5, 5, 5, 5);
         gridLayout_6 = new QGridLayout();
-        gridLayout_6->setObjectName(QStringLiteral("gridLayout_6"));
+        gridLayout_6->setObjectName(QString::fromUtf8("gridLayout_6"));
         label_58 = new QLabel(extr);
-        label_58->setObjectName(QStringLiteral("label_58"));
+        label_58->setObjectName(QString::fromUtf8("label_58"));
         label_58->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_6->addWidget(label_58, 0, 0, 1, 1);
 
         label_59 = new QLabel(extr);
-        label_59->setObjectName(QStringLiteral("label_59"));
+        label_59->setObjectName(QString::fromUtf8("label_59"));
         label_59->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_6->addWidget(label_59, 1, 0, 1, 1);
 
         trans1 = new QDoubleSpinBox(extr);
-        trans1->setObjectName(QStringLiteral("trans1"));
+        trans1->setObjectName(QString::fromUtf8("trans1"));
         trans1->setDecimals(3);
-        trans1->setMinimum(-10000);
-        trans1->setMaximum(10000);
-        trans1->setSingleStep(0.1);
+        trans1->setMinimum(-10000.000000000000000);
+        trans1->setMaximum(10000.000000000000000);
+        trans1->setSingleStep(0.100000000000000);
 
         gridLayout_6->addWidget(trans1, 1, 1, 1, 1);
 
         rot1 = new QDoubleSpinBox(extr);
-        rot1->setObjectName(QStringLiteral("rot1"));
+        rot1->setObjectName(QString::fromUtf8("rot1"));
         rot1->setDecimals(3);
-        rot1->setMinimum(-100);
-        rot1->setSingleStep(0.001);
+        rot1->setMinimum(-100.000000000000000);
+        rot1->setSingleStep(0.001000000000000);
 
         gridLayout_6->addWidget(rot1, 0, 1, 1, 1);
 
         trans2 = new QDoubleSpinBox(extr);
-        trans2->setObjectName(QStringLiteral("trans2"));
+        trans2->setObjectName(QString::fromUtf8("trans2"));
         trans2->setDecimals(3);
-        trans2->setMinimum(-10000);
-        trans2->setMaximum(10000);
-        trans2->setSingleStep(0.1);
+        trans2->setMinimum(-10000.000000000000000);
+        trans2->setMaximum(10000.000000000000000);
+        trans2->setSingleStep(0.100000000000000);
 
         gridLayout_6->addWidget(trans2, 1, 2, 1, 1);
 
         trans3 = new QDoubleSpinBox(extr);
-        trans3->setObjectName(QStringLiteral("trans3"));
+        trans3->setObjectName(QString::fromUtf8("trans3"));
         trans3->setDecimals(3);
-        trans3->setMinimum(-10000);
-        trans3->setMaximum(10000);
-        trans3->setSingleStep(0.1);
-        trans3->setValue(-500);
+        trans3->setMinimum(-10000.000000000000000);
+        trans3->setMaximum(10000.000000000000000);
+        trans3->setSingleStep(0.100000000000000);
+        trans3->setValue(-500.000000000000000);
 
         gridLayout_6->addWidget(trans3, 1, 3, 1, 1);
 
         rot3 = new QDoubleSpinBox(extr);
-        rot3->setObjectName(QStringLiteral("rot3"));
+        rot3->setObjectName(QString::fromUtf8("rot3"));
         rot3->setDecimals(3);
-        rot3->setMinimum(-100);
-        rot3->setSingleStep(0.001);
+        rot3->setMinimum(-100.000000000000000);
+        rot3->setSingleStep(0.001000000000000);
 
         gridLayout_6->addWidget(rot3, 0, 3, 1, 1);
 
         rot2 = new QDoubleSpinBox(extr);
-        rot2->setObjectName(QStringLiteral("rot2"));
+        rot2->setObjectName(QString::fromUtf8("rot2"));
         rot2->setDecimals(3);
-        rot2->setMinimum(-100);
-        rot2->setSingleStep(0.001);
+        rot2->setMinimum(-100.000000000000000);
+        rot2->setSingleStep(0.001000000000000);
 
         gridLayout_6->addWidget(rot2, 0, 2, 1, 1);
 
@@ -994,9 +991,9 @@ public:
         verticalLayout_7->addLayout(gridLayout_6);
 
         horizontalLayout_10 = new QHBoxLayout();
-        horizontalLayout_10->setObjectName(QStringLiteral("horizontalLayout_10"));
+        horizontalLayout_10->setObjectName(QString::fromUtf8("horizontalLayout_10"));
         label_62 = new QLabel(extr);
-        label_62->setObjectName(QStringLiteral("label_62"));
+        label_62->setObjectName(QString::fromUtf8("label_62"));
         QSizePolicy sizePolicy5(QSizePolicy::Expanding, QSizePolicy::Fixed);
         sizePolicy5.setHorizontalStretch(0);
         sizePolicy5.setVerticalStretch(0);
@@ -1007,7 +1004,7 @@ public:
         horizontalLayout_10->addWidget(label_62);
 
         coordLoad3DCalibPoints = new QPushButton(extr);
-        coordLoad3DCalibPoints->setObjectName(QStringLiteral("coordLoad3DCalibPoints"));
+        coordLoad3DCalibPoints->setObjectName(QString::fromUtf8("coordLoad3DCalibPoints"));
         QSizePolicy sizePolicy6(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -1019,7 +1016,7 @@ public:
         horizontalLayout_10->addWidget(coordLoad3DCalibPoints);
 
         extrCalibFetch = new QPushButton(extr);
-        extrCalibFetch->setObjectName(QStringLiteral("extrCalibFetch"));
+        extrCalibFetch->setObjectName(QString::fromUtf8("extrCalibFetch"));
         sizePolicy6.setHeightForWidth(extrCalibFetch->sizePolicy().hasHeightForWidth());
         extrCalibFetch->setSizePolicy(sizePolicy6);
         extrCalibFetch->setMinimumSize(QSize(30, 18));
@@ -1028,7 +1025,7 @@ public:
         horizontalLayout_10->addWidget(extrCalibFetch);
 
         extrCalibSave = new QPushButton(extr);
-        extrCalibSave->setObjectName(QStringLiteral("extrCalibSave"));
+        extrCalibSave->setObjectName(QString::fromUtf8("extrCalibSave"));
         sizePolicy6.setHeightForWidth(extrCalibSave->sizePolicy().hasHeightForWidth());
         extrCalibSave->setSizePolicy(sizePolicy6);
         extrCalibSave->setMinimumSize(QSize(30, 18));
@@ -1037,7 +1034,7 @@ public:
         horizontalLayout_10->addWidget(extrCalibSave);
 
         extrCalibShowPoints = new QPushButton(extr);
-        extrCalibShowPoints->setObjectName(QStringLiteral("extrCalibShowPoints"));
+        extrCalibShowPoints->setObjectName(QString::fromUtf8("extrCalibShowPoints"));
         sizePolicy6.setHeightForWidth(extrCalibShowPoints->sizePolicy().hasHeightForWidth());
         extrCalibShowPoints->setSizePolicy(sizePolicy6);
         extrCalibShowPoints->setMinimumSize(QSize(30, 18));
@@ -1046,7 +1043,7 @@ public:
         horizontalLayout_10->addWidget(extrCalibShowPoints);
 
         extrCalibShowError = new QPushButton(extr);
-        extrCalibShowError->setObjectName(QStringLiteral("extrCalibShowError"));
+        extrCalibShowError->setObjectName(QString::fromUtf8("extrCalibShowError"));
         sizePolicy6.setHeightForWidth(extrCalibShowError->sizePolicy().hasHeightForWidth());
         extrCalibShowError->setSizePolicy(sizePolicy6);
         extrCalibShowError->setMinimumSize(QSize(30, 18));
@@ -1061,25 +1058,25 @@ public:
         verticalLayout_13->addWidget(extr);
 
         align_2 = new QGroupBox(scrollAreaWidgetContents);
-        align_2->setObjectName(QStringLiteral("align_2"));
+        align_2->setObjectName(QString::fromUtf8("align_2"));
         sizePolicy3.setHeightForWidth(align_2->sizePolicy().hasHeightForWidth());
         align_2->setSizePolicy(sizePolicy3);
         align_2->setMinimumSize(QSize(300, 271));
         align_2->setMaximumSize(QSize(16777215, 16777215));
         verticalLayout_14 = new QVBoxLayout(align_2);
-        verticalLayout_14->setObjectName(QStringLiteral("verticalLayout_14"));
+        verticalLayout_14->setObjectName(QString::fromUtf8("verticalLayout_14"));
         verticalLayout_14->setContentsMargins(5, 5, 5, 5);
         gridLayout_7 = new QGridLayout();
-        gridLayout_7->setObjectName(QStringLiteral("gridLayout_7"));
+        gridLayout_7->setObjectName(QString::fromUtf8("gridLayout_7"));
         coordShow = new QCheckBox(align_2);
-        coordShow->setObjectName(QStringLiteral("coordShow"));
+        coordShow->setObjectName(QString::fromUtf8("coordShow"));
         coordShow->setMinimumSize(QSize(57, 17));
         coordShow->setMaximumSize(QSize(16777215, 17));
 
         gridLayout_7->addWidget(coordShow, 0, 0, 1, 1);
 
         coordFix = new QCheckBox(align_2);
-        coordFix->setObjectName(QStringLiteral("coordFix"));
+        coordFix->setObjectName(QString::fromUtf8("coordFix"));
         coordFix->setMinimumSize(QSize(0, 17));
         coordFix->setMaximumSize(QSize(16777215, 17));
 
@@ -1094,7 +1091,7 @@ public:
         verticalLayout_14->addLayout(gridLayout_7);
 
         coordTab = new QTabWidget(align_2);
-        coordTab->setObjectName(QStringLiteral("coordTab"));
+        coordTab->setObjectName(QString::fromUtf8("coordTab"));
         sizePolicy5.setHeightForWidth(coordTab->sizePolicy().hasHeightForWidth());
         coordTab->setSizePolicy(sizePolicy5);
         coordTab->setFocusPolicy(Qt::StrongFocus);
@@ -1105,20 +1102,20 @@ public:
         coordTab->setUsesScrollButtons(true);
         coordTab->setTabsClosable(false);
         coordTab3D = new QWidget();
-        coordTab3D->setObjectName(QStringLiteral("coordTab3D"));
+        coordTab3D->setObjectName(QString::fromUtf8("coordTab3D"));
         verticalLayout_5 = new QVBoxLayout(coordTab3D);
-        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
+        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
         gridLayout_5 = new QGridLayout();
         gridLayout_5->setSpacing(4);
-        gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
+        gridLayout_5->setObjectName(QString::fromUtf8("gridLayout_5"));
         label_54 = new QLabel(coordTab3D);
-        label_54->setObjectName(QStringLiteral("label_54"));
+        label_54->setObjectName(QString::fromUtf8("label_54"));
         label_54->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_5->addWidget(label_54, 0, 0, 1, 1);
 
         coord3DTransX = new QScrollBar(coordTab3D);
-        coord3DTransX->setObjectName(QStringLiteral("coord3DTransX"));
+        coord3DTransX->setObjectName(QString::fromUtf8("coord3DTransX"));
         sizePolicy5.setHeightForWidth(coord3DTransX->sizePolicy().hasHeightForWidth());
         coord3DTransX->setSizePolicy(sizePolicy5);
         coord3DTransX->setMinimumSize(QSize(50, 17));
@@ -1133,7 +1130,7 @@ public:
         gridLayout_5->addWidget(coord3DTransX, 0, 1, 1, 1);
 
         coord3DTransX_spin = new QSpinBox(coordTab3D);
-        coord3DTransX_spin->setObjectName(QStringLiteral("coord3DTransX_spin"));
+        coord3DTransX_spin->setObjectName(QString::fromUtf8("coord3DTransX_spin"));
         coord3DTransX_spin->setMinimumSize(QSize(0, 17));
         coord3DTransX_spin->setMaximumSize(QSize(16777215, 17));
         coord3DTransX_spin->setMinimum(-10000);
@@ -1142,13 +1139,13 @@ public:
         gridLayout_5->addWidget(coord3DTransX_spin, 0, 2, 1, 1);
 
         label_55 = new QLabel(coordTab3D);
-        label_55->setObjectName(QStringLiteral("label_55"));
+        label_55->setObjectName(QString::fromUtf8("label_55"));
         label_55->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_5->addWidget(label_55, 1, 0, 1, 1);
 
         coord3DTransY = new QScrollBar(coordTab3D);
-        coord3DTransY->setObjectName(QStringLiteral("coord3DTransY"));
+        coord3DTransY->setObjectName(QString::fromUtf8("coord3DTransY"));
         coord3DTransY->setMinimumSize(QSize(0, 17));
         coord3DTransY->setMaximumSize(QSize(16777215, 17));
         coord3DTransY->setMinimum(-10000);
@@ -1160,7 +1157,7 @@ public:
         gridLayout_5->addWidget(coord3DTransY, 1, 1, 1, 1);
 
         coord3DTransY_spin = new QSpinBox(coordTab3D);
-        coord3DTransY_spin->setObjectName(QStringLiteral("coord3DTransY_spin"));
+        coord3DTransY_spin->setObjectName(QString::fromUtf8("coord3DTransY_spin"));
         coord3DTransY_spin->setMinimumSize(QSize(0, 17));
         coord3DTransY_spin->setMaximumSize(QSize(16777215, 17));
         coord3DTransY_spin->setMinimum(-10000);
@@ -1169,13 +1166,13 @@ public:
         gridLayout_5->addWidget(coord3DTransY_spin, 1, 2, 1, 1);
 
         label_57 = new QLabel(coordTab3D);
-        label_57->setObjectName(QStringLiteral("label_57"));
+        label_57->setObjectName(QString::fromUtf8("label_57"));
         label_57->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_5->addWidget(label_57, 2, 0, 1, 1);
 
         coord3DTransZ = new QScrollBar(coordTab3D);
-        coord3DTransZ->setObjectName(QStringLiteral("coord3DTransZ"));
+        coord3DTransZ->setObjectName(QString::fromUtf8("coord3DTransZ"));
         coord3DTransZ->setMinimumSize(QSize(0, 17));
         coord3DTransZ->setMaximumSize(QSize(16777215, 17));
         coord3DTransZ->setMinimum(-10000);
@@ -1187,7 +1184,7 @@ public:
         gridLayout_5->addWidget(coord3DTransZ, 2, 1, 1, 1);
 
         coord3DTransZ_spin = new QSpinBox(coordTab3D);
-        coord3DTransZ_spin->setObjectName(QStringLiteral("coord3DTransZ_spin"));
+        coord3DTransZ_spin->setObjectName(QString::fromUtf8("coord3DTransZ_spin"));
         coord3DTransZ_spin->setMinimumSize(QSize(0, 17));
         coord3DTransZ_spin->setMaximumSize(QSize(16777215, 17));
         coord3DTransZ_spin->setMinimum(-10000);
@@ -1196,13 +1193,13 @@ public:
         gridLayout_5->addWidget(coord3DTransZ_spin, 2, 2, 1, 1);
 
         label_56 = new QLabel(coordTab3D);
-        label_56->setObjectName(QStringLiteral("label_56"));
+        label_56->setObjectName(QString::fromUtf8("label_56"));
         label_56->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_5->addWidget(label_56, 3, 0, 1, 1);
 
         coord3DAxeLen = new QScrollBar(coordTab3D);
-        coord3DAxeLen->setObjectName(QStringLiteral("coord3DAxeLen"));
+        coord3DAxeLen->setObjectName(QString::fromUtf8("coord3DAxeLen"));
         coord3DAxeLen->setMinimumSize(QSize(0, 17));
         coord3DAxeLen->setMaximumSize(QSize(16777215, 17));
         coord3DAxeLen->setMinimum(1);
@@ -1214,7 +1211,7 @@ public:
         gridLayout_5->addWidget(coord3DAxeLen, 3, 1, 1, 1);
 
         coord3DAxeLen_spin = new QSpinBox(coordTab3D);
-        coord3DAxeLen_spin->setObjectName(QStringLiteral("coord3DAxeLen_spin"));
+        coord3DAxeLen_spin->setObjectName(QString::fromUtf8("coord3DAxeLen_spin"));
         coord3DAxeLen_spin->setMinimumSize(QSize(0, 17));
         coord3DAxeLen_spin->setMaximumSize(QSize(16777215, 17));
         coord3DAxeLen_spin->setMinimum(1);
@@ -1227,29 +1224,29 @@ public:
         verticalLayout_5->addLayout(gridLayout_5);
 
         horizontalLayout_6 = new QHBoxLayout();
-        horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
+        horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
         label_60 = new QLabel(coordTab3D);
-        label_60->setObjectName(QStringLiteral("label_60"));
+        label_60->setObjectName(QString::fromUtf8("label_60"));
         label_60->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         horizontalLayout_6->addWidget(label_60);
 
         coord3DSwapX = new QCheckBox(coordTab3D);
-        coord3DSwapX->setObjectName(QStringLiteral("coord3DSwapX"));
+        coord3DSwapX->setObjectName(QString::fromUtf8("coord3DSwapX"));
         coord3DSwapX->setMinimumSize(QSize(0, 17));
         coord3DSwapX->setMaximumSize(QSize(16777215, 17));
 
         horizontalLayout_6->addWidget(coord3DSwapX);
 
         coord3DSwapY = new QCheckBox(coordTab3D);
-        coord3DSwapY->setObjectName(QStringLiteral("coord3DSwapY"));
+        coord3DSwapY->setObjectName(QString::fromUtf8("coord3DSwapY"));
         coord3DSwapY->setMinimumSize(QSize(0, 17));
         coord3DSwapY->setMaximumSize(QSize(16777215, 17));
 
         horizontalLayout_6->addWidget(coord3DSwapY);
 
         coord3DSwapZ = new QCheckBox(coordTab3D);
-        coord3DSwapZ->setObjectName(QStringLiteral("coord3DSwapZ"));
+        coord3DSwapZ->setObjectName(QString::fromUtf8("coord3DSwapZ"));
         coord3DSwapZ->setMinimumSize(QSize(0, 17));
         coord3DSwapZ->setMaximumSize(QSize(16777215, 17));
 
@@ -1263,22 +1260,22 @@ public:
         verticalLayout_5->addLayout(horizontalLayout_6);
 
         horizontalLayout_7 = new QHBoxLayout();
-        horizontalLayout_7->setObjectName(QStringLiteral("horizontalLayout_7"));
+        horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
         label_61 = new QLabel(coordTab3D);
-        label_61->setObjectName(QStringLiteral("label_61"));
+        label_61->setObjectName(QString::fromUtf8("label_61"));
         label_61->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         horizontalLayout_7->addWidget(label_61);
 
         extCalibPointsShow = new QCheckBox(coordTab3D);
-        extCalibPointsShow->setObjectName(QStringLiteral("extCalibPointsShow"));
+        extCalibPointsShow->setObjectName(QString::fromUtf8("extCalibPointsShow"));
         extCalibPointsShow->setMinimumSize(QSize(0, 17));
         extCalibPointsShow->setMaximumSize(QSize(16777215, 17));
 
         horizontalLayout_7->addWidget(extCalibPointsShow);
 
         extVanishPointsShow = new QCheckBox(coordTab3D);
-        extVanishPointsShow->setObjectName(QStringLiteral("extVanishPointsShow"));
+        extVanishPointsShow->setObjectName(QString::fromUtf8("extVanishPointsShow"));
         extVanishPointsShow->setMinimumSize(QSize(0, 17));
         extVanishPointsShow->setMaximumSize(QSize(16777215, 17));
 
@@ -1297,15 +1294,15 @@ public:
 
         coordTab->addTab(coordTab3D, QString());
         coordTab2D = new QWidget();
-        coordTab2D->setObjectName(QStringLiteral("coordTab2D"));
+        coordTab2D->setObjectName(QString::fromUtf8("coordTab2D"));
         verticalLayout_4 = new QVBoxLayout(coordTab2D);
-        verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
+        verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         gridLayout4 = new QGridLayout();
         gridLayout4->setSpacing(4);
-        gridLayout4->setObjectName(QStringLiteral("gridLayout4"));
+        gridLayout4->setObjectName(QString::fromUtf8("gridLayout4"));
         gridLayout4->setContentsMargins(0, 0, 0, 0);
         coordTransX_spin = new QSpinBox(coordTab2D);
-        coordTransX_spin->setObjectName(QStringLiteral("coordTransX_spin"));
+        coordTransX_spin->setObjectName(QString::fromUtf8("coordTransX_spin"));
         coordTransX_spin->setMinimumSize(QSize(0, 18));
         coordTransX_spin->setMaximumSize(QSize(16777215, 18));
         coordTransX_spin->setMinimum(0);
@@ -1314,13 +1311,13 @@ public:
         gridLayout4->addWidget(coordTransX_spin, 1, 2, 1, 1);
 
         label_34 = new QLabel(coordTab2D);
-        label_34->setObjectName(QStringLiteral("label_34"));
+        label_34->setObjectName(QString::fromUtf8("label_34"));
         label_34->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout4->addWidget(label_34, 1, 0, 1, 1);
 
         coordTransX = new QScrollBar(coordTab2D);
-        coordTransX->setObjectName(QStringLiteral("coordTransX"));
+        coordTransX->setObjectName(QString::fromUtf8("coordTransX"));
         coordTransX->setMinimumSize(QSize(0, 17));
         coordTransX->setMaximumSize(QSize(16777215, 17));
         coordTransX->setMinimum(0);
@@ -1333,13 +1330,13 @@ public:
         gridLayout4->addWidget(coordTransX, 1, 1, 1, 1);
 
         label_32 = new QLabel(coordTab2D);
-        label_32->setObjectName(QStringLiteral("label_32"));
+        label_32->setObjectName(QString::fromUtf8("label_32"));
         label_32->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout4->addWidget(label_32, 2, 0, 1, 1);
 
         coordTransY = new QScrollBar(coordTab2D);
-        coordTransY->setObjectName(QStringLiteral("coordTransY"));
+        coordTransY->setObjectName(QString::fromUtf8("coordTransY"));
         coordTransY->setMinimumSize(QSize(0, 17));
         coordTransY->setMaximumSize(QSize(16777215, 17));
         coordTransY->setMinimum(0);
@@ -1351,13 +1348,13 @@ public:
         gridLayout4->addWidget(coordTransY, 2, 1, 1, 1);
 
         label_33 = new QLabel(coordTab2D);
-        label_33->setObjectName(QStringLiteral("label_33"));
+        label_33->setObjectName(QString::fromUtf8("label_33"));
         label_33->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout4->addWidget(label_33, 4, 0, 1, 1);
 
         coordScale = new QScrollBar(coordTab2D);
-        coordScale->setObjectName(QStringLiteral("coordScale"));
+        coordScale->setObjectName(QString::fromUtf8("coordScale"));
         coordScale->setMinimumSize(QSize(0, 17));
         coordScale->setMaximumSize(QSize(16777215, 17));
         coordScale->setMinimum(1);
@@ -1369,7 +1366,7 @@ public:
         gridLayout4->addWidget(coordScale, 4, 1, 1, 1);
 
         coordTransY_spin = new QSpinBox(coordTab2D);
-        coordTransY_spin->setObjectName(QStringLiteral("coordTransY_spin"));
+        coordTransY_spin->setObjectName(QString::fromUtf8("coordTransY_spin"));
         coordTransY_spin->setMinimumSize(QSize(0, 18));
         coordTransY_spin->setMaximumSize(QSize(16777215, 18));
         coordTransY_spin->setMinimum(0);
@@ -1378,7 +1375,7 @@ public:
         gridLayout4->addWidget(coordTransY_spin, 2, 2, 1, 1);
 
         coordScale_spin = new QSpinBox(coordTab2D);
-        coordScale_spin->setObjectName(QStringLiteral("coordScale_spin"));
+        coordScale_spin->setObjectName(QString::fromUtf8("coordScale_spin"));
         coordScale_spin->setMinimumSize(QSize(0, 18));
         coordScale_spin->setMaximumSize(QSize(16777215, 18));
         coordScale_spin->setMinimum(1);
@@ -1388,13 +1385,13 @@ public:
         gridLayout4->addWidget(coordScale_spin, 4, 2, 1, 1);
 
         label_35 = new QLabel(coordTab2D);
-        label_35->setObjectName(QStringLiteral("label_35"));
+        label_35->setObjectName(QString::fromUtf8("label_35"));
         label_35->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout4->addWidget(label_35, 3, 0, 1, 1);
 
         coordRotate = new QScrollBar(coordTab2D);
-        coordRotate->setObjectName(QStringLiteral("coordRotate"));
+        coordRotate->setObjectName(QString::fromUtf8("coordRotate"));
         sizePolicy5.setHeightForWidth(coordRotate->sizePolicy().hasHeightForWidth());
         coordRotate->setSizePolicy(sizePolicy5);
         coordRotate->setMinimumSize(QSize(100, 17));
@@ -1407,7 +1404,7 @@ public:
         gridLayout4->addWidget(coordRotate, 3, 1, 1, 1);
 
         coordRotate_spin = new QSpinBox(coordTab2D);
-        coordRotate_spin->setObjectName(QStringLiteral("coordRotate_spin"));
+        coordRotate_spin->setObjectName(QString::fromUtf8("coordRotate_spin"));
         coordRotate_spin->setMinimumSize(QSize(0, 18));
         coordRotate_spin->setMaximumSize(QSize(16777215, 18));
         coordRotate_spin->setMinimum(0);
@@ -1420,29 +1417,29 @@ public:
 
         gridLayout5 = new QGridLayout();
         gridLayout5->setSpacing(6);
-        gridLayout5->setObjectName(QStringLiteral("gridLayout5"));
+        gridLayout5->setObjectName(QString::fromUtf8("gridLayout5"));
         gridLayout5->setContentsMargins(0, 0, 0, 0);
         label_14 = new QLabel(coordTab2D);
-        label_14->setObjectName(QStringLiteral("label_14"));
+        label_14->setObjectName(QString::fromUtf8("label_14"));
 
         gridLayout5->addWidget(label_14, 0, 0, 1, 1);
 
         coordAltitude = new QDoubleSpinBox(coordTab2D);
-        coordAltitude->setObjectName(QStringLiteral("coordAltitude"));
+        coordAltitude->setObjectName(QString::fromUtf8("coordAltitude"));
         sizePolicy6.setHeightForWidth(coordAltitude->sizePolicy().hasHeightForWidth());
         coordAltitude->setSizePolicy(sizePolicy6);
         coordAltitude->setMinimumSize(QSize(0, 18));
         coordAltitude->setMaximumSize(QSize(16777215, 18));
         coordAltitude->setAlignment(Qt::AlignRight);
         coordAltitude->setDecimals(1);
-        coordAltitude->setMinimum(0.1);
-        coordAltitude->setMaximum(9999);
-        coordAltitude->setValue(535);
+        coordAltitude->setMinimum(0.100000000000000);
+        coordAltitude->setMaximum(9999.000000000000000);
+        coordAltitude->setValue(535.000000000000000);
 
         gridLayout5->addWidget(coordAltitude, 0, 1, 1, 1);
 
         coordAltitudeMeasured = new QLabel(coordTab2D);
-        coordAltitudeMeasured->setObjectName(QStringLiteral("coordAltitudeMeasured"));
+        coordAltitudeMeasured->setObjectName(QString::fromUtf8("coordAltitudeMeasured"));
         coordAltitudeMeasured->setMinimumSize(QSize(90, 0));
 
         gridLayout5->addWidget(coordAltitudeMeasured, 0, 2, 1, 1);
@@ -1456,24 +1453,24 @@ public:
 
         gridLayout6 = new QGridLayout();
         gridLayout6->setSpacing(6);
-        gridLayout6->setObjectName(QStringLiteral("gridLayout6"));
+        gridLayout6->setObjectName(QString::fromUtf8("gridLayout6"));
         gridLayout6->setContentsMargins(0, 0, 0, 0);
         label_37 = new QLabel(coordTab2D);
-        label_37->setObjectName(QStringLiteral("label_37"));
+        label_37->setObjectName(QString::fromUtf8("label_37"));
         label_37->setMinimumSize(QSize(57, 0));
 
         gridLayout6->addWidget(label_37, 0, 0, 1, 1);
 
         coordUnit = new QDoubleSpinBox(coordTab2D);
-        coordUnit->setObjectName(QStringLiteral("coordUnit"));
+        coordUnit->setObjectName(QString::fromUtf8("coordUnit"));
         coordUnit->setMinimumSize(QSize(0, 18));
         coordUnit->setMaximumSize(QSize(16777215, 18));
         coordUnit->setAlignment(Qt::AlignRight);
         coordUnit->setDecimals(0);
-        coordUnit->setMinimum(1);
-        coordUnit->setMaximum(9999);
-        coordUnit->setSingleStep(1);
-        coordUnit->setValue(100);
+        coordUnit->setMinimum(1.000000000000000);
+        coordUnit->setMaximum(9999.000000000000000);
+        coordUnit->setSingleStep(1.000000000000000);
+        coordUnit->setValue(100.000000000000000);
 
         gridLayout6->addWidget(coordUnit, 0, 1, 1, 1);
 
@@ -1485,7 +1482,7 @@ public:
         verticalLayout_4->addLayout(gridLayout6);
 
         coordUseIntrinsic = new QCheckBox(coordTab2D);
-        coordUseIntrinsic->setObjectName(QStringLiteral("coordUseIntrinsic"));
+        coordUseIntrinsic->setObjectName(QString::fromUtf8("coordUseIntrinsic"));
         coordUseIntrinsic->setMinimumSize(QSize(0, 17));
         coordUseIntrinsic->setMaximumSize(QSize(16777215, 17));
 
@@ -1499,24 +1496,24 @@ public:
         verticalLayout_13->addWidget(align_2);
 
         align = new QGroupBox(scrollAreaWidgetContents);
-        align->setObjectName(QStringLiteral("align"));
+        align->setObjectName(QString::fromUtf8("align"));
         sizePolicy3.setHeightForWidth(align->sizePolicy().hasHeightForWidth());
         align->setSizePolicy(sizePolicy3);
         align->setMinimumSize(QSize(300, 197));
         align->setMaximumSize(QSize(16777215, 16777215));
         verticalLayout_15 = new QVBoxLayout(align);
-        verticalLayout_15->setObjectName(QStringLiteral("verticalLayout_15"));
+        verticalLayout_15->setObjectName(QString::fromUtf8("verticalLayout_15"));
         verticalLayout_15->setContentsMargins(5, 5, 5, 5);
         horizontalLayout_12 = new QHBoxLayout();
-        horizontalLayout_12->setObjectName(QStringLiteral("horizontalLayout_12"));
+        horizontalLayout_12->setObjectName(QString::fromUtf8("horizontalLayout_12"));
         gridShow = new QCheckBox(align);
-        gridShow->setObjectName(QStringLiteral("gridShow"));
+        gridShow->setObjectName(QString::fromUtf8("gridShow"));
         gridShow->setMinimumSize(QSize(57, 0));
 
         horizontalLayout_12->addWidget(gridShow);
 
         gridFix = new QCheckBox(align);
-        gridFix->setObjectName(QStringLiteral("gridFix"));
+        gridFix->setObjectName(QString::fromUtf8("gridFix"));
         gridFix->setMaximumSize(QSize(16777215, 25));
 
         horizontalLayout_12->addWidget(gridFix);
@@ -1529,7 +1526,7 @@ public:
         verticalLayout_15->addLayout(horizontalLayout_12);
 
         gridTab = new QTabWidget(align);
-        gridTab->setObjectName(QStringLiteral("gridTab"));
+        gridTab->setObjectName(QString::fromUtf8("gridTab"));
         gridTab->setEnabled(true);
         gridTab->setBaseSize(QSize(0, 0));
         gridTab->setLayoutDirection(Qt::LeftToRight);
@@ -1542,21 +1539,21 @@ public:
         gridTab->setTabsClosable(false);
         gridTab->setMovable(false);
         gridTab3D = new QWidget();
-        gridTab3D->setObjectName(QStringLiteral("gridTab3D"));
+        gridTab3D->setObjectName(QString::fromUtf8("gridTab3D"));
         verticalLayout_11 = new QVBoxLayout(gridTab3D);
-        verticalLayout_11->setObjectName(QStringLiteral("verticalLayout_11"));
+        verticalLayout_11->setObjectName(QString::fromUtf8("verticalLayout_11"));
         gridLayout_3 = new QGridLayout();
         gridLayout_3->setSpacing(4);
-        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
+        gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
         gridLayout_3->setSizeConstraint(QLayout::SetDefaultConstraint);
         label_15 = new QLabel(gridTab3D);
-        label_15->setObjectName(QStringLiteral("label_15"));
+        label_15->setObjectName(QString::fromUtf8("label_15"));
         label_15->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_3->addWidget(label_15, 0, 0, 1, 1);
 
         grid3DTransX = new QScrollBar(gridTab3D);
-        grid3DTransX->setObjectName(QStringLiteral("grid3DTransX"));
+        grid3DTransX->setObjectName(QString::fromUtf8("grid3DTransX"));
         sizePolicy4.setHeightForWidth(grid3DTransX->sizePolicy().hasHeightForWidth());
         grid3DTransX->setSizePolicy(sizePolicy4);
         grid3DTransX->setMinimumSize(QSize(50, 17));
@@ -1569,7 +1566,7 @@ public:
         gridLayout_3->addWidget(grid3DTransX, 0, 1, 1, 1);
 
         grid3DTransX_spin = new QSpinBox(gridTab3D);
-        grid3DTransX_spin->setObjectName(QStringLiteral("grid3DTransX_spin"));
+        grid3DTransX_spin->setObjectName(QString::fromUtf8("grid3DTransX_spin"));
         grid3DTransX_spin->setMaximumSize(QSize(16777215, 22));
         grid3DTransX_spin->setMinimum(-10000);
         grid3DTransX_spin->setMaximum(10000);
@@ -1577,13 +1574,13 @@ public:
         gridLayout_3->addWidget(grid3DTransX_spin, 0, 2, 1, 1);
 
         label_49 = new QLabel(gridTab3D);
-        label_49->setObjectName(QStringLiteral("label_49"));
+        label_49->setObjectName(QString::fromUtf8("label_49"));
         label_49->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_3->addWidget(label_49, 1, 0, 1, 1);
 
         grid3DTransY = new QScrollBar(gridTab3D);
-        grid3DTransY->setObjectName(QStringLiteral("grid3DTransY"));
+        grid3DTransY->setObjectName(QString::fromUtf8("grid3DTransY"));
         grid3DTransY->setMinimumSize(QSize(0, 17));
         grid3DTransY->setMaximumSize(QSize(16777215, 17));
         grid3DTransY->setMinimum(-10000);
@@ -1593,7 +1590,7 @@ public:
         gridLayout_3->addWidget(grid3DTransY, 1, 1, 1, 1);
 
         grid3DTransY_spin = new QSpinBox(gridTab3D);
-        grid3DTransY_spin->setObjectName(QStringLiteral("grid3DTransY_spin"));
+        grid3DTransY_spin->setObjectName(QString::fromUtf8("grid3DTransY_spin"));
         grid3DTransY_spin->setMaximumSize(QSize(16777215, 22));
         grid3DTransY_spin->setMinimum(-10000);
         grid3DTransY_spin->setMaximum(10000);
@@ -1601,13 +1598,13 @@ public:
         gridLayout_3->addWidget(grid3DTransY_spin, 1, 2, 1, 1);
 
         label_50 = new QLabel(gridTab3D);
-        label_50->setObjectName(QStringLiteral("label_50"));
+        label_50->setObjectName(QString::fromUtf8("label_50"));
         label_50->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_3->addWidget(label_50, 2, 0, 1, 1);
 
         grid3DTransZ = new QScrollBar(gridTab3D);
-        grid3DTransZ->setObjectName(QStringLiteral("grid3DTransZ"));
+        grid3DTransZ->setObjectName(QString::fromUtf8("grid3DTransZ"));
         sizePolicy4.setHeightForWidth(grid3DTransZ->sizePolicy().hasHeightForWidth());
         grid3DTransZ->setSizePolicy(sizePolicy4);
         grid3DTransZ->setMinimumSize(QSize(50, 17));
@@ -1619,7 +1616,7 @@ public:
         gridLayout_3->addWidget(grid3DTransZ, 2, 1, 1, 1);
 
         grid3DTransZ_spin = new QSpinBox(gridTab3D);
-        grid3DTransZ_spin->setObjectName(QStringLiteral("grid3DTransZ_spin"));
+        grid3DTransZ_spin->setObjectName(QString::fromUtf8("grid3DTransZ_spin"));
         grid3DTransZ_spin->setEnabled(true);
         grid3DTransZ_spin->setMaximumSize(QSize(16777215, 22));
         grid3DTransZ_spin->setMinimum(-1000);
@@ -1628,14 +1625,14 @@ public:
         gridLayout_3->addWidget(grid3DTransZ_spin, 2, 2, 1, 1);
 
         label_51 = new QLabel(gridTab3D);
-        label_51->setObjectName(QStringLiteral("label_51"));
+        label_51->setObjectName(QString::fromUtf8("label_51"));
         label_51->setLayoutDirection(Qt::LeftToRight);
         label_51->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_3->addWidget(label_51, 3, 0, 1, 1);
 
         grid3DResolution = new QScrollBar(gridTab3D);
-        grid3DResolution->setObjectName(QStringLiteral("grid3DResolution"));
+        grid3DResolution->setObjectName(QString::fromUtf8("grid3DResolution"));
         grid3DResolution->setMinimumSize(QSize(0, 17));
         grid3DResolution->setMaximumSize(QSize(16777215, 17));
         grid3DResolution->setMinimum(1);
@@ -1651,7 +1648,7 @@ public:
         gridLayout_3->addWidget(grid3DResolution, 3, 1, 1, 1);
 
         grid3DResolution_spin = new QSpinBox(gridTab3D);
-        grid3DResolution_spin->setObjectName(QStringLiteral("grid3DResolution_spin"));
+        grid3DResolution_spin->setObjectName(QString::fromUtf8("grid3DResolution_spin"));
         grid3DResolution_spin->setMaximumSize(QSize(16777215, 22));
         grid3DResolution_spin->setMinimum(1);
         grid3DResolution_spin->setMaximum(10000);
@@ -1666,20 +1663,20 @@ public:
 
         gridTab->addTab(gridTab3D, QString());
         gridTab2D = new QWidget();
-        gridTab2D->setObjectName(QStringLiteral("gridTab2D"));
+        gridTab2D->setObjectName(QString::fromUtf8("gridTab2D"));
         verticalLayout_10 = new QVBoxLayout(gridTab2D);
-        verticalLayout_10->setObjectName(QStringLiteral("verticalLayout_10"));
+        verticalLayout_10->setObjectName(QString::fromUtf8("verticalLayout_10"));
         gridLayout_100 = new QGridLayout();
         gridLayout_100->setSpacing(6);
-        gridLayout_100->setObjectName(QStringLiteral("gridLayout_100"));
+        gridLayout_100->setObjectName(QString::fromUtf8("gridLayout_100"));
         label_10 = new QLabel(gridTab2D);
-        label_10->setObjectName(QStringLiteral("label_10"));
+        label_10->setObjectName(QString::fromUtf8("label_10"));
         label_10->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_100->addWidget(label_10, 0, 0, 1, 1);
 
         gridTransX = new QScrollBar(gridTab2D);
-        gridTransX->setObjectName(QStringLiteral("gridTransX"));
+        gridTransX->setObjectName(QString::fromUtf8("gridTransX"));
         sizePolicy5.setHeightForWidth(gridTransX->sizePolicy().hasHeightForWidth());
         gridTransX->setSizePolicy(sizePolicy5);
         gridTransX->setMinimumSize(QSize(100, 17));
@@ -1692,7 +1689,7 @@ public:
         gridLayout_100->addWidget(gridTransX, 0, 1, 1, 1);
 
         gridTransX_spin = new QSpinBox(gridTab2D);
-        gridTransX_spin->setObjectName(QStringLiteral("gridTransX_spin"));
+        gridTransX_spin->setObjectName(QString::fromUtf8("gridTransX_spin"));
         gridTransX_spin->setMinimumSize(QSize(0, 17));
         gridTransX_spin->setMaximumSize(QSize(16777215, 17));
         gridTransX_spin->setMinimum(0);
@@ -1701,13 +1698,13 @@ public:
         gridLayout_100->addWidget(gridTransX_spin, 0, 2, 1, 1);
 
         label_11 = new QLabel(gridTab2D);
-        label_11->setObjectName(QStringLiteral("label_11"));
+        label_11->setObjectName(QString::fromUtf8("label_11"));
         label_11->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_100->addWidget(label_11, 1, 0, 1, 1);
 
         gridTransY = new QScrollBar(gridTab2D);
-        gridTransY->setObjectName(QStringLiteral("gridTransY"));
+        gridTransY->setObjectName(QString::fromUtf8("gridTransY"));
         gridTransY->setMinimumSize(QSize(0, 17));
         gridTransY->setMaximumSize(QSize(16777215, 17));
         gridTransY->setMinimum(0);
@@ -1717,7 +1714,7 @@ public:
         gridLayout_100->addWidget(gridTransY, 1, 1, 1, 1);
 
         gridTransY_spin = new QSpinBox(gridTab2D);
-        gridTransY_spin->setObjectName(QStringLiteral("gridTransY_spin"));
+        gridTransY_spin->setObjectName(QString::fromUtf8("gridTransY_spin"));
         gridTransY_spin->setMinimumSize(QSize(0, 17));
         gridTransY_spin->setMaximumSize(QSize(16777215, 17));
         gridTransY_spin->setMinimum(0);
@@ -1726,13 +1723,13 @@ public:
         gridLayout_100->addWidget(gridTransY_spin, 1, 2, 1, 1);
 
         label_9 = new QLabel(gridTab2D);
-        label_9->setObjectName(QStringLiteral("label_9"));
+        label_9->setObjectName(QString::fromUtf8("label_9"));
         label_9->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_100->addWidget(label_9, 2, 0, 1, 1);
 
         gridRotate = new QScrollBar(gridTab2D);
-        gridRotate->setObjectName(QStringLiteral("gridRotate"));
+        gridRotate->setObjectName(QString::fromUtf8("gridRotate"));
         sizePolicy4.setHeightForWidth(gridRotate->sizePolicy().hasHeightForWidth());
         gridRotate->setSizePolicy(sizePolicy4);
         gridRotate->setMinimumSize(QSize(50, 17));
@@ -1744,7 +1741,7 @@ public:
         gridLayout_100->addWidget(gridRotate, 2, 1, 1, 1);
 
         gridRot_spin = new QSpinBox(gridTab2D);
-        gridRot_spin->setObjectName(QStringLiteral("gridRot_spin"));
+        gridRot_spin->setObjectName(QString::fromUtf8("gridRot_spin"));
         gridRot_spin->setEnabled(true);
         gridRot_spin->setMinimumSize(QSize(0, 17));
         gridRot_spin->setMaximumSize(QSize(16777215, 17));
@@ -1754,7 +1751,7 @@ public:
         gridLayout_100->addWidget(gridRot_spin, 2, 2, 1, 1);
 
         label_12 = new QLabel(gridTab2D);
-        label_12->setObjectName(QStringLiteral("label_12"));
+        label_12->setObjectName(QString::fromUtf8("label_12"));
         QSizePolicy sizePolicy7(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy7.setHorizontalStretch(0);
         sizePolicy7.setVerticalStretch(0);
@@ -1767,7 +1764,7 @@ public:
         gridLayout_100->addWidget(label_12, 3, 0, 1, 1);
 
         gridScale = new QScrollBar(gridTab2D);
-        gridScale->setObjectName(QStringLiteral("gridScale"));
+        gridScale->setObjectName(QString::fromUtf8("gridScale"));
         gridScale->setMinimumSize(QSize(0, 17));
         gridScale->setMaximumSize(QSize(16777215, 17));
         gridScale->setMinimum(1);
@@ -1779,7 +1776,7 @@ public:
         gridLayout_100->addWidget(gridScale, 3, 1, 1, 1);
 
         gridScale_spin = new QSpinBox(gridTab2D);
-        gridScale_spin->setObjectName(QStringLiteral("gridScale_spin"));
+        gridScale_spin->setObjectName(QString::fromUtf8("gridScale_spin"));
         gridScale_spin->setMinimumSize(QSize(0, 17));
         gridScale_spin->setMaximumSize(QSize(16777215, 17));
         gridScale_spin->setMinimum(1);
@@ -1805,31 +1802,31 @@ public:
 
         tabs->addTab(calib, QString());
         rec = new QWidget();
-        rec->setObjectName(QStringLiteral("rec"));
+        rec->setObjectName(QString::fromUtf8("rec"));
         QSizePolicy sizePolicy8(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
         sizePolicy8.setHeightForWidth(rec->sizePolicy().hasHeightForWidth());
         rec->setSizePolicy(sizePolicy8);
         horizontalLayout_16 = new QHBoxLayout(rec);
-        horizontalLayout_16->setObjectName(QStringLiteral("horizontalLayout_16"));
+        horizontalLayout_16->setObjectName(QString::fromUtf8("horizontalLayout_16"));
         scrollArea_2 = new QScrollArea(rec);
-        scrollArea_2->setObjectName(QStringLiteral("scrollArea_2"));
+        scrollArea_2->setObjectName(QString::fromUtf8("scrollArea_2"));
         scrollArea_2->setWidgetResizable(true);
         scrollAreaWidgetContents_2 = new QWidget();
-        scrollAreaWidgetContents_2->setObjectName(QStringLiteral("scrollAreaWidgetContents_2"));
+        scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
         scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 337, 874));
         verticalLayout_16 = new QVBoxLayout(scrollAreaWidgetContents_2);
-        verticalLayout_16->setObjectName(QStringLiteral("verticalLayout_16"));
+        verticalLayout_16->setObjectName(QString::fromUtf8("verticalLayout_16"));
         verticalLayout_2 = new QVBoxLayout();
         verticalLayout_2->setSpacing(2);
-        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         hboxLayout = new QHBoxLayout();
         hboxLayout->setSpacing(6);
-        hboxLayout->setObjectName(QStringLiteral("hboxLayout"));
+        hboxLayout->setObjectName(QString::fromUtf8("hboxLayout"));
         hboxLayout->setContentsMargins(0, 0, 0, 0);
         performRecognition = new QCheckBox(scrollAreaWidgetContents_2);
-        performRecognition->setObjectName(QStringLiteral("performRecognition"));
+        performRecognition->setObjectName(QString::fromUtf8("performRecognition"));
         performRecognition->setEnabled(true);
         performRecognition->setChecked(false);
 
@@ -1837,10 +1834,10 @@ public:
 
         gridLayout7 = new QGridLayout();
         gridLayout7->setSpacing(6);
-        gridLayout7->setObjectName(QStringLiteral("gridLayout7"));
+        gridLayout7->setObjectName(QString::fromUtf8("gridLayout7"));
         gridLayout7->setContentsMargins(0, 0, 0, 0);
         recoStep = new QSpinBox(scrollAreaWidgetContents_2);
-        recoStep->setObjectName(QStringLiteral("recoStep"));
+        recoStep->setObjectName(QString::fromUtf8("recoStep"));
         sizePolicy6.setHeightForWidth(recoStep->sizePolicy().hasHeightForWidth());
         recoStep->setSizePolicy(sizePolicy6);
         recoStep->setMinimumSize(QSize(20, 0));
@@ -1852,7 +1849,7 @@ public:
         gridLayout7->addWidget(recoStep, 0, 2, 1, 1);
 
         label_27 = new QLabel(scrollAreaWidgetContents_2);
-        label_27->setObjectName(QStringLiteral("label_27"));
+        label_27->setObjectName(QString::fromUtf8("label_27"));
 
         gridLayout7->addWidget(label_27, 0, 1, 1, 1);
 
@@ -1871,14 +1868,14 @@ public:
         verticalLayout_2->addLayout(hboxLayout);
 
         gridLayout_2 = new QGridLayout();
-        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         label_26 = new QLabel(scrollAreaWidgetContents_2);
-        label_26->setObjectName(QStringLiteral("label_26"));
+        label_26->setObjectName(QString::fromUtf8("label_26"));
 
         gridLayout_2->addWidget(label_26, 0, 0, 1, 1);
 
         recoNumberNow = new QLabel(scrollAreaWidgetContents_2);
-        recoNumberNow->setObjectName(QStringLiteral("recoNumberNow"));
+        recoNumberNow->setObjectName(QString::fromUtf8("recoNumberNow"));
         QFont font1;
         font1.setBold(true);
         font1.setWeight(75);
@@ -1895,16 +1892,16 @@ public:
         verticalLayout_2->addLayout(gridLayout_2);
 
         horizontalLayout_4 = new QHBoxLayout();
-        horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
         recoMethod = new QComboBox(scrollAreaWidgetContents_2);
-        recoMethod->setObjectName(QStringLiteral("recoMethod"));
+        recoMethod->setObjectName(QString::fromUtf8("recoMethod"));
         sizePolicy5.setHeightForWidth(recoMethod->sizePolicy().hasHeightForWidth());
         recoMethod->setSizePolicy(sizePolicy5);
 
         horizontalLayout_4->addWidget(recoMethod);
 
         recoStereoShow = new QPushButton(scrollAreaWidgetContents_2);
-        recoStereoShow->setObjectName(QStringLiteral("recoStereoShow"));
+        recoStereoShow->setObjectName(QString::fromUtf8("recoStereoShow"));
 
         horizontalLayout_4->addWidget(recoStereoShow);
 
@@ -1915,38 +1912,38 @@ public:
         verticalLayout_16->addLayout(verticalLayout_2);
 
         groupBox_2 = new QGroupBox(scrollAreaWidgetContents_2);
-        groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
+        groupBox_2->setObjectName(QString::fromUtf8("groupBox_2"));
         sizePolicy8.setHeightForWidth(groupBox_2->sizePolicy().hasHeightForWidth());
         groupBox_2->setSizePolicy(sizePolicy8);
         groupBox_2->setMinimumSize(QSize(0, 44));
         groupBox_2->setMaximumSize(QSize(350, 16777215));
         groupBox_2->setCheckable(false);
         roiShow = new QCheckBox(groupBox_2);
-        roiShow->setObjectName(QStringLiteral("roiShow"));
+        roiShow->setObjectName(QString::fromUtf8("roiShow"));
         roiShow->setGeometry(QRect(10, 20, 49, 18));
         roiFix = new QCheckBox(groupBox_2);
-        roiFix->setObjectName(QStringLiteral("roiFix"));
+        roiFix->setObjectName(QString::fromUtf8("roiFix"));
         roiFix->setGeometry(QRect(80, 20, 36, 18));
 
         verticalLayout_16->addWidget(groupBox_2);
 
         groupBox_5 = new QGroupBox(scrollAreaWidgetContents_2);
-        groupBox_5->setObjectName(QStringLiteral("groupBox_5"));
+        groupBox_5->setObjectName(QString::fromUtf8("groupBox_5"));
         groupBox_5->setMinimumSize(QSize(0, 80));
         groupBox_5->setMaximumSize(QSize(350, 16777215));
         groupBox_5->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
         verticalLayout_19 = new QVBoxLayout(groupBox_5);
-        verticalLayout_19->setObjectName(QStringLiteral("verticalLayout_19"));
+        verticalLayout_19->setObjectName(QString::fromUtf8("verticalLayout_19"));
         vboxLayout = new QVBoxLayout();
         vboxLayout->setSpacing(6);
-        vboxLayout->setObjectName(QStringLiteral("vboxLayout"));
+        vboxLayout->setObjectName(QString::fromUtf8("vboxLayout"));
         vboxLayout->setContentsMargins(0, 0, 0, 0);
         hboxLayout1 = new QHBoxLayout();
         hboxLayout1->setSpacing(6);
-        hboxLayout1->setObjectName(QStringLiteral("hboxLayout1"));
+        hboxLayout1->setObjectName(QString::fromUtf8("hboxLayout1"));
         hboxLayout1->setContentsMargins(0, 0, 0, 0);
         label_19 = new QLabel(groupBox_5);
-        label_19->setObjectName(QStringLiteral("label_19"));
+        label_19->setObjectName(QString::fromUtf8("label_19"));
         QSizePolicy sizePolicy9(QSizePolicy::Fixed, QSizePolicy::Preferred);
         sizePolicy9.setHorizontalStretch(0);
         sizePolicy9.setVerticalStretch(0);
@@ -1956,7 +1953,7 @@ public:
         hboxLayout1->addWidget(label_19);
 
         markerBrightness = new QScrollBar(groupBox_5);
-        markerBrightness->setObjectName(QStringLiteral("markerBrightness"));
+        markerBrightness->setObjectName(QString::fromUtf8("markerBrightness"));
         sizePolicy4.setHeightForWidth(markerBrightness->sizePolicy().hasHeightForWidth());
         markerBrightness->setSizePolicy(sizePolicy4);
         markerBrightness->setMinimumSize(QSize(50, 0));
@@ -1970,7 +1967,7 @@ public:
         vboxLayout->addLayout(hboxLayout1);
 
         markerIgnoreWithout = new QCheckBox(groupBox_5);
-        markerIgnoreWithout->setObjectName(QStringLiteral("markerIgnoreWithout"));
+        markerIgnoreWithout->setObjectName(QString::fromUtf8("markerIgnoreWithout"));
         markerIgnoreWithout->setChecked(true);
 
         vboxLayout->addWidget(markerIgnoreWithout);
@@ -1982,21 +1979,21 @@ public:
         verticalLayout_16->addWidget(groupBox_5);
 
         colorBox = new QGroupBox(scrollAreaWidgetContents_2);
-        colorBox->setObjectName(QStringLiteral("colorBox"));
+        colorBox->setObjectName(QString::fromUtf8("colorBox"));
         sizePolicy6.setHeightForWidth(colorBox->sizePolicy().hasHeightForWidth());
         colorBox->setSizePolicy(sizePolicy6);
         colorBox->setMinimumSize(QSize(309, 631));
         colorBox->setMaximumSize(QSize(350, 631));
         verticalLayout_9 = new QVBoxLayout(colorBox);
-        verticalLayout_9->setObjectName(QStringLiteral("verticalLayout_9"));
+        verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
         verticalLayout_3 = new QVBoxLayout();
         verticalLayout_3->setSpacing(2);
-        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
         verticalLayout_3->setSizeConstraint(QLayout::SetDefaultConstraint);
         horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         recoShowColor = new QCheckBox(colorBox);
-        recoShowColor->setObjectName(QStringLiteral("recoShowColor"));
+        recoShowColor->setObjectName(QString::fromUtf8("recoShowColor"));
         sizePolicy6.setHeightForWidth(recoShowColor->sizePolicy().hasHeightForWidth());
         recoShowColor->setSizePolicy(sizePolicy6);
         recoShowColor->setChecked(true);
@@ -2004,7 +2001,7 @@ public:
         horizontalLayout_2->addWidget(recoShowColor);
 
         recoOptimizeColor = new QPushButton(colorBox);
-        recoOptimizeColor->setObjectName(QStringLiteral("recoOptimizeColor"));
+        recoOptimizeColor->setObjectName(QString::fromUtf8("recoOptimizeColor"));
         recoOptimizeColor->setMaximumSize(QSize(50, 16777215));
 
         horizontalLayout_2->addWidget(recoOptimizeColor);
@@ -2018,10 +2015,10 @@ public:
 
         hboxLayout2 = new QHBoxLayout();
         hboxLayout2->setSpacing(6);
-        hboxLayout2->setObjectName(QStringLiteral("hboxLayout2"));
+        hboxLayout2->setObjectName(QString::fromUtf8("hboxLayout2"));
         hboxLayout2->setContentsMargins(0, 0, 0, 0);
         label_28 = new QLabel(colorBox);
-        label_28->setObjectName(QStringLiteral("label_28"));
+        label_28->setObjectName(QString::fromUtf8("label_28"));
         sizePolicy9.setHeightForWidth(label_28->sizePolicy().hasHeightForWidth());
         label_28->setSizePolicy(sizePolicy9);
         label_28->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
@@ -2029,7 +2026,7 @@ public:
         hboxLayout2->addWidget(label_28);
 
         recoColorModel = new QComboBox(colorBox);
-        recoColorModel->setObjectName(QStringLiteral("recoColorModel"));
+        recoColorModel->setObjectName(QString::fromUtf8("recoColorModel"));
         sizePolicy4.setHeightForWidth(recoColorModel->sizePolicy().hasHeightForWidth());
         recoColorModel->setSizePolicy(sizePolicy4);
         recoColorModel->setMinimumSize(QSize(50, 0));
@@ -2038,7 +2035,7 @@ public:
         hboxLayout2->addWidget(recoColorModel);
 
         recoAutoWB = new QCheckBox(colorBox);
-        recoAutoWB->setObjectName(QStringLiteral("recoAutoWB"));
+        recoAutoWB->setObjectName(QString::fromUtf8("recoAutoWB"));
 
         hboxLayout2->addWidget(recoAutoWB);
 
@@ -2051,10 +2048,10 @@ public:
 
         hboxLayout3 = new QHBoxLayout();
         hboxLayout3->setSpacing(6);
-        hboxLayout3->setObjectName(QStringLiteral("hboxLayout3"));
+        hboxLayout3->setObjectName(QString::fromUtf8("hboxLayout3"));
         hboxLayout3->setContentsMargins(0, 0, 0, 0);
         label_29 = new QLabel(colorBox);
-        label_29->setObjectName(QStringLiteral("label_29"));
+        label_29->setObjectName(QString::fromUtf8("label_29"));
         sizePolicy9.setHeightForWidth(label_29->sizePolicy().hasHeightForWidth());
         label_29->setSizePolicy(sizePolicy9);
         label_29->setMinimumSize(QSize(32, 0));
@@ -2064,7 +2061,7 @@ public:
         hboxLayout3->addWidget(label_29);
 
         recoColorX = new QComboBox(colorBox);
-        recoColorX->setObjectName(QStringLiteral("recoColorX"));
+        recoColorX->setObjectName(QString::fromUtf8("recoColorX"));
         sizePolicy4.setHeightForWidth(recoColorX->sizePolicy().hasHeightForWidth());
         recoColorX->setSizePolicy(sizePolicy4);
         recoColorX->setMinimumSize(QSize(35, 0));
@@ -2073,26 +2070,26 @@ public:
         hboxLayout3->addWidget(recoColorX);
 
         label_30 = new QLabel(colorBox);
-        label_30->setObjectName(QStringLiteral("label_30"));
+        label_30->setObjectName(QString::fromUtf8("label_30"));
         label_30->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         hboxLayout3->addWidget(label_30);
 
         recoColorY = new QComboBox(colorBox);
-        recoColorY->setObjectName(QStringLiteral("recoColorY"));
+        recoColorY->setObjectName(QString::fromUtf8("recoColorY"));
         recoColorY->setMinimumSize(QSize(35, 0));
         recoColorY->setMaximumSize(QSize(35, 20));
 
         hboxLayout3->addWidget(recoColorY);
 
         label_31 = new QLabel(colorBox);
-        label_31->setObjectName(QStringLiteral("label_31"));
+        label_31->setObjectName(QString::fromUtf8("label_31"));
         label_31->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         hboxLayout3->addWidget(label_31);
 
         recoColorZ = new QScrollBar(colorBox);
-        recoColorZ->setObjectName(QStringLiteral("recoColorZ"));
+        recoColorZ->setObjectName(QString::fromUtf8("recoColorZ"));
         recoColorZ->setMinimumSize(QSize(100, 0));
         recoColorZ->setMaximum(255);
         recoColorZ->setValue(255);
@@ -2106,31 +2103,31 @@ public:
 
         hboxLayout4 = new QHBoxLayout();
         hboxLayout4->setSpacing(6);
-        hboxLayout4->setObjectName(QStringLiteral("hboxLayout4"));
+        hboxLayout4->setObjectName(QString::fromUtf8("hboxLayout4"));
         hboxLayout4->setContentsMargins(0, 0, 0, 0);
         label_38 = new QLabel(colorBox);
-        label_38->setObjectName(QStringLiteral("label_38"));
+        label_38->setObjectName(QString::fromUtf8("label_38"));
         sizePolicy6.setHeightForWidth(label_38->sizePolicy().hasHeightForWidth());
         label_38->setSizePolicy(sizePolicy6);
 
         hboxLayout4->addWidget(label_38);
 
         recoGreyLevel = new QScrollBar(colorBox);
-        recoGreyLevel->setObjectName(QStringLiteral("recoGreyLevel"));
+        recoGreyLevel->setObjectName(QString::fromUtf8("recoGreyLevel"));
         recoGreyLevel->setValue(50);
         recoGreyLevel->setOrientation(Qt::Horizontal);
 
         hboxLayout4->addWidget(recoGreyLevel);
 
         label_39 = new QLabel(colorBox);
-        label_39->setObjectName(QStringLiteral("label_39"));
+        label_39->setObjectName(QString::fromUtf8("label_39"));
         sizePolicy6.setHeightForWidth(label_39->sizePolicy().hasHeightForWidth());
         label_39->setSizePolicy(sizePolicy6);
 
         hboxLayout4->addWidget(label_39);
 
         recoSymbolSize = new QScrollBar(colorBox);
-        recoSymbolSize->setObjectName(QStringLiteral("recoSymbolSize"));
+        recoSymbolSize->setObjectName(QString::fromUtf8("recoSymbolSize"));
         recoSymbolSize->setMinimum(1);
         recoSymbolSize->setMaximum(100);
         recoSymbolSize->setValue(10);
@@ -2142,7 +2139,7 @@ public:
         verticalLayout_3->addLayout(hboxLayout4);
 
         colorPlot = new ColorPlot(colorBox);
-        colorPlot->setObjectName(QStringLiteral("colorPlot"));
+        colorPlot->setObjectName(QString::fromUtf8("colorPlot"));
         sizePolicy5.setHeightForWidth(colorPlot->sizePolicy().hasHeightForWidth());
         colorPlot->setSizePolicy(sizePolicy5);
         colorPlot->setMinimumSize(QSize(288, 350));
@@ -2153,7 +2150,7 @@ public:
         verticalLayout_3->addWidget(colorPlot);
 
         groupBox_4 = new QGroupBox(colorBox);
-        groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
+        groupBox_4->setObjectName(QString::fromUtf8("groupBox_4"));
         QSizePolicy sizePolicy10(QSizePolicy::Expanding, QSizePolicy::Preferred);
         sizePolicy10.setHorizontalStretch(0);
         sizePolicy10.setVerticalStretch(0);
@@ -2162,74 +2159,74 @@ public:
         groupBox_4->setMinimumSize(QSize(250, 110));
         groupBox_4->setMaximumSize(QSize(350, 110));
         layoutWidget11 = new QWidget(groupBox_4);
-        layoutWidget11->setObjectName(QStringLiteral("layoutWidget11"));
+        layoutWidget11->setObjectName(QString::fromUtf8("layoutWidget11"));
         layoutWidget11->setGeometry(QRect(10, 20, 271, 95));
         vboxLayout1 = new QVBoxLayout(layoutWidget11);
         vboxLayout1->setSpacing(6);
-        vboxLayout1->setObjectName(QStringLiteral("vboxLayout1"));
+        vboxLayout1->setObjectName(QString::fromUtf8("vboxLayout1"));
         vboxLayout1->setContentsMargins(0, 0, 0, 0);
         gridLayout8 = new QGridLayout();
         gridLayout8->setSpacing(6);
-        gridLayout8->setObjectName(QStringLiteral("gridLayout8"));
+        gridLayout8->setObjectName(QString::fromUtf8("gridLayout8"));
         gridLayout8->setContentsMargins(0, 0, 0, 0);
         label_44 = new QLabel(layoutWidget11);
-        label_44->setObjectName(QStringLiteral("label_44"));
+        label_44->setObjectName(QString::fromUtf8("label_44"));
         sizePolicy9.setHeightForWidth(label_44->sizePolicy().hasHeightForWidth());
         label_44->setSizePolicy(sizePolicy9);
 
         gridLayout8->addWidget(label_44, 1, 3, 1, 1);
 
         label_40 = new QLabel(layoutWidget11);
-        label_40->setObjectName(QStringLiteral("label_40"));
+        label_40->setObjectName(QString::fromUtf8("label_40"));
         sizePolicy9.setHeightForWidth(label_40->sizePolicy().hasHeightForWidth());
         label_40->setSizePolicy(sizePolicy9);
 
         gridLayout8->addWidget(label_40, 0, 1, 1, 1);
 
         mapX = new QScrollBar(layoutWidget11);
-        mapX->setObjectName(QStringLiteral("mapX"));
+        mapX->setObjectName(QString::fromUtf8("mapX"));
         mapX->setMaximum(718);
         mapX->setOrientation(Qt::Horizontal);
 
         gridLayout8->addWidget(mapX, 0, 2, 1, 1);
 
         mapH = new QScrollBar(layoutWidget11);
-        mapH->setObjectName(QStringLiteral("mapH"));
+        mapH->setObjectName(QString::fromUtf8("mapH"));
         mapH->setMaximum(395);
         mapH->setOrientation(Qt::Horizontal);
 
         gridLayout8->addWidget(mapH, 1, 4, 1, 1);
 
         mapW = new QScrollBar(layoutWidget11);
-        mapW->setObjectName(QStringLiteral("mapW"));
+        mapW->setObjectName(QString::fromUtf8("mapW"));
         mapW->setMaximum(395);
         mapW->setOrientation(Qt::Horizontal);
 
         gridLayout8->addWidget(mapW, 1, 2, 1, 1);
 
         mapY = new QScrollBar(layoutWidget11);
-        mapY->setObjectName(QStringLiteral("mapY"));
+        mapY->setObjectName(QString::fromUtf8("mapY"));
         mapY->setMaximum(718);
         mapY->setOrientation(Qt::Horizontal);
 
         gridLayout8->addWidget(mapY, 0, 4, 1, 1);
 
         label_43 = new QLabel(layoutWidget11);
-        label_43->setObjectName(QStringLiteral("label_43"));
+        label_43->setObjectName(QString::fromUtf8("label_43"));
         sizePolicy9.setHeightForWidth(label_43->sizePolicy().hasHeightForWidth());
         label_43->setSizePolicy(sizePolicy9);
 
         gridLayout8->addWidget(label_43, 1, 1, 1, 1);
 
         label_42 = new QLabel(layoutWidget11);
-        label_42->setObjectName(QStringLiteral("label_42"));
+        label_42->setObjectName(QString::fromUtf8("label_42"));
         sizePolicy9.setHeightForWidth(label_42->sizePolicy().hasHeightForWidth());
         label_42->setSizePolicy(sizePolicy9);
 
         gridLayout8->addWidget(label_42, 0, 3, 1, 1);
 
         mapNr = new QSpinBox(layoutWidget11);
-        mapNr->setObjectName(QStringLiteral("mapNr"));
+        mapNr->setObjectName(QString::fromUtf8("mapNr"));
         sizePolicy6.setHeightForWidth(mapNr->sizePolicy().hasHeightForWidth());
         mapNr->setSizePolicy(sizePolicy6);
         mapNr->setAlignment(Qt::AlignRight);
@@ -2238,7 +2235,7 @@ public:
         gridLayout8->addWidget(mapNr, 0, 0, 1, 1);
 
         mapColor = new QCheckBox(layoutWidget11);
-        mapColor->setObjectName(QStringLiteral("mapColor"));
+        mapColor->setObjectName(QString::fromUtf8("mapColor"));
         sizePolicy6.setHeightForWidth(mapColor->sizePolicy().hasHeightForWidth());
         mapColor->setSizePolicy(sizePolicy6);
         mapColor->setChecked(true);
@@ -2250,29 +2247,29 @@ public:
 
         hboxLayout5 = new QHBoxLayout();
         hboxLayout5->setSpacing(6);
-        hboxLayout5->setObjectName(QStringLiteral("hboxLayout5"));
+        hboxLayout5->setObjectName(QString::fromUtf8("hboxLayout5"));
         hboxLayout5->setContentsMargins(0, 0, 0, 0);
         label_45 = new QLabel(layoutWidget11);
-        label_45->setObjectName(QStringLiteral("label_45"));
+        label_45->setObjectName(QString::fromUtf8("label_45"));
         sizePolicy9.setHeightForWidth(label_45->sizePolicy().hasHeightForWidth());
         label_45->setSizePolicy(sizePolicy9);
 
         hboxLayout5->addWidget(label_45);
 
         mapHeight = new QDoubleSpinBox(layoutWidget11);
-        mapHeight->setObjectName(QStringLiteral("mapHeight"));
+        mapHeight->setObjectName(QString::fromUtf8("mapHeight"));
         sizePolicy6.setHeightForWidth(mapHeight->sizePolicy().hasHeightForWidth());
         mapHeight->setSizePolicy(sizePolicy6);
         mapHeight->setAlignment(Qt::AlignRight);
         mapHeight->setDecimals(1);
-        mapHeight->setMinimum(50);
-        mapHeight->setMaximum(250);
-        mapHeight->setValue(180);
+        mapHeight->setMinimum(50.000000000000000);
+        mapHeight->setMaximum(250.000000000000000);
+        mapHeight->setValue(180.000000000000000);
 
         hboxLayout5->addWidget(mapHeight);
 
         mapAdd = new QPushButton(layoutWidget11);
-        mapAdd->setObjectName(QStringLiteral("mapAdd"));
+        mapAdd->setObjectName(QString::fromUtf8("mapAdd"));
         sizePolicy4.setHeightForWidth(mapAdd->sizePolicy().hasHeightForWidth());
         mapAdd->setSizePolicy(sizePolicy4);
         mapAdd->setMaximumSize(QSize(40, 16777215));
@@ -2280,13 +2277,13 @@ public:
         hboxLayout5->addWidget(mapAdd);
 
         mapDel = new QPushButton(layoutWidget11);
-        mapDel->setObjectName(QStringLiteral("mapDel"));
+        mapDel->setObjectName(QString::fromUtf8("mapDel"));
         mapDel->setMaximumSize(QSize(40, 16777215));
 
         hboxLayout5->addWidget(mapDel);
 
         mapColorRange = new QPushButton(layoutWidget11);
-        mapColorRange->setObjectName(QStringLiteral("mapColorRange"));
+        mapColorRange->setObjectName(QString::fromUtf8("mapColorRange"));
         mapColorRange->setMaximumSize(QSize(80, 16777215));
 
         hboxLayout5->addWidget(mapColorRange);
@@ -2299,29 +2296,29 @@ public:
 
         hboxLayout6 = new QHBoxLayout();
         hboxLayout6->setSpacing(0);
-        hboxLayout6->setObjectName(QStringLiteral("hboxLayout6"));
+        hboxLayout6->setObjectName(QString::fromUtf8("hboxLayout6"));
         hboxLayout6->setContentsMargins(0, 0, 0, 0);
         label_46 = new QLabel(colorBox);
-        label_46->setObjectName(QStringLiteral("label_46"));
+        label_46->setObjectName(QString::fromUtf8("label_46"));
         sizePolicy9.setHeightForWidth(label_46->sizePolicy().hasHeightForWidth());
         label_46->setSizePolicy(sizePolicy9);
 
         hboxLayout6->addWidget(label_46);
 
         mapDefaultHeight = new QDoubleSpinBox(colorBox);
-        mapDefaultHeight->setObjectName(QStringLiteral("mapDefaultHeight"));
+        mapDefaultHeight->setObjectName(QString::fromUtf8("mapDefaultHeight"));
         sizePolicy6.setHeightForWidth(mapDefaultHeight->sizePolicy().hasHeightForWidth());
         mapDefaultHeight->setSizePolicy(sizePolicy6);
         mapDefaultHeight->setAlignment(Qt::AlignRight);
         mapDefaultHeight->setDecimals(1);
-        mapDefaultHeight->setMinimum(0);
-        mapDefaultHeight->setMaximum(250);
-        mapDefaultHeight->setValue(180);
+        mapDefaultHeight->setMinimum(0.000000000000000);
+        mapDefaultHeight->setMaximum(250.000000000000000);
+        mapDefaultHeight->setValue(180.000000000000000);
 
         hboxLayout6->addWidget(mapDefaultHeight);
 
         mapDistribution = new QPushButton(colorBox);
-        mapDistribution->setObjectName(QStringLiteral("mapDistribution"));
+        mapDistribution->setObjectName(QString::fromUtf8("mapDistribution"));
         sizePolicy6.setHeightForWidth(mapDistribution->sizePolicy().hasHeightForWidth());
         mapDistribution->setSizePolicy(sizePolicy6);
         mapDistribution->setMaximumSize(QSize(40, 16777215));
@@ -2329,14 +2326,14 @@ public:
         hboxLayout6->addWidget(mapDistribution);
 
         mapResetHeight = new QPushButton(colorBox);
-        mapResetHeight->setObjectName(QStringLiteral("mapResetHeight"));
+        mapResetHeight->setObjectName(QString::fromUtf8("mapResetHeight"));
         sizePolicy6.setHeightForWidth(mapResetHeight->sizePolicy().hasHeightForWidth());
         mapResetHeight->setSizePolicy(sizePolicy6);
 
         hboxLayout6->addWidget(mapResetHeight);
 
         mapResetPos = new QPushButton(colorBox);
-        mapResetPos->setObjectName(QStringLiteral("mapResetPos"));
+        mapResetPos->setObjectName(QString::fromUtf8("mapResetPos"));
         sizePolicy6.setHeightForWidth(mapResetPos->sizePolicy().hasHeightForWidth());
         mapResetPos->setSizePolicy(sizePolicy6);
 
@@ -2361,37 +2358,37 @@ public:
 
         tabs->addTab(rec, QString());
         track = new QWidget();
-        track->setObjectName(QStringLiteral("track"));
+        track->setObjectName(QString::fromUtf8("track"));
         horizontalLayout_17 = new QHBoxLayout(track);
-        horizontalLayout_17->setObjectName(QStringLiteral("horizontalLayout_17"));
+        horizontalLayout_17->setObjectName(QString::fromUtf8("horizontalLayout_17"));
         scrollArea_3 = new QScrollArea(track);
-        scrollArea_3->setObjectName(QStringLiteral("scrollArea_3"));
+        scrollArea_3->setObjectName(QString::fromUtf8("scrollArea_3"));
         scrollArea_3->setWidgetResizable(true);
         scrollAreaWidgetContents_3 = new QWidget();
-        scrollAreaWidgetContents_3->setObjectName(QStringLiteral("scrollAreaWidgetContents_3"));
+        scrollAreaWidgetContents_3->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_3"));
         scrollAreaWidgetContents_3->setGeometry(QRect(0, 0, 337, 843));
         verticalLayout_17 = new QVBoxLayout(scrollAreaWidgetContents_3);
-        verticalLayout_17->setObjectName(QStringLiteral("verticalLayout_17"));
+        verticalLayout_17->setObjectName(QString::fromUtf8("verticalLayout_17"));
         hboxLayout7 = new QHBoxLayout();
         hboxLayout7->setSpacing(4);
-        hboxLayout7->setObjectName(QStringLiteral("hboxLayout7"));
+        hboxLayout7->setObjectName(QString::fromUtf8("hboxLayout7"));
         hboxLayout7->setContentsMargins(0, 0, 0, 0);
         trackOnlineCalc = new QCheckBox(scrollAreaWidgetContents_3);
-        trackOnlineCalc->setObjectName(QStringLiteral("trackOnlineCalc"));
+        trackOnlineCalc->setObjectName(QString::fromUtf8("trackOnlineCalc"));
         trackOnlineCalc->setMaximumSize(QSize(120, 16777215));
         trackOnlineCalc->setChecked(false);
 
         hboxLayout7->addWidget(trackOnlineCalc);
 
         trackRepeat = new QCheckBox(scrollAreaWidgetContents_3);
-        trackRepeat->setObjectName(QStringLiteral("trackRepeat"));
+        trackRepeat->setObjectName(QString::fromUtf8("trackRepeat"));
         trackRepeat->setMaximumSize(QSize(130, 16777215));
         trackRepeat->setChecked(true);
 
         hboxLayout7->addWidget(trackRepeat);
 
         trackRepeatQual = new QSpinBox(scrollAreaWidgetContents_3);
-        trackRepeatQual->setObjectName(QStringLiteral("trackRepeatQual"));
+        trackRepeatQual->setObjectName(QString::fromUtf8("trackRepeatQual"));
         sizePolicy6.setHeightForWidth(trackRepeatQual->sizePolicy().hasHeightForWidth());
         trackRepeatQual->setSizePolicy(sizePolicy6);
         trackRepeatQual->setMinimumSize(QSize(40, 0));
@@ -2410,22 +2407,22 @@ public:
         verticalLayout_17->addLayout(hboxLayout7);
 
         horizontalLayout_5 = new QHBoxLayout();
-        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
+        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
         trackExtrapolation = new QCheckBox(scrollAreaWidgetContents_3);
-        trackExtrapolation->setObjectName(QStringLiteral("trackExtrapolation"));
+        trackExtrapolation->setObjectName(QString::fromUtf8("trackExtrapolation"));
         trackExtrapolation->setMaximumSize(QSize(150, 16777215));
         trackExtrapolation->setChecked(true);
 
         horizontalLayout_5->addWidget(trackExtrapolation);
 
         trackMerge = new QCheckBox(scrollAreaWidgetContents_3);
-        trackMerge->setObjectName(QStringLiteral("trackMerge"));
+        trackMerge->setObjectName(QString::fromUtf8("trackMerge"));
         trackMerge->setMaximumSize(QSize(75, 16777215));
 
         horizontalLayout_5->addWidget(trackMerge);
 
         trackOnlyVisible = new QCheckBox(scrollAreaWidgetContents_3);
-        trackOnlyVisible->setObjectName(QStringLiteral("trackOnlyVisible"));
+        trackOnlyVisible->setObjectName(QString::fromUtf8("trackOnlyVisible"));
         trackOnlyVisible->setMaximumSize(QSize(75, 16777215));
         trackOnlyVisible->setChecked(true);
 
@@ -2440,17 +2437,17 @@ public:
 
         gridLayout9 = new QGridLayout();
         gridLayout9->setSpacing(2);
-        gridLayout9->setObjectName(QStringLiteral("gridLayout9"));
+        gridLayout9->setObjectName(QString::fromUtf8("gridLayout9"));
         gridLayout9->setContentsMargins(0, 0, 0, 0);
         trackNumberNow = new QLabel(scrollAreaWidgetContents_3);
-        trackNumberNow->setObjectName(QStringLiteral("trackNumberNow"));
+        trackNumberNow->setObjectName(QString::fromUtf8("trackNumberNow"));
         trackNumberNow->setFont(font1);
         trackNumberNow->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout9->addWidget(trackNumberNow, 3, 1, 1, 1);
 
         label_22 = new QLabel(scrollAreaWidgetContents_3);
-        label_22->setObjectName(QStringLiteral("label_22"));
+        label_22->setObjectName(QString::fromUtf8("label_22"));
         sizePolicy4.setHeightForWidth(label_22->sizePolicy().hasHeightForWidth());
         label_22->setSizePolicy(sizePolicy4);
         label_22->setMinimumSize(QSize(0, 16));
@@ -2459,7 +2456,7 @@ public:
         gridLayout9->addWidget(label_22, 1, 0, 1, 1);
 
         label_23 = new QLabel(scrollAreaWidgetContents_3);
-        label_23->setObjectName(QStringLiteral("label_23"));
+        label_23->setObjectName(QString::fromUtf8("label_23"));
         sizePolicy4.setHeightForWidth(label_23->sizePolicy().hasHeightForWidth());
         label_23->setSizePolicy(sizePolicy4);
         label_23->setMinimumSize(QSize(0, 16));
@@ -2468,7 +2465,7 @@ public:
         gridLayout9->addWidget(label_23, 3, 0, 1, 1);
 
         trackNumberAll = new QLabel(scrollAreaWidgetContents_3);
-        trackNumberAll->setObjectName(QStringLiteral("trackNumberAll"));
+        trackNumberAll->setObjectName(QString::fromUtf8("trackNumberAll"));
         trackNumberAll->setFont(font1);
         trackNumberAll->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
@@ -2479,7 +2476,7 @@ public:
         gridLayout9->addItem(spacerItem4, 1, 2, 1, 1);
 
         label_65 = new QLabel(scrollAreaWidgetContents_3);
-        label_65->setObjectName(QStringLiteral("label_65"));
+        label_65->setObjectName(QString::fromUtf8("label_65"));
         sizePolicy4.setHeightForWidth(label_65->sizePolicy().hasHeightForWidth());
         label_65->setSizePolicy(sizePolicy4);
         label_65->setMinimumSize(QSize(0, 16));
@@ -2488,7 +2485,7 @@ public:
         gridLayout9->addWidget(label_65, 2, 0, 1, 1);
 
         trackNumberVisible = new QLabel(scrollAreaWidgetContents_3);
-        trackNumberVisible->setObjectName(QStringLiteral("trackNumberVisible"));
+        trackNumberVisible->setObjectName(QString::fromUtf8("trackNumberVisible"));
         trackNumberVisible->setFont(font1);
         trackNumberVisible->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
@@ -2499,28 +2496,28 @@ public:
 
         gridLayout10 = new QGridLayout();
         gridLayout10->setSpacing(2);
-        gridLayout10->setObjectName(QStringLiteral("gridLayout10"));
+        gridLayout10->setObjectName(QString::fromUtf8("gridLayout10"));
         gridLayout10->setContentsMargins(0, 0, 0, 0);
         trackExport = new QPushButton(scrollAreaWidgetContents_3);
-        trackExport->setObjectName(QStringLiteral("trackExport"));
+        trackExport->setObjectName(QString::fromUtf8("trackExport"));
         trackExport->setMaximumSize(QSize(16777215, 16777215));
 
         gridLayout10->addWidget(trackExport, 1, 0, 1, 1);
 
         trackCalc = new QPushButton(scrollAreaWidgetContents_3);
-        trackCalc->setObjectName(QStringLiteral("trackCalc"));
+        trackCalc->setObjectName(QString::fromUtf8("trackCalc"));
         trackCalc->setMaximumSize(QSize(16777215, 16777215));
 
         gridLayout10->addWidget(trackCalc, 0, 0, 1, 1);
 
         trackImport = new QPushButton(scrollAreaWidgetContents_3);
-        trackImport->setObjectName(QStringLiteral("trackImport"));
+        trackImport->setObjectName(QString::fromUtf8("trackImport"));
         trackImport->setMaximumSize(QSize(16777215, 16777215));
 
         gridLayout10->addWidget(trackImport, 1, 1, 1, 1);
 
         trackReset = new QPushButton(scrollAreaWidgetContents_3);
-        trackReset->setObjectName(QStringLiteral("trackReset"));
+        trackReset->setObjectName(QString::fromUtf8("trackReset"));
         trackReset->setMaximumSize(QSize(16777215, 16777215));
 
         gridLayout10->addWidget(trackReset, 0, 1, 1, 1);
@@ -2529,31 +2526,31 @@ public:
         verticalLayout_17->addLayout(gridLayout10);
 
         groupBox_8 = new QGroupBox(scrollAreaWidgetContents_3);
-        groupBox_8->setObjectName(QStringLiteral("groupBox_8"));
+        groupBox_8->setObjectName(QString::fromUtf8("groupBox_8"));
         groupBox_8->setMinimumSize(QSize(0, 44));
         trackRoiShow = new QCheckBox(groupBox_8);
-        trackRoiShow->setObjectName(QStringLiteral("trackRoiShow"));
+        trackRoiShow->setObjectName(QString::fromUtf8("trackRoiShow"));
         trackRoiShow->setGeometry(QRect(10, 20, 49, 18));
         trackRoiFix = new QCheckBox(groupBox_8);
-        trackRoiFix->setObjectName(QStringLiteral("trackRoiFix"));
+        trackRoiFix->setObjectName(QString::fromUtf8("trackRoiFix"));
         trackRoiFix->setGeometry(QRect(70, 20, 36, 18));
 
         verticalLayout_17->addWidget(groupBox_8);
 
         groupBox_7 = new QGroupBox(scrollAreaWidgetContents_3);
-        groupBox_7->setObjectName(QStringLiteral("groupBox_7"));
+        groupBox_7->setObjectName(QString::fromUtf8("groupBox_7"));
         sizePolicy10.setHeightForWidth(groupBox_7->sizePolicy().hasHeightForWidth());
         groupBox_7->setSizePolicy(sizePolicy10);
         groupBox_7->setMaximumSize(QSize(324, 16777215));
         verticalLayout_6 = new QVBoxLayout(groupBox_7);
         verticalLayout_6->setSpacing(2);
-        verticalLayout_6->setObjectName(QStringLiteral("verticalLayout_6"));
+        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
         verticalLayout_6->setContentsMargins(2, 6, 2, 6);
         gridLayout_4 = new QGridLayout();
         gridLayout_4->setSpacing(4);
-        gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
+        gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
         trackMissingFrames = new QCheckBox(groupBox_7);
-        trackMissingFrames->setObjectName(QStringLiteral("trackMissingFrames"));
+        trackMissingFrames->setObjectName(QString::fromUtf8("trackMissingFrames"));
         sizePolicy5.setHeightForWidth(trackMissingFrames->sizePolicy().hasHeightForWidth());
         trackMissingFrames->setSizePolicy(sizePolicy5);
         trackMissingFrames->setMaximumSize(QSize(100, 16777215));
@@ -2562,7 +2559,7 @@ public:
         gridLayout_4->addWidget(trackMissingFrames, 0, 0, 1, 1);
 
         trackRecalcHeight = new QCheckBox(groupBox_7);
-        trackRecalcHeight->setObjectName(QStringLiteral("trackRecalcHeight"));
+        trackRecalcHeight->setObjectName(QString::fromUtf8("trackRecalcHeight"));
         sizePolicy5.setHeightForWidth(trackRecalcHeight->sizePolicy().hasHeightForWidth());
         trackRecalcHeight->setSizePolicy(sizePolicy5);
         trackRecalcHeight->setMaximumSize(QSize(100, 16777215));
@@ -2571,7 +2568,7 @@ public:
         gridLayout_4->addWidget(trackRecalcHeight, 0, 1, 1, 1);
 
         trackAlternateHeight = new QCheckBox(groupBox_7);
-        trackAlternateHeight->setObjectName(QStringLiteral("trackAlternateHeight"));
+        trackAlternateHeight->setObjectName(QString::fromUtf8("trackAlternateHeight"));
         sizePolicy5.setHeightForWidth(trackAlternateHeight->sizePolicy().hasHeightForWidth());
         trackAlternateHeight->setSizePolicy(sizePolicy5);
         trackAlternateHeight->setMaximumSize(QSize(100, 16777215));
@@ -2579,7 +2576,7 @@ public:
         gridLayout_4->addWidget(trackAlternateHeight, 0, 2, 1, 1);
 
         exportElimTp = new QCheckBox(groupBox_7);
-        exportElimTp->setObjectName(QStringLiteral("exportElimTp"));
+        exportElimTp->setObjectName(QString::fromUtf8("exportElimTp"));
         sizePolicy5.setHeightForWidth(exportElimTp->sizePolicy().hasHeightForWidth());
         exportElimTp->setSizePolicy(sizePolicy5);
         exportElimTp->setMaximumSize(QSize(120, 16777215));
@@ -2588,7 +2585,7 @@ public:
         gridLayout_4->addWidget(exportElimTp, 1, 0, 1, 1);
 
         exportElimTrj = new QCheckBox(groupBox_7);
-        exportElimTrj->setObjectName(QStringLiteral("exportElimTrj"));
+        exportElimTrj->setObjectName(QString::fromUtf8("exportElimTrj"));
         sizePolicy5.setHeightForWidth(exportElimTrj->sizePolicy().hasHeightForWidth());
         exportElimTrj->setSizePolicy(sizePolicy5);
         exportElimTrj->setMaximumSize(QSize(120, 16777215));
@@ -2597,7 +2594,7 @@ public:
         gridLayout_4->addWidget(exportElimTrj, 1, 1, 1, 1);
 
         exportSmooth = new QCheckBox(groupBox_7);
-        exportSmooth->setObjectName(QStringLiteral("exportSmooth"));
+        exportSmooth->setObjectName(QString::fromUtf8("exportSmooth"));
         sizePolicy5.setHeightForWidth(exportSmooth->sizePolicy().hasHeightForWidth());
         exportSmooth->setSizePolicy(sizePolicy5);
         exportSmooth->setMaximumSize(QSize(120, 16777215));
@@ -2606,7 +2603,7 @@ public:
         gridLayout_4->addWidget(exportSmooth, 1, 2, 1, 1);
 
         exportViewDir = new QCheckBox(groupBox_7);
-        exportViewDir->setObjectName(QStringLiteral("exportViewDir"));
+        exportViewDir->setObjectName(QString::fromUtf8("exportViewDir"));
         sizePolicy5.setHeightForWidth(exportViewDir->sizePolicy().hasHeightForWidth());
         exportViewDir->setSizePolicy(sizePolicy5);
         exportViewDir->setMaximumSize(QSize(120, 16777215));
@@ -2614,7 +2611,7 @@ public:
         gridLayout_4->addWidget(exportViewDir, 2, 0, 1, 1);
 
         exportAngleOfView = new QCheckBox(groupBox_7);
-        exportAngleOfView->setObjectName(QStringLiteral("exportAngleOfView"));
+        exportAngleOfView->setObjectName(QString::fromUtf8("exportAngleOfView"));
         sizePolicy5.setHeightForWidth(exportAngleOfView->sizePolicy().hasHeightForWidth());
         exportAngleOfView->setSizePolicy(sizePolicy5);
         exportAngleOfView->setMaximumSize(QSize(120, 16777215));
@@ -2622,7 +2619,7 @@ public:
         gridLayout_4->addWidget(exportAngleOfView, 2, 1, 1, 1);
 
         exportUseM = new QCheckBox(groupBox_7);
-        exportUseM->setObjectName(QStringLiteral("exportUseM"));
+        exportUseM->setObjectName(QString::fromUtf8("exportUseM"));
         sizePolicy5.setHeightForWidth(exportUseM->sizePolicy().hasHeightForWidth());
         exportUseM->setSizePolicy(sizePolicy5);
         exportUseM->setMaximumSize(QSize(120, 16777215));
@@ -2630,7 +2627,7 @@ public:
         gridLayout_4->addWidget(exportUseM, 2, 2, 1, 1);
 
         exportComment = new QCheckBox(groupBox_7);
-        exportComment->setObjectName(QStringLiteral("exportComment"));
+        exportComment->setObjectName(QString::fromUtf8("exportComment"));
         sizePolicy5.setHeightForWidth(exportComment->sizePolicy().hasHeightForWidth());
         exportComment->setSizePolicy(sizePolicy5);
         exportComment->setMaximumSize(QSize(120, 16777215));
@@ -2638,7 +2635,7 @@ public:
         gridLayout_4->addWidget(exportComment, 3, 0, 1, 1);
 
         exportMarkerID = new QCheckBox(groupBox_7);
-        exportMarkerID->setObjectName(QStringLiteral("exportMarkerID"));
+        exportMarkerID->setObjectName(QString::fromUtf8("exportMarkerID"));
 
         gridLayout_4->addWidget(exportMarkerID, 3, 1, 1, 1);
 
@@ -2652,36 +2649,36 @@ public:
         verticalLayout_17->addWidget(groupBox_7);
 
         horizontalLayout_9 = new QHBoxLayout();
-        horizontalLayout_9->setObjectName(QStringLiteral("horizontalLayout_9"));
+        horizontalLayout_9->setObjectName(QString::fromUtf8("horizontalLayout_9"));
         trackTest = new QPushButton(scrollAreaWidgetContents_3);
-        trackTest->setObjectName(QStringLiteral("trackTest"));
+        trackTest->setObjectName(QString::fromUtf8("trackTest"));
         trackTest->setMaximumSize(QSize(60, 16777215));
 
         horizontalLayout_9->addWidget(trackTest);
 
         testEqual = new QCheckBox(scrollAreaWidgetContents_3);
-        testEqual->setObjectName(QStringLiteral("testEqual"));
+        testEqual->setObjectName(QString::fromUtf8("testEqual"));
         testEqual->setMaximumSize(QSize(60, 16777215));
         testEqual->setChecked(true);
 
         horizontalLayout_9->addWidget(testEqual);
 
         testVelocity = new QCheckBox(scrollAreaWidgetContents_3);
-        testVelocity->setObjectName(QStringLiteral("testVelocity"));
+        testVelocity->setObjectName(QString::fromUtf8("testVelocity"));
         testVelocity->setMaximumSize(QSize(60, 16777215));
         testVelocity->setChecked(true);
 
         horizontalLayout_9->addWidget(testVelocity);
 
         testInside = new QCheckBox(scrollAreaWidgetContents_3);
-        testInside->setObjectName(QStringLiteral("testInside"));
+        testInside->setObjectName(QString::fromUtf8("testInside"));
         testInside->setMaximumSize(QSize(60, 16777215));
         testInside->setChecked(true);
 
         horizontalLayout_9->addWidget(testInside);
 
         testLength = new QCheckBox(scrollAreaWidgetContents_3);
-        testLength->setObjectName(QStringLiteral("testLength"));
+        testLength->setObjectName(QString::fromUtf8("testLength"));
         testLength->setMaximumSize(QSize(60, 16777215));
         testLength->setChecked(true);
 
@@ -2696,26 +2693,26 @@ public:
         verticalLayout_17->addLayout(horizontalLayout_9);
 
         groupBox_6 = new QGroupBox(scrollAreaWidgetContents_3);
-        groupBox_6->setObjectName(QStringLiteral("groupBox_6"));
+        groupBox_6->setObjectName(QString::fromUtf8("groupBox_6"));
         sizePolicy8.setHeightForWidth(groupBox_6->sizePolicy().hasHeightForWidth());
         groupBox_6->setSizePolicy(sizePolicy8);
         groupBox_6->setMinimumSize(QSize(0, 120));
         groupBox_6->setMaximumSize(QSize(324, 16777215));
         verticalLayout_20 = new QVBoxLayout(groupBox_6);
-        verticalLayout_20->setObjectName(QStringLiteral("verticalLayout_20"));
+        verticalLayout_20->setObjectName(QString::fromUtf8("verticalLayout_20"));
         verticalLayout = new QVBoxLayout();
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         gridLayout_17 = new QGridLayout();
-        gridLayout_17->setObjectName(QStringLiteral("gridLayout_17"));
+        gridLayout_17->setObjectName(QString::fromUtf8("gridLayout_17"));
         gridLayout_17->setVerticalSpacing(0);
         label_52 = new QLabel(groupBox_6);
-        label_52->setObjectName(QStringLiteral("label_52"));
+        label_52->setObjectName(QString::fromUtf8("label_52"));
         label_52->setMaximumSize(QSize(100, 16777215));
 
         gridLayout_17->addWidget(label_52, 0, 0, 1, 1);
 
         trackRegionScale = new QScrollBar(groupBox_6);
-        trackRegionScale->setObjectName(QStringLiteral("trackRegionScale"));
+        trackRegionScale->setObjectName(QString::fromUtf8("trackRegionScale"));
         trackRegionScale->setMinimum(1);
         trackRegionScale->setValue(16);
         trackRegionScale->setOrientation(Qt::Horizontal);
@@ -2723,13 +2720,13 @@ public:
         gridLayout_17->addWidget(trackRegionScale, 0, 1, 1, 1);
 
         label_53 = new QLabel(groupBox_6);
-        label_53->setObjectName(QStringLiteral("label_53"));
+        label_53->setObjectName(QString::fromUtf8("label_53"));
         label_53->setMaximumSize(QSize(100, 16777215));
 
         gridLayout_17->addWidget(label_53, 1, 0, 1, 1);
 
         trackRegionLevels = new QScrollBar(groupBox_6);
-        trackRegionLevels->setObjectName(QStringLiteral("trackRegionLevels"));
+        trackRegionLevels->setObjectName(QString::fromUtf8("trackRegionLevels"));
         trackRegionLevels->setMinimum(0);
         trackRegionLevels->setMaximum(8);
         trackRegionLevels->setValue(3);
@@ -2738,7 +2735,7 @@ public:
         gridLayout_17->addWidget(trackRegionLevels, 1, 1, 1, 1);
 
         trackErrorExponent = new QScrollBar(groupBox_6);
-        trackErrorExponent->setObjectName(QStringLiteral("trackErrorExponent"));
+        trackErrorExponent->setObjectName(QString::fromUtf8("trackErrorExponent"));
         trackErrorExponent->setMinimum(-10);
         trackErrorExponent->setMaximum(10);
         trackErrorExponent->setPageStep(3);
@@ -2747,7 +2744,7 @@ public:
         gridLayout_17->addWidget(trackErrorExponent, 2, 1, 1, 1);
 
         label_66 = new QLabel(groupBox_6);
-        label_66->setObjectName(QStringLiteral("label_66"));
+        label_66->setObjectName(QString::fromUtf8("label_66"));
         label_66->setMaximumSize(QSize(100, 16777215));
 
         gridLayout_17->addWidget(label_66, 2, 0, 1, 1);
@@ -2757,7 +2754,7 @@ public:
         verticalLayout->addLayout(gridLayout_17);
 
         trackShowSearchSize = new QCheckBox(groupBox_6);
-        trackShowSearchSize->setObjectName(QStringLiteral("trackShowSearchSize"));
+        trackShowSearchSize->setObjectName(QString::fromUtf8("trackShowSearchSize"));
         trackShowSearchSize->setMaximumSize(QSize(300, 16777215));
 
         verticalLayout->addWidget(trackShowSearchSize);
@@ -2769,29 +2766,29 @@ public:
         verticalLayout_17->addWidget(groupBox_6);
 
         groupBox_3 = new QGroupBox(scrollAreaWidgetContents_3);
-        groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
+        groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
         groupBox_3->setMinimumSize(QSize(0, 325));
         groupBox_3->setMaximumSize(QSize(324, 16777215));
         verticalLayout_21 = new QVBoxLayout(groupBox_3);
         verticalLayout_21->setSpacing(6);
-        verticalLayout_21->setObjectName(QStringLiteral("verticalLayout_21"));
+        verticalLayout_21->setObjectName(QString::fromUtf8("verticalLayout_21"));
         verticalLayout_21->setContentsMargins(2, 2, 2, 2);
         vboxLayout2 = new QVBoxLayout();
         vboxLayout2->setSpacing(4);
-        vboxLayout2->setObjectName(QStringLiteral("vboxLayout2"));
+        vboxLayout2->setObjectName(QString::fromUtf8("vboxLayout2"));
         vboxLayout2->setContentsMargins(4, 4, 4, 4);
         hboxLayout8 = new QHBoxLayout();
         hboxLayout8->setSpacing(2);
-        hboxLayout8->setObjectName(QStringLiteral("hboxLayout8"));
+        hboxLayout8->setObjectName(QString::fromUtf8("hboxLayout8"));
         hboxLayout8->setContentsMargins(0, 0, 0, 0);
         trackShow = new QCheckBox(groupBox_3);
-        trackShow->setObjectName(QStringLiteral("trackShow"));
+        trackShow->setObjectName(QString::fromUtf8("trackShow"));
         trackShow->setChecked(true);
 
         hboxLayout8->addWidget(trackShow);
 
         trackFix = new QCheckBox(groupBox_3);
-        trackFix->setObjectName(QStringLiteral("trackFix"));
+        trackFix->setObjectName(QString::fromUtf8("trackFix"));
 
         hboxLayout8->addWidget(trackFix);
 
@@ -2803,39 +2800,39 @@ public:
         vboxLayout2->addLayout(hboxLayout8);
 
         trackShowOnlyVisible = new QCheckBox(groupBox_3);
-        trackShowOnlyVisible->setObjectName(QStringLiteral("trackShowOnlyVisible"));
+        trackShowOnlyVisible->setObjectName(QString::fromUtf8("trackShowOnlyVisible"));
         trackShowOnlyVisible->setMaximumSize(QSize(300, 16777215));
 
         vboxLayout2->addWidget(trackShowOnlyVisible);
 
         horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         trackShowOnly = new QCheckBox(groupBox_3);
-        trackShowOnly->setObjectName(QStringLiteral("trackShowOnly"));
+        trackShowOnly->setObjectName(QString::fromUtf8("trackShowOnly"));
         trackShowOnly->setMaximumSize(QSize(160, 16777215));
 
         horizontalLayout->addWidget(trackShowOnly);
 
         trackShowOnlyNr = new QSpinBox(groupBox_3);
-        trackShowOnlyNr->setObjectName(QStringLiteral("trackShowOnlyNr"));
+        trackShowOnlyNr->setObjectName(QString::fromUtf8("trackShowOnlyNr"));
         trackShowOnlyNr->setMinimum(1);
 
         horizontalLayout->addWidget(trackShowOnlyNr);
 
         trackGotoNr = new QPushButton(groupBox_3);
-        trackGotoNr->setObjectName(QStringLiteral("trackGotoNr"));
+        trackGotoNr->setObjectName(QString::fromUtf8("trackGotoNr"));
         trackGotoNr->setMaximumSize(QSize(40, 16777215));
 
         horizontalLayout->addWidget(trackGotoNr);
 
         trackGotoStartNr = new QPushButton(groupBox_3);
-        trackGotoStartNr->setObjectName(QStringLiteral("trackGotoStartNr"));
+        trackGotoStartNr->setObjectName(QString::fromUtf8("trackGotoStartNr"));
         trackGotoStartNr->setMaximumSize(QSize(40, 16777215));
 
         horizontalLayout->addWidget(trackGotoStartNr);
 
         trackGotoEndNr = new QPushButton(groupBox_3);
-        trackGotoEndNr->setObjectName(QStringLiteral("trackGotoEndNr"));
+        trackGotoEndNr->setObjectName(QString::fromUtf8("trackGotoEndNr"));
         trackGotoEndNr->setMaximumSize(QSize(40, 16777215));
 
         horizontalLayout->addWidget(trackGotoEndNr);
@@ -2848,20 +2845,20 @@ public:
         vboxLayout2->addLayout(horizontalLayout);
 
         horizontalLayout_20 = new QHBoxLayout();
-        horizontalLayout_20->setObjectName(QStringLiteral("horizontalLayout_20"));
+        horizontalLayout_20->setObjectName(QString::fromUtf8("horizontalLayout_20"));
         trackShowOnlyList = new QCheckBox(groupBox_3);
-        trackShowOnlyList->setObjectName(QStringLiteral("trackShowOnlyList"));
+        trackShowOnlyList->setObjectName(QString::fromUtf8("trackShowOnlyList"));
 
         horizontalLayout_20->addWidget(trackShowOnlyList);
 
         trackShowOnlyNrList = new QLineEdit(groupBox_3);
-        trackShowOnlyNrList->setObjectName(QStringLiteral("trackShowOnlyNrList"));
+        trackShowOnlyNrList->setObjectName(QString::fromUtf8("trackShowOnlyNrList"));
         trackShowOnlyNrList->setEnabled(false);
 
         horizontalLayout_20->addWidget(trackShowOnlyNrList);
 
         trackShowOnlyListButton = new QPushButton(groupBox_3);
-        trackShowOnlyListButton->setObjectName(QStringLiteral("trackShowOnlyListButton"));
+        trackShowOnlyListButton->setObjectName(QString::fromUtf8("trackShowOnlyListButton"));
         trackShowOnlyListButton->setEnabled(false);
         trackShowOnlyListButton->setMaximumSize(QSize(40, 16777215));
 
@@ -2875,19 +2872,19 @@ public:
         vboxLayout2->addItem(spacerItem6);
 
         gridLayout11 = new QGridLayout();
-        gridLayout11->setObjectName(QStringLiteral("gridLayout11"));
+        gridLayout11->setObjectName(QString::fromUtf8("gridLayout11"));
         gridLayout11->setHorizontalSpacing(2);
         gridLayout11->setVerticalSpacing(0);
         gridLayout11->setContentsMargins(0, 0, 0, 0);
         trackShowPath = new QCheckBox(groupBox_3);
-        trackShowPath->setObjectName(QStringLiteral("trackShowPath"));
+        trackShowPath->setObjectName(QString::fromUtf8("trackShowPath"));
         trackShowPath->setMaximumSize(QSize(170, 16777215));
         trackShowPath->setChecked(true);
 
         gridLayout11->addWidget(trackShowPath, 2, 0, 1, 1);
 
         trackCurrentPointSize = new QSpinBox(groupBox_3);
-        trackCurrentPointSize->setObjectName(QStringLiteral("trackCurrentPointSize"));
+        trackCurrentPointSize->setObjectName(QString::fromUtf8("trackCurrentPointSize"));
         trackCurrentPointSize->setEnabled(false);
         trackCurrentPointSize->setMaximumSize(QSize(16777215, 16777215));
         trackCurrentPointSize->setAlignment(Qt::AlignRight);
@@ -2897,7 +2894,7 @@ public:
         gridLayout11->addWidget(trackCurrentPointSize, 0, 2, 1, 1);
 
         trackColColorSize = new QSpinBox(groupBox_3);
-        trackColColorSize->setObjectName(QStringLiteral("trackColColorSize"));
+        trackColColorSize->setObjectName(QString::fromUtf8("trackColColorSize"));
         trackColColorSize->setAlignment(Qt::AlignRight);
         trackColColorSize->setMinimum(1);
         trackColColorSize->setValue(11);
@@ -2905,26 +2902,26 @@ public:
         gridLayout11->addWidget(trackColColorSize, 3, 2, 1, 1);
 
         trackShowCurrentPoint = new QCheckBox(groupBox_3);
-        trackShowCurrentPoint->setObjectName(QStringLiteral("trackShowCurrentPoint"));
+        trackShowCurrentPoint->setObjectName(QString::fromUtf8("trackShowCurrentPoint"));
         trackShowCurrentPoint->setMaximumSize(QSize(150, 16777215));
         trackShowCurrentPoint->setChecked(true);
 
         gridLayout11->addWidget(trackShowCurrentPoint, 0, 0, 1, 1);
 
         label_25 = new QLabel(groupBox_3);
-        label_25->setObjectName(QStringLiteral("label_25"));
+        label_25->setObjectName(QString::fromUtf8("label_25"));
         label_25->setMaximumSize(QSize(30, 16777215));
 
         gridLayout11->addWidget(label_25, 2, 1, 1, 1);
 
         label_36 = new QLabel(groupBox_3);
-        label_36->setObjectName(QStringLiteral("label_36"));
+        label_36->setObjectName(QString::fromUtf8("label_36"));
         label_36->setMaximumSize(QSize(30, 16777215));
 
         gridLayout11->addWidget(label_36, 3, 1, 1, 1);
 
         trackShowColColor = new QCheckBox(groupBox_3);
-        trackShowColColor->setObjectName(QStringLiteral("trackShowColColor"));
+        trackShowColColor->setObjectName(QString::fromUtf8("trackShowColColor"));
         trackShowColColor->setMinimumSize(QSize(124, 0));
         trackShowColColor->setMaximumSize(QSize(170, 16777215));
         trackShowColColor->setChecked(true);
@@ -2932,27 +2929,27 @@ public:
         gridLayout11->addWidget(trackShowColColor, 3, 0, 1, 1);
 
         trackShowColorMarker = new QCheckBox(groupBox_3);
-        trackShowColorMarker->setObjectName(QStringLiteral("trackShowColorMarker"));
+        trackShowColorMarker->setObjectName(QString::fromUtf8("trackShowColorMarker"));
         trackShowColorMarker->setMaximumSize(QSize(170, 16777215));
         trackShowColorMarker->setChecked(true);
 
         gridLayout11->addWidget(trackShowColorMarker, 4, 0, 1, 1);
 
         trackShowNumber = new QCheckBox(groupBox_3);
-        trackShowNumber->setObjectName(QStringLiteral("trackShowNumber"));
+        trackShowNumber->setObjectName(QString::fromUtf8("trackShowNumber"));
         trackShowNumber->setMaximumSize(QSize(170, 16777215));
         trackShowNumber->setChecked(true);
 
         gridLayout11->addWidget(trackShowNumber, 5, 0, 1, 1);
 
         label_48 = new QLabel(groupBox_3);
-        label_48->setObjectName(QStringLiteral("label_48"));
+        label_48->setObjectName(QString::fromUtf8("label_48"));
         label_48->setMaximumSize(QSize(30, 16777215));
 
         gridLayout11->addWidget(label_48, 5, 1, 1, 1);
 
         trackNumberSize = new QSpinBox(groupBox_3);
-        trackNumberSize->setObjectName(QStringLiteral("trackNumberSize"));
+        trackNumberSize->setObjectName(QString::fromUtf8("trackNumberSize"));
         trackNumberSize->setAlignment(Qt::AlignRight);
         trackNumberSize->setMinimum(2);
         trackNumberSize->setValue(14);
@@ -2960,28 +2957,28 @@ public:
         gridLayout11->addWidget(trackNumberSize, 5, 2, 1, 1);
 
         trackNumberBold = new QCheckBox(groupBox_3);
-        trackNumberBold->setObjectName(QStringLiteral("trackNumberBold"));
+        trackNumberBold->setObjectName(QString::fromUtf8("trackNumberBold"));
         trackNumberBold->setMaximumSize(QSize(70, 16777215));
         trackNumberBold->setChecked(true);
 
         gridLayout11->addWidget(trackNumberBold, 5, 3, 1, 1);
 
         trackHeadSized = new QCheckBox(groupBox_3);
-        trackHeadSized->setObjectName(QStringLiteral("trackHeadSized"));
+        trackHeadSized->setObjectName(QString::fromUtf8("trackHeadSized"));
         trackHeadSized->setMaximumSize(QSize(70, 16777215));
         trackHeadSized->setChecked(true);
 
         gridLayout11->addWidget(trackHeadSized, 0, 3, 1, 1);
 
         trackShowHeightIndividual = new QCheckBox(groupBox_3);
-        trackShowHeightIndividual->setObjectName(QStringLiteral("trackShowHeightIndividual"));
+        trackShowHeightIndividual->setObjectName(QString::fromUtf8("trackShowHeightIndividual"));
         trackShowHeightIndividual->setMaximumSize(QSize(70, 16777215));
         trackShowHeightIndividual->setChecked(true);
 
         gridLayout11->addWidget(trackShowHeightIndividual, 3, 3, 1, 1);
 
         trackPathColorButton = new QPushButton(groupBox_3);
-        trackPathColorButton->setObjectName(QStringLiteral("trackPathColorButton"));
+        trackPathColorButton->setObjectName(QString::fromUtf8("trackPathColorButton"));
         sizePolicy5.setHeightForWidth(trackPathColorButton->sizePolicy().hasHeightForWidth());
         trackPathColorButton->setSizePolicy(sizePolicy5);
         trackPathColorButton->setMaximumSize(QSize(60, 20));
@@ -3053,7 +3050,7 @@ public:
         gridLayout11->addWidget(trackPathColorButton, 2, 3, 1, 1);
 
         trackPathWidth = new QSpinBox(groupBox_3);
-        trackPathWidth->setObjectName(QStringLiteral("trackPathWidth"));
+        trackPathWidth->setObjectName(QString::fromUtf8("trackPathWidth"));
         trackPathWidth->setAlignment(Qt::AlignRight);
         trackPathWidth->setMinimum(1);
         trackPathWidth->setMaximum(20);
@@ -3062,7 +3059,7 @@ public:
         gridLayout11->addWidget(trackPathWidth, 2, 2, 1, 1);
 
         trackShowPoints = new QCheckBox(groupBox_3);
-        trackShowPoints->setObjectName(QStringLiteral("trackShowPoints"));
+        trackShowPoints->setObjectName(QString::fromUtf8("trackShowPoints"));
         trackShowPoints->setMinimumSize(QSize(90, 0));
         trackShowPoints->setMaximumSize(QSize(170, 16777215));
         trackShowPoints->setChecked(false);
@@ -3070,26 +3067,26 @@ public:
         gridLayout11->addWidget(trackShowPoints, 1, 0, 1, 1);
 
         trackShowPointsColored = new QCheckBox(groupBox_3);
-        trackShowPointsColored->setObjectName(QStringLiteral("trackShowPointsColored"));
+        trackShowPointsColored->setObjectName(QString::fromUtf8("trackShowPointsColored"));
         trackShowPointsColored->setMaximumSize(QSize(70, 16777215));
         trackShowPointsColored->setChecked(true);
 
         gridLayout11->addWidget(trackShowPointsColored, 1, 3, 1, 1);
 
         label_13 = new QLabel(groupBox_3);
-        label_13->setObjectName(QStringLiteral("label_13"));
+        label_13->setObjectName(QString::fromUtf8("label_13"));
         label_13->setMaximumSize(QSize(30, 16777215));
 
         gridLayout11->addWidget(label_13, 1, 1, 1, 1);
 
         label_41 = new QLabel(groupBox_3);
-        label_41->setObjectName(QStringLiteral("label_41"));
+        label_41->setObjectName(QString::fromUtf8("label_41"));
         label_41->setMaximumSize(QSize(30, 16777215));
 
         gridLayout11->addWidget(label_41, 4, 1, 1, 1);
 
         trackColorMarkerSize = new QSpinBox(groupBox_3);
-        trackColorMarkerSize->setObjectName(QStringLiteral("trackColorMarkerSize"));
+        trackColorMarkerSize->setObjectName(QString::fromUtf8("trackColorMarkerSize"));
         trackColorMarkerSize->setAlignment(Qt::AlignRight);
         trackColorMarkerSize->setMinimum(1);
         trackColorMarkerSize->setValue(14);
@@ -3097,7 +3094,7 @@ public:
         gridLayout11->addWidget(trackColorMarkerSize, 4, 2, 1, 1);
 
         trackPointSize = new QSpinBox(groupBox_3);
-        trackPointSize->setObjectName(QStringLiteral("trackPointSize"));
+        trackPointSize->setObjectName(QString::fromUtf8("trackPointSize"));
         trackPointSize->setAlignment(Qt::AlignRight);
         trackPointSize->setMinimum(1);
         trackPointSize->setValue(7);
@@ -3105,26 +3102,26 @@ public:
         gridLayout11->addWidget(trackPointSize, 1, 2, 1, 1);
 
         label_47 = new QLabel(groupBox_3);
-        label_47->setObjectName(QStringLiteral("label_47"));
+        label_47->setObjectName(QString::fromUtf8("label_47"));
         label_47->setMaximumSize(QSize(30, 16777215));
 
         gridLayout11->addWidget(label_47, 0, 1, 1, 1);
 
         trackShowGroundPosition = new QCheckBox(groupBox_3);
-        trackShowGroundPosition->setObjectName(QStringLiteral("trackShowGroundPosition"));
+        trackShowGroundPosition->setObjectName(QString::fromUtf8("trackShowGroundPosition"));
         trackShowGroundPosition->setMaximumSize(QSize(170, 16777215));
         trackShowGroundPosition->setChecked(false);
 
         gridLayout11->addWidget(trackShowGroundPosition, 6, 0, 1, 1);
 
         label_67 = new QLabel(groupBox_3);
-        label_67->setObjectName(QStringLiteral("label_67"));
+        label_67->setObjectName(QString::fromUtf8("label_67"));
         label_67->setMaximumSize(QSize(30, 16777215));
 
         gridLayout11->addWidget(label_67, 6, 1, 1, 1);
 
         trackGroundPositionSize = new QSpinBox(groupBox_3);
-        trackGroundPositionSize->setObjectName(QStringLiteral("trackGroundPositionSize"));
+        trackGroundPositionSize->setObjectName(QString::fromUtf8("trackGroundPositionSize"));
         trackGroundPositionSize->setAlignment(Qt::AlignRight);
         trackGroundPositionSize->setMinimum(1);
         trackGroundPositionSize->setValue(1);
@@ -3132,20 +3129,20 @@ public:
         gridLayout11->addWidget(trackGroundPositionSize, 6, 2, 1, 1);
 
         trackShowGroundPath = new QCheckBox(groupBox_3);
-        trackShowGroundPath->setObjectName(QStringLiteral("trackShowGroundPath"));
+        trackShowGroundPath->setObjectName(QString::fromUtf8("trackShowGroundPath"));
         trackShowGroundPath->setMaximumSize(QSize(170, 16777215));
         trackShowGroundPath->setChecked(false);
 
         gridLayout11->addWidget(trackShowGroundPath, 7, 0, 1, 1);
 
         label_68 = new QLabel(groupBox_3);
-        label_68->setObjectName(QStringLiteral("label_68"));
+        label_68->setObjectName(QString::fromUtf8("label_68"));
         label_68->setMaximumSize(QSize(30, 16777215));
 
         gridLayout11->addWidget(label_68, 7, 1, 1, 1);
 
         trackGroundPathSize = new QSpinBox(groupBox_3);
-        trackGroundPathSize->setObjectName(QStringLiteral("trackGroundPathSize"));
+        trackGroundPathSize->setObjectName(QString::fromUtf8("trackGroundPathSize"));
         trackGroundPathSize->setAlignment(Qt::AlignRight);
         trackGroundPathSize->setMinimum(1);
         trackGroundPathSize->setValue(1);
@@ -3153,7 +3150,7 @@ public:
         gridLayout11->addWidget(trackGroundPathSize, 7, 2, 1, 1);
 
         trackGroundPathColorButton = new QPushButton(groupBox_3);
-        trackGroundPathColorButton->setObjectName(QStringLiteral("trackGroundPathColorButton"));
+        trackGroundPathColorButton->setObjectName(QString::fromUtf8("trackGroundPathColorButton"));
         sizePolicy5.setHeightForWidth(trackGroundPathColorButton->sizePolicy().hasHeightForWidth());
         trackGroundPathColorButton->setSizePolicy(sizePolicy5);
         trackGroundPathColorButton->setMaximumSize(QSize(60, 20));
@@ -3231,17 +3228,17 @@ public:
 
         gridLayout12 = new QGridLayout();
         gridLayout12->setSpacing(0);
-        gridLayout12->setObjectName(QStringLiteral("gridLayout12"));
+        gridLayout12->setObjectName(QString::fromUtf8("gridLayout12"));
         gridLayout12->setContentsMargins(0, 0, 0, 0);
         label_17 = new QLabel(groupBox_3);
-        label_17->setObjectName(QStringLiteral("label_17"));
+        label_17->setObjectName(QString::fromUtf8("label_17"));
         label_17->setMinimumSize(QSize(150, 0));
         label_17->setMaximumSize(QSize(250, 16777215));
 
         gridLayout12->addWidget(label_17, 0, 0, 1, 1);
 
         trackShowAfter = new QSpinBox(groupBox_3);
-        trackShowAfter->setObjectName(QStringLiteral("trackShowAfter"));
+        trackShowAfter->setObjectName(QString::fromUtf8("trackShowAfter"));
         trackShowAfter->setMaximumSize(QSize(80, 16777215));
         trackShowAfter->setAlignment(Qt::AlignRight);
         trackShowAfter->setMinimum(-1);
@@ -3251,13 +3248,13 @@ public:
         gridLayout12->addWidget(trackShowAfter, 1, 1, 1, 1);
 
         label_20 = new QLabel(groupBox_3);
-        label_20->setObjectName(QStringLiteral("label_20"));
+        label_20->setObjectName(QString::fromUtf8("label_20"));
         label_20->setMaximumSize(QSize(250, 16777215));
 
         gridLayout12->addWidget(label_20, 1, 0, 1, 1);
 
         trackShowBefore = new QSpinBox(groupBox_3);
-        trackShowBefore->setObjectName(QStringLiteral("trackShowBefore"));
+        trackShowBefore->setObjectName(QString::fromUtf8("trackShowBefore"));
         trackShowBefore->setMaximumSize(QSize(80, 16777215));
         trackShowBefore->setAlignment(Qt::AlignRight);
         trackShowBefore->setMinimum(-1);
@@ -3289,19 +3286,19 @@ public:
 
         tabs->addTab(track, QString());
         ana = new QWidget();
-        ana->setObjectName(QStringLiteral("ana"));
+        ana->setObjectName(QString::fromUtf8("ana"));
         horizontalLayout_18 = new QHBoxLayout(ana);
-        horizontalLayout_18->setObjectName(QStringLiteral("horizontalLayout_18"));
+        horizontalLayout_18->setObjectName(QString::fromUtf8("horizontalLayout_18"));
         scrollArea_4 = new QScrollArea(ana);
-        scrollArea_4->setObjectName(QStringLiteral("scrollArea_4"));
+        scrollArea_4->setObjectName(QString::fromUtf8("scrollArea_4"));
         scrollArea_4->setWidgetResizable(true);
         scrollAreaWidgetContents_4 = new QWidget();
-        scrollAreaWidgetContents_4->setObjectName(QStringLiteral("scrollAreaWidgetContents_4"));
+        scrollAreaWidgetContents_4->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_4"));
         scrollAreaWidgetContents_4->setGeometry(QRect(0, 0, 354, 311));
         verticalLayout_18 = new QVBoxLayout(scrollAreaWidgetContents_4);
-        verticalLayout_18->setObjectName(QStringLiteral("verticalLayout_18"));
+        verticalLayout_18->setObjectName(QString::fromUtf8("verticalLayout_18"));
         analysePlot = new AnalysePlot(scrollAreaWidgetContents_4);
-        analysePlot->setObjectName(QStringLiteral("analysePlot"));
+        analysePlot->setObjectName(QString::fromUtf8("analysePlot"));
         QSizePolicy sizePolicy11(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy11.setHorizontalStretch(0);
         sizePolicy11.setVerticalStretch(0);
@@ -3314,14 +3311,14 @@ public:
         verticalLayout_18->addWidget(analysePlot);
 
         hboxLayout9 = new QHBoxLayout();
-        hboxLayout9->setObjectName(QStringLiteral("hboxLayout9"));
+        hboxLayout9->setObjectName(QString::fromUtf8("hboxLayout9"));
         anaCalculate = new QPushButton(scrollAreaWidgetContents_4);
-        anaCalculate->setObjectName(QStringLiteral("anaCalculate"));
+        anaCalculate->setObjectName(QString::fromUtf8("anaCalculate"));
 
         hboxLayout9->addWidget(anaCalculate);
 
         anaMissingFrames = new QCheckBox(scrollAreaWidgetContents_4);
-        anaMissingFrames->setObjectName(QStringLiteral("anaMissingFrames"));
+        anaMissingFrames->setObjectName(QString::fromUtf8("anaMissingFrames"));
         anaMissingFrames->setChecked(true);
 
         hboxLayout9->addWidget(anaMissingFrames);
@@ -3330,16 +3327,16 @@ public:
         verticalLayout_18->addLayout(hboxLayout9);
 
         hboxLayout10 = new QHBoxLayout();
-        hboxLayout10->setObjectName(QStringLiteral("hboxLayout10"));
+        hboxLayout10->setObjectName(QString::fromUtf8("hboxLayout10"));
         hboxLayout11 = new QHBoxLayout();
-        hboxLayout11->setObjectName(QStringLiteral("hboxLayout11"));
+        hboxLayout11->setObjectName(QString::fromUtf8("hboxLayout11"));
         label_21 = new QLabel(scrollAreaWidgetContents_4);
-        label_21->setObjectName(QStringLiteral("label_21"));
+        label_21->setObjectName(QString::fromUtf8("label_21"));
 
         hboxLayout11->addWidget(label_21);
 
         anaStep = new QSpinBox(scrollAreaWidgetContents_4);
-        anaStep->setObjectName(QStringLiteral("anaStep"));
+        anaStep->setObjectName(QString::fromUtf8("anaStep"));
         anaStep->setMinimum(1);
         anaStep->setValue(25);
 
@@ -3353,7 +3350,7 @@ public:
         hboxLayout10->addItem(spacerItem9);
 
         anaMarkAct = new QCheckBox(scrollAreaWidgetContents_4);
-        anaMarkAct->setObjectName(QStringLiteral("anaMarkAct"));
+        anaMarkAct->setObjectName(QString::fromUtf8("anaMarkAct"));
 
         hboxLayout10->addWidget(anaMarkAct);
 
@@ -3361,30 +3358,30 @@ public:
         verticalLayout_18->addLayout(hboxLayout10);
 
         hboxLayout12 = new QHBoxLayout();
-        hboxLayout12->setObjectName(QStringLiteral("hboxLayout12"));
+        hboxLayout12->setObjectName(QString::fromUtf8("hboxLayout12"));
         label_16 = new QLabel(scrollAreaWidgetContents_4);
-        label_16->setObjectName(QStringLiteral("label_16"));
+        label_16->setObjectName(QString::fromUtf8("label_16"));
 
         hboxLayout12->addWidget(label_16);
 
         anaConsiderX = new QCheckBox(scrollAreaWidgetContents_4);
-        anaConsiderX->setObjectName(QStringLiteral("anaConsiderX"));
+        anaConsiderX->setObjectName(QString::fromUtf8("anaConsiderX"));
 
         hboxLayout12->addWidget(anaConsiderX);
 
         anaConsiderY = new QCheckBox(scrollAreaWidgetContents_4);
-        anaConsiderY->setObjectName(QStringLiteral("anaConsiderY"));
+        anaConsiderY->setObjectName(QString::fromUtf8("anaConsiderY"));
         anaConsiderY->setChecked(true);
 
         hboxLayout12->addWidget(anaConsiderY);
 
         anaConsiderAbs = new QCheckBox(scrollAreaWidgetContents_4);
-        anaConsiderAbs->setObjectName(QStringLiteral("anaConsiderAbs"));
+        anaConsiderAbs->setObjectName(QString::fromUtf8("anaConsiderAbs"));
 
         hboxLayout12->addWidget(anaConsiderAbs);
 
         anaConsiderRev = new QCheckBox(scrollAreaWidgetContents_4);
-        anaConsiderRev->setObjectName(QStringLiteral("anaConsiderRev"));
+        anaConsiderRev->setObjectName(QString::fromUtf8("anaConsiderRev"));
 
         hboxLayout12->addWidget(anaConsiderRev);
 
@@ -3392,7 +3389,7 @@ public:
         verticalLayout_18->addLayout(hboxLayout12);
 
         showVoronoiCells = new QCheckBox(scrollAreaWidgetContents_4);
-        showVoronoiCells->setObjectName(QStringLiteral("showVoronoiCells"));
+        showVoronoiCells->setObjectName(QString::fromUtf8("showVoronoiCells"));
 
         verticalLayout_18->addWidget(showVoronoiCells);
 
@@ -3408,7 +3405,7 @@ public:
 
         horizontalLayout_19->addWidget(tabs);
 
-#ifndef QT_NO_SHORTCUT
+#if QT_CONFIG(shortcut)
         label_7->setBuddy(tx);
         label_3->setBuddy(cx);
         label_6->setBuddy(r4);
@@ -3418,7 +3415,7 @@ public:
         label_2->setBuddy(fy);
         label_5->setBuddy(r2);
         label_64->setBuddy(r2);
-#endif // QT_NO_SHORTCUT
+#endif // QT_CONFIG(shortcut)
         QWidget::setTabOrder(fx, fy);
         QWidget::setTabOrder(fy, cx);
         QWidget::setTabOrder(cx, cy);
@@ -3574,483 +3571,493 @@ public:
 
     void retranslateUi(QWidget *Control)
     {
-        Control->setWindowTitle(QApplication::translate("Control", "Form", 0));
-        groupBox->setTitle(QApplication::translate("Control", "filter before", 0));
-        filterBorderParamCol->setText(QApplication::translate("Control", "color", 0));
-        filterBgShow->setText(QApplication::translate("Control", "show", 0));
-        filterBgUpdate->setText(QApplication::translate("Control", "update", 0));
-        filterBgReset->setText(QApplication::translate("Control", "reset", 0));
-        filterBgLoad->setText(QApplication::translate("Control", "load", 0));
-        filterBgSave->setText(QApplication::translate("Control", "save", 0));
-#ifndef QT_NO_TOOLTIP
-        filterBgDeleteTrj->setToolTip(QApplication::translate("Control", "delete trajectory after a certain number of trackpoints outside foreground", 0));
-#endif // QT_NO_TOOLTIP
-        filterBgDeleteTrj->setText(QApplication::translate("Control", "delete", 0));
-        label_63->setText(QApplication::translate("Control", "trj. after:", 0));
-        filterSwapH->setText(QApplication::translate("Control", "horizontally", 0));
-        filterSwapV->setText(QApplication::translate("Control", "vertically", 0));
-        filterSwap->setText(QApplication::translate("Control", "swap", 0));
-        filterBorder->setText(QApplication::translate("Control", "border:", 0));
-        filterBrightContrast->setText(QApplication::translate("Control", "brightness:", 0));
-        filterBg->setText(QApplication::translate("Control", "bg subtr.:", 0));
-        label_18->setText(QApplication::translate("Control", "         contrast:", 0));
-        intr->setTitle(QApplication::translate("Control", "intrinsic parameters", 0));
-        apply->setText(QApplication::translate("Control", "apply", 0));
-        label_7->setText(QApplication::translate("Control", "tangential distortion: x:", 0));
-        label_3->setText(QApplication::translate("Control", "center [px]: x:", 0));
-        label_6->setText(QApplication::translate("Control", "4th:", 0));
-        label_8->setText(QApplication::translate("Control", "y:", 0));
-        label->setText(QApplication::translate("Control", "focal length [px]: x:", 0));
-        label_4->setText(QApplication::translate("Control", "y:", 0));
-        label_2->setText(QApplication::translate("Control", "y:", 0));
-        label_5->setText(QApplication::translate("Control", "radial distortion: 2nd:", 0));
-        label_64->setText(QApplication::translate("Control", "6th:", 0));
-        fixCenter->setText(QApplication::translate("Control", "fix center", 0));
-        quadAspectRatio->setText(QApplication::translate("Control", "quad. aspect ratio", 0));
-        tangDist->setText(QApplication::translate("Control", "tang. dist.", 0));
-        autoCalib->setText(QApplication::translate("Control", "auto", 0));
-        calibFiles->setText(QApplication::translate("Control", "files", 0));
-        extr->setTitle(QApplication::translate("Control", "extrinsic parameters", 0));
-#ifndef QT_NO_TOOLTIP
-        label_58->setToolTip(QApplication::translate("Control", "Translate the coordinate system in x-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_58->setText(QApplication::translate("Control", "rotation:", 0));
-#ifndef QT_NO_TOOLTIP
-        label_59->setToolTip(QApplication::translate("Control", "Translate the coordinate system in x-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_59->setText(QApplication::translate("Control", "translation:", 0));
-        label_62->setText(QApplication::translate("Control", "3D/2D Points:", 0));
-#ifndef QT_NO_TOOLTIP
-        coordLoad3DCalibPoints->setToolTip(QApplication::translate("Control", "Load 3D points to corresponding 2D image points", 0));
-#endif // QT_NO_TOOLTIP
-        coordLoad3DCalibPoints->setText(QApplication::translate("Control", "load", 0));
-#ifndef QT_NO_TOOLTIP
-        extrCalibFetch->setToolTip(QApplication::translate("Control", "Fetch marked 2D Points to loaded 3D points", 0));
-#endif // QT_NO_TOOLTIP
-        extrCalibFetch->setText(QApplication::translate("Control", "fetch", 0));
-#ifndef QT_NO_TOOLTIP
-        extrCalibSave->setToolTip(QApplication::translate("Control", "Save 3D and/or 2D points to extrinisc calib file", 0));
-#endif // QT_NO_TOOLTIP
-        extrCalibSave->setText(QApplication::translate("Control", "save", 0));
-#ifndef QT_NO_TOOLTIP
-        extrCalibShowPoints->setToolTip(QApplication::translate("Control", "Show the saved 2D/3D point correspondences in the file", 0));
-#endif // QT_NO_TOOLTIP
-        extrCalibShowPoints->setText(QApplication::translate("Control", "show", 0));
-#ifndef QT_NO_TOOLTIP
-        extrCalibShowError->setToolTip(QApplication::translate("Control", "Show the reprojection error of extrinsic calibration", 0));
-#endif // QT_NO_TOOLTIP
-        extrCalibShowError->setText(QApplication::translate("Control", "error", 0));
-        align_2->setTitle(QApplication::translate("Control", "coordinate system", 0));
-#ifndef QT_NO_TOOLTIP
-        coordShow->setToolTip(QApplication::translate("Control", "Show the coordinate system.", 0));
-#endif // QT_NO_TOOLTIP
-        coordShow->setText(QApplication::translate("Control", "show", 0));
-#ifndef QT_NO_TOOLTIP
-        coordFix->setToolTip(QApplication::translate("Control", "Fix the coordinate system", 0));
-#endif // QT_NO_TOOLTIP
-        coordFix->setText(QApplication::translate("Control", "fix", 0));
-#ifndef QT_NO_TOOLTIP
-        label_54->setToolTip(QApplication::translate("Control", "Translate the coordinate system in x-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_54->setText(QApplication::translate("Control", "translate [cm] x:", 0));
-#ifndef QT_NO_TOOLTIP
-        coord3DTransX->setToolTip(QApplication::translate("Control", "Translate the coordinate system in x-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        coord3DTransX_spin->setToolTip(QApplication::translate("Control", "Translate the coordinate system in x-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        label_55->setToolTip(QApplication::translate("Control", "Translate the coordinate system in y-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_55->setText(QApplication::translate("Control", "y:", 0));
-#ifndef QT_NO_TOOLTIP
-        coord3DTransY->setToolTip(QApplication::translate("Control", "Translate the coordinate system in y-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        coord3DTransY_spin->setToolTip(QApplication::translate("Control", "Translate the coordinate system in y-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        label_57->setToolTip(QApplication::translate("Control", "2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_57->setText(QApplication::translate("Control", "z:", 0));
-#ifndef QT_NO_TOOLTIP
-        coord3DTransZ->setToolTip(QApplication::translate("Control", "2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        coord3DTransZ_spin->setToolTip(QApplication::translate("Control", "2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        label_56->setToolTip(QApplication::translate("Control", "Scale the coordinate system.", 0));
-#endif // QT_NO_TOOLTIP
-        label_56->setText(QApplication::translate("Control", "axis length:", 0));
-#ifndef QT_NO_TOOLTIP
-        coord3DAxeLen->setToolTip(QApplication::translate("Control", "Scale the coordinate system.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        coord3DAxeLen_spin->setToolTip(QApplication::translate("Control", "Scale the coordinate system.", 0));
-#endif // QT_NO_TOOLTIP
-        coord3DAxeLen_spin->setSuffix(QApplication::translate("Control", " cm", 0));
-#ifndef QT_NO_TOOLTIP
-        label_60->setToolTip(QApplication::translate("Control", "Translate the coordinate system in x-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_60->setText(QApplication::translate("Control", "swap axis:", 0));
-        coord3DSwapX->setText(QApplication::translate("Control", "X-axis", 0));
-        coord3DSwapY->setText(QApplication::translate("Control", "Y-axis", 0));
-        coord3DSwapZ->setText(QApplication::translate("Control", "Z-axis", 0));
-#ifndef QT_NO_TOOLTIP
-        label_61->setToolTip(QApplication::translate("Control", "Translate the coordinate system in x-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_61->setText(QApplication::translate("Control", "        show:", 0));
-        extCalibPointsShow->setText(QApplication::translate("Control", "calibration points", 0));
-        extVanishPointsShow->setText(QApplication::translate("Control", "vanish points", 0));
-        coordTab->setTabText(coordTab->indexOf(coordTab3D), QApplication::translate("Control", "     3D     ", 0));
-        coordTab->setTabToolTip(coordTab->indexOf(coordTab3D), QApplication::translate("Control", "Select for 3D coordinatesystem", 0));
-#ifndef QT_NO_TOOLTIP
-        coordTransX_spin->setToolTip(QApplication::translate("Control", "Translate the coordinate system in x-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        label_34->setToolTip(QApplication::translate("Control", "Translate the coordinate system in x-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_34->setText(QApplication::translate("Control", "translate x:", 0));
-#ifndef QT_NO_TOOLTIP
-        coordTransX->setToolTip(QApplication::translate("Control", "Translate the coordinate system in x-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        label_32->setToolTip(QApplication::translate("Control", "Translate the coordinate system in y-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_32->setText(QApplication::translate("Control", "y:", 0));
-#ifndef QT_NO_TOOLTIP
-        coordTransY->setToolTip(QApplication::translate("Control", "Translate the coordinate system in y-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        label_33->setToolTip(QApplication::translate("Control", "Scale the coordinate system.", 0));
-#endif // QT_NO_TOOLTIP
-        label_33->setText(QApplication::translate("Control", "scale:", 0));
-#ifndef QT_NO_TOOLTIP
-        coordScale->setToolTip(QApplication::translate("Control", "Scale the coordinate system.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        coordTransY_spin->setToolTip(QApplication::translate("Control", "Translate the coordinate system in y-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        coordScale_spin->setToolTip(QApplication::translate("Control", "Scale the coordinate system.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        label_35->setToolTip(QApplication::translate("Control", "2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_35->setText(QApplication::translate("Control", "rotate:", 0));
-#ifndef QT_NO_TOOLTIP
-        coordRotate->setToolTip(QApplication::translate("Control", "2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        coordRotate_spin->setToolTip(QApplication::translate("Control", "2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_14->setText(QApplication::translate("Control", "camera altitude [cm]:", 0));
+        Control->setWindowTitle(QCoreApplication::translate("Control", "Form", nullptr));
+        groupBox->setTitle(QCoreApplication::translate("Control", "filter before", nullptr));
+        filterBorderParamCol->setText(QCoreApplication::translate("Control", "color", nullptr));
+        filterBgShow->setText(QCoreApplication::translate("Control", "show", nullptr));
+        filterBgUpdate->setText(QCoreApplication::translate("Control", "update", nullptr));
+        filterBgReset->setText(QCoreApplication::translate("Control", "reset", nullptr));
+        filterBgLoad->setText(QCoreApplication::translate("Control", "load", nullptr));
+        filterBgSave->setText(QCoreApplication::translate("Control", "save", nullptr));
+#if QT_CONFIG(tooltip)
+        filterBgDeleteTrj->setToolTip(QCoreApplication::translate("Control", "delete trajectory after a certain number of trackpoints outside foreground", nullptr));
+#endif // QT_CONFIG(tooltip)
+        filterBgDeleteTrj->setText(QCoreApplication::translate("Control", "delete", nullptr));
+        label_63->setText(QCoreApplication::translate("Control", "trj. after:", nullptr));
+        filterSwapH->setText(QCoreApplication::translate("Control", "horizontally", nullptr));
+        filterSwapV->setText(QCoreApplication::translate("Control", "vertically", nullptr));
+        filterSwap->setText(QCoreApplication::translate("Control", "swap", nullptr));
+        filterBorder->setText(QCoreApplication::translate("Control", "border:", nullptr));
+        filterBrightContrast->setText(QCoreApplication::translate("Control", "brightness:", nullptr));
+        filterBg->setText(QCoreApplication::translate("Control", "bg subtr.:", nullptr));
+        label_18->setText(QCoreApplication::translate("Control", "         contrast:", nullptr));
+        intr->setTitle(QCoreApplication::translate("Control", "intrinsic parameters", nullptr));
+        apply->setText(QCoreApplication::translate("Control", "apply", nullptr));
+        label_7->setText(QCoreApplication::translate("Control", "tangential distortion: x:", nullptr));
+        label_3->setText(QCoreApplication::translate("Control", "center [px]: x:", nullptr));
+        label_6->setText(QCoreApplication::translate("Control", "4th:", nullptr));
+        label_8->setText(QCoreApplication::translate("Control", "y:", nullptr));
+        label->setText(QCoreApplication::translate("Control", "focal length [px]: x:", nullptr));
+        label_4->setText(QCoreApplication::translate("Control", "y:", nullptr));
+        label_2->setText(QCoreApplication::translate("Control", "y:", nullptr));
+        label_5->setText(QCoreApplication::translate("Control", "radial distortion: 2nd:", nullptr));
+        label_64->setText(QCoreApplication::translate("Control", "6th:", nullptr));
+        fixCenter->setText(QCoreApplication::translate("Control", "fix center", nullptr));
+        quadAspectRatio->setText(QCoreApplication::translate("Control", "quad. aspect ratio", nullptr));
+        tangDist->setText(QCoreApplication::translate("Control", "tang. dist.", nullptr));
+        autoCalib->setText(QCoreApplication::translate("Control", "auto", nullptr));
+        calibFiles->setText(QCoreApplication::translate("Control", "files", nullptr));
+        extr->setTitle(QCoreApplication::translate("Control", "extrinsic parameters", nullptr));
+#if QT_CONFIG(tooltip)
+        label_58->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in x-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_58->setText(QCoreApplication::translate("Control", "rotation:", nullptr));
+#if QT_CONFIG(tooltip)
+        label_59->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in x-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_59->setText(QCoreApplication::translate("Control", "translation:", nullptr));
+        label_62->setText(QCoreApplication::translate("Control", "3D/2D Points:", nullptr));
+#if QT_CONFIG(tooltip)
+        coordLoad3DCalibPoints->setToolTip(QCoreApplication::translate("Control", "Load 3D points to corresponding 2D image points", nullptr));
+#endif // QT_CONFIG(tooltip)
+        coordLoad3DCalibPoints->setText(QCoreApplication::translate("Control", "load", nullptr));
+#if QT_CONFIG(tooltip)
+        extrCalibFetch->setToolTip(QCoreApplication::translate("Control", "Fetch marked 2D Points to loaded 3D points", nullptr));
+#endif // QT_CONFIG(tooltip)
+        extrCalibFetch->setText(QCoreApplication::translate("Control", "fetch", nullptr));
+#if QT_CONFIG(tooltip)
+        extrCalibSave->setToolTip(QCoreApplication::translate("Control", "Save 3D and/or 2D points to extrinisc calib file", nullptr));
+#endif // QT_CONFIG(tooltip)
+        extrCalibSave->setText(QCoreApplication::translate("Control", "save", nullptr));
+#if QT_CONFIG(tooltip)
+        extrCalibShowPoints->setToolTip(QCoreApplication::translate("Control", "Show the saved 2D/3D point correspondences in the file", nullptr));
+#endif // QT_CONFIG(tooltip)
+        extrCalibShowPoints->setText(QCoreApplication::translate("Control", "show", nullptr));
+#if QT_CONFIG(tooltip)
+        extrCalibShowError->setToolTip(QCoreApplication::translate("Control", "Show the reprojection error of extrinsic calibration", nullptr));
+#endif // QT_CONFIG(tooltip)
+        extrCalibShowError->setText(QCoreApplication::translate("Control", "error", nullptr));
+        align_2->setTitle(QCoreApplication::translate("Control", "coordinate system", nullptr));
+#if QT_CONFIG(tooltip)
+        coordShow->setToolTip(QCoreApplication::translate("Control", "Show the coordinate system.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        coordShow->setText(QCoreApplication::translate("Control", "show", nullptr));
+#if QT_CONFIG(tooltip)
+        coordFix->setToolTip(QCoreApplication::translate("Control", "Fix the coordinate system", nullptr));
+#endif // QT_CONFIG(tooltip)
+        coordFix->setText(QCoreApplication::translate("Control", "fix", nullptr));
+#if QT_CONFIG(tooltip)
+        label_54->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in x-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_54->setText(QCoreApplication::translate("Control", "translate [cm] x:", nullptr));
+#if QT_CONFIG(tooltip)
+        coord3DTransX->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in x-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        coord3DTransX_spin->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in x-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        label_55->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in y-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_55->setText(QCoreApplication::translate("Control", "y:", nullptr));
+#if QT_CONFIG(tooltip)
+        coord3DTransY->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in y-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        coord3DTransY_spin->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in y-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        label_57->setToolTip(QCoreApplication::translate("Control", "2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_57->setText(QCoreApplication::translate("Control", "z:", nullptr));
+#if QT_CONFIG(tooltip)
+        coord3DTransZ->setToolTip(QCoreApplication::translate("Control", "2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        coord3DTransZ_spin->setToolTip(QCoreApplication::translate("Control", "2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        label_56->setToolTip(QCoreApplication::translate("Control", "Scale the coordinate system.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_56->setText(QCoreApplication::translate("Control", "axis length:", nullptr));
+#if QT_CONFIG(tooltip)
+        coord3DAxeLen->setToolTip(QCoreApplication::translate("Control", "Scale the coordinate system.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        coord3DAxeLen_spin->setToolTip(QCoreApplication::translate("Control", "Scale the coordinate system.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        coord3DAxeLen_spin->setSuffix(QCoreApplication::translate("Control", " cm", nullptr));
+#if QT_CONFIG(tooltip)
+        label_60->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in x-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_60->setText(QCoreApplication::translate("Control", "swap axis:", nullptr));
+        coord3DSwapX->setText(QCoreApplication::translate("Control", "X-axis", nullptr));
+        coord3DSwapY->setText(QCoreApplication::translate("Control", "Y-axis", nullptr));
+        coord3DSwapZ->setText(QCoreApplication::translate("Control", "Z-axis", nullptr));
+#if QT_CONFIG(tooltip)
+        label_61->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in x-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_61->setText(QCoreApplication::translate("Control", "        show:", nullptr));
+        extCalibPointsShow->setText(QCoreApplication::translate("Control", "calibration points", nullptr));
+        extVanishPointsShow->setText(QCoreApplication::translate("Control", "vanish points", nullptr));
+        coordTab->setTabText(coordTab->indexOf(coordTab3D), QCoreApplication::translate("Control", "     3D     ", nullptr));
+#if QT_CONFIG(tooltip)
+        coordTab->setTabToolTip(coordTab->indexOf(coordTab3D), QCoreApplication::translate("Control", "Select for 3D coordinatesystem", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        coordTransX_spin->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in x-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        label_34->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in x-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_34->setText(QCoreApplication::translate("Control", "translate x:", nullptr));
+#if QT_CONFIG(tooltip)
+        coordTransX->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in x-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        label_32->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in y-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_32->setText(QCoreApplication::translate("Control", "y:", nullptr));
+#if QT_CONFIG(tooltip)
+        coordTransY->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in y-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        label_33->setToolTip(QCoreApplication::translate("Control", "Scale the coordinate system.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_33->setText(QCoreApplication::translate("Control", "scale:", nullptr));
+#if QT_CONFIG(tooltip)
+        coordScale->setToolTip(QCoreApplication::translate("Control", "Scale the coordinate system.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        coordTransY_spin->setToolTip(QCoreApplication::translate("Control", "Translate the coordinate system in y-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        coordScale_spin->setToolTip(QCoreApplication::translate("Control", "Scale the coordinate system.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        label_35->setToolTip(QCoreApplication::translate("Control", "2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_35->setText(QCoreApplication::translate("Control", "rotate:", nullptr));
+#if QT_CONFIG(tooltip)
+        coordRotate->setToolTip(QCoreApplication::translate("Control", "2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        coordRotate_spin->setToolTip(QCoreApplication::translate("Control", "2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_14->setText(QCoreApplication::translate("Control", "camera altitude [cm]:", nullptr));
         coordAltitude->setSuffix(QString());
-        coordAltitudeMeasured->setText(QApplication::translate("Control", "(measured: 535.0)", 0));
-        label_37->setText(QApplication::translate("Control", "unit [cm]:", 0));
+        coordAltitudeMeasured->setText(QCoreApplication::translate("Control", "(measured: 535.0)", nullptr));
+        label_37->setText(QCoreApplication::translate("Control", "unit [cm]:", nullptr));
         coordUnit->setSuffix(QString());
-        coordUseIntrinsic->setText(QApplication::translate("Control", "use intrinsic center for calculating real position", 0));
-        coordTab->setTabText(coordTab->indexOf(coordTab2D), QApplication::translate("Control", "     2D     ", 0));
-        coordTab->setTabToolTip(coordTab->indexOf(coordTab2D), QApplication::translate("Control", "Select for 2D coordinatesystem", 0));
-        align->setTitle(QApplication::translate("Control", "alignment grid", 0));
-#ifndef QT_NO_TOOLTIP
-        gridShow->setToolTip(QApplication::translate("Control", "Show the grid.", 0));
-#endif // QT_NO_TOOLTIP
-        gridShow->setText(QApplication::translate("Control", "show", 0));
-#ifndef QT_NO_TOOLTIP
-        gridFix->setToolTip(QApplication::translate("Control", "Fix the grid.", 0));
-#endif // QT_NO_TOOLTIP
-        gridFix->setText(QApplication::translate("Control", "fix", 0));
-#ifndef QT_NO_TOOLTIP
-        label_15->setToolTip(QApplication::translate("Control", "Translate the grid in x-direction", 0));
-#endif // QT_NO_TOOLTIP
-        label_15->setText(QApplication::translate("Control", "translate [cm] x:", 0));
-#ifndef QT_NO_TOOLTIP
-        grid3DTransX->setToolTip(QApplication::translate("Control", "Translate the grid in x-direction", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        grid3DTransX_spin->setToolTip(QApplication::translate("Control", "Translate the grid in x-direction", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        label_49->setToolTip(QApplication::translate("Control", "Translate the grid in y-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_49->setText(QApplication::translate("Control", "y:", 0));
-#ifndef QT_NO_TOOLTIP
-        grid3DTransY->setToolTip(QApplication::translate("Control", "Translate the grid in y-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        grid3DTransY_spin->setToolTip(QApplication::translate("Control", "Translate the grid in y-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        label_50->setToolTip(QApplication::translate("Control", "2D: Rotate the grid clockwise. 3D: Translate the grid in z-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_50->setText(QApplication::translate("Control", "z:", 0));
-#ifndef QT_NO_TOOLTIP
-        grid3DTransZ->setToolTip(QApplication::translate("Control", "2D: Rotate the grid clockwise. 3D: Translate the grid in z-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        grid3DTransZ_spin->setToolTip(QApplication::translate("Control", "2D: Rotate the grid clockwise. 3D: Translate the grid in z-direction.", 0));
-#endif // QT_NO_TOOLTIP
+        coordUseIntrinsic->setText(QCoreApplication::translate("Control", "use intrinsic center for calculating real position", nullptr));
+        coordTab->setTabText(coordTab->indexOf(coordTab2D), QCoreApplication::translate("Control", "     2D     ", nullptr));
+#if QT_CONFIG(tooltip)
+        coordTab->setTabToolTip(coordTab->indexOf(coordTab2D), QCoreApplication::translate("Control", "Select for 2D coordinatesystem", nullptr));
+#endif // QT_CONFIG(tooltip)
+        align->setTitle(QCoreApplication::translate("Control", "alignment grid", nullptr));
+#if QT_CONFIG(tooltip)
+        gridShow->setToolTip(QCoreApplication::translate("Control", "Show the grid.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        gridShow->setText(QCoreApplication::translate("Control", "show", nullptr));
+#if QT_CONFIG(tooltip)
+        gridFix->setToolTip(QCoreApplication::translate("Control", "Fix the grid.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        gridFix->setText(QCoreApplication::translate("Control", "fix", nullptr));
+#if QT_CONFIG(tooltip)
+        label_15->setToolTip(QCoreApplication::translate("Control", "Translate the grid in x-direction", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_15->setText(QCoreApplication::translate("Control", "translate [cm] x:", nullptr));
+#if QT_CONFIG(tooltip)
+        grid3DTransX->setToolTip(QCoreApplication::translate("Control", "Translate the grid in x-direction", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        grid3DTransX_spin->setToolTip(QCoreApplication::translate("Control", "Translate the grid in x-direction", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        label_49->setToolTip(QCoreApplication::translate("Control", "Translate the grid in y-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_49->setText(QCoreApplication::translate("Control", "y:", nullptr));
+#if QT_CONFIG(tooltip)
+        grid3DTransY->setToolTip(QCoreApplication::translate("Control", "Translate the grid in y-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        grid3DTransY_spin->setToolTip(QCoreApplication::translate("Control", "Translate the grid in y-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        label_50->setToolTip(QCoreApplication::translate("Control", "2D: Rotate the grid clockwise. 3D: Translate the grid in z-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_50->setText(QCoreApplication::translate("Control", "z:", nullptr));
+#if QT_CONFIG(tooltip)
+        grid3DTransZ->setToolTip(QCoreApplication::translate("Control", "2D: Rotate the grid clockwise. 3D: Translate the grid in z-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        grid3DTransZ_spin->setToolTip(QCoreApplication::translate("Control", "2D: Rotate the grid clockwise. 3D: Translate the grid in z-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
         grid3DTransZ_spin->setSuffix(QString());
-#ifndef QT_NO_TOOLTIP
-        label_51->setToolTip(QApplication::translate("Control", "Scale the gridcells", 0));
-#endif // QT_NO_TOOLTIP
-        label_51->setText(QApplication::translate("Control", "resolution [cm]:", 0));
-#ifndef QT_NO_TOOLTIP
-        grid3DResolution->setToolTip(QApplication::translate("Control", "Scale the gridcells", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        grid3DResolution_spin->setToolTip(QApplication::translate("Control", "Scale the gridcells", 0));
-#endif // QT_NO_TOOLTIP
-        grid3DResolution_spin->setSuffix(QApplication::translate("Control", " cm", 0));
+#if QT_CONFIG(tooltip)
+        label_51->setToolTip(QCoreApplication::translate("Control", "Scale the gridcells", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_51->setText(QCoreApplication::translate("Control", "resolution [cm]:", nullptr));
+#if QT_CONFIG(tooltip)
+        grid3DResolution->setToolTip(QCoreApplication::translate("Control", "Scale the gridcells", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        grid3DResolution_spin->setToolTip(QCoreApplication::translate("Control", "Scale the gridcells", nullptr));
+#endif // QT_CONFIG(tooltip)
+        grid3DResolution_spin->setSuffix(QCoreApplication::translate("Control", " cm", nullptr));
         grid3DResolution_spin->setPrefix(QString());
-        gridTab->setTabText(gridTab->indexOf(gridTab3D), QApplication::translate("Control", "     3D     ", 0));
-        gridTab->setTabToolTip(gridTab->indexOf(gridTab3D), QApplication::translate("Control", "Select for 3D grid", 0));
-#ifndef QT_NO_TOOLTIP
-        label_10->setToolTip(QApplication::translate("Control", "Translate the grid in x-direction", 0));
-#endif // QT_NO_TOOLTIP
-        label_10->setText(QApplication::translate("Control", "translate x:", 0));
-#ifndef QT_NO_TOOLTIP
-        gridTransX->setToolTip(QApplication::translate("Control", "Translate the grid in x-direction", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        gridTransX_spin->setToolTip(QApplication::translate("Control", "Translate the grid in x-direction", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        label_11->setToolTip(QApplication::translate("Control", "Translate the grid in y-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_11->setText(QApplication::translate("Control", "y:", 0));
-#ifndef QT_NO_TOOLTIP
-        gridTransY->setToolTip(QApplication::translate("Control", "Translate the grid in y-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        gridTransY_spin->setToolTip(QApplication::translate("Control", "Translate the grid in y-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        label_9->setToolTip(QApplication::translate("Control", "2D: Rotate the grid clockwise. 3D: Translate the grid in z-direction.", 0));
-#endif // QT_NO_TOOLTIP
-        label_9->setText(QApplication::translate("Control", "rotate:", 0));
-#ifndef QT_NO_TOOLTIP
-        gridRotate->setToolTip(QApplication::translate("Control", "2D: Rotate the grid clockwise. 3D: Translate the grid in z-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        gridRot_spin->setToolTip(QApplication::translate("Control", "2D: Rotate the grid clockwise. 3D: Translate the grid in z-direction.", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        label_12->setToolTip(QApplication::translate("Control", "Scale the gridcells", 0));
-#endif // QT_NO_TOOLTIP
-        label_12->setText(QApplication::translate("Control", "scale:", 0));
-#ifndef QT_NO_TOOLTIP
-        gridScale->setToolTip(QApplication::translate("Control", "Scale the gridcells", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_TOOLTIP
-        gridScale_spin->setToolTip(QApplication::translate("Control", "Scale the gridcells", 0));
-#endif // QT_NO_TOOLTIP
-        gridTab->setTabText(gridTab->indexOf(gridTab2D), QApplication::translate("Control", "     2D     ", 0));
-        gridTab->setTabToolTip(gridTab->indexOf(gridTab2D), QApplication::translate("Control", "Select for 2D grid", 0));
-        tabs->setTabText(tabs->indexOf(calib), QApplication::translate("Control", "calibration", 0));
-        performRecognition->setText(QApplication::translate("Control", "perform", 0));
-        label_27->setText(QApplication::translate("Control", "step:", 0));
-        label_26->setText(QApplication::translate("Control", "number of recognized people by now:", 0));
-        recoNumberNow->setText(QApplication::translate("Control", "0", 0));
-        recoStereoShow->setText(QApplication::translate("Control", "parameter", 0));
-        groupBox_2->setTitle(QApplication::translate("Control", "region of interest", 0));
-        roiShow->setText(QApplication::translate("Control", "show", 0));
-        roiFix->setText(QApplication::translate("Control", "fix", 0));
-        groupBox_5->setTitle(QApplication::translate("Control", "marker", 0));
-        label_19->setText(QApplication::translate("Control", "marker brightness: ", 0));
-        markerIgnoreWithout->setText(QApplication::translate("Control", "ignore head without marker", 0));
-        colorBox->setTitle(QApplication::translate("Control", "size and color", 0));
-        recoShowColor->setText(QApplication::translate("Control", "show recognition color", 0));
-        recoOptimizeColor->setText(QApplication::translate("Control", "optimize", 0));
-        label_28->setText(QApplication::translate("Control", "model:", 0));
-        recoAutoWB->setText(QApplication::translate("Control", "auto white balance and brigtness", 0));
-        label_29->setText(QApplication::translate("Control", "x:", 0));
-        label_30->setText(QApplication::translate("Control", "y:", 0));
-        label_31->setText(QApplication::translate("Control", "z:", 0));
-        label_38->setText(QApplication::translate("Control", "grey level:", 0));
-        label_39->setText(QApplication::translate("Control", "symbol size:", 0));
-        groupBox_4->setTitle(QApplication::translate("Control", "map", 0));
-        label_44->setText(QApplication::translate("Control", "h:", 0));
-        label_40->setText(QApplication::translate("Control", "x:", 0));
-        label_43->setText(QApplication::translate("Control", "w:", 0));
-        label_42->setText(QApplication::translate("Control", "y:", 0));
-        mapColor->setText(QApplication::translate("Control", "color", 0));
-        label_45->setText(QApplication::translate("Control", "height:", 0));
-        mapAdd->setText(QApplication::translate("Control", "add", 0));
-        mapDel->setText(QApplication::translate("Control", "delete", 0));
-        mapColorRange->setText(QApplication::translate("Control", "color range", 0));
-#ifndef QT_NO_TOOLTIP
-        label_46->setToolTip(QApplication::translate("Control", "default height, if no height is measured through color marker or disparity", 0));
-#endif // QT_NO_TOOLTIP
-        label_46->setText(QApplication::translate("Control", "def. height:", 0));
-#ifndef QT_NO_TOOLTIP
-        mapDistribution->setToolTip(QApplication::translate("Control", "print out distribution of height", 0));
-#endif // QT_NO_TOOLTIP
-        mapDistribution->setText(QApplication::translate("Control", "dist.", 0));
-#ifndef QT_NO_TOOLTIP
-        mapResetHeight->setToolTip(QApplication::translate("Control", "reset height of every person measured over time, so that default value will be choosen", 0));
-#endif // QT_NO_TOOLTIP
-        mapResetHeight->setText(QApplication::translate("Control", "res. height", 0));
-#ifndef QT_NO_TOOLTIP
-        mapResetPos->setToolTip(QApplication::translate("Control", "reset position of every trackpoint (from disparity)", 0));
-#endif // QT_NO_TOOLTIP
-        mapResetPos->setText(QApplication::translate("Control", "res. pos.", 0));
-        tabs->setTabText(tabs->indexOf(rec), QApplication::translate("Control", "recognition", 0));
-        trackOnlineCalc->setText(QApplication::translate("Control", "online calculation", 0));
-        trackOnlineCalc->setShortcut(QApplication::translate("Control", "Shift+T", 0));
-#ifndef QT_NO_TOOLTIP
-        trackRepeat->setToolTip(QApplication::translate("Control", "repeat tracking below existing quality of trackpoint ", 0));
-#endif // QT_NO_TOOLTIP
-        trackRepeat->setText(QApplication::translate("Control", "repeat below quality:", 0));
-        trackExtrapolation->setText(QApplication::translate("Control", "extrapolation for big diff.", 0));
-        trackMerge->setText(QApplication::translate("Control", "merge", 0));
-#ifndef QT_NO_TOOLTIP
-        trackOnlyVisible->setToolTip(QApplication::translate("Control", "online tracking and manual deletion and moving only for trajectories, which are visable (see \"show only people\")", 0));
-#endif // QT_NO_TOOLTIP
-        trackOnlyVisible->setText(QApplication::translate("Control", "only visible", 0));
-        trackNumberNow->setText(QApplication::translate("Control", "0", 0));
-        label_22->setText(QApplication::translate("Control", "number of all tracked and recognized people:", 0));
-        label_23->setText(QApplication::translate("Control", "number of tracked people by now:", 0));
-        trackNumberAll->setText(QApplication::translate("Control", "0", 0));
-        label_65->setText(QApplication::translate("Control", "number of visible people:", 0));
-        trackNumberVisible->setText(QApplication::translate("Control", "0", 0));
-        trackExport->setText(QApplication::translate("Control", "export", 0));
-        trackCalc->setText(QApplication::translate("Control", "calculate all", 0));
-        trackImport->setText(QApplication::translate("Control", "import", 0));
-        trackReset->setText(QApplication::translate("Control", "reset", 0));
-        groupBox_8->setTitle(QApplication::translate("Control", "Region of interest", 0));
-        trackRoiShow->setText(QApplication::translate("Control", "show", 0));
-        trackRoiFix->setText(QApplication::translate("Control", "fix", 0));
-        groupBox_7->setTitle(QApplication::translate("Control", "export options", 0));
-#ifndef QT_NO_TOOLTIP
-        trackMissingFrames->setToolTip(QApplication::translate("Control", "search and insert missing frames", 0));
-#endif // QT_NO_TOOLTIP
-        trackMissingFrames->setText(QApplication::translate("Control", "insert miss. frames", 0));
-#ifndef QT_NO_TOOLTIP
-        trackRecalcHeight->setToolTip(QApplication::translate("Control", "recalculate median height", 0));
-#endif // QT_NO_TOOLTIP
-        trackRecalcHeight->setText(QApplication::translate("Control", "recalc. height", 0));
-#ifndef QT_NO_TOOLTIP
-        trackAlternateHeight->setToolTip(QApplication::translate("Control", "allow alternate height", 0));
-#endif // QT_NO_TOOLTIP
-        trackAlternateHeight->setText(QApplication::translate("Control", "alt. height", 0));
-#ifndef QT_NO_TOOLTIP
-        exportElimTp->setToolTip(QApplication::translate("Control", "eliminate trackpoints at outer margins without calculated height", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_STATUSTIP
+        gridTab->setTabText(gridTab->indexOf(gridTab3D), QCoreApplication::translate("Control", "     3D     ", nullptr));
+#if QT_CONFIG(tooltip)
+        gridTab->setTabToolTip(gridTab->indexOf(gridTab3D), QCoreApplication::translate("Control", "Select for 3D grid", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        label_10->setToolTip(QCoreApplication::translate("Control", "Translate the grid in x-direction", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_10->setText(QCoreApplication::translate("Control", "translate x:", nullptr));
+#if QT_CONFIG(tooltip)
+        gridTransX->setToolTip(QCoreApplication::translate("Control", "Translate the grid in x-direction", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        gridTransX_spin->setToolTip(QCoreApplication::translate("Control", "Translate the grid in x-direction", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        label_11->setToolTip(QCoreApplication::translate("Control", "Translate the grid in y-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_11->setText(QCoreApplication::translate("Control", "y:", nullptr));
+#if QT_CONFIG(tooltip)
+        gridTransY->setToolTip(QCoreApplication::translate("Control", "Translate the grid in y-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        gridTransY_spin->setToolTip(QCoreApplication::translate("Control", "Translate the grid in y-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        label_9->setToolTip(QCoreApplication::translate("Control", "2D: Rotate the grid clockwise. 3D: Translate the grid in z-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_9->setText(QCoreApplication::translate("Control", "rotate:", nullptr));
+#if QT_CONFIG(tooltip)
+        gridRotate->setToolTip(QCoreApplication::translate("Control", "2D: Rotate the grid clockwise. 3D: Translate the grid in z-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        gridRot_spin->setToolTip(QCoreApplication::translate("Control", "2D: Rotate the grid clockwise. 3D: Translate the grid in z-direction.", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        label_12->setToolTip(QCoreApplication::translate("Control", "Scale the gridcells", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_12->setText(QCoreApplication::translate("Control", "scale:", nullptr));
+#if QT_CONFIG(tooltip)
+        gridScale->setToolTip(QCoreApplication::translate("Control", "Scale the gridcells", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        gridScale_spin->setToolTip(QCoreApplication::translate("Control", "Scale the gridcells", nullptr));
+#endif // QT_CONFIG(tooltip)
+        gridTab->setTabText(gridTab->indexOf(gridTab2D), QCoreApplication::translate("Control", "     2D     ", nullptr));
+#if QT_CONFIG(tooltip)
+        gridTab->setTabToolTip(gridTab->indexOf(gridTab2D), QCoreApplication::translate("Control", "Select for 2D grid", nullptr));
+#endif // QT_CONFIG(tooltip)
+        tabs->setTabText(tabs->indexOf(calib), QCoreApplication::translate("Control", "calibration", nullptr));
+        performRecognition->setText(QCoreApplication::translate("Control", "perform", nullptr));
+        label_27->setText(QCoreApplication::translate("Control", "step:", nullptr));
+        label_26->setText(QCoreApplication::translate("Control", "number of recognized people by now:", nullptr));
+        recoNumberNow->setText(QCoreApplication::translate("Control", "0", nullptr));
+        recoStereoShow->setText(QCoreApplication::translate("Control", "parameter", nullptr));
+        groupBox_2->setTitle(QCoreApplication::translate("Control", "region of interest", nullptr));
+        roiShow->setText(QCoreApplication::translate("Control", "show", nullptr));
+        roiFix->setText(QCoreApplication::translate("Control", "fix", nullptr));
+        groupBox_5->setTitle(QCoreApplication::translate("Control", "marker", nullptr));
+        label_19->setText(QCoreApplication::translate("Control", "marker brightness: ", nullptr));
+        markerIgnoreWithout->setText(QCoreApplication::translate("Control", "ignore head without marker", nullptr));
+        colorBox->setTitle(QCoreApplication::translate("Control", "size and color", nullptr));
+        recoShowColor->setText(QCoreApplication::translate("Control", "show recognition color", nullptr));
+        recoOptimizeColor->setText(QCoreApplication::translate("Control", "optimize", nullptr));
+        label_28->setText(QCoreApplication::translate("Control", "model:", nullptr));
+        recoAutoWB->setText(QCoreApplication::translate("Control", "auto white balance and brigtness", nullptr));
+        label_29->setText(QCoreApplication::translate("Control", "x:", nullptr));
+        label_30->setText(QCoreApplication::translate("Control", "y:", nullptr));
+        label_31->setText(QCoreApplication::translate("Control", "z:", nullptr));
+        label_38->setText(QCoreApplication::translate("Control", "grey level:", nullptr));
+        label_39->setText(QCoreApplication::translate("Control", "symbol size:", nullptr));
+        groupBox_4->setTitle(QCoreApplication::translate("Control", "map", nullptr));
+        label_44->setText(QCoreApplication::translate("Control", "h:", nullptr));
+        label_40->setText(QCoreApplication::translate("Control", "x:", nullptr));
+        label_43->setText(QCoreApplication::translate("Control", "w:", nullptr));
+        label_42->setText(QCoreApplication::translate("Control", "y:", nullptr));
+        mapColor->setText(QCoreApplication::translate("Control", "color", nullptr));
+        label_45->setText(QCoreApplication::translate("Control", "height:", nullptr));
+        mapAdd->setText(QCoreApplication::translate("Control", "add", nullptr));
+        mapDel->setText(QCoreApplication::translate("Control", "delete", nullptr));
+        mapColorRange->setText(QCoreApplication::translate("Control", "color range", nullptr));
+#if QT_CONFIG(tooltip)
+        label_46->setToolTip(QCoreApplication::translate("Control", "default height, if no height is measured through color marker or disparity", nullptr));
+#endif // QT_CONFIG(tooltip)
+        label_46->setText(QCoreApplication::translate("Control", "def. height:", nullptr));
+#if QT_CONFIG(tooltip)
+        mapDistribution->setToolTip(QCoreApplication::translate("Control", "print out distribution of height", nullptr));
+#endif // QT_CONFIG(tooltip)
+        mapDistribution->setText(QCoreApplication::translate("Control", "dist.", nullptr));
+#if QT_CONFIG(tooltip)
+        mapResetHeight->setToolTip(QCoreApplication::translate("Control", "reset height of every person measured over time, so that default value will be choosen", nullptr));
+#endif // QT_CONFIG(tooltip)
+        mapResetHeight->setText(QCoreApplication::translate("Control", "res. height", nullptr));
+#if QT_CONFIG(tooltip)
+        mapResetPos->setToolTip(QCoreApplication::translate("Control", "reset position of every trackpoint (from disparity)", nullptr));
+#endif // QT_CONFIG(tooltip)
+        mapResetPos->setText(QCoreApplication::translate("Control", "res. pos.", nullptr));
+        tabs->setTabText(tabs->indexOf(rec), QCoreApplication::translate("Control", "recognition", nullptr));
+        trackOnlineCalc->setText(QCoreApplication::translate("Control", "online calculation", nullptr));
+#if QT_CONFIG(shortcut)
+        trackOnlineCalc->setShortcut(QCoreApplication::translate("Control", "Shift+T", nullptr));
+#endif // QT_CONFIG(shortcut)
+#if QT_CONFIG(tooltip)
+        trackRepeat->setToolTip(QCoreApplication::translate("Control", "repeat tracking below existing quality of trackpoint ", nullptr));
+#endif // QT_CONFIG(tooltip)
+        trackRepeat->setText(QCoreApplication::translate("Control", "repeat below quality:", nullptr));
+        trackExtrapolation->setText(QCoreApplication::translate("Control", "extrapolation for big diff.", nullptr));
+        trackMerge->setText(QCoreApplication::translate("Control", "merge", nullptr));
+#if QT_CONFIG(tooltip)
+        trackOnlyVisible->setToolTip(QCoreApplication::translate("Control", "online tracking and manual deletion and moving only for trajectories, which are visable (see \"show only people\")", nullptr));
+#endif // QT_CONFIG(tooltip)
+        trackOnlyVisible->setText(QCoreApplication::translate("Control", "only visible", nullptr));
+        trackNumberNow->setText(QCoreApplication::translate("Control", "0", nullptr));
+        label_22->setText(QCoreApplication::translate("Control", "number of all tracked and recognized people:", nullptr));
+        label_23->setText(QCoreApplication::translate("Control", "number of tracked people by now:", nullptr));
+        trackNumberAll->setText(QCoreApplication::translate("Control", "0", nullptr));
+        label_65->setText(QCoreApplication::translate("Control", "number of visible people:", nullptr));
+        trackNumberVisible->setText(QCoreApplication::translate("Control", "0", nullptr));
+        trackExport->setText(QCoreApplication::translate("Control", "export", nullptr));
+        trackCalc->setText(QCoreApplication::translate("Control", "calculate all", nullptr));
+        trackImport->setText(QCoreApplication::translate("Control", "import", nullptr));
+        trackReset->setText(QCoreApplication::translate("Control", "reset", nullptr));
+        groupBox_8->setTitle(QCoreApplication::translate("Control", "Region of interest", nullptr));
+        trackRoiShow->setText(QCoreApplication::translate("Control", "show", nullptr));
+        trackRoiFix->setText(QCoreApplication::translate("Control", "fix", nullptr));
+        groupBox_7->setTitle(QCoreApplication::translate("Control", "export options", nullptr));
+#if QT_CONFIG(tooltip)
+        trackMissingFrames->setToolTip(QCoreApplication::translate("Control", "search and insert missing frames", nullptr));
+#endif // QT_CONFIG(tooltip)
+        trackMissingFrames->setText(QCoreApplication::translate("Control", "insert miss. frames", nullptr));
+#if QT_CONFIG(tooltip)
+        trackRecalcHeight->setToolTip(QCoreApplication::translate("Control", "recalculate median height", nullptr));
+#endif // QT_CONFIG(tooltip)
+        trackRecalcHeight->setText(QCoreApplication::translate("Control", "recalc. height", nullptr));
+#if QT_CONFIG(tooltip)
+        trackAlternateHeight->setToolTip(QCoreApplication::translate("Control", "allow alternate height", nullptr));
+#endif // QT_CONFIG(tooltip)
+        trackAlternateHeight->setText(QCoreApplication::translate("Control", "alt. height", nullptr));
+#if QT_CONFIG(tooltip)
+        exportElimTp->setToolTip(QCoreApplication::translate("Control", "eliminate trackpoints at outer margins without calculated height", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
         exportElimTp->setStatusTip(QString());
-#endif // QT_NO_STATUSTIP
-        exportElimTp->setText(QApplication::translate("Control", "elim. tp. wo. hgt.", 0));
-#ifndef QT_NO_TOOLTIP
-        exportElimTrj->setToolTip(QApplication::translate("Control", "eliminate trajectories without calculated height", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_STATUSTIP
+#endif // QT_CONFIG(statustip)
+        exportElimTp->setText(QCoreApplication::translate("Control", "elim. tp. wo. hgt.", nullptr));
+#if QT_CONFIG(tooltip)
+        exportElimTrj->setToolTip(QCoreApplication::translate("Control", "eliminate trajectories without calculated height", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
         exportElimTrj->setStatusTip(QString());
-#endif // QT_NO_STATUSTIP
-        exportElimTrj->setText(QApplication::translate("Control", "elim. trj. wo. hgt.", 0));
-#ifndef QT_NO_TOOLTIP
-        exportSmooth->setToolTip(QApplication::translate("Control", "smooth trajectories (Attention: original trajectories are changed)", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_STATUSTIP
+#endif // QT_CONFIG(statustip)
+        exportElimTrj->setText(QCoreApplication::translate("Control", "elim. trj. wo. hgt.", nullptr));
+#if QT_CONFIG(tooltip)
+        exportSmooth->setToolTip(QCoreApplication::translate("Control", "smooth trajectories (Attention: original trajectories are changed)", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
         exportSmooth->setStatusTip(QString());
-#endif // QT_NO_STATUSTIP
-        exportSmooth->setText(QApplication::translate("Control", "smooth", 0));
-#ifndef QT_NO_TOOLTIP
-        exportViewDir->setToolTip(QApplication::translate("Control", "add direction of head (corresponding to view direction; possible with Japan and casern marker)", 0));
-#endif // QT_NO_TOOLTIP
-        exportViewDir->setText(QApplication::translate("Control", "add head direction", 0));
-#ifndef QT_NO_TOOLTIP
-        exportAngleOfView->setToolTip(QApplication::translate("Control", "add angle of view of camera to person", 0));
-#endif // QT_NO_TOOLTIP
-        exportAngleOfView->setText(QApplication::translate("Control", "add angle of view", 0));
-#ifndef QT_NO_TOOLTIP
-        exportUseM->setToolTip(QApplication::translate("Control", "use meter instead of cm", 0));
-#endif // QT_NO_TOOLTIP
-        exportUseM->setText(QApplication::translate("Control", "use meter", 0));
-        exportComment->setText(QApplication::translate("Control", "add comment", 0));
-        exportMarkerID->setText(QApplication::translate("Control", "add marker ID", 0));
-        trackTest->setText(QApplication::translate("Control", "test", 0));
-#ifndef QT_NO_TOOLTIP
-        testEqual->setToolTip(QApplication::translate("Control", "search for trajectories with similar trackpoints", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_WHATSTHIS
+#endif // QT_CONFIG(statustip)
+        exportSmooth->setText(QCoreApplication::translate("Control", "smooth", nullptr));
+#if QT_CONFIG(tooltip)
+        exportViewDir->setToolTip(QCoreApplication::translate("Control", "add direction of head (corresponding to view direction; possible with Japan and casern marker)", nullptr));
+#endif // QT_CONFIG(tooltip)
+        exportViewDir->setText(QCoreApplication::translate("Control", "add head direction", nullptr));
+#if QT_CONFIG(tooltip)
+        exportAngleOfView->setToolTip(QCoreApplication::translate("Control", "add angle of view of camera to person", nullptr));
+#endif // QT_CONFIG(tooltip)
+        exportAngleOfView->setText(QCoreApplication::translate("Control", "add angle of view", nullptr));
+#if QT_CONFIG(tooltip)
+        exportUseM->setToolTip(QCoreApplication::translate("Control", "use meter instead of cm", nullptr));
+#endif // QT_CONFIG(tooltip)
+        exportUseM->setText(QCoreApplication::translate("Control", "use meter", nullptr));
+        exportComment->setText(QCoreApplication::translate("Control", "add comment", nullptr));
+        exportMarkerID->setText(QCoreApplication::translate("Control", "add marker ID", nullptr));
+        trackTest->setText(QCoreApplication::translate("Control", "test", nullptr));
+#if QT_CONFIG(tooltip)
+        testEqual->setToolTip(QCoreApplication::translate("Control", "search for trajectories with similar trackpoints", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
         testEqual->setWhatsThis(QString());
-#endif // QT_NO_WHATSTHIS
-        testEqual->setText(QApplication::translate("Control", "equal", 0));
-#ifndef QT_NO_TOOLTIP
-        testVelocity->setToolTip(QApplication::translate("Control", "search for hight velocity variations", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_WHATSTHIS
+#endif // QT_CONFIG(whatsthis)
+        testEqual->setText(QCoreApplication::translate("Control", "equal", nullptr));
+#if QT_CONFIG(tooltip)
+        testVelocity->setToolTip(QCoreApplication::translate("Control", "search for hight velocity variations", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
         testVelocity->setWhatsThis(QString());
-#endif // QT_NO_WHATSTHIS
-        testVelocity->setText(QApplication::translate("Control", "velocity", 0));
-#ifndef QT_NO_TOOLTIP
-        testInside->setToolTip(QApplication::translate("Control", "search for trajectories which start or end outside recognition area", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_WHATSTHIS
+#endif // QT_CONFIG(whatsthis)
+        testVelocity->setText(QCoreApplication::translate("Control", "velocity", nullptr));
+#if QT_CONFIG(tooltip)
+        testInside->setToolTip(QCoreApplication::translate("Control", "search for trajectories which start or end outside recognition area", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
         testInside->setWhatsThis(QString());
-#endif // QT_NO_WHATSTHIS
-        testInside->setText(QApplication::translate("Control", "inside", 0));
-#ifndef QT_NO_TOOLTIP
-        testLength->setToolTip(QApplication::translate("Control", "search for short trajectories", 0));
-#endif // QT_NO_TOOLTIP
-#ifndef QT_NO_WHATSTHIS
+#endif // QT_CONFIG(whatsthis)
+        testInside->setText(QCoreApplication::translate("Control", "inside", nullptr));
+#if QT_CONFIG(tooltip)
+        testLength->setToolTip(QCoreApplication::translate("Control", "search for short trajectories", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
         testLength->setWhatsThis(QString());
-#endif // QT_NO_WHATSTHIS
-        testLength->setText(QApplication::translate("Control", "length", 0));
-        groupBox_6->setTitle(QApplication::translate("Control", "search region", 0));
-        label_52->setText(QApplication::translate("Control", "scale:", 0));
-        label_53->setText(QApplication::translate("Control", "levels:", 0));
-        label_66->setText(QApplication::translate("Control", "max. error:", 0));
-        trackShowSearchSize->setText(QApplication::translate("Control", "show pyramidal search size", 0));
-        groupBox_3->setTitle(QApplication::translate("Control", "path", 0));
-        trackShow->setText(QApplication::translate("Control", "show", 0));
-        trackFix->setText(QApplication::translate("Control", "fix", 0));
-        trackShowOnlyVisible->setText(QApplication::translate("Control", "only for visible people", 0));
-        trackShowOnly->setText(QApplication::translate("Control", "show only people:", 0));
-        trackGotoNr->setText(QApplication::translate("Control", "goto", 0));
-        trackGotoStartNr->setText(QApplication::translate("Control", "start", 0));
-        trackGotoEndNr->setText(QApplication::translate("Control", "end", 0));
-        trackShowOnlyList->setText(QApplication::translate("Control", "show only people list: ", 0));
-        trackShowOnlyListButton->setText(QApplication::translate("Control", "list", 0));
-        trackShowPath->setText(QApplication::translate("Control", "show path", 0));
-        trackShowCurrentPoint->setText(QApplication::translate("Control", "show current point", 0));
-        label_25->setText(QApplication::translate("Control", "size:", 0));
-        label_36->setText(QApplication::translate("Control", "size:", 0));
-        trackShowColColor->setText(QApplication::translate("Control", "show height/col. color", 0));
-        trackShowColorMarker->setText(QApplication::translate("Control", "show color marker", 0));
-        trackShowNumber->setText(QApplication::translate("Control", "show number", 0));
-        label_48->setText(QApplication::translate("Control", "size:", 0));
-        trackNumberBold->setText(QApplication::translate("Control", "bold", 0));
-        trackHeadSized->setText(QApplication::translate("Control", "head size", 0));
-        trackShowHeightIndividual->setText(QApplication::translate("Control", "individual", 0));
-        trackPathColorButton->setText(QApplication::translate("Control", "color", 0));
-        trackShowPoints->setText(QApplication::translate("Control", "show points", 0));
-        trackShowPointsColored->setText(QApplication::translate("Control", "colored", 0));
-        label_13->setText(QApplication::translate("Control", "size:", 0));
-        label_41->setText(QApplication::translate("Control", "size:", 0));
-        label_47->setText(QApplication::translate("Control", "size:", 0));
-        trackShowGroundPosition->setText(QApplication::translate("Control", "show ground position", 0));
-        label_67->setText(QApplication::translate("Control", "size:", 0));
-        trackShowGroundPath->setText(QApplication::translate("Control", "show ground path", 0));
-        label_68->setText(QApplication::translate("Control", "size:", 0));
-        trackGroundPathColorButton->setText(QApplication::translate("Control", "color", 0));
-        label_17->setText(QApplication::translate("Control", "frames before actual position:", 0));
-        label_20->setText(QApplication::translate("Control", "frames after actual position:", 0));
-        tabs->setTabText(tabs->indexOf(track), QApplication::translate("Control", "tracking", 0));
-        anaCalculate->setText(QApplication::translate("Control", "calculate", 0));
-        anaMissingFrames->setText(QApplication::translate("Control", "search and  insert missing frames", 0));
-        label_21->setText(QApplication::translate("Control", "averaging step size:", 0));
-        anaMarkAct->setText(QApplication::translate("Control", "mark actual frame", 0));
-        label_16->setText(QApplication::translate("Control", "consider:", 0));
-        anaConsiderX->setText(QApplication::translate("Control", "x", 0));
-        anaConsiderY->setText(QApplication::translate("Control", "y", 0));
-        anaConsiderAbs->setText(QApplication::translate("Control", "absolute", 0));
-        anaConsiderRev->setText(QApplication::translate("Control", "reverse", 0));
-        showVoronoiCells->setText(QApplication::translate("Control", "show voronoi cells", 0));
-        tabs->setTabText(tabs->indexOf(ana), QApplication::translate("Control", "analysis", 0));
+#endif // QT_CONFIG(whatsthis)
+        testLength->setText(QCoreApplication::translate("Control", "length", nullptr));
+        groupBox_6->setTitle(QCoreApplication::translate("Control", "search region", nullptr));
+        label_52->setText(QCoreApplication::translate("Control", "scale:", nullptr));
+        label_53->setText(QCoreApplication::translate("Control", "levels:", nullptr));
+        label_66->setText(QCoreApplication::translate("Control", "max. error:", nullptr));
+        trackShowSearchSize->setText(QCoreApplication::translate("Control", "show pyramidal search size", nullptr));
+        groupBox_3->setTitle(QCoreApplication::translate("Control", "path", nullptr));
+        trackShow->setText(QCoreApplication::translate("Control", "show", nullptr));
+        trackFix->setText(QCoreApplication::translate("Control", "fix", nullptr));
+        trackShowOnlyVisible->setText(QCoreApplication::translate("Control", "only for visible people", nullptr));
+        trackShowOnly->setText(QCoreApplication::translate("Control", "show only people:", nullptr));
+        trackGotoNr->setText(QCoreApplication::translate("Control", "goto", nullptr));
+        trackGotoStartNr->setText(QCoreApplication::translate("Control", "start", nullptr));
+        trackGotoEndNr->setText(QCoreApplication::translate("Control", "end", nullptr));
+        trackShowOnlyList->setText(QCoreApplication::translate("Control", "show only people list: ", nullptr));
+        trackShowOnlyListButton->setText(QCoreApplication::translate("Control", "list", nullptr));
+        trackShowPath->setText(QCoreApplication::translate("Control", "show path", nullptr));
+        trackShowCurrentPoint->setText(QCoreApplication::translate("Control", "show current point", nullptr));
+        label_25->setText(QCoreApplication::translate("Control", "size:", nullptr));
+        label_36->setText(QCoreApplication::translate("Control", "size:", nullptr));
+        trackShowColColor->setText(QCoreApplication::translate("Control", "show height/col. color", nullptr));
+        trackShowColorMarker->setText(QCoreApplication::translate("Control", "show color marker", nullptr));
+        trackShowNumber->setText(QCoreApplication::translate("Control", "show number", nullptr));
+        label_48->setText(QCoreApplication::translate("Control", "size:", nullptr));
+        trackNumberBold->setText(QCoreApplication::translate("Control", "bold", nullptr));
+        trackHeadSized->setText(QCoreApplication::translate("Control", "head size", nullptr));
+        trackShowHeightIndividual->setText(QCoreApplication::translate("Control", "individual", nullptr));
+        trackPathColorButton->setText(QCoreApplication::translate("Control", "color", nullptr));
+        trackShowPoints->setText(QCoreApplication::translate("Control", "show points", nullptr));
+        trackShowPointsColored->setText(QCoreApplication::translate("Control", "colored", nullptr));
+        label_13->setText(QCoreApplication::translate("Control", "size:", nullptr));
+        label_41->setText(QCoreApplication::translate("Control", "size:", nullptr));
+        label_47->setText(QCoreApplication::translate("Control", "size:", nullptr));
+        trackShowGroundPosition->setText(QCoreApplication::translate("Control", "show ground position", nullptr));
+        label_67->setText(QCoreApplication::translate("Control", "size:", nullptr));
+        trackShowGroundPath->setText(QCoreApplication::translate("Control", "show ground path", nullptr));
+        label_68->setText(QCoreApplication::translate("Control", "size:", nullptr));
+        trackGroundPathColorButton->setText(QCoreApplication::translate("Control", "color", nullptr));
+        label_17->setText(QCoreApplication::translate("Control", "frames before actual position:", nullptr));
+        label_20->setText(QCoreApplication::translate("Control", "frames after actual position:", nullptr));
+        tabs->setTabText(tabs->indexOf(track), QCoreApplication::translate("Control", "tracking", nullptr));
+        anaCalculate->setText(QCoreApplication::translate("Control", "calculate", nullptr));
+        anaMissingFrames->setText(QCoreApplication::translate("Control", "search and  insert missing frames", nullptr));
+        label_21->setText(QCoreApplication::translate("Control", "averaging step size:", nullptr));
+        anaMarkAct->setText(QCoreApplication::translate("Control", "mark actual frame", nullptr));
+        label_16->setText(QCoreApplication::translate("Control", "consider:", nullptr));
+        anaConsiderX->setText(QCoreApplication::translate("Control", "x", nullptr));
+        anaConsiderY->setText(QCoreApplication::translate("Control", "y", nullptr));
+        anaConsiderAbs->setText(QCoreApplication::translate("Control", "absolute", nullptr));
+        anaConsiderRev->setText(QCoreApplication::translate("Control", "reverse", nullptr));
+        showVoronoiCells->setText(QCoreApplication::translate("Control", "show voronoi cells", nullptr));
+        tabs->setTabText(tabs->indexOf(ana), QCoreApplication::translate("Control", "analysis", nullptr));
     } // retranslateUi
 
 };

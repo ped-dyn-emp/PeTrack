@@ -7,6 +7,9 @@
 #include "petrack.h"
 #include "control.h"
 
+using namespace std;
+using namespace cv;
+
 #define MAX_AV_ERROR 20
 
 ExtrCalibration::ExtrCalibration()
@@ -390,10 +393,7 @@ void ExtrCalibration::calibExtrParams()
         Mat rvec(3,1,CV_64F),/*,0),*/ tvec(3,1,CV_64F);//,0);
 
         // Solve the PnP-Problem to calibrate the camera to its environment
-#if ((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 3)))
-        bool solvePNPsuccess = true;
-        solvePnP(op,ip,camMat,distMat,rvec,tvec,false);
-#else
+
         bool solvePNPsuccess = solvePnP(op,ip,camMat,distMat,rvec,tvec,false,SOLVEPNP_ITERATIVE);
         //bool solvePNPsuccess = solvePnP(op,ip,camMat,distMat,rvec,tvec,false,SOLVEPNP_P3P); // Requires exactly 4 points
         //bool solvePNPsuccess = solvePnP(op,ip,camMat,distMat,rvec,tvec,false,SOLVEPNP_EPNP);
@@ -401,7 +401,7 @@ void ExtrCalibration::calibExtrParams()
         //bool solvePNPsuccess = solvePnP(op,ip,camMat,distMat,rvec,tvec,false,SOLVEPNP_UPNP);
         //bool solvePNPsuccess = true;
         //solvePnPRansac(op,ip,camMat,distMat,rvec,tvec);
-#endif
+
 
 
 //        debout << "The solvePNP-Method " << (solvePNPsuccess ? "" : "doesn't ") << "worked. " << solvePNPsuccess << endl;
@@ -906,7 +906,7 @@ Point3f ExtrCalibration::get3DPoint(Point2f p2d, double h)
         pointBeforeCam.z = 50;
         if( debug ) cout << "Point before Camera: [" << pointBeforeCam.x << ", " << pointBeforeCam.y << ", " << pointBeforeCam.z << "]" << endl;
         // 3D-Punkt vor Kamera in Weltkoordinaten
-        CvPoint3D32f pBCInWorld = transformRT(pointBeforeCam);
+        Point3f pBCInWorld = transformRT(pointBeforeCam);
         if( debug ) cout << "Point before Camera in World-Coordinatesystem: [" << pBCInWorld.x << ", " << pBCInWorld.y << ", " << pBCInWorld.z << "]" << endl;
         if( debug ) cout << "Camera in World-Coordinatesystem: [" << camInWorld.x << ", " << camInWorld.y << ", " << camInWorld.z << "]" << endl;
         // Berechnung des Richtungsvektors der Gerade von der Kamera durch den Pixel

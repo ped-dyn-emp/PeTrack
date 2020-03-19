@@ -33,8 +33,8 @@ they can be represented in QT.
 #include <cstdlib>
 #include <iomanip>
 
-#include "cv.h"
-#include "highgui.h"
+
+#include "opencv.hpp"
 
 #include "animation.h"
 
@@ -60,7 +60,9 @@ Animation::Animation(QWidget *wParent)
     mFirstSec = -1;
     mFirstMicroSec = -1;
     ////mCapture = NULL;
+#ifndef STEREO_DISABLED
     mCaptureStereo = NULL;
+#endif
 //    mImage = NULL;
 
 //    mStereoImgLeft = NULL;
@@ -388,8 +390,8 @@ double Animation::getFPS()
 {
     if (mCameraLiveStream)
     {
-        if (mVideoCapture.get(CV_CAP_PROP_FPS))
-            setFPS(mVideoCapture.get(CV_CAP_PROP_FPS));
+        if (mVideoCapture.get(CAP_PROP_FPS))
+            setFPS(mVideoCapture.get(CAP_PROP_FPS));
     }
     if (mVideo)
         return mFps;
@@ -452,7 +454,9 @@ void Animation::reset()
     mFirstSec = -1;
     mFirstMicroSec = -1;
     ////mCapture = NULL;
+#ifndef STEREO_DISABLED
     mCaptureStereo = NULL;
+#endif
 
 
     mTimeFileLoaded = false;
@@ -501,6 +505,7 @@ bool Animation::isCameraLiveStream()
     return mCameraLiveStream;
 }
 
+#ifndef STEREO_DISABLED
 enum Camera Animation::getCamera()
 {
     if (mCaptureStereo != NULL)
@@ -516,7 +521,7 @@ void Animation::setCamera(enum Camera c)
     //else   //keine Warnung, damit bei Projekt ohne direkt geladenem Video aber setzen von Stereo-Einstellungen keine Warnung ausgegeben wird
     //    debout << "Warning: Setting camera is only allowed for loaded stereo videos!" << endl;
 }
-
+#endif
 /**********************************************************************/
 /* Sequence of Images implementation                                 **/
 /**********************************************************************/
@@ -780,7 +785,7 @@ void Animation::freePhoto()
 /* Video implementation                                              **/
 /**********************************************************************/
 
-
+#ifndef STEREO_DISABLED
 // used to get access of both frames only with calibStereoFilter
 #ifdef STEREO
 PgrAviFile *Animation::getCaptureStereo()
@@ -790,9 +795,10 @@ StereoAviFile *Animation::getCaptureStereo()
 {
     return mCaptureStereo;
 }
+#endif
 
 // also cvcamPlayAVI() is available!!!!!
-
+#ifndef STEREO_DISABLED
 // Implementation of the openAnimation function for videos
 // Opens an animation from a sequence of stereo video file
 // Stereo data from Arena/Messe (hermes) experiments
@@ -858,7 +864,8 @@ bool Animation::openAnimationStereoVideo(int fileNumber, Mat &stereoImgLeft, Mat
 
     return ret;
 }
-
+#endif
+#ifndef STEREO_DISABLED
 // like above for the first time with new filename
 bool Animation::openAnimationStereoVideo(QString fileName)
 {
@@ -917,6 +924,7 @@ bool Animation::openAnimationStereoVideo(QString fileName)
 
     return ret;
 }
+#endif
 
 // Implementation of the openAnimation function for videos
 // Opens an animation from a video file
@@ -936,9 +944,9 @@ bool Animation::openAnimationVideo(QString fileName)
         ////int width  = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH);
         ////int height = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT);
         ////int fps    = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FPS);
-        int width  = (int) mVideoCapture.get(CV_CAP_PROP_FRAME_WIDTH);
-        int height = (int) mVideoCapture.get(CV_CAP_PROP_FRAME_HEIGHT);
-        int fps    = (int) mVideoCapture.get(CV_CAP_PROP_FPS);
+        int width  = (int) mVideoCapture.get(CAP_PROP_FRAME_WIDTH);
+        int height = (int) mVideoCapture.get(CAP_PROP_FRAME_HEIGHT);
+        int fps    = (int) mVideoCapture.get(CAP_PROP_FPS);
         //int fourcc = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FOURCC);
         //int frameCount = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_COUNT);
         //int propFormat = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FORMAT);
@@ -960,7 +968,7 @@ bool Animation::openAnimationVideo(QString fileName)
     ////if(capture == NULL)
     if(!mVideoCapture.isOpened())
     {
-#ifdef STEREO
+#if  STEREO && not STEREO_DISABLED
 
 
          // untersuchen, ob Stereodaten von Arena/Messe-Versuchen
@@ -996,11 +1004,13 @@ bool Animation::openAnimationVideo(QString fileName)
     {
         // Destroy anything that was before
         free();
+#ifndef STEREO_DISABLED
         if (mCaptureStereo)
         {
             mCaptureStereo->close();
             delete mCaptureStereo;
         }
+#endif
         ////mCapture = capture;
         // Set new video & photo labels
         mStereo = false;
@@ -1067,7 +1077,7 @@ Mat Animation::getFrameVideo(int index)
                 // OLD
                 ////cvSetCaptureProperty(mCapture, CV_CAP_PROP_POS_FRAMES, index);
                 // NEW
-                if( !mVideoCapture.set(CV_CAP_PROP_POS_FRAMES, index) )
+                if( !mVideoCapture.set(CAP_PROP_POS_FRAMES, index) )
                 {
                     debout << "Error: video file does not support skipping." << endl;
                     return Mat();
@@ -1161,6 +1171,7 @@ Mat Animation::getFrameVideo(int index)
 
            */
         }
+#ifndef STEREO_DISABLED
         else if (mStereo && mCaptureStereo)// stereo video
         {
             if (index/640 != mCurrentStereoFileNumber) // 640 stereo frames in one file
@@ -1169,12 +1180,14 @@ Mat Animation::getFrameVideo(int index)
             }
             mImage = cvarrToMat(mCaptureStereo->readFrame(index - mCurrentStereoFileNumber * 640));
         }
+#endif
         // We set the current frame index
         mCurrentFrame = index;
     }
+#ifndef STEREO_DISABLED
     else if (mStereo && (index == mCurrentFrame)) // da mgl anderes Bild rechte/links angefordert wird
         mImage = cvarrToMat(mCaptureStereo->readFrame(index - mCurrentStereoFileNumber * 640));
-
+#endif
     // Return the pointer to the IplImage :-)
     return mImage;
 }
@@ -1205,8 +1218,8 @@ bool Animation::getInfoVideo(QString fileName)
     // We get the FPS number with the cvGetCaptureProperty function
     // Note that this doesn't work if no frame has already retrieved!!
     ////setFPS(cvGetCaptureProperty(mCapture,CV_CAP_PROP_FPS));
-    if (mVideoCapture.get(CV_CAP_PROP_FPS))
-        setFPS(mVideoCapture.get(CV_CAP_PROP_FPS));
+    if (mVideoCapture.get(CAP_PROP_FPS))
+        setFPS(mVideoCapture.get(CAP_PROP_FPS));
  
     // Since the Xine implementation is kaputt, we have to do a hack to get the length of the video
     // We will do two cases :
@@ -1263,7 +1276,7 @@ bool Animation::getInfoVideo(QString fileName)
 //#endif
 
     // detect the used video codec
-    int fourCC = static_cast<int>( mVideoCapture.get(CV_CAP_PROP_FOURCC) );
+    int fourCC = static_cast<int>( mVideoCapture.get(CAP_PROP_FOURCC) );
     char FOURCC[] = {(char)( fourCC & 0XFF) ,
                      (char)((fourCC & 0XFF00) >> 8),
                      (char)((fourCC & 0XFF0000) >> 16),
@@ -1272,31 +1285,31 @@ bool Animation::getInfoVideo(QString fileName)
     //debout << "used video codec: " << FOURCC << endl;
 
     ////mNumFrames = (int) cvGetCaptureProperty(mCapture,CV_CAP_PROP_FRAME_COUNT);
-    mMaxFrames = (int) mVideoCapture.get(CV_CAP_PROP_FRAME_COUNT); //mNumFrame
+    mMaxFrames = (int) mVideoCapture.get(CAP_PROP_FRAME_COUNT); //mNumFrame
     mSourceOutFrame = mMaxFrames-1;
     //debout << "OpenCV FRAME_COUNT: " << mMaxFrames << endl;
 
     // Set videocapture to the last frame if CV_CAP_PROP_POS_FRAMES is supported by used video codec
-    if( mVideoCapture.set(CV_CAP_PROP_POS_FRAMES, mMaxFrames) > 0 )
+    if( mVideoCapture.set(CAP_PROP_POS_FRAMES, mMaxFrames) > 0 )
     {
         // Set videoCapture to the really correct last frame
-        mVideoCapture.set(CV_CAP_PROP_POS_FRAMES, mVideoCapture.get(CV_CAP_PROP_POS_FRAMES)-1);
+        mVideoCapture.set(CAP_PROP_POS_FRAMES, mVideoCapture.get(CAP_PROP_POS_FRAMES)-1);
 
 
         // Check if mNumFrames agrees with last readable frame
-        if( mMaxFrames != (mVideoCapture.get(CV_CAP_PROP_POS_FRAMES)+1) )
+        if( mMaxFrames != (mVideoCapture.get(CAP_PROP_POS_FRAMES)+1) )
         {
-            debout << "Warning: number of frames detected by OpenCV library (" << mMaxFrames << ") seems to be incorrect! (set to estimated value: "<< (mVideoCapture.get(CV_CAP_PROP_POS_FRAMES)+1) << ") [video codec: " << FOURCC << "]" << endl;
-            mMaxFrames = mVideoCapture.get(CV_CAP_PROP_POS_FRAMES)+1;
+            debout << "Warning: number of frames detected by OpenCV library (" << mMaxFrames << ") seems to be incorrect! (set to estimated value: "<< (mVideoCapture.get(CAP_PROP_POS_FRAMES)+1) << ") [video codec: " << FOURCC << "]" << endl;
+            mMaxFrames = mVideoCapture.get(CAP_PROP_POS_FRAMES)+1;
             mSourceOutFrame = mMaxFrames-1;
         }
 
         // Check if the last frame of the video is readable/OK?
         Mat frame;
         while( !mVideoCapture.read(frame) ){
-            mVideoCapture.set(CV_CAP_PROP_POS_FRAMES,mVideoCapture.get(CV_CAP_PROP_POS_FRAMES)-2);
-            mMaxFrames = mVideoCapture.get(CV_CAP_PROP_POS_FRAMES)+1;
-            if( mVideoCapture.get(CV_CAP_PROP_POS_FRAMES) < 0 ){
+            mVideoCapture.set(CAP_PROP_POS_FRAMES,mVideoCapture.get(CAP_PROP_POS_FRAMES)-2);
+            mMaxFrames = mVideoCapture.get(CAP_PROP_POS_FRAMES)+1;
+            if( mVideoCapture.get(CAP_PROP_POS_FRAMES) < 0 ){
                 cerr << "Warning: video file seems to be broken!" << endl;
                 mMaxFrames = -1;
                 mSourceOutFrame = mMaxFrames-1;
@@ -1346,8 +1359,8 @@ bool Animation::getCameraInfo()
     // We get the FPS number with the cvGetCaptureProperty function
     // Note that this doesn't work if no frame has already retrieved!!
     ////setFPS(cvGetCaptureProperty(mCapture,CV_CAP_PROP_FPS));
-    if (mVideoCapture.get(CV_CAP_PROP_FPS))
-        setFPS(mVideoCapture.get(CV_CAP_PROP_FPS));
+    if (mVideoCapture.get(CAP_PROP_FPS))
+        setFPS(mVideoCapture.get(CAP_PROP_FPS));
 
     return true;
 }

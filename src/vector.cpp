@@ -1,4 +1,5 @@
-#include "cxcore.h"
+#include "opencv.hpp"
+
 #include <QPointF>
 #include <QPoint>
 

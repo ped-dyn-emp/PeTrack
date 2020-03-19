@@ -1,7 +1,8 @@
 #ifndef ELLIPSE_H
 #define ELLIPSE_H
 
-#include <cxcore.h>
+
+#include "opencv.hpp"
 
 #include "vector.h"
 

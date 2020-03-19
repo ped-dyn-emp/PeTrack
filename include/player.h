@@ -9,7 +9,8 @@
 #else
 #include "aviFileWriter.h"
 #endif
-#include "cv.h"
+
+#include "opencv.hpp"
 
 class QLabel;
 class QSlider;

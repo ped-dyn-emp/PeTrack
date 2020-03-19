@@ -6,8 +6,6 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 
-#include "cvaux.h"
-#include "cxcore.h"
 
 #include <opencv.hpp>
 //#include "opencv2/cxcore.h"
@@ -31,6 +29,10 @@
 #include "trackingRoiItem.h"
 #include "animation.h"
 #include "extrCalibration.h"
+
+#ifdef STEREO_DISABLED
+enum Camera {cameraLeft, cameraRight, cameraUnset};
+#endif
 
 #define HEAD_SIZE 21. // durchschnittliche Kopflaenge in cm (Kopf 21x14)
 #define AXIS_MARKERS_LENGTH 10
@@ -159,7 +161,7 @@ public:
     void playAll();
     int winSize(QPointF *pos=NULL, int pers=-1, int frame=-1, int level=-1);
     void updateImage(bool imageChanged = false);
-    void updateImage(const Mat &img);
+    void updateImage(const cv::Mat &img);
 //    void updateImage(IplImage *iplImg);
     void updateSequence();
 //    void calcBackground();

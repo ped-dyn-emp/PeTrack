@@ -37,10 +37,11 @@ LIBELAS = true
 
 contains(hostname, [zZ][aA][mM]852) {
 #Hermes rechner #########################################################################################
-  STEREO = true # true / false
+  STEREO = false # true / false
+  DEFINES += STEREO_DISABLED
   AVI = true # true / false
   #CVPATH = "C:/OpenCV-2.2.0/bin"
-  CVPATH = "C:/opencv/build"
+  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
   CVVERSION = "240"
   LIBS += -llibopencv_core$${CVVERSION} -llibopencv_highgui$${CVVERSION} -llibopencv_imgproc$${CVVERSION} -llibopencv_calib3d$${CVVERSION} -llibopencv_video$${CVVERSION} -llibopencv_legacy$${CVVERSION} # -lcv$${CVVERSION} -lcvaux$${CVVERSION}
 #  CVPATH = "C:/Programme/OpenCV1.2"
@@ -52,75 +53,14 @@ contains(hostname, [zZ][aA][mM]852) {
   PGRPATH = "C:/Programme/Point Grey Research/Triclops Stereo Vision SDK"
   # noetig fuer qt 5 um u.a. qprinter zu finden
   QT += printsupport
-} else:contains(hostname, [zZ][aA][mM]673) {
-#Laptop alt #########################################################################################
-  STEREO = true # true / false
-  AVI = true # true / false
-  CVPATH = "C:/OpenCV-2.2.0/bin"
-  CVVERSION = "220"
-  LIBS += -llibopencv_core$${CVVERSION} -llibopencv_highgui$${CVVERSION} -llibopencv_imgproc$${CVVERSION} -llibopencv_calib3d$${CVVERSION} -llibopencv_video$${CVVERSION} -llibopencv_legacy$${CVVERSION} # -lcv$${CVVERSION} -lcvaux$${CVVERSION}
-#  CVPATH = "C:/OpenCV1.2"
-#  CVVERSION = "120"
-#  LIBS += -lcxcore$${CVVERSION} -lcv$${CVVERSION} -lcvaux$${CVVERSION} -lhighgui$${CVVERSION}
-  QWTPATH = "C:/Qwt-5.2.0"
-  PGRPATH = "C:/Program Files/Point Grey Research/Triclops Stereo Vision SDK"
-
-} else:contains(hostname, [zZ][aA][mM]737) {
-#Laptop neu 2012 #########################################################################################
-  # alles fuer 32 bit genommen: qt, opencv, qwt, triclops
-  STEREO = true # true / false
-  AVI = true # true / false
-  #QWT = false # true / false
-  #LIBELAS = false
-
-  CVPATH = "C:/OpenCV-2.2.0/bin"
-  CVVERSION = "220"
-  #CVPATH = "C:/opencv/build"
-  #CVVERSION = "242"
-  # fuer 64 bit -lopencv_ffmpeg_64
-  LIBS += -llibopencv_core$${CVVERSION} -llibopencv_highgui$${CVVERSION} -llibopencv_imgproc$${CVVERSION} -llibopencv_calib3d$${CVVERSION} -llibopencv_video$${CVVERSION} -lopencv_ffmpeg$${CVVERSION} -llibopencv_legacy$${CVVERSION}
-  QWTPATH = "C:/qwt-5.2.0"
-  #QWTPATH = "C:/Program Files (x86)/Qwt-6.0.1"
-  PGRPATH = "C:/Program Files (x86)/Point Grey Research/Triclops Stereo Vision SDK"
-
-} else:contains(hostname, [zZ][aA][mM]427) {  #.zam.kfa-juelich.de
-# Rechner Daniel #########################################################################################
-  CVPATH = "/home/zam/salden/OpenCV-3.0.0/install"
-  #CVPATH = "/usr"
-  #CVPATH = "/home/zam/salden/software/opencv/system_install"
-  #QWTPATH = "/usr"
-  #QWTPATH = "/home/zam/salden/qwt-6.1.2-qt-5.1.1"
-  QWTPATH =/home/zam/salden/qwt-6.1.3-qt-5.6.0
-  #QWTPATH = /usr
-  #PGRPATH = "/home/zam/salden/libs/Triclops/release"
-
-  #INCLUDEPATH += $${CVPATH}/include
-  #LIBS += -L$${CVPATH}/lib64
-
-  message("Build with OpenCV 3.0.0")
-  LIBS += -lopencv_core \
-          -lopencv_highgui \
-          -lopencv_imgproc \
-          -lopencv_calib3d \
-          -lopencv_video \
-          #-lopencv_ffmpeg \
-          -lopencv_videoio \
-          -lopencv_imgcodecs
-
-  LIBS += -L$${QWTPATH}/lib
-  LIBS += -L$${CVPATH}/lib
-
-  #INCLUDEPATH += $${QWTPATH}/include
-  #INCLUDEPATH += $${CVPATH}/include
-  #INCLUDEPATH += $${CVPATH}/include/opencv
-  #INCLUDEPATH += $${CVPATH}/include/opencv2
+QMAKE_CXXFLAGS += -fpermissive
 
 } else:contains(hostname, [zZ][aA][mM]460) {  #.zam.kfa-juelich.de
 # Mac Maik #########################################################################################
   QMAKE_MAC_SDK = macosx10.12
   #CVVERSION = ""
-  CVVERSION = "310"
-  CV_MAJOR_VERSION = "3"
+  CVVERSION = "420"
+  CV_MAJOR_VERSION = "4"
 
   #AVI = true # false
 
@@ -134,7 +74,7 @@ contains(hostname, [zZ][aA][mM]852) {
   #LIBS += -framework qwt
 
   #CVPATH = "/Users/boltes/Applications/opencv-3.1.0/release"
-  CVPATH = "/usr/local/Cellar/opencv3/3.1.0_3"
+  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0"
 
   #INCLUDEPATH += /usr/local/include
   #INCLUDEPATH += /usr/local/include/opencv
@@ -154,28 +94,30 @@ contains(hostname, [zZ][aA][mM]852) {
           -lopencv_video #\
        #   -l opencv_ffmpeg \
        #   -lopencv_legacy
+QMAKE_CXXFLAGS += -fpermissive
 } else:contains(hostname, arne-laptop) {
 # Laptop Daniel ##########################################################################################
-  STEREO = true # true / false
+  STEREO = false # true / false
+  DEFINES += STEREO_DISABLED
 
   #PGRPATH = "C:/Program Files/Point Grey Research/Triclops Stereo Vision SDK"
 
   CONFIG(debug, debug|release) {
       # only debug
         PGRPATH = "../trunk/3rdparty/windows/triclops-3.4"
-        CVPATH = "../trunk/3rdparty/windows/opencv-3.1.0"
-        QWTPATH = "../trunk/3rdparty/windows/qwt-6.1.2"
+        CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
+        QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
 
     } else {
         # only release
         PGRPATH = "../trunk/3rdparty/windows/triclops-3.4"
-        CVPATH = "../trunk/3rdparty/windows/opencv-3.1.0"
-        QWTPATH = "../trunk/3rdparty/windows/qwt-6.1.2"
+        CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
+        QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
     }
   #CVPATH = "%OPENCV_DIR%"
   #CVPATH = "C:\Program Files (x86)\OpenCV\3.0.0\build4qt5\install"
-  CVVERSION = "310"
-  CV_MAJOR_VERSION = "3"
+  CVVERSION = "420"
+  CV_MAJOR_VERSION = "4"
 
   # to switch between version 2.4.10 and 3.0.0 you have to update your OPENCV_DIR environment variable to the specific path
 
@@ -197,45 +139,42 @@ contains(hostname, [zZ][aA][mM]852) {
   #LIBELAS = false
 
   # fuer 64 bit -lopencv_ffmpeg_64
-  LIBS += -lopencv_core$${CVVERSION} \
+  LIBS += -L$${CVPATH}/x64/mingw/bin \
+          -lopencv_core$${CVVERSION} \
           -lopencv_highgui$${CVVERSION} \
           -lopencv_imgproc$${CVVERSION} \
           -lopencv_calib3d$${CVVERSION} \
           -lopencv_video$${CVVERSION} \
-          -lopencv_ffmpeg$${CVVERSION} \
-          -lopencv_aruco$${CVVERSION}
-    contains(CV_MAJOR_VERSION,3){
-      message("Build with OpenCV $${CVVERSION}")
-      LIBS += -lopencv_videoio$${CVVERSION} \
-              -lopencv_imgcodecs$${CVVERSION}
-      QMAKE_CXXFLAGS += -march=i686
-    }else {
-      message("Build with OpenCV 2.x.x")
-      LIBS += -lopencv_legacy$${CVVERSION}
+          -lopencv_videoio_ffmpeg$${CVVERSION}_64\
+          -lopencv_aruco$${CVVERSION} \
+          -lopencv_videoio$${CVVERSION} \
+          -lopencv_imgcodecs$${CVVERSION}
+  # QMAKE_CXXFLAGS += -march=i686
+QMAKE_CXXFLAGS += -fpermissive
 
-    }
 } else:contains(hostname, [zZ][aA][mM]197) {
 # Laptop Daniel ##########################################################################################
-  STEREO = true # true / false
+  STEREO = false # true / false
+  DEFINES += STEREO_DISABLED
 
   #PGRPATH = "C:/Program Files/Point Grey Research/Triclops Stereo Vision SDK"
 
   CONFIG(debug, debug|release) {
       # only debug
         PGRPATH = "../trunk/3rdparty/windows/triclops-3.4"
-        CVPATH = "../trunk/3rdparty/windows/opencv-3.1.0"
-        QWTPATH = "../trunk/3rdparty/windows/qwt-6.1.2"
+        CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
+        QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
 
     } else {
         # only release
         PGRPATH = "../trunk/3rdparty/windows/triclops-3.4"
-        CVPATH = "../trunk/3rdparty/windows/opencv-3.1.0"
-        QWTPATH = "../trunk/3rdparty/windows/qwt-6.1.2"
+        CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
+        QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
     }
   #CVPATH = "%OPENCV_DIR%"
   #CVPATH = "C:\Program Files (x86)\OpenCV\3.0.0\build4qt5\install"
-  CVVERSION = "310"
-  CV_MAJOR_VERSION = "3"
+  CVVERSION = "420"
+  CV_MAJOR_VERSION = "4"
 
   # to switch between version 2.4.10 and 3.0.0 you have to update your OPENCV_DIR environment variable to the specific path
 
@@ -257,25 +196,22 @@ contains(hostname, [zZ][aA][mM]852) {
   #LIBELAS = false
 
   # fuer 64 bit -lopencv_ffmpeg_64
-  LIBS += -lopencv_core$${CVVERSION} \
+  LIBS += -L$${CVPATH}/x64/mingw/bin \
+          -lopencv_core$${CVVERSION} \
           -lopencv_highgui$${CVVERSION} \
           -lopencv_imgproc$${CVVERSION} \
           -lopencv_calib3d$${CVVERSION} \
           -lopencv_video$${CVVERSION} \
-          -lopencv_ffmpeg$${CVVERSION} \
-          -lopencv_aruco$${CVVERSION}
-    contains(CV_MAJOR_VERSION,3){
-      message("Build with OpenCV $${CVVERSION}")
-      LIBS += -lopencv_videoio$${CVVERSION} \
-              -lopencv_imgcodecs$${CVVERSION}
-      QMAKE_CXXFLAGS += -march=i686
-    }else {
-      message("Build with OpenCV 2.x.x")
-      LIBS += -lopencv_legacy$${CVVERSION}
+          -lopencv_videoio_ffmpeg$${CVVERSION}_64\
+          -lopencv_aruco$${CVVERSION} \
+          -lopencv_videoio$${CVVERSION} \
+          -lopencv_imgcodecs$${CVVERSION}
+  # QMAKE_CXXFLAGS += -march=i686
+QMAKE_CXXFLAGS += -fpermissive
 
-    }
 } else:contains(hostname, ias7185) {
   # imotion laptop
+  DEFINES += STEREO_DISABLED
 
   # PointGray
   PGRPATH = "../petrack/3rdparty/windows/triclops-3.4"
@@ -283,9 +219,9 @@ contains(hostname, [zZ][aA][mM]852) {
   # OpenCV
   #CVPATH = "C:/OpenCV/opencv300/build/install"
   #CVPATH = "3rdparty/windows/opencv-3.1.0"
-  CVPATH = "../petrack/3rdparty/windows/opencv-3.1.0"
-  CVVERSION = "310"
-  CV_MAJOR_VERSION = "3"
+  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
+  CVVERSION = "420"
+  CV_MAJOR_VERSION = "4"
 
   # to switch between version 2.4.10 and 3.0.0 you have to update your OPENCV_DIR environment variable to the specific path
 
@@ -293,34 +229,32 @@ contains(hostname, [zZ][aA][mM]852) {
   INCLUDEPATH += $${CVPATH}/include/opencv
   INCLUDEPATH += $${CVPATH}/include/opencv2
 
-  QWTPATH = "C:/Qwt-6.1.4"
+  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
   #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
   INCLUDEPATH += $${QWTPATH}/include
 
-  STEREO = true # true / false
+  STEREO = false # true / false
   AVI = false # true / false
   #QWT = false # true / false
   #LIBELAS = false
 
   # fuer 64 bit -lopencv_ffmpeg_64
-  LIBS += -lopencv_core$${CVVERSION} \
+  LIBS += -L$${CVPATH}/x64/mingw/bin \
+          -lopencv_core$${CVVERSION} \
           -lopencv_highgui$${CVVERSION} \
           -lopencv_imgproc$${CVVERSION} \
           -lopencv_calib3d$${CVVERSION} \
           -lopencv_video$${CVVERSION} \
-          -lopencv_ffmpeg$${CVVERSION}\
-          -lopencv_aruco$${CVVERSION}
-  contains(CV_MAJOR_VERSION,3){
-    message("Build with OpenCV 3.0.0")
-    LIBS += -lopencv_videoio$${CVVERSION} \
-            -lopencv_imgcodecs$${CVVERSION}
-    QMAKE_CXXFLAGS += -march=i686
-  }else {
-    message("Build with OpenCV 2.x.x")
-    LIBS += -lopencv_legacy$${CVVERSION}
-  }
+          -lopencv_videoio_ffmpeg$${CVVERSION}_64\
+          -lopencv_aruco$${CVVERSION} \
+          -lopencv_videoio$${CVVERSION} \
+          -lopencv_imgcodecs$${CVVERSION}
+  # QMAKE_CXXFLAGS += -march=i686
+QMAKE_CXXFLAGS += -fpermissive
+
 } else:contains(hostname, ias7176) {
   # Deniz 32-Bit
+  DEFINES += STEREO_DISABLED
 
   # PointGray
   PGRPATH = "../petrack/3rdparty/windows/triclops-3.4"
@@ -328,9 +262,9 @@ contains(hostname, [zZ][aA][mM]852) {
   # OpenCV
   #CVPATH = "C:/OpenCV/opencv300/build/install"
   #CVPATH = "3rdparty/windows/opencv-3.1.0"
-  CVPATH = "../petrack/3rdparty/windows/opencv-3.1.0"
-  CVVERSION = "310"
-  CV_MAJOR_VERSION = "3"
+  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
+  CVVERSION = "420"
+  CV_MAJOR_VERSION = "4"
 
   # to switch between version 2.4.10 and 3.0.0 you have to update your OPENCV_DIR environment variable to the specific path
 
@@ -338,34 +272,49 @@ contains(hostname, [zZ][aA][mM]852) {
   INCLUDEPATH += $${CVPATH}/include/opencv
   INCLUDEPATH += $${CVPATH}/include/opencv2
 
-  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4"
+  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
   #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
   INCLUDEPATH += $${QWTPATH}/include
 
-  STEREO = true # true / false
+  STEREO = false # true / false
   AVI = false # true / false
   #QWT = false # true / false
   #LIBELAS = false
 
-  # fuer 64 bit -lopencv_ffmpeg_64
-  LIBS += -lopencv_core$${CVVERSION} \
-          -lopencv_highgui$${CVVERSION} \
-          -lopencv_imgproc$${CVVERSION} \
-          -lopencv_calib3d$${CVVERSION} \
-          -lopencv_video$${CVVERSION} \
-          -lopencv_ffmpeg$${CVVERSION}\
-          -lopencv_aruco$${CVVERSION}
-  contains(CV_MAJOR_VERSION,3){
-    message("Build with OpenCV 3.0.0")
-    LIBS += -lopencv_videoio$${CVVERSION} \
-            -lopencv_imgcodecs$${CVVERSION}
-    QMAKE_CXXFLAGS += -march=i686
-  }else {
-    message("Build with OpenCV 2.x.x")
-    LIBS += -lopencv_legacy$${CVVERSION}
-  }
+
+
+#  CONFIG(debug, debug|release){
+#      # fuer 64 bit -lopencv_ffmpeg_64
+#      LIBS += -L$${CVPATH}/x64/mingw/bin \
+#              -lopencv_core$${CVVERSION}d \
+#              -lopencv_highgui$${CVVERSION}d \
+#              -lopencv_imgproc$${CVVERSION}d \
+#              -lopencv_calib3d$${CVVERSION}d \
+#              -lopencv_video$${CVVERSION}d \
+#              -lopencv_videoio_ffmpeg$${CVVERSION}_64\
+#              -lopencv_aruco$${CVVERSION}d \
+#              -lopencv_videoio$${CVVERSION}d \
+#              -lopencv_imgcodecs$${CVVERSION}d
+#      # QMAKE_CXXFLAGS += -march=i686
+#  } else{
+      # fuer 64 bit -lopencv_ffmpeg_64
+      LIBS += -L$${CVPATH}/x64/mingw/bin \
+              -lopencv_core$${CVVERSION} \
+              -lopencv_highgui$${CVVERSION} \
+              -lopencv_imgproc$${CVVERSION} \
+              -lopencv_calib3d$${CVVERSION} \
+              -lopencv_video$${CVVERSION} \
+              -lopencv_videoio_ffmpeg$${CVVERSION}_64\
+              -lopencv_aruco$${CVVERSION} \
+              -lopencv_videoio$${CVVERSION} \
+              -lopencv_imgcodecs$${CVVERSION}
+      ## QMAKE_CXXFLAGS += -march=i686
+QMAKE_CXXFLAGS += -fpermissive
+#  }
+
 } else:contains(hostname, ias7171) {
-  # Deniz 32-Bit
+  # Ann Katrin 32-Bit
+  DEFINES += STEREO_DISABLED
 
   # PointGray
   PGRPATH = "../petrack/3rdparty/windows/triclops-3.4"
@@ -373,9 +322,9 @@ contains(hostname, [zZ][aA][mM]852) {
   # OpenCV
   #CVPATH = "C:/OpenCV/opencv300/build/install"
   #CVPATH = "3rdparty/windows/opencv-3.1.0"
-  CVPATH = "../petrack/3rdparty/windows/opencv-3.1.0"
-  CVVERSION = "310"
-  CV_MAJOR_VERSION = "3"
+  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
+  CVVERSION = "420"
+  CV_MAJOR_VERSION = "4"
 
   # to switch between version 2.4.10 and 3.0.0 you have to update your OPENCV_DIR environment variable to the specific path
 
@@ -383,32 +332,115 @@ contains(hostname, [zZ][aA][mM]852) {
   INCLUDEPATH += $${CVPATH}/include/opencv
   INCLUDEPATH += $${CVPATH}/include/opencv2
 
-  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4"
+  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
   #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
   INCLUDEPATH += $${QWTPATH}/include
 
-  STEREO = true # true / false
+  STEREO = false # true / false
   AVI = false # true / false
   #QWT = false # true / false
   #LIBELAS = false
 
   # fuer 64 bit -lopencv_ffmpeg_64
-  LIBS += -lopencv_core$${CVVERSION} \
+  LIBS += -L$${CVPATH}/x64/mingw/bin \
+          -lopencv_core$${CVVERSION} \
           -lopencv_highgui$${CVVERSION} \
           -lopencv_imgproc$${CVVERSION} \
           -lopencv_calib3d$${CVVERSION} \
           -lopencv_video$${CVVERSION} \
-          -lopencv_ffmpeg$${CVVERSION}\
-          -lopencv_aruco$${CVVERSION}
-  contains(CV_MAJOR_VERSION,3){
-    message("Build with OpenCV 3.0.0")
-    LIBS += -lopencv_videoio$${CVVERSION} \
-            -lopencv_imgcodecs$${CVVERSION}
-    QMAKE_CXXFLAGS += -march=i686
-  }else {
-    message("Build with OpenCV 2.x.x")
-    LIBS += -lopencv_legacy$${CVVERSION}
-  }
+          -lopencv_videoio_ffmpeg$${CVVERSION}_64\
+          -lopencv_aruco$${CVVERSION} \
+          -lopencv_videoio$${CVVERSION} \
+          -lopencv_imgcodecs$${CVVERSION}
+  # QMAKE_CXXFLAGS += -march=i686
+QMAKE_CXXFLAGS += -fpermissive
+
+}else:contains(hostname, ias7160) {
+  # Test Laptop 32-Bit
+  DEFINES += STEREO_DISABLED
+
+  # PointGray
+  PGRPATH = "../petrack/3rdparty/windows/triclops-3.4"
+  #PGRPATH = "C:/Program Files (x86)/Point Grey Research/Triclops Stereo Vision SDK"
+  # OpenCV
+  #CVPATH = "C:/OpenCV/opencv300/build/install"
+  #CVPATH = "3rdparty/windows/opencv-3.1.0"
+  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
+  CVVERSION = "420"
+  CV_MAJOR_VERSION = "4"
+
+  # to switch between version 2.4.10 and 3.0.0 you have to update your OPENCV_DIR environment variable to the specific path
+
+  INCLUDEPATH += $${CVPATH}/include
+  INCLUDEPATH += $${CVPATH}/include/opencv
+  INCLUDEPATH += $${CVPATH}/include/opencv2
+
+  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
+  #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
+  INCLUDEPATH += $${QWTPATH}/include
+
+  STEREO = false # true / false
+  AVI = false # true / false
+  #QWT = false # true / false
+  #LIBELAS = false
+
+  # fuer 64 bit -lopencv_ffmpeg_64
+  LIBS += -L$${CVPATH}/x64/mingw/bin \
+          -lopencv_core$${CVVERSION} \
+          -lopencv_highgui$${CVVERSION} \
+          -lopencv_imgproc$${CVVERSION} \
+          -lopencv_calib3d$${CVVERSION} \
+          -lopencv_video$${CVVERSION} \
+          -lopencv_videoio_ffmpeg$${CVVERSION}_64\
+          -lopencv_aruco$${CVVERSION} \
+          -lopencv_videoio$${CVVERSION} \
+          -lopencv_imgcodecs$${CVVERSION}
+  # QMAKE_CXXFLAGS += -march=i686
+QMAKE_CXXFLAGS += -fpermissive
+
+}else:contains(hostname, ias7169) {
+  # Deniz Laptop
+  DEFINES += STEREO_DISABLED
+
+  # PointGray
+  PGRPATH = "../petrack/3rdparty/windows/triclops-3.4"
+  #PGRPATH = "C:/Program Files (x86)/Point Grey Research/Triclops Stereo Vision SDK"
+  # OpenCV
+  #CVPATH = "C:/OpenCV/opencv300/build/install"
+  #CVPATH = "3rdparty/windows/opencv-3.1.0"
+  CVPATH = "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
+  CVVERSION = "420"
+  CV_MAJOR_VERSION = "4"
+
+  # to switch between version 2.4.10 and 3.0.0 you have to update your OPENCV_DIR environment variable to the specific path
+
+  INCLUDEPATH += $${CVPATH}/include
+  INCLUDEPATH += $${CVPATH}/include/opencv
+  INCLUDEPATH += $${CVPATH}/include/opencv2
+
+  QWTPATH = "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
+  #QWTPATH = "D:/petrack/trunk/3rdparty/windows/qwt-6.1.2"
+  INCLUDEPATH += $${QWTPATH}/include
+
+  STEREO = false # true / false
+  AVI = false # true / false
+  #QWT = false # true / false
+  #LIBELAS = false
+
+  # fuer 64 bit -lopencv_ffmpeg_64
+  LIBS += -L$${CVPATH}/x64/mingw/bin \
+          -lopencv_core$${CVVERSION} \
+          -lopencv_highgui$${CVVERSION} \
+          -lopencv_imgproc$${CVVERSION} \
+          -lopencv_calib3d$${CVVERSION} \
+          -lopencv_video$${CVVERSION} \
+          -lopencv_videoio_ffmpeg$${CVVERSION}_64\
+          -lopencv_aruco$${CVVERSION} \
+          -lopencv_videoio$${CVVERSION} \
+          -lopencv_imgcodecs$${CVVERSION}
+  # QMAKE_CXXFLAGS += -march=i686
+QMAKE_CXXFLAGS += -fpermissive
+
 }else {
   message(Host unknown for configuration!)
 }
@@ -461,7 +493,7 @@ unix:!macx {
 #      message("Build with OpenCV 3.0.0")
 #      LIBS += -lopencv_videoio$${CVVERSION} \
 #              -lopencv_imgcodecs$${CVVERSION}
-#      QMAKE_CXXFLAGS += -march=i686
+#      # QMAKE_CXXFLAGS += -march=i686
 #    }else {
 #      message("Build with OpenCV 2.x.x")
 #      LIBS += -lopencv_legacy$${CVVERSION}

@@ -4,11 +4,13 @@
 #include <QProgressDialog>
 #include <QApplication>
 
-#include "highgui.h"
+#include "highgui.hpp"
 
 #include "autoCalib.h"
 #include "petrack.h"
 #include "control.h"
+
+using namespace::cv;
 
 #define SHOW_CALIB_MAINWINDOW   // definieren, wenn das Schachbrett im Mainwindow und nicht separat angezeigt werden soll:
                                 // fuehrt nach Calibration dazu dass play des originalvideos abstuerzt, insb wenn intr apply nicht ausgewaehlt war
@@ -92,11 +94,8 @@ void AutoCalib::autoCalib()
             QMessageBox::information(mMainWindow, Petrack::tr("Petrack"), Petrack::tr("At first you have to select files."));
             return;
         }
-#if CV_MAJOR_VERSION == 2
-        CvSize board_size = {mBoardSizeX, mBoardSizeY};  //{6, 9};  //{6, 8}; // passt zu meinem Schachbrett, was ich ausgedruckt habe
-#elif CV_MAJOR_VERSION == 3
-        Size board_size(mBoardSizeX, mBoardSizeY);
-#endif
+
+        Size board_size(mBoardSizeX, mBoardSizeY); //{6, 9};  //{6, 8}; // passt zu meinem Schachbrett, was ich ausgedruckt habe
         float square_size = mSquareSize; //5.25f; // 3.f;   // da 3x3cm hat Schachbrett, was ich ausgedruckt habe
         float aspect_ratio = 1.f;
         int flags = 0;
@@ -191,7 +190,7 @@ void AutoCalib::autoCalib()
             {
                 // improve the found corners' coordinate accuracy
 //                view_gray = cvCreateImage(imgSize, 8, 1);
-                cvtColor(view,view_gray,CV_BGR2GRAY);
+                cvtColor(view,view_gray,COLOR_BGR2GRAY);
 //                cvCvtColor(view, view_gray, CV_BGR2GRAY);
                 cornerSubPix(view_gray,corners,Size(11,11),
                              Size(-1,-1),TermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER,30,0.1));

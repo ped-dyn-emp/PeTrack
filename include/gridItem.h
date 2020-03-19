@@ -31,7 +31,7 @@ public:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 //    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
-    int drawLine(QPainter *painter, Point2f *p, int y_offset);
+    int drawLine(QPainter *painter, cv::Point2f *p, int y_offset);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };
 

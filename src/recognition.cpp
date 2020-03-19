@@ -1,7 +1,8 @@
 #include <QPointF>
 #include <QRect>
-
+#if not CV_MAJOR_VERION == 4
 #include <cv.h>
+#endif
 #include <opencv.hpp>
 #include <opencv2/aruco.hpp>
 
@@ -30,6 +31,8 @@
 #include "helper.h"
 #include "tracker.h"
 #include "control.h"
+
+using namespace::cv;
 
 //#include "Psapi.h"
 
@@ -73,7 +76,7 @@ void thresholdHSV (const Mat &src, Mat &bin, const ColorParameters &param)
 
 //    cvCvtColor(srcIpl ,hsvIpl, CV_BGR2HSV); // convert to HSV color space
 
-    cvtColor(src, hsv, CV_BGR2HSV);
+    cvtColor(src, hsv, COLOR_BGR2HSV);
 
 //    unsigned char* dataImg = ((unsigned char*) hsvIpl->imageData);
 //    unsigned char* yDataImg = dataImg;
@@ -121,12 +124,14 @@ void thresholdHSV (const Mat &src, Mat &bin, const ColorParameters &param)
 
 //    cvReleaseImage(&hsvIpl);
 }
+#ifndef STEREO_DISABLED
 void thresholdHSV (const IplImage *srcIpl, IplImage *binIpl, const ColorParameters &param)
 {
     const Mat src = cvarrToMat(srcIpl);
     Mat bin = cvarrToMat(binIpl);
     thresholdHSV(src,bin,param);
 }
+#endif
 
 
 void setColorParameter(const QColor &fromColor, const QColor &toColor, bool inversHue, ColorParameters	&param)
@@ -278,11 +283,8 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
     int i, j, x, y;
     bool atEdge;
     int threshold;
-#if CV_MAJOR_VERSION == 2
-    CvBox2D32f subBox;
-#elif CV_MAJOR_VERSION == 3
+
     RotatedRect subBox;
-#endif
 
     int cx, cy, add;
     int nr;
@@ -359,7 +361,7 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
 //        IplImage *clone = cvCloneImage(binary); // clone, da binary sonst veraendert wird
 //        Mat clone(binary);
 //        storage = cvCreateMemStorage(0);
-        cv::findContours(clone,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_SIMPLE);
+        cv::findContours(clone,contours,cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
 //        cvFindContours(clone, storage, &contour, sizeof(CvContour), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE); // clone wird auch veraendert!!!
 //        findContours(clone,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_SIMPLE);
 //        firstContour = contour;
@@ -613,11 +615,11 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
                     //for (threshold = 40; threshold < 251 ; threshold += 30) // 40, 70, 100, 130, 160, 190, 220, 250
                     for (threshold = 5; threshold < maxThreshold; threshold += step) // col.value()
                     {
-                        cv::threshold(subGray,subBW,threshold,255,CV_THRESH_BINARY);
+                        cv::threshold(subGray,subBW,threshold,255,cv::THRESH_BINARY);
 //                        cvThreshold(subGray, subBW, threshold, 255, CV_THRESH_BINARY);
 
                         // find contours and store them all as a list
-                        cv::findContours(subBW,subContours,CV_RETR_LIST,CV_CHAIN_APPROX_SIMPLE);
+                        cv::findContours(subBW,subContours,cv::RETR_LIST,cv::CHAIN_APPROX_SIMPLE);
 //                        cvFindContours(subBW, subStorage, &subFirstContour, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE); // gray wird auch veraendert!!!
 
                         // test each contour
@@ -665,15 +667,10 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
                                 if (subRatio < 1.8 && subMaxExpansion < markerSize*1.5 && subMaxExpansion > markerSize/2)//1.5
                                 {
                                     // IN OPENCV2.1 liefert cvContourArea KEIN VORZEICHEN ZUM ERKENNEN DER DREHRICHTUNG!!!! es ist ein optionaler paramter hinzugefuegt worden!!!!
-    #if ((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 1)))
-                                    //if  ((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 1)))
-//                                    subContourArea = cvContourArea(subContours,CV_WHOLE_SEQ);
-                                    subContourArea = cv::contourArea(subContour);
-    #else
+
                                     //else
                                     subContourArea = cv::contourArea(subContour,true);
 //                                    subContourArea = cvContourArea(subContours,CV_WHOLE_SEQ, true);
-    #endif
                                     cx = myRound(subBox.center.x);
                                     cy = myRound(subBox.center.y);
 
@@ -861,7 +858,7 @@ void findColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWid
 //    IplImage *clone = cvCloneImage(binary); // clone, da binary sonst veraendert wird
     Mat clone = binary.clone();//(cvarrToMat(binary),true);
 
-    cv::findContours(clone,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_SIMPLE);
+    cv::findContours(clone,contours,cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
 //    cvFindContours(clone, storage, &contour, sizeof(CvContour),
 //        CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE); // clone wird auch veraendert!!!
 
@@ -1057,7 +1054,12 @@ void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidg
     detectorParams->minCornerDistanceRate                 = minCornerDistanceRate;
     detectorParams->minDistanceToBorder                   = codeMarkerWidget->minDistanceToBorder->value();
     detectorParams->minMarkerDistanceRate                 = minMarkerDistanceRate;
-    detectorParams->doCornerRefinement                    = codeMarkerWidget->doCornerRefinement->isChecked();
+    // No refinement is default value
+    // TODO Check if this is the best MEthod for our usecase
+    if(codeMarkerWidget->doCornerRefinement->isChecked()){
+        detectorParams->cornerRefinementMethod            = cv::aruco::CornerRefineMethod::CORNER_REFINE_SUBPIX;
+    }
+    //detectorParams->cornerRefinementMethod                = codeMarkerWidget->doCornerRefinement->isChecked();
     detectorParams->cornerRefinementWinSize               = codeMarkerWidget->cornerRefinementWinSize->value();
     detectorParams->cornerRefinementMaxIterations         = codeMarkerWidget->cornerRefinementMaxIterations->value();
     detectorParams->cornerRefinementMinAccuracy           = codeMarkerWidget->cornerRefinementMinAccuracy->value();
@@ -1163,14 +1165,11 @@ void findContourMarker(Mat &img, QList<TrackPoint> *crossList, int markerBrightn
     vector<vector<Point> > contours;
 //    CvSeq *contours;
 //    CvSeq *firstContour;
-#if CV_MAJOR_VERSION == 2
-    CvPoint2D32f* PointArray2D32f;
-    CvBox2D32f box;
-#elif CV_MAJOR_VERSION == 3
+
+
 //    Mat PointArray2D32f;
     RotatedRect box;
     //CvBox2D box;
-#endif
 //     CvPoint center;
     int expansion;
     double contourArea;
@@ -1206,7 +1205,7 @@ void findContourMarker(Mat &img, QList<TrackPoint> *crossList, int markerBrightn
         //            greyData = (yGreyData += tgray->widthStep); // because sometimes widthStep != width
         //
         //        }
-        cvtColor(img,tgray,CV_RGB2GRAY);
+        cvtColor(img,tgray,COLOR_RGB2GRAY);
 //        cvCvtColor(img, tgray, CV_RGB2GRAY);
     }
     //debout << "Threshold" << endl;
@@ -1266,11 +1265,11 @@ namedWindow("img", CV_WINDOW_AUTOSIZE); // 0 wenn skalierbar sein soll
             //                data = (yData += gray->widthStep); // because sometimes widthStep != width
             //                greyData = (yGreyData += tgray->widthStep); // because sometimes widthStep != width
             //            }
-            cv::threshold(tgray,gray,threshold, 255, CV_THRESH_BINARY);
+            cv::threshold(tgray,gray,threshold, 255, cv::THRESH_BINARY);
 //            cvThreshold(tgray, gray, threshold, 255, CV_THRESH_BINARY);
         }
         else if (img.channels() == 1)
-            cv::threshold(img,gray,threshold,255, CV_THRESH_BINARY);//cvThreshold(img, gray, threshold, 255, CV_THRESH_BINARY);
+            cv::threshold(img,gray,threshold,255, cv::THRESH_BINARY);//cvThreshold(img, gray, threshold, 255, CV_THRESH_BINARY);
         else
             debout << "Error: Wrong number of channels: " << img.channels() <<endl;
         grayFix = gray.clone();// = cvCloneImage(gray); // make a copy
@@ -1285,7 +1284,7 @@ namedWindow("img", CV_WINDOW_AUTOSIZE); // 0 wenn skalierbar sein soll
 #endif
         // find contours and store them all as a list
 //#if CV_MAJOR_VERSION == 2
-        findContours(gray,contours,CV_RETR_LIST,CV_CHAIN_APPROX_SIMPLE);
+        findContours(gray,contours,cv::RETR_LIST,cv::CHAIN_APPROX_SIMPLE);
 //        cvFindContours(gray, storage, &firstContour, sizeof(CvContour),
 //            CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE); // gray wird auch veraendert!!!
 //        contours = firstContour;
@@ -1346,35 +1345,7 @@ cvWaitKey();
 ////// in weiss alle konturen - behindern jedoch weitere untersuchungen
 ////cvDrawContours(img,contours,CV_RGB(255,255,255),CV_RGB(255,255,255),0,1,8,cvPoint(0,0));
 #endif
-#if CV_MAJOR_VERSION == 2
-//debout << "PointArray malloc" << endl;
-                // Alloc memory for contour point set.    
-                PointArray = (CvPoint*)malloc(count*sizeof(CvPoint));
 
-                //cv::Mat PointMat = cv::Mat(1, count, CV_32SC2, contours);
-                //debout << cv::contourArea(PointMat) <<endl;
-                //debout << cv::isContourConvex(PointMat) <<endl;
-                //HoughCircles: Finds circles in a grayscale image using a Hough transform.
-                //debout << "seqToArray" << endl;
-                // Get contour point set.
-                cvCvtSeqToArray(contours, PointArray, CV_WHOLE_SEQ);
-
-
-
-                PointArray2D32f = (CvPoint2D32f*)malloc(count*sizeof(CvPoint2D32f));
-
-                // Convert CvPoint set to CvBox2D32f set.
-                for(i=0; i<count; i++)
-                {
-                    PointArray2D32f[i].x = (float)PointArray[i].x;
-                    PointArray2D32f[i].y = (float)PointArray[i].y;
-                    //debout << "[" << i << "]" << PointArray2D32f[i].x << ", " << PointArray2D32f[i].y << endl;
-                }
-                //debout << "FitEllipse" << endl;
-                // Fits ellipse to current contour.
-                //debout << "count: " << count << endl;
-                cvFitEllipse(PointArray2D32f, count, &box);
-#elif CV_MAJOR_VERSION == 3
 
 //                PointArray2D32f.create(count,2, CV_32F);
 //                //Mat(cvarrToMat(contours)).convertTo(PointArray2D32f.at(i), CV_32F);
@@ -1395,7 +1366,7 @@ cvWaitKey();
                 box = fitEllipse(pointsf);
 
 //                box = fitEllipse(PointArray2D32f);//, count, &box);
-#endif
+
                 // neuer:
                 //// Fits ellipse to current contour.
                 //CvBox2D box = cvFitEllipse2(PointArray2D32f);
@@ -1418,14 +1389,10 @@ cvWaitKey();
                     //debout << "contourArea" << endl;
                     //cvContourArea(contours,CV_WHOLE_SEQ) koennte mit MyEllipse.are() verglichen werden und bei grossen abweichungen verworfenwerden!!!
                     // IN OPENCV2.1 liefert cvContourArea KEIN VORZEICHEN ZUM ERKENNEN DER DREHRICHTUNG!!!! es ist ein optionaler paramter hinzugefuegt worden!!!!
-#if ((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 1)))
-                    //if  ((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 1)))
-                        contourArea = cv:contourArea(contours,true);
-#else
+
                     //else
                         contourArea = cv::contourArea(contour,true);
 //                        contourArea = cvContourArea(contours,CV_WHOLE_SEQ, true);
-#endif
 
                         //contourArea koennte mit MyEllipse.area() verglichen werden und bei grossen abweichungen verworfenwerden!!!
                         //debout << contourArea << " " << box.center.x << " " << box.center.y << " " << box.size.width <<" " << box.size.height <<endl;
@@ -1495,11 +1462,8 @@ imShow("img2", tmpAusgabe2);
                 }
                 //debout << "FreePointArray" << endl;
 //                free(PointArray);
-#if CV_MAJOR_VERSION == 2
-                free(PointArray2D32f);
-#elif CV_MAJOR_VERSION == 3
+
 //                PointArray2D32f.release();
-#endif
             }
             //debout << "Free PointArray" << endl;
 

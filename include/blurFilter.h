@@ -2,7 +2,7 @@
 #define BLURFILTER_H
 
 #include "filter.h"
-#include "cv.h" 
+#include "opencv.hpp"
 
 class BlurFilter : public Filter
 {

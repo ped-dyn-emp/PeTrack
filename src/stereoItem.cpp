@@ -22,6 +22,8 @@ StereoItem::StereoItem(QWidget *wParent, QGraphicsItem * parent)
     // einzig move koennte interessant sein, um grid zu verschieben?!
 //     setAcceptsHoverEvents(true);
 }
+
+
 // // bounding box wird durch linke obere ecke und breite/hoehe angegeben
 // // wenn an den rand gescrollt wurde im view, dann wird durch das dynamische anpassen
 // // bei trans und scale zwar zuerst alles neu gezeichnet durch update, 
@@ -78,6 +80,7 @@ void StereoItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 
     if (mMainWindow->getStereoContext())
     {
+        #ifndef STEREO_DISABLED
         static int lastX = -1, lastY = -1;
         QPointF pos = event->scenePos();
         pos.setX(pos.x() + mMainWindow->getImageBorderSize());
@@ -98,6 +101,7 @@ void StereoItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 
             //debout <<lastX<<" "<< lastY<<" "<< x << " " << y << " " << z << endl;
         }
+#endif
     }
 
     // ACHTUNG: border nicht beachtet!!!
@@ -118,8 +122,10 @@ void StereoItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
     QGraphicsItem::hoverMoveEvent(event);
 }
 
+#ifndef STEREO_DISABLED
 void StereoItem::updateData(IplImage *disp)
 {
+
     if (disp != NULL)
     {
         if ((mImage != NULL) && ((mImage->width() != disp->width) || (mImage->height() != disp->height)))
@@ -182,9 +188,11 @@ void StereoItem::updateData(IplImage *disp)
         }
     }
 }
+#endif
     
 void StereoItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+#ifndef STEREO_DISABLED
     IplImage *disp = NULL;
     bool mDispNewWhilePainting;
 
@@ -204,9 +212,11 @@ void StereoItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
         mDispNew = false;
     }
+#endif
 }
 
 void StereoItem::setDispNew(bool d) // default: d = true
 {
     mDispNew = d;
 }
+

@@ -13,6 +13,8 @@
 //=============================================================================
 #include "aviFileWriter.h"
 //#include "helper.h"
+#include <opencv2/videoio/videoio_c.h>
+
 
 using namespace::cv;
 using namespace::std;

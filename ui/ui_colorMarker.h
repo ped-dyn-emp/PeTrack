@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'colorMarker.ui'
 **
-** Created by: Qt User Interface Compiler version 5.5.0
+** Created by: Qt User Interface Compiler version 5.14.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,15 +10,12 @@
 #define UI_COLORMARKER_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpinBox>
@@ -60,36 +57,36 @@ public:
     void setupUi(QWidget *ColorMarker)
     {
         if (ColorMarker->objectName().isEmpty())
-            ColorMarker->setObjectName(QStringLiteral("ColorMarker"));
+            ColorMarker->setObjectName(QString::fromUtf8("ColorMarker"));
         ColorMarker->resize(267, 287);
         verticalLayout = new QVBoxLayout(ColorMarker);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         groupBox = new QGroupBox(ColorMarker);
-        groupBox->setObjectName(QStringLiteral("groupBox"));
+        groupBox->setObjectName(QString::fromUtf8("groupBox"));
         gridLayout_2 = new QGridLayout(groupBox);
-        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         fromColor = new QPushButton(groupBox);
-        fromColor->setObjectName(QStringLiteral("fromColor"));
+        fromColor->setObjectName(QString::fromUtf8("fromColor"));
 
         gridLayout_2->addWidget(fromColor, 0, 0, 1, 1);
 
         toColor = new QPushButton(groupBox);
-        toColor->setObjectName(QStringLiteral("toColor"));
+        toColor->setObjectName(QString::fromUtf8("toColor"));
 
         gridLayout_2->addWidget(toColor, 0, 1, 1, 1);
 
         fromTriangle = new QtColorTriangle(groupBox);
-        fromTriangle->setObjectName(QStringLiteral("fromTriangle"));
+        fromTriangle->setObjectName(QString::fromUtf8("fromTriangle"));
 
         gridLayout_2->addWidget(fromTriangle, 1, 0, 1, 1);
 
         toTriangle = new QtColorTriangle(groupBox);
-        toTriangle->setObjectName(QStringLiteral("toTriangle"));
+        toTriangle->setObjectName(QString::fromUtf8("toTriangle"));
 
         gridLayout_2->addWidget(toTriangle, 1, 1, 1, 1);
 
         inversHue = new QCheckBox(groupBox);
-        inversHue->setObjectName(QStringLiteral("inversHue"));
+        inversHue->setObjectName(QString::fromUtf8("inversHue"));
 
         gridLayout_2->addWidget(inversHue, 2, 0, 1, 1);
 
@@ -97,9 +94,9 @@ public:
         verticalLayout->addWidget(groupBox);
 
         horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         showMask = new QCheckBox(ColorMarker);
-        showMask->setObjectName(QStringLiteral("showMask"));
+        showMask->setObjectName(QString::fromUtf8("showMask"));
 
         horizontalLayout_2->addWidget(showMask);
 
@@ -107,14 +104,14 @@ public:
         verticalLayout->addLayout(horizontalLayout_2);
 
         gridLayout = new QGridLayout();
-        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         label = new QLabel(ColorMarker);
-        label->setObjectName(QStringLiteral("label"));
+        label->setObjectName(QString::fromUtf8("label"));
 
         gridLayout->addWidget(label, 1, 0, 1, 1);
 
         closeRadius = new QSpinBox(ColorMarker);
-        closeRadius->setObjectName(QStringLiteral("closeRadius"));
+        closeRadius->setObjectName(QString::fromUtf8("closeRadius"));
         closeRadius->setKeyboardTracking(false);
         closeRadius->setMinimum(0);
         closeRadius->setMaximum(99);
@@ -124,12 +121,12 @@ public:
         gridLayout->addWidget(closeRadius, 1, 1, 1, 1);
 
         label_2 = new QLabel(ColorMarker);
-        label_2->setObjectName(QStringLiteral("label_2"));
+        label_2->setObjectName(QString::fromUtf8("label_2"));
 
         gridLayout->addWidget(label_2, 2, 0, 1, 1);
 
         openRadius = new QSpinBox(ColorMarker);
-        openRadius->setObjectName(QStringLiteral("openRadius"));
+        openRadius->setObjectName(QString::fromUtf8("openRadius"));
         openRadius->setKeyboardTracking(false);
         openRadius->setMinimum(0);
         openRadius->setMaximum(99);
@@ -139,18 +136,18 @@ public:
         gridLayout->addWidget(openRadius, 2, 1, 1, 1);
 
         useOpen = new QCheckBox(ColorMarker);
-        useOpen->setObjectName(QStringLiteral("useOpen"));
+        useOpen->setObjectName(QString::fromUtf8("useOpen"));
         useOpen->setChecked(true);
 
         gridLayout->addWidget(useOpen, 2, 2, 1, 1);
 
         label_3 = new QLabel(ColorMarker);
-        label_3->setObjectName(QStringLiteral("label_3"));
+        label_3->setObjectName(QString::fromUtf8("label_3"));
 
         gridLayout->addWidget(label_3, 3, 0, 1, 1);
 
         minArea = new QSpinBox(ColorMarker);
-        minArea->setObjectName(QStringLiteral("minArea"));
+        minArea->setObjectName(QString::fromUtf8("minArea"));
         minArea->setKeyboardTracking(false);
         minArea->setMinimum(1);
         minArea->setMaximum(100000);
@@ -160,43 +157,43 @@ public:
         gridLayout->addWidget(minArea, 3, 1, 1, 1);
 
         label_4 = new QLabel(ColorMarker);
-        label_4->setObjectName(QStringLiteral("label_4"));
+        label_4->setObjectName(QString::fromUtf8("label_4"));
 
         gridLayout->addWidget(label_4, 4, 0, 1, 1);
 
         label_5 = new QLabel(ColorMarker);
-        label_5->setObjectName(QStringLiteral("label_5"));
+        label_5->setObjectName(QString::fromUtf8("label_5"));
 
         gridLayout->addWidget(label_5, 8, 0, 1, 1);
 
         opacity = new QSpinBox(ColorMarker);
-        opacity->setObjectName(QStringLiteral("opacity"));
+        opacity->setObjectName(QString::fromUtf8("opacity"));
         opacity->setMaximum(100);
         opacity->setValue(100);
 
         gridLayout->addWidget(opacity, 8, 1, 1, 1);
 
         maskMask = new QCheckBox(ColorMarker);
-        maskMask->setObjectName(QStringLiteral("maskMask"));
+        maskMask->setObjectName(QString::fromUtf8("maskMask"));
         maskMask->setChecked(true);
 
         gridLayout->addWidget(maskMask, 8, 2, 1, 1);
 
         maxRatio = new QDoubleSpinBox(ColorMarker);
-        maxRatio->setObjectName(QStringLiteral("maxRatio"));
-        maxRatio->setMinimum(1);
-        maxRatio->setValue(2);
+        maxRatio->setObjectName(QString::fromUtf8("maxRatio"));
+        maxRatio->setMinimum(1.000000000000000);
+        maxRatio->setValue(2.000000000000000);
 
         gridLayout->addWidget(maxRatio, 4, 1, 1, 1);
 
         useClose = new QCheckBox(ColorMarker);
-        useClose->setObjectName(QStringLiteral("useClose"));
+        useClose->setObjectName(QString::fromUtf8("useClose"));
         useClose->setChecked(true);
 
         gridLayout->addWidget(useClose, 1, 2, 1, 1);
 
         maxArea = new QSpinBox(ColorMarker);
-        maxArea->setObjectName(QStringLiteral("maxArea"));
+        maxArea->setObjectName(QString::fromUtf8("maxArea"));
         maxArea->setMinimum(1);
         maxArea->setMaximum(100000);
         maxArea->setSingleStep(100);
@@ -215,23 +212,23 @@ public:
 
     void retranslateUi(QWidget *ColorMarker)
     {
-        groupBox->setTitle(QApplication::translate("ColorMarker", "HSV color range", 0));
-        fromColor->setText(QApplication::translate("ColorMarker", "from", 0));
-        toColor->setText(QApplication::translate("ColorMarker", "to", 0));
-        inversHue->setText(QApplication::translate("ColorMarker", "invers hue", 0));
-#ifndef QT_NO_TOOLTIP
-        showMask->setToolTip(QApplication::translate("ColorMarker", "show mask in main window", 0));
-#endif // QT_NO_TOOLTIP
-        showMask->setText(QApplication::translate("ColorMarker", "show mask", 0));
-        label->setText(QApplication::translate("ColorMarker", "close radius", 0));
-        label_2->setText(QApplication::translate("ColorMarker", "open radius", 0));
-        useOpen->setText(QApplication::translate("ColorMarker", "use", 0));
-        label_3->setText(QApplication::translate("ColorMarker", "area", 0));
-        label_4->setText(QApplication::translate("ColorMarker", "max ratio", 0));
-        label_5->setText(QApplication::translate("ColorMarker", "opacity", 0));
-        maskMask->setText(QApplication::translate("ColorMarker", "mask", 0));
-        useClose->setText(QApplication::translate("ColorMarker", "use", 0));
-        Q_UNUSED(ColorMarker);
+        groupBox->setTitle(QCoreApplication::translate("ColorMarker", "HSV color range", nullptr));
+        fromColor->setText(QCoreApplication::translate("ColorMarker", "from", nullptr));
+        toColor->setText(QCoreApplication::translate("ColorMarker", "to", nullptr));
+        inversHue->setText(QCoreApplication::translate("ColorMarker", "invers hue", nullptr));
+#if QT_CONFIG(tooltip)
+        showMask->setToolTip(QCoreApplication::translate("ColorMarker", "show mask in main window", nullptr));
+#endif // QT_CONFIG(tooltip)
+        showMask->setText(QCoreApplication::translate("ColorMarker", "show mask", nullptr));
+        label->setText(QCoreApplication::translate("ColorMarker", "close radius", nullptr));
+        label_2->setText(QCoreApplication::translate("ColorMarker", "open radius", nullptr));
+        useOpen->setText(QCoreApplication::translate("ColorMarker", "use", nullptr));
+        label_3->setText(QCoreApplication::translate("ColorMarker", "area", nullptr));
+        label_4->setText(QCoreApplication::translate("ColorMarker", "max ratio", nullptr));
+        label_5->setText(QCoreApplication::translate("ColorMarker", "opacity", nullptr));
+        maskMask->setText(QCoreApplication::translate("ColorMarker", "mask", nullptr));
+        useClose->setText(QCoreApplication::translate("ColorMarker", "use", nullptr));
+        (void)ColorMarker;
     } // retranslateUi
 
 };

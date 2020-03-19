@@ -1,5 +1,5 @@
 //folgende zeile spaeter raus
-#include <highgui.h>
+#include <highgui.hpp>
 
 // spaeter entfernen naechsten beiden zeilen
 //#include "control.h"
@@ -17,6 +17,8 @@
 #include "markerJapan.h"
 #include "helper.h"
 #include "tracker.h"
+
+using namespace::cv;
 
 // bei marker koennnte sich fuer jeden spot eine liste gemerkt werden und spaeter ausgleich 
 // regressionsgrade legen um optimale linie durch marker zu erhalten
@@ -426,7 +428,7 @@ void MarkerJapan::draw(Mat &img) const
             pt.push_back(Point(mQuadrangle[i].x(),mQuadrangle[i].y()));
 //            pt[i] = mQuadrangle[i].toCvPoint();
         // draw the square as a closed polyline 
-        cv::polylines(img,pt,true,CV_RGB(0,255,0),1,CV_AA,0);
+        cv::polylines(img,pt,true,CV_RGB(0,255,0),1,LINE_AA,0);
 //        cvPolyLine(img, &rect, &count, 1, 1, CV_RGB(0,255,0), 1, CV_AA, 0); //3, CV_AA, 0
     }
 }

@@ -10,11 +10,14 @@
 
 //#define TIME_MEASUREMENT
 
+using namespace::cv;
+
 PersonList::PersonList()
 {
     mSc = NULL;
 }
 
+#ifndef STEREO_DISABLED
 // searching for ellipses from isolines in a height field
 void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFilter* bgFilter)
 {
@@ -975,5 +978,5 @@ void PersonList::calcPersonPos(const Mat &img, QRect &roi, QList<TrackPoint> &pe
 */
 
 }
-
+#endif // STEREO_DISABLED
 

@@ -3,8 +3,8 @@
 
 #include "filter.h"
 
-#include "cvaux.h"
-#include "opencv/cvaux.h"
+
+#include "opencv2/opencv.hpp"
 #include "opencv2/video/background_segm.hpp"
 
 
@@ -18,12 +18,10 @@
 class BackgroundFilter : public Filter
 {
 private:
-#if CV_MAJOR_VERSION == 2
-    CvBGStatModel* mBgModel;
-#elif CV_MAJOR_VERSION == 3
+
     cv::Ptr<cv::BackgroundSubtractorMOG2> mBgModel;
     //Ptr<BackgroundSubtractor> mBgModel;
-#endif
+
     bool mUpdate; // if 0, kein update des models, sonst schon
     pet::StereoContext** mStereoContext; // zeiger auf den zeiger in petrack mit stereocontext
     cv::Mat mBgPointCloud;

@@ -3,7 +3,6 @@
 
 #include "filter.h"
 
-using namespace::cv;
 
 class CalibFilter : public Filter
 {

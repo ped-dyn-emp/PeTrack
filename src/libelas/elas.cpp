@@ -25,6 +25,7 @@ Street, Fifth Floor, Boston, MA 02110-1301, USA
 #include "libelas/elasDescriptor.h"
 #include "libelas/elasTriangle.h"
 #include "libelas/elasMatrix.h"
+#include <algorithm>
 
 using namespace std;
 

@@ -2,7 +2,7 @@
 #include "stereoContext.h"
 
 // nur temporaer fuer anzeige
-#include "highgui.h"
+#include "highgui.hpp"
 #include "helper.h"
 
 // spaeter entfernen naechsten beiden zeilen
@@ -29,14 +29,11 @@ BackgroundFilter::BackgroundFilter()
 {
     setOnCopy(false); // da img nur ausgelesen, aber bnicht veraendert wird kann auf eine kopie verzichtet werden (true ist default bei filter)
 
-#if CV_MAJOR_VERSION == 2
-    mBgModel = NULL;
-#elif CV_MAJOR_VERSION == 3
+
 //    mBgModel = createBackgroundSubtractorMOG2().dynamicCast<BackgroundSubtractor>();
 
 //    mBgModel = method == "knn" ? createBackgroundSubtractorKNN().dynamicCast<BackgroundSubstractor>() :
 //                                 createBackgroundSubtractorMOG2().dynamicCast<BackgroundSubstractor>();//.dynamicCast<BackgroundSubtractorMOG2>();
-#endif
 //    mBgPointCloud = NULL;
 //    mForeground = NULL;
     mLastFile = "";
@@ -44,10 +41,7 @@ BackgroundFilter::BackgroundFilter()
 
 BackgroundFilter::~BackgroundFilter()
 {
-#if CV_MAJOR_VERSION == 2
-    cvReleaseBGStatModel(&mBgModel);
-    cvReleaseMat(&mBgPointCloud);
-#endif
+
 }
 
 
@@ -70,16 +64,6 @@ bool BackgroundFilter::isForeground(int i, int j) // nutzen, wenn einzelne pixel
 // zuruecksetzen, wenn zB helligkeit veraendert wird oder schaerfe
 void BackgroundFilter::reset()
 {
-#if CV_MAJOR_VERSION == 2
-    cvReleaseBGStatModel(&mBgModel);
-    mBgModel = NULL;
-
-    if (*stereoContext())
-    {
-        cvReleaseMat(&mBgPointCloud);
-        mBgPointCloud = NULL;
-    }
-#endif
     // funktioniert nicht wirklich
 //    if (!mBgModel.empty())
     if (!mForeground.empty()) mForeground = Scalar::all(0);
@@ -102,6 +86,7 @@ void BackgroundFilter::setFilename(const QString &fn)
 // rueckgabe, ob speichern geklappt hat
 bool BackgroundFilter::save(QString dest) //default = ""
 {
+#ifndef STEREO_DISABLED
     if (*stereoContext() && !mBgPointCloud.empty())
     {
         // if no destination file or folder is given
@@ -198,6 +183,7 @@ bool BackgroundFilter::save(QString dest) //default = ""
     {
         ;
     }
+#endif
     return true;
 }
 
@@ -360,6 +346,7 @@ waitKey();
 
     if (mBgPointCloud.empty() && mBgModel.empty() || mForeground.empty() || mForeground.size != img.size) // initialisierung wenn entwerder stereo oder model
     {
+#ifndef STEREO_DISABLED
 // For StereoImaging use heightfiled for foreground extraction -------------------------------------------------------------------------------
         if (*stereoContext())
         {
@@ -430,28 +417,14 @@ waitKey();
             mForeground.create(Size(img.cols,img.rows),CV_8UC1);
 //            mForeground = cvCreateImage(cvSize(img->width, img->height), IPL_DEPTH_8U, 1); // CV_8UC1 8, 1
         }
+
         else // nicht stereo
+#endif // STEREO_DISABLED
         {
 
 // GaussBGStatModel ---------------------------------------------------------------------------------------------------------------------
-#if CV_MAJOR_VERSION == 2
 
-        // set parameters for Gaussian model.
-        static CvGaussBGStatModelParams* params = NULL;
 
-        params = new CvGaussBGStatModelParams;
-        params->win_size=200;	//default: 200 /* Learning rate; alpha = 1/CV_GBG_WINDOW_SIZE */
-        params->n_gauss=5;	//default: 5       /* = K = number of Gaussians in mixture */
-        params->bg_threshold=0.7;	//default: 0.7     /* threshold sum of weights for background test */
-        params->std_threshold=2.5; //im netz: 3.5 	//default: 2.5     /* lambda=2.5 is 99% */
-        params->minArea=15; //1800; 	//default: 15 //hier wird meiner vermutung nach die groesse der minimalen abgetrennten bereiche eingestellt
-        params->weight_init=0.05;	//default: 0.05
-        params->variance_init=30; //=sigma_init	//default: 30
-
-        mBgModel = cvCreateGaussianBGModel(img, params);
-        mForeground = mBgModel->foreground;
-
-#elif CV_MAJOR_VERSION == 3
 
         if(!mBgModel.empty())
             mBgModel->clear();
@@ -482,7 +455,6 @@ waitKey();
         //mBgModel->getBackgroundImage(mBackground);
         //mBgModel->apply(img,mForeground);
 
-#endif
 // FGDStatModel ---------------------------------------------------------------------------------------------------------------------
 
         // DOCUMENTATION: http://opencv.willowgarage.com/wiki/VideoSurveillance
@@ -547,6 +519,7 @@ waitKey();
 // SteroBild beruecksichtigen nur disparity --------------------------------------------------------------------------------------------------------
             if (*stereoContext())
             {
+#ifndef STEREO_DISABLED
 // fuer update waere bei stereo denkbar: mittelwert der disp/zwerte, aber Achtung: invalidDisp beruecksichtigen!
 
 
@@ -612,7 +585,7 @@ waitKey();
                     bgPcData = (bgyPcData += mBgPointCloud.cols/sizeof(float));
                 }
 
-
+#endif
            }
 else // nicht stereo
             {
@@ -642,12 +615,7 @@ else // nicht stereo
 
 
 // GaussBGStatModel ---------------------------------------------------------------------------------------------------------------------
-#if CV_MAJOR_VERSION == 2
-                if (update())
-                        cvUpdateBGStatModel(img, mBgModel); // default -1 das Hintergrundmodell wird mit aktuellem Bild aktualisiert
-                    else
-                        cvUpdateBGStatModel(img, mBgModel, 0);
-#elif CV_MAJOR_VERSION == 3
+
 
                 mBgModel->apply(img, mForeground, update() ? -1 : 0);
 
@@ -661,7 +629,6 @@ else // nicht stereo
 //                    mBgModel->apply(img,mForeground,0);
 //                    //mBgModel->apply(img,mForeground,0);
 //                }
-#endif
 
 #ifdef SHOW_TMP_IMG
 imshow("BackgroundFilter",img);
@@ -707,7 +674,7 @@ waitKey();
 //             CvPoint* pointArray;
              // find contours and store them all as a list
 //             CvMemStorage *storage = cvCreateMemStorage(0);
-             cv::findContours(mForeground,contours,CV_RETR_LIST,CV_CHAIN_APPROX_SIMPLE);
+             cv::findContours(mForeground,contours,cv::RETR_LIST,cv::CHAIN_APPROX_SIMPLE);
 //             cvFindContours(mForeground, storage, &contour, sizeof(CvContour),
 //                            CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE); // foreground wird auch veraendert???
              // test each contour
@@ -716,11 +683,7 @@ waitKey();
              {
                  vector<Point> contour = contours.back();
 
-        #if ((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 1)))
-                 contourArea = cvContourArea(contour, CV_WHOLE_SEQ);
-        #else
                  contourArea = cv::contourArea(contour, true);
-        #endif
                  if (contourArea > 0 && contourArea < 400) // kleine innere loecher schliessen
                  {
 //                     pointArray = (CvPoint*)malloc(contour->total*sizeof(CvPoint));
