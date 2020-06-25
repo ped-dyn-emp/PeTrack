@@ -133,3 +133,5 @@ void LogoItem::fadeOut(int frames)
 //     }
 //     setVisible(false);
 }
+
+#include "moc_logoItem.cpp"

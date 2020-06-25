@@ -15,6 +15,9 @@
 #include "colorMarkerWidget.h"
 #include "codeMarkerWidget.h"
 #include "multiColorMarkerWidget.h"
+#include "view.h"
+
+using namespace std;
 
 #define DEFAULT_HEIGHT 180.0
 
@@ -29,9 +32,15 @@ Control::Control(QWidget *parent)
     setupUi(this);
 
     // Weitere Verzerrungsparameter werden vllt. spaeter mal gebraucht bisher von OpenCV nicht beruecksichtig. Muessen dann noch in die Oberflaeche eingebaut werden
-    k4 = new QDoubleSpinBox();
-    k5 = new QDoubleSpinBox();
-    k6 = new QDoubleSpinBox();
+    // Deniz: OpenCV kann Sie mittlerweile benutzen, wenn man calibrateCamera die Flag CALIB_RATIONAL_MODEL übergibt; Ergibt eine genauere Kalibration
+    // Auch rechenintensiver, aber da wir das einmal machen und dann Speichern, ist das auch egal
+    // Diese Boxen müssten in die UI eingebaut und der entsprechende Aufruf in AutoCalib müsste angepasst werden
+    k4 = new QDoubleSpinBox(this);
+    k4->hide();
+    k5 = new QDoubleSpinBox(this);
+    k5->hide();
+    k6 = new QDoubleSpinBox(this);
+    k6->hide();
 
     filterBrightContrast->setCheckState(mMainWindow->getBrightContrastFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
 //     filterContrast->setCheckState(mMainWindow->getContrastFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
@@ -2868,8 +2877,8 @@ void Control::getXml(QDomElement &elem)
                     QColor fromCol, toCol;
                     int h=-1, s=-1, v=-1;
 
-                    fromCol.convertTo(QColor::Hsv);
-                    toCol.convertTo(QColor::Hsv);
+                    fromCol = fromCol.toHsv();
+                    toCol = toCol.toHsv();
                     colorPlot->getMapItem()->delMaps();
                     for(subSubSubElem = subSubElem.firstChildElement(); !subSubSubElem.isNull(); subSubSubElem = subSubSubElem.nextSiblingElement())
                         if (subSubSubElem.tagName() == "MAP")
@@ -3189,4 +3198,279 @@ void Control::getXml(QDomElement &elem)
     mMainWindow->updateCoord();
 }
 
+void Control::on_colorPickerButton_clicked(bool checked)
+{
+    //true wenn neu gechecked, false wenn wieder abgewählt
+    if(checked)
+    {
+        connect(mMainWindow->getView(), SIGNAL(colorSelected(QPoint, GraphicsView*)), this, SLOT(on_expandColor(QPoint, GraphicsView*)));
+        connect(mMainWindow->getView(), SIGNAL(setColorEvent(QPoint, GraphicsView*)), this, SLOT(on_setColor(QPoint, GraphicsView*)));
+    }else{
+        disconnect(mMainWindow->getView(), SIGNAL(colorSelected(QPoint, GraphicsView*)), this, SLOT(on_expandColor(QPoint, GraphicsView*)));
+        disconnect(mMainWindow->getView(), SIGNAL(setColorEvent(QPoint, GraphicsView*)), this, SLOT(on_setColor(QPoint, GraphicsView*)));
+    }
+}
 
+/**
+ * @brief Gets necessary colors and the RectPlotItem
+ *
+ * @param[in] p Clicked Point (gets changed!!!)
+ * @param[in] graphicsView GraphicsView in which the event was detected
+ * @param[out] clickedColor color which was clicked on, with Hue from 0-360 instead of OpenCVs 0-180
+ * @param[out] toColor toColor as in model with triangle color picker
+ * @param[out] fromColor fromColor as in model with triangle picker
+ * @param[out] map
+ *
+ * @return Boolean describing, if a color was retrieved
+ */
+bool Control::getColors(QPoint& p, GraphicsView* graphicsView, std::array<int, 3>& clickedColor, QColor& toColor, QColor& fromColor, RectPlotItem*& map)
+{
+    if(mMainWindow->getImg().empty())
+    {
+        return false;
+    }
+
+    cv::Mat hsvImg;
+    cv::cvtColor(mMainWindow->getImg(), hsvImg, cv::COLOR_BGR2HSV);
+    p.setX(p.x() + mMainWindow->getImageBorderSize());
+    p.setY(p.y() + mMainWindow->getImageBorderSize());
+
+
+    QPointF pointOnScene = graphicsView->mapToScene(p);
+    QPointF imgPoint = mMainWindow->getImageItem()->mapToScene(pointOnScene);
+    if(imgPoint.x() < 0 || imgPoint.x() > hsvImg.cols || imgPoint.y() < 0 || imgPoint.y() > hsvImg.rows)
+    {
+        debout << "Clicked outside the image with color picker." << std::endl;
+        return false;
+    }
+    //debout << "Koordinaten: " << imgPoint.x() << ", " << imgPoint.y() << std::endl;
+
+    cv::Vec3b color = hsvImg.at<cv::Vec3b>((int)imgPoint.y(), (int)imgPoint.x());
+    clickedColor =  {color[0] * 2, color[1], color[2]};
+    //debout << "Farbe: " << (int)clickedColor[0] << ", " << (int)clickedColor[1] << ", " << (int)clickedColor[2] << std::endl;
+
+    map = this->getColorPlot()->getMapItem();
+    toColor = map->getActMapToColor();
+    fromColor = map->getActMapFromColor();
+    return true;
+}
+
+/**
+ * @brief Expands the range of detcted colors to include the color clicked on
+ *
+ * Expands the range of detected colors, so that hue, saturation and value of the
+ * color clicked on are within the range. A Buffer is used as well (more is added to the
+ * range than strictly necessary).  It is possible that the inverse hue flag is set.
+ *
+ * @param p
+ * @param graphicsView
+ */
+void Control::on_expandColor(QPoint p, GraphicsView* graphicsView)
+{
+
+    QColor fromColor, toColor;
+    RectPlotItem* map;
+    std::array<int, 3> clickedColor;
+    if(!getColors(p, graphicsView, clickedColor, toColor, fromColor, map))
+    {
+        return;
+    }
+
+    expandRange(fromColor, toColor, clickedColor);
+
+    saveChange(fromColor, toColor, map);
+};
+
+/**
+ * @brief Selects one color as starting point for furher additions
+ *
+ * @param p
+ * @param graphicsView
+ */
+void Control::on_setColor(QPoint p , GraphicsView* graphicsView){
+    constexpr int BUFFER = 5;
+
+    QColor fromColor, toColor;
+    RectPlotItem* map;
+    std::array<int, 3> clickedColor;
+    if(!getColors(p, graphicsView, clickedColor, toColor, fromColor, map))
+    {
+        return;
+    }
+
+    int minHue, maxHue;
+    if( (clickedColor[0]+BUFFER)%359 < clickedColor[0]+BUFFER)
+    {
+        maxHue = (clickedColor[0]+BUFFER)%BUFFER;
+        map->changeActMapInvHue(true);
+    }else{
+        maxHue = clickedColor[0]+BUFFER;
+        map->changeActMapInvHue(false);
+    }
+    if( (clickedColor[0] - BUFFER) < 0)
+    {
+        minHue = 360 + (clickedColor[0] - BUFFER);
+        map->changeActMapInvHue(true);
+    }else{
+        minHue = clickedColor[0] - BUFFER;
+        //map->changeActMapInvHue(false);
+    }
+    toColor.setHsv(maxHue, min((clickedColor[1]+BUFFER),255), min(clickedColor[2]+BUFFER, 255));
+    fromColor.setHsv(minHue, max(clickedColor[1]-BUFFER,0), max(clickedColor[2]-BUFFER,0));
+
+    //debout << "Inv Hue nach setCol: " <<  map->getActMapInvHue() << std::endl;
+    saveChange(fromColor, toColor, map);
+}
+
+// NOTE Use duplicate observed data on color Data
+//      Meaning: Own class for the Data and every View works with his class!!!
+// NOTE that color slides are not actually working properly on their own; use this or colorRangeWidget!
+void Control::saveChange(const QColor& fromColor, const QColor& toColor, RectPlotItem* map)
+{
+
+    map->changeActMapToColor(toColor);
+    map->changeActMapFromColor(fromColor);
+
+    mMainWindow->getColorRangeWidget()->setControlWidget(toColor.hue(), fromColor.hue(),
+                                                         toColor.saturation(), fromColor.saturation());
+    mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
+    if( !mMainWindow->isLoading() )
+        mMainWindow->updateImage();
+}
+
+/**
+ * @brief Expands the color range of the map to include clickedColor
+ *
+ * @test Change invHue via Extension
+ * @test Hue same, value diff
+ * @test value same, hue diff etc...
+ * @test neues Ding gerade so noch drinnen (Auch von thresholding seite messen)
+ *
+ * @param fromColor[in,out] fromColor of the map, gets changed!
+ * @param toColor[in,out] toColor of the map, gets changed!
+ * @param clickedColor[in]
+ */
+void Control::expandRange(QColor& fromColor, QColor& toColor, const std::array<int, 3>& clickedColor)
+{
+    // NOTE BUFFER in Klassenebene verschieben und bei setColor auch nutzen? (verschiedene Größe vllt. gewünscht?)
+    constexpr int BUFFER = 10;
+
+    std::array<int, 3> toColorArr;
+    toColor.getHsv(&toColorArr[0], &toColorArr[1], &toColorArr[2]);
+    std::array<int, 3> fromColorArr;
+    fromColor.getHsv(&fromColorArr[0], &fromColorArr[1], &fromColorArr[2]);
+
+    //debout << "Alte Grenze: toColor:   " << toColorArr[0] << " " << toColorArr[1] << " "<< toColorArr[2] << std::endl;
+    //debout << "Alte Grenze: fromColor: " << fromColorArr[0] << " " << fromColorArr[1] << " " << fromColorArr[2] << std::endl;
+
+    std::array<bool, 3> isInRange {true, true, true};
+    bool invHue = getColorPlot()->getMapItem()->getActMapInvHue();
+    //debout << "Inverse Hue vorher: " << invHue << std::endl;
+
+    // What values do need to be altered?
+    if(invHue)
+    {
+        if(toColorArr[0] > fromColorArr[0])
+        {
+            if(!(clickedColor[0] >= toColorArr[0] || clickedColor[0] <= fromColorArr[0]))
+            {
+                isInRange[0] = false;
+            }
+        }else
+        {
+            if(!(clickedColor[0] <= toColorArr[0] || clickedColor[0] >= fromColorArr[0]))
+            {
+                isInRange[0] = false;
+            }
+        }
+    }else
+    {
+        if(toColorArr[0] > fromColorArr[0])
+        {
+            if(!(clickedColor[0] <= toColorArr[0] && clickedColor[0] >= fromColorArr[0]))
+            {
+                isInRange[0] = false;
+            }
+        }else
+        {
+            if(!(clickedColor[0] >= toColorArr[0] && clickedColor[0] <= fromColorArr[0]))
+            {
+                isInRange[0] = false;
+            }
+        }
+    }
+
+    for(int i = 1; i < 3; ++i)
+    {
+        if(toColorArr[i] > fromColorArr[i])
+        {
+            if(!(clickedColor[i] <= toColorArr[i] && clickedColor[i] >= fromColorArr[i]))
+            {
+                isInRange[i] = false;
+            }
+        }else{
+            if(!(clickedColor[i] >= toColorArr[i] && clickedColor[i] <= fromColorArr[i]))
+            {
+                isInRange[i] = false;
+            }
+        }
+    }
+
+    // if all in range, no expanding required
+    if(std::count(isInRange.cbegin(), isInRange.cend(), true) == 3){
+        return;
+    }
+
+    int distToColor = 0;
+    int distFromColor = 0;
+
+    for(int i = 0; i < 3; ++i)
+    {
+        if(isInRange[i])
+            continue;
+
+        distToColor = abs(toColorArr[i] - clickedColor[i]);
+        distFromColor = abs(fromColorArr[i] - clickedColor[i]);
+        if(distFromColor < distToColor)
+        {
+            int buffer = fromColorArr[i] - clickedColor[i] < 0 ? BUFFER : -BUFFER;
+            if(i==0) // Hue
+            {
+                fromColorArr[i] = min(359, max(0, clickedColor[i] + buffer));
+            }else
+            {
+                fromColorArr[i] = min(255, max(0, clickedColor[i] + buffer));
+            }
+        }else{
+            int buffer = toColorArr[i] - clickedColor[i] < 0 ? BUFFER : -BUFFER;
+            if(i==0) // Hue
+            {
+                toColorArr[i] = min(359, max(0, clickedColor[i] + buffer));
+            }else
+            {
+                toColorArr[i] = min(255, max(0, clickedColor[i] + buffer));
+            }
+        }
+    }
+
+    int toHue = toColorArr[0];
+    int fromHue = fromColorArr[0];
+    if(invHue){
+        if(toHue+360-fromHue > 180){
+            getColorPlot()->getMapItem()->changeActMapInvHue(false);
+        }
+    }else{
+        if(toHue-fromHue > 180){
+            getColorPlot()->getMapItem()->changeActMapInvHue(true);
+        }
+    }
+
+    //debout << "Inverse Hue nachher " << getColorPlot()->getMapItem()->getActMapInvHue() << std::endl;
+    //debout << "Neue Grenze: toColor:   " << toColorArr[0] << " " << toColorArr[1] << " "<< toColorArr[2] << std::endl;
+    //debout << "Neue Grenze: fromColor: " << fromColorArr[0] << " " << fromColorArr[1] << " " << fromColorArr[2] << std::endl;
+    toColor.setHsv(toColorArr[0], toColorArr[1], toColorArr[2]);
+    fromColor.setHsv(fromColorArr[0], fromColorArr[1], fromColorArr[2]);
+}
+
+
+#include "moc_control.cpp"

@@ -89,7 +89,7 @@ inline Vec3F operator*(double f, const Vec3F& v)
     return v*f;
 }
 
-inline ostream& operator<< (ostream& s, const Vec3F& v)
+inline std::ostream& operator<< (std::ostream& s, const Vec3F& v)
 {
     s << "(" << v.x() << ", " << v.y() << ", " << v.z() << ")";
     return s;
@@ -160,7 +160,7 @@ inline Vec2F operator*(double f, const Vec2F& v)
     return v*f;
 }
 
-inline ostream& operator<< (ostream& s, const Vec2F& v)
+inline std::ostream& operator<< (std::ostream& s, const Vec2F& v)
 {
     s << "(" << v.x() << ", " << v.y() << ")";
     return s;
@@ -172,7 +172,7 @@ inline QTextStream& operator<< (QTextStream& s, const Vec2F& v)
     s << v.x() << " " << v.y(); // ohne (,) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     return s;
 }
-inline istream& operator>> (istream& s, Vec2F& v)
+inline std::istream& operator>> (std::istream& s, Vec2F& v)
 {
     double d;
     s >> d; 

@@ -34,11 +34,12 @@ they can be represented in QT.
 #include <iomanip>
 
 
-#include "opencv.hpp"
+#include "opencv2/opencv.hpp"
 
 #include "animation.h"
 
 using namespace::cv;
+using namespace std;
 
 /**********************************************************************/
 /* Constructors & Destructors                                        **/

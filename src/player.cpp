@@ -595,3 +595,5 @@ int Player::getPos()
 {
     return mAnimation->getCurrentFrameNum();
 }
+
+#include "moc_player.cpp"

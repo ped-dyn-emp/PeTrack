@@ -18,14 +18,13 @@ extern QString commandLineOptionsString;
 #ifdef QT_NO_DEBUG_OUTPUT
     #define debout //
 #else
-    #define debout cout << __func__ << " in " << __FILE__ << " line " << __LINE__ << ": "
+    #define debout std::cout << __func__ << " in " << __FILE__ << " line " << __LINE__ << ": "
 #endif
 
 #include <iostream>
-using namespace std;
 
 #include <QString>
-inline ostream& operator<<(ostream& s, const QString& t)
+inline std::ostream& operator<<(std::ostream& s, const QString& t)
 {
     s << t.toStdString();
     return s;
@@ -157,7 +156,7 @@ inline QColor getValue(const cv::Mat &img ,int x, int y)
 //     s << "RGB "<< col.red() << " " << col.green() << " " << col.blue() << " / HSV " << col.hue() << " " << col.saturation() << " " << col.value();
 //     return s;
 // }
-inline ostream& operator<<(ostream& s, const QColor& col)
+inline std::ostream& operator<<(std::ostream& s, const QColor& col)
 {
     if (col.isValid())
         s << col.red() << " " << col.green() << " " << col.blue();

@@ -8,6 +8,7 @@
 #include "gridItem.h"
 
 using namespace::cv;
+using namespace std;
 
 GridItem::GridItem(QWidget *wParent, QGraphicsItem * parent)
     : QGraphicsItem(parent)
@@ -375,7 +376,7 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     if (mControlWidget->getCalibGridShow())
     {
         QImage *img = mMainWindow->getImage();
-        QMatrix matrixPaint;
+        QTransform matrixPaint;
         QPointF pnt1, pnt2; // floating point
         int bS = mMainWindow->getImageBorderSize();
         if( debug ) debout << "Border-Size: " << bS << endl;
@@ -420,7 +421,7 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
             //matrixPaint.translate(iW/2.-bS, iH/2.-bS);
             matrixPaint.rotate(ro);
             //matrixPaint.translate(-iW/2.+bS, -iH/2.+bS);
-            painter->setWorldMatrix(matrixPaint, true); // true sagt, dass relativ und nicht absolut (also zusaetzlich zur uebergeordneten matrizen)
+            painter->setWorldTransform(matrixPaint, true); // true sagt, dass relativ und nicht absolut (also zusaetzlich zur uebergeordneten matrizen)
             painter->setPen(Qt::red);
 
             for (int i=(int)-((maxExp+100)/sc); i<2*(maxExp/sc); i++)

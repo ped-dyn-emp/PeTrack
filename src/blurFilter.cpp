@@ -1,5 +1,4 @@
 #include "blurFilter.h"
-#include "opencv.hpp"
 #include "opencv2/opencv.hpp"
 
 using namespace::cv;

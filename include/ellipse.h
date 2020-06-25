@@ -2,7 +2,7 @@
 #define ELLIPSE_H
 
 
-#include "opencv.hpp"
+#include "opencv2/opencv.hpp"
 
 #include "vector.h"
 

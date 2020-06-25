@@ -1,5 +1,5 @@
 ﻿//folgende zeile spaeter raus
-#include <highgui.hpp>
+#include "opencv2/highgui.hpp"
 
 // spaeter entfernen naechsten beiden zeilen
 //#include "control.h"
@@ -192,7 +192,7 @@ void MarkerHermes::organize(const Mat &img, bool autoWB)
 
         // loeschen aller zu hellen spots
         QList<int> minValListSort = minValList;
-        qSort(minValListSort); // sortiert aufsteigend
+        std::sort(minValListSort.begin(), minValListSort.end()); // sortiert aufsteigend
         for (i = 0; i < mSpots.size(); ++i)
             if (minValList[i] > minValListSort[0]) // nur der dunkelste bleibt uebrig
             {

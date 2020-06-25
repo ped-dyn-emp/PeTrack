@@ -1,5 +1,5 @@
 //folgende zeile spaeter raus
-#include <highgui.hpp>
+#include "opencv2/highgui.hpp"
 
 // spaeter entfernen naechsten beiden zeilen
 //#include "control.h"
@@ -22,6 +22,7 @@
 #include "tracker.h"
 
 using namespace::cv;
+using namespace std;
 
 // bei marker koennnte sich fuer jeden spot eine liste gemerkt werden und spaeter ausgleich 
 // regressionsgrade legen um optimale linie durch marker zu erhalten
@@ -227,7 +228,7 @@ void MarkerColor::organize(const Mat &img, bool autoWB)
         }
         // loeschen aller zu hellen spots
         QList<int> minValListSort = minValList;
-        qSort(minValListSort); // sortiert aufsteigend
+        std::sort(minValListSort.begin(), minValListSort.end()); // sortiert aufsteigend
         for (i = 0; i < mSpots.size(); ++i)
             if (minValList[i] > minValListSort[3])
             {

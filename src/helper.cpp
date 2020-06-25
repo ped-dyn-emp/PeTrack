@@ -1,8 +1,10 @@
 ﻿#include "helper.h"
 
-#include <opencv.hpp>
+//#include <opencv.hpp>
+#include "opencv2/opencv.hpp"
 
 using namespace::cv;
+using namespace std;
 
 QString commandLineOptionsString = QObject::tr(
 "<p><code>petrack [-help|-?] [[-project] project.pet] </code><br>"
@@ -96,29 +98,8 @@ void copyToQImage(QImage *qImg, cv::Mat &img) // war static functin in animatiol
 
     if (channels == 3)
     {
-        // This loop is optimized so it has to calculate the least amount of indexes
-        // Optimizing the access to the pointer data is useless (no difference in performance when tested)
-        for (y = 0; y < img.rows; y++)
-        {
-            // Pointer to the data information in the QImage for just one column
-            // set pointer to value before, because ++p is faster than p++
-//            p = ((char*)qImg->scanLine(y))-1;
-            for (x = 0; x < img.cols; x++)
-            {
-                Vec3b colour = img.at<Vec3b>(Point(x, y));
-
-                QRgb value = qRgb(colour.val[2], colour.val[1], colour.val[0]);
-                qImg->setPixel(x, y, value);
-//                *(++p) = colour.val[0];//*(data);
-//                *(++p) = colour.val[1];//*(data+1);
-//                *(++p) = colour.val[2];//*(data+2);
-//                *(++p) = 255;
-                //printf("%02x%02x%02x ", (int)*(data), (int)*(data+1), (int)*(data+2));
-//                data += 3; //channels;
-            }
-//            data = (yData += img.cols/*widthStep*/); // because sometimes widthStep != width
-            //printf("\n");
-        }
+        // Needs Qt 5.14 for QImage::Format_BGR888 (saves the color transformation into RGB888)
+        *qImg = QImage((const unsigned char*) (img.data),img.cols,img.rows, img.step, QImage::Format_BGR888).copy();
     }
     else if (channels == 1)
     {

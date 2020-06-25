@@ -3,7 +3,7 @@ import subprocess
 
 
 def pytest_addoption(parser):
-    parser.addoption("--path", action="store", default="../../../petrack.exe")
+    parser.addoption("--path", action="store", default="../../../build/petrack.exe")
 
 
 

@@ -171,7 +171,7 @@ inline QTextStream& operator<<(QTextStream& s, const TrackPoint& tp)
         s << tp.x() << " " << tp.y() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color();
     return s;
 }
-inline ostream& operator<<(ostream& s, const TrackPoint& tp)
+inline std::ostream& operator<<(std::ostream& s, const TrackPoint& tp)
 {
     if (Petrack::trcVersion > 2)
         s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color() << " " << tp.markerID();
@@ -385,7 +385,7 @@ inline QTextStream& operator<<(QTextStream& s, const TrackPerson& tp)
     return s;
 }
 
-inline ostream& operator<<(ostream& s, const TrackPerson& tp)
+inline std::ostream& operator<<(std::ostream& s, const TrackPerson& tp)
 {
     s << tp.nr() << " " << tp.height() << " " << tp.firstFrame() << " " << tp.lastFrame() << " " << tp.colCount() << " " << tp.color() << " " << tp.size() << endl;
     s << tp.comment() << endl;
@@ -414,15 +414,15 @@ private:
     cv::Mat mGrey, mPrevGrey;//, mPyramid, mPrevPyramid;
 //    IplImage *mGrey, *mPrevGrey, *mPyramid, *mPrevPyramid;
 //    CvPoint2D32f* mPrevFeaturePoints, *mFeaturePoints;
-    vector<cv::Point2f> mPrevFeaturePoints, mFeaturePoints;
+    std::vector<cv::Point2f> mPrevFeaturePoints, mFeaturePoints;
 //    CvPoint2D32f* mPrevColorFeaturePoints, *mColorFeaturePoints;
-    vector<uchar> mStatus; //, *mColorStatus;
+    std::vector<uchar> mStatus; //, *mColorStatus;
     int mFlags;
     int mPrevFrame;
 //     IplImage *mPrevImg;
 //    int *mPrevFeaturePointsIdx;
-    vector<int> mPrevFeaturePointsIdx;
-    vector<float> mTrackError; //, *mColorTrackError;
+    std::vector<int> mPrevFeaturePointsIdx;
+    std::vector<float> mTrackError; //, *mColorTrackError;
 //    CvTermCriteria mTermCriteria;
     cv::TermCriteria mTermCriteria;
 

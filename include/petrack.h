@@ -7,7 +7,7 @@
 #include <QMouseEvent>
 
 
-#include <opencv.hpp>
+#include "opencv2/opencv.hpp"
 //#include "opencv2/cxcore.h"
 //#include "opencv2/cvaux.h"
 //#include "opencv2/opencv.hpp"
