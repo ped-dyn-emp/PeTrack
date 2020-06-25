@@ -119,3 +119,4 @@ void StereoWidget::getXml(QDomElement &elem)
     }
 }
 
+#include "moc_stereoWidget.cpp"

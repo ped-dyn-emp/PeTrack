@@ -27,6 +27,7 @@ public:
     void mouseDoubleClickEvent(QMouseEvent *event);
     //void mouseReleaseEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
+    void mousePressEvent(QMouseEvent *event) override;
 
 signals:
     void mouseDoubleClick();
@@ -36,6 +37,8 @@ signals:
     void mouseRightDoubleClick(QPointF pos, int direction);
     void mouseMiddleDoubleClick(int direction);
     void mouseShiftWheel(int delta);
+    void colorSelected(QPoint p, GraphicsView* graphicsView);
+    void setColorEvent(QPoint p, GraphicsView* graphicsView);
     //void mouseRightClick(QPointF pos);
 };
 

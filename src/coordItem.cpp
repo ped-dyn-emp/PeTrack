@@ -239,13 +239,13 @@ void CoordItem::updateData()
         double ro = mControlWidget->getCalibCoordRotate()/10.;
 
         // aktualisierung der transformationsmatrix
-        QMatrix matrix;
+        QTransform matrix;
         // matrix wird nur bei aenderungen neu bestimmt
         matrix.translate(tX, tY);
         matrix.rotate(ro);
         matrix.scale(sc/100., sc/100.);
         //matrix.shear(tX,tY);
-        setMatrix(matrix);
+        setTransform(matrix);
 
     }else // 3D
     {
@@ -258,13 +258,13 @@ void CoordItem::updateData()
         //prepareGeometryChange();
         // Reset Matrix - No Matrix Transformations for 3D Coordsystem
         // aktualisierung der transformationsmatrix
-        QMatrix matrix;
+        QTransform matrix;
         // matrix wird nur bei aenderungen neu bestimmt
         matrix.translate(0, 0);
         matrix.rotate(0);
         matrix.scale(1, 1);
         //matrix.shear(tX,tY);
-        setMatrix(matrix);
+        setTransform(matrix);
 
 //        double tX3D = mControlWidget->getCalibCoord3DTransX();
 //        double tY3D = mControlWidget->getCalibCoord3DTransY();

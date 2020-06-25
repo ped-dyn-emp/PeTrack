@@ -4,13 +4,14 @@
 #include <QProgressDialog>
 #include <QApplication>
 
-#include "highgui.hpp"
+#include "opencv2/highgui.hpp"
 
 #include "autoCalib.h"
 #include "petrack.h"
 #include "control.h"
 
 using namespace::cv;
+using namespace std;
 
 #define SHOW_CALIB_MAINWINDOW   // definieren, wenn das Schachbrett im Mainwindow und nicht separat angezeigt werden soll:
                                 // fuehrt nach Calibration dazu dass play des originalvideos abstuerzt, insb wenn intr apply nicht ausgewaehlt war

@@ -24,7 +24,7 @@ they can be represented in QT.
 #include <QTime>
 
 
-#include "opencv.hpp"
+#include "opencv2/opencv.hpp"
 
 #include "filter.h"
 #include "helper.h"

@@ -22,8 +22,7 @@ ColorRangeWidget::ColorRangeWidget(QWidget *parent)
     toColor->setStyleSheet(styleString);
 
     QColor col;
-    col.convertTo(QColor::Hsv);
-    col.setHsv(fromHue, fromSat, fromVal);
+    col = QColor::fromHsv(fromHue, fromSat, fromVal);
     fromTriangle->setColor(col);
     col.setHsv(toHue, toSat, toVal);
     toTriangle->setColor(col);
@@ -39,7 +38,15 @@ void ColorRangeWidget::on_inversHue_stateChanged(int i)
     mColorPlot->replot();
 }
 
-void ColorRangeWidget::setControlWidget()
+// WARNING Setzt voraus, dass x als Hue und y als Saturation ausgewählt ist
+// Zwar Standardeinstellung, aber nicht zwingend der Fall
+/**
+ * @brief sets x and y slider from colormap widget
+ *
+ * Sets the x and y slider to the right values according to fromColor and toColor,
+ * which were selected via the color picker.
+ */
+void ColorRangeWidget::setControlWidget(int toHue, int fromHue, int toSat, int fromSat)
 {
 
     int fH, tH, fS, tS;
@@ -77,7 +84,7 @@ void ColorRangeWidget::on_fromTriangle_colorChanged(const QColor &col)
     fromColor->setStyleSheet(styleString);
 
     mColorPlot->getMapItem()->changeActMapFromColor(col);
-    setControlWidget();
+    setControlWidget(toHue, fromHue, toSat, fromSat);
 
     mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
     if( !mMainWindow->isLoading() )
@@ -91,7 +98,7 @@ void ColorRangeWidget::on_toTriangle_colorChanged(const QColor &col)
     toColor->setStyleSheet(styleString);
 
     mColorPlot->getMapItem()->changeActMapToColor(col);
-    setControlWidget();
+    setControlWidget(toHue, fromHue, toSat, fromSat);
 
     mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
     if( !mMainWindow->isLoading() )
@@ -104,8 +111,7 @@ void ColorRangeWidget::on_fromColor_clicked()
     // ueber palette war der button ausser initial nicht zu aendern!!!
 
     QColor colBefore;//fromColor->palette().color(QPalette::Button);
-    colBefore.convertTo(QColor::Hsv);
-    colBefore.setHsv(fromHue, fromSat, fromVal);
+    colBefore = QColor::fromHsv(fromHue, fromSat, fromVal);
     QColor col = (QColorDialog::getColor(colBefore, this, "Select color from which value a pixel belongs to marker")).convertTo(QColor::Hsv);
     if (col.isValid() && col != colBefore)
     {
@@ -119,8 +125,7 @@ void ColorRangeWidget::on_toColor_clicked()
     // QWindowsXpStyle uses native theming engine which causes some palette modifications not to have any effect.
     // ueber palette war der button ausser initial nicht zu aendern!!!
     QColor colBefore;//toColor->palette().color(QPalette::Button);
-    colBefore.convertTo(QColor::Hsv);
-    colBefore.setHsv(toHue, toSat, toVal);
+    colBefore = QColor::fromHsv(toHue, toSat, toVal);
     QColor col = (QColorDialog::getColor(colBefore, this, "Select color to which value a pixel belongs to marker")).convertTo(QColor::Hsv);
     //QPalette palette = toColor->palette();
     //palette.setColor(QPalette::Button, col);
@@ -175,3 +180,5 @@ void ColorRangeWidget::setToColor(const QColor &col)
         toTriangle->setColor(col);
     }
 }
+
+#include "moc_colorRangeWidget.cpp"

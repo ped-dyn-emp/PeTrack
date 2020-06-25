@@ -1520,3 +1520,5 @@ QColor QtColorTriangle::colorFromPoint(const QPointF &p) const
     // Voila, we have the color at the point of the selector.
     return QColor(ri, gi, bi);
 }
+
+#include "moc_qtColorTriangle.cpp"

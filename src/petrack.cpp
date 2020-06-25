@@ -43,7 +43,7 @@
 
 #include <iomanip>
 
-#include "opencv.hpp"
+#include "opencv2/opencv.hpp"
 
 // Zeitausgabe aktivieren
 //#define TIME_MEASUREMENT
@@ -55,6 +55,7 @@ Control *cw;
 int Petrack::trcVersion = 0;
 
 using namespace::cv;
+using namespace std;
 
 // Reihenfolge des anlegens der objekte ist sehr wichtig
 Petrack::Petrack()
@@ -137,7 +138,7 @@ Petrack::Petrack()
     mMultiColorMarkerWidget->setWindowTitle("MultiColor marker parameter");
     //mColorMarkerWidget->show();
 
-    mScene = new QGraphicsScene;
+    mScene = new QGraphicsScene(this);
 
     mImageItem = new ImageItem(this); // durch uebergabe von scene wird indirekt ein scene->addItem() aufgerufen
     mControlWidget->setScene(mScene);
@@ -4073,3 +4074,5 @@ void Petrack::skipToFrameWheel(int delta)
 {
     mPlayerWidget->skipToFrame(mPlayerWidget->getPos()+delta);
 }
+
+#include "moc_petrack.cpp"

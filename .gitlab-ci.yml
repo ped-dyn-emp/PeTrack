@@ -2,19 +2,23 @@ stages:
   - build
   - test
 
-cache:
-  paths:
-    - ./petrack.exe
-  key: ${CI_COMMIT_REF_SLUG}  # Cache for each branch
-
+before_script:
+  - $env:Path += ";C:\Program Files\CMake\bin"
 
 build_windows:
   stage: build
   tags:
     - windows
   script:
-    - C:\Qt\5.14.1\mingw73_64\bin\qmake.exe C:\Users\Deniz\Documents\petrack\petrack.pro -spec win32-g++ "CONFIG+=debug" "CONFIG+=qml_debug"
-    - mingw32-make.exe -j6
+    - mkdir -Force build
+    - cd build
+    - cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=TRUE ..
+    - cmake --build . -- -j6
+  artifacts:
+    paths:
+      - "./build/petrack.exe"
+      - "./build/tests/unit_test/petrack_tests.exe"
+    expire_in: 2 hrs 
 
 # Ggf. muss man nicht in den Ordner der Testskripte verzweigen, da PyTest auch rekusrsiv in Unterorndern nach tests sucht
 regression test windows:
@@ -30,4 +34,19 @@ regression test windows:
       - "tests/regression_test/tests/RegressionTestLog.txt"
     reports:
       junit: "tests/regression_test/tests/pytest_report.xml"
+  needs: ["build_windows"]
+
+unit test windows:
+  stage: test
+  tags:
+    - windows
+  script:
+    - cd build/tests/unit_test
+    - ./petrack_tests.exe -r junit -o unit_test_report.xml
+  artifacts:
+    when: always
+    paths:
+        - build/tests/unit_test/unit_test_report.xml
+    reports:
+      junit: "build/tests/unit_test/unit_test_report.xml"
   needs: ["build_windows"]

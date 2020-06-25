@@ -157,7 +157,7 @@ public:
 //             default:
 //                 text.sprintf("%.4f, %.4f", pos.x(), pos.y());
 //         }
-        text.sprintf("%d, %.2f", myRound(pos.x()), pos.y());
+        text.asprintf("%d, %.2f", myRound(pos.x()), pos.y());
         return QwtText(text);
 //         return QwtPlotZoomer::trackerText(pos);
     }
@@ -598,3 +598,4 @@ void AnalysePlot::setScale()
     }
 }
 
+#include "moc_analysePlot.cpp"

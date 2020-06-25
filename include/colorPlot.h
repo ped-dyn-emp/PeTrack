@@ -48,27 +48,27 @@ public:
         : mColored(true), mMapHeight(DEFAULT_HEIGHT), mInversHue(false)
     {
         setRect(0., 0., 0., 0.);
-        mFromCol.convertTo(QColor::Hsv);
-        mToCol.convertTo(QColor::Hsv);
+        mFromCol = mFromCol.toHsv();
+        mToCol = mToCol.toHsv();
     }
     RectMap(QRectF r)
         : QRectF(r), mInversHue(false)
     {
         setRect(0., 0., 0., 0.);
-        mFromCol.convertTo(QColor::Hsv);
-        mToCol.convertTo(QColor::Hsv);
+        mFromCol = mFromCol.toHsv();
+        mToCol = mToCol.toHsv();
     }
     RectMap(double x, double y, double w, double h, bool colored, double mapHeight)
         : QRectF(x, y, w, h), mColored(colored), mMapHeight(mapHeight), mInversHue(false)
     {
-        mFromCol.convertTo(QColor::Hsv);
-        mToCol.convertTo(QColor::Hsv);
+        mFromCol = mFromCol.toHsv();
+        mToCol =mToCol.toHsv();
     }
     RectMap(QRectF r, bool colored, double mapHeight)
         : QRectF(r), mColored(colored), mMapHeight(mapHeight), mInversHue(false)
     {
-        mFromCol.convertTo(QColor::Hsv);
-        mToCol.convertTo(QColor::Hsv);
+        mFromCol = mFromCol.toHsv();
+        mToCol = mToCol.toHsv();
     }
     inline bool colored() const
     {
@@ -134,6 +134,9 @@ public:
     void changeActMapInvHue(bool b);
     void changeActMapFromColor(const QColor &fromCol);
     void changeActMapToColor(const QColor &toCol);
+    bool getActMapInvHue();
+    QColor getActMapToColor();
+    QColor getActMapFromColor();
     RectMap getMap(int index) const;
     void delMap(int index);
     inline void delMaps()

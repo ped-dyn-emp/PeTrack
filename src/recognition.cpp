@@ -3,7 +3,7 @@
 #if not CV_MAJOR_VERION == 4
 #include <cv.h>
 #endif
-#include <opencv.hpp>
+#include "opencv2/opencv.hpp"
 #include <opencv2/aruco.hpp>
 
 //#include "imgcodecs.hpp"
@@ -33,6 +33,7 @@
 #include "control.h"
 
 using namespace::cv;
+using namespace std;
 
 //#include "Psapi.h"
 
@@ -70,7 +71,7 @@ void thresholdHSV (const Mat &src, Mat &bin, const ColorParameters &param)
     int h, s, v;
     int x, y;
 
-    Mat hsv = src.clone();
+    Mat hsv {src.size(), src.type()};
 
 //    hsvIpl = cvCloneImage(srcIpl); // make a copy
 

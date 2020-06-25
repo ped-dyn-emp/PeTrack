@@ -19,6 +19,8 @@ private:
     Parameter mK4;
     Parameter mK5;
     Parameter mK6;
+    cv::Mat map1;
+    cv::Mat map2;
 
 public:
     CalibFilter();

@@ -2,7 +2,7 @@
 #include "stereoContext.h"
 
 // nur temporaer fuer anzeige
-#include "highgui.hpp"
+#include "opencv2/highgui.hpp"
 #include "helper.h"
 
 // spaeter entfernen naechsten beiden zeilen
@@ -23,6 +23,7 @@ extern Control *cw;
 //#define SHOW_TMP_IMG
 
 using namespace::cv;
+using namespace std;
 
 BackgroundFilter::BackgroundFilter()
     :Filter()

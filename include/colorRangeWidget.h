@@ -24,6 +24,7 @@ public:
     void setInvHue(bool b);
     void setFromColor(const QColor &col);
     void setToColor(const QColor &col);
+    void setControlWidget(int toHue, int fromHue, int toSat, int fromSat);
 
 private slots:
 
@@ -38,7 +39,7 @@ private slots:
 
 private:
 
-    void setControlWidget();
+
 
     Petrack *mMainWindow;
     ColorPlot *mColorPlot;

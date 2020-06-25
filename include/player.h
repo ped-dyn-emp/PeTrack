@@ -10,7 +10,7 @@
 #include "aviFileWriter.h"
 #endif
 
-#include "opencv.hpp"
+#include "opencv2/opencv.hpp"
 
 class QLabel;
 class QSlider;

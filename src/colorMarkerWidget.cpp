@@ -20,8 +20,7 @@ ColorMarkerWidget::ColorMarkerWidget(QWidget *parent)
     toColor->setStyleSheet(styleString);
 
     QColor col;
-    col.convertTo(QColor::Hsv);
-    col.setHsv(fromHue, fromSat, fromVal);
+    col = QColor::fromHsv(fromHue, fromSat, fromVal);
     fromTriangle->setColor(col);
     col.setHsv(toHue, toSat, toVal);
     toTriangle->setColor(col);
@@ -75,7 +74,7 @@ void ColorMarkerWidget::getXml(QDomElement &elem)
     int h=0, s=0, v=0; // init, damit compiler nicht meckert
     QString styleString;
     QColor col;
-    col.convertTo(QColor::Hsv);
+    col = col.toHsv();
 
     for(subElem = elem.firstChildElement(); !subElem.isNull(); subElem = subElem.nextSiblingElement())
     {
@@ -179,8 +178,7 @@ void ColorMarkerWidget::on_fromColor_clicked()
     // ueber palette war der button ausser initial nicht zu aendern!!!
 
     QColor colBefore;//fromColor->palette().color(QPalette::Button);
-    colBefore.convertTo(QColor::Hsv);
-    colBefore.setHsv(fromHue, fromSat, fromVal);
+    colBefore = QColor::fromHsv(fromHue, fromSat, fromVal);
     QColor col = (QColorDialog::getColor(colBefore, this, "Select color from which value a pixel belongs to marker")).convertTo(QColor::Hsv);
     if (col.isValid() && col != colBefore)
     {
@@ -194,8 +192,7 @@ void ColorMarkerWidget::on_toColor_clicked()
     // QWindowsXpStyle uses native theming engine which causes some palette modifications not to have any effect.
     // ueber palette war der button ausser initial nicht zu aendern!!!
     QColor colBefore;//toColor->palette().color(QPalette::Button);
-    colBefore.convertTo(QColor::Hsv);
-    colBefore.setHsv(toHue, toSat, toVal);
+    colBefore = QColor::fromHsv(toHue, toSat, toVal);
     QColor col = (QColorDialog::getColor(colBefore, this, "Select color to which value a pixel belongs to marker")).convertTo(QColor::Hsv);
     //QPalette palette = toColor->palette();
     //palette.setColor(QPalette::Button, col);
@@ -223,3 +220,5 @@ void ColorMarkerWidget::on_toColor_clicked()
 //            toColor->setStyleSheet(styleString);
 //        }
 }
+
+#include "moc_colorMarkerWidget.cpp"

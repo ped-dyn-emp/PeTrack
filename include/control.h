@@ -170,6 +170,10 @@ public:
     int getCalibGrid3DResolution();
     void setCalibGrid3DResolution(int i);
 
+    void expandRange(QColor& fromColor, QColor& toColor, const std::array<int, 3>& clickedColor);
+    void saveChange(const QColor& fromColor, const QColor& toColor, RectPlotItem* map);
+    bool getColors(QPoint& p, GraphicsView* graphicsView, std::array<int, 3>& clickedColor, QColor& toColor, QColor& fromColor, RectPlotItem*& map);
+
     void setXml(QDomElement &elem);
     void getXml(QDomElement &elem);
     bool isLoading()
@@ -239,6 +243,9 @@ private slots:
     void on_mapResetHeight_clicked();
     void on_mapResetPos_clicked();
     void on_mapDefaultHeight_valueChanged(double d);
+    void on_expandColor(QPoint p, GraphicsView* graphicsView);
+    void on_setColor(QPoint, GraphicsView*);
+
 
     void on_trackShow_stateChanged(int i);
     void on_trackFix_stateChanged(int i);
@@ -398,6 +405,8 @@ private slots:
     void on_trackRoiFix_stateChanged(int arg1);
 
     //void on_trackExport_released();
+
+    void on_colorPickerButton_clicked(bool checked);
 
 private:
     Petrack *mMainWindow;

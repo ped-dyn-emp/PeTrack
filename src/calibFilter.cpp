@@ -127,6 +127,20 @@ Mat CalibFilter::act(Mat &img, Mat &res)
                                         getR6()->getValue(),
                                         getK4()->getValue(), getK5()->getValue(), getK6()->getValue());
 
+    /*
+     * Eine Möglichkeit das entzerren schneller zu gestalten, indem
+     * der Aufruf von undistort in getrennte Aufrufe geteilt wird
+     * und das Ergebns von initUndistort... gecached wird
+     * Aber TODO muss zuerst gelöst werden (Cache muss bei einladen eines
+     * neues Projekt gecleart werden)
+     */
+    // TODO Was, wenn ein neues Projekt eingeladen wird?
+//    if(map1.empty() || map2.empty())
+//        initUndistortRectifyMap(camera, dist, Mat_<double>::eye(3,3),
+//                                camera,
+//                                img.size(), CV_16SC2, map1, map2);
+//    remap(img, res, map1, map2, INTER_LINEAR, BORDER_CONSTANT);
+
     undistort(img, res, camera, dist);
 //    cvReleaseImage(&resIpl);
 //    resIpl = cvCreateImage(cvSize(res.cols,res.rows),8,3);

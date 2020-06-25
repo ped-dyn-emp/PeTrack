@@ -1,4 +1,4 @@
-#include "opencv.hpp"
+#include "opencv2/opencv.hpp"
 #include "opencv2/video/legacy/constants_c.h"
 
 #include <time.h>
@@ -13,6 +13,7 @@
 #include "multiColorMarkerWidget.h"
 
 using namespace::cv;
+using namespace std;
 
 // Measure Time spending in functions
 //#define TIME_MEASUREMENT
@@ -245,9 +246,9 @@ void TrackPerson::optimizeColor()
             b.append(at(i).color().blue());
         }
     }
-    qSort(r);
-    qSort(g);
-    qSort(b);
+    std::sort(r.begin(), r.end());
+    std::sort(g.begin(), g.end());
+    std::sort(b.begin(), b.end());
     if (r.size()>0 && g.size()>0 && b.size()>0) // kann eigentlich nicht vorkommen
         setColor(QColor(r[(r.size()-1)/2],g[(g.size()-1)/2],b[(b.size()-1)/2]));
 }
@@ -273,7 +274,7 @@ void TrackPerson::recalcHeight(float altitude)
     }
     if (mHeightCount > 0)
     {
-        qSort(zList);
+        std::sort(zList.begin(), zList.end());
         //mHeight = h / mHeightCount;
         mHeight = zList[mHeightCount/2];
         mHeight = altitude - mHeight;

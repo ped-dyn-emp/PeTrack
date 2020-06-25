@@ -15,6 +15,8 @@
 #include "colorPlot.h"
 #include "control.h"
 
+using namespace std;
+
 // class SpectrogramData: public QwtRasterData
 // {
 // public:
@@ -433,6 +435,21 @@ void RectPlotItem::changeActMapToColor(const QColor &toCol)
     }
 }
 
+bool RectPlotItem::getActMapInvHue()
+{
+    return mMaps[mActIndex].invHue();
+}
+
+QColor RectPlotItem::getActMapToColor()
+{
+    return mMaps[mActIndex].toColor();
+}
+
+QColor RectPlotItem::getActMapFromColor()
+{
+    return mMaps[mActIndex].fromColor();
+}
+
 RectMap RectPlotItem::getMap(int index) const
 {
     if (index >= 0 && index < mMaps.size())
@@ -642,7 +659,7 @@ public:
 //             default:
 //                 text.sprintf("%.4f, %.4f", pos.x(), pos.y());
 //         }
-        text.sprintf("%d, %d", myRound(pos.x()), myRound(pos.y()));
+        text.asprintf("%d, %d", myRound(pos.x()), myRound(pos.y()));
         return QwtText(text);
 //         return QwtPlotZoomer::trackerText(pos);
     }
@@ -850,8 +867,20 @@ void ColorPlot::setCursor(const QColor &col)
     //QFrame::mouseMoveEvent(&event);
 }
 
-// ueber z kann die zur plotebene senkrechte kooerdinate zurueckgegeben werden,
-// wenn default NULL nicht zutrifft
+
+/**
+ * @brief Calculate position of color in current colormap
+ *
+ * Calculates the position of color in current colormap, i.e. with the current
+ * mapping from x,y to hsv/rgb. E.g. x->H and y->S.
+ *
+ * ueber z kann die zur plotebene senkrechte kooerdinate zurueckgegeben werden,
+ * wenn default NULL nicht zutrifft
+ *
+ * @param col color for which to determine position
+ * @param z coordinate orthogonal to the plot plane
+ * @return position of color in current colormap
+ */
 QPoint ColorPlot::getPos(const QColor &col, int *z) const
 {
     QPoint p;
@@ -1072,3 +1101,4 @@ int ColorPlot::zValue() const
         return 0;
 }
 
+#include "moc_colorPlot.cpp"

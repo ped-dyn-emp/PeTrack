@@ -81,10 +81,7 @@ void CodeMarkerWidget::setXml(QDomElement &elem)
 void CodeMarkerWidget::getXml(QDomElement &elem)
 {
     QDomElement subElem;
-    int h=0, s=0, v=0; // init, damit compiler nicht meckert
     QString styleString;
-    QColor col;
-    col.convertTo(QColor::Hsv);
 
     for(subElem = elem.firstChildElement(); !subElem.isNull(); subElem = subElem.nextSiblingElement())
     {
@@ -144,3 +141,5 @@ void CodeMarkerWidget::getXml(QDomElement &elem)
         }
     }
 }
+
+#include "moc_codeMarkerWidget.cpp"

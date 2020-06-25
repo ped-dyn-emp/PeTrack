@@ -173,6 +173,16 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
     }
 }
 
+void GraphicsView::mousePressEvent(QMouseEvent *event)
+{
+
+    if(event->modifiers() & Qt::ShiftModifier){
+        emit setColorEvent(event->pos(), this);
+    }else{
+        emit colorSelected(event->pos(), this);
+    }
+}
+
 //---------------------------------------------------------------------
 
 
@@ -366,3 +376,6 @@ void ViewWidget::hideShowControls()
 {
     mMainWindow->getHideControlActor()->setChecked(mMainWindow->getControlWidget()->isVisible());
 }
+
+
+#include "moc_view.cpp"

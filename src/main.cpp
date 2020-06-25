@@ -6,6 +6,8 @@
 #include "petrack.h"
 #include "helper.h"
 
+using namespace std;
+
 // Aufrufbeispiel:
 // release/petrack.exe -sequence ../../einzelbilder/wert0001.png -autoSave dir|ttt.avi
 

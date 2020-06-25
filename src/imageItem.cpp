@@ -47,11 +47,11 @@ void ImageItem::setImage(QImage *img)
 {
     mImage = img;
 
-    QMatrix matrix;
+    QTransform matrix;
     matrix.translate(1, 1); // FEHLER IN QT ????? noetig, damit trotz recognitionroiitem auch image auch ohne border komplett neu gezeichnet wird // wird 2 zeilen weiter zurueckgesetzt, aber mit 0, 0 geht es nicht
-    setMatrix(matrix);
+    setTransform(matrix);
     matrix.translate(-mMainWindow->getImageBorderSize()-1, -mMainWindow->getImageBorderSize()-1);
-    setMatrix(matrix);
+    setTransform(matrix);
 
     //debout << "mControlWidget->setCalibCxMin(MAX(0," << mImage->width() << "/2.-50)); (" << MAX(0,mImage->width()/2.-50) << ")" << endl;
     //debout << "mControlWidget->setCalibCyMin(MAX(0," << mImage->height() << "/2.-50)); (" << MAX(0,mImage->height()/2.-50) << ")" << endl;
@@ -376,3 +376,4 @@ void ImageItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 //{
 //    mMainWindow->dropEvent(event);
 //}
+
