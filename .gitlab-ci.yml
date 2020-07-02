@@ -12,13 +12,13 @@ build_windows:
   script:
     - mkdir -Force build
     - cd build
-    - cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=TRUE ..
+    - cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -DUSE_3RD_PARTY=ON ..
     - cmake --build . -- -j6
   artifacts:
     paths:
       - "./build/petrack.exe"
       - "./build/tests/unit_test/petrack_tests.exe"
-    expire_in: 2 hrs 
+    expire_in: 2 hrs
 
 # Ggf. muss man nicht in den Ordner der Testskripte verzweigen, da PyTest auch rekusrsiv in Unterorndern nach tests sucht
 regression test windows:
