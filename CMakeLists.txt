@@ -1,9 +1,144 @@
-cmake_minimum_required(VERSION 3.16)
-
+# Documentation: Some useful options: cmake [options] [path to CMakeLists.txt]
+# helpful cmake options:
+# -DCMAKE_CXX_COMPILER=clang++ (setting the used C++ compiler)
+# -DCMAKE_BUILD_TYPE=Debug (default Release)
+# -DCMAKE_VERBOSE_MAKEFILE=ON (default OFF)
+# -DCMAKE_PREFIX_PATH=[paths where additionally to search for libraries etc]
+#
+# petrack options:
+# -DUSE_3RD_PARTY=ON (default ON on Windows, OFF else) use the libraries provided in 3rdparty
+# -DBUILD_UNIT_TESTS=ON (default ON) for unit tests
+#
+# currently not supported:
+# -DSTEREO=ON (default OFF)
+# -DAVI=ON (default OFF)
+# -DDISABLE_STEREO=ON (default OFF)
+#
+################################################################################
+# Project setup
+################################################################################
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 project(petrack LANGUAGES CXX)
-include(CMakeDependentOption)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+include(helper_functions)
+
+# Set default build type to release
+set(default_build_type "Release")
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
+  set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
+      STRING "Choose the type of build." FORCE)
+endif()
+
+check_prefix_path()
+
+include(CMakeDependentOption)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+################################################################################
+# Optional features
+################################################################################
+option(STEREO "Use Point Grey's Triclops SDK? (currently not supported)" OFF)
+print_var(STEREO)
+
+option(AVI "Use Avi File from Point Grey (currently not supported)" OFF)
+print_var(AVI)
+
+option(LIBELAS "Use Libelas" ON)
+print_var(LIBELAS)
+
+option(DISABLE_STEREO "Disable Stereo features (currently must be taken)" ON)
+print_var(DISABLE_STEREO)
+
+option(BUILD_UNIT_TESTS "Build catch2 unit tests" OFF)
+print_var(BUILD_UNIT_TESTS)
+
+CMAKE_DEPENDENT_OPTION(USE_3RD_PARTY "Use the default libraries provided in 3rd party" ON WIN32 OFF)
+print_var(USE_3RD_PARTY)
+
+################################################################################
+# Compilation flags
+################################################################################
+# Note: Setting global compile flags via CMAKE_CXX_FLAGS has the drawback that
+#       generator expressions cannot be used. This leads to all kind of
+#       conditional adding of flags. It is generally preferable to use generator
+#       expresssions.
+#
+# WARNING: Do not break the lines, each option has to be on its own line or
+#          CMake will enclose multiple flags in '' which the compiler then
+#          treats as a single flag and does not understand.
+list(APPEND COMMON_COMPILE_OPTIONS
+    $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wall>
+    $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wextra>
+    $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-fdiagnostics-color=always>
+    $<$<CXX_COMPILER_ID:MSVC>:/W2>
+    $<$<CXX_COMPILER_ID:MSVC>:/EHsc>
+)
+
+################################################################################
+# Check some compile options if allowed
+################################################################################
+# Using the default 3rd party libraries only allowed on Windows with MinGW
+if (USE_3RD_PARTY AND NOT (WIN32 AND MINGW))
+  message(FATAL_ERROR "The provided 3rd party libraries can only be used on
+  Windows with the MinGW compiler. Please install the required libraries
+  yourself." )
+endif()
+
+# Check for currently unavailable options
+if (AVI)
+  message(FATAL_ERROR "Currently the avi File from Point Grey needs to be disabled.")
+endif()
+
+# Stero only allowed
+if (NOT DISABLE_STEREO OR STEREO)
+  message(FATAL_ERROR "Currently the stereo feature needs to be disabled.")
+endif()
+
+################################################################################
+# Dependencies
+################################################################################
+# if win32 and mingw use in 3rd party
+if (USE_3RD_PARTY)
+  # Setting path to OpenCV
+  set(OpenCV_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv-4.2.0_64bit")
+
+  # Setting path to QWT
+  set(QWT_ROOT_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows/Qwt-6.1.4_64bit")
+  set(QWT_INCLUDE_DIR "${QWT_ROOT_DIR}/include")
+  set(QWT_LIBRARY "${QWT_ROOT_DIR}/lib/libqwt.a")
+endif ()
+
+# Qt
+find_package(
+  Qt5 5.14
+  COMPONENTS Widgets OpenGL Xml Core PrintSupport
+  REQUIRED)
+
+# OpenCV
+find_package(OpenCV 4.0.0 REQUIRED )
+message("Building with OpenCV${OpenCV_VERSION_MAJOR}(${OpenCV_VERSION})")
+
+# QWT
+if(APPLE)
+    set(CMAKE_FIND_FRAMEWORK ONLY)
+    find_library(QWT
+        NAMES qwt
+        HINTS /usr/local/opt/qwt/lib/
+        REQUIRED)
+    if(QWT)
+        include_directories(${QWT}/Headers)
+        link_libraries(${QWT})
+    endif()
+else()
+  find_package(Qwt REQUIRED)
+endif()
 
 #**********************************************************
 # Qt and Misc Stuff                                       *
@@ -13,76 +148,35 @@ list(APPEND CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_SOURCE_DIR}/ui" "./src")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-find_package(
-  Qt5
-  COMPONENTS Widgets OpenGL Xml Core PrintSupport
-  REQUIRED)
-
+#**********************************************************
+# Create library and exectuable                           *
+#**********************************************************
 add_library(petrack_core STATIC)
 add_executable(petrack src/main.cpp)
 target_link_libraries(petrack PRIVATE petrack_core)
-target_link_libraries(petrack_core PUBLIC Qt5::Widgets Qt5::OpenGL Qt5::Xml Qt5::Core Qt5::PrintSupport)
 
-
-source_group(TREE .)
-
-#**********************************************************
-# Cache Variables                                         *
-#**********************************************************
-
-set(STEREO
-    FALSE
-    CACHE BOOL "Use Point Grey's Triclops SDK? (currently not supported)")
-
-set(AVI
-    FALSE
-    CACHE BOOL "Use Avi File from Point Grey (currently not supported)")
-
-set(QWT
-    TRUE
-    CACHE BOOL "Use Qwt (currently critical)")
-
-set(LIBELAS
-    TRUE
-    CACHE BOOL "Use Libelas")
-
-set(DISABLE_STEREO
-    TRUE
-    CACHE BOOL "Disable Stereo features (currently must be taken)")
-
-set(CVPATH
-    "../petrack/3rdparty/windows/opencv-4.2.0_64bit"
-    CACHE
-    PATH
-    "Path to OpenCV installation (should usually not be needed to be changed)")
-
-set(QWTPATH
-    "../petrack/3rdparty/windows/Qwt-6.1.4_64bit"
-    CACHE PATH "Path to Qwt installation. Ususally shouln't be altered.")
-
-set(BUILD_UNIT_TESTS
-    OFF
-    CACHE BOOL "Whether to build or not to build Catch2 Unit Tests")
-
-cmake_dependent_option(BUILD_UNIT_TESTS_WITH_LLD
-    "Use -fuse-ld=lld flag for linking unit-tests (need lld to be installed)"
-    OFF
-    "BUILD_UNIT_TESTS" OFF)
-
-#*****************************************************************
-# APPLIES ALWAYS                                                 *
-#*****************************************************************
-target_compile_options(petrack_core PRIVATE "-fpermissive")
+# TODO we should remove this compile option and be more strict
+target_compile_options(petrack_core PRIVATE "-fpermissive" ${COMMON_COMPILE_OPTIONS})
 target_compile_definitions(petrack_core PUBLIC STEREO_DISABLED)
 
-set(OpenCV_DIR "${CVPATH}")
-find_package(OpenCV REQUIRED)
-message("Building with OpenCV${OpenCV_VERSION_MAJOR}(${OpenCV_VERSION})")
+#**********************************************************
+# Linking Qt                                              *
+#**********************************************************
+target_link_libraries(petrack_core PUBLIC
+  Qt5::Widgets
+  Qt5::OpenGL
+  Qt5::Xml
+  Qt5::Core
+  Qt5::PrintSupport
+)
 
+target_include_directories(petrack_core PRIVATE "${CMAKE_SOURCE_DIR}/ui")
+
+#*****************************************************************
+# Linking OpenCV                                                 *
+#*****************************************************************
 add_library(opencv INTERFACE IMPORTED)
+
 # Debug Version of slows our debug down to a unusable degree
 set_target_properties(${OpenCV_LIBS} PROPERTIES
     MAP_IMPORTED_CONFIG_DEBUG RELEASE
@@ -90,30 +184,26 @@ set_target_properties(${OpenCV_LIBS} PROPERTIES
 
 target_link_libraries(petrack_core PUBLIC ${OpenCV_LIBS})
 
-target_include_directories(petrack_core PRIVATE "../ui")
+#*****************************************************************
+# Linking QWT                                                    *
+#*****************************************************************
+if(APPLE)
+  target_link_directories(petrack_core PUBLIC ${QWT})
+else()
+  target_compile_definitions(
+    petrack_core PRIVATE
+    $<$<AND:$<PLATFORM_ID:Windows>,$<BOOL:USE_3RD_PARTY>>:QWT QWT_DLL>)
+
+  target_include_directories(petrack_core PUBLIC ${QWT_INCLUDE_DIR})
+  target_link_libraries(petrack_core PUBLIC ${QWT_LIBRARY})
+endif()
+
+target_sources(petrack_core PRIVATE src/analysePlot.cpp)
+
 #*************************************************************
 # Handling of Options                                        *
 #*************************************************************
-
-
-if(BUILD_UNIT_TESTS)
-    enable_testing()
-    find_package(Qt5Test REQUIRED)
-    find_package(trompeloeil REQUIRED HINTS "./3rdparty/trompeloeil/lib/cmake/trompeloeil")
-    add_subdirectory(./tests/unit_test)
-    target_link_libraries(petrack_tests PRIVATE petrack_core)
-    add_subdirectory(./3rdparty/Catch2)
-    target_link_libraries(petrack_tests PRIVATE Catch2::Catch2 Qt5::Test trompeloeil)
-    target_include_directories(petrack_tests PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/petrack_core_autogen/include")
-
-    if(BUILD_UNIT_TESTS_WITH_LLD)
-        target_compile_options(petrack_tests PRIVATE "-fuse-ld=lld")
-        target_link_options(petrack_tests PRIVATE "-fuse-ld=lld")
-    endif(BUILD_UNIT_TESTS_WITH_LLD)
-endif(BUILD_UNIT_TESTS)
-
 if(LIBELAS)
-  message("LIBELAS enabled!")
   target_compile_definitions(petrack_core PRIVATE LIBELAS)
   target_sources(petrack_core PRIVATE
     src/libelas/elasDescriptor.cpp
@@ -124,42 +214,53 @@ if(LIBELAS)
   )
 endif(LIBELAS)
 
-
-if(QWT)
-  message("Qwt (analysis) enabled!")
-  # in qwt.../install steht, dass QWT_DLL gesetzt werden muss - insbesondere
-  # wegen debug/release mischungs problem
-  target_compile_definitions(
-    petrack_core PRIVATE
-    "QWT"
-    "QWT_DLL")
-  target_include_directories(petrack_core PUBLIC "${QWTPATH}/include")
-  target_link_directories(petrack_core PUBLIC "${QWTPATH}/lib")
-  target_link_libraries(petrack_core PUBLIC qwt$<$<CONFIG:Debug>:d>)
-  target_sources(petrack_core PRIVATE src/analysePlot.cpp)
-else()
-  message("Qwt disabled!")
-endif(QWT)
-
-
+# TODO currently not available
 if(AVI)
-  message("AVI enabled!")
   target_compile_definitions(petrack_core PRIVATE AVI)
-  target_sources(petrack_core "src/aviFile.cpp")
+  target_sources(petrack_core PUBLIC
+    include/aviFile.h
+    src/aviFile.cpp
+  )
 else()
   target_sources(petrack_core PRIVATE "src/aviFileWriter.cpp")
 endif(AVI)
-
 
 # WIN32 steht für Windows allgemein, nicht nur 32Bit
 if(WIN32)
   target_link_libraries(petrack_core PUBLIC psapi)
 endif(WIN32)
 
+################################################################################
+# petrack_core unit tests
+################################################################################
+if(BUILD_UNIT_TESTS)
+    enable_testing()
+    if (USE_3RD_PARTY)
+        add_subdirectory("${CMAKE_SOURCE_DIR}/3rdparty/Catch2")
+    else()
+      find_package(Catch2 REQUIRED)
+    endif()
+
+    find_package(Qt5Test REQUIRED)
+    find_package(trompeloeil REQUIRED
+      HINTS "${CMAKE_SOURCE_DIR}/3rdparty/trompeloeil/lib/cmake/trompeloeil")
+
+    add_subdirectory(${CMAKE_SOURCE_DIR}/tests/unit_test)
+    target_link_libraries(petrack_tests PRIVATE petrack_core)
+
+    target_link_libraries(petrack_tests PRIVATE Catch2::Catch2 Qt5::Test trompeloeil)
+    target_include_directories(petrack_tests PRIVATE
+      "${CMAKE_CURRENT_BINARY_DIR}/petrack_core_autogen/include")
+
+    if(BUILD_UNIT_TESTS_WITH_LLD)
+        target_compile_options(petrack_tests PRIVATE "-fuse-ld=lld")
+        target_link_options(petrack_tests PRIVATE "-fuse-ld=lld")
+    endif(BUILD_UNIT_TESTS_WITH_LLD)
+endif(BUILD_UNIT_TESTS)
+
 #**************************************************************
 # SOURCES                                                     *
 #**************************************************************
-
 # An sich wäre nur target_include_diretories notwendig, aber AUTOUIC
 # sucht nur in target source nach, ob ein ui header included wurde.
 # Aus bequemlichkeit dann einfach alle aus der alten .pro rüberkopiert
@@ -216,7 +317,6 @@ target_sources(petrack_core PRIVATE
     include/trackingRoiItem.h
     include/analysePlot.h
     )
-
 
 target_sources(petrack_core PRIVATE
     src/helper.cpp
@@ -280,11 +380,9 @@ target_sources(petrack PRIVATE
   petrack.rc
   icons/icons.qrc)
 
-
 #*****************************************************************************
 # CODE AUS DER ALTEN .PRO DATEI, DER NOCH NICHT IN DIE CMAKE EINGEBAUT WURDE *
 #*****************************************************************************
-
 if(${STEREO})
   # Should not happen at the moment Code below was at this point in .pro
   # $$STEREO { !build_pass:message(Stereo enabled!) DEFINES += STEREO
