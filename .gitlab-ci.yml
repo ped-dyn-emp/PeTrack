@@ -1,16 +1,65 @@
 stages:
+  - build_environment
   - build
   - test
 
-before_script:
-  - $env:Path += ";C:\Program Files\CMake\bin"
+###############################################################################
+# Linux CI
+###############################################################################
+# Build environment for building and testing the program. Uses the Dockerfile
+# from the repository
+build_container:
+  stage: build_environment
+  image: 
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/container/arch/Dockerfile --destination $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_linux
+  rules:
+    - changes:
+        - $CI_PROJECT_DIR/container/arch/Dockerfile
 
+# Build petrack and petrack unit_tests
+build_linux:
+  image: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_linux
+  stage: build
+  script:
+    - mkdir build
+    - cd build
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON 
+    - cmake --build . -- -j4    
+  artifacts:
+    paths:
+      - "./build/"
+    expire_in: 2 hrs
+
+# Execute unit tests
+unit_test_linux:
+  image: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_linux
+  stage: test
+  script:
+    - cd build/tests/unit_test
+    - ./petrack_tests -platform offscreen -r junit -o unit_test_report.xml
+  artifacts:
+    when: always
+    paths:
+        - build/tests/unit_test/unit_test_report.xml
+    reports:
+      junit: "build/tests/unit_test/unit_test_report.xml"
+
+
+###############################################################################
+# Windows CI
+###############################################################################
+# Build petrack and petrack unit_tests
 build_windows:
   stage: build
   tags:
     - windows
   script:
     - mkdir -Force build
+    - $env:Path += ";C:\Program Files\CMake\bin"
     - cd build
     - cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -DUSE_3RD_PARTY=ON ..
     - cmake --build . -- -j6
@@ -20,8 +69,24 @@ build_windows:
       - "./build/tests/unit_test/petrack_tests.exe"
     expire_in: 2 hrs
 
+# Execute unit tests
+unit_test_windows:
+  stage: test
+  tags:
+    - windows
+  script:
+    - cd build/tests/unit_test
+    - ./petrack_tests.exe -r junit -o unit_test_report.xml
+  artifacts:
+    when: always
+    paths:
+        - build/tests/unit_test/unit_test_report.xml
+    reports:
+      junit: "build/tests/unit_test/unit_test_report.xml"
+  needs: ["build_windows"]
+
 # Ggf. muss man nicht in den Ordner der Testskripte verzweigen, da PyTest auch rekusrsiv in Unterorndern nach tests sucht
-regression test windows:
+regression_test_windows:
   stage: test
   tags:
     - windows
@@ -36,17 +101,3 @@ regression test windows:
       junit: "tests/regression_test/tests/pytest_report.xml"
   needs: ["build_windows"]
 
-unit test windows:
-  stage: test
-  tags:
-    - windows
-  script:
-    - cd build/tests/unit_test
-    - ./petrack_tests.exe -r junit -o unit_test_report.xml
-  artifacts:
-    when: always
-    paths:
-        - build/tests/unit_test/unit_test_report.xml
-    reports:
-      junit: "build/tests/unit_test/unit_test_report.xml"
-  needs: ["build_windows"]
