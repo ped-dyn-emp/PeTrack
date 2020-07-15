@@ -409,27 +409,17 @@ class Tracker : public QList<TrackPerson>
 {
 private:
     Petrack *mMainWindow;
-    //int mNr;
-    //double mFps;
-    cv::Mat mGrey, mPrevGrey;//, mPyramid, mPrevPyramid;
-//    IplImage *mGrey, *mPrevGrey, *mPyramid, *mPrevPyramid;
-//    CvPoint2D32f* mPrevFeaturePoints, *mFeaturePoints;
+    cv::Mat mGrey, mPrevGrey;
+    std::vector<cv::Mat> mPrevPyr, mCurrentPyr;
     std::vector<cv::Point2f> mPrevFeaturePoints, mFeaturePoints;
-//    CvPoint2D32f* mPrevColorFeaturePoints, *mColorFeaturePoints;
-    std::vector<uchar> mStatus; //, *mColorStatus;
-    int mFlags;
+    std::vector<uchar> mStatus;
     int mPrevFrame;
-//     IplImage *mPrevImg;
-//    int *mPrevFeaturePointsIdx;
     std::vector<int> mPrevFeaturePointsIdx;
-    std::vector<float> mTrackError; //, *mColorTrackError;
-//    CvTermCriteria mTermCriteria;
+    std::vector<float> mTrackError;
     cv::TermCriteria mTermCriteria;
 
 public:
     Tracker(QWidget *wParent);
-
-    ~Tracker();
 
     // neben loeschen der liste muessen auch ...
     void init(cv::Size size);
@@ -472,12 +462,13 @@ public:
     int smallestFirstFrame();
     int smallestLastFrame();
 
-    int calcPrevFeaturePoints(int prevFrame, cv::Rect &rect, int frame, bool reTrack, int reQual, int borderSize, QSet<int> onlyVisible);
+    size_t calcPrevFeaturePoints(int prevFrame, cv::Rect &rect, int frame, bool reTrack, int reQual, int borderSize, QSet<int> onlyVisible);
 
-    int insertFeaturePoints(int frame, int count, cv::Mat &img, int borderSize, float errorScale);
+    int insertFeaturePoints(int frame, size_t count, cv::Mat &img, int borderSize, float errorScale);
 
     // frame ist frame fuer naechsten prev frame
     int track(cv::Mat &img,cv::Rect &rect, int frame, bool reTrack, int reQual, int borderSize, int level=3, QSet<int> onlyVisible = QSet<int>(), int errorScaleExponent=0);
+
 
     void checkPlausibility(QList<int> &pers, QList<int> &frame,
                            bool testEqual = true,
@@ -497,6 +488,15 @@ public:
     bool printHeightDistribution();
 
     void purge(int frame);
+
+private:
+    bool tryMergeTrajectories(const TrackPoint& v, size_t i, int frame);
+
+    void trackFeaturePointsLK(int level);
+    void refineViaColorPointLK(int level, float errorScale);
+    void useBackgroundFilter(QList<int>& trjToDel, BackgroundFilter *bgFilter);
+    void refineViaNearDarkPoint();
+    void preCalculateImagePyramids(int level);
 };
 
 #endif

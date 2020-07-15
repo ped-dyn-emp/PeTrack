@@ -1,5 +1,4 @@
 #include "opencv2/opencv.hpp"
-#include "opencv2/video/legacy/constants_c.h"
 
 #include <time.h>
 #include <iomanip>
@@ -24,54 +23,53 @@ using namespace std;
 
 inline float errorToQual(float error)
 {
-    return 80. - error/20.;
+    return 80.F - error/20.F;
 }
 
 TrackPoint::TrackPoint()
-    : mQual(0),
-      mMarkerID(-1),
+    : mMarkerID(-1),
+      mQual(0),
       mSp(-1., -1., -1.)
 {
 }
 TrackPoint::TrackPoint(const Vec2F &p)
     : Vec2F(p),
-      mQual(0),
       mMarkerID(-1),
+      mQual(0),
       mSp(-1., -1., -1.)
 {
 }
 TrackPoint::TrackPoint(const Vec2F &p, int qual)
     : Vec2F(p),
-      mQual(qual),
       mMarkerID(-1),
+      mQual(qual),
       mSp(-1., -1., -1.)
 {
 }
 TrackPoint::TrackPoint(const Vec2F &p, int qual, int markerID)
     : Vec2F(p),
-      mQual(qual),
       mMarkerID(markerID),
+      mQual(qual),
       mSp(-1.,-1.,-1.)
 {
 }
 TrackPoint::TrackPoint(const Vec2F &p, int qual, const QColor &col)
     : Vec2F(p),
-      mQual(qual),
+      mCol(col),
       mMarkerID(-1),
+      mQual(qual),
       mSp(-1., -1., -1.)
-//       mCol(col) // kommt warnung, warum???
 {
-    mCol = col;
 }
+
 TrackPoint::TrackPoint(const Vec2F &p, int qual, const Vec2F &colPoint, const QColor &col)
     : Vec2F(p),
-      mQual(qual),
+      mColPoint(colPoint),
+      mCol(col),
       mMarkerID(-1),
+      mQual(qual),
       mSp(-1., -1., -1.)
-//       mCol(col) // kommt warnung, warum???
 {
-    mColPoint = colPoint;
-    mCol = col;
 }
 
 // const TrackPoint& TrackPoint::operator=(const TrackPoint& tp)
@@ -99,21 +97,6 @@ const TrackPoint TrackPoint::operator+(const Vec2F& v) const
     return TrackPoint(*this) += v; //Vec2F(mX + v.mX, mY + v.mY);
 }
 
-// private:
-//     //QPointF &mP; //Vec3F mP // position in x, y //, z -  height is the same for the whole track
-// //     int mFrame; // frame
-// public:
-//     bool nearBy(QPointF &p)
-//     {
-//         return false;
-//     }
-//     void setP(const Vec2F& v)
-//     {
-//         mP.setX(p.x());
-//         mP.setY(p.y());
-//         mP.setZ(h);
-//     }
-
 //--------------------------------------------------------------------------
 
 // the list index is the frame number plus mFirstFrame 0..mLastFrame-mFirstFrame
@@ -125,9 +108,9 @@ TrackPerson::TrackPerson()
       mFirstFrame(-1),
       mLastFrame(0),
       mNewReco(false),
+      mComment(),
       mColCount(0),
-      mNrInBg(0),
-      mComment()
+      mNrInBg(0)
 {
 }
 // TrackPerson::TrackPerson(int nr, int frame, const Vec2F &p)
@@ -149,11 +132,9 @@ TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p)
       mLastFrame(frame),
       mNewReco(true),
       mCol(p.color()),
-      mColCount(1),
-      mComment()
+      mComment(),
+      mColCount(1)
 {
-    //TrackPoint t = p;
-    //for (int i = 0; i <= frame; ++i)
     append(p);
 }
 
@@ -327,7 +308,7 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool
     double distance;
 
 //    debout << "frame: " << frame << " first: " << mFirstFrame << " last: " << mLastFrame << endl;
-    
+
     if (frame > mLastFrame)
     {
         // lineare interpolation, wenn frames uebersprungen wurden
@@ -344,7 +325,7 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool
                 append(tp);
             }
             append(p);
-        } 
+        }
         else if (extrapolate && ((mLastFrame-mFirstFrame) > 0)) // mind. 2 trackpoints sind in liste!
         {
             tmp = last()-at(size()-2); // vektor zw letztem und vorletztem pkt
@@ -380,7 +361,7 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool
         else
             append(p);
         mLastFrame = frame;
-    } 
+    }
     else if (frame < mFirstFrame)
     {
         if (mFirstFrame-frame-1 > 0)
@@ -425,7 +406,7 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool
             prepend(p);
         mFirstFrame = frame;
     }
-    else 
+    else
     {
         // dieser Zweig wird insbesondere von reco durchlaufen, da vorher immer auch noch getrackt wird und reco draufgesetzt wird!!!
 
@@ -466,7 +447,7 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool
             if (trackPointExist(frame-1))
                 tmp = trackPointAt(frame) - trackPointAt(frame-1);
             else if (trackPointExist(frame+1))
-                tmp = trackPointAt(frame+1) - trackPointAt(frame);      
+                tmp = trackPointAt(frame+1) - trackPointAt(frame);
             if ((trackPointExist(frame-1) || trackPointExist(frame+1)) && ((distance = (trackPointAt(frame).distanceToPoint(tp))) > 1.5*tmp.length()) && (distance > 3))
             {
                 int anz;
@@ -506,12 +487,12 @@ const TrackPoint& TrackPerson::trackPointAt(int frame) const // & macht bei else
 {
 //     if (frame >= mFirstFrame && frame <= mLastFrame) ////!!!! muss vorher ueberprueft werden, ob es existiert!!!
         return at(frame-mFirstFrame);
-//     else              
+//     else
 //         return TrackPoint();
 }
 
 //     ~TrackerPerson();
-    
+
 //     inline const MyEllipse& head() const
 //     {
 //         return mHead;
@@ -565,23 +546,11 @@ Tracker::Tracker(QWidget *wParent)
 //    mPrevFeaturePointsIdx = (int*) cvAlloc(MAX_COUNT*sizeof(int));
 //    mTrackError = (float*) cvAlloc(MAX_COUNT*sizeof(float));
 ////    mColorTrackError = (float*) cvAlloc(MAX_COUNT*sizeof(float));
-    mTermCriteria = TermCriteria(TermCriteria::COUNT|TermCriteria::EPS, 20, 0.03);
+    mTermCriteria = TermCriteria(TermCriteria::COUNT|TermCriteria::EPS, 20, 0.03); ///< maxIter=20 and epsilon=0.03
 
     reset();
 }
 
-Tracker::~Tracker()
-{
-//    cvFree(&mPrevFeaturePoints);
-//    cvFree(&mFeaturePoints);
-//    cvFree(&mStatus);
-//    cvFree(&mPrevFeaturePointsIdx);
-//    cvFree(&mTrackError);
-//    cvFree(&mPrevColorFeaturePoints);
-//    cvFree(&mColorFeaturePoints);
-//    cvFree(&mColorStatus);
-//    cvFree(&mColorTrackError);
-}
 
 // neben loeschen der liste muessen auch ...
 void Tracker::init(Size size)
@@ -611,7 +580,6 @@ void Tracker::init(Size size)
 // damit neu aufgesetzt werden kann
 void Tracker::reset()
 {
-    mFlags = 0; // pyr muss auch fuer prev berechnet werden
     mPrevFrame = -1; // das vorherige Bild ist zu ignorieren oder existiert nicht
 }
 
@@ -619,64 +587,19 @@ void Tracker::resize(Size size)
 {
     if (!mGrey.empty() && ((size.width != mGrey.cols) || (size.height != mGrey.rows)))
     {
-        // folgende 6 Zeilen habe ich herausgenommen, obwohl sie mir logisch erscheinen und vorher mal funktionierten
-        // aber es kam zum schwer lokalisierbarem Fehler mIplImage in petrack.cpp wurde zerschossen!!!
-        // und auch ohne folgende Zeilen steigt der Speicherplatzbedarf voln petrack nicht an - warum?
-//        if (mGrey)
-//            cvReleaseImage(&mGrey);
-//        if (mPyramid)
-//            cvReleaseImage(&mPyramid);
-//        if (mPrevPyramid)
-//            cvReleaseImage(&mPrevPyramid);
+        mGrey.create(size,CV_8UC1);
 
-        mGrey.create(size,CV_8UC1);// = cvCreateImage(size, 8, 1);
-//        mPyramid.create(size,CV_8UC1);// = cvCreateImage(size, 8, 1);
-//        mPrevPyramid.create(size,CV_8UC1);// = cvCreateImage(size, 8, 1);
-        
         // umkopieren des alten Graubildes in groesseres oder auch kleineres bild (wg border)
         // aus borderFilter kopiert
         if (!mPrevGrey.empty())
         {
-            int x, y, s = (size.width-mPrevGrey.cols)/2;
-//            Mat prevGreyOld = mPrevGrey.clone();
-//            mPrevGrey.create(size,CV_8UC1);
-//            IplImage *prevGreyOld = mPrevGrey;
-//            mPrevGrey = cvCreateImage(size, 8, 1);
-//            debout << "border size to add: " << s << endl;
+            int s = (size.width-mPrevGrey.cols)/2;
             if( s >= 0)
                 cv::copyMakeBorder(mPrevGrey,mPrevGrey,s,s,s,s,cv::BORDER_CONSTANT,cv::Scalar(0));
             else
                 mPrevGrey = mPrevGrey(Rect(-s,-s,mPrevGrey.cols+2*s,mPrevGrey.rows+2*s));
-//            // Pointer to the data information in the IplImage
-//            unsigned char *dataIn  = (unsigned char *) prevGreyOld.data;
-//            unsigned char *dataOut = (unsigned char *) mPrevGrey.data;
-//            // set poiner to value before array, because ++i is more effective than i++
-//            --dataIn; --dataOut;
-            
-//            if (s < 0) // if dataIn is bigger than dataOut skip the first lines
-//                dataIn += -s*prevGreyOld.cols;
-
-//            for (y = 0; y < mPrevGrey.rows; ++y)
-//            {
-//                if (s < 0) // if dataIn is bigger than dataOut skip the first rows in every line
-//                    dataIn += -s;
-//                for (x = 0; x < mPrevGrey.cols; ++x)
-//                {
-//                    if ((x >= s) && (x < s+prevGreyOld.cols) && (y >= s) && (y < s+prevGreyOld.rows))
-//                        *(++dataOut) = *(++dataIn);
-//                    else
-//                        *(++dataOut) = 0; //schwarz, wo keine daten vorliegen
-//                }
-//                if (s < 0) // if dataIn is bigger than dataOut skip the last rows in every line
-//                    dataIn += -s;
-//            }
-//            cvReleaseImage(&prevGreyOld);
         }
-
-        //debout << mPrevGrey->nChannels << " " << mGrey->nChannels  << endl;
-        mFlags = 0; // pyr muss auch fuer prev berechnet werden - kein umkopieren, da datenstruktur von pyr nicht bekannt!!!
     }
-
 //             ; //anpassungen von prev bildmaterial (und punkten selber?)
 //         // -getImgBorderSize() nutzen
 }
@@ -791,7 +714,8 @@ void Tracker::delPointAll(int direction, int frame)
                  (direction == 0) ||
                  ((direction == 1) && (frame < at(i).firstFrame())))
         {
-            removeAt(i--); // nach Loeschen wird i um 1 erniedrigt
+            removeAt(i);
+            i--;
         }
     }
 }
@@ -805,7 +729,6 @@ void Tracker::delPointInsideROI()
     int i, j;
     QRectF rect = mMainWindow->getRecoRoiItem()->rect();
     bool inside;
-    //int numOfTrackPersons = size(); // static because the plits enlarge the size, but the added ones are already splitted
 
     for (i = 0; i < size(); ++i) // ueber TrackPerson
     {
@@ -817,14 +740,18 @@ void Tracker::delPointInsideROI()
                 splitPerson(i, at(i).firstFrame()+j);
                 if (inside)
                 {
-                    removeAt(i--); // nach Loeschen wird i um 1 erniedrigt
+                    removeAt(i);
+                    i--;
                     inside = !inside;
                 }
                 break;
             }
         }
-        if (inside)
-            removeAt(i--); // rest loeschen
+        if (inside){
+            // rest loeschen
+            removeAt(i);
+            i--;
+        }
     }
 }
 
@@ -832,7 +759,6 @@ void Tracker::delPointInsideROI()
 // man koennte noch unterscheiden, ob trajektorie aktuell in petrack zu sehen sein soll
 void Tracker::delPointROI()
 {
-
     int i, j, anz=0;
     QRectF rect = mMainWindow->getRecoRoiItem()->rect();
 
@@ -840,13 +766,11 @@ void Tracker::delPointROI()
     {
         for (j = 0; j < at(i).size(); ++j)
         {
-            //debout << j << " "<< at(i).lastFrame()<< " "<<at(i).size()<<endl;
             if (rect.contains(at(i).at(j).x(), at(i).at(j).y()))
             {
-
                 anz++;
-                removeAt(i--); // nach Loeschen wird i um 1 erniedrigt
-                //debout << i+1 <<endl;
+                removeAt(i);
+                i--;
                 break;
             }
         }
@@ -920,8 +844,6 @@ bool Tracker::editTrackPersonComment(const Vec2F& p, int frame, QSet<int> onlyVi
         if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(NULL, i, frame)/2.))) // war: MIN_DISTANCE)) // 30 ist abstand zwischen kopfen
         {
             bool ok;
-            //QString comment = QInputDialog::getMultiLineText(mMainWindow, QObject::tr("Add Comment"),
-            //                                                 QObject::tr("Comment:"), at(i).comment() , &ok);
             QString comment = QInputDialog::getText(mMainWindow,QObject::tr("Add Comment"),QObject::tr("Comment:"),
                                                     QLineEdit::Normal, at(i).comment() , &ok);
             if (ok)
@@ -1050,7 +972,7 @@ int Tracker::calcPosition(int frame)
 
 // true, if new traj is inserted with point p and initial frame frame
 // p in pixel coord
-// used from recognition and manual 
+// used from recognition and manual
 bool Tracker::addPoint(TrackPoint &p, int frame, QSet<int> onlyVisible, int *pers)
 {
     bool found = false;
@@ -1246,7 +1168,18 @@ int Tracker::smallestLastFrame()
     return min;
 }
 
-int Tracker::calcPrevFeaturePoints(int prevFrame, Rect &rect, int frame, bool reTrack, int reQual, int borderSize, QSet<int> onlyVisible)
+/**
+ * @brief Tracker::calcPrevFeaturePoints calculates all featurePoints(Persons) from the "previous" frame
+ * @param prevFrame Number of previous frame (can be both, larger or smaller; forward or backwards)
+ * @param rect ROI
+ * @param frame current frame number
+ * @param reTrack boolean saying if people should be retracked, when tracking was of low quality
+ * @param reQual threshold for low quality in case of reTrack = true
+ * @param borderSize
+ * @param onlyVisible
+ * @return number of feature points
+ */
+size_t Tracker::calcPrevFeaturePoints(int prevFrame, Rect &rect, int frame, bool reTrack, int reQual, int borderSize, QSet<int> onlyVisible)
 {
     int j = -1;
 
@@ -1255,60 +1188,60 @@ int Tracker::calcPrevFeaturePoints(int prevFrame, Rect &rect, int frame, bool re
 
     if (prevFrame != -1)
     {
-        int i;
-
-
-        for (i = 0; i < size(); ++i)
+        for (int i = 0; i < size(); ++i)
         {
             if (((onlyVisible.empty()) || (onlyVisible.contains(i))) &&
                 at(i).trackPointExist(prevFrame) &&
-                ((reTrack && at(i).trackPointExist(frame) && at(i).trackPointAt(frame).qual() < reQual) || 
+                ((reTrack && at(i).trackPointExist(frame) && at(i).trackPointAt(frame).qual() < reQual) ||
                  !at(i).trackPointExist(frame)))
             {
-                // naechstes if nur temporaer um an aussentreppe abzubrechen, wenn hinter Pfeiler
-                //if (!((at(i).at(prevFrame-at(i).firstFrame()).toCvPoint2D32f()).x < 234 &&
-                //      (at(i).at(prevFrame-at(i).firstFrame()).toCvPoint2D32f()).y < 237))
-                //{
-//                mPrevFeaturePoints.push_back(Point2f(at(i).at(prevFrame-at(i).firstFrame()).x()+borderSize,
-//                                                     at(i).at(prevFrame-at(i).firstFrame()).y()+borderSize));
                 Point2f p2f(at(i).at(prevFrame-at(i).firstFrame()).x()+borderSize,
                             at(i).at(prevFrame-at(i).firstFrame()).y()+borderSize);
                 if(rect.contains(p2f))
                 {
                     mPrevFeaturePoints.push_back(p2f);
                     ++j;
-//                    mPrevFeaturePoints[++j] = p2f;
-//                mPrevFeaturePoints[j].x += borderSize;
-//                mPrevFeaturePoints[j].y += borderSize;
-
-//                mPrevColorFeaturePoints[j] = at(i).at(prevFrame-at(i).firstFrame()).colPoint().toCvPoint2D32f();
-//                mPrevColorFeaturePoints[j].x += borderSize;
-//                mPrevColorFeaturePoints[j].y += borderSize;
 
                     mPrevFeaturePointsIdx.push_back(i);
-//                    mPrevFeaturePointsIdx[j] = i;
-
                 if (j > MAX_COUNT-2)
                 {
                     debout << "Warning: reached maximal number of tracking point: " << MAX_COUNT << endl;
                     break; // for loop
                 }
                 }
-                //}
             }
         }
     }
 
-    return /*mPrevFeaturePointsIdx.size();//*/j+1;
+    return mPrevFeaturePointsIdx.size();
 }
 
 // rueckgabewert gibt anzahl an, wieviele punkte akzeptiert wurden,
 //   um listen verschmelzen zu lassen, neu hinzugefuegt wurden, existierende mgl verbessert haben
-int Tracker::insertFeaturePoints(int frame, int count, Mat &img, int borderSize, float errorScale)
+/**
+ * @brief Tries to insert the featurepoints into the trajectories. Might merge.
+ *
+ * If the point is in the original image (without border) and/or has a small tracking error
+ * and is in the picture, it will be added to a tajectory, by using insertAtFrame, which will
+ * only accept the point, if the quality increases. If merging is activated, we search for
+ * another point, less then one head size away from the current one and merge these, if they werent
+ * more distant to each other in neighbouring frames.
+ *
+ * @see Tracker::tryMergeTrajectories
+ * @see TrackPerson::insertAtFrame
+ *
+ * @param frame Current frame
+ * @param count number of tracked people
+ * @param img current image
+ * @param borderSize
+ * @param errorScale
+ * @return
+ */
+int Tracker::insertFeaturePoints(int frame, size_t count, Mat &img, int borderSize, float errorScale)
 {
     int inserted = 0;
     TrackPoint v;
-    int i, j, k, qual, deleteIndex;
+    int qual;
     bool found;
     Vec2F borderSize2F(-borderSize, -borderSize);
     int dist = (borderSize > 9) ? borderSize : 10; // abstand zum bildrand, ab wann warnung ueber trj verlust herausgeschrieben wird
@@ -1316,19 +1249,16 @@ int Tracker::insertFeaturePoints(int frame, int count, Mat &img, int borderSize,
     int borderColorGray = qGray(mMainWindow->getBorderFilter()->getBorderColR()->getValue(),
                                 mMainWindow->getBorderFilter()->getBorderColG()->getValue(),
                                 mMainWindow->getBorderFilter()->getBorderColB()->getValue());
-                
-    for (i = 0; i < count; ++i)
+
+    for (size_t i = 0; i < count; ++i)
     {
         if (mStatus[i])
         {
             v = Vec2F(mFeaturePoints.at(i).x,mFeaturePoints.at(i).y); // umwandlung nach TrackPoint bei "="
-            //debout << v << " " << mTrackError[i] << " " << getGrey(mGrey, ((int)v.x()+1), ((int)v.y()+1)) << endl;
-            //debout <<(int)v.x()+1 <<" "<< ((int)v.y()+1)<<" "<< borderSize << " "<<img->width<<" "<<mGrey->width <<endl;
+
             // ausserhalb der groesse des originalbildes
             if ((v.x() >= borderSize && v.y() >= borderSize && v.x() <= img.cols-1-borderSize && v.y() <= img.rows-1-borderSize) ||
                 (mTrackError[i] < errorScale*MAX_TRACK_ERROR)) // nur bei kleinem Fehler darf auch im Randbereich getrackt werden
-                // bei folgender Abfrage muesste noch (int)v.x()+1) >= 0 ... getestet werden., ansonsten Absturz, aber sowieso fuerht dies am Rand zum rumkrkseln!!!
-                //|| (getGrey(mGrey, ((int)v.x()+1), ((int)v.y()+1)) != borderColorGray)) // im Rand keine Hintergrundfarbe // schoener waere hier zu ermitteln in welchem bereich verzerrtes bild noch keine hintergrundfarbe hat!!!
             {
                 // das Beschraenken auf die Bildgroesse ist reine sicherheitsmassnahme,
                 // oft sind tracking paths auch ausserhalb des bildes noch gut,
@@ -1351,77 +1281,27 @@ int Tracker::insertFeaturePoints(int frame, int count, Mat &img, int borderSize,
                         //(*this)[i].setHeight(z, mMainWindow->getControlWidget()->coordAltitude->value(), frame);
                     }
 #endif
-                    
+
 //                     // wenn bei punkten, die nicht am rand liegen, der fehler gross ist,
 //                     // wird geguckt, ob der sprung sich zur vorherigen richtung stark veraendert hat
 //                     // wenn sprung sehr unterschiedlich, wird lieber interpoliert oder stehen geblieben
-//                     // ist richtung ok, dann wird dunkelstes pixel gesucht 
+//                     // ist richtung ok, dann wird dunkelstes pixel gesucht
 //                     // (subpixel aufgrund von nachbarpixel)
 //                     // oder einfach bei schlechtem fehler mit groesserem winSize=30 den Problempunkt nochmal machen
-//                     if (mTrackError[i] > MAX_TRACK_ERROR)
-//                         debout << "big error!" <<endl;
+                    // NOTE Wird gerade eben nicht gemacht. Sollten wir???
+
 
                     // ueberpruefen, ob tracking ziel auf anderem tracking path landet, dann beide trackpaths verschmelzen lassen
                     found = false;
                     if (mMainWindow->getControlWidget()->trackMerge->checkState() == Qt::Checked) // wenn zusammengefuehrt=merge=verschmolzen werden soll
                     {
-                        // nach trajektorie suchen, mit der eine verschmelzung erfolgen koennte
-                        for (j = 0; !found && j < size(); ++j) // ueber TrackPerson
-                        {
-                            if (j != mPrevFeaturePointsIdx[i] && at(j).trackPointExist(frame) && (at(j).trackPointAt(frame).distanceToPoint(v) < mMainWindow->getHeadSize(NULL, j, frame)/2.)) // war: MIN_DISTANCE)) // 30 ist abstand zwischen koepfen
-                            {
-                                // um ein fehltracking hin zu einer anderen Trajektorie nicht zum Verschmelzen dieser fuehren zu lassen
-                                // (die fehlerbehandlung durch interpolation wird in insertAtFrame durchgefuehrt)
-                                if (!((at(mPrevFeaturePointsIdx[i]).trackPointExist(frame-1) &&
-                                       (at(mPrevFeaturePointsIdx[i]).trackPointAt(frame-1).distanceToPoint(v) > mMainWindow->getHeadSize(NULL, mPrevFeaturePointsIdx[i], frame-1)/2.)) ||
-                                      (at(mPrevFeaturePointsIdx[i]).trackPointExist(frame+1) &&
-                                       (at(mPrevFeaturePointsIdx[i]).trackPointAt(frame+1).distanceToPoint(v) > mMainWindow->getHeadSize(NULL, mPrevFeaturePointsIdx[i], frame+1)/2.)))) // war 2x MIN_DISTANCE))))
-                                {
-                                    if (at(j).firstFrame() < (*this)[mPrevFeaturePointsIdx[i]].firstFrame() &&
-                                        at(j).lastFrame()  > (*this)[mPrevFeaturePointsIdx[i]].lastFrame())
-                                    {
-                                        for (k = 0; k < at(mPrevFeaturePointsIdx[i]).size(); ++k)
-                                        {
-                                            // bei insertAtFrame wird qual beruecksichtigt, ob vorheriger besser
-                                            //debout << "Warning: this merging feature not been tested up to now!!!" <<endl;
-                                            (*this)[j].insertAtFrame(at(mPrevFeaturePointsIdx[i]).firstFrame()+k, at(mPrevFeaturePointsIdx[i]).at(k), j, (mMainWindow->getControlWidget()->trackExtrapolation->checkState() == Qt::Checked));
-                                        }
-                                        deleteIndex=mPrevFeaturePointsIdx[i];
-                                    }
-                                    else if (at(j).firstFrame() < (*this)[mPrevFeaturePointsIdx[i]].firstFrame())
-                                    {
-                                        for (k = at(j).size()-1; k > -1; --k)
-                                        {
-                                            // bei insertAtFrame wird qual beruecksichtigt, ob vorheriger besser
-                                            (*this)[mPrevFeaturePointsIdx[i]].insertAtFrame(at(j).firstFrame()+k, at(j).at(k), mPrevFeaturePointsIdx[i], (mMainWindow->getControlWidget()->trackExtrapolation->checkState() == Qt::Checked));
-                                        }
-                                        deleteIndex=j;
-                                    }
-                                    else
-                                    {
-                                        for (k = 0; k < at(j).size(); ++k)
-                                        {
-                                            // bei insertAtFrame wird qual beruecksichtigt, ob vorheriger besser
-                                            (*this)[mPrevFeaturePointsIdx[i]].insertAtFrame(at(j).firstFrame()+k, at(j).at(k), mPrevFeaturePointsIdx[i], (mMainWindow->getControlWidget()->trackExtrapolation->checkState() == Qt::Checked));
-                                        }
-                                        deleteIndex=j;
-                                    }
-                                    removeAt(deleteIndex);
-
-                                    // shift index of feature points
-                                    for (k = 0; k < count; ++k)
-                                        if (mPrevFeaturePointsIdx[k] > deleteIndex) //mPrevFeaturePointsIdx[i]
-                                            --mPrevFeaturePointsIdx[k];
-                                    found = true;
-                                }
-                            }
-                        }
+                        found = tryMergeTrajectories(v, i, frame);
                     }
 
                     // wenn keine verschmelzung erfolgte, versuchen trackpoint einzufuegen
                     if (!found)
                     {
-                        qual = (int) errorToQual(mTrackError[i]);
+                        qual = static_cast<int>(errorToQual(mTrackError[i]));
                         if (qual < 20)
                             qual = 20;
                         v.setQual(qual); // qual um 50, damit nur reco-kopf-ellipsen points nicht herauskegeln
@@ -1444,20 +1324,96 @@ int Tracker::insertFeaturePoints(int frame, int count, Mat &img, int borderSize,
     return inserted;
 }
 
-// frame ist frame fuer naechsten prev frame
-// returns the number of tracked points
+/**
+ * @brief Tries to find a suitable other trajectory and merge
+ *
+ * @param v TrackPoint to be inserted
+ * @param i Index in mFeaturePointsIdx and rest of point/person to be inserted
+ * @param frame frame in which the point v was tracked
+ * @return true if a suitable trajectory to merge with was found
+ */
+bool Tracker::tryMergeTrajectories(const TrackPoint& v, size_t i, int frame)
+{
+    int deleteIndex;
+    bool found = false;
+    int j;
+    // nach trajektorie suchen, mit der eine verschmelzung erfolgen koennte
+    for (j = 0; !found && j < size(); ++j) // ueber TrackPerson
+    {
+        if (j != mPrevFeaturePointsIdx[i] && at(j).trackPointExist(frame) && (at(j).trackPointAt(frame).distanceToPoint(v) < mMainWindow->getHeadSize(nullptr, j, frame)/2.))
+        {
+            // um ein fehltracking hin zu einer anderen Trajektorie nicht zum Verschmelzen dieser fuehren zu lassen
+            // (die fehlerbehandlung durch interpolation wird in insertAtFrame durchgefuehrt)
+            if (!((at(mPrevFeaturePointsIdx[i]).trackPointExist(frame-1) &&
+                   (at(mPrevFeaturePointsIdx[i]).trackPointAt(frame-1).distanceToPoint(v) > mMainWindow->getHeadSize(nullptr, mPrevFeaturePointsIdx[i], frame-1)/2.)) ||
+                  (at(mPrevFeaturePointsIdx[i]).trackPointExist(frame+1) &&
+                   (at(mPrevFeaturePointsIdx[i]).trackPointAt(frame+1).distanceToPoint(v) > mMainWindow->getHeadSize(nullptr, mPrevFeaturePointsIdx[i], frame+1)/2.))))
+            {
+                if (at(j).firstFrame() < (*this)[mPrevFeaturePointsIdx[i]].firstFrame() &&
+                    at(j).lastFrame()  > (*this)[mPrevFeaturePointsIdx[i]].lastFrame())
+                {
+                    for (int k = 0; k < at(mPrevFeaturePointsIdx[i]).size(); ++k)
+                    {
+                        // bei insertAtFrame wird qual beruecksichtigt, ob vorheriger besser
+                        (*this)[j].insertAtFrame(at(mPrevFeaturePointsIdx[i]).firstFrame()+k, at(mPrevFeaturePointsIdx[i]).at(k), j, (mMainWindow->getControlWidget()->trackExtrapolation->checkState() == Qt::Checked));
+                    }
+                    deleteIndex=mPrevFeaturePointsIdx[i];
+                }
+                else if (at(j).firstFrame() < (*this)[mPrevFeaturePointsIdx[i]].firstFrame())
+                {
+                    for (int k = at(j).size()-1; k > -1; --k)
+                    {
+                        // bei insertAtFrame wird qual beruecksichtigt, ob vorheriger besser
+                        (*this)[mPrevFeaturePointsIdx[i]].insertAtFrame(at(j).firstFrame()+k, at(j).at(k), mPrevFeaturePointsIdx[i], (mMainWindow->getControlWidget()->trackExtrapolation->checkState() == Qt::Checked));
+                    }
+                    deleteIndex=j;
+                }
+                else
+                {
+                    for (int k = 0; k < at(j).size(); ++k)
+                    {
+                        // bei insertAtFrame wird qual beruecksichtigt, ob vorheriger besser
+                        (*this)[mPrevFeaturePointsIdx[i]].insertAtFrame(at(j).firstFrame()+k, at(j).at(k), mPrevFeaturePointsIdx[i], (mMainWindow->getControlWidget()->trackExtrapolation->checkState() == Qt::Checked));
+                    }
+                    deleteIndex=j;
+                }
+                removeAt(deleteIndex);
+
+                // shift index of feature points
+                for (size_t k = 0; k < mPrevFeaturePointsIdx.size(); ++k)
+                    if (mPrevFeaturePointsIdx[k] > deleteIndex)
+                        --mPrevFeaturePointsIdx[k];
+                found = true;
+            }
+        }
+    }
+
+    return found;
+}
+
 // default: int winSize=10, int level=3
 // winSize=3 ist genauer, aber kann auch leichter abgelenkt werden; winSize=30 ist robuster aber ungenauer
 // level kann groesser gewaehlt werden, wenn winSize klein, macht aber keinen grossen unterschied; (0) waere ohne pyramide
 // war , int winSize=10
-int Tracker::track(Mat &img,Rect &rect, int frame, bool reTrack, int reQual, int borderSize, int level, QSet<int> onlyVisible, int errorScaleExponent) //IplImage *prevImg, int prevFrame,
+/**
+ * @brief Tracks points from the last frame in this (current) frame
+ *
+ * @param img Image of current frame
+ * @param rect ROI in which tracking is executed
+ * @param frame frame-number of the current frame
+ * @param reTrack boolean saying if people should be retracked, when tracking was of low quality
+ * @param reQual threshold for low quality in case of reTrack = true
+ * @param borderSize
+ * @param level level of Gauss-Pyramid that is used with Lucas-Kanade
+ * @param onlyVisible Set of trajectories which should be evaluated; @see Petrack::getOnlyVisible
+ * @param errorScaleExponent errorScale is 1.5^errorScaleExponent
+ * @return Number of tracked points
+ */
+int Tracker::track(Mat &img,Rect &rect, int frame, bool reTrack, int reQual, int borderSize, int level, QSet<int> onlyVisible, int errorScaleExponent)
 {
 //    debout << "frame="<<frame<<" reTrack="<<reTrack<<" reQual="<<reQual<<" borderSize="<<borderSize<<" level="<<level<<" errorScaleExponent="<<errorScaleExponent << endl;
-    int i, j, k, count, inserted = 0;
-    // int againNumber = 0;
-//    Mat swapTemp;
+    int inserted = 0;
     QList<int> trjToDel;
-    bool useColor = mMainWindow->getMultiColorMarkerWidget()->useColor->isChecked();
     float errorScale = pow(1.5,errorScaleExponent); // 0 waere neutral
 
     if (mGrey.empty())
@@ -1472,62 +1428,27 @@ int Tracker::track(Mat &img,Rect &rect, int frame, bool reTrack, int reQual, int
         return -1;
     }
 
-    if ((mPrevFrame != -1) && (abs(frame - mPrevFrame) > MAX_STEP_TRACK)) //prevImg != NULL
+    if ((mPrevFrame != -1) && (abs(frame - mPrevFrame) > MAX_STEP_TRACK))
         reset();
-
-        // wird in resize() gemacht, was von petrack explizit bei aenderung der border aufgerufen wird
-//         if (mPrevImg->width != img->width || mPrevImg->height != img->height)
-//             ; //anpassungen von prev bildmaterial (und punkten selber?)
-//         // -getImgBorderSize() nutzen
-
-    //mGrey = cvCreateImage(size, 8, 1);cvCreateData( header );
-
-//    cvNamedWindow("img", CV_WINDOW_AUTOSIZE ); // 0 wenn skalierbar sein soll
-//    cvShowImage("img", img);
-//    cvWaitKey( 0 ); // zahl statt null, wenn nach bestimmter zeit weitergegangen werden soll
 
     if (img.channels() == 3)
     {
-        // folgende Zeilen fkt ab 2.2 nicht mehr:
-//        // folgende Zeilen erledigen das gleiche wie cvCvtColor(img, mGrey, CV_BGR2GRAY);
-//        // noetig gewesen, da opencv Probleme machte
-//        int x,y;
-//        char *data = img->imageData;
-//        char *greyData = mGrey->imageData;
-//        char *yData = data;
-//        char *yGreyData = greyData;
-//        for (y = 0; y < img->height; y++)
-//        {
-//            for (x = 0; x < img->width; x++)
-//                *(greyData) = 0.299*data[0]+0.587*data[1]+0.114*data[2];       //*(greyData) = *(data);
-//            data = (yData += img->widthStep); // because sometimes widthStep != width
-//            greyData = (yGreyData += mGrey->widthStep); // because sometimes widthStep != width
-
-//        }
-        //if (mGrey) debout << "mGrey: " << mGrey << " " << (void *) mGrey->imageData<<endl;
-        //if (img) debout << "img: " << img << " " << (void *) img->imageData<<endl;
-//        cvCvtColor(img, mGrey, CV_BGR2GRAY);
         cvtColor(img,mGrey,COLOR_BGR2GRAY);
     }
-    else if (img.channels() == 1)
-        img.copyTo(mGrey);//cvCopy(img, mGrey); //mGrey = cvCloneImage(img); // es waere auch denkbar, dass gar nicht kopiert wird, sondern mit mGrey=img gearbeitet wird, nur bei obigen fkt muesste bei release etc aufgepasst werden
-    else
+    else if (img.channels() == 1){
+        img.copyTo(mGrey);
+    }else{
         debout << "Error: Wrong number of channels: " << img.channels() <<endl;
+        return -1;
+    }
 
-    count = calcPrevFeaturePoints(mPrevFrame, rect, frame, reTrack, reQual, borderSize, onlyVisible);
+    size_t numOfPeopleToTrack = calcPrevFeaturePoints(mPrevFrame, rect, frame, reTrack, reQual, borderSize, onlyVisible);
 
-//    debout << "test " << count << endl;
-    if (count > 0)
+    if (numOfPeopleToTrack > 0)
     {
-        int winSize;
-//        CvPoint2D32f prevColorFeaturePoint, colorFeaturePoint;
-        vector<Point2f> prevColorFeaturePoint, colorFeaturePoint;
-        vector<uchar> colorStatus;
-        vector<float> colorTrackError;
-        int l;
-//        bool failed = false;
+        preCalculateImagePyramids(level);
 
-        if (mPrevFrame != -1) //prevImg != NULL
+        if (mPrevFrame != -1)
         {
             if (abs(frame - mPrevFrame) > MAX_STEP_TRACK)
                 debout << "Warning: no tracking because of too many skipped frames (" << mPrevFrame << " to " << frame << ")!" << endl;
@@ -1535,315 +1456,24 @@ int Tracker::track(Mat &img,Rect &rect, int frame, bool reTrack, int reQual, int
                 debout << "Warning: linear interpolation of skipped frames which are not already tracked (" << mPrevFrame << " to " << frame << ")." << endl; // will be done in insertFeaturePoints
         }
 
-        // (count > 0 ? count : 1) - nicht mehr: das hochsetzen von count auf mind. 1 ist zwar falsch, aber sonst absturz der routine
-        //cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 20, 0.03)
-        //   generelle routine und abbruchkriterium fuer iterative algorithmen festzulegen
-        //   erlaeterung in cxcore: 20=maxIter, 0.03=epsilon
-//        debout <<frame<<endl;
-
-        for (i = 0; i < count; ++i)
-        {
-            //mTermCriteria ist cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 20, 0.03);
-            // das Durchlaufen der level bis 0 fuer den Fall, dass kein Tracking moeglich ist (mStatus ==0)
-            //     ist erst ab opencv 3 hinzugenommen worden, da es manchmal zum abbruch kam, obwohl ein tracking moeglich sein sollte
-            //     ein verdacht: wenn sich in folgebildern kein eindeutiger punkt ergibt, da in der kleinsten pyr stufe rundherum die exakt gleiche farbe/graustufe vorherscht
-            l = level;
-
-//            double winSizeD = 0;
-//            for(i=0;i<count;i++)
-//                winSizeD += (int)((mMainWindow->getHeadSize(NULL, mPrevFeaturePointsIdx[i], mPrevFrame) / pow(2.,l)) * (mMainWindow->getControlWidget()->trackRegionScale->value() / 10.));
-
-//            winSize = (int) winSizeD/count;
-
-//            if (winSize < MIN_WIN_SIZE)
-//            {
-//                winSize = MIN_WIN_SIZE;
-//                debout << "Warning: set search region to the minimum size of "<<MIN_WIN_SIZE<<" for person " << mPrevFeaturePointsIdx[i] << "!" << endl;
-//            }
-
-            do
-            {
-                winSize = mMainWindow->winSize(NULL, mPrevFeaturePointsIdx[i], mPrevFrame, l);
-                if (winSize < MIN_WIN_SIZE)
-                {
-                    winSize = MIN_WIN_SIZE;
-                    debout << "Warning: set search region to the minimum size of "<<MIN_WIN_SIZE<<" for person " << mPrevFeaturePointsIdx[i] << "!" << endl;
-                }
-
-                if (l < level)
-                    debout << "Warning: try tracking person " /*<< mPrevFeaturePointsIdx[i]*/ << " with pyramid level " << l<<"!" << endl;
-//                std::vector<cv::Point2f> points[2];// = new vector<Point2f>(2);
-//                points[0].push_back(mPrevFeaturePoints[i]);
-//                points[1].push_back(mFeaturePoints[i]);
-//                goodFeaturesToTrack(mGrey, points[1], MAX_COUNT, 0.01, 10, Mat(), 3, 0, 0.04);
-//                cornerSubPix(mGrey, points[1], Size(10,10), Size(-1,-1), mTermCriteria);
-                //Mat points = new Mat(mPrevFeaturePoints[i]);
-//                points.at(0).x = 0;
-//                points[0] = new Point2f(mPrevFeaturePoints[i]);
-//                points[1] = mFeaturePoints[i];
-                cv::calcOpticalFlowPyrLK(mPrevGrey,mGrey,/*points[0]*/mPrevFeaturePoints,/*points[1]*/mFeaturePoints,mStatus,mTrackError,Size(winSize,winSize),l,mTermCriteria,mFlags);
-
-//                cv::swap(mPrevFeaturePoints,mFeaturePoints);
-//                mPrevFeaturePoints[i] = points[0];
-//                mFeaturePoints[i] = points[1];
-
-//                cv::calcOpticalFlowPyrLK(mPrevGrey,mGrey,mPrevFeaturePoints,mFeaturePoints,mStatus,mTrackError,Size(winSize,winSize),l,mTermCriteria,mFlags);
-//                cvCalcOpticalFlowPyrLK(mPrevGrey, mGrey, mPrevPyramid, mPyramid,
-//                    &mPrevFeaturePoints[i], &mFeaturePoints[i], 1, cvSize(winSize, winSize), l, &mStatus[i], &mTrackError[i],
-//                    mTermCriteria, mFlags);
-                //debout << (int) mStatus[i] << " " << mPrevFeaturePoints[i].x << " "<< mPrevFeaturePoints[i].y << " " << mFeaturePoints[i].x << " "<< mFeaturePoints[i].y
-                //       << " "<< winSize<< " "<< l << " "<<mTrackError[i] << " "<< mFlags <<endl;
-                //mFlags |= CV_LKFLOW_PYR_A_READY; // mPrevPyramid ist bereits berechnet
-                //mFlags |= CV_LKFLOW_PYR_B_READY; // mPyramid ist bereits berechnet
-
-//                for(i=0;i<count;i++)
-//                {
-//                    if(mStatus[i] == 0)
-//                    {
-//                        failed = true;
-//                        break;
-//                    }
-//                }
-
-            }  while(mStatus[i] == 0 && (l--) > 0); //while (failed && (l--) > 0); //
-
-        // war: (alle Punkte auf einmal mit der gleichen winsize)
-        //cvCalcOpticalFlowPyrLK(mPrevGrey, mGrey, mPrevPyramid, mPyramid,
-        //    mPrevFeaturePoints, mFeaturePoints, count, cvSize(winSize, winSize), level, mStatus, mTrackError,
-        //    cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 20, 0.03), mFlags);
-
-        // fehler normalisieren, da ein einfuegen davon abhaengig gemacht wird und die quali darueber berechnet wird
-        //for (i = 0; i < count; ++i)
-
-            // tracken des Farbpunktes - bei farbigen Muetzen die Mitte des Fabbereichs
-//            cvCalcOpticalFlowPyrLK(mPrevGrey, mGrey, mPrevPyramid, mPyramid,
-//                &mPrevColorFeaturePoints[i], &mColorFeaturePoints[i], 1, cvSize(winSize, winSize), level, &mColorStatus[i], &mColorTrackError[i],
-//                mTermCriteria, mFlags);
-
-//            bool colorTrack = false;
-//            for(i=0; i<count; i++) {
-//                mTrackError[i] = mTrackError[i]*10./winSize;
-
-//                if( useColor && mTrackError[i] > errorScale*150 && at(mPrevFeaturePointsIdx[i]).at(mPrevFrame-at(mPrevFeaturePointsIdx[i]).firstFrame()).color().isValid())
-//                {
-//                    colorTrack = true;
-//                    break;
-//                }
-//            }
-//                mTrackError *= 10./winSize;
-            mTrackError[i] = mTrackError[i]*10./winSize;
-//            mColorTrackError[i] = mColorTrackError[i]*10./winSize;
-            // wenn fehler zu gross, dann Farbmarkerelement nehmen // fuer multicolor marker / farbiger hut mit schwarzem punkt
-            if ( useColor && mTrackError[i]>errorScale*150. && at(mPrevFeaturePointsIdx[i]).at(mPrevFrame-at(mPrevFeaturePointsIdx[i]).firstFrame()).color().isValid()) //mColorTrackError[i]<50 && mColorStatus[i] == 1)
-            {
-//                for(i=0;i<count;i++)
-                    prevColorFeaturePoint.push_back(Point2f(at(mPrevFeaturePointsIdx[i]).at(mPrevFrame-at(mPrevFeaturePointsIdx[i]).firstFrame()).colPoint().x(),
-                                                    at(mPrevFeaturePointsIdx[i]).at(mPrevFrame-at(mPrevFeaturePointsIdx[i]).firstFrame()).colPoint().y()));
-
-                            //colorFeaturePoint = at(mPrevFeaturePointsIdx[i]).at(frame-at(mPrevFeaturePointsIdx[i]).firstFrame()).colPoint().toCvPoint2D32f();
-                cv::calcOpticalFlowPyrLK(mPrevGrey,mGrey,prevColorFeaturePoint,colorFeaturePoint,colorStatus,colorTrackError,Size(winSize,winSize),level,mTermCriteria,mFlags);
-//                cvCalcOpticalFlowPyrLK(mPrevGrey, mGrey, mPrevPyramid, mPyramid,
-//                                       &prevColorFeaturePoint, &colorFeaturePoint, 1, cvSize(winSize, winSize), level, &colorStatus, &colorTrackError,
-//                                       mTermCriteria, mFlags);
-//                for(i=0;i<count;i++)
-//                {
-                    colorTrackError[i] = colorTrackError[i]*10./winSize;
-
-                if ((colorStatus[i] == 1) && (colorTrackError[i] < errorScale*50.))
-                {
-                    debout << "Warning: tracking color marker instead of structural marker of person "<< mPrevFeaturePointsIdx[i]+1 <<" at " << mFeaturePoints[i].x << " x " << mFeaturePoints[i].y
-                           << " / error: " << mTrackError[i] << " / color error: " << colorTrackError[i] <<endl;
-//                    mFeaturePoints[i].x = mPrevFeaturePoints[i].x + (colorFeaturePoint.x - prevColorFeaturePoint.x);
-//                    mFeaturePoints[i].y = mPrevFeaturePoints[i].y + (colorFeaturePoint.y - prevColorFeaturePoint.y);
-
-                    mFeaturePoints[i] = Point2f(mPrevFeaturePoints[i].x+(colorFeaturePoint[i].x-prevColorFeaturePoint[i].x),
-                                                mPrevFeaturePoints[i].x+(colorFeaturePoint[i].x-prevColorFeaturePoint[i].x));
-                    debout << "         resulting point: " << mFeaturePoints[i].x << " x " << mFeaturePoints[i].y << endl;
-                    mTrackError[i] = colorTrackError[i];
-//                    debout << "Warning: tracking color marker instead of structural marker at " << mFeaturePoints[i].x << " x " << mFeaturePoints[i].y
-//                           << " / error: " << mTrackError[i] << " / color error: " << mColorTrackError[i] <<endl;
-//                    mFeaturePoints[i].x = mPrevFeaturePoints[i].x + (mColorFeaturePoints[i].x - mPrevColorFeaturePoints[i].x);
-//                    mFeaturePoints[i].y = mPrevFeaturePoints[i].y + (mColorFeaturePoints[i].y - mPrevColorFeaturePoints[i].y);
-//                    debout << "         resulting point: " << mFeaturePoints[i].x << " x " << mFeaturePoints[i].y << endl;
-                }
-//                }
-//debout << "person "<< mPrevFeaturePointsIdx[i]+1 <<" at " << mFeaturePoints[i].x << " x " << mFeaturePoints[i].y << " / error: " << mTrackError[i] << " / color error: " << colorTrackError <<endl;
-            }
-//debout << "person "<< mPrevFeaturePointsIdx[i]+1 <<" at " << mFeaturePoints[i].x << " x " << mFeaturePoints[i].y << " / error: " << mTrackError[i] <<endl;
-
-
-//            debout << mPrevFeaturePointsIdx[i]+1 << ": " << mPrevFeaturePoints[i].x << " x " << mPrevFeaturePoints[i].y << " -> " << mFeaturePoints[i].x << " x " << mFeaturePoints[i].y << " / error: " << mTrackError[i] << endl;
-//            debout << mPrevColorFeaturePoints[i].x << " x " << mPrevColorFeaturePoints[i].y << " -> " << mColorFeaturePoints[i].x << " x " << mColorFeaturePoints[i].y << " / color error: " << mColorTrackError[i] << endl;
-        }//for
+        trackFeaturePointsLK(level);
+        refineViaColorPointLK(level, errorScale);
 
         BackgroundFilter *bgFilter = mMainWindow->getBackgroundFilter();
         // testen, ob Punkt im Vordergrund liegt, ansonsten, wenn nicht gerade zuvor detektiert, ganze trajektorie loeschen (maximnale laenge ausserhalb ist somit 2 frames)
         if (bgFilter && bgFilter->getEnabled() && (mPrevFrame != -1)) // nur fuer den fall von bgSubtraction durchfuehren
         {
-            int x, y;
-            static int margin=10; // rand am bild, ab dem trajectorie in den hintergrund laufen darf
-            int bS = mMainWindow->getImageBorderSize();
-            QRectF rect = mMainWindow->getRecoRoiItem()->rect();
-            //debout << rect.x() << " " <<rect.y() << " " <<rect.width() << " " <<rect.height() << " " <<endl;
-            for (i = 0; i < count; ++i)
-            {
-                x = myRound(mFeaturePoints[i].x-.5);
-                y = myRound(mFeaturePoints[i].y-.5);
-
-//                // Rahmen, in dem nicht vordergrunf pflicht, insbesondere am rechten rand!!!!
-//                if ((mStatus[i] == 1) &&
-//                        x >= 10 && x < mGrey->width-60 &&
-//                        y >= 10 && y < mGrey->height-10)
-                // Rahmen, in dem nicht vordergrund pflicht, insbesondere am rechten rand!!!! es wird gruenes von hand angelegtes bounding rect roi genutzt
-                if ((mStatus[i] == 1) &&
-                        x >= MAX(margin, rect.x()) && x <= MIN(mGrey.cols-1-2*bS-margin-50, rect.x()+rect.width()) &&
-                        y >= MAX(margin, rect.y()) && y <= MIN(mGrey.rows-1-2*bS-margin, rect.y()+rect.height()))
-                {
-                    if (!bgFilter->isForeground(x, y) && at(mPrevFeaturePointsIdx[i]).trackPointAt(mPrevFrame).qual() < 100)
-                    {
-                        if ((mMainWindow->getControlWidget()->filterBgDeleteTrj->checkState() == Qt::Checked) &&
-                            (at(mPrevFeaturePointsIdx[i]).nrInBg() >= mMainWindow->getControlWidget()->filterBgDeleteNumber->value()))
-                        {
-                            // nur zum loeschen vormerken und am ende der fkt loeschen, da sonst Seiteneffekte komplex
-                            trjToDel+= mPrevFeaturePointsIdx[i];
-                            debout << "Warning: Delete trajectory " << mPrevFeaturePointsIdx[i]+1 << " inside region of interest, because it laid outside foreground for " <<
-                                      mMainWindow->getControlWidget()->filterBgDeleteNumber->value() << " successive frames!" << endl;
-                        }
-                        else
-                        {
-                            (*this)[mPrevFeaturePointsIdx[i]].setNrInBg(at(mPrevFeaturePointsIdx[i]).nrInBg()+1);
-                        }
-                    }
-                    else // zaehler zuruecksetzen, der anzahl von getrackten Punkten im hintergrund zaehlt
-                    {
-                        (*this)[mPrevFeaturePointsIdx[i]].setNrInBg(0);
-                    }
-                }
-            }
+            useBackgroundFilter(trjToDel, bgFilter);
         }
-
-//        for (i = 0; i < count; ++i)
-//        {
-
-//            if (mStatus[i] != 1)
-//                debout << "Status != 1 for " << mPrevFeaturePointsIdx[i]+1<<endl;
-//        }
 
         // (bei schlechten, aber noch ertraeglichem fehler in der naehe dunkelsten punkt suchen)
         // dieser ansatz kann dazu fuehren, dass bei starken helligkeitsunterschieden auf pappe zum schatten gewandert wird!!!
         int recoMethod = mMainWindow->getControlWidget()->getRecoMethod(); // 0 == Kaserne, 1 == Hermes, 2 == Ohne, 3 == Color, 4 == Japan
         if (!mMainWindow->getStereoWidget()->stereoUseForReco->isChecked() && ((recoMethod == 0)|| (recoMethod == 1))) // nicht benutzen, wenn ueber disparity der kopf gesucht wird und somit kein marker vorhanden oder zumindest nicht am punkt lewigen muss
         {
-            int x, y;
-            for (i = 0; i < count; ++i)
-            {
-                x = myRound(mFeaturePoints[i].x-.5);
-                y = myRound(mFeaturePoints[i].y-.5);
-                // der reine fehler ist leider kein alleinig gutes mass,
-                // da in kontrastarmen regionen der angegebene fehler gering, aber das resultat haeufiger fehlerhaft ist
-                // es waere daher schoen, wenn der fehler in abhaengigkeit von kontrast in umgebung skaliert wuerde
-                // zb (max 0..255): normal 10..150 -> *1; klein 15..50 -> *3; gross 0..255 -> *.5
-                if ((mTrackError[i] > MAX_TRACK_ERROR) && (mStatus[i] == 1) && //&& (mTrackError[i] <= 2*MAX_TRACK_ERROR)
-                        x >= 0 && x < mGrey.cols && y >= 0 && y < mGrey.rows)
-                {
-                    int regionSize = myRound(mMainWindow->getHeadSize(NULL, mPrevFeaturePointsIdx[i], mPrevFrame)/10.); // war:  2; // groesse der region die um gefundenen punkt untersucht wird: -regionSize..regionSize
-                    int xMin, xMax, yMin, yMax, xMin2, xMax2, yMin2, yMax2, darkest;
-                    bool markerInsideWhite = true;
-                    int xDark = x, yDark = y;
-
-                    //debout << mFeaturePoints[i].x << "x" << mFeaturePoints[i].y << " error: " << mTrackError[i] << endl;
-                    //Vec2F v = Vec2F(mFeaturePoints+i);//mFeaturePoints[i], da zeiger statt wert erwartet wird
-                    // trotz grau (img)->nChannels=3
-                    xMin = ((0 > (x-regionSize)) ? 0 : (x-regionSize));
-                    yMin = ((0 > (y-regionSize)) ? 0 : (y-regionSize));
-                    xMax = ((mGrey.cols  < (x+regionSize+1)) ? mGrey.cols  : (x+regionSize+1));
-                    yMax = ((mGrey.rows < (y+regionSize+1)) ? mGrey.rows : (y+regionSize+1));
-
-                    darkest = 255;
-                    //              brightest = 0;
-                    for (k = yMin; k < yMax; ++k)
-                    {
-                        for (j = xMin; j < xMax; ++j)
-                        {
-                            if (getValue(mGrey, j, k).value() < darkest)
-                            {
-                                darkest = getValue(mGrey, j, k).value();
-                                xDark = j;
-                                yDark = k;
-                            }
-                            //                         elseif (getGrey(mGrey, j, k) > brightest)
-                            //                         {
-                            //                             brightest = getGrey(mGrey, j, k);
-                            //                         }
-                        }
-                    }
-                    //regionSize += 1; // um dunklen Marker bereich wo hell sein muss // doch nicht erhoeht, da ja schon auf dunklen punkt verschoben
-                    xMin2 = ((0 > (xDark-regionSize)) ? 0 : (xDark-regionSize));
-                    yMin2 = ((0 > (yDark-regionSize)) ? 0 : (yDark-regionSize));
-                    xMax2 = ((mGrey.cols  < (xDark+regionSize+1)) ? mGrey.cols  : (xDark+regionSize+1));
-                    yMax2 = ((mGrey.rows < (yDark+regionSize+1)) ? mGrey.rows : (yDark+regionSize+1));
-
-                    // suchbereich:
-                    //  ###
-                    // #   #
-                    // #   #
-                    // #   #
-                    //  ###
-                    for (k = yMin2+1; k < yMax2-1; ++k)
-                    {
-
-                        //debout << xMin2 << " " << k << " " << getGrey(mGrey, xMin2, k) << endl;
-                        //debout << xMax2-1 << " " << k << " " << getGrey(mGrey, xMax2-1, k) << endl;
-                        if ((getValue(mGrey, xMin2, k).value() <= darkest) || (getValue(mGrey, xMax2-1, k).value() <= darkest))
-                        {
-                            markerInsideWhite = false;
-                            break;
-                        }
-                    }
-                    if (markerInsideWhite)
-                        for (j = xMin2+1; j < xMax2-1; ++j)
-                        {
-                            //debout << j << " " << yMin2 << " " << getGrey(mGrey, j, yMin2) << endl;
-                            //debout << j << " " << yMax2-1 << " " << getGrey(mGrey, j, yMax2-1) << endl;
-                            if ((getValue(mGrey, j, yMin2).value() <= darkest) || (getValue(mGrey, j, yMax2-1).value() <= darkest))
-                            {
-                                markerInsideWhite = false;
-                                break;
-                            }
-                        }
-
-                    if (markerInsideWhite)
-                    {
-                        mFeaturePoints[i].x = xDark;
-                        mFeaturePoints[i].y = yDark;
-                        //    debout << "Move trackpoint to darker pixel!" << endl;
-                    }
-                    //else
-                    //    debout << "Not moving trackpoint to darker pixel!" << endl;
-
-                    //                  // bei geringem kontrast abbrechen
-                    //                  if ((brightest-darkest) < 10)
-                    //                  {
-                    //                      mStatus[i] = 0;
-                    //                  }
-                    //                  else
-                    {
-                        // interpolation wg nachbargrauwerten:
-                        x = myRound(mFeaturePoints[i].x);
-                        y = myRound(mFeaturePoints[i].y);
-                        if ((x>0) && (x<(mGrey.cols-1)) && (y>0) && (y<(mGrey.rows-1)) && (darkest<255))
-                        {
-                            mFeaturePoints[i].x += .5*((double)(getValue(mGrey, x+1, y).value()-getValue(mGrey, x-1, y).value()))/((double)(255-darkest));
-                            mFeaturePoints[i].y += .5*((double)(getValue(mGrey, x, y+1).value()-getValue(mGrey, x, y-1).value()))/((double)(255-darkest));
-                        }
-
-                        mFeaturePoints[i].x += .5; mFeaturePoints[i].y += .5; // da 1. pixel von 0..1, das 2. pixel von 1..2 etc geht
-                    }
-
-                    //debout << "  -> " << mFeaturePoints[i].x << "x" << mFeaturePoints[i].y << endl;
-                }
-            }
+            refineViaNearDarkPoint();
         }
+        // NOTE Following comment can probably be deleted, quite old code -> commented out for long time
         /*
         // bei noch schlechteren punkten zweite strategie
         for (i = 0; i < count; ++i)
@@ -1891,55 +1521,270 @@ int Tracker::track(Mat &img,Rect &rect, int frame, bool reTrack, int reQual, int
             cvFree(&againStatus);
         }
         */
-        mFlags |= CV_LKFLOW_PYR_A_READY; // mPrevPyramid ist bereits berechnet
 
-// cvNamedWindow("img", CV_WINDOW_AUTOSIZE ); // 0 wenn skalierbar sein soll
-// cvShowImage("img", mPrevGrey);
-// cvNamedWindow("pyr", CV_WINDOW_AUTOSIZE ); // 0 wenn skalierbar sein soll
-// cvShowImage("pyr", mPrevPyramid);
-// //  sprintf(outstr,"c:/%d.png",threshold);
-// // cvSaveImage(outstr, tmpAusgabe);
-// cvWaitKey( 0 ); // zahl statt null, wenn nach bestimmter zeit weitergegangen werden soll
-
-        inserted = insertFeaturePoints(frame, count, img, borderSize, errorScale); // mPrevPyramid muss neu berechnet werden
+        inserted = insertFeaturePoints(frame, numOfPeopleToTrack, img, borderSize, errorScale);
     }
-    else
-        mFlags = 0; //waere richtiger, aber count kann bei retrack-einstellungen 0 sein und dann wird keine pyramide bestimmt!!!
 
-//     for (i = 0; i < count; ++i)
-//     {
-//         Vec2F v = Vec2F(mPrevFeaturePoints+i);
-//         Vec2F w = Vec2F(mFeaturePoints+i);
-//         debout << i << ": " << (int) mStatus[i] << " " << v.x() << " " <<v.y() << " " <<w.x() << " " << w.y() << " error: " << mTrackError[i] << endl;
-//     }
-
-    cv::swap(mPrevGrey,mGrey);
-//    cv::swap(mPrevPyramid,mPyramid);
-
-//    CV_SWAP(mPrevGrey, mGrey, swapTemp);
-//    CV_SWAP(mPrevPyramid, mPyramid, swapTemp);
-//     cvCopy(img, mPrevImg); //    CV_SWAP(mPrevImg, img, swapTemp);
+    cv::swap(mPrevGrey, mGrey);
 
     mPrevFrame = frame;
 
     // delete vorher ausgewaehlte trj
     // ACHTUNG: einzige stelle in tracker, wo eine trj geloescht wird
     // trackNumberAll, trackShowOnlyNr werden nicht angepasst, dies wird aber am ende von petrack::updateimage gemacht
-    for (i = 0; i < trjToDel.size(); ++i) // ueber TrackPerson
+    for (int i = 0; i < trjToDel.size(); ++i) // ueber TrackPerson
     {
         removeAt(trjToDel[i]);
-        //mControlWidget->trackNumberAll->setText(QString("%1").arg(mTracker->size()));
-        //mControlWidget->trackShowOnlyNr->setMaximum(MAX(mTracker->size(),1));
     }
 
-//     // abziehen von punkten, die nicht getrackt werden konnten
-//     for (int i = 0; i < count; ++i)
-//         if (!(mStatus[i] && (mTrackError[i] < MAX_TRACK_ERROR)))
-//             --count;
-
-    // count kann trotz nicht retrack > 0 sein auch bei alten pfaden
+    // numOfPeopleToTrack kann trotz nicht retrack > 0 sein auch bei alten pfaden
     // da am bildrand pfade keinen nachfolger haben und somit dort immer neu bestimmt werden!
-    return count;
+    return static_cast<int>(numOfPeopleToTrack);
+}
+
+/**
+ * @brief Calculates the image pyramids for Lucas-Kanade
+ *
+ * This functions calculates image pyramids together with the gradients for the
+ * consumption by Lucas-Kanade. They are precomputed with the biggest winsize
+ * so they have enough padding calcOpticalFlowPyrLK can use them for all used
+ * winsizes
+ *
+ * @param level Maximum used level for Lucas-Kanade
+ * @param numOfPeopleToTrack Number of people who are going to be tracked
+ */
+void Tracker::preCalculateImagePyramids(int level)
+{
+    int maxWinSize = 3;
+    for(size_t i = 0; i < mPrevFeaturePointsIdx.size(); ++i){
+        int winSize = mMainWindow->winSize(nullptr, mPrevFeaturePointsIdx[i], mPrevFrame, 0);
+        if(winSize > maxWinSize){
+            maxWinSize = winSize;
+        }
+    }
+
+    cv::buildOpticalFlowPyramid(mPrevGrey, mPrevPyr, cv::Size(maxWinSize, maxWinSize), level);
+    cv::buildOpticalFlowPyramid(mGrey, mCurrentPyr, cv::Size(maxWinSize,maxWinSize), level);
+}
+
+/**
+ * @brief Tracks the mPrevFeaturePoints with Lucas-Kanade
+ *
+ * This function tracks all points in mPrevFeaturePoints via Lucas-Kanade. Each person is
+ * tracked with a different winSize according to the size of the head.
+ *
+ * @param level Maximum level to track with
+ * @param numOfPeopleToTrack Number of people to be tracked
+ * @see Tracker::calcPrevFeaturePoints
+ */
+void Tracker::trackFeaturePointsLK(int level)
+{
+    int winSize;
+    for (size_t i = 0; i < mPrevFeaturePointsIdx.size(); ++i)
+    {
+        // das Durchlaufen der level bis 0 fuer den Fall, dass kein Tracking moeglich ist (mStatus ==0)
+        //     ist erst ab opencv 3 hinzugenommen worden, da es manchmal zum abbruch kam, obwohl ein tracking moeglich sein sollte
+        //     ein verdacht: wenn sich in folgebildern kein eindeutiger punkt ergibt, da in der kleinsten pyr stufe rundherum die exakt gleiche farbe/graustufe vorherscht
+        int l = level;
+
+        do
+        {
+            winSize = mMainWindow->winSize(nullptr, mPrevFeaturePointsIdx[i], mPrevFrame, l);
+            if (winSize < MIN_WIN_SIZE)
+            {
+                winSize = MIN_WIN_SIZE;
+                debout << "Warning: set search region to the minimum size of "<<MIN_WIN_SIZE<<" for person " << mPrevFeaturePointsIdx[i] << "!" << endl;
+            }
+
+            if (l < level)
+                debout << "Warning: try tracking person " /*<< mPrevFeaturePointsIdx[i]*/ << " with pyramid level " << l<<"!" << endl;
+
+            cv::calcOpticalFlowPyrLK(mPrevPyr,mCurrentPyr,/*points[0]*/mPrevFeaturePoints,/*points[1]*/mFeaturePoints,mStatus,mTrackError,Size(winSize,winSize),l,mTermCriteria);
+
+        }  while(mStatus[i] == 0 && (l--) > 0);
+
+        mTrackError[i] = mTrackError[i]*10.F/winSize;
+    }
+}
+
+/**
+ * @brief Tries to track colorPoint when featurePoint has high error
+ * @param level Pyramidlevel to track with
+ * @param numOfPeopleToTrack
+ * @param errorScale Factor for highest tolerable tracking error
+ */
+void Tracker::refineViaColorPointLK(int level, float errorScale)
+{
+    int winSize;
+    bool useColor = mMainWindow->getMultiColorMarkerWidget()->useColor->isChecked();
+    vector<Point2f> prevColorFeaturePoint, colorFeaturePoint;
+    vector<uchar> colorStatus;
+    vector<float> colorTrackError;
+
+    for (size_t i = 0; i < mPrevFeaturePointsIdx.size(); ++i)
+    {
+        // wenn fehler zu gross, dann Farbmarkerelement nehmen // fuer multicolor marker / farbiger hut mit schwarzem punkt
+        if ( useColor && mTrackError[i]>errorScale*150.F && at(mPrevFeaturePointsIdx[i]).at(mPrevFrame-at(mPrevFeaturePointsIdx[i]).firstFrame()).color().isValid())
+        {
+            float prevPointX = static_cast<float>(at(mPrevFeaturePointsIdx[i]).at(mPrevFrame-at(mPrevFeaturePointsIdx[i]).firstFrame()).colPoint().x());
+            float prevPointY = static_cast<float>(at(mPrevFeaturePointsIdx[i]).at(mPrevFrame-at(mPrevFeaturePointsIdx[i]).firstFrame()).colPoint().y());
+            prevColorFeaturePoint.push_back(Point2f(prevPointX, prevPointY));
+            winSize = mMainWindow->winSize(nullptr, mPrevFeaturePointsIdx[i], mPrevFrame, level);
+
+            cv::calcOpticalFlowPyrLK(mPrevPyr,mCurrentPyr,prevColorFeaturePoint,colorFeaturePoint,colorStatus,colorTrackError,Size(winSize,winSize),level,mTermCriteria);
+
+            colorTrackError[i] = colorTrackError[i]*10.F/winSize;
+
+            if ((colorStatus[i] == 1) && (colorTrackError[i] < errorScale*50.F))
+            {
+                debout << "Warning: tracking color marker instead of structural marker of person "<< mPrevFeaturePointsIdx[i]+1 <<" at " << mFeaturePoints[i].x << " x " << mFeaturePoints[i].y
+                        << " / error: " << mTrackError[i] << " / color error: " << colorTrackError[i] <<endl;
+
+
+                mFeaturePoints[i] = Point2f(mPrevFeaturePoints[i].x+(colorFeaturePoint[i].x-prevColorFeaturePoint[i].x),
+                                            mPrevFeaturePoints[i].x+(colorFeaturePoint[i].x-prevColorFeaturePoint[i].x));
+                debout << "         resulting point: " << mFeaturePoints[i].x << " x " << mFeaturePoints[i].y << endl;
+                mTrackError[i] = colorTrackError[i];
+            }
+        }
+    }
+}
+
+void Tracker::useBackgroundFilter(QList<int>& trjToDel, BackgroundFilter *bgFilter){
+    int x, y;
+    static int margin=10; // rand am bild, ab dem trajectorie in den hintergrund laufen darf
+    int bS = mMainWindow->getImageBorderSize();
+    QRectF rect = mMainWindow->getRecoRoiItem()->rect();
+    for (size_t i = 0; i < mPrevFeaturePointsIdx.size(); ++i)
+    {
+        x = myRound(mFeaturePoints[i].x-.5);
+        y = myRound(mFeaturePoints[i].y-.5);
+
+        // Rahmen, in dem nicht vordergrund pflicht, insbesondere am rechten rand!!!! es wird gruenes von hand angelegtes bounding rect roi genutzt
+        if ((mStatus[i] == 1) &&
+                x >= MAX(margin, rect.x()) && x <= MIN(mGrey.cols-1-2*bS-margin-50, rect.x()+rect.width()) &&
+                y >= MAX(margin, rect.y()) && y <= MIN(mGrey.rows-1-2*bS-margin, rect.y()+rect.height()))
+        {
+            if (!bgFilter->isForeground(x, y) && at(mPrevFeaturePointsIdx[i]).trackPointAt(mPrevFrame).qual() < 100)
+            {
+                if ((mMainWindow->getControlWidget()->filterBgDeleteTrj->checkState() == Qt::Checked) &&
+                    (at(mPrevFeaturePointsIdx[i]).nrInBg() >= mMainWindow->getControlWidget()->filterBgDeleteNumber->value()))
+                {
+                    // nur zum loeschen vormerken und am ende der fkt loeschen, da sonst Seiteneffekte komplex
+                    trjToDel+= mPrevFeaturePointsIdx[i];
+                    debout << "Warning: Delete trajectory " << mPrevFeaturePointsIdx[i]+1 << " inside region of interest, because it laid outside foreground for " <<
+                              mMainWindow->getControlWidget()->filterBgDeleteNumber->value() << " successive frames!" << endl;
+                }
+                else
+                {
+                    (*this)[mPrevFeaturePointsIdx[i]].setNrInBg(at(mPrevFeaturePointsIdx[i]).nrInBg()+1);
+                }
+            }
+            else // zaehler zuruecksetzen, der anzahl von getrackten Punkten im hintergrund zaehlt
+            {
+                (*this)[mPrevFeaturePointsIdx[i]].setNrInBg(0);
+            }
+        }
+    }
+}
+
+/**
+ * @brief Tracks a near dark point if error is (still) high
+ *
+ * This method is only used with the Casern and Hermes Markers, which both have
+ * an black middle. The target of this method is to find this dark point in the
+ * middle of the marker and track that instead of the feature point.
+ *
+ * @param numOfPeopleTracked Number of people who have been tracked
+ */
+void Tracker::refineViaNearDarkPoint()
+{
+    int x, y;
+    for (int i = 0; i < mPrevFeaturePointsIdx.size(); ++i)
+    {
+        x = myRound(mFeaturePoints[i].x-.5);
+        y = myRound(mFeaturePoints[i].y-.5);
+        // der reine fehler ist leider kein alleinig gutes mass,
+        // da in kontrastarmen regionen der angegebene fehler gering, aber das resultat haeufiger fehlerhaft ist
+        // es waere daher schoen, wenn der fehler in abhaengigkeit von kontrast in umgebung skaliert wuerde
+        // zb (max 0..255): normal 10..150 -> *1; klein 15..50 -> *3; gross 0..255 -> *.5
+        if ((mTrackError[i] > MAX_TRACK_ERROR) && (mStatus[i] == 1) &&
+                x >= 0 && x < mGrey.cols && y >= 0 && y < mGrey.rows)
+        {
+            int regionSize = myRound(mMainWindow->getHeadSize(nullptr, mPrevFeaturePointsIdx[i], mPrevFrame)/10.); ///< size of searched region around point: -regionSize to regionSize
+            int xMin, xMax, yMin, yMax, xMin2, xMax2, yMin2, yMax2, darkest;
+            bool markerInsideWhite = true;
+            int xDark = x, yDark = y;
+
+            // trotz grau (img)->nChannels=3
+            xMin = ((0 > (x-regionSize)) ? 0 : (x-regionSize));
+            yMin = ((0 > (y-regionSize)) ? 0 : (y-regionSize));
+            xMax = ((mGrey.cols  < (x+regionSize+1)) ? mGrey.cols  : (x+regionSize+1));
+            yMax = ((mGrey.rows < (y+regionSize+1)) ? mGrey.rows : (y+regionSize+1));
+
+            darkest = 255;
+            for (int k = yMin; k < yMax; ++k)
+            {
+                for (int j = xMin; j < xMax; ++j)
+                {
+                    if (getValue(mGrey, j, k).value() < darkest)
+                    {
+                        darkest = getValue(mGrey, j, k).value();
+                        xDark = j;
+                        yDark = k;
+                    }
+                }
+            }
+
+            xMin2 = ((0 > (xDark-regionSize)) ? 0 : (xDark-regionSize));
+            yMin2 = ((0 > (yDark-regionSize)) ? 0 : (yDark-regionSize));
+            xMax2 = ((mGrey.cols  < (xDark+regionSize+1)) ? mGrey.cols  : (xDark+regionSize+1));
+            yMax2 = ((mGrey.rows < (yDark+regionSize+1)) ? mGrey.rows : (yDark+regionSize+1));
+
+            // suchbereich:
+            //  ###
+            // #   #
+            // #   #
+            // #   #
+            //  ###
+            for (int k = yMin2+1; k < yMax2-1; ++k)
+            {
+                if ((getValue(mGrey, xMin2, k).value() <= darkest) || (getValue(mGrey, xMax2-1, k).value() <= darkest))
+                {
+                    markerInsideWhite = false;
+                    break;
+                }
+            }
+            if (markerInsideWhite)
+                for (int j = xMin2+1; j < xMax2-1; ++j)
+                {
+                    if ((getValue(mGrey, j, yMin2).value() <= darkest) || (getValue(mGrey, j, yMax2-1).value() <= darkest))
+                    {
+                        markerInsideWhite = false;
+                        break;
+                    }
+                }
+
+            if (markerInsideWhite)
+            {
+                mFeaturePoints[i].x = xDark;
+                mFeaturePoints[i].y = yDark;
+                debout << "Move trackpoint to darker pixel for" << i+1 << "!" << endl;
+            }
+
+            // interpolation wg nachbargrauwerten:
+            x = myRound(mFeaturePoints[i].x);
+            y = myRound(mFeaturePoints[i].y);
+            if ((x>0) && (x<(mGrey.cols-1)) && (y>0) && (y<(mGrey.rows-1)) && (darkest<255))
+            {
+                mFeaturePoints[i].x += .5*((double)(getValue(mGrey, x+1, y).value()-getValue(mGrey, x-1, y).value()))/((double)(255-darkest));
+                mFeaturePoints[i].y += .5*((double)(getValue(mGrey, x, y+1).value()-getValue(mGrey, x, y-1).value()))/((double)(255-darkest));
+            }
+
+            mFeaturePoints[i].x += .5F;
+            mFeaturePoints[i].y += .5F; // da 1. pixel von 0..1, das 2. pixel von 1..2 etc geht
+        }
+    }
 }
 
 void Tracker::recalcHeight(float altitude)
@@ -2048,7 +1893,7 @@ void Tracker::checkPlausibility(QList<int> &pers, QList<int> &frame,
     // testen, ob grosse Geschwindigkeitsaenderungen
     // statt distanz koennte man auch noch vektoren vergleichen, was genauere analyse waer!!!!
     if (testVelocity)
-    {        
+    {
         qApp->processEvents();
         progress.setValue(200);
         progress.setLabelText("Check velocity...");

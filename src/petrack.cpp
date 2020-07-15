@@ -3576,9 +3576,9 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 //            debout << "test" << endl;
 
             int anz = mTracker->track(mImgFiltered, rect, frameNum,
-                                      mControlWidget->trackRepeat->isChecked(), //war: mControlWidget->trackRepeat->checkState() == Qt::Checked),
+                                      mControlWidget->trackRepeat->isChecked(),
                                       mControlWidget->trackRepeatQual->value(), getImageBorderSize(),
-                                      mControlWidget->trackRegionLevels->value(), getOnlyVisible()); //mPrevIplImgFiltered, mPrevFrame,
+                                      mControlWidget->trackRegionLevels->value(), getOnlyVisible());
 #ifdef TIME_MEASUREMENT
             debout << "nach track: " << getElapsedTime() <<endl;
 #endif
@@ -3925,7 +3925,16 @@ double Petrack::getHeadSize(QPointF *pos, int pers, int frame)
 
 }
 
-// return empty QSet<int>: alle Trajektorien sollen beachtet werden, ansonsten nur return QSet<int> mit Trajektorien
+/**
+ * @brief Petrack::getOnlyVisible Returns trajectories which should be evaluated
+ *
+ * If "only for visible people" is checked, then only people visible via
+ * "show only people" (single person) or "show only people list"(multiple persons)
+ * are going to be evaluated. If "only for visible people" is not checked,
+ * everyone gets evaluated, not only the ones selected for visibility.
+ *
+ * @return all trajectories which should be evaluated; empty when all should be evaluated
+ */
 QSet<int> Petrack::getOnlyVisible()
 {
     if  ((mControlWidget->trackOnlyVisible->checkState() == Qt::Checked) && (mControlWidget->trackShowOnly->checkState() == Qt::Checked || mControlWidget->trackShowOnlyList->checkState() == Qt::Checked))
