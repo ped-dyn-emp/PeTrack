@@ -18,4 +18,5 @@ Vec2F autoCorrectColorMarker(Vec2F &boxImageCentre, Control *controlWidget);
 
 //void getMarkerPos(IplImage *iplImg, QRect roi, QList<TrackPoint> *crossList, int markerBrightness, int borderSize, bool ignoreWithoutMarker, bool autoWB, BackgroundFilter *bgFilter, int recoMethod);
 void getMarkerPos(cv::Mat &img, QRect &roi, QList<TrackPoint> *crossList, Control *controlWidget, int borderSize, BackgroundFilter *bgFilter);
+void findCodeMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, Vec2F offsetCropRect2Roi=Vec2F{0,0});
 #endif

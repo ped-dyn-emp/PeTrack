@@ -171,10 +171,17 @@ void showImg(QLabel *l, IplImage *i)
 }
 #endif
 
-// get roi
-// no copy of data, only new header which allows to access rect
-// copys roi to rect by set values of roi to correct values inside rect
-// rect wird veraendert, roi nicht
+/**
+@brief get roi: copys roi to rect by setting values of roi to correct values inside rect
+
+no copy of data, only new header which allows to access rect
+rect wird veraendert, roi nicht
+
+@param[in] img Mat &img
+@param[in] const QRect &roi
+@param[in] Rect &rect
+@return img(rect)
+*/
 Mat getRoi(Mat &img, const QRect &roi, Rect &rect, bool evenPixelNumber)
 {
 //    Mat tImg;

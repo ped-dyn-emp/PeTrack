@@ -201,9 +201,16 @@ void setColorParameter(const QColor &fromColor, const QColor &toColor, bool inve
 ////        DWORD PeakPagefileUsage;
 ////    } PROCESS_MEMORY_COUNTERS,*PPROCESS_MEMORY_COUNTERS;
 
-// berechnet pixelverschiebung aufgrund von schraegsicht bei einem farbmarker
-// Maik Dissertation Seite 138
-// boxImageCentre ohne Border
+
+/**
+ * @brief calculates pixel-displacement due to oblique/angular view
+ *
+ * Relevant for Color Markers. boxImageCentre without border. More information: Dissertation Maik pp. 138
+ *
+ * @param boxImageCentre
+ * @param controlWidget
+ * @return
+ */
 Vec2F autoCorrectColorMarker(Vec2F &boxImageCentre, Control *controlWidget)
 {
     Petrack *mainWindow = controlWidget->getMainWindow();
@@ -237,10 +244,20 @@ Vec2F autoCorrectColorMarker(Vec2F &boxImageCentre, Control *controlWidget)
     return (0.12*angle/cmPerPixel.length())*moveDir; // Maik Dissertation Seite 138
 }
 
-//  Run color blob detection on an image to find features.
-//  Runs color thresholding to binarize the image and computes connected components.
-//  The features are the center of gravity of each connected component.
-//  offset is corner of roi
+
+/**
+ * @brief Run color blob detection on an image to find features
+ *
+ * Runs color thresholding to binarize the image and computes connected components.
+ * The features are the center of gravity of each connected component.
+ * offset is corner of roi.
+ *
+ * @param img
+ * @param crossList
+ * @param controlWidget
+ * @param ignoreWithoutMarker
+ * @param offset
+ */
 void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, bool ignoreWithoutMarker, Vec2F &offset)
 {
     ColorParameters	param;
@@ -264,6 +281,7 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
     int minArea = cmWidget->minArea->value(), maxArea = cmWidget->maxArea->value();
     double maxRatio = cmWidget->maxRatio->value();
     bool useBlackDot = cmWidget->useDot->isChecked();
+    bool useCodeMarker = cmWidget->useCodeMarker->isChecked();
     bool restrictPosition = cmWidget->restrictPosition->isChecked();
     ignoreWithoutMarker = cmWidget->ignoreWithoutDot->isChecked(); // ueberschreiben von uebergeordnetem ignoreWithoutMarker
     bool autoCorrect = cmWidget->autoCorrect->isChecked();
@@ -423,7 +441,7 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
 
                 if (useBlackDot)
                 {
-                    oriRect = cv::Rect(Point(0,0),Size(img.cols,img.rows));//     img.cvGetImageROI(img);;
+                    // oriRect = cv::Rect(Point(0,0),Size(img.cols,img.rows));//     img.cvGetImageROI(img);;
                     // cropRect ist orthogonal und verzichtet auf rotation, genauer waere:
                     // http://answers.opencv.org/question/38452/how-to-extract-pixels-from-a-rotated-box2d/
                     // max wegen bildrand
@@ -621,7 +639,7 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
 
                         // find contours and store them all as a list
                         cv::findContours(subBW,subContours,cv::RETR_LIST,cv::CHAIN_APPROX_SIMPLE);
-//                        cvFindContours(subBW, subStorage, &subFirstContour, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE); // gray wird auch veraendert!!!
+//                      cvFindContours(subBW, subStorage, &subFirstContour, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE); // gray wird auch veraendert!!!
 
                         // test each contour
                         while (!subContours.empty())
@@ -727,7 +745,76 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
 ////}
                 }
 //                debout << "contours.size(): " << contours.size() << "Color: " << col << endl;
-                if (!useBlackDot && foundHead)
+                if (useCodeMarker && foundHead)
+                {
+                    // Goal of the following part: implement useage of ArucoCode instead of "useBlackDot"
+                    // Output of findCodeMarker-Funktion: crossList->append(TrackPoint(Vec2F(x,y), 100, ids.at(i)));
+                    // where x,y are coordinates of the CodeMarkers and i is the running index over all detected marker
+                    // missing frames where Code is not recognized are interpolated in trackerReal.cpp and Marker ID is set to -1
+
+                    // cropRect has coordinates of rechtangele around color blob with respect to lower left corner (as in the beginning of useBlackDot)
+                    cropRect.x = max(1, myRound(box.center.x-box.size.width/2.-border));
+                    cropRect.y = max(1, myRound(box.center.y-box.size.height/2.-border));
+                    cropRect.width = min(img.cols-cropRect.x-1, 2*border+(myRound(maxExpansion) & -2));
+                    cropRect.height = min(img.rows-cropRect.y-1, 2*border+(myRound(maxExpansion) & -2));
+                    subImg=img(cropRect); // --> shallow copy (points to original data)
+
+                    int lengthini = crossList->size(); // initial length of crossList (before findCodeMarker() is called)
+
+                    Vec2F offsetCropRect2Roi; // needed for drawing detected ArucoCode-Candidates correctly -> passed on to findCodeMarker()-Function
+                    offsetCropRect2Roi.setX(cropRect.x);
+                    offsetCropRect2Roi.setY(cropRect.y);
+
+                    if (subImg.empty())
+                        return;
+                    findCodeMarker(subImg, crossList, controlWidget, offsetCropRect2Roi);
+
+                    // The next tree statements each:
+                    // - set the offset of subImg with regards to ROI //(ROI to original image is archieved later in the code for all methods)
+                    // - add the functionality of autocorrection
+                    // - deal with functionality of ignore/not ignore heads without identified ArucoMarker
+                    if (ignoreWithoutMarker && lengthini<crossList->size()) // if CodeMarker-Call returns crossList containing a new element (identified the ArucoMarker)
+                    {
+                        size_t ii = crossList->size()-1;
+                        if (autoCorrect && !autoCorrectOnlyExport)
+                        {
+                            moveDir = autoCorrectColorMarker(boxImageCentre, controlWidget);
+                        }
+                        else
+                        {
+                            moveDir = Vec2F(0, 0);
+                        }
+                        (*crossList)[ii] = (*crossList)[ii] + (TrackPoint(Vec2F(cropRect.x, cropRect.y) + moveDir));
+                    }
+                    else if(!ignoreWithoutMarker && (lengthini==crossList->size())) // in case ignoreWithoutMarker is checked and CodeMarker-Call returns empty crossList (could not identify a marker) the center of the smallest rectangle around the colorblobb is used as position
+                    {
+                        if (autoCorrect && !autoCorrectOnlyExport)
+                        {
+                            moveDir = autoCorrectColorMarker(boxImageCentre, controlWidget);
+
+                            crossList->append(TrackPoint(Vec2F(box.center.x, box.center.y)+moveDir, 100, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
+                        }
+                        else
+                        {
+                            crossList->append(TrackPoint(Vec2F(box.center.x, box.center.y), 90, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
+                        }
+                    }
+                    else if(!ignoreWithoutMarker && (crossList->size()!=lengthini)) // in case ignoreWithoutMarker is checked and CodeMarker-Call returns non-empty crossList (could identify a marker)
+                    {
+                        size_t ii = crossList->size()-1;
+                        if (autoCorrect && !autoCorrectOnlyExport)
+                        {
+                            moveDir = autoCorrectColorMarker(boxImageCentre, controlWidget);
+                        }
+                        else
+                        {
+                           moveDir = Vec2F(0, 0);
+                        }
+                        (*crossList)[ii] = (*crossList)[ii] + (TrackPoint(Vec2F(cropRect.x, cropRect.y) + moveDir));
+                    }
+
+                }
+                if (!useBlackDot && foundHead && !useCodeMarker)
                 {
                     if (autoCorrect && !autoCorrectOnlyExport)
                     {
@@ -738,9 +825,11 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
                     else
                         crossList->append(TrackPoint(Vec2F(box.center.x, box.center.y), 100, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
                 }
-                else if (minGrey <260) // mit gefundenem schwarzem punkt
+                else if (minGrey <260 && !useCodeMarker) // mit gefundenem schwarzem punkt
+                {
                     crossList->append(TrackPoint(subCenter, 100, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
-                else if (!ignoreWithoutMarker && foundHead)
+                }
+                else if (!ignoreWithoutMarker && foundHead && !useCodeMarker)    
                 {
                     if (autoCorrect && !autoCorrectOnlyExport)
                     {
@@ -752,9 +841,7 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
                         crossList->append(TrackPoint(Vec2F(box.center.x, box.center.y), 90, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
                 }
             }
-
             // take the next contour
-//            contour = contour->h_next;
             contours.pop_back();
         }
 //        if (firstContour)
@@ -768,10 +855,16 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
 //    cvReleaseStructuringElement(&openKernel);
 }
 
-
-//  Run color blob detection on an image to find features.
-//  Runs color thresholding to binarize the image and computes connected components.
-//  The features are the center of gravity of each connected component.
+/**
+ * @brief Run color blob detection on an image to find features.
+ *
+ * Runs color thresholding to binarize the image and computes connected components.
+ * The features are the center of gravity of each connected component.
+ *
+ * @param img
+ * @param crossList
+ * @param controlWidget
+ */
 void findColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidget)
 {
     ColorParameters	param;
@@ -976,17 +1069,18 @@ void findColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWid
     //cout << "Found " << crossList->size() << " features.\n";
 }
 
-void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidget)
+/**
+ * @brief uses openCV libraries to detect Aruco CodeMarkers
+ * @param img
+ * @param crossList
+ * @param controlWidget
+ */
+void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, Vec2F offsetCropRect2Roi)
 {
 //#if 0 // Maik temporaer, damit es auf dem Mac laeuft
 
     CodeMarkerItem* codeMarkerItem = controlWidget->getMainWindow()->getCodeMarkerItem();
     CodeMarkerWidget* codeMarkerWidget = controlWidget->getMainWindow()->getCodeMarkerWidget();
-
-//    Mat mat = cvarrToMat(img);//.clone(); // for marker detection and debug output (show detected candidates)
-
-//    debout << "w: " << img->width << " h: " << img->height << endl;
-//    IplImage* binary = codeMarkerItem->createMask(img->width, img->height); // create binary mask with size of img
 
     Ptr<aruco::Dictionary> dictionary = aruco::getPredefinedDictionary(aruco::PREDEFINED_DICTIONARY_NAME(codeMarkerWidget->dictList->currentIndex()));
 
@@ -997,53 +1091,56 @@ void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidg
     Petrack *mainWindow = controlWidget->getMainWindow();
 
     int bS = mainWindow->getImageBorderSize();
-
-    //debout << "Image w=" << mainWindow->getImage()->width() << ", h=" << mainWindow->getImage()->height() << " bS=" << bS << endl;
+    int recoMethod = controlWidget->getRecoMethod();
 
     if (controlWidget->getCalibCoordDimension() == 0) // 3D
     {
-        QRect rect(myRound(mainWindow->getRecoRoiItem()->rect().x()),//+controlWidget->getMainWindow()->getImageBorderSize()),
-                   myRound(mainWindow->getRecoRoiItem()->rect().y()),//+controlWidget->getMainWindow()->getImageBorderSize()),
-                   myRound(mainWindow->getRecoRoiItem()->rect().width()),
-                   myRound(mainWindow->getRecoRoiItem()->rect().height()));
-        QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y(),controlWidget->mapDefaultHeight->value()),
-                p2 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y(),controlWidget->mapDefaultHeight->value()),
-                p3 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value()),
-                p4 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value());
+        if (recoMethod == 6)  // for usage of codemarker with CodeMarker-function (-> without MulticolorMarker)
+        {
+            QRect rect(myRound(mainWindow->getRecoRoiItem()->rect().x()),//+controlWidget->getMainWindow()->getImageBorderSize()),
+                       myRound(mainWindow->getRecoRoiItem()->rect().y()),//+controlWidget->getMainWindow()->getImageBorderSize()),
+                       myRound(mainWindow->getRecoRoiItem()->rect().width()),
+                       myRound(mainWindow->getRecoRoiItem()->rect().height()));
+            QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y(),controlWidget->mapDefaultHeight->value()),
+                    p2 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y(),controlWidget->mapDefaultHeight->value()),
+                    p3 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value()),
+                    p4 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value());
 
-//        QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(0,0,controlWidget->mapDefaultHeight->value()),
-//                p2 = mainWindow->getImageItem()->getCmPerPixel(mainWindow->getImage()->width()-bS,0,controlWidget->mapDefaultHeight->value()),
-//                p3 = mainWindow->getImageItem()->getCmPerPixel(0,mainWindow->getImage()->height()-bS,controlWidget->mapDefaultHeight->value()),
-//                p4 = mainWindow->getImageItem()->getCmPerPixel(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS,controlWidget->mapDefaultHeight->value());
+            double cmPerPixel_min = min(min(min(p1.x(), p1.y()), min(p2.x(), p2.y())),
+                                        min(min(p3.x(), p3.y()), min(p4.x(), p4.y())));
+            double cmPerPixel_max = max(max(max(p1.x(), p1.y()), max(p2.x(), p2.y())),
+                                        max(max(p3.x(), p3.y()), max(p4.x(), p4.y())));
 
-        double cmPerPixel_min = min(min(min(p1.x(), p1.y()), min(p2.x(), p2.y())),
-                                    min(min(p3.x(), p3.y()), min(p4.x(), p4.y())));
-        double cmPerPixel_max = max(max(max(p1.x(), p1.y()), max(p2.x(), p2.y())),
-                                    max(max(p3.x(), p3.y()), max(p4.x(), p4.y())));
+            minMarkerPerimeterRate = (codeMarkerWidget->minMarkerPerimeter->value()*4./cmPerPixel_max)/max(rect.width(),rect.height());
+            maxMarkerPerimeterRate = (codeMarkerWidget->maxMarkerPerimeter->value()*4./cmPerPixel_min)/max(rect.width(),rect.height());
+        }
 
-//        minMarkerPerimeterRate = (codeMarkerWidget->minMarkerPerimeter->value()*4/cmPerPixel_max)/max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
-//        maxMarkerPerimeterRate = (codeMarkerWidget->maxMarkerPerimeter->value()*4/cmPerPixel_min)/max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
+        if (recoMethod == 5)   // for usage of codemarker with MulticolorMarker
+        {
+            QRect rect(0,0, img.rows, img.cols);
+            QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y(),controlWidget->mapDefaultHeight->value()),
+                    p2 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y(),controlWidget->mapDefaultHeight->value()),
+                    p3 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value()),
+                    p4 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value());
 
-        minMarkerPerimeterRate = (codeMarkerWidget->minMarkerPerimeter->value()*4/cmPerPixel_max)/max(rect.width(),rect.height());
-        maxMarkerPerimeterRate = (codeMarkerWidget->maxMarkerPerimeter->value()*4/cmPerPixel_min)/max(rect.width(),rect.height());
+            // from Aruco Documentation values 0 + 4 all info is considered (low performance issues expected due to small image size)
+            minMarkerPerimeterRate = 0.02;
+            maxMarkerPerimeterRate = 4.;
+        }
 
         minCornerDistanceRate = codeMarkerWidget->minCornerDistance->value();
         minMarkerDistanceRate = codeMarkerWidget->minMarkerDistance->value();
-        //debout << "image w=" << mainWindow->getImage()->width() << ", h=" << mainWindow->getImage()->height() << ", bS=" << bS << endl;
-        //debout << "cm/px: min=" << cmPerPixel_min << " max=" << cmPerPixel_max << " minRate: " << minMarkerPerimeterRate << " maxRate: " << maxMarkerPerimeterRate << endl;
 
-    }else // 2D
+    }
+    else // 2D
     {
         double cmPerPixel = mainWindow->getImageItem()->getCmPerPixel();
         minMarkerPerimeterRate = (codeMarkerWidget->minMarkerPerimeter->value()*4/cmPerPixel)/max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
         maxMarkerPerimeterRate = (codeMarkerWidget->maxMarkerPerimeter->value()*4/cmPerPixel)/max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
-//        debout << "cm/px: " << cmPerPixel << " minRate: " << minMarkerPerimeterRate << " maxRate: " << maxMarkerPerimeterRate << endl;
 
         minCornerDistanceRate = codeMarkerWidget->minCornerDistance->value();
         minMarkerDistanceRate = codeMarkerWidget->minMarkerDistance->value();
     }
-
-//    debout << "MinMarkerPerimeterRate: " << minMarkerPerimeterRate << " MaxMarkerPerimeterRate: " << maxMarkerPerimeterRate << endl;
 
     detectorParams->adaptiveThreshWinSizeMin              = codeMarkerWidget->adaptiveThreshWinSizeMin->value();
     detectorParams->adaptiveThreshWinSizeMax              = codeMarkerWidget->adaptiveThreshWinSizeMax->value();
@@ -1071,8 +1168,6 @@ void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidg
     detectorParams->minOtsuStdDev                         = codeMarkerWidget->minOtsuStdDev->value();
     detectorParams->errorCorrectionRate                   = codeMarkerWidget->errorCorrectionRate->value();
 
-    //debout << "findCodeMarker: dictID: " << codeMarkerWidget->dictList->currentIndex() << endl; // used dictionary
-
     vector<int> ids;
     vector<vector<Point2f> > corners, rejected;
     ids.clear();
@@ -1084,16 +1179,20 @@ void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidg
     debout << "start detectCodeMarkers : " << getElapsedTime() <<endl;
 #endif
 
-//    Mat copy = cvarrToMat(img).clone();
-//    debout << "img(" << bS << "): " << img << " channels: " << img->nChannels << " depth: " << img->depth << endl;
-//    debout << "test" << endl;
+    //debout << "XXX: " << img.locateROI();
     aruco::detectMarkers(img/*copy.clone()*/, dictionary, corners, ids, detectorParams, rejected);
-//    debout << " --> ok " << endl;
-//    aruco::detectMarkers(cvarrToMat(img),dictionary,corners,ids);
+    debout << "findCodeMarker: dictID: " << codeMarkerWidget->dictList->currentIndex() << endl; // used dictionary
+
 #ifdef TIME_MEASUREMENT
     //        "==========: "
     debout << "end detectCodeMarkers  : " << getElapsedTime() <<endl;
 #endif
+
+
+    if (offsetCropRect2Roi.length()!=0)
+    {
+        codeMarkerItem->setOffsetCropRect2Roi(offsetCropRect2Roi);
+    }
 
     codeMarkerItem->setDetectedMarkers(corners,ids);
     codeMarkerItem->setRejectedMarkers(rejected);
@@ -1101,9 +1200,7 @@ void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidg
     double x,y;
     int i;
 
-
-
-    // detected code markers
+    // write detected code markers in crossList
     for(i = 0; i<ids.size(); i++)
     {
 //        debout << "Detected MarkerID: " << ids.at(i) << " [( " << corners.at(i).at(0).x << "," << corners.at(i).at(0).y << "),( "
@@ -1111,21 +1208,10 @@ void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidg
 //                                                               << corners.at(i).at(2).x << "," << corners.at(i).at(2).y << "),( "
 //                                                               << corners.at(i).at(3).x << "," << corners.at(i).at(3).y << ")]" <<  endl;
 
-//        if (codeMarkerWidget->showMask->isChecked())
-//        {
-//            detected_points[0] = CvPoint(corners.at(i).at(0).x, corners.at(i).at(0).y);
-//            detected_points[1] = CvPoint(corners.at(i).at(1).x, corners.at(i).at(1).y);
-//            detected_points[2] = CvPoint(corners.at(i).at(2).x, corners.at(i).at(2).y);
-//            detected_points[3] = CvPoint(corners.at(i).at(3).x, corners.at(i).at(3).y);
-
-//            cvFillConvexPoly(binary,detected_points,4,RGB(255,255,255));
-//        }
-
         x = (corners.at(i).at(0).x+corners.at(i).at(1).x+corners.at(i).at(2).x+corners.at(i).at(3).x)*0.25;
         y = (corners.at(i).at(0).y+corners.at(i).at(1).y+corners.at(i).at(2).y+corners.at(i).at(3).y)*0.25;
 
         crossList->append(TrackPoint(Vec2F(x,y), 100, ids.at(i))); // 100 beste qualitaet
-
     }
 
 #ifdef TIME_MEASUREMENT
@@ -1138,7 +1224,6 @@ void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidg
 
 void findContourMarker(Mat &img, QList<TrackPoint> *crossList, int markerBrightness, bool ignoreWithoutMarker, bool autoWB, int recoMethod, float headSize)
 {
-
     int i, threshold, plus, count;
     double angle;
     //MarkerCasernList markerList;
@@ -1562,10 +1647,8 @@ imShow("img2", tmpAusgabe2);
 
 // returns list of mid point of black crosses on white ground in region of interest roi
 // in image iplImg
-void getMarkerPos(Mat &img, QRect &roi, QList<TrackPoint> *crossList, Control *controlWidget,
-                 int borderSize, BackgroundFilter *bgFilter)
+void getMarkerPos(Mat &img, QRect &roi, QList<TrackPoint> *crossList, Control *controlWidget, int borderSize, BackgroundFilter *bgFilter)
 {
-
     int markerBrightness = controlWidget->markerBrightness->value();
     bool ignoreWithoutMarker = (controlWidget->markerIgnoreWithout->checkState() == Qt::Checked);
     bool autoWB = (controlWidget->recoAutoWB->checkState() == Qt::Checked);

@@ -22,6 +22,10 @@ void MultiColorMarkerWidget::setXml(QDomElement &elem)
     subElem.setAttribute("RESTRICT_POSITION", restrictPosition->isChecked());
     elem.appendChild(subElem);
 
+    subElem = (elem.ownerDocument()).createElement("CODE_MARKER");
+    subElem.setAttribute("USE", useCodeMarker->isChecked());
+    elem.appendChild(subElem);
+
     subElem = (elem.ownerDocument()).createElement("AUTO_CORRECT");
     subElem.setAttribute("USE", autoCorrect->isChecked());
     subElem.setAttribute("ONLY_EXPORT", autoCorrectOnlyExport->isChecked());
@@ -74,6 +78,13 @@ void MultiColorMarkerWidget::getXml(QDomElement &elem)
                 useColor->setCheckState(subElem.attribute("USE_COLOR").toInt() ? Qt::Checked : Qt::Unchecked);
             if (subElem.hasAttribute("RESTRICT_POSITION"))
                 restrictPosition->setCheckState(subElem.attribute("RESTRICT_POSITION").toInt() ? Qt::Checked : Qt::Unchecked);
+        }
+        if (subElem.tagName() == "CODE_MARKER")
+        {
+            if (subElem.hasAttribute("USE"))
+                useCodeMarker->setCheckState(subElem.attribute("USE").toInt() ? Qt::Checked : Qt::Unchecked);
+            if (subElem.hasAttribute("IGNORE_WITHOUT"))
+                ignoreWithoutDot->setCheckState(subElem.attribute("IGNORE_WITHOUT").toInt() ? Qt::Checked : Qt::Unchecked);
         }
         if (subElem.tagName() == "AUTO_CORRECT")
         {

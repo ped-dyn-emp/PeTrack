@@ -6,6 +6,7 @@
 #include "codeMarkerWidget.h"
 #include "tracker.h"
 #include "animation.h"
+#include "control.h"
 
 using namespace::cv;
 using namespace std;
@@ -54,48 +55,103 @@ void CodeMarkerItem::setRect(Vec2F& v)
     mUlc = v; // upper left corner to draw
 }
 
+/**
+ * @brief draws colored shapes at heads in image to indicate detection status
+ *
+ * differnet calculations of position depending on whether function is called out of findCodeMarker() Function
+ * only (== recoMethod 6) or if findCodeMarker() Function is called out of findMulticolorMarker() Function (== recoMethod 5).
+ * In the first case the offset is added automatically via 'offset' and 'v'.
+ * In the second case the offset from cropRect to ROI has to be added manually.
+ *
+ * @param painter
+ * @param option
+ * @param widget
+ */
 void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
 
     if (mMainWindow->getCodeMarkerWidget()->showDetectedCandidates->isChecked())
     {
-        QColor textColor = QColor(255,0,0),
-               cornerColor = QColor(0,0,255),
-               borderColor = QColor(0,255,0);
+        QColor textColor = QColor(255,0,0), // red
+               cornerColor = QColor(0,0,255), // blue
+               borderColor = QColor(0,255,0); // green
 
         int nMarkers = mCorners.size();
         int nRejected = mRejected.size();
 
 //        debout << "#markers: " << nMarkers << " #rejected: " << nRejected << endl;
         Point2f p0, p1;
-        for(int i = 0; i < nMarkers; i++)
+        for(int i = 0; i < nMarkers; i++) // draws green square/ circle around head if person recognized
         {
-            vector<Point2f> currentMarker = mCorners.at(i);
-            // draw marker sides
-            for(int j = 0; j < 4; j++) {
-                p0 = currentMarker.at(j);
-                p1 = currentMarker.at((j + 1) % 4);
-//                debout << "p0: " << p0 << " p1: " << p1 << endl;
-                painter->setPen(borderColor);
-                painter->drawLine(QPointF(mUlc.x()+p0.x,mUlc.y()+p0.y),QPointF(mUlc.x()+p1.x,mUlc.y()+p1.y));
+            int recoMethod = mMainWindow->getControlWidget()->getRecoMethod();
+
+            if (recoMethod == 6) // for usage of ArucoCodeMarker-Funktion (without MulticolorMarker)
+            {
+                vector<Point2f> currentMarker = mCorners.at(i);
+                // draw marker sides
+                for(int j = 0; j < 4; j++) {
+                    p0 = currentMarker.at(j);
+                    p1 = currentMarker.at((j + 1) % 4);
+    //                debout << "p0: " << p0 << " p1: " << p1 << endl;
+                    painter->setPen(borderColor);
+                    painter->drawLine(QPointF(mUlc.x()+p0.x,mUlc.y()+p0.y),QPointF(mUlc.x()+p1.x,mUlc.y()+p1.y));
+                }
+                painter->setPen(cornerColor);
+                painter->drawText(QPointF(mUlc.x()+currentMarker.at(0).x+10.,mUlc.y()+currentMarker.at(0).y+10. ), QString::number(mIds.at(i)));
+                painter->drawRect(QRectF(mUlc.x()+currentMarker.at(0).x-3.0,mUlc.y()+currentMarker.at(0).y-3.0,6.0,6.0));
             }
-            painter->setPen(cornerColor);
-            painter->drawText(QPointF(mUlc.x()+currentMarker.at(0).x+10,mUlc.y()+currentMarker.at(0).y+10 ), QString::number(mIds.at(i)));
-            painter->drawRect(QRectF(mUlc.x()+currentMarker.at(0).x-3.0,mUlc.y()+currentMarker.at(0).y-3.0,6.0,6.0));
+
+            if (recoMethod == 5) // for usage of codemarker with MulticolorMarker
+            {
+                vector<Point2f> currentMarker = mCorners.at(i);
+                // draw marker sides
+                for(int j = 0; j < 4; j++) {
+                    p0 = currentMarker.at(j);
+                    p1 = currentMarker.at((j + 1) % 4);
+    //                debout << "p0: " << p0 << " p1: " << p1 << endl;
+                    painter->setPen(borderColor);
+                    painter->drawLine(QPointF(mUlc.x()+p0.x+mOffsetCropRect2Roi.x(),mUlc.y()+p0.y+mOffsetCropRect2Roi.y()),QPointF(mUlc.x()+p1.x+mOffsetCropRect2Roi.x(),mUlc.y()+p1.y+mOffsetCropRect2Roi.y()));
+                }
+                painter->setPen(cornerColor);
+                painter->drawText(QPointF(mUlc.x()+currentMarker.at(0).x+mOffsetCropRect2Roi.x()+10.,mUlc.y()+currentMarker.at(0).y+mOffsetCropRect2Roi.y()+10. ), QString::number(mIds.at(i)));
+                painter->drawRect(QRectF(mUlc.x()+currentMarker.at(0).x+mOffsetCropRect2Roi.x()-3.0,mUlc.y()+currentMarker.at(0).y+mOffsetCropRect2Roi.y()-3.0,6.0,6.0));
+            }
+
         }
         for(int i = 0; i < nRejected; i++)
         {
-            vector<Point2f> currentMarker = mRejected.at(i);
+            int recoMethod = mMainWindow->getControlWidget()->getRecoMethod();
 
-            for(int j = 0; j < 4; j++) {
-                p0 = currentMarker.at(j);
-                p1 = currentMarker.at((j + 1) % 4);
-//                debout << "p0: " << p0 << " p1: " << p1 << endl;
-                painter->setPen(textColor);
-                painter->drawLine(QPointF(mUlc.x()+p0.x,mUlc.y()+p0.y),QPointF(mUlc.x()+p1.x,mUlc.y()+p1.y));
+            if (recoMethod == 6) // for usage of ArucoCodeMarker-Funktion (without MulticolorMarker)
+            {
+                vector<Point2f> currentMarker = mRejected.at(i);
+
+                for(int j = 0; j < 4; j++) {
+                    p0 = currentMarker.at(j);
+                    p1 = currentMarker.at((j + 1) % 4);
+    //                debout << "p0: " << p0 << " p1: " << p1 << endl;
+                    painter->setPen(textColor);
+                    painter->drawLine(QPointF(mUlc.x()+p0.x,mUlc.y()+p0.y),QPointF(mUlc.x()+p1.x,mUlc.y()+p1.y));
+                }
+                painter->setPen(borderColor);
+                painter->drawRect(QRectF(mUlc.x()+currentMarker.at(0).x-3.0,mUlc.y()+currentMarker.at(0).y-3.0,6.0,6.0));
             }
-            painter->setPen(borderColor);
-            painter->drawRect(QRectF(mUlc.x()+currentMarker.at(0).x-3.0,mUlc.y()+currentMarker.at(0).y-3.0,6.0,6.0));
+
+            if (recoMethod == 5) // for usage of all types of detection (except combination of multicolormarker with arucoCode)
+            {
+                vector<Point2f> currentMarker = mRejected.at(i);
+
+                for(int j = 0; j < 4; j++) {
+                    p0 = currentMarker.at(j);
+                    p1 = currentMarker.at((j + 1) % 4);
+    //                debout << "p0: " << p0 << " p1: " << p1 << endl;
+                    painter->setPen(textColor);
+                    painter->drawLine(QPointF(mUlc.x()+p0.x+mOffsetCropRect2Roi.x(),mUlc.y()+p0.y+mOffsetCropRect2Roi.y()),QPointF(mUlc.x()+p1.x+mOffsetCropRect2Roi.x(),mUlc.y()+p1.y+mOffsetCropRect2Roi.y()));
+                }
+                painter->setPen(borderColor);
+                painter->drawRect(QRectF(mUlc.x()+currentMarker.at(0).x+mOffsetCropRect2Roi.x()-3.0,mUlc.y()+currentMarker.at(0).y+mOffsetCropRect2Roi.y()-3.0,6.0,6.0));
+            }
+
         }
     }
     if (false) // Show min/max marker size
@@ -142,4 +198,17 @@ void CodeMarkerItem::setDetectedMarkers(vector<vector<Point2f> > corners, vector
 void CodeMarkerItem::setRejectedMarkers(vector<vector<Point2f> > rejected)
 {
     mRejected = rejected;
+}
+
+/**
+ * @brief sets Offset from cropRect to Roi for correct drawing of CodeMarkers in paint() when calling findCodeMarker() out of findMulticolorMarker().
+ *
+ * Explanation: when calling findCodeMarker() out of findMultiColorMarker() the transfer parameter is not the entire image but rather a small rectangle (cropRect) around the detected colorBlobb.
+ * Offset additions via 'offset' and 'v' only allow addition of ONE offset for all candidates per frame, as is originates from realising the offset from the entire image to the region of interest (ROI).
+ * offsetCropRect2Roi closes the resulting gap between ROI and cropRect (which is individuall for each pedestrian and frame).
+ * @param offsetCropRect2Roi
+ */
+void CodeMarkerItem::setOffsetCropRect2Roi(Vec2F offsetCropRect2Roi)
+{
+    mOffsetCropRect2Roi = offsetCropRect2Roi;
 }

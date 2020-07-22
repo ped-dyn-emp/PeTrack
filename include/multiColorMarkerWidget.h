@@ -6,6 +6,7 @@
 
 #include "petrack.h"
 #include "multiColorMarkerItem.h"
+#include "codeMarkerWidget.h"
 #include "imageItem.h"
 #include "control.h"
 
@@ -33,6 +34,15 @@ private slots:
     {
         mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
         mMainWindow->updateImage();
+    }
+    void on_useCodeMarker_stateChanged(int /* i */)
+    {
+        mMainWindow->setRecognitionChanged(true);
+        mMainWindow->updateImage();
+    }
+    void on_CodeMarkerParameter_clicked()
+    {
+        mMainWindow->getCodeMarkerWidget()->show();
     }
     void on_ignoreWithoutDot_stateChanged(int i)
     {
