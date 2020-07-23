@@ -19,7 +19,7 @@ def petrack_on_testdata(request, pytestconfig):
     truth_path = "../data/" + request.param + "_truth"
     project = "../data/" + request.param + ".pet"
     output = test_path
-    subprocess.run([petrack_path, "-project", project, "-autotrack", output], check=True, stdout=subprocess.DEVNULL)
+    subprocess.run([petrack_path, "-project", project, "-autotrack", output, "-platform", "offscreen"], check=True, stdout=subprocess.DEVNULL)
 
     yield test_path, truth_path
 

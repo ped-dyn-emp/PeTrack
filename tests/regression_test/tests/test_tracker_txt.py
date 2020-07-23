@@ -9,7 +9,7 @@ import time
 
 
 class TestTrackerTxt:
-    EPSILON = 5e-3  # Angabe in Meter
+    EPSILON = 15e-3  # Angabe in Meter
     error_message = []
     MAX_DIFF = 99999999
 

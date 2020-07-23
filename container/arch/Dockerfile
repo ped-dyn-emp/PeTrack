@@ -1,4 +1,4 @@
-from archlinux
+FROM archlinux
 
 # Update the repositories
 RUN pacman -Syy
@@ -6,10 +6,8 @@ RUN pacman -Syy
 RUN pacman -S --needed --noconfirm \
 	git \
 	gcc \
-	clang \
 	cmake \
 	make \
-	ninja \
 	base-devel \
 	glew
 
@@ -18,4 +16,9 @@ RUN pacman -S --needed --noconfirm \
 	opencv hdf5 vtk\
 	qwt \
 	catch2
+
+RUN pacman -S --needed --noconfirm \
+    python \
+    python-pip
+RUN pip install pytest
 
