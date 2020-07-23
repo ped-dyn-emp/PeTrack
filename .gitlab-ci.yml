@@ -18,7 +18,7 @@ build_container:
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/container/arch/Dockerfile --destination $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_linux
   rules:
     - changes:
-        - $CI_PROJECT_DIR/container/arch/Dockerfile
+        - container/arch/Dockerfile
 
 # Build petrack and petrack unit_tests
 build_linux:
