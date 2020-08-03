@@ -48,19 +48,20 @@ unit_test_linux:
     reports:
       junit: "build/tests/unit_test/unit_test_report.xml"
 
+# Currently disabled
 # Execute regression tests
-regression_test_linux:
-  image: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_linux
-  stage: test
-  script:
-    - cd tests/regression_test/tests
-    - python -m pytest --path=../../../build/petrack --junitxml=pytest_report.xml >> "RegressionTestLog.txt"
-  artifacts:
-    when: on_failure
-    paths:
-      - "tests/regression_test/tests/RegressionTestLog.txt"
-    reports:
-      junit: "tests/regression_test/tests/pytest_report.xml"
+#regression_test_linux:
+#  image: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_linux
+#  stage: test
+#  script:
+#    - cd tests/regression_test/tests
+#    - python -m pytest --path=../../../build/petrack --junitxml=pytest_report.xml >> "RegressionTestLog.txt"
+#  artifacts:
+#    when: on_failure
+#    paths:
+#      - "tests/regression_test/tests/RegressionTestLog.txt"
+#    reports:
+#      junit: "tests/regression_test/tests/pytest_report.xml"
 
 
 ###############################################################################
