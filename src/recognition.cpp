@@ -754,10 +754,11 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
                     // missing frames where Code is not recognized are interpolated in trackerReal.cpp and Marker ID is set to -1
 
                     // cropRect has coordinates of rechtangele around color blob with respect to lower left corner (as in the beginning of useBlackDot)
+                    int extendRect = myRound(maxExpansion*.3); // scalar to increase area of cropRect for better detection of codemarkers when marker appears to stick out of the colored head because of tilted heads; value of .3 chosen arbitrarily after discussion
                     cropRect.x = max(1, myRound(box.center.x-box.size.width/2.-border));
                     cropRect.y = max(1, myRound(box.center.y-box.size.height/2.-border));
-                    cropRect.width = min(img.cols-cropRect.x-1, 2*border+(myRound(maxExpansion) & -2));
-                    cropRect.height = min(img.rows-cropRect.y-1, 2*border+(myRound(maxExpansion) & -2));
+                    cropRect.width = min(img.cols-cropRect.x-extendRect-1, 2*border+(myRound(maxExpansion)+extendRect & -2));
+                    cropRect.height = min(img.rows-cropRect.y-extendRect-1, 2*border+(myRound(maxExpansion)+extendRect & -2));
                     subImg=img(cropRect); // --> shallow copy (points to original data)
 
                     int lengthini = crossList->size(); // initial length of crossList (before findCodeMarker() is called)
