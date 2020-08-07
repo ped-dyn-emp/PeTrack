@@ -28,6 +28,7 @@ CodeMarkerWidget::CodeMarkerWidget(QWidget *parent)
     dictList->addItem("DICT_7X7_1000");// 15
 
     dictList->addItem("DICT_ARUCO_ORGINAL"); // 16
+    dictList->addItem("DICT_mip_36h12");//17
 
     // Add some other marker dictionaries
     //dictList->addItem("ARTOOLKIT");
