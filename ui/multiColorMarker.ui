@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>369</width>
-    <height>390</height>
+    <height>397</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -57,7 +57,7 @@
           <string>using Code Marker on top of the head for tracking</string>
          </property>
          <property name="text">
-          <string>use Code Marker</string>
+          <string>use code marker</string>
          </property>
         </widget>
        </item>
