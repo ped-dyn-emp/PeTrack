@@ -2071,3 +2071,33 @@ void Tracker::purge(int frame)
 //            ++noHeight;
     }
 }
+
+// Brief: Synchronize TrackPoint.mMarkerID with TrackPerson.mMarkerID
+// set PersonMarkerID from TrackPointMarkerID if MarkerID == -1 and check if not other "real ID" was detected - trigger warning otherwise
+// Zu entscheiden: nutzung als funktion mit input+output oder als aufruf mit (*this)[i]
+// wie setTrackPersonHeight() ????
+void Tracker::syncTrackPersonMarkerID(QList<TrackPoint> &pL) // usage of &pL für PointList oder &p für Point ???
+{
+    for (int i = 0; i < size(); ++i) // ueber TrackPerson
+    {
+        if (TrackPoint.mMarkerID[i]!=-1) // first time a Person is found but marker is not detected
+        {
+            TrackPerson.mMarkerID = TrackPoint.mMarkerID;
+        }
+        // else if (TrackPerson.mMarkerID == TrackPoint.mMarkerID){// do nothin all is fine}
+        else if (TrackPerson.mMarkerID != TrackPoint.mMarkerID)
+        {
+            cout << "ERROR: Two MarkerIDs were found for one trajectory." << endl;
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
