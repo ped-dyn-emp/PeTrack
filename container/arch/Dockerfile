@@ -1,9 +1,9 @@
-FROM archlinux
+FROM archlinux:20200705
 
 # Update the repositories
 RUN pacman -Syy
 
-RUN pacman -S --needed --noconfirm \
+RUN pacman -Syu --needed --noconfirm \
 	git \
 	gcc \
 	cmake \
@@ -11,13 +11,13 @@ RUN pacman -S --needed --noconfirm \
 	base-devel \
 	glew
 
-RUN pacman -S --needed --noconfirm \
+RUN pacman -Syu --needed --noconfirm \
 	qt5-base \
 	opencv hdf5 vtk\
 	qwt \
 	catch2
 
-RUN pacman -S --needed --noconfirm \
+RUN pacman -Syu --needed --noconfirm \
     python \
     python-pip
 RUN pip install pytest
