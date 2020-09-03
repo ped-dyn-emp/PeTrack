@@ -181,6 +181,7 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
     }else{
         emit colorSelected(event->pos(), this);
     }
+    QGraphicsView::mousePressEvent(event);
 }
 
 //---------------------------------------------------------------------
