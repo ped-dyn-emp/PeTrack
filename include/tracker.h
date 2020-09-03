@@ -318,6 +318,7 @@ public:
     // gibt -1 zurueck, wenn frame oder naechster frame nicht existiert
     // entfernung ist absolut
     double distanceToNextFrame(int frame) const;
+    void syncTrackPersonMarkerID(TrackPoint &tp);
 };
 
 //mHeightCount wird nicht e3xportiert und auch nicht wieder eingelesen -> nach import auf 0 obwohl auf height ein wert steht, daher immer mheight auf -1 testen!!!
@@ -489,6 +490,7 @@ public:
 
     void purge(int frame);
 
+
 private:
     bool tryMergeTrajectories(const TrackPoint& v, size_t i, int frame);
 
@@ -498,5 +500,7 @@ private:
     void refineViaNearDarkPoint();
     void preCalculateImagePyramids(int level);
 };
+
+
 
 #endif

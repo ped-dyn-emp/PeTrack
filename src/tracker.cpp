@@ -464,8 +464,9 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool
                 for (i=1; i<(anz-1); ++i) // anz ist einer zu viel; zudem nur boie anz-1 , da sonst eh nur mit 1 multipliziert wuerde
                     (*this)[frame-mFirstFrame+i].setQual((i*trackPointAt(frame+i).qual())/anz);
             }
-
+            syncTrackPersonMarkerID(tp); // Funktion sucht, wie markerID von TrackPoint ist und macht Dinge abhängig davon und vom vorherigen TrackPoint
             replace(frame-mFirstFrame, tp);
+
             if (tp.qual() > 100) // manual add // after inserting, because p ist const
                 (*this)[frame-mFirstFrame].setQual(100); // so moving of a point is possible
             //debout << "Warning: frame exists already in trajectory!" << endl;
@@ -1075,7 +1076,11 @@ bool Tracker::addPoint(TrackPoint &p, int frame, QSet<int> onlyVisible, int *per
 
         if (pers != NULL)
             *pers = iNearest;
+
+        syncTrackPersonMarkerID(p);
+
         (*this)[iNearest].setNewReco(true);
+
     }
 
     //--i;
@@ -2075,17 +2080,17 @@ void Tracker::purge(int frame)
 // Brief: Synchronize TrackPoint.mMarkerID with TrackPerson.mMarkerID
 // set PersonMarkerID from TrackPointMarkerID if MarkerID == -1 and check if not other "real ID" was detected - trigger warning otherwise
 // Zu entscheiden: nutzung als funktion mit input+output oder als aufruf mit (*this)[i]
-// wie setTrackPersonHeight() ????
-void Tracker::syncTrackPersonMarkerID(QList<TrackPoint> &pL) // usage of &pL für PointList oder &p für Point ???
+void TrackPerson::syncTrackPersonMarkerID(TrackPoint &tp) // usage of &pL für PointList oder &p für Point ???
 {
-    for (int i = 0; i < size(); ++i) // ueber TrackPerson
+    int tpMarkerID = tp.markerID(); //MarkerID of currently handled trackpoint
+
+    if (tpMarkerID != -1)
     {
-        if (TrackPoint.mMarkerID[i]!=-1) // first time a Person is found but marker is not detected
+        if (mMarkerID == -1) // first time a Person is found
         {
-            TrackPerson.mMarkerID = TrackPoint.mMarkerID;
+            mMarkerID = tpMarkerID; // set TrackPerson MarkerID equal to TrackPoint MarkerID  //pL[i].markerID();
         }
-        // else if (TrackPerson.mMarkerID == TrackPoint.mMarkerID){// do nothin all is fine}
-        else if (TrackPerson.mMarkerID != TrackPoint.mMarkerID)
+        else if (mMarkerID != tpMarkerID)
         {
             cout << "ERROR: Two MarkerIDs were found for one trajectory." << endl;
         }
