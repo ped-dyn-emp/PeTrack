@@ -27,132 +27,39 @@ QString commandLineOptionsString = QObject::tr(
 
 
 
-void copyToQImage(QImage *qImg, cv::Mat &img) // war static functin in animatioln class
+void copyToQImage(QImage &qImg, cv::Mat &img) // war static functin in animatioln class
 {
-//    debout << "pointer " << iplImg << " to " << qImg << endl;
-    // Check if the sizes are the same
-//    debout << "iplImage: " << iplImg->width << "x" << iplImg->height << endl;
-//    debout << "qImg    : " << qImg->width() << "x" << qImg->height() << endl;
-
-//    Mat img = cvarrToMat(iplImg);
-
-//    if (qImg->height() != img.rows || qImg->width() != img.cols)
-//    {
-//        if (!qImg->isNull())
-//            delete qImg;
-//        qImg = new QImage(QSize(img.cols,img.rows),QImage::Format_RGB32);
-//    }
-
-    if (qImg->height() != img.rows || qImg->width() != img.cols) //!qImg || ( or qImg has no object behind pointer
+    if (qImg.height() != img.rows || qImg.width() != img.cols) //!qImg || ( or qImg has no object behind pointer
     {
-        // If it exists, delete it and then create a new QImage with the size of the IplImage
-        if (!qImg->isNull())
-            delete qImg;
-//        qImg = NULL;
-        qImg = new QImage(QSize(img.cols,img.rows),QImage::Format_RGB888);
-//        qImg = new QImage(QSize(img.cols,img.rows),QImage::Format_RGB32);
+        qImg = QImage(QSize(img.cols,img.rows),QImage::Format_RGB888);
     }
 
-//    Mat _tmp, image = cvarrToMat(iplImg);
-
-//    debout << "image.type(): " << image.type() << endl;
-
-//    switch (image.type()) {
-//    case CV_8UC1:
-//            cvtColor(image, image, CV_GRAY2RGB);
-//            break;
-//    case CV_8UC3:
-////            image = image;
-//            cvtColor(image, image, CV_BGR2RGB);
-//            break;
-//    case CV_8UC4:
-//            debout << "unknown behavior: type=" << image.type() << endl;
-//            break;
-//    default:
-//            debout << "unknown behavior: type=" << image.type() << endl;
-//            break;
-//    }
-
-//    // QImage needs the data to be stored continuously in memory
-//    assert(image.isContinuous());
-//    // Assign OpenCV's image buffer to the QImage. Note that the bytesPerLine parameter
-//    // (http://qt-project.org/doc/qt-4.8/qimage.html#QImage-6) is 3*width because each pixel
-//    // has three bytes.
-//    namedWindow("test");
-//    imshow("test",image);
-//    waitKey();
-
-//    qImg = new QImage((uchar*) image.data, image.cols, image.rows, image.step/*cols*3*/, QImage::Format_RGB888);// 888 ???
-
-////    QImage _qTmp =
-////    qImg->bits() = _qTmp.bits();
-
-//    return;
-
-    int x,y;
-    // Pointer to the data information in the IplImage
-//    uchar *data = /*(char*)*/ img.data;//->imageData;
-//    uchar *yData = data;
-    int channels = img.channels();//->nChannels;
-//    char *p;
+    int channels = img.channels();
 
     if (channels == 3)
     {
         // Needs Qt 5.14 for QImage::Format_BGR888 (saves the color transformation into RGB888)
-        *qImg = QImage((const unsigned char*) (img.data),img.cols,img.rows, img.step, QImage::Format_BGR888).copy();
+        qImg = QImage((const unsigned char*) (img.data),img.cols,img.rows, img.step, QImage::Format_BGR888).copy();
     }
     else if (channels == 1)
     {
         // This loop is optimized so it has to calculate the least amount of indexes
         // Optimizing the access to the pointer data is useless (no difference in performance when tested)
-        for (y = 0; y < img.rows; y++)
+        for (int y = 0; y < img.rows; y++)
         {
             // Pointer to the data information in the QImage for just one column
             // set pointer to value before, because ++p is faster than p++
-//            p = ((char*)qImg->scanLine(y))-1;
-            for (x = 0; x < img.cols; x++)
+            for (int x = 0; x < img.cols; x++)
             {
                 Scalar colour = img.at<uchar>(Point(x, y));
-                qImg->setPixel(x,y,colour.val[0]);
-//                *(++p) = colour.val[0];//*(data);
-//                *(++p) = colour.val[0];//*(data);
-//                *(++p) = colour.val[0];//*(data);
-//                *(++p) = 255;
-                //printf("%02x ", (int)*(data));
-//                data++;// += channels;
+                qImg.setPixel(x,y,colour.val[0]);
             }
-//            data = (yData += img.cols/*->widthStep*/); // because sometimes widthStep != width
-            //printf("\n");
         }
     }
-//    else if (channels == 4)
-//    {
-//        // This loop is optimized so it has to calculate the least amount of indexes
-//        // Optimizing the access to the pointer data is useless (no difference in performance when tested)
-//        for (y = 0; y < iplImg->height; y++)
-//        {
-//            // Pointer to the data information in the QImage for just one column
-//            // set pointer to value before, because ++p is faster than p++
-//            p = ((char*)qImg->scanLine(y))-1;
-//            for (x = 0; x < iplImg->width; x++)
-//            {
-//                *(++p) = *(data);
-//                *(++p) = *(data+1);
-//                *(++p) = *(data+2);
-//                *(++p) = *(data+3);
-//                //*(++p) = 255;
-//                //printf("%02x%02x%02x ", (int)*(data), (int)*(data+1), (int)*(data+2));
-//                data += 4; //channels;
-//            }
-//            data = (yData += iplImg->widthStep); // because sometimes widthStep != width
-//            //printf("\n");
-//        }
-//    }
     else
         cout << "Error: " << channels << " channels are not supported!" << endl;
-
-//    debout << "copyImage ende" << endl;
 }
+
 #ifndef STEREO_DISABLED
 void copyToQImage(QImage *qImg, IplImage *iplImg)
 {

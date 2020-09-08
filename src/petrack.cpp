@@ -3682,7 +3682,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
         // in anzuzeigendes Bild kopieren
         // erst hier wird die bildgroesse von mimage an filteredimg mit border angepasst
-        copyToQImage(mImage, mImgFiltered);
+        copyToQImage(*mImage, mImgFiltered);
 
         if (borderChanged)
             mImageItem->setImage(mImage);
