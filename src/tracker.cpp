@@ -464,7 +464,9 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool
                 for (i=1; i<(anz-1); ++i) // anz ist einer zu viel; zudem nur boie anz-1 , da sonst eh nur mit 1 multipliziert wuerde
                     (*this)[frame-mFirstFrame+i].setQual((i*trackPointAt(frame+i).qual())/anz);
             }
-            syncTrackPersonMarkerID(tp); // Funktion sucht, wie markerID von TrackPoint ist und macht Dinge abhängig davon und vom vorherigen TrackPoint
+
+            // An dieser Stelle sollte Funktion nach Rücksprache mit Maik hin. !!!ABER!!! Bei normalem Durchlauf, wird dieser Teil des Codes nicht erreicht...
+            //syncTrackPersonMarkerID(tp); // Funktion sucht, wie markerID von TrackPoint ist und macht Dinge abhängig davon und vom vorherigen TrackPoint
             replace(frame-mFirstFrame, tp);
 
             if (tp.qual() > 100) // manual add // after inserting, because p ist const
@@ -1056,7 +1058,7 @@ bool Tracker::addPoint(TrackPoint &p, int frame, QSet<int> onlyVisible, int *per
                     // WAR: break inner loop
                     found = true;
                 }
-            }
+            }  
         }
     }
     if (found) // den naechstgelegenen nehmen
@@ -1066,6 +1068,9 @@ bool Tracker::addPoint(TrackPoint &p, int frame, QSet<int> onlyVisible, int *per
             //|| !at(i).trackPointAt(frame).color().isValid() moeglich, um auch bei schlechterer qualitaet aber aktuell nicht
             // vorliegender farbe die ermittelte farbe einzutragen - kommt nicht vor!
         {
+            // 3. Idee wo Funktion eingesetzt werden könnte
+            (*this)[iNearest].syncTrackPersonMarkerID(p);
+
             // set/add color
             if (p.color().isValid()) // not valid for manual, than old color is used
             {
@@ -1077,7 +1082,8 @@ bool Tracker::addPoint(TrackPoint &p, int frame, QSet<int> onlyVisible, int *per
         if (pers != NULL)
             *pers = iNearest;
 
-        syncTrackPersonMarkerID(p);
+        // 2. Idee wo Funktion eingesetzt werden könnte
+        //(*this)[iNearest].syncTrackPersonMarkerID(p);
 
         (*this)[iNearest].setNewReco(true);
 
@@ -2083,18 +2089,25 @@ void Tracker::purge(int frame)
 void TrackPerson::syncTrackPersonMarkerID(TrackPoint &tp) // usage of &pL für PointList oder &p für Point ???
 {
     int tpMarkerID = tp.markerID(); //MarkerID of currently handled trackpoint
+    bool foundTwoDifferentMarkerIDs = false;
 
-    if (tpMarkerID != -1)
+    if (tpMarkerID != -1) // CodeMarker was recognized
     {
-        if (mMarkerID == -1) // first time a Person is found
+        if (mMarkerID == 0 ) // first time a Person is found TrackPerson.mMarkerID is natively zero
         {
-            mMarkerID = tpMarkerID; // set TrackPerson MarkerID equal to TrackPoint MarkerID  //pL[i].markerID();
+            setMarkerID(tpMarkerID); // set TrackPerson MarkerID equal to TrackPoint MarkerID
         }
-        else if (mMarkerID != tpMarkerID)
+        if (mMarkerID != tpMarkerID)
         {
+            foundTwoDifferentMarkerIDs = true;
             cout << "ERROR: Two MarkerIDs were found for one trajectory." << endl;
         }
     }
+//    else if (tpMarkerID == -1) // dann schaue,ob
+//    {
+
+
+//    }
 }
 
 
