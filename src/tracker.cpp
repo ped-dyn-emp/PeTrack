@@ -2093,7 +2093,7 @@ void TrackPerson::syncTrackPersonMarkerID(TrackPoint &tp) // usage of &pL für P
 
     if (tpMarkerID != -1) // CodeMarker was recognized
     {
-        if (mMarkerID == 0 ) // first time a Person is found TrackPerson.mMarkerID is natively zero
+        if (mMarkerID == -1) // first time a Person is found TrackPerson.mMarkerID is -1 by initialisation
         {
             setMarkerID(tpMarkerID); // set TrackPerson MarkerID equal to TrackPoint MarkerID
         }

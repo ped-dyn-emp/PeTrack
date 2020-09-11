@@ -190,7 +190,7 @@ class TrackPerson : public QList<TrackPoint>
 {
 private:
     int mNr; // person number
-    int mMarkerID; //
+    int mMarkerID = -1; //markerID of Trackperson; -1 as positive values including 0 do exist as ArucoCodeNumbers-Values
     double mHeight; // height of the person
     int mHeightCount; // number of colors where mHeight is averaged
     int mFirstFrame; // 0.. frame where the person was tracked the first time
