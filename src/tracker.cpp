@@ -2088,7 +2088,7 @@ void Tracker::purge(int frame)
 // Zu entscheiden: nutzung als funktion mit input+output oder als aufruf mit (*this)[i]
 void TrackPerson::syncTrackPersonMarkerID(TrackPoint &tp) // usage of &pL für PointList oder &p für Point ???
 {
-    int tpMarkerID = tp.markerID(); //MarkerID of currently handled trackpoint
+    int tpMarkerID = tp.getMarkerID(); //MarkerID of currently handled trackpoint
     bool foundTwoDifferentMarkerIDs = false;
 
     if (tpMarkerID != -1) // CodeMarker was recognized

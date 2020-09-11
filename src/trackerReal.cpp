@@ -376,7 +376,7 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                         }
                         if (exportMarkerID)
                         {
-                            trackPersonReal.last().setMarkerID((*tracker)[i][j].markerID());
+                            trackPersonReal.last().setMarkerID((*tracker)[i][j].getMarkerID());
                         }
 
                         // firstFrame+j+addFrames    //ist die kontinuierliche frame number
@@ -609,7 +609,7 @@ void TrackerReal::exportTxt(QTextStream &out, bool alternateHeight, bool useTrac
                 out << " " << at(i).at(j).angleOfView() << endl;
 
             if (exportMarkerID)
-                out << " " << at(i).at(j).markerID() << endl;
+                out << " " << at(i).at(j).getMarkerID() << endl;
             else
                 out << endl;
         }

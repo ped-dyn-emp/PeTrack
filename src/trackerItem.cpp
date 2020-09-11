@@ -520,9 +520,9 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
                     rect.setRect(tp.x()+10,tp.y()+10,15*pSC,10*pSC);
                     painter->drawText(rect,mTracker->at(i).comment());
                     rect.setRect(tp.x()-pSC,tp.y()-pSC,50,50);
-                    if (tp.markerID()>0)
+                    if (tp.getMarkerID()>0)
                     {
-                        painter->drawText(rect,QString("id=%1").arg(tp.markerID()));
+                        painter->drawText(rect,QString("id=%1").arg(tp.getMarkerID()));
                     }
 
                 }

@@ -43,7 +43,7 @@ public:
     {
         mAngleOfView = a;
     }
-    inline int markerID() const
+    inline int getMarkerID() const
     {
         return mMarkerID;
     }

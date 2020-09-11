@@ -33,7 +33,7 @@ public:
     TrackPoint();
     TrackPoint(const Vec2F &p);
     TrackPoint(const Vec2F &p, int qual);
-    TrackPoint(const Vec2F &p, int qual, int markerID);
+    TrackPoint(const Vec2F &p, int qual, int getMarkerID);
     TrackPoint(const Vec2F &p, int qual, const QColor &col);
     TrackPoint(const Vec2F &p, int qual, const Vec2F &colPoint, const QColor &col);
 
@@ -77,7 +77,7 @@ public:
     {
         mQual = qual;
     }
-    inline int markerID() const
+    inline int getMarkerID() const
     {
         return mMarkerID;
     }
@@ -164,7 +164,7 @@ inline QTextStream& operator>>(QTextStream& s, TrackPoint& tp)
 inline QTextStream& operator<<(QTextStream& s, const TrackPoint& tp)
 {
     if (Petrack::trcVersion > 2)
-        s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color() << " " << tp.markerID();
+        s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color() << " " << tp.getMarkerID();
     else if (Petrack::trcVersion == 2)
         s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color();
     else
@@ -174,7 +174,7 @@ inline QTextStream& operator<<(QTextStream& s, const TrackPoint& tp)
 inline std::ostream& operator<<(std::ostream& s, const TrackPoint& tp)
 {
     if (Petrack::trcVersion > 2)
-        s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color() << " " << tp.markerID();
+        s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color() << " " << tp.getMarkerID();
     else if (Petrack::trcVersion > 1)
         s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color();
     else
@@ -247,7 +247,7 @@ public:
     void recalcHeight(float altitude);
     double getNearestZ(int i, int *extrapolated);
 
-    inline const int markerID() const
+    inline const int getMarkerID() const
     {
         return mMarkerID;
     }
