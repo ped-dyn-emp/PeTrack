@@ -130,7 +130,7 @@ build_windows_installer:
     - mkdir -Force build
     - $env:Path += ";C:\Program Files\CMake\bin"
     - cd build
-    - rm *
+    - Remove-Item -Force -Recurse -Path *
     - cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -DUSE_3RD_PARTY=ON ..
     - cpack -C Release
   artifacts:
