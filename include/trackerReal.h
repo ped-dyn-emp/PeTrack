@@ -101,6 +101,7 @@ private:
     double mHeight; // height of the person
     int mFirstFrame; // 0.. frame where the person was tracked the first time
     int mLastFrame; // 0..
+    int mMarkerID = -1; //set to -1 as -1 does not naturally occur as a ArucoMarkerNumber-value
 
 public:
     TrackPersonReal();
@@ -131,6 +132,14 @@ public:
     {
         mLastFrame = f;
     }
+    inline int getMarkerID() const
+    {
+        return mMarkerID;
+    }
+    inline void setMarkerID(int markerID)
+    {
+        mMarkerID = markerID;
+    }
     bool trackPointExist(int frame) const;
     const TrackPointReal& trackPointAt(int frame) const; // & macht bei else probleme, sonst mit [] zugreifbar
     // gibt -1 zurueck, wenn frame oder naechster frame nicht existiert
@@ -140,7 +149,7 @@ public:
 //     double distanceXBetweenFrames(int fromFrame, int toFrame) const;
 //     double distanceYBetweenFrames(int fromFrame, int toFrame) const;
 //     double velocityToNextFrame(int frame) const;
-    void init(int firstFrame, double height);
+    void init(int firstFrame, double height, int markerID);
     void addEnd(const QPointF& pos, int frame);
     void addEnd(const Vec3F& pos, int frame);
     void addEnd(const QPointF& pos, int frame, const QPointF &dir);

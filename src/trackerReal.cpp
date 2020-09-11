@@ -78,12 +78,13 @@ double TrackPersonReal::distanceToNextFrame(int frame) const
     else
         return -1;
 }
-void TrackPersonReal::init(int firstFrame, double height)
+void TrackPersonReal::init(int firstFrame, double height, int markerID)
 {
     clear();
     mFirstFrame = firstFrame;
     mLastFrame = firstFrame-1;
     mHeight = height;
+    setMarkerID(markerID);
 }
 
 void TrackPersonReal::addEnd(const QPointF& pos, int frame)
@@ -209,6 +210,7 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
         int extrapolated;
         QPointF colPos;
         float angle;
+        int markerID;
 
         for (i = 0; i < tracker->size(); ++i) // ueber trajektorien
         {
@@ -232,7 +234,10 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                     //tmpMissingListAnz.removeFirst(); // anzahl
                 }
             }
-            trackPersonReal.init(firstFrame+addFrames, height);
+
+            markerID = (*tracker)[i].getMarkerID(); // set markerID to TrackPerson.markerID
+
+            trackPersonReal.init(firstFrame+addFrames, height, markerID);
             tsize = tracker->at(i).size();
             for (j = 0; (j < tsize); ++j) // ueber trackpoints
             {
@@ -609,7 +614,7 @@ void TrackerReal::exportTxt(QTextStream &out, bool alternateHeight, bool useTrac
                 out << " " << at(i).at(j).angleOfView() << endl;
 
             if (exportMarkerID)
-                out << " " << at(i).at(j).getMarkerID() << endl;
+                out << " " << at(i).getMarkerID() << endl;
             else
                 out << endl;
         }
