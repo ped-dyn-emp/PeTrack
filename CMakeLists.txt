@@ -18,7 +18,7 @@
 # Project setup
 ################################################################################
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
-project(petrack LANGUAGES CXX)
+project(petrack LANGUAGES CXX VERSION 0.8.14)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -188,14 +188,14 @@ target_link_libraries(petrack_core PUBLIC ${OpenCV_LIBS})
 # Linking QWT                                                    *
 #*****************************************************************
 if(APPLE)
-  target_link_directories(petrack_core PUBLIC ${QWT})
+  target_link_directories(petrack_core PUBLIC "${QWT}")
 else()
   target_compile_definitions(
     petrack_core PRIVATE
     $<$<AND:$<PLATFORM_ID:Windows>,$<BOOL:USE_3RD_PARTY>>:QWT QWT_DLL>)
 
-  target_include_directories(petrack_core PUBLIC ${QWT_INCLUDE_DIR})
-  target_link_libraries(petrack_core PUBLIC ${QWT_LIBRARY})
+  target_include_directories(petrack_core PUBLIC "${QWT_INCLUDE_DIR}")
+  target_link_libraries(petrack_core PUBLIC Qwt::Qwt)
 endif()
 
 target_sources(petrack_core PRIVATE src/analysePlot.cpp)
@@ -212,7 +212,7 @@ if(LIBELAS)
     src/libelas/elasMatrix.cpp
     src/libelas/elasTriangle.cpp
   )
-  target_include_directories(elas PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+  target_include_directories(elas PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
   target_compile_options(elas PRIVATE "-fpermissive")
   target_link_libraries(petrack_core PRIVATE elas)
 endif(LIBELAS)
@@ -406,3 +406,12 @@ endif(${STEREO})
 
 # # fuer pgrAviFile win32:LIBS += -lavifil32 win32:LIBS += -lmsvfw32 win64:LIBS
 # += -lavifil32 win64:LIBS += -lmsvfw32
+
+
+
+
+
+#####################################################
+# Installer                                         #
+#####################################################
+include(install_helper)

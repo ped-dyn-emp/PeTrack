@@ -2,6 +2,8 @@ stages:
   - build_environment
   - build
   - test
+  - build_installer
+  - deploy
 
 ###############################################################################
 # Linux CI
@@ -115,3 +117,38 @@ regression_test_windows:
     reports:
       junit: "tests/regression_test/tests/pytest_report.xml"
   needs: ["build_windows"]
+
+build_windows_installer:
+  stage: build_installer
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  tags:
+    - windows
+  script:
+    - mkdir -Force build
+    - $env:Path += ";C:\Program Files\CMake\bin"
+    - cd build
+    - rm *
+    - cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -DUSE_3RD_PARTY=ON ..
+    - cpack -C Release
+  artifacts:
+    paths:
+      - "build/petrack-installer-*"
+    expire_in: 2hrs
+
+make_release:
+  image: alpine
+  stage: deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  needs: ["build_windows_installer"]
+  script:
+    - apk --no-cache add curl
+    - cd build
+    - winInst=$(echo petrack-installer-*)
+    - curl -k -T $winInst -u "${SCIEBO_TOKEN}:" https://fz-juelich.sciebo.de/public.php/webdav/$winInst
+
