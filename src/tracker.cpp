@@ -465,8 +465,6 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool
                     (*this)[frame-mFirstFrame+i].setQual((i*trackPointAt(frame+i).qual())/anz);
             }
 
-            // An dieser Stelle sollte Funktion nach Rücksprache mit Maik hin. !!!ABER!!! Bei normalem Durchlauf, wird dieser Teil des Codes nicht erreicht...
-            //syncTrackPersonMarkerID(tp); // Funktion sucht, wie markerID von TrackPoint ist und macht Dinge abhängig davon und vom vorherigen TrackPoint
             replace(frame-mFirstFrame, tp);
 
             if (tp.qual() > 100) // manual add // after inserting, because p ist const
@@ -1068,7 +1066,7 @@ bool Tracker::addPoint(TrackPoint &p, int frame, QSet<int> onlyVisible, int *per
             //|| !at(i).trackPointAt(frame).color().isValid() moeglich, um auch bei schlechterer qualitaet aber aktuell nicht
             // vorliegender farbe die ermittelte farbe einzutragen - kommt nicht vor!
         {
-            // 3. Idee wo Funktion eingesetzt werden könnte
+            // Synchronize TrackPerson.markerID with TrackPoint.markerID
             (*this)[iNearest].syncTrackPersonMarkerID(p);
 
             // set/add color
@@ -1081,9 +1079,6 @@ bool Tracker::addPoint(TrackPoint &p, int frame, QSet<int> onlyVisible, int *per
 
         if (pers != NULL)
             *pers = iNearest;
-
-        // 2. Idee wo Funktion eingesetzt werden könnte
-        //(*this)[iNearest].syncTrackPersonMarkerID(p);
 
         (*this)[iNearest].setNewReco(true);
 
@@ -2089,7 +2084,6 @@ void Tracker::purge(int frame)
 void TrackPerson::syncTrackPersonMarkerID(TrackPoint &tp) // usage of &pL für PointList oder &p für Point ???
 {
     int tpMarkerID = tp.getMarkerID(); //MarkerID of currently handled trackpoint
-    bool foundTwoDifferentMarkerIDs = false;
 
     if (tpMarkerID != -1) // CodeMarker was recognized
     {
@@ -2099,15 +2093,10 @@ void TrackPerson::syncTrackPersonMarkerID(TrackPoint &tp) // usage of &pL für P
         }
         if (mMarkerID != tpMarkerID)
         {
-            foundTwoDifferentMarkerIDs = true;
             cout << "ERROR: Two MarkerIDs were found for one trajectory." << endl;
         }
     }
-//    else if (tpMarkerID == -1) // dann schaue,ob
-//    {
 
-
-//    }
 }
 
 
