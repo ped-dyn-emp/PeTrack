@@ -2078,9 +2078,14 @@ void Tracker::purge(int frame)
     }
 }
 
-// Brief: Synchronize TrackPoint.mMarkerID with TrackPerson.mMarkerID
-// set PersonMarkerID from TrackPointMarkerID if MarkerID == -1 and check if not other "real ID" was detected - trigger warning otherwise
-// Zu entscheiden: nutzung als funktion mit input+output oder als aufruf mit (*this)[i]
+/**
+ * @brief TrackPerson::syncTrackPersonMarkerID Synchronize TrackPoint.mMarkerID with TrackPerson.mMarkerID
+ *
+ * 1. Function sets PersonMarkerID from TrackPointMarkerID if MarkerID == -1
+ * 2. checks if not other ID was detected and triggers a warning otherwise
+ *
+ * @param tp TrackPoint from TrackPoint Class
+ */
 void TrackPerson::syncTrackPersonMarkerID(TrackPoint &tp) // usage of &pL für PointList oder &p für Point ???
 {
     int tpMarkerID = tp.getMarkerID(); //MarkerID of currently handled trackpoint
@@ -2096,7 +2101,6 @@ void TrackPerson::syncTrackPersonMarkerID(TrackPoint &tp) // usage of &pL für P
             cout << "ERROR: Two MarkerIDs were found for one trajectory." << endl;
         }
     }
-
 }
 
 
