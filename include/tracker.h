@@ -33,7 +33,7 @@ public:
     TrackPoint();
     TrackPoint(const Vec2F &p);
     TrackPoint(const Vec2F &p, int qual);
-    TrackPoint(const Vec2F &p, int qual, int getMarkerID);
+    TrackPoint(const Vec2F &p, int qual, int markerID);
     TrackPoint(const Vec2F &p, int qual, const QColor &col);
     TrackPoint(const Vec2F &p, int qual, const Vec2F &colPoint, const QColor &col);
 
@@ -318,7 +318,7 @@ public:
     // gibt -1 zurueck, wenn frame oder naechster frame nicht existiert
     // entfernung ist absolut
     double distanceToNextFrame(int frame) const;
-    void syncTrackPersonMarkerID(TrackPoint &tp);
+    void syncTrackPersonMarkerID(int markerID);
 };
 
 //mHeightCount wird nicht e3xportiert und auch nicht wieder eingelesen -> nach import auf 0 obwohl auf height ein wert steht, daher immer mheight auf -1 testen!!!

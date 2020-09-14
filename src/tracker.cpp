@@ -1067,7 +1067,7 @@ bool Tracker::addPoint(TrackPoint &p, int frame, QSet<int> onlyVisible, int *per
             // vorliegender farbe die ermittelte farbe einzutragen - kommt nicht vor!
         {
             // Synchronize TrackPerson.markerID with TrackPoint.markerID
-            (*this)[iNearest].syncTrackPersonMarkerID(p);
+            (*this)[iNearest].syncTrackPersonMarkerID(p.getMarkerID());
 
             // set/add color
             if (p.color().isValid()) // not valid for manual, than old color is used
@@ -2086,9 +2086,9 @@ void Tracker::purge(int frame)
  *
  * @param tp TrackPoint from TrackPoint Class
  */
-void TrackPerson::syncTrackPersonMarkerID(TrackPoint &tp) // usage of &pL für PointList oder &p für Point ???
+void TrackPerson::syncTrackPersonMarkerID(int markerID)
 {
-    int tpMarkerID = tp.getMarkerID(); //MarkerID of currently handled trackpoint
+    int tpMarkerID = markerID; //MarkerID of currently handled trackpoint
 
     if (tpMarkerID != -1) // CodeMarker was recognized
     {

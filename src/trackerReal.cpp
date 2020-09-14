@@ -210,7 +210,6 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
         int extrapolated;
         QPointF colPos;
         float angle;
-        int markerID;
 
         for (i = 0; i < tracker->size(); ++i) // ueber trajektorien
         {
@@ -235,7 +234,7 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                 }
             }
 
-            markerID = (*tracker)[i].getMarkerID(); // set markerID to TrackPerson.markerID
+            int markerID = (*tracker)[i].getMarkerID(); // set markerID to TrackPerson.markerID
 
             trackPersonReal.init(firstFrame+addFrames, height, markerID);
             tsize = tracker->at(i).size();
