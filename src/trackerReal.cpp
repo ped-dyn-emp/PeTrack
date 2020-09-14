@@ -84,7 +84,7 @@ void TrackPersonReal::init(int firstFrame, double height, int markerID)
     mFirstFrame = firstFrame;
     mLastFrame = firstFrame-1;
     mHeight = height;
-    setMarkerID(markerID);
+    mMarkerID = markerID;
 }
 
 void TrackPersonReal::addEnd(const QPointF& pos, int frame)

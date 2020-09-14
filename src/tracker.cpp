@@ -2084,7 +2084,7 @@ void Tracker::purge(int frame)
  * 1. Function sets PersonMarkerID from TrackPointMarkerID if MarkerID == -1
  * 2. checks if not other ID was detected and triggers a warning otherwise
  *
- * @param tp TrackPoint from TrackPoint Class
+ * @param markerID integer representing ArucoCodeMarker for currently handled TrackPoint
  */
 void TrackPerson::syncTrackPersonMarkerID(int markerID)
 {
