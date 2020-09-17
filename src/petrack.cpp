@@ -2449,13 +2449,19 @@ void Petrack::importTracker(QString dest) //default = ""
             sz = firstLine.toInt(&ok);
             if (!ok)
             {
-                if (firstLine.contains("version 3",Qt::CaseInsensitive))
+                if (firstLine.contains("version 4",Qt::CaseInsensitive))
+                {
+                    trcVersion = 4;
+                }
+                else if (firstLine.contains("version 3",Qt::CaseInsensitive))
                 {
                     trcVersion = 3;
-                }else if(firstLine.contains("version 2",Qt::CaseInsensitive))
+                }
+                else if(firstLine.contains("version 2",Qt::CaseInsensitive))
                 {
                     trcVersion = 2;
-                }else
+                }
+                else
                 {
                     debout << "Error: wrong header while reading TRC file." << endl;
                     sz = 0;
@@ -2950,7 +2956,7 @@ void Petrack::exportTracker(QString dest) //default = ""
                 qApp->processEvents();
 
                 //if (mControlWidget->exportComment->isChecked())
-                    trcVersion = 3;
+                    trcVersion = 4;
                 //else
                 //    trcVersion = 2;
 
