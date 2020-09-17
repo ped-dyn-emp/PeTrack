@@ -207,6 +207,8 @@ public:
 //     TrackPerson(int nr, int frame, const Vec2F &p);
     TrackPerson(int nr, int frame, const TrackPoint &p);
 
+    TrackPerson(int nr, int frame, const TrackPoint &p, int markerID);
+
     bool insertAtFrame(int frame, const TrackPoint &p, int persNr, bool extrapolate);
 
     inline int nrInBg() const

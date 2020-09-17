@@ -133,6 +133,22 @@ TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p)
       mNewReco(true),
       mCol(p.color()),
       mComment(),
+      mMarkerID(-1),
+      mColCount(1)
+{
+    append(p);
+}
+
+TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p, int markerID)
+    : mNr(0),
+      mHeight(MIN_HEIGHT),
+      mHeightCount(0),
+      mFirstFrame(frame),
+      mLastFrame(frame),
+      mNewReco(true),
+      mCol(p.color()),
+      mComment(),
+      mMarkerID(markerID),
       mColCount(1)
 {
     append(p);
@@ -1091,7 +1107,8 @@ bool Tracker::addPoint(TrackPoint &p, int frame, QSet<int> onlyVisible, int *per
 
         if (p.qual() > 100) //manual add
             p.setQual(100);
-        append(TrackPerson(/*p.markerID()>0 ? p.markerID() :*/ 0, frame, p)); // 0 is person number/markerID; newReco is set to true by default
+        append(TrackPerson(/*p.markerID()>0 ? p.markerID() :*/ 0, frame, p, p.getMarkerID())); // 0 is person number/markerID; newReco is set to true by default
+
     }
     if ((z > 0) && ((onlyVisible.empty()) || found))
         (*this)[iNearest].setHeight(z, mMainWindow->getControlWidget()->coordAltitude->value()); // , frame
