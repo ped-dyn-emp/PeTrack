@@ -57,7 +57,7 @@ inline std::ostream& operator<<(std::ostream& s, const QString& t)
 #include "cxcore.h"
 void copyToQImage(QImage *qImg, IplImage *iplImg); // war static functin in animatioln class
 #endif
-void copyToQImage(QImage *qImg, cv::Mat &img);
+void copyToQImage(QImage &qImg, cv::Mat &img);
 
 #include <QLabel>
 #ifndef STEREO_DISABLED
