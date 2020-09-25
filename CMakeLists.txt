@@ -147,6 +147,7 @@ set(CMAKE_AUTOUIC ON)
 list(APPEND CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_SOURCE_DIR}/ui" "./src")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
+set(AUTOGEN_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/${NAME}_autogen")
 
 #**********************************************************
 # Create library and exectuable                           *
