@@ -107,6 +107,7 @@ public:
  
     // Returns the FPS of the current animation if it is a video
     double getFPS();
+    double getOriginalFPS();
 
     void setFPS(double fps);
  
@@ -170,6 +171,7 @@ private:
  
     // Number of frames per second in video
     double mFps;
+    double mOriginalFps;
 
     // the time (seconds since 1.1.1970 0 uhr, microseconds (.000001s)) when the first frame was recorded (bumblebee .time file)
     int mFirstSec;

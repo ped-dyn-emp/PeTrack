@@ -34,14 +34,14 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     //frame forward Button
     mFrameForwardButton = new QToolButton;
     mFrameForwardButton->setAutoRepeat(true);
-    mFrameForwardButton->setAutoRepeatDelay(400);   // before repetition starts   
+    mFrameForwardButton->setAutoRepeatDelay(400);   // before repetition starts
     mFrameForwardButton->setAutoRepeatInterval(1000./DEFAULT_FPS); // war: 40 // for 1000 ms / 25 fps
     mFrameForwardButton->setIcon(QPixmap(":/skipF"));
     mFrameForwardButton->setIconSize(iconSize);
     connect(mFrameForwardButton,SIGNAL(clicked()),this,SLOT(frameForward()));
 
     //frame backward Button
-    mFrameBackwardButton = new QToolButton; 
+    mFrameBackwardButton = new QToolButton;
     mFrameBackwardButton->setAutoRepeat(true);
     mFrameBackwardButton->setAutoRepeatDelay(400);   // before repetition starts
     mFrameBackwardButton->setAutoRepeatInterval(1000./DEFAULT_FPS); // war: 40 // for 1000 ms / 25 fps
@@ -152,7 +152,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mPlayerLayout->addWidget(mFpsNum);
     mPlayerLayout->addWidget(mFpsLabel);
     mPlayerLayout->setMargin(0);
- 
+
     mMainWindow = (class Petrack*) parent;
 
     setLayout(mPlayerLayout);
@@ -184,6 +184,12 @@ void Player::togglePlayerSpeedFixed()
 bool Player::getPlayerSpeedFixed()
 {
     return mPlayerSpeedFixed;
+}
+
+void Player::fixSpeedRelativeToRealtime(double factor)
+{
+    setFPS(mAnimation->getOriginalFPS()*factor);
+    setPlayerSpeedFixed(true);
 }
 
 void Player::setAnim(Animation *anim)
@@ -218,7 +224,7 @@ bool Player::updateImage()
     if (mImg.empty())
     {
         pause();
-        //cerr<<"No valid image to update"<<endl;        
+        //cerr<<"No valid image to update"<<endl;
 //        mMainWindow->updateImage(Mat(mImg.rows,mImg.cols,CV_8UC3,Scalar(0,0,0)));
         return false;
     }
@@ -245,40 +251,23 @@ bool Player::updateImage()
     mSlider->setValue(mAnimation->getCurrentFrameNum()); //(1000*mAnimation->getCurrentFrameNum())/mAnimation->getNumFrames());
     mFrameNum->setText(QString().number(mAnimation->getCurrentFrameNum()));
     mSliderSet = false; // reset setSlider here because if value doesnt change than it would not be reset by skiptoframe
-    //QTimer::singleShot(5, this, SLOT(done())); first try, but skip images, if updating need to much time
     qApp->processEvents(); // to allow event while playing
 
     // slow down the player speed for extrem fast video sequences (Jiayue China or 16fps cam99 basigo grid video)
-    static double stoppTime = 10;
-
     if (mPlayerSpeedFixed)
     {
-        double diff = mMainWindow->getStatusFPS() - mAnimation->getFPS();
-//        debout << "diff: " << diff << endl;
-
-        diff = abs(diff);
-
-        if (diff > 3)
-            stoppTime *= mMainWindow->getStatusFPS() < mAnimation->getFPS() ? 0.9 : 1.1;
-        else if (diff > 1)
-            stoppTime *= mMainWindow->getStatusFPS() < mAnimation->getFPS() ? 0.99 : 1.01;
-        else if (diff > 0.2)
-            stoppTime *= mMainWindow->getStatusFPS() < mAnimation->getFPS() ? 0.999 : 1.001;
-
-        //    debout << "stopp time: " << stoppTime << endl;
-
-        if (stoppTime < 1)
-            stoppTime = 1; // to avoid double overflow 0.0000000001...
-        else if ( stoppTime > (1000.0/mAnimation->getFPS()) )
-            stoppTime = (1000.0/mAnimation->getFPS()); // stoppTime = max. 1 sec./FPS
-
-        if (stoppTime > 1) // if there is stopp time  slow down the speed
-        {
-            QTimer::singleShot(stoppTime, this, SLOT(done()));
-        }else
-        {
-            done();
+        auto supposedDiff = static_cast<long long int>(1'000/mAnimation->getFPS());
+        static QElapsedTimer timer;
+        if(timer.isValid()){
+            while(!timer.hasExpired(supposedDiff)){
+                qApp->processEvents();
+            }
+        }else{
+            timer.start();
         }
+
+        timer.start();
+        done();
     }else
     {
         done();
