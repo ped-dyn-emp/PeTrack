@@ -454,6 +454,15 @@ private:
     QAction *mFitROIAct;
     QAction *mCameraLeftViewAct;
     QAction *mCameraRightViewAct;
+    QAction *mFixToRealtime;
+    QAction *mFixTo0p75;
+    QAction *mFixTo0p50;
+    QAction *mFixTo0p25;
+    QAction *mFixTo1p25;
+    QAction *mFixTo1p50;
+    QAction *mFixTo1p75;
+    QAction *mFixTo2p00;
+    QAction *mFixUnlimited;
     QAction *mDelPastAct;
     QAction *mDelFutureAct;
     QAction *mDelAllRoiAct;
@@ -463,6 +472,7 @@ private:
     QAction *mAboutAct;
     QAction *mOnlineHelpAct;
     QActionGroup *mCameraGroupView;
+    QMenu *mFixPlaybackSpeedMenu;
 
     QMenu *mFileMenu;
     QMenu *mViewMenu;

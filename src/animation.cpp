@@ -407,6 +407,11 @@ double Animation::getFPS()
         return -1;
 }
 
+double Animation::getOriginalFPS()
+{
+    return mOriginalFps;
+}
+
 // -2 shows, that it is called by widget
 void Animation::setFPS(double fps)
 {
@@ -1219,8 +1224,11 @@ bool Animation::getInfoVideo(QString fileName)
     // We get the FPS number with the cvGetCaptureProperty function
     // Note that this doesn't work if no frame has already retrieved!!
     ////setFPS(cvGetCaptureProperty(mCapture,CV_CAP_PROP_FPS));
-    if (mVideoCapture.get(CAP_PROP_FPS))
+    if (mVideoCapture.get(CAP_PROP_FPS)){
         setFPS(mVideoCapture.get(CAP_PROP_FPS));
+        mOriginalFps = mVideoCapture.get(CAP_PROP_FPS);
+    }
+
  
     // Since the Xine implementation is kaputt, we have to do a hack to get the length of the video
     // We will do two cases :
@@ -1360,8 +1368,12 @@ bool Animation::getCameraInfo()
     // We get the FPS number with the cvGetCaptureProperty function
     // Note that this doesn't work if no frame has already retrieved!!
     ////setFPS(cvGetCaptureProperty(mCapture,CV_CAP_PROP_FPS));
-    if (mVideoCapture.get(CAP_PROP_FPS))
+    if (mVideoCapture.get(CAP_PROP_FPS)){
         setFPS(mVideoCapture.get(CAP_PROP_FPS));
+        mOriginalFps = mVideoCapture.get(CAP_PROP_FPS);
+    }
+
+
 
     return true;
 }

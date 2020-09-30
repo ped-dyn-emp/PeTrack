@@ -30,6 +30,7 @@ public:
     Player(Animation *anim, QWidget *parent = 0);
     void setAnim(Animation *anim);
     bool getPaused();
+    void fixSpeedRelativeToRealtime(double factor);
 
 public slots:
     bool frameForward();
@@ -69,6 +70,7 @@ private:
     bool mPlayerSpeedFixed;
     bool mSliderSet;
     bool mRec;
+
 
 #ifdef AVI
     AviFile mAviFile;

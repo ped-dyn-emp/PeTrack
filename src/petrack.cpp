@@ -1720,6 +1720,24 @@ void Petrack::createActions()
     connect(mCameraRightViewAct, SIGNAL(triggered()), this, SLOT(setCamera()));
     mCameraRightViewAct->setChecked(true); // right wird als default genommen, da reference image in triclops auch right ist // erste trj wurden mit left gerechnet
 
+    mFixToRealtime = new QAction(tr("&Realtime"));
+    connect(mFixToRealtime, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(1.0);});
+    mFixTo2p00 = new QAction(tr("&x2"));
+    connect(mFixTo2p00, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(2.0);});
+    mFixTo1p75 = new QAction(tr("&x1.75"));
+    connect(mFixTo1p75, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(1.75);});
+    mFixTo1p50 = new QAction(tr("&x1.5"));
+    connect(mFixTo1p50, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(1.5);});
+    mFixTo1p25 = new QAction(tr("&x1.25"));
+    connect(mFixTo1p25, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(1.25);});
+    mFixTo0p75 = new QAction(tr("&x0.75"));
+    connect(mFixTo0p75, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(0.75);});
+    mFixTo0p50 = new QAction(tr("&x0.5"));
+    connect(mFixTo0p50, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(0.5);});
+    mFixTo0p25 = new QAction(tr("&x0.25"));
+    connect(mFixTo0p25, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(0.25);});
+    mFixUnlimited = new QAction(tr("&Unlimited"));
+    connect(mFixUnlimited, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->setPlayerSpeedFixed(false);});
     // -------------------------------------------------------------------------------------------------------
 
     QSignalMapper* signalMapper = new QSignalMapper(this);
@@ -1783,6 +1801,16 @@ void Petrack::createMenus()
     mCameraMenu = mViewMenu->addMenu(tr("&Camera"));
     mCameraMenu->addAction(mCameraLeftViewAct);
     mCameraMenu->addAction(mCameraRightViewAct);
+    mFixPlaybackSpeedMenu = mViewMenu->addMenu(tr("&Max playback speed"));
+    mFixPlaybackSpeedMenu->addAction(mFixToRealtime);
+    mFixPlaybackSpeedMenu->addAction(mFixUnlimited);
+    mFixPlaybackSpeedMenu->addAction(mFixTo2p00);
+    mFixPlaybackSpeedMenu->addAction(mFixTo1p75);
+    mFixPlaybackSpeedMenu->addAction(mFixTo1p50);
+    mFixPlaybackSpeedMenu->addAction(mFixTo1p25);
+    mFixPlaybackSpeedMenu->addAction(mFixTo0p75);
+    mFixPlaybackSpeedMenu->addAction(mFixTo0p50);
+    mFixPlaybackSpeedMenu->addAction(mFixTo0p25);
     mViewMenu->addSeparator();
     mViewMenu->addAction(mFitViewAct);
     mViewMenu->addAction(mFitROIAct);
@@ -2151,12 +2179,12 @@ void Petrack::setShowFPS(double fps)
 
 void Petrack::updateShowFPS()
 {
-    static clock_t lastTime = -1;
+    static QElapsedTimer lastTime;
 
     if (mPlayerWidget->getPaused()) //(!imageChanged)
     {
         setShowFPS(0.);
-        lastTime = -1;
+        lastTime.invalidate();
     }
     else
     {
@@ -2165,10 +2193,14 @@ void Petrack::updateShowFPS()
         //                mShowFPS = 1000./milliSec;
         //            updateTime.start();
 
-        if (lastTime != -1)
-            if ((lastTime = clock()-lastTime) != 0)
-                setShowFPS(CLOCKS_PER_SEC / ((double)(lastTime)));
-        lastTime = clock();
+        if (lastTime.isValid())
+        {
+            if (lastTime.elapsed() > 0)
+            {
+                setShowFPS(1000./lastTime.elapsed());
+            }
+        }
+        lastTime.start();
     }
 }
 
