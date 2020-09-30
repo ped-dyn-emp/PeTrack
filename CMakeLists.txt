@@ -122,7 +122,7 @@ find_package(
   REQUIRED)
 
 # OpenCV
-find_package(OpenCV 4.0.0 REQUIRED )
+find_package(OpenCV 4.2.0 EXACT REQUIRED )
 message("Building with OpenCV${OpenCV_VERSION_MAJOR}(${OpenCV_VERSION})")
 
 # QWT
