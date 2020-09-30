@@ -13,9 +13,6 @@ StereoWidget::StereoWidget(QWidget *parent)
     stereoDispAlgo->addItem("ptGrey");
     stereoDispAlgo->addItem("openCV block matching");
     stereoDispAlgo->addItem("openCV semi-global block matching");
-#ifdef LIBELAS
-    stereoDispAlgo->addItem("libelas");
-#endif
 }
 
 //---------------------------------------

@@ -50,9 +50,6 @@ print_var(STEREO)
 option(AVI "Use Avi File from Point Grey (currently not supported)" OFF)
 print_var(AVI)
 
-option(LIBELAS "Use Libelas" OFF)
-print_var(LIBELAS)
-
 option(DISABLE_STEREO "Disable Stereo features (currently must be taken)" ON)
 print_var(DISABLE_STEREO)
 
@@ -156,7 +153,6 @@ add_library(petrack_core STATIC)
 add_executable(petrack src/main.cpp)
 target_link_libraries(petrack PRIVATE petrack_core)
 
-# TODO we should remove this compile option and be more strict
 target_compile_options(petrack_core PRIVATE ${COMMON_COMPILE_OPTIONS})
 target_compile_definitions(petrack_core PUBLIC STEREO_DISABLED)
 
@@ -204,19 +200,6 @@ target_sources(petrack_core PRIVATE src/analysePlot.cpp)
 #*************************************************************
 # Handling of Options                                        *
 #*************************************************************
-if(LIBELAS)
-  target_compile_definitions(petrack_core PRIVATE LIBELAS)
-  add_library(elas STATIC
-    src/libelas/elasDescriptor.cpp
-    src/libelas/elas.cpp
-    src/libelas/elasFilter.cpp
-    src/libelas/elasMatrix.cpp
-    src/libelas/elasTriangle.cpp
-  )
-  target_include_directories(elas PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-  target_compile_options(elas PRIVATE "-fpermissive")
-  target_link_libraries(petrack_core PRIVATE elas)
-endif(LIBELAS)
 
 # TODO currently not available
 if(AVI)
