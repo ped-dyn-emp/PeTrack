@@ -357,13 +357,12 @@ inline QTextStream& operator>>(QTextStream& s, TrackPerson& tp)
     trjInfoLine >> col;
     tp.setColor(col);
     //cout << " col: " << tp.color();
-    trjInfoLine >> n; // size of list
-
     if (Petrack::trcVersion > 3)
     {
         trjInfoLine >> markerID;
         tp.setMarkerID(markerID);
     }
+    trjInfoLine >> n; // size of list
     if (Petrack::trcVersion > 2) // Reading the comment line
     {
         //s.skipWhiteSpace(); // skip white spaces for reading the comment line without this the reading makes some problems
@@ -386,15 +385,13 @@ inline QTextStream& operator>>(QTextStream& s, TrackPerson& tp)
 
 inline QTextStream& operator<<(QTextStream& s, const TrackPerson& tp)
 {
+    s << tp.nr() << " " << tp.height() << " " << tp.firstFrame() << " " << tp.lastFrame() << " " << tp.colCount() << " " << tp.color();
     if (Petrack::trcVersion > 3)
     {
-        s << tp.nr() << " " << tp.height() << " " << tp.firstFrame() << " " << tp.lastFrame() << " " << tp.colCount() << " " << tp.color() << " " << tp.size() << " " << tp.getMarkerID()<< endl;
+        s << " " <<tp.getMarkerID();
     }
-    else if (Petrack::trcVersion <= 3)
-    {
-        s << tp.nr() << " " << tp.height() << " " << tp.firstFrame() << " " << tp.lastFrame() << " " << tp.colCount() << " " << tp.color() << " " << tp.size() << endl;
-    }
-    s << tp.comment() << endl;
+    s << " " << tp.size();
+    s << endl << tp.comment() << endl;
     for (int i = 0; i < tp.size(); ++i)
         s << tp.at(i) << endl;
     return s;
@@ -402,15 +399,13 @@ inline QTextStream& operator<<(QTextStream& s, const TrackPerson& tp)
 
 inline std::ostream& operator<<(std::ostream& s, const TrackPerson& tp)
 {
+    s << tp.nr() << " " << tp.height() << " " << tp.firstFrame() << " " << tp.lastFrame() << " " << tp.colCount() << " " << tp.color();
     if(Petrack::trcVersion > 3)
     {
-        s << tp.nr() << " " << tp.height() << " " << tp.firstFrame() << " " << tp.lastFrame() << " " << tp.colCount() << " " << tp.color() << " " << tp.size() << " " << tp.getMarkerID()<< endl;
+        s <<  " " << tp.getMarkerID();
     }
-    else if (Petrack::trcVersion <= 3)
-    {
-        s << tp.nr() << " " << tp.height() << " " << tp.firstFrame() << " " << tp.lastFrame() << " " << tp.colCount() << " " << tp.color() << " " << tp.size() << endl;
-    }
-        s << tp.comment() << endl;
+    s << " " << tp.size();
+    s << endl << tp.comment() << endl;
     for (int i = 0; i < tp.size(); ++i)
         s << tp.at(i) << endl;
     return s;
