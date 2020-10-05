@@ -8,9 +8,6 @@
 #include "control.h"
 #include "ellipse.h"
 #include "person.h"
-#ifdef LIBELAS
-  #include "libelas/elas.h"
-#endif
 
 #ifdef STEREO
 
@@ -518,7 +515,7 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
 //        debout << BMState->numberOfDisparities<<endl;
 
 //        //Computes the disparity map using block matching algorithm.
-//        //    * disparity – The output single-channel 16-bit signed, or 32-bit floating-point disparity map of the same size as input images.
+//        //    * disparity ï¿½ The output single-channel 16-bit signed, or 32-bit floating-point disparity map of the same size as input images.
 //        //                  In the first case the computed disparities are represented as fixed-point numbers with 4 fractional bits
 //        //                  (i.e. the computed disparity values are multiplied by 16 and rounded to integers).
 //        //The function cvFindStereoCorrespondenceBM computes disparity map for the input rectified stereo pair.
@@ -972,173 +969,6 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
 
             mDisparity.imageData = (char *) mBMdisparity16->data.ptr;
         }
-#ifdef LIBELAS
-        else if (mMain->getStereoWidget()->stereoDispAlgo->currentIndex() == 3) // libelas, KIT, http://www.rainsoft.de/software/libelas.html -------------------------------------------------------------------------------------------------------------------
-        {
-            if (!mBMdisparity16)
-            {
-                mBMdisparity16 = cvCreateMat(mDisparity.height, mDisparity.width, CV_16S);
-                if (mBMdisparity16 == NULL)
-                    debout << "Error: create matrix for libelas disparity map!"  << endl;
-            }
-
-            IplImage* I1 = getRectified(cameraRight);
-            IplImage* I2 = getRectified(cameraLeft);
-
-            // check for correct size
-            if (I1->width<=0 || I1->height <=0 || I2->width<=0 || I2->height <=0 ||
-                I1->width!=I2->width || I1->height!=I2->height) {
-              debout << "ERROR: Images must be of same size!" << endl;
-              return NULL;
-            }
-
-            // get image width and height
-            int32_t width  = I1->width;
-            int32_t height = I1->height;
-
-            // allocate memory for disparity images
-            const int32_t dims[3] = {width,height,width}; // bytes per line = width
-            float* D1_data = (float*)malloc(width*height*sizeof(float));
-            float* D2_data = (float*)malloc(width*height*sizeof(float));
-
-            // process
-            Elas::parameters param(Elas::ROBOTICS); // Elas::MIDDLEBURY
-            param.postprocess_only_left = false;
-            param.disp_min              = mMain->getStereoWidget()->minDisparity->value();
-            int dispMax = MAX(mMain->getStereoWidget()->minDisparity->value()+10, mMain->getStereoWidget()->maxDisparity->value());
-            if (dispMax > mMain->getStereoWidget()->maxDisparity->value())
-                debout << "Warning: set max disparity to " << dispMax << endl;
-            param.disp_max              = MAX(mMain->getStereoWidget()->minDisparity->value()+10, mMain->getStereoWidget()->maxDisparity->value()); // mind 10 unterschied, sonst Absturz
-            //param.sradius               = myClip(mMain->getStereoWidget()->stereoMaskSize->value(), 1, 11);
-            //param.support_threshold     = (mMain->getStereoWidget()->edgeMaskSize->value()-3)/20.+0.6;//0.6..1.0; // unterschied zwischen besten und zweitbesten treffer
-            //debout << param.filter_median;          // optional median filter (approximated)
-            //debout << param.filter_adaptive_mean;   // optional adaptive mean filter (approximated)
-            //param.filter_median = false;
-            //param.filter_adaptive_mean = false;
-
-//            parameters (setting s=ROBOTICS) {
-//              // default settings in a robotics environment
-//              // (do not produce results in half-occluded areas
-//              //  and are a bit more robust towards lighting etc.)
-//              if (s==ROBOTICS) {
-//                disp_min              = 0;
-//                disp_max              = 255;
-//                support_threshold     = 0.85;
-//                support_texture       = 10;
-//                candidate_stepsize    = 5;
-//                incon_window_size     = 5;
-//                incon_threshold       = 5;
-//                incon_min_support     = 5;
-//                add_corners           = 0;
-//                grid_size             = 20;
-//                beta                  = 0.02;
-//                gamma                 = 3;
-//                sigma                 = 1;
-//                sradius               = 2;
-//                match_texture         = 1;
-//                lr_threshold          = 2;
-//                speckle_sim_threshold = 1;
-//                speckle_size          = 200;
-//                ipol_gap_width        = 3;
-//                filter_median         = 0;
-//                filter_adaptive_mean  = 1;
-//                postprocess_only_left = 1;
-//                subsampling           = 0;
-//              // default settings for middlebury benchmark
-//              // (interpolate all missing disparities)
-//              } else {
-//                disp_min              = 0;
-//                disp_max              = 255;
-//                support_threshold     = 0.95;
-//                support_texture       = 10;
-//                candidate_stepsize    = 5;
-//                incon_window_size     = 5;
-//                incon_threshold       = 5;
-//                incon_min_support     = 5;
-//                add_corners           = 1;
-//                grid_size             = 20;
-//                beta                  = 0.02;
-//                gamma                 = 5;
-//                sigma                 = 1;
-//                sradius               = 3;
-//                match_texture         = 0;
-//                lr_threshold          = 2;
-//                speckle_sim_threshold = 1;
-//                speckle_size          = 200;
-//                ipol_gap_width        = 5000;
-//                filter_median         = 1;
-//                filter_adaptive_mean  = 0;
-//                postprocess_only_left = 0;
-//                subsampling           = 0;
-
-//            int32_t disp_min;               // min disparity
-//            int32_t disp_max;               // max disparity
-//            float   support_threshold;      // max. uniqueness ratio (best vs. second best support match)
-//            int32_t support_texture;        // min texture for support points
-//            int32_t candidate_stepsize;     // step size of regular grid on which support points are matched
-//            int32_t incon_window_size;      // window size of inconsistent support point check
-//            int32_t incon_threshold;        // disparity similarity threshold for support point to be considered consistent
-//            int32_t incon_min_support;      // minimum number of consistent support points
-//            bool    add_corners;            // add support points at image corners with nearest neighbor disparities
-//            int32_t grid_size;              // size of neighborhood for additional support point extrapolation
-//            float   beta;                   // image likelihood parameter
-//            float   gamma;                  // prior constant
-//            float   sigma;                  // prior sigma
-//            float   sradius;                // prior sigma radius
-//            int32_t match_texture;          // min texture for dense matching
-//            int32_t lr_threshold;           // disparity threshold for left/right consistency check
-//            float   speckle_sim_threshold;  // similarity threshold for speckle segmentation
-//            int32_t speckle_size;           // maximal size of a speckle (small speckles get removed)
-//            int32_t ipol_gap_width;         // interpolate small gaps (left<->right, top<->bottom)
-//            bool    filter_median;          // optional median filter (approximated)
-//            bool    filter_adaptive_mean;   // optional adaptive mean filter (approximated)
-//            bool    postprocess_only_left;  // saves time by not postprocessing the right image
-//            bool    subsampling;            // saves time by only computing disparities for each 2nd pixel
-//                                            // note: for this option D1 and D2 must be passed with size
-//                                            //       width/2 x height/2 (rounded towards zero)
-            Elas elas(param);
-            elas.process((uint8_t *) I2->imageData, (uint8_t *) I1->imageData,D1_data,D2_data,dims);
-
-            // exchange/replace value in mBMdisparity16 so that the error value is the same like in pointgrey
-            short* data16 = (short*) mBMdisparity16->data.s;
-            short* yData16 = data16;
-
-            for (int y = 0; y < mBMdisparity16->height; ++y)
-            {
-                for (int x = 0; x < mBMdisparity16->width; ++x)
-                {
-//                    if ((-*data16 < (mMain->getStereoWidget()->minDisparity->value())*16) ||
-//                            (-*data16 > (mMain->getStereoWidget()->maxDisparity->value())*16) ||  // laesst nur den Teil ueber, der in gui eingestellt wurde
-//                            (*data16 <= (mSgbm->minDisparity)*16))// enthaelt auch: (*data16 == (mBMState->minDisparity-1)*16)) // marker fuer nicht berechneten wert
-//                    {
-//                        *data16 = 0xFF00; // fehlercode gemaess ptgrey
-//                    }
-//                    else // vorzeichen umkehren und
-//                    {
-//                        if (-*data16*16 > SHRT_MAX)
-//                        {
-//                            *data16 = SHRT_MAX;
-//                            debout << "Warning: Disparity set to SHRT_MAX for Pixel " << x << "/" << y << endl;
-//                        }
-//                        else
-//                            *data16 = -*data16*16; // *16, da cv disp nur faktor 16 fuer subpixelgenauigkeit hat und triclops *256
-//                    }
-                    *data16 = D2_data[x+y*mBMdisparity16->width];
-                    ++data16;
-                }
-                data16 = (yData16 += (mBMdisparity16->step/sizeof(short)));
-            }
-
-            mDisparity.imageData = (char *) mBMdisparity16->data.ptr;
-
-
-
-
-            // free memory
-            free(D1_data);
-            free(D2_data);
-        }
-#endif
 
         setStatus(genDisparity);
 
@@ -1308,7 +1138,7 @@ bool pet::StereoContext::getXYZ(int col, int row, float* x, float* y, float* z)
         return false;
 }
 
-// liefert zu einer Disparität die Entfernung in cm
+// liefert zu einer Disparitï¿½t die Entfernung in cm
 // die Entfernung ist fuer jedes Pixel gleich (hier 0,0 genommen)
 float pet::StereoContext::getZfromDisp(unsigned short int disp)
 {
