@@ -28,7 +28,7 @@ if (WIN32)
     install(FILES "${OpenCV_DIR}/LICENSE/" DESTINATION "Licenses/OpenCV_Licenses")
 endif()
 
-install(FILES "${CMAKE_SOURCE_DIR}/ReadMe.txt" "${CMAKE_SOURCE_DIR}/LICENSE" DESTINATION ".")
+install(FILES "${CMAKE_SOURCE_DIR}/ReadMe.md" "${CMAKE_SOURCE_DIR}/LICENSE" DESTINATION ".")
 
 
 ##################################################################
@@ -41,9 +41,9 @@ set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERISON_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERISON_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERISON_PATCH})
 set(CPACK_PACKAGE_DESCRIPTION "PeTrack is a software for the automated extraction of pedestrian trajectories from videos.")
-set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/ReadMe.txt")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/ReadMe.md")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://www.fz-juelich.de/ias/ias-7/EN/Expertise/Software/PeTrack/petrack.html")
-set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/ReadMe.txt")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/ReadMe.md")
 set(CPACK_PACKAGE_EXECUTABLES "petrack;PeTrack")
 set(CPACK_MONOLITHIC_INSTALL TRUE)
 set(CPACK_CREATE_DESKTOP_LINKS petrack)
