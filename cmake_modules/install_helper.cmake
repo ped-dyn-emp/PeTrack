@@ -22,6 +22,8 @@ if (WIN32)
         execute_process(COMMAND ${WINDEPLOYQT_APP} \"\${CMAKE_INSTALL_PREFIX}/bin/petrack.exe\")
     ")
 
+    install(FILES "${OpenCV_LIB_PATH}/../bin/opencv_videoio_ffmpeg${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}_64.dll" DESTINATION ${CMAKE_INSTALL_BINDIR})
+
     # NOTE: Paths might be platform specific
     install(DIRECTORY "${Qt5Core_DIR}/../../../../../Licenses" DESTINATION "Licenses/Qt_Licenses")
     install(DIRECTORY "${OpenCV_DIR}/etc/licenses" DESTINATION "Licenses/OpenCV_Licenses")
@@ -29,7 +31,6 @@ if (WIN32)
 endif()
 
 install(FILES "${CMAKE_SOURCE_DIR}/ReadMe.md" "${CMAKE_SOURCE_DIR}/LICENSE" DESTINATION ".")
-
 
 ##################################################################
 #                         PACKAGE                                #
