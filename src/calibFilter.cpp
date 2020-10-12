@@ -69,56 +69,8 @@ CalibFilter::CalibFilter()
 
 Mat CalibFilter::act(Mat &img, Mat &res)
 {
-//#if (CV_MAJOR_VERSION == 2)
-//    static double _camera[9], _dist[8];
-//    static CvMat camera = cvMat(3, 3, CV_64F, _camera);
-//    static CvMat dist = cvMat(1, 8, CV_64F, _dist);
-
-//    _camera[0] = getFx()->getValue(); _camera[1] = 0;                   _camera[2] = getCx()->getValue();
-//    _camera[3] = 0;                   _camera[4] = getFy()->getValue(); _camera[5] = getCy()->getValue();
-//    _camera[6] = 0;                   _camera[7] = 0;                   _camera[8] = 1;
-//    _dist[0] = getR2()->getValue(); _dist[1] = getR4()->getValue(); _dist[4] = getR6()->getValue();
-//    _dist[2] = getTx()->getValue(); _dist[3] = getTy()->getValue();
-//    _dist[5] = getK4()->getValue(); _dist[5] = getK5()->getValue(); _dist[7] = getK6()->getValue();
-
-//    // opencv 2 kann bei undistort2 anscheinend nur noch 8bit bilder verarbeiten?! ==> nicht mehr aktuell fuer OpenCV 3? funktioniert bisher ohne Probleme um eine halb sekunde schneller pro frame!
-//    // http://stackoverflow.com/questions/2333868/cvundistort2-and-cvremap-crash
-
-//    IplImage *r = cvCreateImage(cvGetSize(imgIpl),8,1);
-//    IplImage *g = cvCreateImage(cvGetSize(imgIpl),8,1);
-//    IplImage *b = cvCreateImage(cvGetSize(imgIpl),8,1);
-//    IplImage *r2 = cvCreateImage(cvGetSize(imgIpl),8,1);
-//    IplImage *g2 = cvCreateImage(cvGetSize(imgIpl),8,1);
-//    IplImage *b2 = cvCreateImage(cvGetSize(imgIpl),8,1);
-//    if( imgIpl->nChannels == 3 )
-//    {
-//        cvSplit(imgIpl, r,g,b, NULL);
-
-////      debout << "Distortioncoefficients: " << endl;
-////      debout << "r2: " << _dist[0] << "r4: " << _dist[1] << "r6: " << _dist[4]
-////           << "tx: " << _dist[2] << "ty: " << _dist[3]
-////           << "k4: " << _dist[5] << "k5: " << _dist[6] << "k6: " << _dist[7] << endl;
-
-//        cvUndistort2(r, r2, &camera, &dist);
-//        cvUndistort2(g, g2, &camera, &dist);
-//        cvUndistort2(b, b2, &camera, &dist);
-//        cvMerge(r2, g2, b2, NULL, resIpl);
-//    }else
-//    {
-//        cvUndistort2(imgIpl,resIpl,&camera, &dist);
-//    }
-//    cvReleaseImage(&r);
-//    cvReleaseImage(&g);
-//    cvReleaseImage(&b);
-//    cvReleaseImage(&r2);
-//    cvReleaseImage(&g2);
-//    cvReleaseImage(&b2);
-
-//    return resIpl;
-//#else
-//    Mat img = cvarrToMat(imgIpl),
-//        res = cvarrToMat(resIpl);
-
+    if(this->changed() || map1.empty() || map2.empty())
+    {
     Mat camera = (Mat_<float>(3,3) << getFx()->getValue(), 0,                   getCx()->getValue(),
                                           0,                   getFy()->getValue(), getCy()->getValue(),
                                           0,                   0,                   1                   );
@@ -127,34 +79,15 @@ Mat CalibFilter::act(Mat &img, Mat &res)
                                         getR6()->getValue(),
                                         getK4()->getValue(), getK5()->getValue(), getK6()->getValue());
 
-    /*
-     * Eine Möglichkeit das entzerren schneller zu gestalten, indem
-     * der Aufruf von undistort in getrennte Aufrufe geteilt wird
-     * und das Ergebns von initUndistort... gecached wird
-     * Aber TODO muss zuerst gelöst werden (Cache muss bei einladen eines
-     * neues Projekt gecleart werden)
-     */
-    // TODO Was, wenn ein neues Projekt eingeladen wird?
-//    if(map1.empty() || map2.empty())
-//        initUndistortRectifyMap(camera, dist, Mat_<double>::eye(3,3),
-//                                camera,
-//                                img.size(), CV_16SC2, map1, map2);
-//    remap(img, res, map1, map2, INTER_LINEAR, BORDER_CONSTANT);
 
-    undistort(img, res, camera, dist);
-//    cvReleaseImage(&resIpl);
-//    resIpl = cvCreateImage(cvSize(res.cols,res.rows),8,3);
-//    IplImage tmpIpl = res;
-//    cvCopy(&tmpIpl,resIpl);
+        initUndistortRectifyMap(camera, dist, Mat_<double>::eye(3,3),
+                                camera,
+                                img.size(), CV_16SC2, map1, map2);
+    }
 
+    remap(img, res, map1, map2, INTER_LINEAR, BORDER_CONSTANT);
     return res;
-//#endif
 }
-
-// bool CalibFilter::changed()
-// {
-//     return Filter::changed() || mFx.changed() || mFy.changed() || mCx.changed() ||  mCy.changed() ||  mR2.changed() ||  mR4.changed() || mTx.changed() ||  mTy.changed();   
-// }
 
 Parameter* CalibFilter::getFx()
 {

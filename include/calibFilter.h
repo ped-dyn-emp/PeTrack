@@ -25,10 +25,7 @@ private:
 public:
     CalibFilter();
 
-//    IplImage* act(IplImage *img, IplImage *res);
     cv::Mat act(cv::Mat &img, cv::Mat &res);
-
-//     bool changed();
 
     Parameter *getFx();
     Parameter *getFy();
