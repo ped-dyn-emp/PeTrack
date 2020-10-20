@@ -91,7 +91,7 @@
           <string>ignore head without black dot, if not visible / surrounded by color</string>
          </property>
          <property name="text">
-          <string>ignore head without black dot or Code Marker</string>
+          <string>ignore head without black dot or code marker</string>
          </property>
          <property name="checked">
           <bool>true</bool>
