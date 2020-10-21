@@ -199,7 +199,7 @@ inline QTextStream& operator>>(QTextStream& s, QColor& col)
 inline QString getExistingFile(const QString &fileList, const QString &relToFileName)
 {
     QStringList list;
-    list = fileList.split(";", QString::SkipEmptyParts);
+    list = fileList.split(";", Qt::SkipEmptyParts);
     for (int i = 0; i < list.size(); ++i)
     {
         if (QFile(list.at(i)).exists())

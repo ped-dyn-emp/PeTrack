@@ -184,7 +184,7 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                 {
                     missingList.append(f);
                     missingListAnz.append(myRound(sum/lastSum - 1.));
-                    debout << "Warning: potentially missing " << myRound(sum/lastSum - 1.) << " frame(s) between " << f << " and " << f+1 << " will be inserted." << endl;
+                    debout << "Warning: potentially missing " << myRound(sum/lastSum - 1.) << " frame(s) between " << f << " and " << f+1 << " will be inserted." << std::endl;
                 }
                 lastDistanceMap = distanceMap;
                 lastSum = sum;
@@ -273,7 +273,7 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                             if(fabs((*tracker)[i].at(j-nrRew).sp().z()-(*tracker)[i].at(j).sp().z()) > nrRew*40.) // 40cm
                             {
                                 (*tracker)[i][j].setSp((*tracker)[i].at(j).sp().x(),(*tracker)[i].at(j).sp().y(),(*tracker)[i].at(j-nrRew).sp().z());
-                                debout << "Warning: Trackpoint smoothed height at the end or next to unknown height in the future for trajectory " << i+1 << " in frame " << j+firstFrame << "." << endl;
+                                debout << "Warning: Trackpoint smoothed height at the end or next to unknown height in the future for trajectory " << i+1 << " in frame " << j+firstFrame << "." << std::endl;
                             }
                         }
                         else if (((j+nrFor != tsize) && (j-nrRew < 0)) || ((j+nrFor != tsize) && (nrFor < nrRew))) // nur oder eher in der zukunft hoeheninfo gefunden
@@ -282,7 +282,7 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                             if(fabs((*tracker)[i].at(j+nrFor).sp().z()-(*tracker)[i].at(j).sp().z()) > nrFor*40.) // 40cm
                             {
                                 (*tracker)[i][j].setSp((*tracker)[i].at(j).sp().x(),(*tracker)[i].at(j).sp().y(),(*tracker)[i].at(j+nrFor).sp().z());
-                                debout << "Warning: Trackpoint smoothed height at the beginning or next to unknown height in the past for trajectory " << i+1 << " in frame " << j+firstFrame << "." << endl;
+                                debout << "Warning: Trackpoint smoothed height at the beginning or next to unknown height in the past for trajectory " << i+1 << " in frame " << j+firstFrame << "." << std::endl;
                             }
                         }
                         else if ((j+nrFor != tsize) && (j-nrRew >= 0))// in beiden richtungen hoeheninfo gefunden und nrFor==nrRew
@@ -294,7 +294,7 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                             if(fabs(zMedian-(*tracker)[i].at(j).sp().z()) > 20.*(nrFor+nrRew)) // 20cm
                             {
                                 (*tracker)[i][j].setSp((*tracker)[i].at(j).sp().x(),(*tracker)[i].at(j).sp().y(),zMedian);
-                                debout << "Warning: Trackpoint smoothed height inside for trajectory " << i+1 << " in frame " << j+firstFrame << "." << endl;
+                                debout << "Warning: Trackpoint smoothed height inside for trajectory " << i+1 << " in frame " << j+firstFrame << "." << std::endl;
                             }
                         }
                     }
@@ -317,13 +317,13 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                         {
                             if (exportElimTrj)
                             {
-                                debout << "Warning: no calculated height for trackpoint " << j << " (frame " << tracker->at(i).firstFrame()+j<< ") of person " << i+1 << ", person is not exported!" << endl;
+                                debout << "Warning: no calculated height for trackpoint " << j << " (frame " << tracker->at(i).firstFrame()+j<< ") of person " << i+1 << ", person is not exported!" << std::endl;
                                 break; // TrackPerson ist angelegt, erhaelt aber keine Points und wird deshalb am ende nicht eingefuegt
                             }
                             else
                             {
                                 bestZ = height; // wenn gar kein trackpoint ungleich -1 gefunden wird, dann wird zu allerletzt Hoehe genommen
-                                debout << "Warning: no calculated height for trackpoint " << j << " (frame " << tracker->at(i).firstFrame()+j<< ") of person " << i+1 << ", default height is used!" << endl;
+                                debout << "Warning: no calculated height for trackpoint " << j << " (frame " << tracker->at(i).firstFrame()+j<< ") of person " << i+1 << ", default height is used!" << std::endl;
                             }
                         }
                         else
@@ -334,12 +334,12 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                         {
                             if (extrapolated == 1) // zu beginn verworfen
                                 trackPersonReal.setFirstFrame(trackPersonReal.firstFrame()+1);
-                            debout << "Warning: no calculated height for trackpoint " << j << " (frame " << tracker->at(i).firstFrame()+j<< ") of person " << i+1 << ", extrapolated height not used, trackpoint not inserted!" << endl;
+                            debout << "Warning: no calculated height for trackpoint " << j << " (frame " << tracker->at(i).firstFrame()+j<< ") of person " << i+1 << ", extrapolated height not used, trackpoint not inserted!" << std::endl;
                         }
                         else
                         {
                             if (extrapolated)
-                                debout << "Warning: no calculated height for trackpoint " << j << " (frame " << tracker->at(i).firstFrame()+j<< ") of person " << i+1 << ", extrapolated height is used!" << endl;
+                                debout << "Warning: no calculated height for trackpoint " << j << " (frame " << tracker->at(i).firstFrame()+j<< ") of person " << i+1 << ", extrapolated height is used!" << std::endl;
 
                             Vec2F moveDir(0,0);
                             if (exportAutoCorrect)
@@ -410,7 +410,7 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                         {
                             if (alternateHeight) // personenhoehe variiert ueber trajektorie (unebene versuche); berechnung durch mich und nicht pointgrey nutzen
                             {
-                                debout << "Warning: No interpolation is done, because alternate height is enabled - has to be implemented!" << endl;
+                                debout << "Warning: No interpolation is done, because alternate height is enabled - has to be implemented!" << std::endl;
                             }
                             else
                             {
@@ -454,14 +454,14 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                         trackPersonReal.setLastFrame(trackPersonReal.lastFrame()-1);
                         trackPersonReal.removeLast();
                     }
-                    debout << "Warning: delete last " << tsize-j << " frames of person " << i+1 << " because of height jump!" << endl;
+                    debout << "Warning: delete last " << tsize-j << " frames of person " << i+1 << " because of height jump!" << std::endl;
                     break;
                 }
             }
             tsize = trackPersonReal.size();
             if (delNumFront > 0)
             {
-                debout << "Warning: delete first " << delNumFront << " frames of person " << i+1 << " because of height jump!" << endl;
+                debout << "Warning: delete first " << delNumFront << " frames of person " << i+1 << " because of height jump!" << std::endl;
                 for (k = 0; (k < delNumFront) && (k < tsize); k++)
                 {
                     trackPersonReal.setFirstFrame(trackPersonReal.firstFrame()+1);
@@ -469,18 +469,18 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                 }
             }
             if (trackPersonReal.size() < 20)
-                debout << "Warning: Person " << i+1 << " has only " << trackPersonReal.size() << " trackpoints!" << endl;
+                debout << "Warning: Person " << i+1 << " has only " << trackPersonReal.size() << " trackpoints!" << std::endl;
             if (trackPersonReal.size() > 0)
                 append(trackPersonReal);
             else // ggf weil keine calculated height vorlag (siehe exportElimTrj)
-                debout << "Warning: Person " << i+1 << " is not inserted, because of no trackpoints!" << endl;
+                debout << "Warning: Person " << i+1 << " is not inserted, because of no trackpoints!" << std::endl;
 
         }
         return size();
     }
     else
     {
-        debout << "Warning: no real tracking data calculated, because of missing tracking data, image reference or color map!" << endl;
+        debout << "Warning: no real tracking data calculated, because of missing tracking data, image reference or color map!" << std::endl;
         return -1;
     }
 }
@@ -548,11 +548,11 @@ void TrackerReal::exportTxt(QTextStream &out, bool alternateHeight, bool useTrac
 {
     float scale;
 
-    out << "# z: can be 3d position or height of person (alternating or not)" << endl;
+    out << "# z: can be 3d position or height of person (alternating or not)" << Qt::endl;
     if (exportViewingDirection)
-        out << "# viewDirX viewDirY: vector of direction of head of person" << endl;
+        out << "# viewDirX viewDirY: vector of direction of head of person" << Qt::endl;
     if (exportAngleOfView)
-        out << "# viewAngle: angle of view of camera to person from perpendicular [0..Pi/2]" << endl;
+        out << "# viewAngle: angle of view of camera to person from perpendicular [0..Pi/2]" << Qt::endl;
     if (exportUseM)
         out << "# id frame x/m y/m z/m";
     else
@@ -560,11 +560,11 @@ void TrackerReal::exportTxt(QTextStream &out, bool alternateHeight, bool useTrac
     if (exportViewingDirection)
         out << " viewDirX viewDirY";
     if (exportAngleOfView)
-        out << " viewAngle" << endl;
+        out << " viewAngle" << Qt::endl;
     if (exportMarkerID)
-        out << " markerID" << endl;
+        out << " markerID" << Qt::endl;
     else
-        out << endl;
+        out << Qt::endl;
 
     if (exportUseM)
         scale = .01;
@@ -610,12 +610,12 @@ void TrackerReal::exportTxt(QTextStream &out, bool alternateHeight, bool useTrac
                 out << " " << at(i).at(j).viewDir();
 
             if (exportAngleOfView)
-                out << " " << at(i).at(j).angleOfView() << endl;
+                out << " " << at(i).at(j).angleOfView() << Qt::endl;
 
             if (exportMarkerID)
-                out << " " << at(i).getMarkerID() << endl;
+                out << " " << at(i).getMarkerID() << Qt::endl;
             else
-                out << endl;
+                out << Qt::endl;
         }
     }
 }
@@ -637,7 +637,7 @@ void TrackerReal::exportDat(QTextStream &out, bool alternateHeight, bool useTrac
     progress.setVisible(true);
     progress.setValue(0);
     progress.setLabelText(QString("Export tracking data ..."));
-    debout << "size:" << size() << endl;
+    debout << "size:" << size() << std::endl;
     if (useTrackpoints)
     {
         for (int i = 0; i < size(); ++i)
@@ -648,8 +648,8 @@ void TrackerReal::exportDat(QTextStream &out, bool alternateHeight, bool useTrac
 
             for (int j = 0; j < at(i).size(); ++j)
                 // Umrechnung in coordSystem fehlt, auch camera altitude unberuecksichtigt!!!
-                out << at(i).firstFrame()+j << " " << at(i).at(j) << " " << at(i).at(j).z() << endl; // z Koordinate ist Kopf
-            out << endl;
+                out << at(i).firstFrame()+j << " " << at(i).at(j) << " " << at(i).at(j).z() << Qt::endl; // z Koordinate ist Kopf
+            out << Qt::endl;
         }
     }
     else
@@ -659,16 +659,16 @@ void TrackerReal::exportDat(QTextStream &out, bool alternateHeight, bool useTrac
             progress.setLabelText(QString("Export person %1 of %2 ...").arg(i+1).arg(size()));
             qApp->processEvents();
             progress.setValue(i+1);
-            debout << "person: " << i << endl;
+            debout << "person: " << i << std::endl;
 
             for (int j = 0; j < at(i).size(); ++j)
             {
                 if (alternateHeight)
-                    out << at(i).firstFrame()+j << " " << at(i).at(j) << " " << at(i).at(j).z() << endl; // z Koordinate ist Kopf
+                    out << at(i).firstFrame()+j << " " << at(i).at(j) << " " << at(i).at(j).z() << Qt::endl; // z Koordinate ist Kopf
                 else
-                    out << at(i).firstFrame()+j << " " << at(i).at(j) << " " << at(i).height() << endl; // z Koordinate ist Kopf
+                    out << at(i).firstFrame()+j << " " << at(i).at(j) << " " << at(i).height() << Qt::endl; // z Koordinate ist Kopf
         }
-            out << endl;
+            out << Qt::endl;
         }
     }
 }
@@ -689,15 +689,15 @@ void TrackerReal::exportXml(QTextStream &outXml, bool alternateHeight, bool useT
     qApp->processEvents();
 
     // j = person
-    outXml << "    <shape>" << endl;
+    outXml << "    <shape>" << Qt::endl;
     for (j = 0; j < size(); ++j)
     {
         if (alternateHeight) // bei variierender groesse wird einfach durchschnittsgroesse genommen, da an treppen gar keine vernuempftige Groesse vorliegt
-            outXml << "        <agentInfo ID=\"" << j+1 << "\" color=\"100\" height=\"" << defaultPersonHeight << "\"/>" << endl;
+            outXml << "        <agentInfo ID=\"" << j+1 << "\" color=\"100\" height=\"" << defaultPersonHeight << "\"/>" << Qt::endl;
         else
-            outXml << "        <agentInfo ID=\"" << j+1 << "\" color=\"100\" height=\"" << at(j).height() << "\"/>" << endl;
+            outXml << "        <agentInfo ID=\"" << j+1 << "\" color=\"100\" height=\"" << at(j).height() << "\"/>" << Qt::endl;
     }
-    outXml << "    </shape>" << endl <<endl;
+    outXml << "    </shape>" << Qt::endl << Qt::endl;
 
     // i = frame; j = person
     for (i = smallestFirstFrame(); i <= largestLastFr; ++i)
@@ -706,7 +706,7 @@ void TrackerReal::exportXml(QTextStream &outXml, bool alternateHeight, bool useT
         qApp->processEvents();
         progress.setValue(i);
 
-        outXml << "    <frame ID=\""<< i <<"\">" << endl;
+        outXml << "    <frame ID=\""<< i <<"\">" << Qt::endl;
         for (j = 0; j < size(); ++j)
         {
             if (at(j).trackPointExist(i))
@@ -724,10 +724,10 @@ void TrackerReal::exportXml(QTextStream &outXml, bool alternateHeight, bool useT
                     else
                         z = 0; //at(j).height();
                 }
-                outXml << "        <agent ID=\"" << j+1 << "\" xPos=\"" << at(j).trackPointAt(i).x() << "\" yPos=\"" << at(j).trackPointAt(i).y() << "\" zPos=\"" << z << "\" xVel=\"0\" yVel=\"0\" zVel=\"0\" radiusA=\"18\" radiusB=\"15\" ellipseOrientation=\"130\" ellipseColor=\"0\"/>" << endl; // z Koordinate ist Boden
+                outXml << "        <agent ID=\"" << j+1 << "\" xPos=\"" << at(j).trackPointAt(i).x() << "\" yPos=\"" << at(j).trackPointAt(i).y() << "\" zPos=\"" << z << "\" xVel=\"0\" yVel=\"0\" zVel=\"0\" radiusA=\"18\" radiusB=\"15\" ellipseOrientation=\"130\" ellipseColor=\"0\"/>" << Qt::endl; // z Koordinate ist Boden
             }
         }
-        outXml << "    </frame>" << endl;
+        outXml << "    </frame>" << Qt::endl;
     }
 
     // alte Version der trav datei

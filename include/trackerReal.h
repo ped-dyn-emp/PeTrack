@@ -116,7 +116,7 @@ public:
     {
         mHeight = h;
     }
-    inline const int firstFrame() const
+    inline int firstFrame() const
     {
         return mFirstFrame;
     }
@@ -124,7 +124,7 @@ public:
     {
         mFirstFrame = f;
     }
-    inline const int lastFrame() const
+    inline int lastFrame() const
     {
         return mLastFrame;
     }
@@ -189,7 +189,7 @@ inline QTextStream& operator<<(QTextStream& s, const TrackPersonReal& tp)
 {
     int firstFrame = tp.firstFrame();
     for (int i = 0; i < tp.size(); ++i)
-        s << firstFrame+i << tp.at(i) << tp.height() << endl;
+        s << firstFrame+i << tp.at(i) << tp.height() << Qt::endl;
     return s;
 }
 

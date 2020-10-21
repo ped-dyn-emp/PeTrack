@@ -22,7 +22,7 @@ public:
     MyEllipse();
     MyEllipse(double x, double y, double r1, double r2, double angle);
     MyEllipse(QPointF center, QSizeF size, double angle);
-    MyEllipse(const MyEllipse &ellipse);
+    MyEllipse(const MyEllipse &ellipse) = default;
 
     Vec2F center() const;
     QSizeF size() const;

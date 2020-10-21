@@ -110,7 +110,7 @@ void StereoWidget::getXml(QDomElement &elem)
                         stereoUseCalibrationCenter->setCheckState(subSubElem.attribute("CALIB_CENTER").toInt() ? Qt::Checked : Qt::Unchecked);
                 }
                 else
-                    debout << "Unknown STEREO tag " << subSubElem.tagName() << endl;
+                    debout << "Unknown STEREO tag " << subSubElem.tagName() << std::endl;
             }
         }
     }

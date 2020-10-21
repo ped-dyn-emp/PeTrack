@@ -18,12 +18,6 @@ Vec3F::Vec3F(double x, double y, double z)
       mZ(z)
 {
 }
-Vec3F::Vec3F(const Vec3F& v)
-    : mX(v.mX),
-      mY(v.mY),
-      mZ(v.mZ)
-{
-}
 // Vec3F::Vec3F(const QPointF& v)
 //     : mX(v.x()),
 //       mY(v.y())
@@ -217,11 +211,6 @@ Vec2F::Vec2F()
 Vec2F::Vec2F(double x, double y)
     : mX(x),
       mY(y)
-{
-}
-Vec2F::Vec2F(const Vec2F& v)
-    : mX(v.mX),
-      mY(v.mY)
 {
 }
 Vec2F::Vec2F(const QPointF& v)

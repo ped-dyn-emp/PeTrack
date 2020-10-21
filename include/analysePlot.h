@@ -103,7 +103,6 @@ private:
 //     RectPlotItem *mRectItem;
 //     ViewAnalysePlotItem *mViewAnalyseItem;
     QwtPlotZoomer *mZoomer;
-    int mGreyDiff;
     int mActFrame;
 };
 

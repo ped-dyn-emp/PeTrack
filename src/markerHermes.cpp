@@ -118,7 +118,7 @@ void MarkerHermes::deleteSpot(int i)
 }
 
 // nach organize gibt es entweder 0 oder 1 spots pro kopf
-void MarkerHermes::organize(const Mat &img, bool autoWB)
+void MarkerHermes::organize(const Mat &img, bool /*autoWB*/)
 {
     int i, j, k;
 

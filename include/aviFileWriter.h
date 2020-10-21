@@ -142,11 +142,7 @@ protected:
    long int m_liBytesWritten;
 
    /** avi file name */
-#ifdef WINDOWS
-   char m_szAVIDestFile[ _MAX_PATH ];
-#else
-   char m_szAVIDestFile[ PATH_MAX ];
-#endif
+   std::string m_szAVIDestFile;
 
    char* m_fourCC;
    //int m_fourCC;

@@ -116,8 +116,8 @@ void CodeMarkerWidget::getXml(QDomElement &elem)
             if (subElem.hasAttribute("MIN_MARKER_DISTANCE"))
                 minMarkerDistance->setValue(subElem.attribute("MIN_MARKER_DISTANCE").toDouble());
             if (subElem.hasAttribute("CORNER_REFINEMENT"))
-                doCornerRefinement->setChecked(subElem.attribute("CORNER_REFINEMENT").toInt() ? Qt::Checked : Qt::Unchecked);
-            if (subElem.hasAttribute("CORNER_REFINEMENT_WIN_SIZE"))
+                doCornerRefinement->setChecked(subElem.attribute("CORNER_REFINEMENT").toInt());
+          if (subElem.hasAttribute("CORNER_REFINEMENT_WIN_SIZE"))
                 cornerRefinementWinSize->setValue(subElem.attribute("CORNER_REFINEMENT_WIN_SIZE").toInt());
             if (subElem.hasAttribute("CORNER_REFINEMENT_MAX_ITERATIONS"))
                 cornerRefinementMaxIterations->setValue(subElem.attribute("CORNER_REFINEMENT_MAX_ITERATIONS").toInt());

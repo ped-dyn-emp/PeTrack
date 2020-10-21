@@ -238,14 +238,13 @@ bool ExtrCalibration::loadExtrCalibFile(){
 bool ExtrCalibration::fetch2DPoints()
 {
     bool all_ok = true;
-    int sz_2d = 0;
     if( !mMainWindow->getTracker() || mMainWindow->getTracker()->size() < 4 )
     {
        QMessageBox::critical(mMainWindow, QObject::tr("Petrack"), QObject::tr("Error: At minimum four 3D calibration points needed for 3D calibration."));
        all_ok = false;
     }else
     {
-        sz_2d = mMainWindow->getTracker()->size();
+        size_t sz_2d = mMainWindow->getTracker()->size();
 
         if( points3D.size()>0 && sz_2d != points3D.size() ){
             QMessageBox::critical(mMainWindow, QObject::tr("Petrack"), QObject::tr("Count of 2D-Points (%1) and 3D-Points (%2) disagree").arg(sz_2d).arg(points3D.size()));
@@ -257,7 +256,7 @@ bool ExtrCalibration::fetch2DPoints()
         {
             points2D.clear();
 
-            for(int i = 0; i < sz_2d; i++)
+            for(size_t i = 0; i < sz_2d; i++)
             {
                 //debout << "[" << i << "]: (" << mMainWindow->getTracker()->at(i).at(0).x() << ", " << mMainWindow->getTracker()->at(i).at(0).y() << ")" << endl;
                 // Info: Tracker->TrackPerson->TrackPoint->Vec2F
@@ -279,11 +278,10 @@ bool ExtrCalibration::saveExtrCalibPoints()
     QString out_str;
     QTextStream out(&out_str);
 
-    int i;
 
-    for (i = 0; i < points3D.size(); ++i)
+    for (size_t i = 0; i < points3D.size(); ++i)
     {
-        out << "[" << QString::number(i+1,'i',0) << "]: "<< QString::number(points3D.at(i).x,'f',1) << " " << QString::number(points3D.at(i).y,'f',1) << " " << QString::number(points3D.at(i).z,'f',1) << " " << QString::number(points2D.at(i).x,'f',3) << " " << QString::number(points2D.at(i).y,'f',3) << endl;
+        out << "[" << QString::number(i+1,'i',0) << "]: "<< QString::number(points3D.at(i).x,'f',1) << " " << QString::number(points3D.at(i).y,'f',1) << " " << QString::number(points3D.at(i).z,'f',1) << " " << QString::number(points2D.at(i).x,'f',3) << " " << QString::number(points2D.at(i).y,'f',3) << Qt::endl;
     }
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Warning);
@@ -307,10 +305,10 @@ bool ExtrCalibration::saveExtrCalibPoints()
 
             QTextStream file_out(&file);
 
-            file_out << points3D.size() << endl;
-            for (i = 0; i < points3D.size(); ++i)
+            file_out << points3D.size() << Qt::endl;
+            for (size_t i = 0; i < points3D.size(); ++i)
             {
-                file_out << points3D.at(i).x << " " << points3D.at(i).y << " " << points3D.at(i).z << " " << points2D.at(i).x << " " << points2D.at(i).y << endl;
+                file_out << points3D.at(i).x << " " << points3D.at(i).y << " " << points3D.at(i).z << " " << points2D.at(i).x << " " << points2D.at(i).y << Qt::endl;
             }
             all_okay = file.flush();
             file.close();
@@ -332,17 +330,17 @@ bool ExtrCalibration::saveExtrCalibPoints()
 
 bool ExtrCalibration::isSetExtrCalib(){
 
-    bool isSetExtrCalib = false;
-
-    if( mControlWidget->getCalibExtrRot1() != 0.00 &&
-        mControlWidget->getCalibExtrRot2() != 0.00 &&
-        mControlWidget->getCalibExtrRot3() != 0.00 &&
-        mControlWidget->getCalibExtrTrans1() != 0.00 &&
-        mControlWidget->getCalibExtrTrans2() != 0.00 &&
-        mControlWidget->getCalibExtrTrans3() != 0.00 )
-    {
-        isSetExtrCalib = true;
-    }
+//    bool isSetExtrCalib = false;
+//
+//    if( mControlWidget->getCalibExtrRot1() != 0.00 &&
+//        mControlWidget->getCalibExtrRot2() != 0.00 &&
+//        mControlWidget->getCalibExtrRot3() != 0.00 &&
+//        mControlWidget->getCalibExtrTrans1() != 0.00 &&
+//        mControlWidget->getCalibExtrTrans2() != 0.00 &&
+//        mControlWidget->getCalibExtrTrans3() != 0.00 )
+//    {
+//        isSetExtrCalib = true;
+//    }
     return true;//isSetExtrCalib;
 }
 
@@ -352,7 +350,6 @@ void ExtrCalibration::calibExtrParams()
     if( !points3D.empty() && !points2D.empty() && points2D.size() == points3D.size() )
     {
 
-        bool debug = false;
         int bS = mMainWindow->getImageBorderSize();
         /* Create Camera-Matrix form Camera-Params in the Petrack-GUI */
         Mat camMat = (Mat_<double>(3,3) <<
@@ -394,7 +391,7 @@ void ExtrCalibration::calibExtrParams()
 
         // Solve the PnP-Problem to calibrate the camera to its environment
 
-        bool solvePNPsuccess = solvePnP(op,ip,camMat,distMat,rvec,tvec,false,SOLVEPNP_ITERATIVE);
+        solvePnP(op,ip,camMat,distMat,rvec,tvec,false,SOLVEPNP_ITERATIVE);
         //bool solvePNPsuccess = solvePnP(op,ip,camMat,distMat,rvec,tvec,false,SOLVEPNP_P3P); // Requires exactly 4 points
         //bool solvePNPsuccess = solvePnP(op,ip,camMat,distMat,rvec,tvec,false,SOLVEPNP_EPNP);
         //bool solvePNPsuccess = solvePnP(op,ip,camMat,distMat,rvec,tvec,false,SOLVEPNP_DLS);

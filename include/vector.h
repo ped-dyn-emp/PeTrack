@@ -14,7 +14,7 @@ class QPoint;
 
 inline void printQVector3D(const QVector3D &p)
 {
-    debout << p.x() << " " << p.y() << " " << p.z() << endl;
+    debout << p.x() << " " << p.y() << " " << p.z() << std::endl;
 }
 
 
@@ -22,7 +22,7 @@ inline void printQMatrix4x4(const QMatrix4x4 &m)
 {
     for (int i=0; i<4; ++i)
         debout << (m.data())[i*4+0] << " " << (m.data())[i*4+1] << " "
-               << (m.data())[i*4+2] << " " << (m.data())[i*4+3] << endl;
+               << (m.data())[i*4+2] << " " << (m.data())[i*4+3] << std::endl;
 }
 
 class Vec3F
@@ -35,7 +35,7 @@ protected:
 public:
     Vec3F();
     Vec3F(double x, double y, double z);
-    Vec3F(const Vec3F& v);
+    Vec3F(const Vec3F& v) = default;
 //     Vec3F(const QPointF& v);
 //     Vec3F(const CvPoint* v);
 
@@ -107,7 +107,7 @@ protected:
 public:
     Vec2F();
     Vec2F(double x, double y);
-    Vec2F(const Vec2F& v);
+    Vec2F(const Vec2F& v) = default;
     Vec2F(const QPointF& v);
     Vec2F(const CvPoint* v);
     Vec2F(const CvPoint2D32f* v);

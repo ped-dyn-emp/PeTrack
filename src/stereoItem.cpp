@@ -49,7 +49,7 @@ QRectF StereoItem::boundingRect() const
 }
 
 // event, of moving mouse while button is pressed
-void StereoItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void StereoItem::mouseMoveEvent(QGraphicsSceneMouseEvent */*event*/)
 {
 //    if (!mControlWidget->getCalibCoordFix())
 //    {
@@ -190,7 +190,7 @@ void StereoItem::updateData(IplImage *disp)
 }
 #endif
     
-void StereoItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void StereoItem::paint(QPainter */*painter*/, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
 #ifndef STEREO_DISABLED
     IplImage *disp = NULL;

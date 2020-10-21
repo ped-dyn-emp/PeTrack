@@ -73,7 +73,7 @@ pet::StereoContext::StereoContext(Petrack* main)
     }
     else
     {
-        debout << "Error: No cam1 or cam2 string in video filename to detect used camera!" <<endl;
+        debout << "Error: No cam1 or cam2 string in video filename to detect used camera!" << std::endl;
         return;
     }
     QFile calFpInt(calFileInt);
@@ -86,10 +86,10 @@ pet::StereoContext::StereoContext(Petrack* main)
     //debout << QFile::copy(":/calibCam1", calFile) <<endl;
     if (!QFile::exists(calFile))
     {
-        debout << "Error: Calibration file "<< calFile <<" could not be created!" <<endl;
+        debout << "Error: Calibration file "<< calFile <<" could not be created!" << std::endl;
         return;
     }
-    debout << "Using " << calFile << " (" << version <<") for calibration." << endl;
+    debout << "Using " << calFile << " (" << version <<") for calibration." << std::endl;
 #ifdef STEREO
     TriclopsError triclopsError;
     triclopsError = triclopsGetDefaultContextFromFile(&mTriclopsContext, (char *)  calFile.toLatin1().data());

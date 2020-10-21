@@ -149,8 +149,8 @@ int Animation::getSpeedup()
 bool Animation::openTimeFile(QString &timeFileName)
 {
     QFile file(timeFileName);
-    int fframe , fcycSec=-1, fcycCount=-1, fcycOffset, fsec=-1, fmicroSec=-1, fbufIndex, fbufSeqNum, fseqNum; // fuer erstes frame
-    int lframe=-1 , lcycSec=-1, lcycCount=-1, lcycOffset, lsec=-1, lmicroSec=-1, lbufIndex, lbufSeqNum, lseqNum; // fuer vorangegangenen frame
+    int fcycSec=-1, fcycCount=-1; // fuer erstes frame
+    int lframe=-1 , lcycSec=-1, lcycCount=-1; // fuer vorangegangenen frame
     int frame=-1 , cycSec, cycCount, cycOffset, sec, microSec, bufIndex, bufSeqNum, seqNum;
     int dum, add=0;
     double fps, dif, difMin=1000., difMax=-1000.;
@@ -174,7 +174,7 @@ bool Animation::openTimeFile(QString &timeFileName)
             in >> cycSec >> cycCount >> cycOffset >> sec >> microSec >> bufIndex >> bufSeqNum >> seqNum;
             if (frame == 0)
             {
-                fframe=frame; fcycSec=cycSec; fcycCount=cycCount; fcycOffset=cycOffset; fsec=sec; fmicroSec=microSec; fbufIndex=bufIndex; fbufSeqNum=bufSeqNum; fseqNum=seqNum;
+                fcycSec=cycSec; fcycCount=cycCount;
                 dt.setTime_t(sec);
                 debout << "  Recording starts at " << dt.toString("dd.MM.yyyy hh:mm:ss.");
                 cout << setw(6) << setfill('0') << microSec << endl;
@@ -202,7 +202,7 @@ bool Animation::openTimeFile(QString &timeFileName)
                     minFrame = lframe;
                 }
             }
-            lframe=frame; lcycSec=cycSec; lcycCount=cycCount; lcycOffset=cycOffset; lsec=sec; lmicroSec=microSec; lbufIndex=bufIndex; lbufSeqNum=bufSeqNum; lseqNum=seqNum;
+            lframe=frame; lcycSec=cycSec; lcycCount=cycCount;
             in >> dum;
         }
         dt.setTime_t(sec);
@@ -1200,7 +1200,7 @@ Mat Animation::getFrameVideo(int index)
 
 // Gets Size and Frame number information of the recently open animation
 // It is thought to be called once just at the opening of an animation
-bool Animation::getInfoVideo(QString fileName)
+bool Animation::getInfoVideo(QString /*fileName*/)
 {
     // Set the size of the frames
     // We will grab the information from a frame of the animation

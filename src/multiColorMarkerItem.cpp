@@ -53,29 +53,28 @@ void MultiColorMarkerItem::setRect(Vec2F& v)
     mUlc = v; // upper left corner to draw
 }
 
-void MultiColorMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void MultiColorMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
     if (!mMask.empty())
     {
-        if ((mImage != NULL) && ((mImage->width() != mMask.cols) || (mImage->height() != mMask.rows)))
+        if ((mImage != nullptr) && ((mImage->width() != mMask.cols) || (mImage->height() != mMask.rows)))
         {
             delete mImage; // delete null pointer is ok
-            mImage = NULL; // is not been done by delete
+            mImage = nullptr; // is not been done by delete
         }
-        if (mImage == NULL) // zu Beginn oder wenn sich die Groesse aendert
+        if (mImage == nullptr) // zu Beginn oder wenn sich die Groesse aendert
             mImage = new QImage(mMask.cols, mMask.rows, QImage::Format_ARGB32);
 
         int x,y;
-        char* data = ((char*) mMask.data);
-        char* yData = data;
-        char *p;
+        auto* data = mMask.data;
+        auto* yData = data;
         int notMaskMask = ((int) !mMainWindow->getMultiColorMarkerWidget()->maskMask->isChecked())*255; // 255 oder 0
 
         for (y = 0; y < mMask.rows; y++)
         {
             // Pointer to the data information in the QImage for just one column
             // set pointer to value before, because ++p is faster than p++
-            p = ((char*)mImage->scanLine(y))-1;
+            auto* p = mImage->scanLine(y)-1;
             for (x = 0; x < mMask.cols; x++)
             {
                 *(++p) = *data; // color.blue();

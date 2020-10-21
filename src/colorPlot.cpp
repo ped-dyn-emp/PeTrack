@@ -61,7 +61,7 @@ public:
 //         return QwtDoubleRect(0., 0., 200., 200.);
 //     }
 
-    void draw(QPainter* p, const QwtScaleMap& mx, const QwtScaleMap& my, const QRectF& r) const
+    void draw(QPainter* p, const QwtScaleMap& mx, const QwtScaleMap& my, const QRectF& /*r*/) const
     {
 //         debout << "---" <<endl;
 //         debout << r.x() << " " << r.y() << " " << r.width() << " " << r.height()<<endl;
@@ -141,7 +141,7 @@ TrackerPlotItem::TrackerPlotItem()
     mTracker = NULL;
 }
 
-void TrackerPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& re) const
+void TrackerPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& /*re*/) const
 {
 //     // alt: ohne betrachtung des z-wertes:
 //     QRectF rect;
@@ -458,7 +458,7 @@ RectMap RectPlotItem::getMap(int index) const
         return RectMap();
 }
 
-void RectPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& re) const
+void RectPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& /*re*/) const
 {
     QRectF rect;
     double sx = mapX.p2()/(mapX.s2() - mapX.s1());
@@ -547,7 +547,7 @@ public:
 
     // ueberschrieben, da so kommazahlen unterdrueckt werden, da intervall mindestens 5 umfasst
 // Qwt 5: QwtDoubleSize minZoomSize() const //QwtPlotZoomer::
-    QSizeF minZoomSize() const
+    QSizeF minZoomSize() const override
     {
         return QwtDoubleSize(5., 5.);
     }
@@ -567,7 +567,7 @@ public:
 
 //widgetWheelEvent  	(   	QWheelEvent *   	 e  	 )
 
-    void widgetMouseMoveEvent(QMouseEvent *e)
+    void widgetMouseMoveEvent(QMouseEvent *e) override
     {
         static int lastX = -1;
         static int lastY = -1;
@@ -644,24 +644,18 @@ public:
 //         QwtPlotZoomer::widgetMouseReleaseEvent(e);
 //     }
 
-    QwtText trackerText(const QwtDoublePoint &pos) const
+    QwtText trackerText(const QPoint &pos) const override
     {
         QString text;
- 
-//         switch(rubberBand())
-//         {
-//             case HLineRubberBand:
-//                 text.sprintf("%.4f", pos.y());
-//                 break;
-//             case VLineRubberBand:
-//                 text.sprintf("%.4f", pos.x());
-//                 break;
-//             default:
-//                 text.sprintf("%.4f, %.4f", pos.x(), pos.y());
-//         }
-        text.asprintf("%d, %d", myRound(pos.x()), myRound(pos.y()));
+        text = QString::asprintf("%d, %d", myRound(pos.x()), myRound(pos.y()));
         return QwtText(text);
-//         return QwtPlotZoomer::trackerText(pos);
+    }
+
+    QwtText trackerTextF(const QPointF &pos) const override
+    {
+        QString text;
+        text = QString::asprintf("%d, %d", myRound(pos.x()), myRound(pos.y()));
+        return QwtText(text);
     }
 };
 
@@ -674,9 +668,8 @@ public:
     {
     }
 
-    void draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& re) const
+    void draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& /*re*/) const
     {
-        QRectF rect;
         double sx = mapX.p2()/(mapX.s2() - mapX.s1());
         double sy = mapY.p1()/(mapY.s2() - mapY.s1());
         double yMax = ((ColorPlot *) plot())->yMax();

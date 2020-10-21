@@ -67,7 +67,7 @@ void CodeMarkerItem::setRect(Vec2F& v)
  * @param option
  * @param widget
  */
-void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
 
     if (mMainWindow->getCodeMarkerWidget()->showDetectedCandidates->isChecked())

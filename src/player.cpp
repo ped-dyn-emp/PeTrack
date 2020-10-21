@@ -292,7 +292,7 @@ bool Player::forward()
         //debout << "mIplImg == NULL " << mAnimation->getCurrentFrameNum() << endl;
         if (!should_be_last_frame)
         {
-            debout << "Warning: video unexpected finished." << endl;
+            debout << "Warning: video unexpected finished." << std::endl;
             //mSlider->setMaximum(mAnimation->getCurrentFrameNum());
             //mMainWindow->updateWindowTitle();
         }else
@@ -449,7 +449,7 @@ void Player::recStream()
             {
                 mMainWindow->statusBar()->showMessage(tr("Saved video file to %1.").arg(dest), 5000);
                 if (!QFile(videoTmp).remove())
-                debout << "Could not remove tmp-file: " << videoTmp << endl;
+                debout << "Could not remove tmp-file: " << videoTmp << std::endl;
 
                 progress.setValue(2);
             }
@@ -462,7 +462,7 @@ void Player::recStream()
                 mRecButton->setIcon(QPixmap(":/stop-record"));
             }else
             {
-                debout << "error: could not open video output file!" << endl;
+                debout << "error: could not open video output file!" << std::endl;
             }
         }
     }

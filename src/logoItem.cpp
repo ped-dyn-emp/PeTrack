@@ -95,7 +95,7 @@ QRectF LogoItem::boundingRect() const
 //    mMainWindow->dropEvent(event);
 //}
     
-void LogoItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void LogoItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     int w;
     int h;

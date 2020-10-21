@@ -103,7 +103,7 @@ public:
     {
         mStatus = s*2-1;
     }
-    inline void resetStatus(enum stereoStatus s)
+    inline void resetStatus()
     {
         mStatus = clean;
     }

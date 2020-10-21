@@ -130,7 +130,7 @@ void WhiteBalance::autoWBAdjustementFromColor(const QColor &tc, double &temperat
 {
     // Calculate Temperature and Green component from color picked.
 
-    register int l, r, m;
+    int l, r, m;
     double sR, sG, sB, mRB, t;
 
     t   = qMax( qMax(tc.red(), tc.green()), tc.blue());
@@ -139,7 +139,7 @@ void WhiteBalance::autoWBAdjustementFromColor(const QColor &tc, double &temperat
     sB  = tc.blue()  / t;
     mRB = sR / sB;
 
-    debout << "Sums:  R:" << sR << " G:" << sG  << " B:" << sB << endl;
+    debout << "Sums:  R:" << sR << " G:" << sG  << " B:" << sB << std::endl;
 
     l = 0;
     r = sizeof(blackBodyWhiteBalance)/(sizeof(float)*3);
@@ -154,21 +154,21 @@ void WhiteBalance::autoWBAdjustementFromColor(const QColor &tc, double &temperat
 
         debout << "L,M,R:  " << l << " " << m << " " << r
                  << " blackBodyWhiteBalance[m]=:" << blackBodyWhiteBalance[m][0]/blackBodyWhiteBalance[m][2]
-                 << endl;
+                 << std::endl;
     }
 
-    debout << "Temperature (K):" << m*10.0+2000.0 << endl;
+    debout << "Temperature (K):" << m*10.0+2000.0 << std::endl;
 
     t = (blackBodyWhiteBalance[m][1]/blackBodyWhiteBalance[m][0]) / (sG/sR);
 
-    debout << "Green component:" << t << endl;
+    debout << "Green component:" << t << std::endl;
 
     temperature = m*10.0+2000.0;
     green       = t;
 }
 
-void WhiteBalance::autoExposureAdjustement(uchar* data, int width, int height, bool sb,
-                                           double &black, double &expo)
+void WhiteBalance::autoExposureAdjustement(uchar* /*data*/, int /*width*/, int /*height*/, bool /*sb*/,
+                                           double &/*black*/, double &/*expo*/)
 {
     // Create an histogram of original image.
 
@@ -236,7 +236,7 @@ void WhiteBalance::setLUTv()
              << " B:"    << d->mb
              << " BP:"   << d->BP
              << " WP:"   << d->WP
-             << endl;
+             << std::endl;
 
     d->curve[0] = 0;
 
