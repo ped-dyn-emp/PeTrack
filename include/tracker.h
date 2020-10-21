@@ -25,8 +25,8 @@ class TrackPoint : public Vec2F // Vec2F is pixel point in picture
 private:
     Vec2F mColPoint; // center of color marker
     QColor mCol;     // color of corresponding marker
-    int mMarkerID;   // ID of detected Marker
     int mQual;       // quality 0 (worst) .. 100 (best)
+    int mMarkerID;   // ID of detected Marker
     Vec3F mSp;        // measured 3d point with stereo // mZdistanceToCam; // distance in z direction to camera - measured with stereo
 
 public:
@@ -199,8 +199,8 @@ private:
     bool mNewReco; // true if person was just recognized
     QColor mCol; // color of point
     QString mComment; // comment for person
-    int mColCount; // number of colors where mCol is average from
     int mNrInBg; // number of successive frames in the background
+    int mColCount; // number of colors where mCol is average from
 
 public:
     TrackPerson();
@@ -249,7 +249,7 @@ public:
     void recalcHeight(float altitude);
     double getNearestZ(int i, int *extrapolated);
 
-    inline const int getMarkerID() const
+    inline int getMarkerID() const
     {
         return mMarkerID;
     }
@@ -265,7 +265,7 @@ public:
     {
         mCol = col;
     }
-    inline const bool newReco() const
+    inline bool newReco() const
     {
         return mNewReco;
     }
@@ -273,7 +273,7 @@ public:
     {
         mNewReco = b;
     }
-    inline const int firstFrame() const
+    inline int firstFrame() const
     {
         return mFirstFrame;
     }
@@ -281,7 +281,7 @@ public:
     {
         mFirstFrame = f;
     }
-    inline const int lastFrame() const
+    inline int lastFrame() const
     {
         return mLastFrame;
     }
@@ -289,7 +289,7 @@ public:
     {
         mLastFrame = f;
     }
-    inline const int nr() const
+    inline int nr() const
     {
         return mNr;
     }
@@ -305,7 +305,7 @@ public:
     {
         mComment = s;
     }
-    inline const int colCount() const
+    inline int colCount() const
     {
         return mColCount;
     }
@@ -391,9 +391,9 @@ inline QTextStream& operator<<(QTextStream& s, const TrackPerson& tp)
         s << " " <<tp.getMarkerID();
     }
     s << " " << tp.size();
-    s << endl << tp.comment() << endl;
+    s << Qt::endl << tp.comment() << Qt::endl;
     for (int i = 0; i < tp.size(); ++i)
-        s << tp.at(i) << endl;
+        s << tp.at(i) << Qt::endl;
     return s;
 }
 
@@ -405,9 +405,9 @@ inline std::ostream& operator<<(std::ostream& s, const TrackPerson& tp)
         s <<  " " << tp.getMarkerID();
     }
     s << " " << tp.size();
-    s << endl << tp.comment() << endl;
+    s << std::endl << tp.comment() << std::endl;
     for (int i = 0; i < tp.size(); ++i)
-        s << tp.at(i) << endl;
+        s << tp.at(i) << std::endl;
     return s;
 }
 
@@ -506,7 +506,6 @@ public:
 
     void purge(int frame);
 
-
 private:
     bool tryMergeTrajectories(const TrackPoint& v, size_t i, int frame);
 
@@ -516,7 +515,5 @@ private:
     void refineViaNearDarkPoint();
     void preCalculateImagePyramids(int level);
 };
-
-
 
 #endif

@@ -30,7 +30,7 @@ QRectF BackgroundItem::boundingRect() const
         return QRectF(0, 0, 0, 0);
 }
     
-void BackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void BackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
     Mat fg;
 
@@ -47,15 +47,14 @@ void BackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
             mImage = new QImage(fg.cols, fg.rows, QImage::Format_ARGB32);
 
         int x,y;
-        unsigned char* data = (unsigned char*) fg.data; // char*
-        unsigned char* yData = data;
-        char *p;
+        auto* data =  fg.data;
+        auto* yData = data;
 
         for (y = 0; y < fg.rows; y++)
         {
             // Pointer to the data information in the QImage for just one column
             // set pointer to value before, because ++p is faster than p++
-            p = ((char*)mImage->scanLine(y))-1;
+            auto* p = mImage->scanLine(y)-1;
             for (x = 0; x < fg.cols; x++)
             {
 //                if (*data == 1)

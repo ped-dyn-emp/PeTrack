@@ -64,7 +64,7 @@ public:
 
 //widgetWheelEvent  	(   	QWheelEvent *   	 e  	 )
 
-    void widgetMouseMoveEvent(QMouseEvent *e)
+    void widgetMouseMoveEvent(QMouseEvent *e) override
     {
         static int lastX = -1;
         static int lastY = -1;
@@ -142,24 +142,11 @@ public:
 //         QwtPlotZoomer::widgetMouseReleaseEvent(e);
 //     }
 
-    QwtText trackerText(const QwtDoublePoint &pos) const
+    QwtText trackerTextF(const QPointF &pos) const override
     {
         QString text;
- 
-//         switch(rubberBand())
-//         {
-//             case HLineRubberBand:
-//                 text.sprintf("%.4f", pos.y());
-//                 break;
-//             case VLineRubberBand:
-//                 text.sprintf("%.4f", pos.x());
-//                 break;
-//             default:
-//                 text.sprintf("%.4f, %.4f", pos.x(), pos.y());
-//         }
-        text.asprintf("%d, %.2f", myRound(pos.x()), pos.y());
+        text = QString::asprintf("%d, %.2f", myRound(pos.x()), pos.y());
         return QwtText(text);
-//         return QwtPlotZoomer::trackerText(pos);
     }
 };
 
@@ -171,7 +158,7 @@ TrackerRealPlotItem::TrackerRealPlotItem()
     mTrackerReal = NULL;
 }
 
-void TrackerRealPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& re) const
+void TrackerRealPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& /*re*/) const
 {
     Control *controlWidget = ((AnalysePlot *) plot())->getControlWidget();
     if (mTrackerReal && (mTrackerReal->size() > 0) && controlWidget != NULL)
@@ -491,7 +478,7 @@ AnalysePlot::AnalysePlot(QWidget *parent) // default= NULL
 //     debout << "moveEvent" << endl;
 // }
 
-void AnalysePlot::setCursor(const QColor &col)
+void AnalysePlot::setCursor(const QColor &/*col*/)
 {
     //QPoint pos = getPos(col);
     //QMouseEvent event(QEvent::MouseMove, pos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);

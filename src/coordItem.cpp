@@ -70,7 +70,7 @@ QRectF CoordItem::boundingRect() const
     {
         //debout << "Items pos: " << this->pos() << " scenePos(): " << this->scenePos() << endl;
 
-        if( !mControlWidget->getCalibCoordDimension() == 0 ) // 2D view
+        if( mControlWidget->getCalibCoordDimension() != 0 ) // 2D view
         {
             return QRectF(-110., -110., 220., 220.);
         }
@@ -286,8 +286,6 @@ void CoordItem::updateData()
 
             ursprung = extCalib->getImagePoint(Point3f(0,0,0));
 
-            bool ursprungOutside = false;
-
             x3D = Point3f(axeLen,0,0);
             y3D = Point3f(0,axeLen,0);
             z3D = Point3f(0,0,axeLen);
@@ -296,7 +294,6 @@ void CoordItem::updateData()
             if( extCalib->isOutsideImage(ursprung) )
             {
                 //debout << "Ursprung: " << ursprung.x << ", " <<ursprung.y << endl;
-                ursprungOutside = true;
                 return;
             }
             //debout << "Test" << endl;
@@ -339,15 +336,13 @@ void CoordItem::updateData()
     }
 }
 
-void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
     bool debug = false;
 
 
-    int bS = mMainWindow->getImageBorderSize();
-
-    if( debug ) debout << "**************** CoordItem:paint() aufgerufen" << endl;
-    if( debug ) debout << "show coord: " << mControlWidget->getCalibCoordShow() << endl;
+    if( debug ) debout << "**************** CoordItem:paint() aufgerufen" << std::endl;
+    if( debug ) debout << "show coord: " << mControlWidget->getCalibCoordShow() << std::endl;
     ////////////////////////////////
     // Drawing Calibration Points //
     ////////////////////////////////
@@ -363,7 +358,7 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
             painter->setFont(font);
 
-            for(int i=0; i< extCalib->get2DList().size(); i++)
+            for(size_t i=0; i< extCalib->get2DList().size(); i++)
             {
                 painter->setPen(Qt::red);
                 painter->setBrush(Qt::NoBrush);
@@ -696,9 +691,9 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
             painter->drawText(QPointF(p[0].x-5,p[0].y+5), QString("Z"));
 
 
-            if( debug ) debout << "Ursprungskoordinaten: " << ursprung.x << ", " << ursprung.y << endl;
-            if( debug ) debout << "Bildsize: " << mMainWindow->getImage()->width() << "x" << mMainWindow->getImage()->height() << endl;
-            if( debug ) sprintf (coordinaten, "(%d  %d %d)", tX3D, tY3D, tZ3D);
+            if( debug ) debout << "Ursprungskoordinaten: " << ursprung.x << ", " << ursprung.y << std::endl;
+            if( debug ) debout << "Bildsize: " << mMainWindow->getImage()->width() << "x" << mMainWindow->getImage()->height() << std::endl;
+            if( debug ) sprintf (coordinaten, "(%f  %f %f)", tX3D, tY3D, tZ3D);
             //painter->drawText(QPoint(ursprung.x+25,ursprung.y),QString(coordinaten));
 
             //////////////////////////////

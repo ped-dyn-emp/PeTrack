@@ -841,12 +841,12 @@ void Control::on_anaCalculate_clicked()
 //     mapNr->setValue(mapNr->maximum());
 }
 
-void Control::on_anaStep_valueChanged(int i)
+void Control::on_anaStep_valueChanged(int /*i*/)
 {
     if (!isLoading())
         analysePlot->replot();
 }
-void Control::on_anaMarkAct_stateChanged(int i)
+void Control::on_anaMarkAct_stateChanged(int /*i*/)
 {
     if (!isLoading())
         analysePlot->replot();
@@ -891,17 +891,17 @@ void Control::on_anaConsiderY_stateChanged(int i)
             analysePlot->replot();
     }
 }
-void Control::on_anaConsiderAbs_stateChanged(int i)
+void Control::on_anaConsiderAbs_stateChanged(int /*i*/)
 {
     if (!isLoading())
         analysePlot->replot();
 }
-void Control::on_anaConsiderRev_stateChanged(int i)
+void Control::on_anaConsiderRev_stateChanged(int /*i*/)
 {
     if (!isLoading())
         analysePlot->replot();
 }
-void Control::on_showVoronoiCells_stateChanged(int arg1)
+void Control::on_showVoronoiCells_stateChanged(int /*arg1*/)
 {
     if (!isLoading())
         mMainWindow->getScene()->update();
@@ -917,7 +917,7 @@ void Control::on_trackShow_stateChanged(int i)
     else if (i == Qt::Unchecked)
         mMainWindow->getTrackerItem()->hide();
 }
-void Control::on_trackFix_stateChanged(int i)
+void Control::on_trackFix_stateChanged(int /*i*/)
 {
     // erst sinnvoll, wenn einzelne Punkte verschiebbar sind
 //     if (i == Qt::Checked)
@@ -994,21 +994,21 @@ void Control::on_trackGroundPathColorButton_clicked()
         mMainWindow->updateImage();
 }
 
-void Control::on_trackRegionScale_valueChanged(int i) 
+void Control::on_trackRegionScale_valueChanged(int /*i*/)
 { 
     mMainWindow->setTrackChanged(true); 
     mMainWindow->getTracker()->reset(); 
     if( !mMainWindow->isLoading() )
         mMainWindow->updateImage();
 }
-void Control::on_trackRegionLevels_valueChanged(int i) 
+void Control::on_trackRegionLevels_valueChanged(int /*i*/)
 { 
     mMainWindow->setTrackChanged(true); 
     mMainWindow->getTracker()->reset(); 
     if( !mMainWindow->isLoading() )
         mMainWindow->updateImage();
 }
-void Control::on_trackShowSearchSize_stateChanged(int i) 
+void Control::on_trackShowSearchSize_stateChanged(int /*i*/)
 { 
     mScene->update(); 
 }
@@ -1031,14 +1031,14 @@ void Control::on_trackShowOnlyList_stateChanged(int i)
     if (!isLoading()) mScene->update();
 }
 
-void Control::on_trackShowOnlyNr_valueChanged(int i)
+void Control::on_trackShowOnlyNr_valueChanged(int /*i*/)
 {
     if (!mMainWindow->isLoading())
         mScene->update();
 //        mMainWindow->updateImage();
 }
 
-void Control::on_trackShowOnlyNrList_textChanged(const QString &arg1)
+void Control::on_trackShowOnlyNrList_textChanged(const QString &/*arg1*/)
 {
     if (!mMainWindow->isLoading())
         mScene->update();
@@ -1252,7 +1252,7 @@ void Control::on_recoColorModel_currentIndexChanged(int index)
     }
 }
 
-void Control::on_recoColorX_currentIndexChanged(int index)
+void Control::on_recoColorX_currentIndexChanged(int /*index*/)
 {
     if (mColorChanging == false)
     {
@@ -1268,7 +1268,7 @@ void Control::on_recoColorX_currentIndexChanged(int index)
 //         recoColorY->setItemText(2, "B");
 }
 
-void Control::on_recoColorY_currentIndexChanged(int index)
+void Control::on_recoColorY_currentIndexChanged(int /*index*/)
 {
     if (mColorChanging == false)
     {
@@ -1280,7 +1280,7 @@ void Control::on_recoColorY_currentIndexChanged(int index)
     }
 }
 
-void Control::on_recoColorZ_valueChanged(int index)
+void Control::on_recoColorZ_valueChanged(int /*index*/)
 {
     if (mColorChanging == false)
     {
@@ -1349,42 +1349,42 @@ void Control::on_mapNr_valueChanged(int i)
     }
 //    mMainWindow->setLoading(isloading);
 }
-void Control::on_mapX_valueChanged(int i)
+void Control::on_mapX_valueChanged(int /*i*/)
 {
     colorPlot->getMapItem()->changeMap(mapNr->value(), mapX->value()/2., mapY->value()/2., mapW->value(), mapH->value(), 
                                        mapColor->isChecked(), mapHeight->value());
     if (!isLoading())
         colorPlot->replot();
 }
-void Control::on_mapY_valueChanged(int i)
+void Control::on_mapY_valueChanged(int /*i*/)
 {
     colorPlot->getMapItem()->changeMap(mapNr->value(), mapX->value()/2., mapY->value()/2., mapW->value(), mapH->value(), 
                                        mapColor->isChecked(), mapHeight->value());
     if (!isLoading())
         colorPlot->replot();
 }
-void Control::on_mapW_valueChanged(int i)
+void Control::on_mapW_valueChanged(int /*i*/)
 {
     colorPlot->getMapItem()->changeMap(mapNr->value(), mapX->value()/2., mapY->value()/2., mapW->value(), mapH->value(), 
                                        mapColor->isChecked(), mapHeight->value());
     if (!isLoading())
         colorPlot->replot();
 }
-void Control::on_mapH_valueChanged(int i)
+void Control::on_mapH_valueChanged(int /*i*/)
 {
     colorPlot->getMapItem()->changeMap(mapNr->value(), mapX->value()/2., mapY->value()/2., mapW->value(), mapH->value(), 
                                        mapColor->isChecked(), mapHeight->value());
     if (!isLoading())
         colorPlot->replot();
 }
-void Control::on_mapColor_stateChanged(int i)
+void Control::on_mapColor_stateChanged(int /*i*/)
 {
     colorPlot->getMapItem()->changeMap(mapNr->value(), mapX->value()/2., mapY->value()/2., mapW->value(), mapH->value(), 
                                        mapColor->isChecked(), mapHeight->value());
     if (!isLoading())
         colorPlot->replot();
 }
-void Control::on_mapHeight_valueChanged(double d)
+void Control::on_mapHeight_valueChanged(double /*d*/)
 {
     colorPlot->getMapItem()->changeMap(mapNr->value(), mapX->value()/2., mapY->value()/2., mapW->value(), mapH->value(), 
                                        mapColor->isChecked(), mapHeight->value());
@@ -1427,20 +1427,20 @@ void Control::on_mapDefaultHeight_valueChanged(double d)
     mMainWindow->setHeadSize();
     mMainWindow->getBackgroundFilter()->setDefaultHeight(d);
 }
-void Control::on_performRecognition_stateChanged(int i)
+void Control::on_performRecognition_stateChanged(int /*i*/)
 {
     mMainWindow->setRecognitionChanged(true);// flag changes of recognition parameters
     if( !mMainWindow->isLoading() )
         mMainWindow->updateImage();
 }
 
-void Control::on_markerBrightness_valueChanged(int i)
+void Control::on_markerBrightness_valueChanged(int /*i*/)
 {
     mMainWindow->setRecognitionChanged(true);// flag changes of recognition parameters
     if( !mMainWindow->isLoading() )
         mMainWindow->updateImage();
 }
-void Control::on_markerIgnoreWithout_stateChanged(int i)
+void Control::on_markerIgnoreWithout_stateChanged(int /*i*/)
 {
     mMainWindow->setRecognitionChanged(true);// flag changes of recognition parameters
     if( !mMainWindow->isLoading() )
@@ -1833,37 +1833,37 @@ void Control::on_calibFiles_clicked()
 }
 //---------------------------------------
 
-void Control::on_rot1_valueChanged(double arg1)
+void Control::on_rot1_valueChanged(double /*arg1*/)
 {
     if (!isLoading())
         mMainWindow->updateCoord();
 }
-void Control::on_rot2_valueChanged(double arg1)
+void Control::on_rot2_valueChanged(double /*arg1*/)
 {
     if (!isLoading())
          mMainWindow->updateCoord();
 }
-void Control::on_rot3_valueChanged(double arg1)
+void Control::on_rot3_valueChanged(double /*arg1*/)
 {
     if (!isLoading())
         mMainWindow->updateCoord();
 }
-void Control::on_trans1_valueChanged(double arg1)
+void Control::on_trans1_valueChanged(double /*arg1*/)
 {
     if (!isLoading())
          mMainWindow->updateCoord();
 }
-void Control::on_trans2_valueChanged(double arg1)
+void Control::on_trans2_valueChanged(double /*arg1*/)
 {
     if (!isLoading())
         mMainWindow->updateCoord();
 }
-void Control::on_trans3_valueChanged(double arg1)
+void Control::on_trans3_valueChanged(double /*arg1*/)
 {
     if (!isLoading())
         mMainWindow->updateCoord();
 }
-void Control::on_extCalibPointsShow_stateChanged(int arg1)
+void Control::on_extCalibPointsShow_stateChanged(int /*arg1*/)
 {
     if (!isLoading())
          mScene->update();
@@ -1911,7 +1911,7 @@ void Control::on_extrCalibShowError_clicked()
     msgBox.exec();
 
 }
-void Control::on_extVanishPointsShow_stateChanged(int arg1)
+void Control::on_extVanishPointsShow_stateChanged(int /*arg1*/)
 {
     if (!isLoading())
         mScene->update();
@@ -1941,7 +1941,7 @@ void Control::on_extrCalibShowPoints_clicked()
 
     unsigned int i;
 
-    out << "<table><tr><th>Nr.</th><th>3D.x</th><th>3D.y</th><th>3D.z</th><th>2D.x</th><th>2D.y</th></tr>" << endl;
+    out << "<table><tr><th>Nr.</th><th>3D.x</th><th>3D.y</th><th>3D.z</th><th>2D.x</th><th>2D.y</th></tr>" << Qt::endl;
 
 
     for (i = 0; i < max(mMainWindow->getExtrCalibration()->get3DList().size(),mMainWindow->getExtrCalibration()->get2DList().size()); ++i)
@@ -1965,9 +1965,9 @@ void Control::on_extrCalibShowPoints_clicked()
         {
             out << "<td>-</td><td>-</td>";
         }
-        out << "</tr>" <<  endl;
+        out << "</tr>" <<  Qt::endl;
     }
-    out << "</table>" << endl;
+    out << "</table>" << Qt::endl;
 
     QMessageBox msgBox;
     msgBox.setWindowTitle("PeTrack");
@@ -1980,54 +1980,54 @@ void Control::on_extrCalibShowPoints_clicked()
 
 }
 //---------------------------------------
-void Control::on_gridTab_currentChanged(int index)
+void Control::on_gridTab_currentChanged(int /*index*/)
 {
     //cout << "on_gridTabView_currentchanged: index=" << index << endl;
     mScene->update();
 }
-void Control::on_gridShow_stateChanged(int i)
+void Control::on_gridShow_stateChanged(int /*i*/)
 {
     mScene->update();
 //     mMainWindow->getImageWidget()->update(); // repaint() zeichnet sofort - schneller aber mgl flicker
 }
-void Control::on_gridFix_stateChanged(int i)
+void Control::on_gridFix_stateChanged(int /*i*/)
 {
     mScene->update();
 }
-void Control::on_gridRotate_valueChanged(int i)
+void Control::on_gridRotate_valueChanged(int /*i*/)
 {
     mScene->update();
 }
-void Control::on_gridTransX_valueChanged(int i)
+void Control::on_gridTransX_valueChanged(int /*i*/)
 {
     mScene->update();
 }
-void Control::on_gridTransY_valueChanged(int i)
+void Control::on_gridTransY_valueChanged(int /*i*/)
 {
     mScene->update();
 }
-void Control::on_gridScale_valueChanged(int i)
+void Control::on_gridScale_valueChanged(int /*i*/)
 {
     mScene->update();
 }
-void Control::on_grid3DTransX_valueChanged(int value)
+void Control::on_grid3DTransX_valueChanged(int /*value*/)
 {
     if (!isLoading())
          mScene->update();
 }
-void Control::on_grid3DTransY_valueChanged(int value)
-{
-    if (!isLoading())
-         mScene->update();
-}
-
-void Control::on_grid3DTransZ_valueChanged(int value)
+void Control::on_grid3DTransY_valueChanged(int /*value*/)
 {
     if (!isLoading())
          mScene->update();
 }
 
-void Control::on_grid3DResolution_valueChanged(int value)
+void Control::on_grid3DTransZ_valueChanged(int /*value*/)
+{
+    if (!isLoading())
+         mScene->update();
+}
+
+void Control::on_grid3DResolution_valueChanged(int /*value*/)
 {
     if (!isLoading())
          mScene->update();
@@ -2050,7 +2050,7 @@ void Control::on_coordTab_currentChanged(int index)
         mScene->update();
      }
 }
-void Control::on_coordShow_stateChanged(int i)
+void Control::on_coordShow_stateChanged(int /*i*/)
 {
     if (!isLoading()){
         mMainWindow->updateCoord();
@@ -2060,97 +2060,97 @@ void Control::on_coordShow_stateChanged(int i)
 //     mScene->update(); //mScene->sceneRect() // ging auch, aber dann wurde zu oft matrix berechnet etc
 //     mMainWindow->getImageWidget()->update(); // repaint() zeichnet sofort - schneller aber mgl flicker
 }
-void Control::on_coordFix_stateChanged(int i)
+void Control::on_coordFix_stateChanged(int /*i*/)
 {
     if (!isLoading()){
         mMainWindow->updateCoord();
     }
 }
-void Control::on_coordRotate_valueChanged(int i)
+void Control::on_coordRotate_valueChanged(int /*i*/)
 {
     if (!isLoading()){
         mMainWindow->updateCoord();
     }
 }
-void Control::on_coordTransX_valueChanged(int i)
+void Control::on_coordTransX_valueChanged(int /*i*/)
 {
     if (!isLoading()){
         mMainWindow->updateCoord();
     }
 }
-void Control::on_coordTransY_valueChanged(int i)
+void Control::on_coordTransY_valueChanged(int /*i*/)
 {
     if (!isLoading()){
         mMainWindow->updateCoord();
     }
 }
-void Control::on_coordScale_valueChanged(int i)
+void Control::on_coordScale_valueChanged(int /*i*/)
 {
     mMainWindow->updateCoord();
     setMeasuredAltitude();
     mMainWindow->setHeadSize();
 }
 
-void Control::on_coordAltitude_valueChanged(double d)
+void Control::on_coordAltitude_valueChanged(double /*d*/)
 {
     mMainWindow->setHeadSize();
     mScene->update(); // fuer kreis um kopf, der mgl der realen kopfgroesse angepasst wird
 }
-void Control::on_coordUnit_valueChanged(double d)
+void Control::on_coordUnit_valueChanged(double /*d*/)
 {
     setMeasuredAltitude();
     mMainWindow->setHeadSize();
     mScene->update(); // fuer kreis um kopf, der mgl der realen kopfgroesse angepasst wird
 }
-void Control::on_coordUseIntrinsic_stateChanged(int i)
+void Control::on_coordUseIntrinsic_stateChanged(int /*i*/)
 {
     mMainWindow->setStatusPosReal();
 }
 
-void Control::on_coord3DTransX_valueChanged(int value)
+void Control::on_coord3DTransX_valueChanged(int /*value*/)
 {
     if (!isLoading()){
         mMainWindow->updateCoord();
     }
 }
 
-void Control::on_coord3DTransY_valueChanged(int value)
+void Control::on_coord3DTransY_valueChanged(int /*value*/)
 {
     if (!isLoading()){
         mMainWindow->updateCoord();
     }
 }
 
-void Control::on_coord3DTransZ_valueChanged(int value)
+void Control::on_coord3DTransZ_valueChanged(int /*value*/)
 {
     if (!isLoading()){
         mMainWindow->updateCoord();
     }
 }
 
-void Control::on_coord3DAxeLen_valueChanged(int value)
+void Control::on_coord3DAxeLen_valueChanged(int /*value*/)
 {
     if (!isLoading()){
         mMainWindow->updateCoord();
     }
 }
 
-void Control::on_coord3DSwapX_stateChanged(int arg1)
+void Control::on_coord3DSwapX_stateChanged(int /*arg1*/)
 {
     if (!isLoading()){
         mMainWindow->updateCoord();
     }
 }
 
-void Control::on_coord3DSwapY_stateChanged(int arg1)
+void Control::on_coord3DSwapY_stateChanged(int /*arg1*/)
 {
     if (!isLoading()){
-        bool hans = isLoading();
+//        bool hans = isLoading();
         mMainWindow->updateCoord();
     }
 }
 
-void Control::on_coord3DSwapZ_stateChanged(int arg1)
+void Control::on_coord3DSwapZ_stateChanged(int /*arg1*/)
 {
     if (!isLoading()){
         mMainWindow->updateCoord();

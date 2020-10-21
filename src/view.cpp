@@ -43,7 +43,7 @@ GraphicsView::GraphicsView(ViewWidget *viewWidget)
 
 void GraphicsView::wheelEvent(QWheelEvent * event)
 {
-    int numDegrees = event->delta() / 8;
+    QPoint numDegrees = event->angleDelta() / 8;
 
     // hier koennte man einstellen, dass das pixel unter cursor stehen bleibt das dort bereits steht
     // (dorhin gezoomt wird, wo mouse steht!!!)
@@ -66,17 +66,19 @@ void GraphicsView::wheelEvent(QWheelEvent * event)
 
     if (event->modifiers() == Qt::ShiftModifier) // nur shift zugelassen ...
     {
-        if (event->orientation() == Qt::Horizontal) // warum orienttion?
-            emit mouseShiftWheel(numDegrees/15);
+        // Check if horizontal scroll
+        if (event->angleDelta().x() != 0) // warum orienttion?
+            emit mouseShiftWheel(numDegrees.x()/15);
         else
-            emit mouseShiftWheel(-numDegrees/15);
+            emit mouseShiftWheel(-numDegrees.y()/15);
     }
     else
     {
-        if (event->orientation() == Qt::Horizontal) // warum orienttion?
-            mViewWidget->zoomIn(numDegrees/2);
+        // Check if horizontal scroll
+        if (event->angleDelta().x() != 0) // warum orienttion?
+            mViewWidget->zoomIn(numDegrees.x()/2);
         else
-            mViewWidget->zoomOut(numDegrees/2);
+            mViewWidget->zoomOut(numDegrees.y()/2);
     }
 
 //     mat = matrix();
@@ -295,7 +297,7 @@ void ViewWidget::fitInView()
 {
     mGraphicsView->fitInView(mGraphicsView->sceneRect(), Qt::KeepAspectRatio); // Qt::KeepAspectRatioByExpanding wuerde nur in eine dimension passend machen
     // doesnt work: mGraphicsView->fitInView(mGraphicsView->sceneRect(), Qt::KeepAspectRatio); // two times, while in the first run possibly the scrollbars have been there for calculation
-    QMatrix matrix = mGraphicsView->matrix();
+    QTransform matrix = mGraphicsView->transform();
     // calculates the sclaing of matrix
     // see http://www.robertblum.com/articles/2005/02/14/decomposing-matrices for rotation out of matrix
     double scale = Vec2F(matrix.m11(), matrix.m21()).length();
@@ -310,7 +312,7 @@ void ViewWidget::fitInROI(QRectF rect)
 
     mGraphicsView->fitInView(rect, Qt::KeepAspectRatio); // Qt::KeepAspectRatioByExpanding wuerde nur in eine dimension passend machen
     // doesnt work: mGraphicsView->fitInView(mGraphicsView->sceneRect(), Qt::KeepAspectRatio); // two times, while in the first run possibly the scrollbars have been there for calculation
-    QMatrix matrix = mGraphicsView->matrix();
+    QTransform matrix = mGraphicsView->transform();
     // calculates the sclaing of matrix
     // see http://www.robertblum.com/articles/2005/02/14/decomposing-matrices for rotation out of matrix
     double scale = Vec2F(matrix.m11(), matrix.m21()).length();
@@ -321,14 +323,14 @@ void ViewWidget::setupMatrix()
 {
     qreal scale = ::pow(2.0, (mZoomSlider->value() - 250) / 50.0);
 
-    QMatrix matrix;
+    QTransform matrix;
     matrix.scale(scale, scale);
     matrix.rotate(mRotateSlider->value());
 
 //     debout << matrix.m11() << " " << matrix.m12() <<endl;
 //     debout << matrix.m21() << " " << matrix.m22() <<endl;
 //     debout << matrix.dx() << " " << matrix.dy() <<endl;
-    mGraphicsView->setMatrix(matrix);
+    mGraphicsView->setTransform(matrix);
 }
 
 //  void View::print()

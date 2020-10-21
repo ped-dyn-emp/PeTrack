@@ -469,15 +469,15 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
         {
             if (elem.hasAttribute("ANTIALIAS"))
             {
-                mAntialiasAct->setChecked(elem.attribute("ANTIALIAS").toInt() ? Qt::Checked : Qt::Unchecked);
+                mAntialiasAct->setChecked(elem.attribute("ANTIALIAS").toInt() == Qt::Checked);
             }
             if (elem.hasAttribute("OPENGL"))
             {
-                mOpenGLAct->setChecked(elem.attribute("OPENGL").toInt() ? Qt::Checked : Qt::Unchecked);
+                mOpenGLAct->setChecked(elem.attribute("OPENGL").toInt() == Qt::Checked);
             }
             if (elem.hasAttribute("SAVE_TRANSFORMED"))
             {
-                mCropZoomViewAct->setChecked(elem.attribute("SAVE_TRANSFORMED").toInt() ? Qt::Checked : Qt::Unchecked);
+                mCropZoomViewAct->setChecked(elem.attribute("SAVE_TRANSFORMED") == Qt::Checked);
             }
             if (elem.hasAttribute("TRANSFORMATION"))
             {
@@ -494,7 +494,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
             }
             if (elem.hasAttribute("HIDE_CONTROLS"))
             {
-                mHideControlsAct->setChecked(elem.attribute("HIDE_CONTROLS").toInt() ? Qt::Checked : Qt::Unchecked);
+                mHideControlsAct->setChecked(elem.attribute("HIDE_CONTROLS").toInt() == Qt::Checked);
             }
         } else if (elem.tagName() == "AUTO_TRACK")
         {
@@ -759,7 +759,7 @@ void Petrack::writeXmlElement(QXmlStreamWriter& xmlStream, QDomElement element)
 
     QVector<QString> attribute_names;
     const QDomNamedNodeMap attributes = element.attributes();
-    for(size_t i = 0; i < attributes.size(); ++i){
+    for(int i = 0; i < attributes.size(); ++i){
         attribute_names.push_back(attributes.item(i).toAttr().name());
     }
 
@@ -775,7 +775,7 @@ void Petrack::writeXmlElement(QXmlStreamWriter& xmlStream, QDomElement element)
     // order of child nodes is defined at creation
     if(element.hasChildNodes()){
         const QDomNodeList children = element.childNodes();
-        for(size_t i = 0; i < children.size(); ++i){
+        for(int i = 0; i < children.size(); ++i){
             writeXmlElement(xmlStream, children.at(i).toElement());
         }
     }
@@ -822,7 +822,6 @@ void Petrack::openSequence(QString fileName) // default fileName = ""
     //         fileName = getExistingFile(fileName); // ueberprueft die ;-getrennten Dateinamen auf existenz und gibt ersten zurueck - interessant fuer relativen und absoluten pfad
     if (!fileName.isEmpty())
     {
-        bool lastIsStereoVideo = mAnimation->isStereoVideo();
         if (!mAnimation->openAnimation(fileName))
         {
             QMessageBox::critical(this, tr("PeTrack"), tr("Cannot load %1.").arg(fileName));
@@ -841,6 +840,7 @@ void Petrack::openSequence(QString fileName) // default fileName = ""
             mStereoContext = new pet::StereoContext(this);
         }
 
+        bool lastIsStereoVideo = mAnimation->isStereoVideo();
         if (mCalibFilter == NULL || (mAnimation->isStereoVideo() != lastIsStereoVideo))
         {
             bool lastCalibFilterEnabled = false;
@@ -916,7 +916,7 @@ void Petrack::saveViewSequence()
 void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // default saveView= false, dest=""
 {
     static QString lastDir;
-    bool autoSave = false;
+//    bool autoSave = false;
 
     // if no destination file or folder is given
     if (dest.isEmpty())
@@ -941,7 +941,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
     }
     else // uebergabe von saveVideo spielt keine roll mehr, sondern wird hier analysiert anhand von Dateiendung
     {
-        autoSave = true; // command line option
+//        autoSave = true; // command line option
         if (dest.right(4) == ".avi")
             saveVideo = true;
         else
@@ -2992,11 +2992,11 @@ void Petrack::exportTracker(QString dest) //default = ""
                 //else
                 //    trcVersion = 2;
 
-                debout << "export tracking data to " << dest << " (" << mTracker->size() << " person(s), file version " << trcVersion << ")..." << endl;
+                debout << "export tracking data to " << dest << " (" << mTracker->size() << " person(s), file version " << trcVersion << ")..." << std::endl;
                 QTextStream out(&file);
 
-                out << "version " << trcVersion << endl;
-                out << mTracker->size() << endl;
+                out << "version " << trcVersion << Qt::endl;
+                out << mTracker->size() << Qt::endl;
                 for (i = 0; i < mTracker->size(); ++i)
                 {
                     qApp->processEvents();
@@ -3004,7 +3004,7 @@ void Petrack::exportTracker(QString dest) //default = ""
                     progress.setValue(i+1);
                     //if(mControlWidget->exportComment->isChecked())
                     //    out << "# " << (*mTracker)[i].comment() << endl;
-                    out << (*mTracker)[i] << endl;
+                    out << (*mTracker)[i] << Qt::endl;
                 }
                 file.flush();
                 file.close();
@@ -3035,7 +3035,7 @@ void Petrack::exportTracker(QString dest) //default = ""
 
                 progress.setValue(mTracker->size()+1);
 
-                cout << " finished " << endl;
+                std::cout << " finished " << std::endl;
 
 #ifdef TIME_MEASUREMENT
                 time1 += clock() - tstart;
@@ -3107,24 +3107,24 @@ void Petrack::exportTracker(QString dest) //default = ""
 
                 QTextStream out(&file);
 
-                out << "# PeTrack project: "     << QFileInfo(getProFileName()).fileName() << endl;
-                out << "# raw trajectory file: " << QFileInfo(getTrackFileName()).fileName() << endl;
-                out << "# framerate: "           << mAnimation->getFPS() << " fps" << endl;
+                out << "# PeTrack project: "     << QFileInfo(getProFileName()).fileName() << Qt::endl;
+                out << "# raw trajectory file: " << QFileInfo(getTrackFileName()).fileName() << Qt::endl;
+                out << "# framerate: "           << mAnimation->getFPS() << " fps" << Qt::endl;
 
                 if (mControlWidget->exportComment->isChecked())
                 {
-                    out << "# personal information:" << endl;
-                    out << "# ID| Comment" << endl;
+                    out << "# personal information:" << Qt::endl;
+                    out << "# ID| Comment" << Qt::endl;
 
                     // std out
-                    cout << endl << "Printing comment table..." << endl << endl;
-                    cout << "ID  | Comment" << endl;
-                    cout << "----|----------------" << endl;
+                    std::cout << std::endl << "Printing comment table..." << std::endl << std::endl;
+                    std::cout << "ID  | Comment" << std::endl;
+                    std::cout << "----|----------------" << std::endl;
 
                     for(int i=0;i<mTracker->size();++i)
                     {
-                        out << "#" << qSetFieldWidth(3) << (i+1) << qSetFieldWidth(0) << "|" << mTracker->at(i).comment() << endl;
-                        cout << setw(4) << (i+1) << "|" << mTracker->at(i).comment() << endl;
+                        out << "#" << qSetFieldWidth(3) << (i+1) << qSetFieldWidth(0) << "|" << mTracker->at(i).comment() << Qt::endl;
+                        std::cout << setw(4) << (i+1) << "|" << mTracker->at(i).comment() << std::endl;
                     }
                 }
                 mTrackerReal->exportTxt(out,
@@ -3149,7 +3149,7 @@ void Petrack::exportTracker(QString dest) //default = ""
                 else
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
 
-                cout << " finished" << endl;
+                std::cout << " finished" << std::endl;
 
 #ifdef TIME_MEASUREMENT
                 time1 += clock() - tstart;
@@ -3201,7 +3201,7 @@ void Petrack::exportTracker(QString dest) //default = ""
                                         mControlWidget->exportViewDir->isChecked(), mControlWidget->exportAngleOfView->isChecked(), mControlWidget->exportMarkerID->isChecked(),
                                         autoCorrectOnlyExport);
 
-                debout << "export tracking data to " << dest << " (" << mTracker->size() << " person(s))..." << endl;
+                debout << "export tracking data to " << dest << " (" << mTracker->size() << " person(s))..." << std::endl;
                 QTextStream outDat(&fileDat);
                 mTrackerReal->exportDat(outDat, mControlWidget->trackAlternateHeight->checkState(), mStereoWidget->stereoUseForExport->isChecked());
                 fileDat.flush();
@@ -3218,7 +3218,7 @@ void Petrack::exportTracker(QString dest) //default = ""
                 else
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
 
-                cout << " finished" << endl;
+                std::cout << " finished" << std::endl;
 
 
 //                mTracker->checkPlausibility(pers, frame,
@@ -3284,24 +3284,24 @@ void Petrack::exportTracker(QString dest) //default = ""
                     QMessageBox::critical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(fileXml.errorString()));
                     return;
                 }
-                debout << "export tracking data to " << dest << " (" << mTracker->size() << " person(s))..." << endl;
+                debout << "export tracking data to " << dest << " (" << mTracker->size() << " person(s))..." << std::endl;
                 // already done: mTrackerReal->calculate(mTracker, mImageItem, mControlWidget->getColorPlot(), getImageBorderSize(), mControlWidget->trackMissingFrames->checkState());
                 QTextStream outXml(&fileXml);
-                outXml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<endl;
-                outXml << "<trajectoriesDataset>" <<endl;
-                outXml << "    <header version=\"1.0\">" <<endl;
-                outXml << "        <roomCaption>PeTrack: " << mAnimation->getFileBase() << "</roomCaption>" << endl;
-                outXml << "        <roomID>0</roomID>" <<endl;
-                outXml << "        <agents>" << mTracker->size() << "</agents>" << endl;
-                outXml << "        <frameRate>" << mAnimation->getFPS() << "</frameRate> <!--per second-->" << endl;
+                outXml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << Qt::endl;
+                outXml << "<trajectoriesDataset>" << Qt::endl;
+                outXml << "    <header version=\"1.0\">" << Qt::endl;
+                outXml << "        <roomCaption>PeTrack: " << mAnimation->getFileBase() << "</roomCaption>" << Qt::endl;
+                outXml << "        <roomID>0</roomID>" << Qt::endl;
+                outXml << "        <agents>" << mTracker->size() << "</agents>" << Qt::endl;
+                outXml << "        <frameRate>" << mAnimation->getFPS() << "</frameRate> <!--per second-->" << Qt::endl;
                 // outXml << "        <timeStep>" << 1000./mAnimation->getFPS() << "</timeStep>   <!-- millisecond-->" << endl; inverse von
                 outXml << "        <timeFirstFrame sec=\"" << mAnimation->getFirstFrameSec() << "\" microsec=\"" << mAnimation->getFirstFrameMicroSec()
-                       << "\"/> <!-- " << mAnimation->getTimeString(0) << " -->" << endl;
-                outXml << "    </header>" <<endl<<endl;
+                       << "\"/> <!-- " << mAnimation->getTimeString(0) << " -->" << Qt::endl;
+                outXml << "    </header>" << Qt::endl<< Qt::endl;
 
                 mTrackerReal->exportXml(outXml, mControlWidget->trackAlternateHeight->checkState(), mStereoWidget->stereoUseForExport->isChecked());
 
-                outXml << "</trajectoriesDataset>" <<endl;
+                outXml << "</trajectoriesDataset>" << Qt::endl;
                 fileXml.flush();
                 fileXml.close();
 
@@ -3654,7 +3654,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                            myRound(mRecognitionRoiItem->rect().width()),
                            myRound(mRecognitionRoiItem->rect().height()));
                 QList<TrackPoint> persList;
-                bool markerLess = true;
+//                bool markerLess = true;
                 int recoMethod = mControlWidget->getRecoMethod();
 #ifdef TIME_MEASUREMENT
                 //        "==========: "
@@ -3667,7 +3667,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                     //                                getImageBorderSize(), (mControlWidget->markerIgnoreWithout->checkState() == Qt::Checked),
                     //                                (mControlWidget->recoAutoWB->checkState() == Qt::Checked), getBackgroundFilter(), recoMethod); //#tempImg
                     getMarkerPos(mImgFiltered, rect, &persList, mControlWidget, getImageBorderSize(), getBackgroundFilter());
-                    markerLess = false;
+//                    markerLess = false;
 //                    debout << "Testausgabe persList: [Frame " << frameNum << "] " << endl;
 //                    for (int i = 0; i < persList.size(); ++i)
 //                    {
@@ -3980,7 +3980,7 @@ QSet<int> Petrack::getOnlyVisible()
 //        int maxPed = mTracker->size();
         if( mControlWidget->trackShowOnlyList->checkState() == Qt::Checked)
         {
-            QStringList list = mControlWidget->trackShowOnlyNrList->text().split(",", QString::SkipEmptyParts);
+            QStringList list = mControlWidget->trackShowOnlyNrList->text().split(",", Qt::SkipEmptyParts);
             QSet<int> onlyVisible;
             foreach(QString s, list)
             {
@@ -3990,7 +3990,7 @@ QSet<int> Petrack::getOnlyVisible()
                     onlyVisible.insert(nr-1);
                 else // error or IDs range (e.g. 1-3, 6-10, etc.)
                 {
-                    QStringList range = s.split("-",QString::SkipEmptyParts);
+                    QStringList range = s.split("-", Qt::SkipEmptyParts);
                     int last,first = range[0].toInt(&ok);
 
                     if(ok/* && first <= maxPed && nr > 0*/)

@@ -10,7 +10,7 @@ CalibStereoFilter::CalibStereoFilter()
 
 
 
-Mat CalibStereoFilter::act(Mat &img, Mat &res)
+Mat CalibStereoFilter::act(Mat &/*img*/, Mat &/*res*/)
 {
     return Mat();
 

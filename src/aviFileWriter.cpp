@@ -94,35 +94,34 @@ bool AviFileWriter::openSizeLimitedAVI(
                  int	      ibpp,
                  double	      dFramerate )
 {
-#ifdef WINDOWS
-   char szAVIFile[ _MAX_PATH ];
-#else
-   char szAVIFile[ PATH_MAX ];
-#endif
+   std::string szAVIFile;
    m_bSizeLimited = true;
    m_iSplitFile = 0;
 
-   sprintf(szAVIFile, "%s", pszFilename );
+   std::stringstream stringStream;
+   stringStream << pszFilename;
+   szAVIFile = stringStream.str();
 
    // Remove any extensions.
-   char* pcExt = strstr( szAVIFile, "." );
-   if( pcExt != NULL )
-   {
-      *( pcExt ) = 0x0;
-   }
+   size_t lastindex = szAVIFile.find_first_of('.');
+   szAVIFile = szAVIFile.substr(0, lastindex);
 
    //
    // Keep the basic avi file name in m_szAVIDestFile.
    //
-   sprintf(m_szAVIDestFile, "%s", szAVIFile );
+   stringStream.str("");
+   stringStream << szAVIFile;
+   m_szAVIDestFile = stringStream.str();
 
    //
    // The avi file names will be in the form  of ***_0000.avi, ***_0001.avi,
    // ***_0002.avi...
    // The size of each avi file is limited by AVI_FILE_SPLIT_SIZE bytes
    //
-   sprintf(szAVIFile, "%s_%04d.avi", m_szAVIDestFile, m_iSplitFile );
-   return open( szAVIFile, iCols, iRows, ibpp, dFramerate );
+   stringStream.str("");
+   stringStream << m_szAVIDestFile << "_" << std::setfill('0') << std::setw(4) << m_iSplitFile << ".avi";
+   szAVIFile = stringStream.str();
+   return open( szAVIFile.c_str(), iCols, iRows, ibpp, dFramerate );
 }
 
 bool AviFileWriter::open(const char*  pszFilename, int iCols, int iRows, int ibpp, double dFramerate)
@@ -245,7 +244,7 @@ bool AviFileWriter::open(
                  const char*  pszFilename,
                  int	      iCols,
                  int	      iRows,
-                 int	      ibpp,
+                 int	      /*ibpp*/,
                  int	      iFramerate )
 {
   //return m_vWriter.open(pszFilename,CV_FOURCC_DEFAULT,(double) iFramerate,Size(iCols,iRows),m_isColor);
@@ -263,7 +262,7 @@ long int AviFileWriter::bytesWritten()
    //return m_iTimeIndex * m_iSize;
 }
 
-bool AviFileWriter::appendFrame(const unsigned char* pBuffer, bool bInvert)
+bool AviFileWriter::appendFrame(const unsigned char* pBuffer, bool /*bInvert*/)
 {
    if( !m_vWriter.isOpened() ){
          assert(false);
@@ -322,7 +321,7 @@ bool AviFileWriter::appendFrame(const unsigned char* pBuffer, bool bInvert)
 
    //LONG lSamplesWritten;
    //LONG lBytesWritten;
-   long lBytesWritten;
+   long lBytesWritten = 0;
 
    //
    // If the AVI file is opened with openSizeLimitedAVI(), split it if necessory.
@@ -335,15 +334,14 @@ bool AviFileWriter::appendFrame(const unsigned char* pBuffer, bool bInvert)
       //if(bytesWritten() >= (__int64)(AVI_FILE_SPLIT_SIZE))
       if(bytesWritten() >= (long int)(AVI_FILE_SPLIT_SIZE))
       {
-#ifdef WINDOWS
-         char szAVIFile[_MAX_PATH];
-#else
-          char szAVIFile[PATH_MAX];
-#endif
+         std::string szAVIFile;
+         std::stringstream stringStream;
          close();
          m_iSplitFile++;
-         sprintf(szAVIFile, "%s_%04d.avi", m_szAVIDestFile, m_iSplitFile );
-         if( !open( szAVIFile, m_iCols, m_iRows, m_iBPP, m_frameRate ) )
+         stringStream << m_szAVIDestFile << "_" << std::setfill('0') << std::setw(4) << m_iSplitFile << ".avi";
+         szAVIFile = stringStream.str();
+
+         if( !open( szAVIFile.c_str(), m_iCols, m_iRows, m_iBPP, m_frameRate ) )
             return false;
       }
    }

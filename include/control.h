@@ -260,36 +260,36 @@ private slots:
     void on_trackRegionLevels_valueChanged(int i);
     void on_trackShowSearchSize_stateChanged(int i);
 
-    void on_trackShowOnlyVisible_stateChanged(int i) { if (!isLoading()) mScene->update(); }
+    void on_trackShowOnlyVisible_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
 //    void on_trackShowOnlyNr_valueChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackShowCurrentPoint_stateChanged(int i) { if (!isLoading()) mScene->update(); }
+    void on_trackShowCurrentPoint_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
     void on_trackGotoNr_clicked();
     void on_trackGotoStartNr_clicked();
     void on_trackGotoEndNr_clicked();
 
     void on_trackHeadSized_stateChanged(int i);
 
-    void on_trackShowPoints_stateChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackShowPointsColored_stateChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackShowPath_stateChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackShowColColor_stateChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackShowColorMarker_stateChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackShowNumber_stateChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackShowGroundPosition_stateChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackShowGroundPath_stateChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackShowHeightIndividual_stateChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackNumberBold_stateChanged(int i) { if (!isLoading()) mScene->update(); }
+    void on_trackShowPoints_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackShowPointsColored_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackShowPath_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackShowColColor_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackShowColorMarker_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackShowNumber_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackShowGroundPosition_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackShowGroundPath_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackShowHeightIndividual_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackNumberBold_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
 
-    void on_trackCurrentPointSize_valueChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackPointSize_valueChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackPathWidth_valueChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackColColorSize_valueChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackColorMarkerSize_valueChanged(int i) { mScene->update(); }
-    void on_trackNumberSize_valueChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackGroundPositionSize_valueChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackGroundPathSize_valueChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackShowBefore_valueChanged(int i) { if (!isLoading()) mScene->update(); }
-    void on_trackShowAfter_valueChanged(int i) { if (!isLoading()) mScene->update(); }
+    void on_trackCurrentPointSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackPointSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackPathWidth_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackColColorSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackColorMarkerSize_valueChanged(int /*i*/) { mScene->update(); }
+    void on_trackNumberSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackGroundPositionSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackGroundPathSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackShowBefore_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackShowAfter_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
 
     void on_performRecognition_stateChanged(int i);
     void on_markerBrightness_valueChanged(int i);

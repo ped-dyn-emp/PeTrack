@@ -85,7 +85,7 @@ void BackgroundFilter::setFilename(const QString &fn)
 }
 
 // rueckgabe, ob speichern geklappt hat
-bool BackgroundFilter::save(QString dest) //default = ""
+bool BackgroundFilter::save(QString /*dest*/) //default = ""
 {
 #ifndef STEREO_DISABLED
     if (*stereoContext() && !mBgPointCloud.empty())
@@ -345,7 +345,7 @@ waitKey();
 
 //BackgroundSubtractorMOG
 
-    if (mBgPointCloud.empty() && mBgModel.empty() || mForeground.empty() || mForeground.size != img.size) // initialisierung wenn entwerder stereo oder model
+    if ((mBgPointCloud.empty() && mBgModel.empty()) || mForeground.empty() || mForeground.size != img.size) // initialisierung wenn entwerder stereo oder model
     {
 #ifndef STEREO_DISABLED
 // For StereoImaging use heightfiled for foreground extraction -------------------------------------------------------------------------------

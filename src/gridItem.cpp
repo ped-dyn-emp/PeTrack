@@ -141,7 +141,7 @@ int GridItem::drawLine(QPainter *painter, Point2f *p, int y_offset){
     }
 
 
-    double x1_d, y1_d, x2_d, y2_d;
+    double x1_d = 0., y1_d = 0., x2_d = 0. , y2_d = 0.;
 
     // Steigung m und Achsenabschnitt b der Geraden berechnen: g(x) = m * x + b
     double m = (p[1].y-p[0].y)/(p[1].x-p[0].x), // Steigung
@@ -218,7 +218,7 @@ int GridItem::drawLine(QPainter *painter, Point2f *p, int y_offset){
     return 0;
 }
 
-void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
 
     bool debug = false;
@@ -548,7 +548,6 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
                 //mControlWidget->setGridMinMaxTranslation(min_x, max_x, min_y, max_y);
 
                 Point3f ursprung(0,0,0);// = extCalib->getImagePoint(Point3f(tX3D,tY3D,tZ3D));
-                double abs = 0;
                 int res = -1;
 
                 Point3f xl, xr, yo, yu;

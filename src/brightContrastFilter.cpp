@@ -23,7 +23,6 @@ BrightContrastFilter::BrightContrastFilter()
 Mat BrightContrastFilter::act(Mat &img, Mat &res)
 {
 
-    int i, v;
     double delta, a, b;
     /*
      * The algorithm is by Werner D. Streidt

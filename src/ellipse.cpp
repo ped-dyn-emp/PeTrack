@@ -38,16 +38,6 @@ MyEllipse::MyEllipse(QPointF center, QSizeF size, double angle)
 {
     MyEllipse(center.x(), center.y(), size.width(), size.height(), angle);
 }
-MyEllipse::MyEllipse(const MyEllipse &ellipse) // nicht noetig - wird defaultmaessig erstellt ???
-    : mC(ellipse.mC), 
-      mR1(ellipse.mR1),
-      mR2(ellipse.mR2),
-      mAngle(ellipse.mAngle),
-      mF1(ellipse.mF1), 
-      mF2(ellipse.mF2)
-
-{
-}
 
 Vec2F MyEllipse::center() const
 {

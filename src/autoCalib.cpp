@@ -110,9 +110,7 @@ void AutoCalib::autoCalib()
         Mat dist_coeffs = Mat::zeros(1, 8, CV_64F);//, _dist_coeffs);
         Mat extr_params;
         double reproj_errs;
-        double avg_reproj_err = 0;
         Mat view, view_gray;
-        int count = 0;
         bool found = false;
 //        CvMemStorage* storage = NULL;
 //        int elem_size;
@@ -301,7 +299,7 @@ int AutoCalib::runCalibration(vector<vector<Point2f> > image_points, Size img_si
     vector<vector<Point3f> > object_points;
 
     // initialize arrays of points
-    for(int j=0; j<image_points.size();j++)
+    for(size_t j=0; j<image_points.size();j++)
     {
         vector<Point3f> points_3d;
         for(int i=0; i<board_size.width*board_size.height;i++)

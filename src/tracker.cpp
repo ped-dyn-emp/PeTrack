@@ -27,37 +27,37 @@ inline float errorToQual(float error)
 }
 
 TrackPoint::TrackPoint()
-    : mMarkerID(-1),
-      mQual(0),
+    : mQual(0),
+      mMarkerID(-1),
       mSp(-1., -1., -1.)
 {
 }
 TrackPoint::TrackPoint(const Vec2F &p)
     : Vec2F(p),
-      mMarkerID(-1),
       mQual(0),
+      mMarkerID(-1),
       mSp(-1., -1., -1.)
 {
 }
 TrackPoint::TrackPoint(const Vec2F &p, int qual)
     : Vec2F(p),
-      mMarkerID(-1),
       mQual(qual),
+      mMarkerID(-1),
       mSp(-1., -1., -1.)
 {
 }
 TrackPoint::TrackPoint(const Vec2F &p, int qual, int markerID)
     : Vec2F(p),
-      mMarkerID(markerID),
       mQual(qual),
+      mMarkerID(markerID),
       mSp(-1.,-1.,-1.)
 {
 }
 TrackPoint::TrackPoint(const Vec2F &p, int qual, const QColor &col)
     : Vec2F(p),
       mCol(col),
-      mMarkerID(-1),
       mQual(qual),
+      mMarkerID(-1),
       mSp(-1., -1., -1.)
 {
 }
@@ -66,8 +66,8 @@ TrackPoint::TrackPoint(const Vec2F &p, int qual, const Vec2F &colPoint, const QC
     : Vec2F(p),
       mColPoint(colPoint),
       mCol(col),
-      mMarkerID(-1),
       mQual(qual),
+      mMarkerID(-1),
       mSp(-1., -1., -1.)
 {
 }
@@ -109,8 +109,8 @@ TrackPerson::TrackPerson()
       mLastFrame(0),
       mNewReco(false),
       mComment(),
-      mColCount(0),
-      mNrInBg(0)
+      mNrInBg(0),
+      mColCount(0)
 {
 }
 // TrackPerson::TrackPerson(int nr, int frame, const Vec2F &p)
@@ -125,7 +125,8 @@ TrackPerson::TrackPerson()
 //     append(p);
 // }
 TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p)
-    : mNr(0),
+    : mNr(nr),
+      mMarkerID(-1),
       mHeight(MIN_HEIGHT),
       mHeightCount(0),
       mFirstFrame(frame),
@@ -133,14 +134,14 @@ TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p)
       mNewReco(true),
       mCol(p.color()),
       mComment(),
-      mMarkerID(-1),
       mColCount(1)
 {
     append(p);
 }
 
 TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p, int markerID)
-    : mNr(0),
+    : mNr(nr),
+      mMarkerID(markerID),
       mHeight(MIN_HEIGHT),
       mHeightCount(0),
       mFirstFrame(frame),
@@ -148,7 +149,6 @@ TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p, int markerID)
       mNewReco(true),
       mCol(p.color()),
       mComment(),
-      mMarkerID(markerID),
       mColCount(1)
 {
     append(p);
@@ -945,15 +945,15 @@ bool Tracker::resetTrackPersonHeight(const Vec2F& p, int frame, QSet<int> onlyVi
 
 // used for calculation of 3D point for all points in frame
 // returns number of found points or -1 if no stereoContext available (also points without disp found are counted)
-int Tracker::calcPosition(int frame)
-{
+int Tracker::calcPosition(int /*frame*/) {
+#ifndef STEREO_DISABLED
     int anz = 0, notFoundDisp = 0;
     pet::StereoContext * sc = mMainWindow->getStereoContext();
     float x, y, z;
 
     if (sc)
     {
-#ifndef STEREO_DISABLED
+
         // for every point of a person, which has already identified at this frame
         for (int i = 0; i < size(); ++i) // ueber TrackPerson
         {
@@ -981,10 +981,11 @@ int Tracker::calcPosition(int frame)
         //if (notFoundDisp>0) // Meldung zu haeufig
         //    debout << "Warning: No disparity information found for " << (100.*notFoundDisp)/anz << " percent of points." << endl;
         return anz;
-#endif
     }
     else
         return -1;
+#endif
+    return -1;
 }
 
 // true, if new traj is inserted with point p and initial frame frame
@@ -993,12 +994,13 @@ int Tracker::calcPosition(int frame)
 bool Tracker::addPoint(TrackPoint &p, int frame, QSet<int> onlyVisible, int *pers)
 {
     bool found = false;
-    int i, iNearest;
-    float x=-1, y=-1, z=-1;
+    int i, iNearest = 0.;
     float scaleHead;
     float dist, minDist = 1000000.;
-
+    float z = -1;
 #ifndef STEREO_DISABLED
+    float x=-1, y=-1;
+
     // ACHTUNG: BORDER NICHT BEACHTET bei p.x()...
     // hier wird farbe nur bei reco bestimmt gegebenfalls auch beim tracken interessant
     // calculate height with disparity map
@@ -1268,10 +1270,10 @@ int Tracker::insertFeaturePoints(int frame, size_t count, Mat &img, int borderSi
     bool found;
     Vec2F borderSize2F(-borderSize, -borderSize);
     int dist = (borderSize > 9) ? borderSize : 10; // abstand zum bildrand, ab wann warnung ueber trj verlust herausgeschrieben wird
-    float x=-1, y=-1, z=-1;
-    int borderColorGray = qGray(mMainWindow->getBorderFilter()->getBorderColR()->getValue(),
-                                mMainWindow->getBorderFilter()->getBorderColG()->getValue(),
-                                mMainWindow->getBorderFilter()->getBorderColB()->getValue());
+    float z=-1;
+//    int borderColorGray = qGray(mMainWindow->getBorderFilter()->getBorderColR()->getValue(),
+//                                mMainWindow->getBorderFilter()->getBorderColG()->getValue(),
+//                                mMainWindow->getBorderFilter()->getBorderColB()->getValue());
 
     for (size_t i = 0; i < count; ++i)
     {
@@ -1293,6 +1295,7 @@ int Tracker::insertFeaturePoints(int frame, size_t count, Mat &img, int borderSi
                     v += borderSize2F;
 
 #ifndef STEREO_DISABLED
+                    float x=-1, y=-1;
                     // ACHTUNG: BORDER NICHT BEACHTET bei p.x()...
                     // calculate height with disparity map
                     if (mMainWindow->getStereoContext() && mMainWindow->getStereoWidget()->stereoUseForHeight->isChecked())
@@ -1435,7 +1438,7 @@ bool Tracker::tryMergeTrajectories(const TrackPoint& v, size_t i, int frame)
 int Tracker::track(Mat &img,Rect &rect, int frame, bool reTrack, int reQual, int borderSize, int level, QSet<int> onlyVisible, int errorScaleExponent)
 {
 //    debout << "frame="<<frame<<" reTrack="<<reTrack<<" reQual="<<reQual<<" borderSize="<<borderSize<<" level="<<level<<" errorScaleExponent="<<errorScaleExponent << endl;
-    int inserted = 0;
+    [[maybe_unused]] int inserted = 0;
     QList<int> trjToDel;
     float errorScale = pow(1.5,errorScaleExponent); // 0 waere neutral
 
@@ -1723,7 +1726,7 @@ void Tracker::useBackgroundFilter(QList<int>& trjToDel, BackgroundFilter *bgFilt
 void Tracker::refineViaNearDarkPoint()
 {
     int x, y;
-    for (int i = 0; i < mPrevFeaturePointsIdx.size(); ++i)
+    for (size_t i = 0; i < mPrevFeaturePointsIdx.size(); ++i)
     {
         x = myRound(mFeaturePoints[i].x-.5);
         y = myRound(mFeaturePoints[i].y-.5);

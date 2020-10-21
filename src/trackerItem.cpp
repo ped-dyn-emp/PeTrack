@@ -97,9 +97,9 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     }
     QMenu menu;
     TrackPerson tp;
-    float height;
+    float height = 0.f;
     bool height_set_by_user = false;
-    QAction *delTrj, *delFutureTrj, *delPastTrj, *creTrj, *infoTrj, *addComment, *setHeight, *resetHeight;
+    QAction *delTrj = nullptr, *delFutureTrj = nullptr, *delPastTrj = nullptr, *creTrj = nullptr, *infoTrj = nullptr, *addComment = nullptr, *setHeight = nullptr, *resetHeight = nullptr;
 
     //debout << "mTracker->size(): " << mTracker->size() << endl;
     if(found)
@@ -148,7 +148,7 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     if( selectedAction == creTrj )
     {
         //debout << "Create new trajectory..." << endl;
-        int res = mMainWindow->addManualTrackPoint(event->scenePos());
+        mMainWindow->addManualTrackPoint(event->scenePos());
         //debout << "addManuelTrackPoint: " << res << endl;
     }else if( selectedAction == delTrj )
     {
@@ -322,7 +322,7 @@ void TrackerItem::updateData()
 //     mScene->update();
 }
     
-void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
 //    debout << "TrackerItem::paint" << endl;
 //         double scale=mControlWidget->getCalibCoordScale()/10.;
@@ -416,7 +416,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     for (i = 0; i < mTracker->size(); ++i) // ueber TrackPerson
     {
         // show current frame
-        if (!(mControlWidget->trackShowOnly->checkState() == Qt::Checked) && !(mControlWidget->trackShowOnlyList->checkState() == Qt::Checked) ||
+        if ((!(mControlWidget->trackShowOnly->checkState() == Qt::Checked) && !(mControlWidget->trackShowOnlyList->checkState() == Qt::Checked)) ||
             (((mControlWidget->trackShowOnly->checkState() == Qt::Checked) || (mControlWidget->trackShowOnlyList->checkState() == Qt::Checked)) &&
                 mMainWindow->getOnlyVisible().contains((i))))
         {
@@ -787,7 +787,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
             QPointF circleStart, circleEnd;
             float area = 0;
             float r = 50, m = 0, n = 0, s1_x = 0, s2_x = 0, s1_y = 0, s2_y = 0;
-            bool circleStarted = false, circleEnded = false;
+            bool circleStarted = false;
             for( size_t j = 0; j < facets3D[i].size(); j++ )
             {
                 facets3D.at(i).at(j).x = x_switch>0 ? x_switch-facets3D.at(i).at(j).x-x_offset : facets3D.at(i).at(j).x-x_offset;
@@ -842,7 +842,6 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
                         //                      painter->drawLine(circleEnd,QPointF(center2D.x,center2D.y));
                         debout << "End point: (" << s1_x << ", " << s1_y << ")" << endl;
                         //                    area += (M_PI*pow(r,2)*angle/360);
-                        circleEnded = true;
 
                     }else
                     {
@@ -911,7 +910,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 
 //            QPointF ifacet_array[ifacet2D.size()];
             QVector<QPointF> ifacet_vec;
-            for(int i=0; i<ifacet2D.size(); i++)
+            for(size_t i=0; i<ifacet2D.size(); i++)
             {
 //                ifacet_array[i] = ifacet2D.at(i);
                 ifacet_vec.append(ifacet2D.at(i));
@@ -933,7 +932,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
             painter->drawConvexPolygon(QPolygonF(ifacet_vec));
             //        fillConvexPoly(img, ifacet, color, 8, 0);
             //        if (circleStarted)
-            QPointF cmPerPixel = mMainWindow->getImageItem()->getCmPerPixel(center2D.x,center2D.y);
+            //        QPointF cmPerPixel = mMainWindow->getImageItem()->getCmPerPixel(center2D.x,center2D.y);
             //        painter->drawPie(center2D.x-50/cmPerPixel.x(),center2D.y-50/cmPerPixel.y(),100/cmPerPixel.x(),100/cmPerPixel.y(),0*16,360*16);
             //        ifacets[0] = ifacet;
             //        polylines(img, ifacets, true, Scalar(), 1, CV_AA, 0);

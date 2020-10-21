@@ -41,60 +41,60 @@ private slots:
 //        if (mMainWindow && (mMainWindow->getScene()))
 //            mMainWindow->getScene()->update();
 //    }
-    void on_maskMask_stateChanged(int i)
+    void on_maskMask_stateChanged(int /*i*/)
     {
         mMainWindow->getScene()->update();
     }
-    void on_opacity_valueChanged(int i)
+    void on_opacity_valueChanged(int /*i*/)
     {
         mMainWindow->getScene()->update();
     }
 
     // functions which force a new recognition
-    void on_inversHue_stateChanged(int i)
+    void on_inversHue_stateChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
         if( !mMainWindow->isLoading() )
             mMainWindow->updateImage();
     }
-    void on_useOpen_stateChanged(int i)
+    void on_useOpen_stateChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
         if( !mMainWindow->isLoading() )
             mMainWindow->updateImage();
     }
-    void on_useClose_stateChanged(int i)
+    void on_useClose_stateChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
         if( !mMainWindow->isLoading() )
             mMainWindow->updateImage();
     }
 
-    void on_closeRadius_valueChanged(int i)
+    void on_closeRadius_valueChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
         if( !mMainWindow->isLoading() )
             mMainWindow->updateImage();
     }
-    void on_openRadius_valueChanged(int i)
+    void on_openRadius_valueChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
         if( !mMainWindow->isLoading() )
             mMainWindow->updateImage();
     }
-    void on_minArea_valueChanged(int i)
+    void on_minArea_valueChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
         if( !mMainWindow->isLoading() )
             mMainWindow->updateImage();
     }
-    void on_maxArea_valueChanged(int i)
+    void on_maxArea_valueChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
         if( !mMainWindow->isLoading() )
             mMainWindow->updateImage();
     }
-    void on_maxRatio_valueChanged(double d)
+    void on_maxRatio_valueChanged(double /*d*/)
     {
         mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
         if( !mMainWindow->isLoading() )
