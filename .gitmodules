@@ -1,4 +1,4 @@
 [submodule "3rdparty"]
 	path = 3rdparty
-	url = ../petrack-binaries
+	url = ../petrack-3rdparty.git
 	shallow = true
