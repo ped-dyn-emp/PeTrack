@@ -29,8 +29,8 @@ build_linux:
   script:
     - mkdir build
     - cd build
-    - cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON 
-    - cmake --build . -- -j4    
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -G Ninja
+    - cmake --build .
   artifacts:
     paths:
       - "./build/"

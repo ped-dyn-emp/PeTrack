@@ -224,13 +224,13 @@ if(BUILD_UNIT_TESTS)
     enable_testing()
     if (USE_3RD_PARTY)
         add_subdirectory("${CMAKE_SOURCE_DIR}/3rdparty/Catch2")
+        add_subdirectory("${CMAKE_SOURCE_DIR}/3rdparty/trompeloeil")
     else()
       find_package(Catch2 REQUIRED)
+      find_package(trompeloeil REQUIRED)
     endif()
 
     find_package(Qt5Test REQUIRED)
-    find_package(trompeloeil REQUIRED
-      HINTS "${CMAKE_SOURCE_DIR}/3rdparty/trompeloeil/lib/cmake/trompeloeil")
 
     add_subdirectory(${CMAKE_SOURCE_DIR}/tests/unit_test)
     target_link_libraries(petrack_tests PRIVATE petrack_core)

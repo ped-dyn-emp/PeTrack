@@ -10,7 +10,7 @@ RUN pacman -Syu --needed --noconfirm \
 	cmake \
 	make \
 	base-devel \
-	glew
+	ninja
 
 # Install the needed libraries
 RUN pacman -Syu --needed --noconfirm \
@@ -23,6 +23,18 @@ RUN pacman -Syu --needed --noconfirm \
     python \
     python-pip
 RUN pip install pytest
+
+# Install trompeloeil from source (not in package manager)
+RUN mkdir deps && \
+    cd deps && \
+    git clone https://github.com/rollbear/trompeloeil.git &&\
+    cd trompeloeil &&\
+    git fetch --all --tags &&\
+    git checkout tags/v38 &&\
+    mkdir build &&\
+    cd build && \
+    cmake .. && \
+    cmake --build . --target install
 
 # Install opencv 4.2 (last command to avoid any updates by pacman)
 RUN pacman --needed --noconfirm -U \
