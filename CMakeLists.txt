@@ -205,8 +205,8 @@ target_sources(petrack_core PRIVATE src/analysePlot.cpp)
 if(AVI)
   target_compile_definitions(petrack_core PRIVATE AVI)
   target_sources(petrack_core PUBLIC
-    include/aviFile.h
-    src/aviFile.cpp
+      "${CMAKE_SOURCE_DIR}/3rdparty/avifile/aviFile.h"
+      "${CMAKE_SOURCE_DIR}/3rdparty/avifile/aviFile.cpp"
   )
 else()
   target_sources(petrack_core PRIVATE "src/aviFileWriter.cpp")
@@ -380,7 +380,7 @@ if(${STEREO})
   # disabled!) }
 
   # Auch das spielt hier eine Rolle:
-
+  # Remark: pgrAviFile.cpp/h can now be found at 3rdparty/avifile
   # $$STEREO{ SOURCES += src/pgrAviFile.cpp HEADERS += include/pgrAviFile.h
   # message("Include pgrAviFile") }else{ SOURCES += src/stereoAviFile.cpp
   # HEADERS += include/stereoAviFile.h message("Include stereoAviFile") }
