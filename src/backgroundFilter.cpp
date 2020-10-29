@@ -193,7 +193,7 @@ bool BackgroundFilter::save(QString /*dest*/) //default = ""
 // wenn mit photoshop backgroundImgage veraendert wird muss darauf geachtet werden, dass photoshop in greyscale modus arbeitet!!!!!!!!!!!!!!!!!!!!!!!!
 bool BackgroundFilter::load(QString dest) //default = ""
 {
-    if (!mBgPointCloud.empty() || mBgModel != NULL) // initialisierung
+    if (!mBgPointCloud.empty() || mBgModel != nullptr) // initialisierung
         debout << "Warning: Eliminate existing background!" <<endl;
 
     if (1) // (*stereoContext()) // auskommentiert, damit bg auch angelegt werden kann, wenn noch kein video geladen wurde
