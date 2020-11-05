@@ -1181,9 +1181,7 @@ void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidg
     debout << "start detectCodeMarkers : " << getElapsedTime() <<endl;
 #endif
 
-    //debout << "XXX: " << img.locateROI();
     aruco::detectMarkers(img/*copy.clone()*/, dictionary, corners, ids, detectorParams, rejected);
-    debout << "findCodeMarker: dictID: " << codeMarkerWidget->dictList->currentIndex() << endl; // used dictionary
 
 #ifdef TIME_MEASUREMENT
     //        "==========: "
