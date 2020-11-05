@@ -14,11 +14,23 @@ extern QString commandLineOptionsString;
 // stefans ansatz steht in svt_system (nicht besser); noetig: #include "imagehlp.h"
 // this ausserhalb von objekt nicht verfuegbar: #define debout cout << typeid(this).name() << "." << __func__ << " in " << __FILE__ << " line " << __LINE__ << ": "
 
+constexpr const char* file_name(const char* path) {
+    const char* file = path;
+    while (*path) {
+        const char current = *path;
+        ++path;
+        if (current == '/' || current == '\\') {
+            file = path;
+        }
+    }
+    return file;
+}
+
 // gleiche Variable wie QT benutzt, es gibt auch noch QT_NO_DEBUG and QT_NO_WARNING_OUTPUT
 #ifdef QT_NO_DEBUG_OUTPUT
     #define debout //
 #else
-    #define debout std::cout << __func__ << " in " << __FILE__ << " line " << __LINE__ << ": "
+#define debout std::cout << __func__ << " in " << file_name(__FILE__) << " line " << __LINE__ << ": "
 #endif
 
 #include <iostream>
