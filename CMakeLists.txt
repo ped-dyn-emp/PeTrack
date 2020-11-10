@@ -296,7 +296,6 @@ target_sources(petrack_core PRIVATE
     include/codeMarkerItem.h
     include/multiColorMarkerItem.h
     include/backgroundItem.h
-    include/whitebalance.h
     include/person.h
     include/qtColorTriangle.h
     include/swapFilter.h
@@ -349,7 +348,6 @@ target_sources(petrack_core PRIVATE
     src/codeMarkerItem.cpp
     src/multiColorMarkerItem.cpp
     src/backgroundItem.cpp
-    src/whitebalance.cpp
     src/person.cpp
     src/qtColorTriangle.cpp
     src/swapFilter.cpp
