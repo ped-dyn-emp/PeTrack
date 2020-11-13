@@ -774,9 +774,9 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
                     // - set the offset of subImg with regards to ROI //(ROI to original image is archieved later in the code for all methods)
                     // - add the functionality of autocorrection
                     // - deal with functionality of ignore/not ignore heads without identified ArucoMarker
-                    if (ignoreWithoutMarker && lengthini<crossList->size()) // if CodeMarker-Call returns crossList containing a new element (identified the ArucoMarker)
+                    if (ignoreWithoutMarker && lengthini!=crossList->size()) // if CodeMarker-Call returns crossList containing a new element (identified the ArucoMarker)
                     {
-                        size_t ii = crossList->size()-1;
+                        auto ii = crossList->size()-1;
                         if (autoCorrect && !autoCorrectOnlyExport)
                         {
                             moveDir = autoCorrectColorMarker(boxImageCentre, controlWidget);
@@ -785,24 +785,30 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
                         {
                             moveDir = Vec2F(0, 0);
                         }
-                        (*crossList)[ii] = (*crossList)[ii] + (TrackPoint(Vec2F(cropRect.x, cropRect.y) + moveDir));
+                        (*crossList)[ii].setCol(col);
+                        (*crossList)[ii].setColPoint(Vec2F(box.center.x, box.center.y));
+                        (*crossList)[ii] = (*crossList)[ii] + (Vec2F(cropRect.x, cropRect.y) + moveDir);
                     }
                     else if(!ignoreWithoutMarker && (lengthini==crossList->size())) // in case ignoreWithoutMarker is checked and CodeMarker-Call returns empty crossList (could not identify a marker) the center of the smallest rectangle around the colorblobb is used as position
                     {
+                        offsetCropRect2Roi.setX(0); // set to zero as cooridinates are directly used from cropRect
+                        offsetCropRect2Roi.setY(0);
+                        CodeMarkerItem* codeMarkerItem = controlWidget->getMainWindow()->getCodeMarkerItem();
+                        codeMarkerItem->setOffsetCropRect2Roi(offsetCropRect2Roi);
+
                         if (autoCorrect && !autoCorrectOnlyExport)
                         {
                             moveDir = autoCorrectColorMarker(boxImageCentre, controlWidget);
-
-                            crossList->append(TrackPoint(Vec2F(box.center.x, box.center.y)+moveDir, 100, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
                         }
                         else
                         {
-                            crossList->append(TrackPoint(Vec2F(box.center.x, box.center.y), 90, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
+                            moveDir = Vec2F(0,0);
                         }
+                        crossList->append(TrackPoint(Vec2F(box.center.x, box.center.y) + moveDir, 90, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
                     }
                     else if(!ignoreWithoutMarker && (crossList->size()!=lengthini)) // in case ignoreWithoutMarker is checked and CodeMarker-Call returns non-empty crossList (could identify a marker)
                     {
-                        size_t ii = crossList->size()-1;
+                        auto ii = crossList->size()-1;
                         if (autoCorrect && !autoCorrectOnlyExport)
                         {
                             moveDir = autoCorrectColorMarker(boxImageCentre, controlWidget);
@@ -811,7 +817,9 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
                         {
                            moveDir = Vec2F(0, 0);
                         }
-                        (*crossList)[ii] = (*crossList)[ii] + (TrackPoint(Vec2F(cropRect.x, cropRect.y) + moveDir));
+                        (*crossList)[ii].setCol(col);
+                        (*crossList)[ii].setColPoint(Vec2F(box.center.x, box.center.y));
+                        (*crossList)[ii] = (*crossList)[ii] + (Vec2F(cropRect.x, cropRect.y) + moveDir);
                     }
 
                 }
@@ -1120,10 +1128,6 @@ void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidg
         if (recoMethod == 5)   // for usage of codemarker with MulticolorMarker
         {
             QRect rect(0,0, img.rows, img.cols);
-//            QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y(),controlWidget->mapDefaultHeight->value()),
-//                    p2 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y(),controlWidget->mapDefaultHeight->value()),
-//                    p3 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value()),
-//                    p4 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value());
 
             // from Aruco Documentation values 0 + 4 all info is considered (low performance issues expected due to small image size)
             minMarkerPerimeterRate = 0.02;
@@ -1807,4 +1811,3 @@ cv::Ptr<cv::aruco::Dictionary> getDictMip36h12()
 
     return dictionary;
 }
-
