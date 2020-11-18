@@ -809,7 +809,7 @@ void Petrack::openCameraLiveStream(int camID)
         mLogoItem->fadeOut(50);
     updateCoord();
 
-    mPlayerWidget->playForward();
+    mPlayerWidget->play(PlayerState::FORWARD);
 }
 
 void Petrack::openSequence(QString fileName) // default fileName = ""
