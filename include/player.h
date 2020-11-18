@@ -23,6 +23,12 @@ class QDoubleValidator;
 class Animation;
 class Petrack;
 
+enum class PlayerState{
+    FORWARD,
+    BACKWARD,
+    PAUSE
+};
+
 class Player : public QWidget
 {
     Q_OBJECT
@@ -35,8 +41,6 @@ public:
 public slots:
     bool frameForward();
     bool frameBackward();
-    void playForward();
-    void playBackward();
     void recStream();
     void pause();
     void togglePlayPause();
@@ -53,7 +57,7 @@ public slots:
     int getFrameInNum();
     int getFrameOutNum();
     int getPos();
-    bool done();
+    void play(PlayerState state);
 
 
 private:
@@ -62,11 +66,11 @@ private:
     bool updateImage();
     bool forward();
     bool backward();
+    void playVideo();
 
     Animation *mAnimation;    
     QTemporaryFile mTmpFile;
-    bool mPlayF;
-    bool mPlayB;
+    PlayerState mState = PlayerState::PAUSE;
     bool mPlayerSpeedFixed;
     bool mSliderSet;
     bool mRec;
@@ -98,6 +102,7 @@ private:
     QIntValidator *mFrameInNumValidator;
     QIntValidator *mFrameOutNumValidator;
     QDoubleValidator *mFpsNumValidator;
+
 };
 
 #endif

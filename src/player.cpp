@@ -23,13 +23,13 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mPlayForwardButton = new QToolButton;
     mPlayForwardButton->setIcon(QPixmap(":/playF"));
     mPlayForwardButton->setIconSize(iconSize);
-    connect(mPlayForwardButton,SIGNAL(clicked()),this,SLOT(playForward()));
+    connect(mPlayForwardButton, &QToolButton::clicked,this, [&](){this->play(PlayerState::FORWARD);});
 
     //play backward Button
     mPlayBackwardButton = new QToolButton;
     mPlayBackwardButton->setIcon(QPixmap(":/playB"));
     mPlayBackwardButton->setIconSize(iconSize);
-    connect(mPlayBackwardButton,SIGNAL(clicked()),this,SLOT(playBackward()));
+    connect(mPlayBackwardButton, &QToolButton::clicked, this, [&](){this->play(PlayerState::BACKWARD);});
 
     //frame forward Button
     mFrameForwardButton = new QToolButton;
@@ -211,7 +211,7 @@ void Player::setAnim(Animation *anim)
 
 bool Player::getPaused()
 {
-    return (!mPlayF && !mPlayB);
+    return mState == PlayerState::PAUSE;
 }
 
 void Player::setSliderMax(int max)
@@ -219,6 +219,14 @@ void Player::setSliderMax(int max)
     mSlider->setMaximum(max);
 }
 
+/**
+ * @brief Processes and displays the image mImg (set in forward() or backward())
+ *
+ * Heavy lifting is in Petrack::updateImage(). This method itself handles
+ * recording and updating the value of the video-slider.
+ *
+ * @return Boolean indicating if an frame was processed and displayed
+ */
 bool Player::updateImage()
 {
     if (mImg.empty())
@@ -253,25 +261,6 @@ bool Player::updateImage()
     mSliderSet = false; // reset setSlider here because if value doesnt change than it would not be reset by skiptoframe
     qApp->processEvents(); // to allow event while playing
 
-    // slow down the player speed for extrem fast video sequences (Jiayue China or 16fps cam99 basigo grid video)
-    if (mPlayerSpeedFixed)
-    {
-        auto supposedDiff = static_cast<long long int>(1'000/mAnimation->getFPS());
-        static QElapsedTimer timer;
-        if(timer.isValid()){
-            while(!timer.hasExpired(supposedDiff)){
-                qApp->processEvents();
-            }
-        }else{
-            timer.start();
-        }
-
-        timer.start();
-        done();
-    }else
-    {
-        done();
-    }
     return true;
 }
 
@@ -285,19 +274,13 @@ bool Player::forward()
 
     bool should_be_last_frame = mAnimation->getCurrentFrameNum() == mAnimation->getSourceOutFrameNum();
 
-    mImg = mAnimation->getNextFrame();//cvarrToMat(mAnimation->getNextFrame());
+    mImg = mAnimation->getNextFrame();
     // check if animation is broken somewhere in the video
     if (mImg.empty())
     {
-        //debout << "mIplImg == NULL " << mAnimation->getCurrentFrameNum() << endl;
         if (!should_be_last_frame)
         {
             debout << "Warning: video unexpected finished." << std::endl;
-            //mSlider->setMaximum(mAnimation->getCurrentFrameNum());
-            //mMainWindow->updateWindowTitle();
-        }else
-        {
-            //debout << "Animation reached its end!" << endl;
         }
     }
 #ifdef TIME_MEASUREMENT
@@ -315,13 +298,66 @@ bool Player::backward()
     double time1 = 0.0, tstart;
     tstart = clock();
 #endif
-    mImg = mAnimation->getPreviousFrame();//cvarrToMat(mAnimation->getPreviousFrame());
+    mImg = mAnimation->getPreviousFrame();
 #ifdef TIME_MEASUREMENT
     time1 += clock() - tstart;
     time1 = time1/CLOCKS_PER_SEC;
     cout << "  time(load frame) = " << time1 << " sec." << endl;
 #endif
     return updateImage();
+}
+
+/**
+ * @brief Sets the state of the video player
+ *
+ * @see PlayerState
+ * @param state
+ */
+void Player::play(PlayerState state){
+    if(mState == PlayerState::PAUSE){
+        mState = state;
+        playVideo();
+    }else{
+        mState = state;
+    }
+}
+
+/**
+ * @brief Quasi MainLoop: Plays video in accordance to set frame rate
+ *
+ * This method is (indirectly) initiating calls to Player::updateImage
+ * and thus controls processing and display of video frames. The user has
+ * the option to limit playback speed, which is enforced here as well.
+ *
+ * The method is left, when the video is paused and reentered, when playing
+ * gets started again.
+ */
+void Player::playVideo(){
+    while(mState != PlayerState::PAUSE){
+        // slow down the player speed for extrem fast video sequences (Jiayue China or 16fps cam99 basigo grid video)
+        if (mPlayerSpeedFixed)
+        {
+            auto supposedDiff = static_cast<long long int>(1'000/mAnimation->getFPS());
+            static QElapsedTimer timer;
+            if(timer.isValid()){
+                while(!timer.hasExpired(supposedDiff)){
+                    qApp->processEvents();
+                }
+            }else{
+                timer.start();
+            }
+
+            timer.start();
+        }
+
+        if(mState == PlayerState::FORWARD){
+            this->forward();
+        }else if(mState == PlayerState::BACKWARD){
+            this->backward();
+        }else{
+            debout << "Illegal Player state (should be forward, backward or pause)" << std::endl;
+        }
+    }
 }
 
 bool Player::frameForward()
@@ -335,67 +371,30 @@ bool Player::frameBackward()
     return backward();
 }
 
-void Player::playForward()
-{
-    if (mPlayF)
-        return;
-    if (mPlayB)
-    {
-        pause();
-        playForward(); //pause();
-        return;
-    }
-    pause();
-    mPlayF = true;
-    forward();
-}
-
-void Player::playBackward()
-{
-    if (mPlayB)
-        return;
-    if (mPlayF)
-    {
-        pause();
-        playBackward(); //pause();
-        return;
-    }
-    pause();
-    mPlayB = true;
-    backward();
-}
-
 void Player::pause()
 {
-    mPlayF = false;
-    mPlayB = false;
+    mState = PlayerState::PAUSE;
     mMainWindow->setShowFPS(0.);
 }
 
+/**
+ * @brief Toggles pause/play for use via spacebar
+ */
 void Player::togglePlayPause()
 {
-    static bool lastPlayF = true; // muss entgegen dem in setAnim() gesetzt werden von playF
+    static PlayerState lastState;
 
-    if (mPlayF || mPlayB)
+    if (mState != PlayerState::PAUSE)
     {
-        lastPlayF = mPlayF;
+        lastState = mState;
         pause();
     }
-    else if (lastPlayF)
-        playForward();
     else
-        playBackward();
+    {
+        play(lastState);
+    }
 }
 
-bool Player::done()
-{
-    qApp->processEvents();
-    if (mPlayF)
-        return forward();
-    if (mPlayB)
-        return backward();
-    return false;
-}
 void Player::recStream()
 {
     if (mAnimation->isCameraLiveStream() || mAnimation->isVideo() || mAnimation->isImageSequence() || mAnimation->isStereoVideo())
