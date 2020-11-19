@@ -1,3 +1,23 @@
+/*
+ * PeTrack - Software for tracking pedestrians movement in videos
+ * Copyright (C) 2010-2020 Forschungszentrum J√ºlich GmbH,
+ * Maik Boltes, Juliane Adrian, Ricardo Martin Brualla, Arne Graf, Paul H√§ger, Daniel Hillebrand,
+ * Deniz Kilic, Paul Lieberenz, Daniel Salden, Tobias Schr√∂dter, Ann Katrin Seemann
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include "person.h"
 #include "helper.h"
 //#include "highgui.h"
@@ -228,8 +248,8 @@ int frameNum = mSc->getAnimation()->getCurrentFrameNum();
                 //     entspricht:
                 // < 4.2cm x 4.2cm=18cm^2  = 50 Pixel in maximaler personengroesse
                 //in maximaler Entfernung zur Kamera
-                //(in ebenen Versuchen entspricht dies 40cm ¸ber Bodenhˆhe)
-                //grˆﬂer als 4500cm^2 = 8000 Pixel
+                //(in ebenen Versuchen entspricht dies 40cm √ºber Bodenh√∂he)
+                //gr√∂√üer als 4500cm^2 = 8000 Pixel
 
                 if (contourArea>l1*l1 && contourArea<l2*l2)
                 {
@@ -464,7 +484,7 @@ void PersonList::insertEllipses(const QList<MyEllipse> &el, float distFromCam) /
     Vec2F center;
 
     float r1Max = 60./mSc->getCmPerPixel(.01*distFromCam); // war 80 px am boden ist 60cm // radius der ellips mit maxmalem radius 80 pixel
-    float r1Min = 10./mSc->getCmPerPixel(.01*distFromCam); // war 15 px in Schulterhohe sei 10cm // laenge der grossen Hauptachse in mittlerer Kopfhˆhe
+    float r1Min = 10./mSc->getCmPerPixel(.01*distFromCam); // war 15 px in Schulterhohe sei 10cm // laenge der grossen Hauptachse in mittlerer Kopfh√∂he
 
     for (i = 0; i < el.size(); ++i) // ueber uebergebene liste von ellipsen
     {
@@ -617,14 +637,14 @@ void PersonList::optimize()
     for (int i = 0; i < size(); ++i) // ueber uebergebene liste von ellipsen stacks
     { // r1 ist immer die groessere ausdehnung
         //debout << at(i).at(0).center().x() << " " << at(i).at(0).center().y() << " " << at(i).last().area() << endl;
-        // at(i).getDistTopEllipse()+10) // in cm // 10 cm (eigentlich 10+step_size/2) unterhalb kˆrpergrˆﬂe
+        // at(i).getDistTopEllipse()+10) // in cm // 10 cm (eigentlich 10+step_size/2) unterhalb k√∂rpergr√∂√üe
         float r1Max = 34./mSc->getCmPerPixel(.01*(at(i).getDistTopEllipse()+10)); // war 37.cm // war 60 px // 60px in kopfhoehe sind 37cm in kopfhoehe // radius der ellips mit maxmalem radius 80 pixel
 //        float r2Min = 12./mSc->getCmPerPixel(.01*(at(i).getDistTopEllipse()+20)); // war 60 px // 60px in kopfhoehe sind 37cm in kopfhoehe // radius der ellips mit maxmalem radius 80 pixel
         float areaMin = 22./mSc->getCmPerPixel(.01*(at(i).getDistTopEllipse()+100)); // 22. = 12.5*sqrt(Pi) wg area = r1*r2*Pi
         areaMin = areaMin*areaMin;
 //        float areaMin2 = 35.45/mSc->getCmPerPixel(.01*(at(i).getDistTopEllipse()+100)); // 22. = 20*sqrt(Pi) wg area = r1*r2*Pi
 //        areaMin2 = areaMin2*areaMin2;
-//        // 1000 px^2 entspricht r1=r2 = 18 px = 12,5cm radius in oberschenkelhˆhe bzw 100cm unterhalb kopf
+//        // 1000 px^2 entspricht r1=r2 = 18 px = 12,5cm radius in oberschenkelh√∂he bzw 100cm unterhalb kopf
 //        if (at(i).last().area() < areaMin2 && at(i).last().area() >= areaMin)
 //            debout << "1250 cm2 loescht bei " << at(i).at(0).center().x() << " " << at(i).at(0).center().y() << endl;
         if (at(i).last().area() < areaMin) // war 1000 px // at(i).last().r1() < 15 nicht zu gross waehlen um auch nur kopferkennung in dichten situationen zuzulassen // war: area() < 1000) || // groesste ellips in pyr muss mindestgroesse besitzen
