@@ -31,6 +31,9 @@ with saving the project to project.pet again:
 petrack.exe -project project.pet -sequence frame000.jpg -autoTrack tracker_file -autoSave project.pet
 ```
 
+## License
+This project is licensed under the terms of the GPLv3 license. For further information see [LICENSE](./LICENSE).
+
 ## Changelog:
 v0.8 : slanted view for external calibration, coordinate system and grid is possible, introduced multicolor marker with black dot, video support for various codecs <br/>
 v0.7 : introduce stereo cameras; alternate height <br/>
