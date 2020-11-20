@@ -44,22 +44,22 @@ void checkSelectedColor(Control* con, bool invHue, int toHue, int fromHue,
     QColor fromColor = con->getColorPlot()->getMapItem()->getActMapFromColor();
 
     // Hue
-    REQUIRE(toColor.hue() == toHue);
-    REQUIRE(fromColor.hue() == fromHue);
+    REQUIRE(toColor.hue() == Approx(toHue).margin(1));
+    REQUIRE(fromColor.hue() == Approx(fromHue).margin(1));
 
     // Saturation
-    REQUIRE(toColor.saturation() == toSat);
-    REQUIRE(fromColor.saturation() == fromSat);
+    REQUIRE(toColor.saturation() == Approx(toSat).margin(1));
+    REQUIRE(fromColor.saturation() == Approx(fromSat).margin(1));
 
     // Value
-    REQUIRE(toColor.value() == toVal);
-    REQUIRE(fromColor.value() == fromVal);
+    REQUIRE(toColor.value() == Approx(toVal).margin(1));
+    REQUIRE(fromColor.value() == Approx(fromVal).margin(1));
 
     // Sliders
-    REQUIRE(con->mapX->value() == mapX);
-    REQUIRE(con->mapW->value() == mapW);
-    REQUIRE(con->mapY->value() == mapY);
-    REQUIRE(con->mapH->value() == mapH);
+    REQUIRE(con->mapX->value() == Approx(mapX).margin(2));
+    REQUIRE(con->mapW->value() == Approx(mapW).margin(2));
+    REQUIRE(con->mapY->value() == Approx(mapY).margin(2));
+    REQUIRE(con->mapH->value() == Approx(mapH).margin(2));
 }
 
 
@@ -88,12 +88,13 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
         AND_GIVEN("I shift+click on one point of the (red) image"){
             eventList.clear();
             eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::ShiftModifier, viewCenter);
+            eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::ShiftModifier, viewCenter);
 
-            QSignalSpy setColorSpy{pet.getView(), SIGNAL(setColorEvent(QPoint, GraphicsView*))};
+            QSignalSpy setColorSpy{pet.getView(), &GraphicsView::setColorEvent};
             REQUIRE(setColorSpy.isValid());
             setColorSpy.wait(20);
             eventList.simulate(pet.getView()->viewport());
-            REQUIRE(setColorSpy.count() == 1);
+            REQUIRE(setColorSpy.count() == 2);
 
             THEN("This pixel and its sourroundings get selected as new color"){
                 // Red, so we need Inverse Hue
@@ -161,6 +162,7 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
 
             QTestEventList eventList;
             eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::ShiftModifier, viewCenter);
+            eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::ShiftModifier, viewCenter);
             eventList.simulate(pet.getView()->viewport());
 
             REQUIRE(!con->getColorPlot()->getMapItem()->getActMapInvHue());
@@ -185,6 +187,7 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
                 pet.updateImage(pinkTestImage);
 
                 QTestEventList eventList;
+                eventList.addMouseMove(viewCenter);
                 eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier, viewCenter);
                 eventList.simulate(pet.getView()->viewport());
 
@@ -199,17 +202,21 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
             newTestImage.at<cv::Vec3b>(cv::Point(25,25)) = cv::Vec3b(100,255,255);
             cv::cvtColor(newTestImage, newTestImage, cv::COLOR_HSV2BGR);
             pet.updateImage(newTestImage);
+            QMouseEvent event {QEvent::HoverMove, QPoint(25, 25), Qt::NoButton, Qt::NoButton, Qt::NoModifier};
 
-            QTestEventList eventList;
             QPointF pointOnScene = pet.getImageItem()->mapToScene(QPoint(25, 25));
             QPoint pointOnViewport = pet.getView()->mapFromScene(pointOnScene);
+
+            // Only after a click the hover event setting mMousePosOnImage gets fired. Focus?
+            eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::ShiftModifier,
+                                    pointOnViewport);
             eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::ShiftModifier,
                                     pointOnViewport);
             eventList.simulate(pet.getView()->viewport());
 
             THEN("I get a color selection fitting this single pixel"){
                 bool invHue = false;
-                // Upper Bound Hue 200 + 5 -> 105 Lower Bound: 200 - 5 -> 95
+                // Upper Bound Hue 200 + 5 -> 205 Lower Bound: 200 - 5 -> 195
                 int fromHue = 195, toHue = 205;
                 // mapW = tH-fH = 10
                 int mapW = 10;
