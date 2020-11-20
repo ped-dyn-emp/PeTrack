@@ -3221,21 +3221,20 @@ void Control::getXml(QDomElement &elem)
 void Control::on_colorPickerButton_clicked(bool checked)
 {
     //true wenn neu gechecked, false wenn wieder abgewählt
+    GraphicsView *view = mMainWindow->getView();
     if(checked)
     {
-        connect(mMainWindow->getView(), SIGNAL(colorSelected(QPoint, GraphicsView*)), this, SLOT(on_expandColor(QPoint, GraphicsView*)));
-        connect(mMainWindow->getView(), SIGNAL(setColorEvent(QPoint, GraphicsView*)), this, SLOT(on_setColor(QPoint, GraphicsView*)));
+        connect(view, &GraphicsView::colorSelected, this, &Control::on_expandColor);
+        connect(view, &GraphicsView::setColorEvent, this, &Control::on_setColor);
     }else{
-        disconnect(mMainWindow->getView(), SIGNAL(colorSelected(QPoint, GraphicsView*)), this, SLOT(on_expandColor(QPoint, GraphicsView*)));
-        disconnect(mMainWindow->getView(), SIGNAL(setColorEvent(QPoint, GraphicsView*)), this, SLOT(on_setColor(QPoint, GraphicsView*)));
+        disconnect(view, &GraphicsView::colorSelected, this, &Control::on_expandColor);
+        disconnect(view, &GraphicsView::setColorEvent, this, &Control::on_setColor);
     }
 }
 
 /**
  * @brief Gets necessary colors and the RectPlotItem
  *
- * @param[in] p Clicked Point (gets changed!!!)
- * @param[in] graphicsView GraphicsView in which the event was detected
  * @param[out] clickedColor color which was clicked on, with Hue from 0-360 instead of OpenCVs 0-180
  * @param[out] toColor toColor as in model with triangle color picker
  * @param[out] fromColor fromColor as in model with triangle picker
@@ -3243,35 +3242,33 @@ void Control::on_colorPickerButton_clicked(bool checked)
  *
  * @return Boolean describing, if a color was retrieved
  */
-bool Control::getColors(QPoint& p, GraphicsView* graphicsView, std::array<int, 3>& clickedColor, QColor& toColor, QColor& fromColor, RectPlotItem*& map)
+bool Control::getColors(QColor& clickedColor, QColor& toColor, QColor& fromColor, RectPlotItem*& map)
 {
     if(mMainWindow->getImg().empty())
     {
         return false;
     }
 
-    cv::Mat hsvImg;
-    cv::cvtColor(mMainWindow->getImg(), hsvImg, cv::COLOR_BGR2HSV);
-    p.setX(p.x() + mMainWindow->getImageBorderSize());
-    p.setY(p.y() + mMainWindow->getImageBorderSize());
+    QImage *hsvImg = mMainWindow->getImage();
+    QPointF imgPoint = mMainWindow->getMousePosOnImage();
 
-
-    QPointF pointOnScene = graphicsView->mapToScene(p);
-    QPointF imgPoint = mMainWindow->getImageItem()->mapToScene(pointOnScene);
-    if(imgPoint.x() < 0 || imgPoint.x() > hsvImg.cols || imgPoint.y() < 0 || imgPoint.y() > hsvImg.rows)
+    if(imgPoint.x() < 0 || imgPoint.x() > hsvImg->width() || imgPoint.y() < 0 || imgPoint.y() > hsvImg->height())
     {
         debout << "Clicked outside the image with color picker." << std::endl;
         return false;
     }
     //debout << "Koordinaten: " << imgPoint.x() << ", " << imgPoint.y() << std::endl;
 
-    cv::Vec3b color = hsvImg.at<cv::Vec3b>((int)imgPoint.y(), (int)imgPoint.x());
-    clickedColor =  {color[0] * 2, color[1], color[2]};
+    clickedColor = QColor {hsvImg->pixel(imgPoint.toPoint())};
     //debout << "Farbe: " << (int)clickedColor[0] << ", " << (int)clickedColor[1] << ", " << (int)clickedColor[2] << std::endl;
 
     map = this->getColorPlot()->getMapItem();
     toColor = map->getActMapToColor();
     fromColor = map->getActMapFromColor();
+    if(!toColor.isValid() || !fromColor.isValid()){
+        debout << "Map is corrupted" << std::endl;
+        return false;
+    }
     return true;
 }
 
@@ -3285,13 +3282,13 @@ bool Control::getColors(QPoint& p, GraphicsView* graphicsView, std::array<int, 3
  * @param p
  * @param graphicsView
  */
-void Control::on_expandColor(QPoint p, GraphicsView* graphicsView)
+void Control::on_expandColor()
 {
 
     QColor fromColor, toColor;
     RectPlotItem* map;
-    std::array<int, 3> clickedColor;
-    if(!getColors(p, graphicsView, clickedColor, toColor, fromColor, map))
+    QColor clickedColor;
+    if(!getColors(clickedColor, toColor, fromColor, map))
     {
         return;
     }
@@ -3307,36 +3304,37 @@ void Control::on_expandColor(QPoint p, GraphicsView* graphicsView)
  * @param p
  * @param graphicsView
  */
-void Control::on_setColor(QPoint p , GraphicsView* graphicsView){
+void Control::on_setColor()
+{
     constexpr int BUFFER = 5;
 
     QColor fromColor, toColor;
     RectPlotItem* map;
-    std::array<int, 3> clickedColor;
-    if(!getColors(p, graphicsView, clickedColor, toColor, fromColor, map))
+    QColor clickedColor;
+    if(!getColors(clickedColor, toColor, fromColor, map))
     {
         return;
     }
 
     int minHue, maxHue;
-    if( (clickedColor[0]+BUFFER)%359 < clickedColor[0]+BUFFER)
+    if( (clickedColor.hue()+BUFFER)%359 < clickedColor.hue()+BUFFER)
     {
-        maxHue = (clickedColor[0]+BUFFER)%BUFFER;
+        maxHue = (clickedColor.hue()+BUFFER)%BUFFER;
         map->changeActMapInvHue(true);
     }else{
-        maxHue = clickedColor[0]+BUFFER;
+        maxHue = clickedColor.hue()+BUFFER;
         map->changeActMapInvHue(false);
     }
-    if( (clickedColor[0] - BUFFER) < 0)
+    if( (clickedColor.hue() - BUFFER) < 0)
     {
-        minHue = 360 + (clickedColor[0] - BUFFER);
+        minHue = 360 + (clickedColor.hue() - BUFFER);
         map->changeActMapInvHue(true);
     }else{
-        minHue = clickedColor[0] - BUFFER;
+        minHue = clickedColor.hue() - BUFFER;
         //map->changeActMapInvHue(false);
     }
-    toColor.setHsv(maxHue, min((clickedColor[1]+BUFFER),255), min(clickedColor[2]+BUFFER, 255));
-    fromColor.setHsv(minHue, max(clickedColor[1]-BUFFER,0), max(clickedColor[2]-BUFFER,0));
+    toColor.setHsv(maxHue, min((clickedColor.saturation()+BUFFER),255), min(clickedColor.value()+BUFFER, 255));
+    fromColor.setHsv(minHue, max(clickedColor.saturation()-BUFFER,0), max(clickedColor.value()-BUFFER,0));
 
     //debout << "Inv Hue nach setCol: " <<  map->getActMapInvHue() << std::endl;
     saveChange(fromColor, toColor, map);
@@ -3370,11 +3368,13 @@ void Control::saveChange(const QColor& fromColor, const QColor& toColor, RectPlo
  * @param toColor[in,out] toColor of the map, gets changed!
  * @param clickedColor[in]
  */
-void Control::expandRange(QColor& fromColor, QColor& toColor, const std::array<int, 3>& clickedColor)
+void Control::expandRange(QColor& fromColor, QColor& toColor, const QColor& clickedColor)
 {
     // NOTE BUFFER in Klassenebene verschieben und bei setColor auch nutzen? (verschiedene Größe vllt. gewünscht?)
     constexpr int BUFFER = 10;
 
+    std::array<int, 3> clickedColorArr;
+    clickedColor.getHsv(&clickedColorArr[0], &clickedColorArr[1], &clickedColorArr[2]);
     std::array<int, 3> toColorArr;
     toColor.getHsv(&toColorArr[0], &toColorArr[1], &toColorArr[2]);
     std::array<int, 3> fromColorArr;
@@ -3390,30 +3390,30 @@ void Control::expandRange(QColor& fromColor, QColor& toColor, const std::array<i
     // What values do need to be altered?
     if(invHue)
     {
-        if(toColorArr[0] > fromColorArr[0])
+        if(toColor.hue() > fromColor.hue())
         {
-            if(!(clickedColor[0] >= toColorArr[0] || clickedColor[0] <= fromColorArr[0]))
+            if(!(clickedColor.hue() >= toColor.hue() || clickedColor.hue() <= fromColor.hue()))
             {
                 isInRange[0] = false;
             }
         }else
         {
-            if(!(clickedColor[0] <= toColorArr[0] || clickedColor[0] >= fromColorArr[0]))
+            if(!(clickedColor.hue() <= toColor.hue() || clickedColor.hue() >= fromColor.hue()))
             {
                 isInRange[0] = false;
             }
         }
     }else
     {
-        if(toColorArr[0] > fromColorArr[0])
+        if(toColor.hue() > fromColor.hue())
         {
-            if(!(clickedColor[0] <= toColorArr[0] && clickedColor[0] >= fromColorArr[0]))
+            if(!(clickedColor.hue() <= toColor.hue() && clickedColor.hue() >= fromColor.hue()))
             {
                 isInRange[0] = false;
             }
         }else
         {
-            if(!(clickedColor[0] >= toColorArr[0] && clickedColor[0] <= fromColorArr[0]))
+            if(!(clickedColor.hue() >= toColor.hue() && clickedColor.hue() <= fromColor.hue()))
             {
                 isInRange[0] = false;
             }
@@ -3424,12 +3424,12 @@ void Control::expandRange(QColor& fromColor, QColor& toColor, const std::array<i
     {
         if(toColorArr[i] > fromColorArr[i])
         {
-            if(!(clickedColor[i] <= toColorArr[i] && clickedColor[i] >= fromColorArr[i]))
+            if(!(clickedColorArr[i] <= toColorArr[i] && clickedColorArr[i] >= fromColorArr[i]))
             {
                 isInRange[i] = false;
             }
         }else{
-            if(!(clickedColor[i] >= toColorArr[i] && clickedColor[i] <= fromColorArr[i]))
+            if(!(clickedColorArr[i] >= toColorArr[i] && clickedColorArr[i] <= fromColorArr[i]))
             {
                 isInRange[i] = false;
             }
@@ -3449,26 +3449,26 @@ void Control::expandRange(QColor& fromColor, QColor& toColor, const std::array<i
         if(isInRange[i])
             continue;
 
-        distToColor = abs(toColorArr[i] - clickedColor[i]);
-        distFromColor = abs(fromColorArr[i] - clickedColor[i]);
+        distToColor = abs(toColorArr[i] - clickedColorArr[i]);
+        distFromColor = abs(fromColorArr[i] - clickedColorArr[i]);
         if(distFromColor < distToColor)
         {
-            int buffer = fromColorArr[i] - clickedColor[i] < 0 ? BUFFER : -BUFFER;
+            int buffer = fromColorArr[i] - clickedColorArr[i] < 0 ? BUFFER : -BUFFER;
             if(i==0) // Hue
             {
-                fromColorArr[i] = min(359, max(0, clickedColor[i] + buffer));
+                fromColorArr[i] = min(359, max(0, clickedColorArr[i] + buffer));
             }else
             {
-                fromColorArr[i] = min(255, max(0, clickedColor[i] + buffer));
+                fromColorArr[i] = min(255, max(0, clickedColorArr[i] + buffer));
             }
         }else{
-            int buffer = toColorArr[i] - clickedColor[i] < 0 ? BUFFER : -BUFFER;
+            int buffer = toColorArr[i] - clickedColorArr[i] < 0 ? BUFFER : -BUFFER;
             if(i==0) // Hue
             {
-                toColorArr[i] = min(359, max(0, clickedColor[i] + buffer));
+                toColorArr[i] = min(359, max(0, clickedColorArr[i] + buffer));
             }else
             {
-                toColorArr[i] = min(255, max(0, clickedColor[i] + buffer));
+                toColorArr[i] = min(255, max(0, clickedColorArr[i] + buffer));
             }
         }
     }

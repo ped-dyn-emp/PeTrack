@@ -57,8 +57,8 @@ signals:
     void mouseRightDoubleClick(QPointF pos, int direction);
     void mouseMiddleDoubleClick(int direction);
     void mouseShiftWheel(int delta);
-    void colorSelected(QPoint p, GraphicsView* graphicsView);
-    void setColorEvent(QPoint p, GraphicsView* graphicsView);
+    void colorSelected();
+    void setColorEvent();
     //void mouseRightClick(QPointF pos);
 };
 

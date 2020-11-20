@@ -190,9 +190,9 @@ public:
     int getCalibGrid3DResolution();
     void setCalibGrid3DResolution(int i);
 
-    void expandRange(QColor& fromColor, QColor& toColor, const std::array<int, 3>& clickedColor);
+    void expandRange(QColor& fromColor, QColor& toColor, const QColor& clickedColor);
     void saveChange(const QColor& fromColor, const QColor& toColor, RectPlotItem* map);
-    bool getColors(QPoint& p, GraphicsView* graphicsView, std::array<int, 3>& clickedColor, QColor& toColor, QColor& fromColor, RectPlotItem*& map);
+    bool getColors(QColor& clickedColor, QColor& toColor, QColor& fromColor, RectPlotItem*& map);
 
     void setXml(QDomElement &elem);
     void getXml(QDomElement &elem);
@@ -263,8 +263,8 @@ private slots:
     void on_mapResetHeight_clicked();
     void on_mapResetPos_clicked();
     void on_mapDefaultHeight_valueChanged(double d);
-    void on_expandColor(QPoint p, GraphicsView* graphicsView);
-    void on_setColor(QPoint, GraphicsView*);
+    void on_expandColor();
+    void on_setColor();
 
 
     void on_trackShow_stateChanged(int i);

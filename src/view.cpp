@@ -61,6 +61,7 @@ GraphicsView::GraphicsView(ViewWidget *viewWidget)
 //             setDragMode(QGraphicsView::ScrollHandDrag);
 //     }
 
+
 void GraphicsView::wheelEvent(QWheelEvent * event)
 {
     QPoint numDegrees = event->angleDelta() / 8;
@@ -199,9 +200,9 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
 {
 
     if(event->modifiers() & Qt::ShiftModifier){
-        emit setColorEvent(event->pos(), this);
+        emit setColorEvent();
     }else{
-        emit colorSelected(event->pos(), this);
+        emit colorSelected();
     }
     QGraphicsView::mousePressEvent(event);
 }

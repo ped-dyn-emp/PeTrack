@@ -416,8 +416,24 @@ int RectPlotItem::addMap()
 
 void RectPlotItem::delMap(int index)
 {
+    if(mMaps.size() == 1){
+        if(index != 0)
+        {
+            debout << "Invalid index for map deletion!" << std::endl;
+            return;
+        }
+        mMaps.replace(0, RectMap());
+        return;
+    }
+
     if (index >= 0 && index < mMaps.size() && mMaps.size() > 0)
+    {
         mMaps.removeAt(index);
+        return;
+    }
+
+    debout << "Invalid index for map deletion!" << std::endl;
+    return;
 }
 
 void RectPlotItem::changeMap(int index, double x, double y, double w, double h, bool colored, double mapHeight)
@@ -457,17 +473,29 @@ void RectPlotItem::changeActMapToColor(const QColor &toCol)
 
 bool RectPlotItem::getActMapInvHue()
 {
-    return mMaps[mActIndex].invHue();
+    if (mActIndex >= 0 && mActIndex < mMaps.size())
+    {
+        return mMaps[mActIndex].invHue();
+    }
+    return false; // Dependent on other fail checks
 }
 
 QColor RectPlotItem::getActMapToColor()
 {
-    return mMaps[mActIndex].toColor();
+    if (mActIndex >= 0 && mActIndex < mMaps.size())
+    {
+        return mMaps[mActIndex].toColor();
+    }
+    return QColor::Invalid;
 }
 
 QColor RectPlotItem::getActMapFromColor()
 {
-    return mMaps[mActIndex].fromColor();
+    if (mActIndex >= 0 && mActIndex < mMaps.size())
+    {
+        return mMaps[mActIndex].fromColor();
+    }
+    return QColor::Invalid;
 }
 
 RectMap RectPlotItem::getMap(int index) const

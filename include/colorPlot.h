@@ -68,27 +68,27 @@ public:
         : mColored(true), mMapHeight(DEFAULT_HEIGHT), mInversHue(false)
     {
         setRect(0., 0., 0., 0.);
-        mFromCol = mFromCol.toHsv();
-        mToCol = mToCol.toHsv();
+        mFromCol = QColor::fromHsv(0,0,0);
+        mToCol = QColor::fromHsv(359,255,255);
     }
     RectMap(QRectF r)
         : QRectF(r), mInversHue(false)
     {
         setRect(0., 0., 0., 0.);
-        mFromCol = mFromCol.toHsv();
-        mToCol = mToCol.toHsv();
+        mFromCol = QColor::fromHsv(0,0,0);
+        mToCol = QColor::fromHsv(359,255,255);
     }
     RectMap(double x, double y, double w, double h, bool colored, double mapHeight)
         : QRectF(x, y, w, h), mColored(colored), mMapHeight(mapHeight), mInversHue(false)
     {
-        mFromCol = mFromCol.toHsv();
-        mToCol =mToCol.toHsv();
+        mFromCol = QColor::fromHsv(0,0,0);
+        mToCol = QColor::fromHsv(359,255,255);
     }
     RectMap(QRectF r, bool colored, double mapHeight)
         : QRectF(r), mColored(colored), mMapHeight(mapHeight), mInversHue(false)
     {
-        mFromCol = mFromCol.toHsv();
-        mToCol = mToCol.toHsv();
+        mFromCol = QColor::fromHsv(0,0,0);
+        mToCol = QColor::fromHsv(359,255,255);
     }
     inline bool colored() const
     {
