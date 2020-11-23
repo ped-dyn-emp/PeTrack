@@ -31,6 +31,8 @@
 #include "player.h"
 #include "animation.h"
 #include "petrack.h"
+#include "control.h"
+
 
 //#define TIME_MEASUREMENT
 
@@ -152,7 +154,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     //mFpsLabel->setText("fps");
     mFpsLabel->setFont(f2);
     // default value
-    mPlayerSpeedFixed = false;
+    mPlayerSpeedLimited = false;
 
     //player layout
     mPlayerLayout = new QHBoxLayout();
@@ -192,24 +194,28 @@ void Player::setFPS(double fps) // default: double fps=-1.
     mAnimation->setFPS(mFpsNum->text().toDouble());
 
 }
+void Player::setPlayerSpeedLimited(bool fixed)
+{
+    mPlayerSpeedLimited = fixed;
+}
+
+void Player::togglePlayerSpeedLimited()
+{
+    setPlayerSpeedLimited(!mPlayerSpeedLimited);
+}
+bool Player::getPlayerSpeedLimited()
+{
+    return mPlayerSpeedLimited;
+}
+
 void Player::setPlayerSpeedFixed(bool fixed)
 {
     mPlayerSpeedFixed = fixed;
 }
 
-void Player::togglePlayerSpeedFixed()
-{
-    setPlayerSpeedFixed(!mPlayerSpeedFixed);
-}
-bool Player::getPlayerSpeedFixed()
-{
-    return mPlayerSpeedFixed;
-}
-
-void Player::fixSpeedRelativeToRealtime(double factor)
+void Player::setSpeedRelativeToRealtime(double factor)
 {
     setFPS(mAnimation->getOriginalFPS()*factor);
-    setPlayerSpeedFixed(true);
 }
 
 void Player::setAnim(Animation *anim)
@@ -327,6 +333,7 @@ bool Player::backward()
     return updateImage();
 }
 
+
 /**
  * @brief Sets the state of the video player
  *
@@ -353,31 +360,58 @@ void Player::play(PlayerState state){
  * gets started again.
  */
 void Player::playVideo(){
+    static QElapsedTimer timer;
+    int currentFrame = mAnimation->getCurrentFrameNum();
+    long long int overtime = 0;
+
     while(mState != PlayerState::PAUSE){
         // slow down the player speed for extrem fast video sequences (Jiayue China or 16fps cam99 basigo grid video)
-        if (mPlayerSpeedFixed)
+        if (mPlayerSpeedLimited || mPlayerSpeedFixed)
         {
             auto supposedDiff = static_cast<long long int>(1'000/mAnimation->getFPS());
-            static QElapsedTimer timer;
+
             if(timer.isValid()){
+                if(mPlayerSpeedFixed && mState == PlayerState::FORWARD){
+                    overtime = std::max(0LL, overtime + (timer.elapsed() - supposedDiff));
+                    if(overtime >= supposedDiff){
+                        mAnimation->skipFrame(static_cast<int>(overtime / supposedDiff));
+                        overtime = overtime % supposedDiff;
+                        currentFrame = mAnimation->getCurrentFrameNum() + 1;
+                    }
+                }
+
                 while(!timer.hasExpired(supposedDiff)){
                     qApp->processEvents();
                 }
-            }else{
-                timer.start();
             }
-
             timer.start();
+        }else{
+            timer.invalidate();
         }
 
-        if(mState == PlayerState::FORWARD){
-            this->forward();
-        }else if(mState == PlayerState::BACKWARD){
-            this->backward();
-        }else{
-            debout << "Illegal Player state (should be forward, backward or pause)" << std::endl;
+
+        switch(mState){
+        case PlayerState::FORWARD:
+            mImg = mAnimation->getFrameAtIndex(currentFrame);
+            currentFrame++;
+            break;
+        case PlayerState::BACKWARD:
+            mImg = mAnimation->getFrameAtIndex(currentFrame);
+            currentFrame--;
+            break;
+        case PlayerState::PAUSE:
+            break;
+        }
+
+        if(!updateImage()){
+            mState = PlayerState::PAUSE;
+            if(mState == PlayerState::FORWARD && mAnimation->getCurrentFrameNum() != mAnimation->getSourceOutFrameNum()){
+                debout << "Warning: video unexpected finished." << std::endl;
+            }
         }
     }
+
+    timer.invalidate();
 }
 
 bool Player::frameForward()

@@ -88,6 +88,8 @@ public:
 //    IplImage* getCurrentFrame();
     cv::Mat getCurrentFrame();
 
+    void skipFrame(int num = 1);
+
     // Return String with current time
     QString getTimeString(int frame = -1);
 
@@ -110,9 +112,6 @@ public:
  
     // Returns the index of the current frame  
     int getCurrentFrameNum();
-
-    // Returns the speedup to accelerate the video speed
-    int getSpeedup();
 
     // Sets the sourceIn/Out frame numbers
     void updateSourceInFrameNum(int in=-1);
@@ -199,9 +198,6 @@ private:
 
     // Index of the current opened frame 
     int mCurrentFrame;
-
-    // Speed up to accelerate the video speed
-    int mSpeedup;
 
     // Index of sourceIn/Out frame
     int mSourceInFrame;

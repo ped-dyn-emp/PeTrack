@@ -56,7 +56,7 @@ public:
     Player(Animation *anim, QWidget *parent = 0);
     void setAnim(Animation *anim);
     bool getPaused();
-    void fixSpeedRelativeToRealtime(double factor);
+    void setSpeedRelativeToRealtime(double factor);
 
 public slots:
     bool frameForward();
@@ -69,9 +69,10 @@ public slots:
     bool skipToFrame();
     void update();
     void setFPS(double fps=-1.);
-    void togglePlayerSpeedFixed();
+    void togglePlayerSpeedLimited();
+    void setPlayerSpeedLimited(bool fixed);
+    bool getPlayerSpeedLimited();
     void setPlayerSpeedFixed(bool fixed);
-    bool getPlayerSpeedFixed();
     void setFrameInNum(int in=-1.);
     void setFrameOutNum(int out=-1.);
     int getFrameInNum();
@@ -91,7 +92,8 @@ private:
     Animation *mAnimation;    
     QTemporaryFile mTmpFile;
     PlayerState mState = PlayerState::PAUSE;
-    bool mPlayerSpeedFixed;
+    bool mPlayerSpeedLimited;
+    bool mPlayerSpeedFixed = false;
     bool mSliderSet;
     bool mRec;
 
