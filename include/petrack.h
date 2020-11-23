@@ -165,7 +165,7 @@ public:
     void setStatusTime();
     void setStatusFPS();
     void setShowFPS(double fps);
-    void updateShowFPS();
+    void updateShowFPS(bool skipped = false);
     void setStatusPosReal(const QPointF &pos);
     void setStatusPos(const QPoint &pos);
     void setStatusColor(const QRgb &col);
@@ -474,15 +474,16 @@ private:
     QAction *mFitROIAct;
     QAction *mCameraLeftViewAct;
     QAction *mCameraRightViewAct;
-    QAction *mFixToRealtime;
-    QAction *mFixTo0p75;
-    QAction *mFixTo0p50;
-    QAction *mFixTo0p25;
-    QAction *mFixTo1p25;
-    QAction *mFixTo1p50;
-    QAction *mFixTo1p75;
-    QAction *mFixTo2p00;
-    QAction *mFixUnlimited;
+    QAction *mLimitPlaybackSpeed;
+    QAction *mFixPlaybackSpeed;
+    QAction *mSetToRealtime;
+    QAction *mSetTo0p75;
+    QAction *mSetTo0p50;
+    QAction *mSetTo0p25;
+    QAction *mSetTo1p25;
+    QAction *mSetTo1p50;
+    QAction *mSetTo1p75;
+    QAction *mSetTo2p00;
     QAction *mDelPastAct;
     QAction *mDelFutureAct;
     QAction *mDelAllRoiAct;
@@ -492,7 +493,7 @@ private:
     QAction *mAboutAct;
     QAction *mOnlineHelpAct;
     QActionGroup *mCameraGroupView;
-    QMenu *mFixPlaybackSpeedMenu;
+    QMenu *mPlaybackSpeedMenu;
 
     QMenu *mFileMenu;
     QMenu *mViewMenu;

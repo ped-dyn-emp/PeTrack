@@ -482,7 +482,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
             }
             if (elem.hasAttribute("PLAYER_SPEED_FIXED"))
             {
-                mPlayerWidget->setPlayerSpeedFixed(elem.attribute("PLAYER_SPEED_FIXED").toInt());
+                mPlayerWidget->setPlayerSpeedLimited(elem.attribute("PLAYER_SPEED_FIXED").toInt());
             }
         }
         else if (elem.tagName() == "VIEW")
@@ -687,7 +687,7 @@ void Petrack::saveXml(QDomDocument &doc)
     elem.setAttribute("FPS", mAnimation->getFPS());
     elem.setAttribute("SOURCE_FRAME_IN", mPlayerWidget->getFrameInNum());
     elem.setAttribute("SOURCE_FRAME_OUT", mPlayerWidget->getFrameOutNum());
-    elem.setAttribute("PLAYER_SPEED_FIXED", mPlayerWidget->getPlayerSpeedFixed());
+    elem.setAttribute("PLAYER_SPEED_FIXED", mPlayerWidget->getPlayerSpeedLimited());
 
     root.appendChild(elem);
 
@@ -1740,24 +1740,28 @@ void Petrack::createActions()
     connect(mCameraRightViewAct, SIGNAL(triggered()), this, SLOT(setCamera()));
     mCameraRightViewAct->setChecked(true); // right wird als default genommen, da reference image in triclops auch right ist // erste trj wurden mit left gerechnet
 
-    mFixToRealtime = new QAction(tr("&Realtime"));
-    connect(mFixToRealtime, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(1.0);});
-    mFixTo2p00 = new QAction(tr("&x2"));
-    connect(mFixTo2p00, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(2.0);});
-    mFixTo1p75 = new QAction(tr("&x1.75"));
-    connect(mFixTo1p75, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(1.75);});
-    mFixTo1p50 = new QAction(tr("&x1.5"));
-    connect(mFixTo1p50, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(1.5);});
-    mFixTo1p25 = new QAction(tr("&x1.25"));
-    connect(mFixTo1p25, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(1.25);});
-    mFixTo0p75 = new QAction(tr("&x0.75"));
-    connect(mFixTo0p75, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(0.75);});
-    mFixTo0p50 = new QAction(tr("&x0.5"));
-    connect(mFixTo0p50, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(0.5);});
-    mFixTo0p25 = new QAction(tr("&x0.25"));
-    connect(mFixTo0p25, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->fixSpeedRelativeToRealtime(0.25);});
-    mFixUnlimited = new QAction(tr("&Unlimited"));
-    connect(mFixUnlimited, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->setPlayerSpeedFixed(false);});
+    mLimitPlaybackSpeed = new QAction(tr("&Limit playback speed"));
+    // Not checkable like Fix since this is also controlled through clicking on FPS and syncing currently would be bothersome
+    connect(mLimitPlaybackSpeed, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->setPlayerSpeedLimited(!mPlayerWidget->getPlayerSpeedLimited());});
+    mFixPlaybackSpeed = new QAction(tr("&Fix playback speed"));
+    mFixPlaybackSpeed->setCheckable(true);
+    connect(mFixPlaybackSpeed, &QAction::toggled, mPlayerWidget, &Player::setPlayerSpeedFixed);
+    mSetToRealtime = new QAction(tr("&Realtime"));
+    connect(mSetToRealtime, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->setSpeedRelativeToRealtime(1.0);});
+    mSetTo2p00 = new QAction(tr("&x2"));
+    connect(mSetTo2p00, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->setSpeedRelativeToRealtime(2.0);});
+    mSetTo1p75 = new QAction(tr("&x1.75"));
+    connect(mSetTo1p75, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->setSpeedRelativeToRealtime(1.75);});
+    mSetTo1p50 = new QAction(tr("&x1.5"));
+    connect(mSetTo1p50, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->setSpeedRelativeToRealtime(1.5);});
+    mSetTo1p25 = new QAction(tr("&x1.25"));
+    connect(mSetTo1p25, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->setSpeedRelativeToRealtime(1.25);});
+    mSetTo0p75 = new QAction(tr("&x0.75"));
+    connect(mSetTo0p75, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->setSpeedRelativeToRealtime(0.75);});
+    mSetTo0p50 = new QAction(tr("&x0.5"));
+    connect(mSetTo0p50, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->setSpeedRelativeToRealtime(0.5);});
+    mSetTo0p25 = new QAction(tr("&x0.25"));
+    connect(mSetTo0p25, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->setSpeedRelativeToRealtime(0.25);});
     // -------------------------------------------------------------------------------------------------------
 
     QSignalMapper* signalMapper = new QSignalMapper(this);
@@ -1821,16 +1825,17 @@ void Petrack::createMenus()
     mCameraMenu = mViewMenu->addMenu(tr("&Camera"));
     mCameraMenu->addAction(mCameraLeftViewAct);
     mCameraMenu->addAction(mCameraRightViewAct);
-    mFixPlaybackSpeedMenu = mViewMenu->addMenu(tr("&Max playback speed"));
-    mFixPlaybackSpeedMenu->addAction(mFixToRealtime);
-    mFixPlaybackSpeedMenu->addAction(mFixUnlimited);
-    mFixPlaybackSpeedMenu->addAction(mFixTo2p00);
-    mFixPlaybackSpeedMenu->addAction(mFixTo1p75);
-    mFixPlaybackSpeedMenu->addAction(mFixTo1p50);
-    mFixPlaybackSpeedMenu->addAction(mFixTo1p25);
-    mFixPlaybackSpeedMenu->addAction(mFixTo0p75);
-    mFixPlaybackSpeedMenu->addAction(mFixTo0p50);
-    mFixPlaybackSpeedMenu->addAction(mFixTo0p25);
+    mViewMenu->addAction(mFixPlaybackSpeed);
+    mViewMenu->addAction(mLimitPlaybackSpeed);
+    mPlaybackSpeedMenu = mViewMenu->addMenu(tr("&Playback speed"));
+    mPlaybackSpeedMenu->addAction(mSetToRealtime);
+    mPlaybackSpeedMenu->addAction(mSetTo2p00);
+    mPlaybackSpeedMenu->addAction(mSetTo1p75);
+    mPlaybackSpeedMenu->addAction(mSetTo1p50);
+    mPlaybackSpeedMenu->addAction(mSetTo1p25);
+    mPlaybackSpeedMenu->addAction(mSetTo0p75);
+    mPlaybackSpeedMenu->addAction(mSetTo0p50);
+    mPlaybackSpeedMenu->addAction(mSetTo0p25);
     mViewMenu->addSeparator();
     mViewMenu->addAction(mFitViewAct);
     mViewMenu->addAction(mFitROIAct);
@@ -2172,7 +2177,7 @@ void Petrack::setStatusFPS()
         QColor color;//(qRed(col), qGreen(col), qBlue(col));
 
         double diff = mShowFPS-mAnimation->getFPS();
-        int opacity = mPlayerWidget->getPlayerSpeedFixed() ? 128 : 20;
+        int opacity = mPlayerWidget->getPlayerSpeedLimited() ? 128 : 20;
 
         if( diff < -6 ) // very slow ==> red
             color.setRgb(200,0,0,opacity);//mStatusLabelFPS->setStyleSheet("background-color: rgba(200,0,0,20);");// border-style: outset; border-width: 1px; border-color: yellow;");//, qRgba(250,0,0,50));//Qt::yellow);
@@ -2197,27 +2202,40 @@ void Petrack::setShowFPS(double fps)
     setStatusFPS();
 }
 
-void Petrack::updateShowFPS()
-{
+/**
+ * @brief Updates the FPS shown to the User
+ *
+ * This method calculates the FPS by remembering how long
+ * it has been since it was called last time. If skipped is
+ * true, it doesn't directly updat the FPS since 2
+ * skipped frames have essentially a time delay of 0 between
+ * them, which would make calculations wonky.
+ *
+ * @param skipped True, if this is a skipped frame; default false
+ */
+void Petrack::updateShowFPS(bool skipped) {
     static QElapsedTimer lastTime;
+    static int skippedFrames = 0;
 
-    if (mPlayerWidget->getPaused()) //(!imageChanged)
+    if(skipped){
+        skippedFrames++;
+        return;
+    }
+
+    if (mPlayerWidget->getPaused())
     {
         setShowFPS(0.);
         lastTime.invalidate();
     }
     else
     {
-        //            int milliSec = updateTime.restart();
-        //            if (milliSec != 0)
-        //                mShowFPS = 1000./milliSec;
-        //            updateTime.start();
-
         if (lastTime.isValid())
         {
             if (lastTime.elapsed() > 0)
             {
-                setShowFPS(1000./lastTime.elapsed());
+                int numFrames = skippedFrames > 0 ? skippedFrames+1 : 1;
+                setShowFPS(numFrames*1000./lastTime.elapsed());
+                skippedFrames = 0;
             }
         }
         lastTime.start();
@@ -2414,7 +2432,7 @@ void Petrack::mousePressEvent(QMouseEvent *event)
     // mouse click in fps status label ?
     if( event->pos().x() >= mStatusLabelFPS->pos().x() && event->pos().x() <= mStatusLabelFPS->pos().x()+mStatusLabelFPS->width() )
     {
-        mPlayerWidget->togglePlayerSpeedFixed();
+        mPlayerWidget->togglePlayerSpeedLimited();
         setStatusFPS();
     }
 }
@@ -3465,12 +3483,12 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
     static int lastRecoFrame = -10000;
     static bool borderChangedForTracking = false;
+
     //static QTime updateTime; // ergibt die gleichen werte wie benutzte native systemroutinben!!!
 
     // need semaphore to guarrantee that updateImage only called once
     // updateValue of control automatically calls updateImage!!!
     static QSemaphore semaphore(1);
-
     if (!mImg.empty() && mImage && semaphore.tryAcquire())
     {
 
@@ -3535,7 +3553,6 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
     //        "==========: "
     debout << "vor  calib: " << getElapsedTime() <<endl;
 #endif
-
         if (imageChanged || swapChanged || brightContrastChanged || borderChanged || calibChanged)
             mImgFiltered = mCalibFilter->apply(mImgFiltered);
         else
@@ -3632,7 +3649,6 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             debout << "vor  track: " << getElapsedTime() <<endl;
 #endif
 //            debout << "test" << endl;
-
             int anz = mTracker->track(mImgFiltered, rect, frameNum,
                                       mControlWidget->trackRepeat->isChecked(),
                                       mControlWidget->trackRepeatQual->value(), getImageBorderSize(),
@@ -3705,7 +3721,6 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                 //        "==========: "
                 debout << "nach  reco: " << getElapsedTime() <<endl;
 #endif
-
                 mTracker->addPoints(persList, frameNum);
 //                debout << "reco anz: " << persList.size() << endl;
                 // folgendes lieber im Anschluss, ggf beim exportieren oder statt test direkt del:
@@ -3772,7 +3787,6 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 void Petrack::updateImage(const Mat &img)
 {
     mImg = img;
-
 //    namedWindow("Test");
 //    imshow("Test",mImg);
 //    waitKey();

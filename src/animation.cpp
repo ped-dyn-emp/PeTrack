@@ -73,7 +73,6 @@ Animation::Animation(QWidget *wParent)
     mImgSeq = false;
     mCameraLiveStream = false;
     mCurrentFrame = -1;
-    mSpeedup = 1;
     mMaxFrames = -1;
     mSourceInFrame = -1;
     mSourceOutFrame = -1;
@@ -114,13 +113,13 @@ Animation::~Animation()
 // Returns a pointer to the next frame of the animation 
 Mat Animation::getNextFrame()
 {
-    return getFrameAtIndex(mCurrentFrame+mSpeedup);
+    return getFrameAtIndex(mCurrentFrame+1);
 }
 
 // Returns a pointer to the previous frame of the animation
 Mat Animation::getPreviousFrame()
 {
-    return getFrameAtIndex(mCurrentFrame-mSpeedup);
+    return getFrameAtIndex(mCurrentFrame-1);
 }
 
 // Returns a pointer to the frame at the index index
@@ -158,10 +157,23 @@ Mat Animation::getCurrentFrame()
 {
     return mImage;
 }
-// Returns the speedup to accelerate the video speed
-int Animation::getSpeedup()
+
+/**
+ * @brief Skips (grabs) the given number of frames (default 1)
+ * @param num Number of frames to skip.
+ */
+void Animation::skipFrame(int num)
 {
-    return mSpeedup;
+    if(mVideoCapture.isOpened())
+    {
+        int lastFrameNum = getSourceOutFrameNum();
+        for(int i = 0; i < num && mCurrentFrame < lastFrameNum; ++i)
+        {
+            mVideoCapture.grab();
+            mCurrentFrame += 1;
+            mMainWindow->updateShowFPS(true);
+        }
+    }
 }
 
 // reads the .time file of bumblebee xb3 experiments
@@ -472,7 +484,6 @@ void Animation::reset()
     mImgSeq = false;
     mCameraLiveStream = false;
     mCurrentFrame = -1;
-    mSpeedup = 1;
     mMaxFrames = -1;
     mSourceInFrame = -1;
     mSourceOutFrame = -1;
