@@ -73,6 +73,7 @@ public slots:
     void setPlayerSpeedLimited(bool fixed);
     bool getPlayerSpeedLimited();
     void setPlayerSpeedFixed(bool fixed);
+    void setLooping(bool looping);
     void setFrameInNum(int in=-1.);
     void setFrameOutNum(int out=-1.);
     int getFrameInNum();
@@ -94,6 +95,7 @@ private:
     PlayerState mState = PlayerState::PAUSE;
     bool mPlayerSpeedLimited;
     bool mPlayerSpeedFixed = false;
+    bool mLooping = false;
     bool mSliderSet;
     bool mRec;
 

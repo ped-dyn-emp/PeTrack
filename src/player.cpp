@@ -213,6 +213,11 @@ void Player::setPlayerSpeedFixed(bool fixed)
     mPlayerSpeedFixed = fixed;
 }
 
+void Player::setLooping(bool looping)
+{
+    mLooping = looping;
+}
+
 void Player::setSpeedRelativeToRealtime(double factor)
 {
     setFPS(mAnimation->getOriginalFPS()*factor);
@@ -376,7 +381,7 @@ void Player::playVideo(){
                     if(overtime >= supposedDiff){
                         mAnimation->skipFrame(static_cast<int>(overtime / supposedDiff));
                         overtime = overtime % supposedDiff;
-                        currentFrame = mAnimation->getCurrentFrameNum() + 1;
+                        currentFrame = std::min(mAnimation->getCurrentFrameNum() + 1, mAnimation->getSourceOutFrameNum());
                     }
                 }
 
@@ -405,8 +410,25 @@ void Player::playVideo(){
 
         if(!updateImage()){
             mState = PlayerState::PAUSE;
-            if(mState == PlayerState::FORWARD && mAnimation->getCurrentFrameNum() != mAnimation->getSourceOutFrameNum()){
-                debout << "Warning: video unexpected finished." << std::endl;
+            if( mAnimation->getCurrentFrameNum() != 0 && mAnimation->getCurrentFrameNum() != mAnimation->getSourceOutFrameNum()){
+                debout << "Warning: video unexpectedly finished." << std::endl;
+            }
+        }else{
+            if(mMainWindow->getControlWidget()->trackOnlineCalc->checkState() == Qt::Checked)
+            {
+                QMessageBox::warning(this, "Error: No tracking while looping", "Looping and tracking are incompatible. Please disable one first.");
+                mState = PlayerState::PAUSE;
+                break;
+            }
+            if(mLooping)
+            {
+                if(mState == PlayerState::FORWARD && mAnimation->getCurrentFrameNum() == mAnimation->getSourceOutFrameNum())
+                {
+                    currentFrame = 0;
+                }else if(mState == PlayerState::BACKWARD && mAnimation->getCurrentFrameNum() == 0)
+                {
+                    currentFrame = mAnimation->getSourceOutFrameNum();
+                }
             }
         }
     }

@@ -1762,6 +1762,10 @@ void Petrack::createActions()
     connect(mSetTo0p50, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->setSpeedRelativeToRealtime(0.5);});
     mSetTo0p25 = new QAction(tr("&x0.25"));
     connect(mSetTo0p25, &QAction::triggered, mPlayerWidget, [&](){mPlayerWidget->setSpeedRelativeToRealtime(0.25);});
+
+    mPlayerLooping = new QAction(tr("&Loop"));
+    mPlayerLooping->setCheckable(true);
+    connect(mPlayerLooping, &QAction::triggered, mPlayerWidget, &Player::setLooping);
     // -------------------------------------------------------------------------------------------------------
 
     QSignalMapper* signalMapper = new QSignalMapper(this);
@@ -1836,6 +1840,7 @@ void Petrack::createMenus()
     mPlaybackSpeedMenu->addAction(mSetTo0p75);
     mPlaybackSpeedMenu->addAction(mSetTo0p50);
     mPlaybackSpeedMenu->addAction(mSetTo0p25);
+    mViewMenu->addAction(mPlayerLooping);
     mViewMenu->addSeparator();
     mViewMenu->addAction(mFitViewAct);
     mViewMenu->addAction(mFitROIAct);
