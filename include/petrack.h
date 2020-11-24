@@ -484,6 +484,7 @@ private:
     QAction *mSetTo1p50;
     QAction *mSetTo1p75;
     QAction *mSetTo2p00;
+    QAction *mPlayerLooping;
     QAction *mDelPastAct;
     QAction *mDelFutureAct;
     QAction *mDelAllRoiAct;
