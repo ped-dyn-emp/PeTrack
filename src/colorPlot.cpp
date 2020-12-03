@@ -626,7 +626,7 @@ public:
         lastY = e->y();
 
         //if (e->button() == Qt::MidButton) fkt bei move nicht
-        if (e->buttons() == Qt::MidButton)
+        if (e->buttons() == Qt::MiddleButton)
         {
             plot()->setAutoReplot(false);
             for (int axis = 0; axis < QwtPlot::axisCnt; axis++)
