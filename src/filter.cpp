@@ -119,73 +119,40 @@ void Filter::setChanged(bool b)
     mChg=b;
 }
 
-//void Filter::setResStored(bool b)
-//{
-//    mResStored=b;
-//}
-
+/**
+ * @brief Applies filter and sets changed to false
+ *
+ * Applies the filter and after that sets changed to false
+ * The filter is only applied, when it is enabled, else
+ * the img just gets returned without filtering.
+ *
+ * @param img Image to apply filter to
+ * @return filtered image
+ */
 Mat Filter::apply(Mat &img)
 {
-    mChg = false;
-
     if (getEnabled())
     {
         if (getOnCopy())
         {
-//            mResStored = true;
             Mat res(Size(img.cols,img.rows),CV_8UC(img.channels()));
-            return mRes = act(img,res);
+            mRes = act(img,res);
+            mChg = false;
+            return mRes;
         }else
         {
-//            mResStored = false;
-            return mRes = act(img,img);
+            mRes = act(img,img);
+            mChg = false;
+            return mRes;
         }
 
     }else
     {
-//        mRes = img;
-//        mResStored = false;
+        mChg = false;
         return mRes = img;
     }
 }
 
-// apply on original Data
-//IplImage* Filter::apply(IplImage *img)
-//{
-//    mChg = false; // dass sich filter mit param gaendert haben kann zurueckgesetzt weren
-//                  // da der filter nun angewandt wird
-
-//    if (mResStored == true) // wenn beim letzten Mal Speicherplatz angelegt wurde
-//        cvReleaseImage(&mRes);
-
-
-//    if (getEnabled())
-//    {
-//        if (getOnCopy())
-//        {
-//            mResStored = true;
-//            IplImage *res = cvCreateImage(cvGetSize(img),8,img->nChannels);
-//            //res->origin = img->origin; // because 1 - bottom-left origin (Windows bitmaps style) is not default!!!
-
-//            mRes=act(img, res);// depth/Farbtiefe pro Kanal 8, channels/Kanaele == 1 oder 3 bei mir erlaubt
-//            cvReleaseImage(&res);
-
-//            return mRes;
-//        }
-//        else
-//        {
-//            // hier muesste noch beachtet werden, dass mIplImage von hauptanwendung nicht uebergeben wurde!!!!
-//            mResStored = false;
-//            return mRes=act(img, img);
-//        }
-
-//    }
-//    else
-//    {
-//        mResStored = false;
-//        return mRes=img;
-//    }
-//}
 Mat Filter::getLastResult()
 {
     return mRes;
