@@ -90,7 +90,7 @@ void GridItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 mControlWidget->setCalibGridTransY(mControlWidget->getCalibGridTransY()+(int)(10.*diff.y()));
             }
         }
-        else if (event->buttons() == Qt::MidButton)
+        else if (event->buttons() == Qt::MiddleButton)
         {
             if( mControlWidget->getCalibGridDimension() == 0)
             {

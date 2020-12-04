@@ -1376,7 +1376,7 @@ void Petrack::print()
         // HighResolution font zu gross! und laengere laufzeit und eher overflow
         // aber so pixelig und keine schoenen linien
         QPrinter printer(QPrinter::ScreenResolution); //ScreenResolution, HighResolution// liefert zu hause: QWin32PrintEngine::initialize: GetPrinter failed ()
-        printer.setPageSize(QPrinter::A4);
+        printer.setPageSize(QPageSize{QPageSize::PageSizeId::A4});
         QPrintDialog dialog(&printer, this);
         //printer.setOutputFormat(QPrinter::PostScriptFormat);
         if (dialog.exec()) {

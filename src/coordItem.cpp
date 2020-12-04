@@ -187,7 +187,7 @@ void CoordItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 mControlWidget->setCalibCoordTransY(mControlWidget->getCalibCoordTransY()+(int)(10.*diff.y()));
             }
         }
-        else if (event->buttons() == Qt::MidButton)
+        else if (event->buttons() == Qt::MiddleButton)
         {
             if( mControlWidget->getCalibCoordDimension() == 0 )
             {
