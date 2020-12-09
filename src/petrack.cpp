@@ -3166,8 +3166,16 @@ void Petrack::exportTracker(QString dest) //default = ""
 
                     for(int i=0;i<mTracker->size();++i)
                     {
-                        out << "#" << qSetFieldWidth(3) << (i+1) << qSetFieldWidth(0) << "|" << mTracker->at(i).comment() << Qt::endl;
-                        std::cout << setw(4) << (i+1) << "|" << mTracker->at(i).comment() << std::endl;
+                        auto commentSplit = mTracker->at(i).comment().split("\n", Qt::KeepEmptyParts);
+                        out << "#" << qSetFieldWidth(3) << (i+1) << qSetFieldWidth(0) << "|" << commentSplit.at(0) << Qt::endl;
+                        std::cout  << setw(4) << (i+1) << "|" << commentSplit.at(0) << std::endl;
+
+                        commentSplit.pop_front();
+                        for (const auto& line : commentSplit)
+                        {
+                            out << "#" << qSetFieldWidth(3) << " " << qSetFieldWidth(0) << "|" << line << Qt::endl;
+                            std::cout << "    |" << line << std::endl;
+                        }
                     }
                 }
                 mTrackerReal->exportTxt(out,
