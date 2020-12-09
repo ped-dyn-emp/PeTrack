@@ -2293,13 +2293,10 @@ void Petrack::setStatusColor(const QRgb &col)
 void Petrack::setStatusColor()
 {
     QPointF pos = getMousePosOnImage();
-    if ((int)(pos.x())<mImage->width() && (int)(pos.y())<mImage->height())
+    if (pos.x() >= 0 && pos.x() < mImage->width() && pos.y() > 0 && pos.y() < mImage->height())
     {
-        QPoint pos2((int)(pos.x()), (int)(pos.y())); // .toPoint() ???
-        setStatusColor(mImage->pixel(pos2));
+        setStatusColor(mImage->pixel(pos.toPoint()));
     }
-    //     else
-    //         setStatusColor(qRgb(255, 255, 255));
 }
 
 double Petrack::getStatusPosRealHeight()
@@ -2387,20 +2384,11 @@ void Petrack::setMousePosOnImage(QPointF pos)
         setStatusPosReal(mImageItem->getPosReal(pos, getStatusPosRealHeight()));
 
         // pixel coordinate
-        //s.sprintf("%4dx%4d", event->pos().x(), event->pos().y());
-        //QTextStream(&s) << event->pos().x() << "x" << event->pos().y();
         QPoint pos1((int)(pos.x())+1, (int)(pos.y())+1);
-        setStatusPos(pos1);  //QString("%1x%2").arg((int)event->pos().x()+1, 4).arg((int)event->pos().y()+1, 4)
-        //== event->scenePos().x()
-        // Koordinaten auf dem Bildschirm: event->screenPos().x(), event->screenPos().y()
+        setStatusPos(pos1);
         
         // pixel color
-        QPoint pos2((int)(pos.x()), (int)(pos.y()));
-        setStatusColor(mImage->pixel(pos2));//(mImage->toImage()).pixel(pos... wenn pixmap
-
-        //        if ((mStereoContext) && mStereoContext->getDisparity())
-        //        {
-        //        }
+        setStatusColor();
     }
 }
 
