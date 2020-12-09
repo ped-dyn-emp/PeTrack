@@ -414,13 +414,12 @@ void Player::playVideo(){
                 debout << "Warning: video unexpectedly finished." << std::endl;
             }
         }else{
-            if(mMainWindow->getControlWidget()->trackOnlineCalc->checkState() == Qt::Checked)
+            if( mLooping && mMainWindow->getControlWidget()->trackOnlineCalc->checkState() == Qt::Checked)
             {
                 QMessageBox::warning(this, "Error: No tracking while looping", "Looping and tracking are incompatible. Please disable one first.");
                 mState = PlayerState::PAUSE;
                 break;
-            }
-            if(mLooping)
+            }else if(mLooping)
             {
                 if(mState == PlayerState::FORWARD && mAnimation->getCurrentFrameNum() == mAnimation->getSourceOutFrameNum())
                 {
