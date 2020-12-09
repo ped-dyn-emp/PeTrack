@@ -321,6 +321,17 @@ public:
     {
         return mComment;
     }
+    /**
+     * @brief Get the comment without line breaks
+     *
+     * Get the comment as a one line QString where all linebreak are replaced with '<br>'
+     * @return comment without line breaks
+     */
+    inline QString serializeComment() const
+    {
+        return QString{mComment}.replace(QRegularExpression("\n"), "<br>");
+    }
+
     inline void setComment(QString s)
     {
         mComment = s;
@@ -388,7 +399,7 @@ inline QTextStream& operator>>(QTextStream& s, TrackPerson& tp)
         //s.skipWhiteSpace(); // skip white spaces for reading the comment line without this the reading makes some problems
         // Kommentarzeile lesen
         str = s.readLine();
-        tp.setComment(str);
+        tp.setComment(str.replace(QRegularExpression("<br>"), "\n"));
         //cout << " comment: " << tp.comment() << endl;
         //if ( !comment.isEmpty())
         //    s.skipWhiteSpace();
@@ -411,7 +422,7 @@ inline QTextStream& operator<<(QTextStream& s, const TrackPerson& tp)
         s << " " <<tp.getMarkerID();
     }
     s << " " << tp.size();
-    s << Qt::endl << tp.comment() << Qt::endl;
+    s << Qt::endl << tp.serializeComment() << Qt::endl;
     for (int i = 0; i < tp.size(); ++i)
         s << tp.at(i) << Qt::endl;
     return s;
@@ -425,7 +436,7 @@ inline std::ostream& operator<<(std::ostream& s, const TrackPerson& tp)
         s <<  " " << tp.getMarkerID();
     }
     s << " " << tp.size();
-    s << std::endl << tp.comment() << std::endl;
+    s << std::endl << tp.serializeComment() << std::endl;
     for (int i = 0; i < tp.size(); ++i)
         s << tp.at(i) << std::endl;
     return s;
@@ -473,7 +484,7 @@ public:
     void delPointAll(int direction, int frame);
     void delPointROI();
     void delPointInsideROI();
-    bool editTrackPersonComment(const Vec2F& p, int frame, QSet<int> onlyVisible);
+    bool editTrackPersonComment(const Vec2F& p, int frame, const QSet<int>& onlyVisible);
     bool setTrackPersonHeight(const Vec2F& p, int frame, QSet<int> onlyVisible);
     bool resetTrackPersonHeight(const Vec2F& p, int frame, QSet<int> onlyVisible);
 

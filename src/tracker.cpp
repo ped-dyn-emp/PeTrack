@@ -873,23 +873,50 @@ void Tracker::delPointROI()
 
 
 }
-bool Tracker::editTrackPersonComment(const Vec2F& p, int frame, QSet<int> onlyVisible)
-{
-    int i;
 
-    for (i = 0; i < size(); ++i) // ueber TrackPerson
-        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(NULL, i, frame)/2.))) // war: MIN_DISTANCE)) // 30 ist abstand zwischen kopfen
+/**
+ * @brief Editing the comment of a TrackPerson
+ *
+ * Allows editing the comment of a TrackPerson in a new Dialog. When a new dialog gets opened, it automatically
+ * appends 'Frame {\p frame}: ' to the dialog, if no comment for the frame exists.
+ *
+ * @param p position the user clicked
+ * @param frame current frame number
+ * @param onlyVisible list of visible persons
+ * @return if a comment has been saved
+ */
+bool Tracker::editTrackPersonComment(const Vec2F& p, int frame, const QSet<int>& onlyVisible)
+{
+    for (int i = 0; i < size(); ++i) // ueber TrackPerson
+    {
+        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) &&
+                                                                     (at(i).trackPointAt(frame).distanceToPoint(p) <
+                                                                      mMainWindow->getHeadSize(nullptr, i, frame) /
+                                                                      2.))) // war: MIN_DISTANCE)) // 30 ist abstand zwischen kopfen
         {
-            bool ok;
-            QString comment = QInputDialog::getText(mMainWindow,QObject::tr("Add Comment"),QObject::tr("Comment:"),
-                                                    QLineEdit::Normal, at(i).comment() , &ok);
-            if (ok)
+            QString displayedComment = at(i).comment();
+            QString framePrefix = "Frame " + QString::number(frame, 'g', 5) + ": ";
+
+            if (displayedComment.isEmpty())
             {
-                if(comment.isEmpty())
-                {
-                    int ret = QMessageBox::warning(mMainWindow, QObject::tr("Empty comment"), QObject::tr("Are you sure you want to save an empty comment?"), QMessageBox::Save | QMessageBox::Cancel);
-                    if( ret == QMessageBox::Cancel )
-                    {
+                displayedComment.append(framePrefix);
+            }
+            else if (!displayedComment.contains(framePrefix))
+            {
+                displayedComment.append("\n" + framePrefix);
+            }
+
+            bool ok = false;
+            QString comment = QInputDialog::getMultiLineText(mMainWindow, QObject::tr("Add Comment"),
+                                                             QObject::tr("Comment:"),
+                                                             displayedComment, &ok);
+
+            if (ok) {
+                if (comment.isEmpty()) {
+                    int ret = QMessageBox::warning(mMainWindow, QObject::tr("Empty comment"),
+                                                   QObject::tr("Are you sure you want to save an empty comment?"),
+                                                   QMessageBox::Save | QMessageBox::Cancel);
+                    if (ret == QMessageBox::Cancel) {
                         return false;
                     }
                 }
@@ -897,6 +924,7 @@ bool Tracker::editTrackPersonComment(const Vec2F& p, int frame, QSet<int> onlyVi
                 return true;
             }
         }
+    }
     return false;
 }
 
