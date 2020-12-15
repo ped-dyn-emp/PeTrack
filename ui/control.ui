@@ -121,8 +121,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>342</width>
-            <height>1081</height>
+            <width>337</width>
+            <height>1028</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -3211,8 +3211,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>342</width>
-            <height>876</height>
+            <width>337</width>
+            <height>874</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -4447,8 +4447,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>342</width>
-            <height>863</height>
+            <width>337</width>
+            <height>843</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_17">
@@ -5407,17 +5407,31 @@
                  </layout>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="trackShowSearchSize">
-                  <property name="maximumSize">
-                   <size>
-                    <width>300</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>show pyramidal search size</string>
-                  </property>
-                 </widget>
+                 <layout class="QHBoxLayout" name="horizontalLayout_23">
+                  <item>
+                   <widget class="QCheckBox" name="trackShowSearchSize">
+                    <property name="maximumSize">
+                     <size>
+                      <width>300</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>show pyramidal search size</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QCheckBox" name="adaptiveLevel">
+                    <property name="toolTip">
+                     <string>When checked, failed attempts to track are repeated with a lower pyramid level. Mostly results in worse trajectories.</string>
+                    </property>
+                    <property name="text">
+                     <string>adaptive level</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </item>
                </layout>
               </item>
@@ -7199,8 +7213,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>356</width>
-            <height>557</height>
+            <width>354</width>
+            <height>558</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -7457,7 +7471,6 @@
   <tabstop>testVelocity</tabstop>
   <tabstop>testInside</tabstop>
   <tabstop>testLength</tabstop>
-  <tabstop>trackShowSearchSize</tabstop>
   <tabstop>trackShow</tabstop>
   <tabstop>trackFix</tabstop>
   <tabstop>trackShowOnlyVisible</tabstop>

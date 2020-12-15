@@ -58,6 +58,8 @@ public:
     bool getTrackRoiFix();
     void setTrackRoiFix(bool b);
 
+    bool getAdaptiveLevel();
+
     int getFilterBorderSize();
 
     double getCalibFxValue();

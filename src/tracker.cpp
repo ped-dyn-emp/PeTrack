@@ -1530,7 +1530,9 @@ int Tracker::track(Mat &img,Rect &rect, int frame, bool reTrack, int reQual, int
                 debout << "Warning: linear interpolation of skipped frames which are not already tracked (" << mPrevFrame << " to " << frame << ")." << endl; // will be done in insertFeaturePoints
         }
 
-        trackFeaturePointsLK(level);
+        trackFeaturePointsLK(level, mMainWindow->getControlWidget()->getAdaptiveLevel());
+
+        // TODO Split up refineViaColorPointLK as well...
         refineViaColorPointLK(level, errorScale);
 
         BackgroundFilter *bgFilter = mMainWindow->getBackgroundFilter();
@@ -1547,54 +1549,6 @@ int Tracker::track(Mat &img,Rect &rect, int frame, bool reTrack, int reQual, int
         {
             refineViaNearDarkPoint();
         }
-        // NOTE Following comment can probably be deleted, quite old code -> commented out for long time
-        /*
-        // bei noch schlechteren punkten zweite strategie
-        for (i = 0; i < count; ++i)
-            if ((mTrackError[i] > MAX_TRACK_ERROR) || (mStatus[i] == 0))
-                againNumber++;
-        // wenn trackpoint zu grossen fehler haben oder gar nicht berechnet werden konnten,
-        // dann wird mit dem zehnfachen der winSize (30) eine wiederholung durchgefuehrt
-        if (againNumber)
-        {
-            // mgl besser einmal anlegen und immer wieder benutzen
-            CvPoint2D32f* againPrevFeaturePoints = (CvPoint2D32f*) cvAlloc(againNumber*sizeof(CvPoint2D32f)); //points[0]
-            CvPoint2D32f* againFeaturePoints = (CvPoint2D32f*) cvAlloc(againNumber*sizeof(CvPoint2D32f)); //points[1]
-            char* againStatus = (char*) cvAlloc(againNumber);
-            //againTrackError = (float*) cvAlloc(againNumber*sizeof(float));
-            j=0;
-            for (i = 0; i < count; ++i)
-                if ((mTrackError[i] > MAX_TRACK_ERROR) || (mStatus[i] == 0))
-                {
-                    againPrevFeaturePoints[j] = mPrevFeaturePoints[i];
-                    againFeaturePoints[j] = mFeaturePoints[i];
-                    againStatus[j] = 0;
-                    j++;
-                }
-            cvCalcOpticalFlowPyrLK(mPrevGrey, mGrey, mPrevPyramid, mPyramid,
-                againPrevFeaturePoints, againFeaturePoints, againNumber, cvSize(winSize*10, winSize*10), level, againStatus, NULL,
-                cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 20, 0.03), CV_LKFLOW_PYR_A_READY|CV_LKFLOW_PYR_B_READY);
-            j=0;
-            for (i = 0; i < count; ++i)
-                if ((mTrackError[i] > MAX_TRACK_ERROR) || (mStatus[i] == 0))
-                {
-                    Vec2F v = Vec2F(mFeaturePoints+i);
-                    Vec2F w = Vec2F(againFeaturePoints+j);
-                    debout << "--------------" << i << ", " << j << ": " << (int) againStatus[j] << " " << v.x() << " " <<v.y() << " " <<w.x() << " " << w.y() << " error: " << mTrackError[i] <<endl;
-                    if ((againStatus[j] != 0))
-                    {
-                        mStatus[i] = 1;
-                        mFeaturePoints[i] = againFeaturePoints[j];
-                        // im anschluss koennte die position noch optimiert werden (dunkelster punkt in umgebung)
-                    }
-                    j++;
-
-                }
-            cvFree(&againPrevFeaturePoints);
-            cvFree(&againFeaturePoints);
-            cvFree(&againStatus);
-        }
-        */
 
         inserted = insertFeaturePoints(frame, numOfPeopleToTrack, img, borderSize, errorScale);
     }
@@ -1641,43 +1595,71 @@ void Tracker::preCalculateImagePyramids(int level)
     cv::buildOpticalFlowPyramid(mGrey, mCurrentPyr, cv::Size(maxWinSize,maxWinSize), level);
 }
 
+
 /**
- * @brief Tracks the mPrevFeaturePoints with Lucas-Kanade
+ * @brief Tracks the mPrevFeaturePoints with Lucas-Kanade (optional adaptive pyramid level)
  *
  * This function tracks all points in mPrevFeaturePoints via Lucas-Kanade. Each person is
- * tracked with a different winSize according to the size of the head.
+ * tracked with a different winSize according to the size of the head. Optionally the
+ * pyramid level can lowered, if the person could not be properly tracked and adaptive is
+ * set to true. This was added because from OpenCV 3 onwards the tracking failed in cases,
+ * where it should work. A suspicion: Happens when there is no unique point in the following
+ * frame, because of every pixel having the exact same grey level in the smalles pyramid scale.
  *
- * @param level Maximum level to track with
- * @param numOfPeopleToTrack Number of people to be tracked
- * @see Tracker::calcPrevFeaturePoints
+ * @param level Maximum pyramid level to track with
+ * @param adaptive indicates if pyramid level should be lowered after unsuccessful tracking attempt
  */
-void Tracker::trackFeaturePointsLK(int level)
+void Tracker::trackFeaturePointsLK(int level, bool adaptive)
 {
-    int winSize;
-    for (size_t i = 0; i < mPrevFeaturePointsIdx.size(); ++i)
+    const size_t numOfPeople = mPrevFeaturePointsIdx.size();
+    mFeaturePoints.resize(numOfPeople);
+    mStatus.resize(numOfPeople);
+    mTrackError.resize(numOfPeople);
+    vector<uchar> localStatus;
+    vector<float> localTrackError;
+
+    for(size_t i = 0; i < numOfPeople; ++i)
     {
-        // das Durchlaufen der level bis 0 fuer den Fall, dass kein Tracking moeglich ist (mStatus ==0)
-        //     ist erst ab opencv 3 hinzugenommen worden, da es manchmal zum abbruch kam, obwohl ein tracking moeglich sein sollte
-        //     ein verdacht: wenn sich in folgebildern kein eindeutiger punkt ergibt, da in der kleinsten pyr stufe rundherum die exakt gleiche farbe/graustufe vorherscht
-        int l = level;
+        int l       = level;
+        int winSize = 0;
 
         do
         {
-            winSize = mMainWindow->winSize(nullptr, mPrevFeaturePointsIdx[i], mPrevFrame, l);
-            if (winSize < MIN_WIN_SIZE)
+            if(l < level)
             {
-                winSize = MIN_WIN_SIZE;
-                debout << "Warning: set search region to the minimum size of "<<MIN_WIN_SIZE<<" for person " << mPrevFeaturePointsIdx[i] << "!" << endl;
+                debout << "Warning: try tracking person " << mPrevFeaturePointsIdx[i] << " with pyramid level " << l
+                       << "!" << endl;
             }
 
-            if (l < level)
-                debout << "Warning: try tracking person " /*<< mPrevFeaturePointsIdx[i]*/ << " with pyramid level " << l<<"!" << endl;
+            winSize = mMainWindow->winSize(nullptr, mPrevFeaturePointsIdx[i], mPrevFrame, l);
+            if(winSize < MIN_WIN_SIZE)
+            {
+                winSize = MIN_WIN_SIZE;
+                debout << "Warning: set search region to the minimum size of " << MIN_WIN_SIZE << " for person "
+                       << mPrevFeaturePointsIdx[i] << "!" << endl;
+            }
 
-            cv::calcOpticalFlowPyrLK(mPrevPyr,mCurrentPyr,/*points[0]*/mPrevFeaturePoints,/*points[1]*/mFeaturePoints,mStatus,mTrackError,Size(winSize,winSize),l,mTermCriteria);
+            vector<cv::Point2f> prevFeaturePoint{mPrevFeaturePoints[i]};
+            vector<cv::Point2f> nextFeaturePoint{};
+            localStatus.clear();
+            localTrackError.clear();
 
-        }  while(mStatus[i] == 0 && (l--) > 0);
+            cv::calcOpticalFlowPyrLK(
+                mPrevPyr,
+                mCurrentPyr,
+                prevFeaturePoint,
+                nextFeaturePoint,
+                localStatus,
+                localTrackError,
+                Size(winSize, winSize),
+                l,
+                mTermCriteria);
 
-        mTrackError[i] = mTrackError[i]*10.F/winSize;
+            mFeaturePoints[i] = nextFeaturePoint[0];
+            mTrackError[i]    = localTrackError[0] * 10.F / winSize;
+
+        } while(adaptive && localStatus[0] == 0 && (l--) > 0);
+        mStatus[i] = localStatus[0];
     }
 }
 

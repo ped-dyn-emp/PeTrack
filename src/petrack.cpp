@@ -4057,7 +4057,7 @@ QSet<int> Petrack::getOnlyVisible()
                 if(!ok)
                     debout << "Warning: error while reading showOnlyVisible list from input line!" << endl;
             }
-            return onlyVisible;//QSet<int>() << mControlWidget->trackShowOnlyNr->text().split(",").toSet(); //in anzeige wird ab 1 gezaehlt, in datenstruktur ab 0
+            return onlyVisible; //in anzeige wird ab 1 gezaehlt, in datenstruktur ab 0
 
         }else // if(ControlWidget->trackShowOnly->checkState() == Qt::Checked) //
         {
