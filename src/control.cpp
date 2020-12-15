@@ -252,6 +252,13 @@ void Control::setTrackRoiFix(bool b)
 
 //---------------------------------------
 
+bool Control::getAdaptiveLevel()
+{
+    return adaptiveLevel->isChecked();
+}
+
+//---------------------------------------
+
 int Control::getFilterBorderSize()
 {
     return filterBorderParamSize->value();
@@ -2488,6 +2495,7 @@ void Control::setXml(QDomElement &elem)
         subSubElem.setAttribute("LEVELS", trackRegionLevels->value());
         subSubElem.setAttribute("MAX_ERROR", trackErrorExponent->value());
         subSubElem.setAttribute("SHOW", trackShowSearchSize->isChecked());
+        subSubElem.setAttribute("ADAPTIVE", adaptiveLevel->isChecked());
         subElem.appendChild(subSubElem);
 
         subSubElem = (elem.ownerDocument()).createElement("PATH");
@@ -3095,6 +3103,8 @@ void Control::getXml(QDomElement &elem)
                         trackErrorExponent->setValue(subSubElem.attribute("MAX_ERROR").toInt());
                     if (subSubElem.hasAttribute("SHOW"))
                         trackShowSearchSize->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                    if(subSubElem.hasAttribute("ADAPTIVE"))
+                        adaptiveLevel->setCheckState(subSubElem.attribute("ADAPTIVE").toInt() ? Qt::Checked : Qt::Unchecked);
                 }
                 else if (subSubElem.tagName() == "PATH")
                 {

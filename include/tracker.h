@@ -541,6 +541,7 @@ private:
     bool tryMergeTrajectories(const TrackPoint& v, size_t i, int frame);
 
     void trackFeaturePointsLK(int level);
+    void trackFeaturePointsLK(int level, bool adaptive);
     void refineViaColorPointLK(int level, float errorScale);
     void useBackgroundFilter(QList<int>& trjToDel, BackgroundFilter *bgFilter);
     void refineViaNearDarkPoint();
