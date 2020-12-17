@@ -59,6 +59,15 @@ they can be represented in QT.
 
 class Petrack;
 
+/**
+ * @brief The Animation class manages the sequence
+ *
+ * The Animation class manages the sequence. Currently supported
+ * are video files of different formats (via OpenCV/FFMPEG),
+ * image sequences and camera livestreams. Every access to metadata
+ * (FPS, resolution, etc.) and to the sequene itself is managed by
+ * this class.
+ */
 class Animation{
 
 public:

@@ -43,7 +43,7 @@ private:
     //Ptr<BackgroundSubtractor> mBgModel;
 
     bool mUpdate; // if 0, kein update des models, sonst schon
-    pet::StereoContext** mStereoContext; // zeiger auf den zeiger in petrack mit stereocontext
+    pet::StereoContext** mStereoContext; ///< zeiger auf den zeiger in petrack mit stereocontext
     cv::Mat mBgPointCloud;
     cv::Mat mForeground;
     QString mLastFile;
@@ -67,13 +67,12 @@ public:
     void setStereoContext(pet::StereoContext **sc);
     pet::StereoContext** stereoContext();
 
-    cv::Mat getForeground(); // nutzen, wenn ueber ganzes bild foreground benutzt wird; NULL, wenn keine background subtraction aktiviert
-    bool isForeground(int i, int j); // nutzen, wenn einzelne pixel abgefraget werden
+    cv::Mat getForeground(); ///< nutzen, wenn ueber ganzes bild foreground benutzt wird; NULL, wenn keine background subtraction aktiviert
+    bool isForeground(int i, int j);
 
     void reset();
 
     cv::Mat act(cv::Mat &img, cv::Mat &res);
-//    IplImage* act(IplImage *img, IplImage *res);
 
     void maskBg(cv::Mat &mat, float val);
 };

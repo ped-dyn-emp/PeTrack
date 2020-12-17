@@ -226,8 +226,15 @@ inline QTextStream& operator>>(QTextStream& s, QColor& col)
 #include <QFileInfo>
 #include <QString>
 #include <QStringList>
-// ueberprueft die ;-getrennten Dateinamen auf existenz und gibt ersten zurueck
-// interessant fuer relativen und absoluten pfad
+/**
+ * @brief checks the ;-separated file names for existence and returns the first
+ *
+ * Interesting for working with absolute <em>and</em> relative paths.
+ *
+ * @param fileList
+ * @param relToFileName
+ * @return first file to exist
+ */
 inline QString getExistingFile(const QString &fileList, const QString &relToFileName)
 {
     QStringList list;

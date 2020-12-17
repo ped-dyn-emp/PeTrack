@@ -23,7 +23,12 @@
 
 #include "filter.h"
 
-
+/**
+ * @brief Undistortion filter
+ *
+ * This class is a filter which undistorts the image using the camera matrix from intrinsic calibration.
+ * It caches the mapping from distorted to undistorted image.
+ */
 class CalibFilter : public Filter
 {
 private:

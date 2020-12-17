@@ -63,7 +63,7 @@ CodeMarkerWidget::CodeMarkerWidget(QWidget *parent)
 //    <PARAM CLOSE_RADIUS="0" CLOSE_USED="0" OPEN_RADIUS="0" OPEN_USED="0" MIN_AREA="0" MAX_AREA="0" MAX_RATIO="0.0"/>
 //</COLOR_MARKER>
 
-// store data in xml node
+/// store data in xml node
 void CodeMarkerWidget::setXml(QDomElement &elem)
 {
     QDomElement subElem;
@@ -98,7 +98,7 @@ void CodeMarkerWidget::setXml(QDomElement &elem)
 
 }
 
-// read data from xml node
+/// read data from xml node
 void CodeMarkerWidget::getXml(QDomElement &elem)
 {
     QDomElement subElem;

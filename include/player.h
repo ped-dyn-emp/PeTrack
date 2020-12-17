@@ -49,6 +49,16 @@ enum class PlayerState{
     PAUSE
 };
 
+/**
+ * @brief The Player class controls the playing and processing of the Animation/Sequence
+ *
+ * The Player controls the playback and recordings of the Animation.
+ * It does not hold the sequence itself. That is done in Animation. However, the
+ * actual processing of the Animation is tied to it being played since the player
+ * runs Petrack::updateImage() as part of its play-loop. So processing means
+ * playing. But processing can be turned off by the user, so playing does not
+ * neccessarily mean processing.
+ */
 class Player : public QWidget
 {
     Q_OBJECT

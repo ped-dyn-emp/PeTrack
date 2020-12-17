@@ -38,6 +38,15 @@ ImageItem::ImageItem(QWidget *wParent, QGraphicsItem * parent)
     setAcceptHoverEvents(true);
 //    setAcceptDrops(true);
 }
+
+/**
+ * @brief Bounding box of drawn to area.
+ *
+ * This bounding box is used to determine if this Item needs to be redrawn or not.
+ * See the official Qt Docs for QGraphicsItem
+ *
+ * @return (updated) bounding rect of this item
+ */
 QRectF ImageItem::boundingRect() const
 {
     if (mImage)
@@ -172,13 +181,12 @@ double ImageItem::getAngleToGround(float px, float py, float height){
 }
 
 QPointF ImageItem::getPosImage(QPointF pos, float height)
-//QPointF ImageItem::getPosImage(QPointF pos)
 {
     bool debug = false;
     cv::Point2f p2d;
     if( mImage )
     {
-        if( mControlWidget->getCalibCoordDimension() == 0 )
+        if( mControlWidget->getCalibCoordDimension() == 0 ) // Tab coordinate system is on 3D
         {
             p2d = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(pos.x(),pos.y(),height));
             pos.setX(p2d.x);
@@ -320,7 +328,11 @@ void ImageItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsItem::mouseMoveEvent(event);
 }
-// event, of moving mouse
+
+/**
+ * @brief Updates the mousePosOnImage in Petrack
+ * @param event
+ */
 void ImageItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
 //     // real coordinate

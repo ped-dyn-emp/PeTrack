@@ -110,19 +110,19 @@ Animation::~Animation()
 /* Common Implementation of Video and Sequence of Images             **/
 /**********************************************************************/
 
-// Returns a pointer to the next frame of the animation 
+/// Returns the next frame of the animation
 Mat Animation::getNextFrame()
 {
     return getFrameAtIndex(mCurrentFrame+1);
 }
 
-// Returns a pointer to the previous frame of the animation
+/// Returns the previous frame of the animation
 Mat Animation::getPreviousFrame()
 {
     return getFrameAtIndex(mCurrentFrame-1);
 }
 
-// Returns a pointer to the frame at the index index
+/// Returns the frame at the index index
 Mat Animation::getFrameAtIndex(int index)
 {
     if (mCameraLiveStream)
@@ -145,14 +145,18 @@ Mat Animation::getFrameAtIndex(int index)
     return Mat();
 }
 
-// Returns a pointer to the frame at the position position
-// positions is a double between 0 and 1 that indicates the position in the animation
+/**
+ * @brief Returns the frame at the position position
+ *
+ * @param position double between 0 and 1 that indicates the position in the animation
+ * @return the frame at the indicated position
+ */
 Mat Animation::getFrameAtPos(double position)
 {
     return getFrameAtIndex((int) (getSourceInFrameNum()+(position*(getNumFrames()-1))));
 }
 
-// Returns a pointer to the current frame 
+/// Returns the current frame
 Mat Animation::getCurrentFrame()
 {
     return mImage;
@@ -160,6 +164,7 @@ Mat Animation::getCurrentFrame()
 
 /**
  * @brief Skips (grabs) the given number of frames (default 1)
+ *
  * @param num Number of frames to skip.
  */
 void Animation::skipFrame(int num)
@@ -176,8 +181,12 @@ void Animation::skipFrame(int num)
     }
 }
 
-// reads the .time file of bumblebee xb3 experiments
-// returns, if timefile could be read
+/**
+ * @brief reads the .time file of bumblebee xb3 experiments
+ *
+ * @param timeFileName
+ * @return if timefile could be read
+ */
 bool Animation::openTimeFile(QString &timeFileName)
 {
     QFile file(timeFileName);
@@ -252,7 +261,7 @@ bool Animation::openTimeFile(QString &timeFileName)
     }
 }
 
-// returns -1, if not set by time file
+/// returns -1, if not set by time file
 int Animation::getFirstFrameSec()
 {
     return mFirstSec;
@@ -262,8 +271,12 @@ int Animation::getFirstFrameMicroSec()
     return mFirstMicroSec;
 }
 
-// get actual Time
-// fuer default: frame = -1 wird aktueller frame genommen
+/**
+ * @brief Get actual time of the given frame
+ *
+ * @param frame frame for which to determine time; -1 means current frame
+ * @return string with real time at given frame
+ */
 QString Animation::getTimeString(int frame)
 {
     if (frame == -1)
@@ -285,8 +298,11 @@ QString Animation::getTimeString(int frame)
     }
 }
 
-// Opens an animation given the filename of a video or an image.
-// Returns true if the animation was open succesfully
+/**
+ * @brief Opens an animation given the filename of a video or an image
+ * @param fileName
+ * @return true if the animation was open succesfully
+ */
 bool Animation::openAnimation(QString fileName)
 {
 
@@ -325,7 +341,8 @@ bool Animation::openAnimation(QString fileName)
     else 
         return false;
 }
-// Opens a camera livestream
+
+/// Opens a camera livestream
 bool Animation::openCameraStream(int camID)
 {
    if( !mVideoCapture.open(camID) )
@@ -350,7 +367,7 @@ bool Animation::openCameraStream(int camID)
    return true;
 }
 
-// Returns the number of frames in the current animation  
+/// Returns the number of frames in the current animation
 int Animation::getNumFrames()
 {
     if (mVideo || mImgSeq || mStereo)
@@ -365,7 +382,7 @@ int Animation::getMaxFrames()
     return 0;
 }
 
-// Returns the index of the current frame  
+/// Returns the index of the current frame
 int Animation::getCurrentFrameNum()
 {
     return mCurrentFrame;
@@ -380,7 +397,7 @@ void Animation::setSourceInFrameNum(int in)
     mSourceInFrame = in;
     mMainWindow->updateSourceInOutFrames();
 }
-// Returns the sourceIn frame number
+/// Returns the sourceIn frame number
 int Animation::getSourceInFrameNum()
 {
     return mSourceInFrame;
@@ -395,13 +412,13 @@ void Animation::setSourceOutFrameNum(int out)
     mSourceOutFrame = out;
     mMainWindow->updateSourceInOutFrames();
 }
-// Returns the sourceOut frame number
+/// Returns the sourceOut frame number
 int Animation::getSourceOutFrameNum()
 {
     return mSourceOutFrame;
 }
 
-// Returns the filename of the current frame  
+/// Returns the filename of the current frame
 QString Animation::getCurrentFileName()
 {
     if (mCameraLiveStream)
@@ -418,7 +435,7 @@ QString Animation::getCurrentFileName()
         return mFileBase + "." + mFileSuffix; //".avi"; //QString()
 }
 
-// Returns the FPS of the current animation
+/// Returns the FPS of the current animation
 double Animation::getFPS()
 {
     if (mCameraLiveStream)
@@ -450,7 +467,7 @@ void Animation::setFPS(double fps)
     mFps = fps;
 }
 
-// Returns the size of the original frames (could made bigger after filtering)
+/// Returns the size of the original frames (could made bigger after filtering)
 QSize Animation::getSize()
 {
     if (mVideo || mImgSeq)
@@ -463,7 +480,7 @@ QSize Animation::getSize()
     }
 }
 
-// free's all the data in animation
+/// free's all the data in animation
 void Animation::free()
 {
     if (mImgSeq)
@@ -511,7 +528,7 @@ void Animation::reset()
 //     else return mFilter->apply(image); //mFilter->setOnCopy(false); geht nicht
 // }
 
-// filename without sequence number and suffix : image0001-left.png => image-left
+/// filename without sequence number and suffix : image0001-left.png => image-left
 QString Animation::getFileBase()
 {
     return mFileBase;
@@ -692,8 +709,11 @@ bool Animation::openAnimationPhoto(QString fileName)
     return true;
 }
 
-// Implementation of getFrameAtIndex for photo series
-// Returns a pointer to the frame at index index in the serie 
+/**
+ * @brief Implementation of getFrameAtIndex for photo series
+ * @param index
+ * @return the frame at given index in the series
+ */
 Mat Animation::getFramePhoto(int index)
 {
     if ((index != mCurrentFrame) || mImage.empty())
@@ -772,8 +792,15 @@ Mat Animation::getFramePhoto(int index)
     return mImage; //applyFilter(mImage);
 }
 
-// Gets Size and Frame number information of the recently open animation
-// It is thought to be called once just at the opening of an animation
+
+/**
+ * @brief Gets Size and Frame number information of the recently open animation
+ *
+ * This methods gets size and length in frames of the current animation. It
+ * should be called just once. Afterwards the saved values can be used.
+ *
+ * @return If data could be succesfully read
+ */
 bool Animation::getInfoPhoto()
 {
     bool rc = false;
@@ -963,8 +990,8 @@ bool Animation::openAnimationStereoVideo(QString fileName)
 }
 #endif
 
-// Implementation of the openAnimation function for videos
-// Opens an animation from a video file
+/// Implementation of the openAnimation function for videos
+/// Opens an animation from a video file
 bool Animation::openAnimationVideo(QString fileName)
 {
     ///CvCapture *capture = NULL;
@@ -1070,8 +1097,8 @@ bool Animation::openAnimationVideo(QString fileName)
     return true;
 }
 
-// Implementation of getFrameAtIndex for videos
-// Returns a pointer to the frame at index index in the video 
+/// Implementation of getFrameAtIndex for videos
+/// Returns the frame at given index in the video
 Mat Animation::getFrameVideo(int index)
 {
 
@@ -1229,8 +1256,8 @@ Mat Animation::getFrameVideo(int index)
     return mImage;
 }
 
-// Gets Size and Frame number information of the recently open animation
-// It is thought to be called once just at the opening of an animation
+/// Gets Size and Frame number information of the recently open animation
+/// It is thought to be called once just at the opening of an animation
 bool Animation::getInfoVideo(QString /*fileName*/)
 {
     // Set the size of the frames
@@ -1409,7 +1436,7 @@ bool Animation::getCameraInfo()
     return true;
 }
 
-// Free's the video data 
+/// Free's the video data
 void Animation::freeVideo()
 {
     // Release the capture device

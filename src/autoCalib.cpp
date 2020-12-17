@@ -33,7 +33,7 @@
 using namespace::cv;
 using namespace std;
 
-#define SHOW_CALIB_MAINWINDOW   // definieren, wenn das Schachbrett im Mainwindow und nicht separat angezeigt werden soll:
+#define SHOW_CALIB_MAINWINDOW   ///< definieren, wenn das Schachbrett im Mainwindow und nicht separat angezeigt werden soll:
                                 // fuehrt nach Calibration dazu dass play des originalvideos abstuerzt, insb wenn intr apply nicht ausgewaehlt war
 
 AutoCalib::AutoCalib()
@@ -105,6 +105,16 @@ bool AutoCalib::openCalibFiles()
     return false;
 }
 
+/**
+ * @brief Loads CalibFiles, detects Chessboard corners and calibrates with these
+ *
+ * This function loads the calib files specified by the user. In these images
+ * chessboard corners are detected and refined (cv::sornerSubPix). If this
+ * detection is successful at least in one image, the detected points are used
+ * for the intrinsic calibration of the camera.
+ *
+ * Also sets the GUI elements to the calculated value.
+ */
 void AutoCalib::autoCalib()
 {
     if (mMainWindow)
@@ -122,18 +132,12 @@ void AutoCalib::autoCalib()
         int flags = 0;
         vector<Point2f> corners;
         vector<vector<Point2f> > image_points;
-//        Mat corners;
-//        CvSeq* image_points_seq = NULL;
-//        CvPoint2D32f* image_points_buf = NULL;
-//        double _camera_matrix[9], _dist_coeffs[8];
-        Mat camera_matrix = Mat::eye(3, 3, CV_64F);//, _camera_matrix);
-        Mat dist_coeffs = Mat::zeros(1, 8, CV_64F);//, _dist_coeffs);
+        Mat camera_matrix = Mat::eye(3, 3, CV_64F);
+        Mat dist_coeffs = Mat::zeros(1, 8, CV_64F);
         Mat extr_params;
         double reproj_errs;
         Mat view, view_gray;
         bool found = false;
-//        CvMemStorage* storage = NULL;
-//        int elem_size;
         Mat origImg;
         Size imgSize;
 
@@ -141,11 +145,6 @@ void AutoCalib::autoCalib()
         if (!mMainWindow->getImg().empty())
             origImg = mMainWindow->getImg().clone(); // must be cloned, because mIplImg will be deleted in updateImage
 #endif
-
-//        elem_size = board_size.width*board_size.height*sizeof(image_points_buf[0]);
-//        storage = cvCreateMemStorage(MAX( elem_size*4, 1 << 16));
-//        image_points_buf = (CvPoint2D32f*)cvAlloc(elem_size);
-//        image_points_seq = cvCreateSeq(0, sizeof(CvSeq), elem_size, storage);
 
         QProgressDialog progress("Calculating intrinsic camera parameters...", "Abort calculation", 0, mCalibFiles.size(), mMainWindow);
         progress.setWindowModality(Qt::WindowModal); // blocks main window
@@ -159,11 +158,8 @@ void AutoCalib::autoCalib()
             qApp->processEvents();
             if (progress.wasCanceled())
                 break;
-            //cout << mCalibFiles.at(i).toStdString() << endl; //toAscii() .data() Local8Bit().constData() << endl;
 
             // cannot load image
-            //if (!(view = cvLoadImage(mCalibFiles.at(i).toAscii(), 1)))
-            //            if (!(view = cvLoadImage(mCalibFiles.at(i).toLatin1(), CV_LOAD_IMAGE_COLOR)))
             view = imread(mCalibFiles.at(i).toStdString(),IMREAD_COLOR);
             if (view.empty())
             {
@@ -173,55 +169,28 @@ void AutoCalib::autoCalib()
                 // reset view to animation image 
                 if (!origImg.empty())
                 {
-//                    Mat ii = mMainWindow->getImg();
-//                    cvReleaseImage(&ii); // neue zeile, da in updateimage nicht mehr geloescht wird
                     mMainWindow->updateImage(origImg); // now the last view will be deleted
                 }
 #endif
                 return;
             }
-//            debout << "Size: " << view.rows << "x" << view.cols << endl;
+
             // muss nur bei einem bild gemacht werden
             if (i==0)
                 imgSize = Size(view.rows,view.cols);
-//            debout << "Size: " << imgSize.width << "x" << imgSize.height << endl;
+
             // search for chessboard corners
             found = findChessboardCorners(view,board_size,corners,CALIB_CB_ADAPTIVE_THRESH);
-//            found = cvFindChessboardCorners(view, board_size,
-//                image_points_buf, &count, CV_CALIB_CB_ADAPTIVE_THRESH);
 
-            // if not found try other board_size
-//            if( !found )
-//            {
-//                debout << "Try other chessboard size..." << endl;
-//                if( board_size.width == 9 )
-//                {
-//                    board_size.width = 8;
-//                }else
-//                {
-//                    board_size.width = 9;
-//                }
-//                found = cvFindChessboardCorners(view, board_size,
-//                             image_points_buf, &count, CV_CALIB_CB_ADAPTIVE_THRESH);
-//            }
-//            debout << "found: " << found << endl;
             if (found)
             {
                 // improve the found corners' coordinate accuracy
-//                view_gray = cvCreateImage(imgSize, 8, 1);
                 cvtColor(view,view_gray,COLOR_BGR2GRAY);
-//                cvCvtColor(view, view_gray, CV_BGR2GRAY);
                 cornerSubPix(view_gray,corners,Size(11,11),
                              Size(-1,-1),TermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER,30,0.1));
-//                cvFindCornerSubPix(view_gray, image_points_buf, count, cvSize(11,11),
-//                    cvSize(-1,-1), cvTermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1));
-//                cvReleaseImage(&view_gray);
             
-//                cvSeqPush(image_points_seq, image_points_buf);
-
                 image_points.push_back(corners);
                 drawChessboardCorners(view,board_size,corners,found);
-//                cvDrawChessboardCorners(view, board_size, image_points_buf, count, found);
 
 #ifndef SHOW_CALIB_MAINWINDOW
                 namedWindow("img", CV_WINDOW_AUTOSIZE ); // 0 wenn skalierbar sein soll
@@ -230,8 +199,6 @@ void AutoCalib::autoCalib()
 #endif
 #ifdef SHOW_CALIB_MAINWINDOW
                 // show image in view to show calculation
-//                IplImage* ii = mMainWindow->getIplImage();
-//                cvReleaseImage(&ii); // neue zeile, da in updateimage nicht mehr geloescht wird
                 mMainWindow->updateImage(view);
 #endif
                 qApp->processEvents(); // to allow events and update sceen for viewing new image
@@ -239,8 +206,6 @@ void AutoCalib::autoCalib()
             }
             else
                 debout << "Calibration pattern not found in: "<< mCalibFiles.at(i).toStdString() << endl;
-
-            //cvReleaseImage(&view); // not allowed, because view will be deleted in updateImage
         }
 
         if( !min_one_pattern_found )
@@ -301,18 +266,31 @@ void AutoCalib::autoCalib()
         // reset view to animation image 
         if (!origImg.empty())
         {
-//            IplImage* ii = mMainWindow->getIplImage();
-//            cvReleaseImage(&ii); // neue zeile, da in updateimage nicht mehr geloescht wird
             mMainWindow->updateImage(origImg); // now the last view will be deleted
         }
 #endif
     }
 }
- 
+
+
+/**
+ * @brief Runs intrinsic calibration with given parameters
+ *
+ *
+ * @param image_points[in] detected and refined chessboard-corners
+ * @param img_size
+ * @param board_size[in] size of chessboard in fields (e.g. 6x8)
+ * @param square_size[in] size of single square on chessboard pattern
+ * @param aspect_ratio
+ * @param flags[in] Flags for calibration; user input assembled in autoCalib()
+ * @param camera_matrix[out]
+ * @param dist_coeffs[out] distortion coefficients
+ * @param reproj_errs[out]
+ * @return
+ */
 int AutoCalib::runCalibration(vector<vector<Point2f> > image_points, Size img_size, Size board_size,
     float square_size, float aspect_ratio, int flags,
-    Mat &camera_matrix, Mat &dist_coeffs, double *reproj_errs)//, Mat &extr_params)//,
-    //double *reproj_errs)//, double* avg_reproj_err)
+    Mat &camera_matrix, Mat &dist_coeffs, double *reproj_errs)
 {
     int code;
 
@@ -332,30 +310,6 @@ int AutoCalib::runCalibration(vector<vector<Point2f> > image_points, Size img_si
 
     vector<Mat> rot_vects, trans_vects;
 
-//    for(i = 0; i < image_count; i++)
-//    {
-//        CvPoint2D32f* src_img_pt = (CvPoint2D32f*)reader.ptr;
-//        CvPoint2D32f* dst_img_pt = ((CvPoint2D32f*)image_points->data.fl) + i*point_count;
-//        CvPoint3D32f* obj_pt = ((CvPoint3D32f*)object_points->data.fl) + i*point_count;
-
-//        for(j = 0; j < board_size.height; j++)
-//            for(k = 0; k < board_size.width; k++)
-//            {
-//                *obj_pt++ = cvPoint3D32f(j*square_size, k*square_size, 0);
-//                *dst_img_pt++ = *src_img_pt++;
-//            }
-//        CV_NEXT_SEQ_ELEM(image_points_seq->elem_size, reader);
-//    }
-
-//    cvSet(point_counts, cvScalar(point_count));
-
-//    *extr_params = cvCreateMat(image_count, 6, CV_32FC1);
-//    cvGetCols(*extr_params, &rot_vects, 0, 3);
-//    cvGetCols(*extr_params, &trans_vects, 3, 6);
-
-//    cvZero(camera_matrix);
-//    cvZero(dist_coeffs);
-
     if(flags & CV_CALIB_FIX_ASPECT_RATIO)
     {
         camera_matrix.ptr<double>(0)[0] = aspect_ratio;
@@ -363,23 +317,8 @@ int AutoCalib::runCalibration(vector<vector<Point2f> > image_points, Size img_si
     }
 
     *reproj_errs = calibrateCamera(object_points,image_points,img_size,camera_matrix,dist_coeffs,rot_vects,trans_vects,flags);
-//    cvCalibrateCamera2(object_points, image_points, point_counts,
-//        img_size, camera_matrix, dist_coeffs,
-//        &rot_vects, &trans_vects, flags);
 
-    code = 1;//cvCheckArr(camera_matrix, CV_CHECK_QUIET) &&
-//    cvCheckArr(dist_coeffs, CV_CHECK_QUIET) &&
-//    cvCheckArr(*extr_params, CV_CHECK_QUIET);
-
-//    *reproj_errs = cvCreateMat(1, image_count, CV_64FC1);
-    //*avg_reproj_err =
-    //         compute_reprojection_error( object_points, &rot_vects, &trans_vects,
-    //             camera_matrix, dist_coeffs, image_points, point_counts, *reproj_errs );
-
-//    cvReleaseMat(&object_points);
-//    cvReleaseMat(&image_points);
-//    cvReleaseMat(&point_counts);
-
+    code = 1;
     return code;
 }
 

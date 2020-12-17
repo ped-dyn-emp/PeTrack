@@ -87,6 +87,16 @@ CalibFilter::CalibFilter()
     getK6()->setFilter(this);
 }
 
+/**
+ * @brief Undistorts the image.
+ *
+ * This method calculates and caches the mapping for undistortion.
+ * The mapping is applied to the input image.
+ *
+ * @param img[in]
+ * @param res[out]
+ * @return undistorted image
+ */
 Mat CalibFilter::act(Mat &img, Mat &res)
 {
     if(this->changed() || map1.empty() || map2.empty())

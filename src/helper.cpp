@@ -99,7 +99,7 @@ void showImg(QLabel *l, IplImage *i)
 #endif
 
 /**
-@brief get roi: copys roi to rect by setting values of roi to correct values inside rect
+@brief get roi: copies roi to rect by setting values of roi to correct values inside rect
 
 no copy of data, only new header which allows to access rect
 rect wird veraendert, roi nicht

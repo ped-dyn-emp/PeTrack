@@ -38,36 +38,23 @@ CodeMarkerItem::CodeMarkerItem(QWidget *wParent, QGraphicsItem * parent)
     : QGraphicsItem(parent)
 {
     mMainWindow = (class Petrack*) wParent;
-//    mImage = NULL;
-    //setAcceptsHoverEvents(true);
-
-    //    setEnabled(false); // all mouse events connot access this item, but it will be seen
-    // einzig move koennte interessant sein, um grid zu verschieben?!
-//     setAcceptsHoverEvents(true);
 }
-// // bounding box wird durch linke obere ecke und breite/hoehe angegeben
-// // wenn an den rand gescrollt wurde im view, dann wird durch das dynamische anpassen
-// // bei trans und scale zwar zuerst alles neu gezeichnet durch update, 
-// // aber beim verkleinern des scrollbereichs nur der teil von tracker neu gezeichnet
+
+
+/**
+ * @brief Bounding box of drawn to area.
+ *
+ * This bounding box is used to determine if this Item needs to be redrawn or not.
+ * See the official Qt Docs for QGraphicsItem
+ *
+ * @return (updated) bounding rect of this item
+ */
 QRectF CodeMarkerItem::boundingRect() const
 {
     if (mMainWindow->getImage())
-//        return QRectF(mUlc.x(),mUlc.y(),mMainWindow->width(),mMainWindow->height());
         return QRectF(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize(), mMainWindow->getImage()->width(), mMainWindow->getImage()->height());
-//         return QRectF(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize(), mImage->width(), mImage->height());
     else
         return QRectF(0, 0, 0, 0);
-//     // bounding box wird in lokalen koordinaten angegeben!!! (+-10 wegen zahl "1")
-//     if (mControlWidget->getCalibCoordShow())
-//         return QRectF(-110., -110., 220., 220.);
-//     else                    ;
-
-//         return QRectF(0., 0., 0., 0.);
-
-//     // sicher ware diese boundingbox, da alles
-//     //     return QRectF(xMin, yMin, xMax-xMin, yMax-yMin);
-//     // eigentlich muesste folgende Zeile reichen, aber beim ranzoomen verschwindet dann koord.sys.
-//     //     return QRectF(mControlWidget->getCalibCoordTransX()/10.-scale, mControlWidget->getCalibCoordTransY()/10.-scale, 2*scale, 2*scale);
 }
 
 void CodeMarkerItem::setRect(Vec2F& v)
@@ -78,7 +65,7 @@ void CodeMarkerItem::setRect(Vec2F& v)
 /**
  * @brief draws colored shapes at heads in image to indicate detection status
  *
- * differnet calculations of position depending on whether function is called out of findCodeMarker() Function
+ * different calculations of position depending on whether function is called out of findCodeMarker() Function
  * only (== recoMethod 6) or if findCodeMarker() Function is called out of findMulticolorMarker() Function (== recoMethod 5).
  * In the first case the offset is added automatically via 'offset' and 'v'.
  * In the second case the offset from cropRect to ROI has to be added manually.

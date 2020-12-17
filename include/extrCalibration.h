@@ -39,7 +39,17 @@
 class Petrack;
 class Control;
 
-
+/**
+ * @brief The ExtrCalibration class manages the extrinsic calibration
+ *
+ * If the aperture of our camera is not the origin of our world coordinate
+ * system, we need to know the position of the camera in space to properly
+ * reason about the position of points on the image plane in the real world.
+ * To estimate the translation and rotation of the camera with respect to a
+ * chosen world coordinate system with the help of a few specified points is
+ * called the Perspective-n-Point problem. This class loads such a set of points
+ * and solves PnP with the help of OpenCV.
+ */
 class ExtrCalibration
 {
 

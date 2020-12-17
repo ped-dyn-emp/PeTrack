@@ -37,35 +37,22 @@ ColorMarkerItem::ColorMarkerItem(QWidget *wParent, QGraphicsItem * parent)
 {
     mMainWindow = (class Petrack*) wParent;
     mImage = NULL;
-//    mMask = NULL;
-    //setAcceptsHoverEvents(true);
-
-    //    setEnabled(false); // all mouse events connot access this item, but it will be seen
-    // einzig move koennte interessant sein, um grid zu verschieben?!
-//     setAcceptsHoverEvents(true);
 }
-// // bounding box wird durch linke obere ecke und breite/hoehe angegeben
-// // wenn an den rand gescrollt wurde im view, dann wird durch das dynamische anpassen
-// // bei trans und scale zwar zuerst alles neu gezeichnet durch update, 
-// // aber beim verkleinern des scrollbereichs nur der teil von tracker neu gezeichnet
+
+/**
+ * @brief Bounding box of drawn to area.
+ *
+ * This bounding box is used to determine if this Item needs to be redrawn or not.
+ * See the official Qt Docs for QGraphicsItem
+ *
+ * @return (updated) bounding rect of this item
+ */
 QRectF ColorMarkerItem::boundingRect() const
 {
     if (mMainWindow->getImage())
         return QRectF(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize(), mMainWindow->getImage()->width(), mMainWindow->getImage()->height());
-//         return QRectF(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize(), mImage->width(), mImage->height());
     else
         return QRectF(0, 0, 0, 0);
-//     // bounding box wird in lokalen koordinaten angegeben!!! (+-10 wegen zahl "1")
-//     if (mControlWidget->getCalibCoordShow())
-//         return QRectF(-110., -110., 220., 220.);
-//     else                    ;
-
-//         return QRectF(0., 0., 0., 0.);
-
-//     // sicher ware diese boundingbox, da alles
-//     //     return QRectF(xMin, yMin, xMax-xMin, yMax-yMin);
-//     // eigentlich muesste folgende Zeile reichen, aber beim ranzoomen verschwindet dann koord.sys.
-//     //     return QRectF(mControlWidget->getCalibCoordTransX()/10.-scale, mControlWidget->getCalibCoordTransY()/10.-scale, 2*scale, 2*scale);
 }
 
 void ColorMarkerItem::setRect(Vec2F& v)
@@ -73,6 +60,15 @@ void ColorMarkerItem::setRect(Vec2F& v)
     mUlc = v; // upper left corner to draw
 }
 
+/**
+ * @brief Paints color thresholding mask
+ *
+ * Paints a mask over the image which imitates the thresholding
+ * via thresholdHSV(). The mask is set by using it in the thresholding.
+ * It is accessed via createMask.
+ *
+ * @param painter
+ */
 void ColorMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
     if (!mMask.empty())
@@ -112,20 +108,17 @@ void ColorMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */
     }
 }
 
-// only pointer is set, no copy of data
+/// be aware of data sharing between cv::Mat's
 void ColorMarkerItem::setMask(Mat &mask)
 {
     mMask = mask;
 }
 
-// original width w and height h must be given
+/// original width w and height h must be given
 Mat ColorMarkerItem::createMask(int w, int h)
 {
     if (w>0 && h>0 && (mMask.empty() || (!mMask.empty() && (w != mMask.cols || h != mMask.rows))))
     {
-//        cvReleaseImage(&mMask);
-//        mMask = cvCreateImage(cvSize(w, h), 8, 1);
-
         mMask.create(h,w,CV_8UC1);
     }
     return mMask;

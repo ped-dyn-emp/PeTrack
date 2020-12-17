@@ -347,6 +347,15 @@ void Petrack::dragEnterEvent(QDragEnterEvent *event)
     if (event->mimeData()->hasUrls())
         event->acceptProposedAction();
 }
+
+/**
+ * @brief Accepts dropped .pet, .trc and media files
+ *
+ * Opens the project for a .pet. Imports the trajectories for a .trc
+ * and tries to open the sequence for any other kind of file.
+ *
+ * @param event
+ */
 void Petrack::dropEvent(QDropEvent *event)
 {
     if (event->mimeData()->hasUrls())
@@ -404,6 +413,12 @@ void Petrack::updateSceneRect()
         mScene->setSceneRect(-bS, -bS, iW, iH);
 }
 
+/**
+ * @brief Loads the content of a .pet file into petrack
+ *
+ * @param doc the DOM of the .pet file
+ * @param openSeq true, if sequence given in doc should be opened
+ */
 void Petrack::openXml(QDomDocument &doc, bool openSeq)
 {
 
@@ -716,13 +731,13 @@ void Petrack::saveXml(QDomDocument &doc)
     root.appendChild(elem);
 }
 
-// rueckgabewert zeigt an, ob gesichert werden konnte
+/// rueckgabewert zeigt an, ob gesichert werden konnte
 bool Petrack::saveSameProject()
 {
     return saveProject(mProFileName);
 }
 
-// rueckgabewert zeigt an, ob gesichert werden konnte
+/// rueckgabewert zeigt an, ob gesichert werden konnte
 bool Petrack::saveProject(QString fileName) // default fileName=""
 {
     // if no destination file or folder is given
@@ -803,7 +818,11 @@ void Petrack::writeXmlElement(QXmlStreamWriter& xmlStream, QDomElement element)
     xmlStream.writeEndElement();
 }
 
-void Petrack::openCameraLiveStream(int camID)
+/**
+ * @brief Opens camera livestream from cam with camID
+ * @param camID id of camera to use (defaults to 0)
+ */
+void Petrack::openCameraLiveStream(int camID /* =-1*/)
 {
     if (camID == -1)
     {
@@ -930,9 +949,18 @@ void Petrack::saveViewSequence()
 {
     saveSequence(false, true);
 }
-// kann die geladene einzelbildsequnz oder video in video oder einzelbildsequenz speichern
-// saveSequ zeigt an, ob einzelbildsequenz oder video gespeichert werden soll,
-// wenn dest nicht angegeben ist, ansonsten wird dateiendung von dest als hinweis auf format genommen
+
+
+/**
+ * @brief Saves current sequence as avi-file or image sequence
+ *
+ * Saves the loaded image sequence or video from current frame on till the end.
+ * One can save the sequence as is or one can save the view shown in PeTrack.
+ *
+ * @param saveVideo true, if wanting to save a video. Ignored when dest isn't empty
+ * @param saveView true, if sequence should be saved as shown in PeTrack (with trajectories etc.)
+ * @param dest destination file; if empty, the user chooses via a dialog
+ */
 void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // default saveView= false, dest=""
 {
     static QString lastDir;
@@ -1264,6 +1292,11 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
     }
 }
 
+/**
+ * @brief Saves the current View, including visualizations, in a file (.g. pdf)
+ *
+ * @param dest name of the saved file; if empty, a dialogue for the user opens
+ */
 void Petrack::saveView(QString dest) //default = ""
 {
     static QString lastFile;
@@ -1627,6 +1660,10 @@ void Petrack::setCamera()
 #endif
 }
 
+/**
+ * @brief Helper function to create Actions for the menu bar
+ * @see Petrack::createMenus()
+ */
 void Petrack::createActions()
 {
     mOpenSeqAct = new QAction(tr("&Open Sequence"), this);
@@ -1801,6 +1838,10 @@ void Petrack::createActions()
     connect(mOnlineHelpAct, SIGNAL(triggered()), this, SLOT(onlineHelp()));
 }
 
+/**
+ * @brief Helper function building menues out of QActions
+ * @see Petrack::createActions()
+ */
 void Petrack::createMenus()
 {
     mFileMenu = new QMenu(tr("&File"), this);
@@ -1870,6 +1911,9 @@ void Petrack::createMenus()
     mCameraMenu->setEnabled(false);
 }
 
+/**
+ * @brief Helper function to create status bar at the bottom of the window
+ */
 void Petrack::createStatusBar()
 {
     QFont f("Courier", 12, QFont::Bold); //Times Helvetica, Normal
@@ -2212,7 +2256,7 @@ void Petrack::setShowFPS(double fps)
  *
  * This method calculates the FPS by remembering how long
  * it has been since it was called last time. If skipped is
- * true, it doesn't directly updat the FPS since 2
+ * true, it doesn't directly update the FPS since 2
  * skipped frames have essentially a time delay of 0 between
  * them, which would make calculations wonky.
  *
@@ -2254,6 +2298,7 @@ void Petrack::setStatusPosReal() // pos in cm
     if (mImageItem)
         setStatusPosReal(mImageItem->getPosReal(mMousePosOnImage, getStatusPosRealHeight()));
 }
+
 void Petrack::setStatusPosReal(const QPointF &pos) // pos in cm
 {
     if (mStatusLabelPosReal)
@@ -2265,10 +2310,12 @@ void Petrack::setStatusPosReal(const QPointF &pos) // pos in cm
         mStatusLabelPosReal->setText(labelText);
     }
 }
+
 void Petrack::setStatusPos(const QPoint &pos) // pos in pixel
 {
     mStatusLabelPos->setText(QString("%1x%2").arg(pos.x(), 4).arg(pos.y(), 4));
 }
+
 void Petrack::setStatusColor(const QRgb &col)
 {
     QString s("#%1%2%3"); // static moeglich?
@@ -2290,6 +2337,7 @@ void Petrack::setStatusColor(const QRgb &col)
 
     //debout << "QColor: " << color << " height: " << mControlWidget->getColorPlot()->map(color) << endl;
 }
+
 void Petrack::setStatusColor()
 {
     QPointF pos = getMousePosOnImage();
@@ -2307,6 +2355,14 @@ double Petrack::getStatusPosRealHeight()
         return 0.;
 }
 
+/**
+ * @brief Reads (and applies) settings form platform-independent persistent storage
+ *
+ * The saved size and position of the application window get reconstructed. As well as
+ * the options about antialiasing and the usage of OpenGL.
+ * mSeqFileName and mProFileName get set, so the "Open Project" and "Open Sequence"
+ * dialogues start at correct folder. The old project/sequence is NOT actually loaded.
+ */
 void Petrack::readSettings()
 {
     QSettings settings("Forschungszentrum Juelich GmbH", "PeTrack by Maik Boltes, Daniel Salden");
@@ -2325,6 +2381,10 @@ void Petrack::readSettings()
     opengl();
 }
 
+/**
+ * @brief Writes persistent setting.
+ * @see Petrack::readSettings
+ */
 void Petrack::writeSettings()
 {
     QSettings settings("Forschungszentrum Juelich GmbH", "PeTrack by Maik Boltes, Daniel Salden");
@@ -2375,6 +2435,13 @@ void Petrack::closeEvent(QCloseEvent *event)
 
 }
 
+/**
+ * @brief Sets the mMousePosOnImage member variable and displayed pixel/real coordinates
+ *
+ * Gets called from ImageItem::hoverMoveEvent() and enables an easy access
+ * to the mouse position.
+ * @param pos Position of mouse cursor in image pixel coordinates
+ */
 void Petrack::setMousePosOnImage(QPointF pos)
 {
     if (mImage)
@@ -2430,7 +2497,7 @@ void Petrack::mousePressEvent(QMouseEvent *event)
     }
 }
 
-// update control widget, if image size changed (especially because of changing border)
+/// update control widget, if image size changed (especially because of changing border)
 void Petrack::updateControlImage(Mat &img)
 {
 
@@ -3393,6 +3460,17 @@ void Petrack::playAll()
     mPlayerWidget->skipToFrame(memPos);
 }
 
+/**
+ * @brief Activates tracking and reco; calcs through the video (in both ways)
+ *
+ * This method activates tracking and reco and plays the whole video (from current
+ * frame on) till the end. Then, if mAutoBackTrack is set, it jumps back to the
+ * largest first frame, i.e. the last time a new person was added/recognized, and
+ * tracks backwards till the beginning of the video.
+ *
+ * The old settings for tracking and reco will be restored. No interaction with the
+ * main window is possible for the time of tracking.
+ */
 void Petrack::trackAll()
 {
     int memPos = mPlayerWidget->getPos();
@@ -3869,62 +3947,31 @@ void Petrack::updateSequence()
 }
 
 
-//// calculate background for backgroud subtraction
-//// WIRD NICHT MEHR BENOETIGT, DA HINTERGRUNDMODELL IM BETRIEB AKTUALISIERT WIRD!!!
-//void Petrack::calcBackground()
-//{
-//    int memPos = mPlayerWidget->getPos();
-//    if (memPos != -1) // video loaded
-//    {
-//        int progVal = 0;
-//        int from = mControlWidget->filterBgFrom->value(); // from - frame where background begins
-//        int num  = mControlWidget->filterBgNum->value(); // num  - frame number for averaging because of stabilization
-
-//        if (from < mAnimation->getNumFrames())
-//        {
-//            QProgressDialog progress("Calculating background...", "Abort calculation", 0, num, this);
-//            progress.setWindowModality(Qt::WindowModal); // blocks main window
-//            mPlayerWidget->skipToFrame(from);
-
-//            cvNamedWindow("BG", 1);
-//            cvNamedWindow("FG", 1);
-//            CvBGStatModel* bg_model = cvCreateGaussianBGModel(getIplImageFiltered());
-//            //CvBGStatModel* bg_model = cvCreateFGDStatModel(getIplImageFiltered());
-
-//            while ((++progVal < num) && (mPlayerWidget->frameForward()))
-//            {
-//                cvUpdateBGStatModel(getIplImageFiltered(), bg_model);
-//                cvShowImage("BG", bg_model->background);
-//                cvShowImage("FG", bg_model->foreground);
-
-//                progress.setValue(progVal);
-//                qApp->processEvents();
-//                if (progress.wasCanceled())
-//                    break;
-//            }
-
-//            cvReleaseBGStatModel(&bg_model);
-
-//            mPlayerWidget->skipToFrame(memPos); // ruecksprung zur urspruenglichen Position
-//        }
-//        else
-//        {
-//            QMessageBox::critical(this, tr("PeTrack"), tr("from has to be smaller than %1.").arg(mAnimation->getNumFrames()));
-//            return;
-//        }
-//    }
-//}
-
-// gibt cm pro pixel zurueck
-// wert wir nur neu bestimmt, wenn auch kopfgroesse berechnet wird
+/**
+ * @brief Gets cm per pixel. Only recalculates when calculating head size.
+ * @return cm per pixel
+ */
 double Petrack::getCmPerPixel()
 {
     return mCmPerPixel;
 }
+
 // die Groesse des kreises des durchschnittlichen Kopfdurchmessers, der ganzen kopf umfasst in Pixel
 // annahmen: 21cm avg kopflaenge, mapDefaultheight genommen statt: 173cm avg koerpergroesse mann / frau mit Schuhen (180cm waere nur Mann)
 // hS ==-1 als default besagt, dass mHeadSize neu berechnet statt gesetzt werden soll
 // WENN HEADSIZE NEU BERECHNET WIRD WIRD AUTOMATISCH AUCH CMPERPIXEL MITBERECHNET
+/**
+ * @brief Sets the size of the circle of the average head circumference in pixel.
+ *
+ * Assumption for default calculation: <br>
+ * 21cm avg head length <br>
+ * default height of person accoring to mapDefaultHeigt <br>
+ *
+ * Default case recalculates mCmPerPixel
+ *
+ * @see Petrack::getCmPerPixel
+ * @param hS new headsize or -1, for calculating default
+ */
 void Petrack::setHeadSize(double hS)
 {
     if (hS == -1)

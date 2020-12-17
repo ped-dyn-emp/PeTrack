@@ -97,6 +97,29 @@ bool ExtrCalibration::openExtrCalibFile(){
     return false;
 
 }
+
+/**
+ * @brief Loads the extrinsic calibration from mExtrCalibFile
+ *
+ * This methods reads an extrinsic calibration in one of two formats:
+ * First: 3D coordinates followed by corresponding 2D coordinates
+ *
+ *     x y z px py
+ *
+ * Second: Just 3D coordinates
+ *
+ *     x y z
+ *
+ * It is possible to optionally start the file with the number of lines:
+ *
+ *     2
+ *     x1 y1 z1
+ *     x2 y2 z2
+ *
+ * This is just going to be ignored. Comments start with "#".
+ *
+ * @return
+ */
 bool ExtrCalibration::loadExtrCalibFile(){
 
     bool all_ok = true;
@@ -127,14 +150,8 @@ bool ExtrCalibration::loadExtrCalibFile(){
                  with_3D_data = false,
                  end_loop = false;
 
-            while( 1 )
+            while( !in.atEnd() )
             {
-                // Falls Datei am Ende Schleife beenden
-                if( in.atEnd() )
-                {
-                    break;
-                }
-
                 // Neue Zeile einlesen
                 line = in.readLine();
                 ++line_counter;
@@ -255,6 +272,14 @@ bool ExtrCalibration::loadExtrCalibFile(){
         calibExtrParams();
     return all_ok;
 }
+
+/**
+ * @brief Uses manually set TrackPoints as 2D points for extrinsic calibration
+ *
+ * @pre loaded at least 4 3D-points
+ *
+ * @return true if calibration did take place
+ */
 bool ExtrCalibration::fetch2DPoints()
 {
     bool all_ok = true;
@@ -291,6 +316,18 @@ bool ExtrCalibration::fetch2DPoints()
     }
     return all_ok;
 }
+
+/**
+ * @brief Saves points used for extrinsic calibration
+ *
+ * Saves the points used for extrinsic calibration in the format:
+ *
+ *     n
+ *     x y z px py
+ *
+ * With n as number of points, x,y,z as 3D coordianted and px,py as 2D coordinates.
+ * @return
+ */
 bool ExtrCalibration::saveExtrCalibPoints()
 {
     bool all_okay = false;
@@ -364,6 +401,9 @@ bool ExtrCalibration::isSetExtrCalib(){
     return true;//isSetExtrCalib;
 }
 
+/**
+ * @brief Extrinsic calibration with help of cv::solvePnP
+ */
 void ExtrCalibration::calibExtrParams()
 {
 
@@ -538,6 +578,17 @@ void ExtrCalibration::calibExtrParams()
 
 }
 
+/**
+ * @brief Calculates the reprojection Error
+ *
+ * This method calculates following errors and their variance:
+ * <ul>
+ * <li>2D Point to 3D Point against 3D Point - using calibration points</li>
+ * <li>3D to 2D to 3D against 2D to 3D - using default height for calib. points</li>
+ * <li>3D to 2D against 2D - using calib. points</li>
+ * </ul>
+ * @return
+ */
 bool ExtrCalibration::calcReprojectionError()
 {
     //////
@@ -553,38 +604,38 @@ bool ExtrCalibration::calcReprojectionError()
     bool debug = false;
     for(int i=0; i< num_points; i++)
     {
-        Point2f p2 = get2DList().at(i);
+        Point2f p2d = get2DList().at(i);
         Point3f p3d = get3DList().at(i);
         p3d.x -= mControlWidget->getCalibCoord3DTransX();
         p3d.y -= mControlWidget->getCalibCoord3DTransY();
         p3d.z -= mControlWidget->getCalibCoord3DTransZ();
-        Point2f p3 = getImagePoint(p3d);
+        Point2f p3dTo2d = getImagePoint(p3d);
 
         // Error measurements metric (cm)
         //debout << "Point-Height: " << endl;
-        Point3f p2d = get3DPoint(Point2f(p2.x/*+bS*/,p2.y/*+bS*/),p3d.z);
+        Point3f p2dTo3d = get3DPoint(p2d,p3d.z);
         //debout << p2d.x << " " << p2d.y << " " << p2d.z << endl;
         //debout << p3d.x << " " <<p3d.y << " " <<p3d.z  << endl;
 
         //debout << "Default-Height: " << endl;
-        Point3f p2d_mapDefaultHeight = get3DPoint(p2,mControlWidget->mapDefaultHeight->value()); // mStatusPosRealHeight->value()); ?
+        Point3f p2dTo3dMapDefaultHeight = get3DPoint(p2d,mControlWidget->mapDefaultHeight->value());
         //debout << p2d_mapDefaultHeight.x << " " << p2d_mapDefaultHeight.y << " " << p2d_mapDefaultHeight.z << endl;
 
-        Point3f p3d_mapDefaultHeight = get3DPoint(Point2f(p3.x,p3.y)/*getImagePoint(p2d_mapDefaultHeight)*/,mControlWidget->mapDefaultHeight->value());
+        Point3f p3dTo2dTo3dMapDefaultHeight = get3DPoint(p3dTo2d,mControlWidget->mapDefaultHeight->value());
         //debout << p3d_mapDefaultHeight.x << " " << p3d_mapDefaultHeight.y << " " << p3d_mapDefaultHeight.z << endl;
 
-        val = sqrt(pow(p3d.x-p2d.x,2) + pow(p3d.y-p2d.y,2));
+        val = sqrt(pow(p3d.x - p2dTo3d.x,2) + pow(p3d.y - p2dTo3d.y,2));
         if ( val > max_pH ) max_pH = val;
             sum_pH += val;
         if( debug ) debout << "Error point[" << i << "]: " << val << endl;
 
-        val = sqrt(pow(p3d_mapDefaultHeight.x-p2d_mapDefaultHeight.x,2) + pow(p3d_mapDefaultHeight.y-p2d_mapDefaultHeight.y,2));
+        val = sqrt(pow(p3dTo2dTo3dMapDefaultHeight.x - p2dTo3dMapDefaultHeight.x,2) + pow(p3dTo2dTo3dMapDefaultHeight.y-p2dTo3dMapDefaultHeight.y,2));
         if ( val > max_dH ) max_dH = val;
             sum_dH += val;
         if( debug ) debout << "Error point[" << i << "]: " << val << endl;
 
         // Error measurements pixel
-        val = sqrt(pow(p3.x-p2.x,2) + pow(p3.y-p2.y,2));
+        val = sqrt(pow(p3dTo2d.x - p2d.x,2) + pow(p3dTo2d.y - p2d.y,2));
         // Maximum
         if ( val > max_px ) max_px = val;
             sum_px += val;
@@ -593,33 +644,33 @@ bool ExtrCalibration::calcReprojectionError()
     }
     for(int i=0; i< num_points; i++)
     {
-        Point2f p2 = get2DList().at(i);
+        Point2f p2d = get2DList().at(i);
         Point3f p3d = get3DList().at(i);
         p3d.x -= mControlWidget->getCalibCoord3DTransX();
         p3d.y -= mControlWidget->getCalibCoord3DTransY();
         p3d.z -= mControlWidget->getCalibCoord3DTransZ();
-        Point2f p3 = getImagePoint(p3d);
+        Point2f p3d_to_2d = getImagePoint(p3d);
 
         // Error measurements metric (cm)
         //debout << "Point-Height: " << endl;
-        Point3f p2d = get3DPoint(Point2f(p2.x/*+bS*/,p2.y/*+bS*/),p3d.z);
+        Point3f p2d_to_3d = get3DPoint(p2d,p3d.z);
         //debout << p2d.x << " " << p2d.y << " " << p2d.z << endl;
         //debout << p3d.x << " " <<p3d.y << " " <<p3d.z  << endl;
 
         //debout << "Default-Height: " << endl;
-        Point3f p2d_mapDefaultHeight = get3DPoint(p2,mControlWidget->mapDefaultHeight->value()); // mStatusPosRealHeight->value()); ?
+        Point3f p2d_to_3d_mapDefaultHeight = get3DPoint(p2d,mControlWidget->mapDefaultHeight->value()); // mStatusPosRealHeight->value()); ?
         //debout << p2d_mapDefaultHeight.x << " " << p2d_mapDefaultHeight.y << " " << p2d_mapDefaultHeight.z << endl;
 
-        Point3f p3d_mapDefaultHeight = get3DPoint(Point2f(p3.x,p3.y)/*getImagePoint(p2d_mapDefaultHeight)*/,mControlWidget->mapDefaultHeight->value());
+        Point3f p3d_to2d_to3d_mapDefaultHeight = get3DPoint(p3d_to_2d,mControlWidget->mapDefaultHeight->value());
         //debout << p3d_mapDefaultHeight.x << " " << p3d_mapDefaultHeight.y << " " << p3d_mapDefaultHeight.z << endl;
 
-        val = pow(sqrt(pow(p3d.x-p2d.x,2) + pow(p3d.y-p2d.y,2))-(sum_pH/num_points),2);
+        val = pow(sqrt(pow(p3d.x-p2d_to_3d.x,2) + pow(p3d.y-p2d_to_3d.y,2))-(sum_pH/num_points),2);
         var_pH += val;
 
-        val = pow(sqrt(pow(p3d_mapDefaultHeight.x-p2d_mapDefaultHeight.x,2) + pow(p3d_mapDefaultHeight.y-p2d_mapDefaultHeight.y,2))-(sum_dH/num_points),2);
+        val = pow(sqrt(pow(p3d_to2d_to3d_mapDefaultHeight.x-p2d_to_3d_mapDefaultHeight.x,2) + pow(p3d_to2d_to3d_mapDefaultHeight.y-p2d_to_3d_mapDefaultHeight.y,2))-(sum_dH/num_points),2);
         var_dH += val;
 
-        val = pow(sqrt(pow(p3.x-p2.x,2) + pow(p3.y-p2.y,2))-(sum_px/num_points),2);
+        val = pow(sqrt(pow(p3d_to_2d.x-p2d.x,2) + pow(p3d_to_2d.y-p2d.y,2))-(sum_px/num_points),2);
         var_px += val;
 
     }
@@ -663,7 +714,16 @@ bool ExtrCalibration::calcReprojectionError()
     return reprojectionError[0] > MAX_AV_ERROR ? false : true; // Falls pixel fehler im schnitt > 20 ist das Ergebnis nicht akzeptabel
 }
 
-
+/**
+ * @brief Projects the 3D point to the image plane
+ *
+ * Projection is done by multiplying with the external camera matrix
+ * composed out of rotation and translation aquired in ExtrCalibration::calibExtrParams().
+ * After that, the internal camera matrix is applied.
+ *
+ * @param p3d 3D point to transform
+ * @return calculated 2D projection of p3d
+ */
 Point2f ExtrCalibration::getImagePoint(Point3f p3d)
 {
     bool debug = false;
@@ -768,19 +828,15 @@ Point2f ExtrCalibration::getImagePoint(Point3f p3d)
     }
     return point2D;
 }
-/**
-  * Methode get3DPoint
-  * Wandelt einen 2D-Punkt in einen 3D Punkt um
-  * Dazu muss der 2D-Pixelpunkt sowie der Abstand
-  * des 2D-Punktes zur xy-Ebene angegeben werden (i.d.R. die Hoehe/Personengroesse)
-  *
-  * Input: p2d = 2D Pixelpunkt (Uebergabe ohne Border)
-  *        h = Abstand des Punktes zur xy-Ebene
-  *
-  * Output: Point3f resultPoint gibt den berechneten 3D-Punkt zurueck
-  *
-  */
 
+
+/**
+ * @brief Tranforms a 2D point into a 3D point with given height.
+ *
+ * @param p2d 2D pixel point (without border)
+ * @param h height i.e. distance to xy-plane
+ * @return calculated 3D point
+ */
 Point3f ExtrCalibration::get3DPoint(Point2f p2d, double h)
 {
         bool debug = false;

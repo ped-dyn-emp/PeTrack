@@ -52,7 +52,7 @@ ColorMarkerWidget::ColorMarkerWidget(QWidget *parent)
 //    <PARAM CLOSE_RADIUS="0" CLOSE_USED="0" OPEN_RADIUS="0" OPEN_USED="0" MIN_AREA="0" MAX_AREA="0" MAX_RATIO="0.0"/>
 //</COLOR_MARKER>
 
-// store data in xml node
+/// store data in xml node
 void ColorMarkerWidget::setXml(QDomElement &elem)
 {
     QDomElement subElem;
@@ -87,7 +87,7 @@ void ColorMarkerWidget::setXml(QDomElement &elem)
     elem.appendChild(subElem);
 }
 
-// read data from xml node
+/// read data from xml node
 void ColorMarkerWidget::getXml(QDomElement &elem)
 {
     QDomElement subElem;
