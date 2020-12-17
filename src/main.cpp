@@ -25,6 +25,7 @@
 
 #include "petrack.h"
 #include "helper.h"
+#include "tracker.h"
 
 using namespace std;
 
@@ -34,6 +35,7 @@ using namespace std;
 #include <stdio.h>  /* defines FILENAME_MAX */
 
 #include "signal.h"
+#include "IO.h"
 
 // musst be done to store fixed order of attributes in XML files
 // see: http://stackoverflow.com/questions/27378143/qt-5-produce-random-attribute-order-in-xml
@@ -97,6 +99,9 @@ int main(int argc, char *argv[])
     bool autoTrack = false;
     bool autoPlay = false;
 
+    QString autoReadHeightFile;
+    bool autoReadHeight = false;
+
     for (int i = 1; i < arg.size(); ++i) // i=0 ist Programmname
     {
         //cout << arg.at(i).toStdString() << endl;
@@ -139,6 +144,13 @@ int main(int argc, char *argv[])
             if (project.isEmpty())
                 project = arg.at(i);
         }
+        else if ((arg.at(i) == "-autoReadHeight") || (arg.at(i) == "-autoreadheight"))
+        {
+            // -autoreadheight followed by txt-file including markerIDs and individual heights
+            // reads the txt-file and applies the heights to persons with corresponding markerIDs
+            autoReadHeight = true;
+            autoReadHeightFile = arg.at(++i);
+        }
         else
             // hier koennte je nach dateiendung *pet oder *avi oder *png angenommern werden
             // aber ueberpruefen, ob variable project oder sequence schon besetzt!!!
@@ -172,6 +184,24 @@ int main(int argc, char *argv[])
     if (autoTrack)
     {
         petrack.trackAll();
+
+        // platziert zwischen tracken und exportieren
+        if (autoReadHeight)
+        {
+            auto markerHeights = IO::readHeightFile(autoReadHeightFile);
+            if (std::holds_alternative<std::unordered_map<int, float>>(markerHeights)) // heights contains the height map
+            {
+                petrack.getTracker()->resetHeight();
+                petrack.getTracker()->setMarkerHeights(std::get<std::unordered_map<int, float>>(markerHeights));
+                petrack.setHeightFileName(autoReadHeightFile);
+            }
+            else //heights contains an error string
+            {
+                debout << "Error: " << std::get<std::string>(markerHeights) << "\n";
+                return EXIT_FAILURE;
+            }
+        }
+
 //         if ((autoTrackDest.right(4) == ".trc") || (autoTrackDest.right(4) == ".txt"))
             petrack.exportTracker(autoTrackDest);
 //         else // beide formate - wird nun in exportTracker ermoeglicht

@@ -36,6 +36,7 @@
 #include "codeMarkerWidget.h"
 #include "multiColorMarkerWidget.h"
 #include "view.h"
+#include "IO.h"
 
 using namespace std;
 
@@ -1454,6 +1455,30 @@ void Control::on_mapDefaultHeight_valueChanged(double d)
     mMainWindow->setHeadSize();
     mMainWindow->getBackgroundFilter()->setDefaultHeight(d);
 }
+
+void Control::on_mapReadHeights_clicked()
+{
+    QString heightFile = QFileDialog::getOpenFileName(mMainWindow, Petrack::tr("Select text file with height information"), mMainWindow->getHeightFileName(),
+                                              Petrack::tr("Height File (*.txt);;All files (*.*)"));
+
+    auto heights = IO::readHeightFile(heightFile);
+
+    if (std::holds_alternative<std::unordered_map<int, float>>(heights)) // heights contains the height map
+    {
+        mMainWindow->getTracker()->resetHeight();
+        mMainWindow->getTracker()->setMarkerHeights(std::get<std::unordered_map<int, float>>(heights));
+        mMainWindow->setHeightFileName(heightFile);
+    }
+    else //heights contains an error string
+    {
+        QMessageBox::critical(mMainWindow, Petrack::tr("PeTrack"),
+                              Petrack::tr(std::get<std::string>(heights).c_str()));
+    }
+
+    mMainWindow->getTracker()->printHeightDistribution();
+    mScene->update();
+}
+
 void Control::on_performRecognition_stateChanged(int /*i*/)
 {
     mMainWindow->setRecognitionChanged(true);// flag changes of recognition parameters
@@ -2200,6 +2225,7 @@ void Control::setXml(QDomElement &elem)
         QDomElement subSubElem;
         QDomElement subSubSubElem;
         QString fn;
+        QString heightFile;
 
         elem.setAttribute("TAB", tabs->currentIndex());
 
@@ -2382,6 +2408,18 @@ void Control::setXml(QDomElement &elem)
             subSubElem.appendChild(subSubSubElem);
         }
         subSubElem.setAttribute("DEFAULT_HEIGHT", mapDefaultHeight->value());
+
+        subElem.appendChild(subSubElem);
+
+        subSubElem = (elem.ownerDocument()).createElement("READ_HEIGHTS");
+
+        heightFile = mMainWindow->getHeightFileName();
+        if (!heightFile.isEmpty()) {
+            heightFile = getFileList(heightFile, mMainWindow->getProFileName());
+        }
+
+        subSubElem.setAttribute("HEIGHT_FILE", heightFile);
+
         subElem.appendChild(subSubElem);
 
         // - - - - - - - - - - - - - - - - - - - 
@@ -2946,6 +2984,7 @@ void Control::getXml(QDomElement &elem)
                             colorPlot->getMapItem()->addMap(x, y, width, height, colored, mapHeight, fromCol, toCol, invHue);
 
                         }
+
                         else
                             debout << "Unknown RECOGNITION MAP tag " << subSubElem.tagName() << endl;
 
@@ -2958,6 +2997,22 @@ void Control::getXml(QDomElement &elem)
                     if (subSubElem.hasAttribute("DEFAULT_HEIGHT"))
                         mapDefaultHeight->setValue(subSubElem.attribute("DEFAULT_HEIGHT").toDouble());
                 }
+
+                else if (subSubElem.tagName() == "READ_HEIGHTS")
+                {
+                    if (subSubElem.hasAttribute("HEIGHT_FILE"))
+                    {
+                        QString heightFileName = (subSubElem.attribute("HEIGHT_FILE"));
+                        if (!getExistingFile(heightFileName, mMainWindow->getProFileName()).isEmpty())
+                        {
+                            mMainWindow->setHeightFileName(getExistingFile(heightFileName, mMainWindow->getProFileName()));
+                        } else
+                        {
+                            mMainWindow->setHeightFileName(heightFileName);
+                        }
+                    }
+                }
+
                 else
                     debout << "Unknown RECOGNITION tag " << subSubElem.tagName() << endl;
         }
@@ -3501,6 +3556,5 @@ void Control::expandRange(QColor& fromColor, QColor& toColor, const QColor& clic
     toColor.setHsv(toColorArr[0], toColorArr[1], toColorArr[2]);
     fromColor.setHsv(fromColorArr[0], fromColorArr[1], fromColorArr[2]);
 }
-
 
 #include "moc_control.cpp"

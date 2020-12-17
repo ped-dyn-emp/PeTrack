@@ -2129,8 +2129,12 @@ void Tracker::resetHeight()
 void Tracker::resetPos()
 {
     for (int i = 0; i < size(); ++i) // ueber TrackPerson
+    {
         for (int j = 0; j < (*this)[i].size(); ++j) // ueber TrackPoints
+        {
             (*this)[i][j].setSp(-1., -1., -1.);
+        }
+    }
 }
 
 /**
@@ -2179,6 +2183,36 @@ bool Tracker::printHeightDistribution()
 
     return true;
 }
+
+ /**
+  * Sets the heights based on the values contained in \p heights.
+  * @param heights Map between marked ID and corresponding height
+  */
+void Tracker::setMarkerHeights(const unordered_map<int, float> &heights)
+{
+    for (int i = 0; i < size(); ++i) // over TrackPerson
+    {
+        for (int j = 0; j < (*this)[i].size(); ++j) // over TrackPoints
+        {
+            // markerID of current person at current TrackPoint:
+            int markerID = (*this)[i][j].getMarkerID();
+
+            if (markerID != -1) // when a real markerID is found (not -1)
+            {
+                // find index of mID within List of MarkerIDs that were read from txt-file:
+                if (heights.find(markerID) != std::end(heights))
+                {
+                    (*this)[i].setHeight(heights.at(markerID));
+                } else
+                {
+                    debout << "Warning, the following markerID was not part of the height-file: " << markerID << std::endl;
+                    debout << "No height set for personNR: " << (*this)[i].nr() << std::endl;
+                }
+            }
+        }
+     }
+}
+
 
 /**
  * @brief Deletes TrackPersons with over 80% solely tracked points

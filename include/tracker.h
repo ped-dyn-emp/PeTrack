@@ -534,6 +534,8 @@ public:
     void resetPos();
     void recalcHeight(float altitude);
 
+    void setMarkerHeights(const std::unordered_map<int, float> &heights);
+
     // gibt groessenverteilung der personen auf stdout aus
     // rueckgabewert false wenn keine hoeheninformationen in tracker datensatz vorliegt
     bool printHeightDistribution();
