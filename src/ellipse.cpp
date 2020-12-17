@@ -74,7 +74,8 @@ double MyEllipse::area() const
 {
     return PI*mR1*mR2;
 }
-// only estimation, because of complex elliptical integral
+
+/// only estimation, because of complex elliptical integral
 double MyEllipse::outline() const
 {
     return PI*(1.5*(mR1+mR2) - sqrt(mR1*mR2));
@@ -83,7 +84,8 @@ double MyEllipse::outline() const
     //return PI*sqrt(2.*(mR1*mR1+mR2*mR2));
     //return PI*(mR1+mR2);
 }
-// is point p inside or on the ellipse
+
+/// is point p inside or on the ellipse
 bool MyEllipse::isInside(const Vec2F& p) const
 {
     // for a point to be inside the ellipse the sum of the

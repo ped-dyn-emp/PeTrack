@@ -27,6 +27,20 @@
 class Petrack;
 class Control;
 
+/**
+ * @brief Class for intrinsic calibration
+ *
+ * If we know certain parameters of the camera, such as focal
+ * length, radial and tangent distortion etc. we can calculate
+ * where a point in the real world will be projected onto the
+ * image plane and with additional information (e.g. person
+ * height), the inverse is true as well. Determining these
+ * parameters is called intrinsic calibration.
+ *
+ * This class runs the intrinsic calibration of the camera
+ * based on a chessboard-pattern. The dimensions of the chessboard
+ * are settable by the user, but no other pattern is currently supported.
+ */
 class AutoCalib
 {
 public:

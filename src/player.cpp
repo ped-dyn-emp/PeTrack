@@ -470,6 +470,14 @@ void Player::togglePlayPause()
     }
 }
 
+/**
+ * @brief Toggles recording and saving of recording
+ *
+ * If already recording, the method stops the recording and saves it to
+ * a user-given file. If recording hasn't started, this method starts it.
+ *
+ * Actual recording happens in Player::updateImage()
+ */
 void Player::recStream()
 {
     if (mAnimation->isCameraLiveStream() || mAnimation->isVideo() || mAnimation->isImageSequence() || mAnimation->isStereoVideo())
@@ -587,6 +595,9 @@ bool Player::skipToFrame() // [0..mAnimation->getNumFrames()-1]
     return skipToFrame(mFrameNum->text().toInt());
 }
 
+/**
+ * @brief Properly updates FrameInNum and FrameOutNum
+ */
 void Player::update()
 {
     if (true || !mMainWindow->isLoading())

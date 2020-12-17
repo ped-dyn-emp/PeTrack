@@ -80,39 +80,39 @@ public:
 //     {
 //         return QwtDoubleRect(0., 0., 200., 200.);
 //     }
-
+    /**
+     * @brief Draws the mImage at the right position in correct size.
+     * @param p
+     * @param mx
+     * @param my
+     */
     void draw(QPainter* p, const QwtScaleMap& mx, const QwtScaleMap& my, const QRectF& /*r*/) const
     {
-//         debout << "---" <<endl;
-//         debout << r.x() << " " << r.y() << " " << r.width() << " " << r.height()<<endl;
-//         debout << "x:" <<endl;
-//         debout << mx.p1() << " "<< mx.p2() << " " << mx.s1() << " "<< mx.s2() << " "<<endl;
-//         debout << "y:" <<endl;
-//         debout << my.p1() << " "<< my.p2() << " " << my.s1() << " "<< my.s2() << " "<<endl;
-
         p->save();
         p->scale(mx.p2()/(mx.s2() - mx.s1()), my.p1()/(my.s2() - my.s1()));//
-//         p->scale((mx.p2() - mx.p1())/(mx.s2() - mx.s1()), (my.p1() - my.p2())/(my.s2() - my.s1()));//
         p->translate(-mx.s1(), my.s2()-((ColorPlot *) plot())->yMax());
-        //mx.p1()-mx.s1(), my.s2()+my.p2()-((ColorPlot *) plot())->yMax()
         p->drawImage(0, 0, *mImage);
         p->restore();
     }
 
-    // fuer x==y werden restliche komponenten gemaess z gewertet und das min in beide dimensionen als wert genommen
+    /**
+     * @brief Generates the color background or the color plot
+     *
+     * If x == y, the minimal values for both are used and the other two
+     * dimenions get set with the value of z.
+     *
+     * @param model
+     * @param x First dimension (dimension for x-values) RGB or HSV (e.g. Hue, Value, Red)
+     * @param y Second dimension (dimension for y-values) RGB or HSV (e.g. Hue, Value, Red)
+     * @param z Value for third dimension (if x == y for 2nd and 3rd)
+     */
     void generateImage(int model, int x, int y, int z)
     {
-//         debout << "generate image" <<endl;
-
-//         if (!mControlWidget)
-//             return;
-
         QColor col;
         int i, j;
 
-        if (model == 0) // HSV //mControlWidget->recoColorModel->currentIndex()
+        if (model == 0) // HSV
         {
-            // mControlWidget->recoColorX->currentIndex()
             for (i = 0; i < (x==0?360:256); ++i)
                 for (j = 0; j < (y==0?360:256); ++j)
                 {
@@ -161,48 +161,15 @@ TrackerPlotItem::TrackerPlotItem()
     mTracker = NULL;
 }
 
+/**
+ * @brief Draws a circle in the colorplot for every color associated with a trackperson.
+ *
+ * @param p
+ * @param mapX
+ * @param mapY
+ */
 void TrackerPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& /*re*/) const
 {
-//     // alt: ohne betrachtung des z-wertes:
-//     QRectF rect;
-//     double sx = mapX.p2()/(mapX.s2() - mapX.s1());
-//     double sy = mapY.p1()/(mapY.s2() - mapY.s1());
-//     double yMax = ((ColorPlot *) plot())->yMax();
-//     double circleSize = ((ColorPlot *) plot())->symbolSize();
-//     int i;
-
-//     p->save();
-//     p->scale(sx, sy);
-//     p->translate(-mapX.s1(), mapY.s2()-yMax);
-
-//     rect.setWidth(circleSize/sx);
-//     rect.setHeight(circleSize/sy);
-//     sx = circleSize/(2.*sx);
-//     sy = circleSize/(2.*sy);
-//     if (mTracker)
-//     {
-//         for (i = 0; i < mTracker->size(); ++i)
-//         {
-//             if ((*mTracker)[i].color().isValid()) // insbesondere von hand eingefuegte trackpoint/persons haben keine farbe
-//             {
-//                 QPoint point = ((ColorPlot *) plot())->getPos((*mTracker)[i].color());
-//                 rect.moveLeft(point.x()-sx);
-//                 rect.moveTop(point.y()-sy);
-         
-//                 p->setBrush(QBrush((*mTracker)[i].color()));
-//                 if (((ColorPlot *) plot())->isGrey((*mTracker)[i].color()))
-//                     p->setPen(Qt::red);
-//                 else
-//                     p->setPen(mPen);
-
-//                 p->drawEllipse(rect);
-//             }
-//         }
-//     }
-//     p->restore();
-
-
-
     QRectF rect;
     double sx = mapX.p2()/(mapX.s2() - mapX.s1());
     double sy = mapY.p1()/(mapY.s2() - mapY.s1());
@@ -346,11 +313,11 @@ RectPlotItem::RectPlotItem()
 {
 }
 
-// auch wenn punkt auf linie liegt, wird er als drinnen gezaehlt!!!!
-// es wird einfach der erste treffer in map-list genommen - unterscheidung zwischen farbe und graustufe
-// wird keine farbige map fuer farbige col gefunden, wird in grauen map der erste treffer genommen und
-// andersherum: wird fuer graue col keine graue map gefunden, wird erste farbige map zurueckgegeben
-// und hoehe zurueckgegeben
+/// auch wenn punkt auf linie liegt, wird er als drinnen gezaehlt!!!!
+/// es wird einfach der erste treffer in map-list genommen - unterscheidung zwischen farbe und graustufe
+/// wird keine farbige map fuer farbige col gefunden, wird in grauen map der erste treffer genommen und
+/// andersherum: wird fuer graue col keine graue map gefunden, wird erste farbige map zurueckgegeben
+/// und hoehe zurueckgegeben
 double RectPlotItem::map(const QColor &col) const //const TrackPerson &tp RectMap ... double x, double y
 {
     double yMax = ((ColorPlot *) plot())->yMax();
@@ -506,6 +473,15 @@ RectMap RectPlotItem::getMap(int index) const
         return RectMap();
 }
 
+/**
+ * @brief Draws rectangles representing the color maps into the color plot.
+ *
+ * The currently active/selected map is drawn green, the rest red.
+ *
+ * @param p
+ * @param mapX
+ * @param mapY
+ */
 void RectPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& /*re*/) const
 {
     QRectF rect;
@@ -615,6 +591,10 @@ public:
 
 //widgetWheelEvent  	(   	QWheelEvent *   	 e  	 )
 
+    /**
+     * @brief Allows movement in the zoomed in color plot via dragging with a pressed down middle mouse button.
+     * @param e
+     */
     void widgetMouseMoveEvent(QMouseEvent *e) override
     {
         static int lastX = -1;
@@ -716,6 +696,16 @@ public:
     {
     }
 
+    /**
+     * @brief Marks the point in color plot with the color under the cursor in the image.
+     *
+     * This function draws a little x at the place in the colorplot corresponding
+     * to the color the image/video frame has under the cursor of the user.
+     *
+     * @param p
+     * @param mapX
+     * @param mapY
+     */
     void draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& /*re*/) const
     {
         double sx = mapX.p2()/(mapX.s2() - mapX.s1());

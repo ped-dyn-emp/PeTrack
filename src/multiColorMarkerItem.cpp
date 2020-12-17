@@ -44,10 +44,15 @@ MultiColorMarkerItem::MultiColorMarkerItem(QWidget *wParent, QGraphicsItem * par
     // einzig move koennte interessant sein, um grid zu verschieben?!
 //     setAcceptsHoverEvents(true);
 }
-// // bounding box wird durch linke obere ecke und breite/hoehe angegeben
-// // wenn an den rand gescrollt wurde im view, dann wird durch das dynamische anpassen
-// // bei trans und scale zwar zuerst alles neu gezeichnet durch update, 
-// // aber beim verkleinern des scrollbereichs nur der teil von tracker neu gezeichnet
+
+/**
+ * @brief Bounding box of drawn to area.
+ *
+ * This bounding box is used to determine if this Item needs to be redrawn or not.
+ * See the official Qt Docs for QGraphicsItem
+ *
+ * @return (updated) bounding rect of this item
+ */
 QRectF MultiColorMarkerItem::boundingRect() const
 {
     if (mMainWindow->getImage())

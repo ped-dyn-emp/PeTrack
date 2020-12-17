@@ -1095,9 +1095,9 @@ void findColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWid
 }
 
 /**
- * @brief uses openCV libraries to detect Aruco CodeMarkers
+ * @brief uses OpenCV libraries to detect Aruco CodeMarkers
  * @param img
- * @param crossList
+ * @param crossList[out] list of detected TrackPoints
  * @param controlWidget
  */
 void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, Vec2F offsetCropRect2Roi)
@@ -1676,9 +1676,16 @@ imShow("img2", tmpAusgabe2);
 }
 
 
-
-// returns list of mid point of black crosses on white ground in region of interest roi
-// in image iplImg
+/**
+ * @brief Detects position of markers from user-chosen type
+ *
+ * @param img
+ * @param roi Region of interest for recognition
+ * @param crossList[out] detected TrackPoints
+ * @param controlWidget
+ * @param borderSize
+ * @param bgFilter
+ */
 void getMarkerPos(Mat &img, QRect &roi, QList<TrackPoint> *crossList, Control *controlWidget, int borderSize, BackgroundFilter *bgFilter)
 {
     int markerBrightness = controlWidget->markerBrightness->value();

@@ -29,15 +29,12 @@
 #include "control.h"
 extern Control *cw;
 
-// Entfernung zum Hintergrund, um als Vordergrund angesehen zu werden
-// darf nicht zu gross werden, da sonst an waenden problem
-// z-Wert in m (nicht cm!)
-//wenn z-wert 1m unter defaultgroesse
-//#define FOREGROUND_DISTANCE ((mDefaultHeight/100.-1.0) > 0. ? (mDefaultHeight/100.-1.0): 0.)
+/// Entfernung zum Hintergrund, um als Vordergrund angesehen zu werden
+/// darf nicht zu gross werden, da sonst an waenden problem
 #define FOREGROUND_DISTANCE 0.4
 
-// kleine Bereiche werden eliminiert, dies koennte in Abhaengigkeit von der disparity gemacht werden!!!!!!!!
-// Anzahl der Pixel, die ein Vordergrund aufweisen muss
+/// kleine Bereiche werden eliminiert, dies koennte in Abhaengigkeit von der disparity gemacht werden!!!!!!!!
+/// Anzahl der Pixel, die ein Vordergrund aufweisen muss
 #define MIN_FOREGROUND_AREA -1000 // war:-400
 
 //#define SHOW_TMP_IMG
@@ -72,17 +69,24 @@ Mat BackgroundFilter::getForeground() // nutzen, wenn ueber ganzes bild foregrou
     return mForeground;
 }
 
-// i entlang zeile, j entlang spalte
-// zur Effizientssteigerung ohne ueberpruefung der grenzen!!!
-bool BackgroundFilter::isForeground(int i, int j) // nutzen, wenn einzelne pixel abgefraget werden
+/**
+ * @brief Determines if pixel is in foreground. Use for single pixels.
+ *
+ * Does not check if pixel position is valid! (For efficiency)
+ *
+ * @param coloumn
+ * @param row
+ * @return true if foreground
+ */
+bool BackgroundFilter::isForeground(int coloumn, int row)
 {
-    if (!mForeground.empty()) // && i >= 0 && i < mForeground->width && j >= 0 && j < mForeground->height)
-        return (bool) mForeground.data[j*mForeground.cols+i]; // 0 background, 1 foreground
+    if (!mForeground.empty())
+        return (bool) mForeground.data[row*mForeground.cols+coloumn]; // 0 background, 1 foreground
     else
         return false;
 }
 
-// zuruecksetzen, wenn zB helligkeit veraendert wird oder schaerfe
+/// zuruecksetzen, wenn zB helligkeit veraendert wird oder schaerfe
 void BackgroundFilter::reset()
 {
     // funktioniert nicht wirklich

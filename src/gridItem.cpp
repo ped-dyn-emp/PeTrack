@@ -39,6 +39,15 @@ GridItem::GridItem(QWidget *wParent, QGraphicsItem * parent)
     //setEnabled(false); // all mouse events connot access this item, but it will be seen
     // einzig move koennte interessant sein, um grid zu verschieben?!
 }
+
+/**
+ * @brief Bounding box of drawn to area.
+ *
+ * This bounding box is used to determine if this Item needs to be redrawn or not.
+ * See the official Qt Docs for QGraphicsItem
+ *
+ * @return (updated) bounding rect of this item
+ */
 QRectF GridItem::boundingRect() const
 {
     // -mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize() TUTS NICHT !!!!!

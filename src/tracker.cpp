@@ -40,7 +40,11 @@ using namespace std;
 
 #define MIN_WIN_SIZE 3.
 
-
+/**
+ * @brief Transforms OpenCV error in tracking (L1-Norm) to quality
+ * @param error error reported by cv::calcOpticalFlowPyrLK
+ * @return quality according to error
+ */
 inline float errorToQual(float error)
 {
     return 80.F - error/20.F;
@@ -334,6 +338,30 @@ double TrackPerson::getNearestZ(int i, int *extrapolated)
 
 // rueckgabe zeigt an, ob neuer p eingefuegt wurde oder nicht, falls qualitaet schlechter
 // persNr ist index in uebergeordneter liste zur sinnvollen warnungs-ausgabe
+/**
+ * @brief Inserts point
+ *
+ * If the point would be appended or prepended, it is inserted
+ * and the points at the frames between the current one and the
+ * last one with a frame get linearly interpolated. If the point
+ * being appended/prepended is further away than the speed
+ * (between the last two points) would reasonably allow, the point
+ * is either not inserted or extrapolated.
+ *
+ * If the new point would replace an old point, it is only added
+ * if it has a better quality.
+ *
+ * Multicolor-Blackdot and Multicolor-Aruco markers which get
+ * recognized by color are shifted by the difference between
+ * dot/code-point and color-point to avoid stuttering of the
+ * trajectory.
+ *
+ * @param frame
+ * @param p
+ * @param persNr
+ * @param extrapolate
+ * @return true if point was added
+ */
 bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool extrapolate)
 {
 //         if (frame == mLastFrame+1) //included in following lines
@@ -536,8 +564,12 @@ const TrackPoint& TrackPerson::trackPointAt(int frame) const // & macht bei else
 //     }
     //void draw(IplImage *img) const;
 
-// gibt -1 zurueck, wenn frame oder naechster frame nicht existiert
-// entfernung ist absolut
+/**
+ * @brief Absolute distance to next frame
+ *
+ * @param frame
+ * @return absolute distance or -1, if frame doen't exist
+ */
 double TrackPerson::distanceToNextFrame(int frame) const
 {
     if (frame >= mFirstFrame && frame+1 <= mLastFrame)
@@ -641,7 +673,7 @@ void Tracker::resize(Size size)
 //         // -getImgBorderSize() nutzen
 }
 
-// split trajectorie pers before frame frame
+/// split trajectorie pers before frame frame
 void Tracker::splitPerson(int pers, int frame)
 {
     int j;
@@ -662,9 +694,14 @@ void Tracker::splitPerson(int pers, int frame)
     }
 }
 
-// split trajectorie before frame frame
-// onlyVisible == -1 : immer alles betrachten, ansonsten nur person onlyVisible
-// gibt true zurueck, wenn trajektorie gesplttet werden konnte
+/**
+ * @brief Split trajectory at point p before given frame
+ *
+ * @param p point where to split trajectory (helpful if onlyVisible isn't set)
+ * @param frame frame at which to split the trajectory
+ * @param onlyVisible set of people for whom to do it (empty means everyone)
+ * @return true if a trajectory was split
+ */
 bool Tracker::splitPersonAt(const Vec2F& p, int frame, QSet<int> onlyVisible)
 {
     int i;
@@ -679,10 +716,13 @@ bool Tracker::splitPersonAt(const Vec2F& p, int frame, QSet<int> onlyVisible)
     return false;
 }
 
-// gibt true zurueck, wenn punkt geloescht werden konnte
-// direction zeigt an, ob bis zum aktuellen (-1), ab dem aktuellen (1) oder ganzer trackpath (0)
-// onlyVisible == -1 : immer alles betrachten, ansonsten nur person onlyVisible
-// loescht trackpoint nur einer trajektorie
+/**
+ * @brief Deletes points of pers
+ * @param pers TrackPerson whose points should be deleted
+ * @param direction notes if previous (-1), following(1) or whole(0) trajectory should be deleted
+ * @param frame
+ * @return true, if deletion occured
+ */
 bool Tracker::delPointOf(int pers, int direction, int frame)
 {
     int j;
@@ -709,6 +749,14 @@ bool Tracker::delPointOf(int pers, int direction, int frame)
 // direction zeigt an, ob bis zum aktuellen (-1), ab dem aktuellen (1) oder ganzer trackpath (0)
 // onlyVisible == -1 : immer alles betrachten, ansonsten nur person onlyVisible
 // loescht trackpoint nur einer trajektorie
+/**
+ * @brief Deletes points of a SINGLE person in onlyVisible
+ * @param p point which need to be on the person (helpful if onlyVisible is not properly set)
+ * @param direction notes if previous (-1), following(1) or whole(0) trajectory should be deleted
+ * @param frame
+ * @param onlyVisible set of people whose points could be deleted; empty means everyone
+ * @return true if deletion occured
+ */
 bool Tracker::delPoint(const Vec2F& p, int direction, int frame, QSet<int> onlyVisible)
 {
     int i;
@@ -722,8 +770,11 @@ bool Tracker::delPoint(const Vec2F& p, int direction, int frame, QSet<int> onlyV
     return false;
 }
 
-// direction zeigt an, ob bis zum aktuellen (-1), ab dem aktuellen (1) oder ganzer trackpath (0)
-// loescht trackpoints aller trajektorien
+/**
+ * @brief Deletes trackpoints of all trajectories
+ * @param direction notes if previous (-1), following(1) or whole(0) trajectory should be deleted
+ * @param frame
+ */
 void Tracker::delPointAll(int direction, int frame)
 {
     int i, j;
@@ -1243,6 +1294,7 @@ int Tracker::smallestLastFrame()
 
 /**
  * @brief Tracker::calcPrevFeaturePoints calculates all featurePoints(Persons) from the "previous" frame
+ *
  * @param prevFrame Number of previous frame (can be both, larger or smaller; forward or backwards)
  * @param rect ROI
  * @param frame current frame number
@@ -1665,6 +1717,7 @@ void Tracker::trackFeaturePointsLK(int level, bool adaptive)
 
 /**
  * @brief Tries to track colorPoint when featurePoint has high error
+ *
  * @param level Pyramidlevel to track with
  * @param numOfPeopleToTrack
  * @param errorScale Factor for highest tolerable tracking error
@@ -1706,6 +1759,17 @@ void Tracker::refineViaColorPointLK(int level, float errorScale)
     }
 }
 
+/**
+ * @brief Counts consecutive TrackPoints in background and deletes trajectories with too many
+ *
+ * If a TrackPoint is inside the recognition ROI and in the background
+ * a counter is incremented. Once this counter hits a user defined value
+ * and if the user has enabled deletion of trajectories, the trajectory is
+ * marked for deletion.
+ *
+ * @param trjToDel[out] trajectories marked for deletion
+ * @param bgFilter[in] backgroundFilter, which determines if a point is in the bg
+ */
 void Tracker::useBackgroundFilter(QList<int>& trjToDel, BackgroundFilter *bgFilter){
     int x, y;
     static int margin=10; // rand am bild, ab dem trajectorie in den hintergrund laufen darf
@@ -1852,6 +1916,23 @@ void Tracker::recalcHeight(float altitude)
     }
 }
 
+/**
+ * @brief Performs different tests to check the plausibility of trajectories.
+ *
+ * This method can check for
+ * <ul><li>shortness (less than 10 points)</li>
+ * <li>start and endpoint (both should be outside the reco ROI
+ * with exceptions for the beginning and end of the video)</li>
+ * <li>Fast variations of speed (4 frame interval)</li>
+ * <li>TrackPoints are too close together</li></ul>
+ *
+ * @param pers[in] list of persons (ID) to check
+ * @param frame[out] list of frames at which "problems" occured
+ * @param testEqual[in] true if warning for very close points are wished
+ * @param testVelocity[in] true if warning for fast speed variations is whished
+ * @param testInside[in] true if warning for start and endpoint in reco ROI is wished
+ * @param testLength[in] true if warning for very short trajectories is wished
+ */
 void Tracker::checkPlausibility(QList<int> &pers, QList<int> &frame,
                                 bool testEqual, bool testVelocity, bool testInside, bool testLength)
     {
@@ -2052,8 +2133,11 @@ void Tracker::resetPos()
             (*this)[i][j].setSp(-1., -1., -1.);
 }
 
-// gibt groessenverteilung der personen auf stdout aus
-// rueckgabewert false wenn keine hoeheninformationen in tracker datensatz vorliegt
+/**
+ * @brief Prints height distribution to stdout
+ *
+ * @return false if no height information is available, else true
+ */
 bool Tracker::printHeightDistribution()
 {
     debout << endl;
@@ -2096,10 +2180,21 @@ bool Tracker::printHeightDistribution()
     return true;
 }
 
+/**
+ * @brief Deletes TrackPersons with over 80% solely tracked points
+ *
+ * DOESN'T WORK WITH COLOR MARKERS because they have a quality under
+ * 100 (quality threshold of this method could be changed)
+ *
+ * Only trajectories having a point at the given frame are purged.
+ * Trajectories with less than 10 points are not purged.
+ *
+ * @param frame frame at which all trajectories should be purged
+ */
 void Tracker::purge(int frame)
 {
     int i, j;
-    float count; // anzahl der trackpoints, an denen die person nicht gefunden wurde
+    float count; ///< number of trackpoints without recognition
 
     for (i = 0; i < size(); ++i)
     {

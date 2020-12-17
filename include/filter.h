@@ -26,6 +26,15 @@
 
 class Filter;
 
+/**
+ * @brief Class for Filter-parameters
+ *
+ * This class is made to hold parameters for filters.
+ * It has a minimum and maximum value and notifies the
+ * associated filter of changes.
+ *
+ * @todo make a template out of it, so different types are supported
+ */
 class Parameter
 {
 private:
@@ -57,6 +66,16 @@ public:
 
 //------------------------------------------------------------
 
+/**
+ * @brief Base class for every image filter
+ *
+ * This class is the base class for every image filter,
+ * like the CalibFilter or Background filter. The
+ * interface this class defines includes a unified way
+ * to apply the different filters, caching of the results,
+ * activation/deactivation as well as automated detection
+ * of changed parameters.
+ */
 class Filter {
 private:
     bool mChg;       // if filter paramater were changed

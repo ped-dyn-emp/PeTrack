@@ -100,12 +100,17 @@ Filter::Filter()
 //    mResStored = false;
 }
 
-// was pure virtuell function must be implemented
-// and has to return, if any parameter is changed
-// so that the filter would return another result
-//----------
-// now this function has also to be called
-// from a child function which looks for changing parameters
+/**
+ * @brief Indicates if any of the parameters of the filter have changed
+ *
+ * was pure virtuell function must be implemented
+ * and has to return, if any parameter is changed
+ * so that the filter would return another result
+ * now this function has also to be called
+ * from a child function which looks for changing parameters
+ *
+ * @return true, if a parameter changed
+ */
 bool Filter::changed()
 {
     return mChg;
@@ -120,14 +125,16 @@ void Filter::setChanged(bool b)
 }
 
 /**
- * @brief Applies filter and sets changed to false
+ * @brief Applies the filter to img and sets changed on false.
  *
- * Applies the filter and after that sets changed to false
- * The filter is only applied, when it is enabled, else
- * the img just gets returned without filtering.
+ * The filter is applied, iff it is enabled. Else the image
+ * is returned without any modifications. Depending on the
+ * Filter::getOnCopy() result, the image is copied before the filter
+ * is applied.
  *
- * @param img Image to apply filter to
- * @return filtered image
+ * The result is cached and can be accessed through Filter::getLastResult().
+ * @param img image to be transformed
+ * @return if enabled the transformed image else just img without changes (still gets cached)
  */
 Mat Filter::apply(Mat &img)
 {

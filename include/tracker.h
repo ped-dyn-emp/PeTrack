@@ -444,15 +444,18 @@ inline std::ostream& operator<<(std::ostream& s, const TrackPerson& tp)
 
 //----------------------------------------------------------------------------
 
-// using tracker:
-// 1. initial recognition
-// 2. next frame track existing track points
-// 3. new recognition and check if exist otherwise include new
-// (4. delete inner tracking point, which does not recognized over a longer time)
-// 5. backward tracking from firstFrame() on
-// 6. calculate color over tracking (accumulated over tracking while procedure above) path and set height
-// 7. recalc coord with real coord with known height
-
+/**
+ * @brief Class orchestrating tracking and related stuff
+ *
+ * using tracker:
+ * 1. initial recognition
+ * 2. next frame track existing track points
+ * 3. new recognition and check if exist otherwise include new
+ * (4. delete inner tracking point, which does not recognized over a longer time)
+ * 5. backward tracking from firstFrame() on
+ * 6. calculate color over tracking (accumulated over tracking while procedure above) path and set height
+ * 7. recalc coord with real coord with known height
+ */
 class Tracker : public QList<TrackPerson>
 {
 private:
