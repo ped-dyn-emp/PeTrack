@@ -217,6 +217,15 @@ public:
     {
         mTrcFileName = fn;
     }
+    inline QString getHeightFileName()
+    {
+        return mHeightFileName;
+    }
+    inline void setHeightFileName(const QString &fn)
+    {
+        mHeightFileName = fn;
+    }
+
     inline Control* getControlWidget()
     {
         return mControlWidget;
@@ -505,7 +514,7 @@ private:
     QString mSeqFileName;
     QString mProFileName;
     QString mTrcFileName;
-
+    QString mHeightFileName;
 //    IplImage *mIplImg;
 //     IplImage *mPrevIplImgFiltered;
 //    IplImage *mIplImgFiltered;

@@ -251,6 +251,8 @@ private slots:
     void on_recoSymbolSize_valueChanged(int index);
     void on_recoStereoShow_clicked();
     void on_mapColorRange_clicked();
+    void on_colorPickerButton_clicked(bool checked);
+    void on_mapReadHeights_clicked();
 
     void on_mapNr_valueChanged(int i);
     void on_mapX_valueChanged(int i);
@@ -427,8 +429,6 @@ private slots:
     void on_trackRoiFix_stateChanged(int arg1);
 
     //void on_trackExport_released();
-
-    void on_colorPickerButton_clicked(bool checked);
 
 private:
     Petrack *mMainWindow;

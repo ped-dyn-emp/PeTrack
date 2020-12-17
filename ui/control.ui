@@ -3958,10 +3958,10 @@
                   <property name="title">
                    <string>map</string>
                   </property>
-                  <layout class="QHBoxLayout" name="horizontalLayout_21">
+                   <layout class="QHBoxLayout" name="horizontalLayout_21">
                    <property name="spacing">
-                    <number>9</number>
-                   </property>
+                   <number>9</number>
+                  </property>
                    <item>
                     <layout class="QVBoxLayout">
                      <property name="spacing">
@@ -4407,6 +4407,16 @@
                    </widget>
                   </item>
                  </layout>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="mapReadHeights">
+                  <property name="toolTip">
+                   <string>Select a file with individual heights mapped with markerID</string>
+                  </property>
+                  <property name="text">
+                   <string>read heights from file</string>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
