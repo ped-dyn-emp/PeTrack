@@ -3118,7 +3118,7 @@ void Control::getXml(QDomElement &elem)
                     if (subSubElem.hasAttribute("ONLY_PEOPLE"))
                         trackShowOnly->setCheckState(subSubElem.attribute("ONLY_PEOPLE").toInt() ? Qt::Checked : Qt::Unchecked);
                     if (subSubElem.hasAttribute("ONLY_PEOPLE_LIST"))
-                        trackShowOnly->setCheckState(subSubElem.attribute("ONLY_PEOPLE_LIST").toInt() ? Qt::Checked : Qt::Unchecked);
+                        trackShowOnlyList->setCheckState(subSubElem.attribute("ONLY_PEOPLE_LIST").toInt() ? Qt::Checked : Qt::Unchecked);
 
                     // wird in petrack.cpp abgewickelt, da es nach dem laden der trajektorien gemacht werden muss
 //                     if (subSubElem.hasAttribute("ONLY_PEOPLE_NR"))
