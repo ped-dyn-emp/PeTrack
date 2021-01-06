@@ -282,8 +282,6 @@ target_sources(petrack_core PRIVATE
     include/autoCalib.h
     include/filter.h
     include/brightContrastFilter.h
-    include/brightFilter.h
-    include/contrastFilter.h
     include/blurFilter.h
     include/borderFilter.h
     include/backgroundFilter.h
@@ -335,8 +333,6 @@ target_sources(petrack_core PRIVATE
     src/autoCalib.cpp
     src/filter.cpp
     src/brightContrastFilter.cpp
-    src/brightFilter.cpp
-    src/contrastFilter.cpp
     src/blurFilter.cpp
     src/borderFilter.cpp
     src/backgroundFilter.cpp
