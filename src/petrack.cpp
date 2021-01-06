@@ -1579,7 +1579,7 @@ void Petrack::keyBindings()
 
 void Petrack::onlineHelp()
 {
-    static QUrl url("http://www.fz-juelich.de/jsc/petrack/");
+    static QUrl url("https://jugit.fz-juelich.de/ped-dyn-emp/petrack/-/wikis/home");
     if (!(QDesktopServices::openUrl(url)))
         QMessageBox::critical(this, tr("PeTrack"), tr("Cannot open external browser<br>with url ") + url.toString() + "!");
 }
