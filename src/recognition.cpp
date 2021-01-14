@@ -813,8 +813,6 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
                     {
                         offsetCropRect2Roi.setX(0); // set to zero as cooridinates are directly used from cropRect
                         offsetCropRect2Roi.setY(0);
-                        CodeMarkerItem* codeMarkerItem = controlWidget->getMainWindow()->getCodeMarkerItem();
-                        codeMarkerItem->setOffsetCropRect2Roi(offsetCropRect2Roi);
 
                         if (autoCorrect && !autoCorrectOnlyExport)
                         {
@@ -1100,7 +1098,7 @@ void findColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWid
  * @param crossList[out] list of detected TrackPoints
  * @param controlWidget
  */
-void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, Vec2F offsetCropRect2Roi)
+void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, Vec2F offsetCropRect2Roi /*=(0,0)*/)
 {
 //#if 0 // Maik temporaer, damit es auf dem Mac laeuft
 
@@ -1212,14 +1210,8 @@ void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidg
     debout << "end detectCodeMarkers  : " << getElapsedTime() <<endl;
 #endif
 
-
-    if (offsetCropRect2Roi.length()!=0)
-    {
-        codeMarkerItem->setOffsetCropRect2Roi(offsetCropRect2Roi);
-    }
-
-    codeMarkerItem->setDetectedMarkers(corners,ids);
-    codeMarkerItem->setRejectedMarkers(rejected);
+    codeMarkerItem->addDetectedMarkers(corners,ids, offsetCropRect2Roi);
+    codeMarkerItem->addRejectedMarkers(rejected, offsetCropRect2Roi);
 
     // detected code markers
     for(size_t i = 0; i<ids.size(); i++)

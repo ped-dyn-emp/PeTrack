@@ -129,6 +129,7 @@ public:
     Vec2F(double x, double y);
     Vec2F(const Vec2F& v) = default;
     Vec2F(const QPointF& v);
+    Vec2F(const cv::Point2f& p);
     Vec2F(const CvPoint* v);
     Vec2F(const CvPoint2D32f* v);
 

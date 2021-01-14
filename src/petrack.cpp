@@ -3560,6 +3560,8 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
     debout << "go  update: " << getElapsedTime() <<endl;
 #endif
 
+    mCodeMarkerItem->resetSavedMarkers();
+
     static int lastRecoFrame = -10000;
     static bool borderChangedForTracking = false;
 
