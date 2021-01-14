@@ -238,6 +238,13 @@ Vec2F::Vec2F(const QPointF& v)
       mY(v.y())
 {
 }
+
+Vec2F::Vec2F(const cv::Point2f &p)
+    : mX(p.x),
+      mY(p.y)
+{
+}
+
 Vec2F::Vec2F(const CvPoint* v)
     : mX(v->x),
       mY(v->y)

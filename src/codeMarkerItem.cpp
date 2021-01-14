@@ -79,10 +79,6 @@ void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*
 
     if (mMainWindow->getCodeMarkerWidget()->showDetectedCandidates->isChecked())
     {
-        QColor textColor = QColor(255,0,0), // red
-               cornerColor = QColor(0,0,255), // blue
-               borderColor = QColor(0,255,0); // green
-
         int nMarkers = mCorners.size();
         int nRejected = mRejected.size();
 
@@ -90,77 +86,14 @@ void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*
         Point2f p0, p1;
         for(int i = 0; i < nMarkers; i++) // draws green square/ circle around head if person recognized
         {
-            int recoMethod = mMainWindow->getControlWidget()->getRecoMethod();
-
-            if (recoMethod == 6) // for usage of ArucoCodeMarker-Funktion (without MulticolorMarker)
-            {
-                vector<Point2f> currentMarker = mCorners.at(i);
-                // draw marker sides
-                for(int j = 0; j < 4; j++) {
-                    p0 = currentMarker.at(j);
-                    p1 = currentMarker.at((j + 1) % 4);
-    //                debout << "p0: " << p0 << " p1: " << p1 << endl;
-                    painter->setPen(borderColor);
-                    painter->drawLine(QPointF(mUlc.x()+p0.x,mUlc.y()+p0.y),QPointF(mUlc.x()+p1.x,mUlc.y()+p1.y));
-                }
-                painter->setPen(cornerColor);
-                painter->drawText(QPointF(mUlc.x()+currentMarker.at(0).x+10.,mUlc.y()+currentMarker.at(0).y+10. ), QString::number(mIds.at(i)));
-                painter->drawRect(QRectF(mUlc.x()+currentMarker.at(0).x-3.0,mUlc.y()+currentMarker.at(0).y-3.0,6.0,6.0));
-            }
-
-            if (recoMethod == 5) // for usage of codemarker with MulticolorMarker
-            {
-                vector<Point2f> currentMarker = mCorners.at(i);
-                // draw marker sides
-                for(int j = 0; j < 4; j++) {
-                    p0 = currentMarker.at(j);
-                    p1 = currentMarker.at((j + 1) % 4);
-    //                debout << "p0: " << p0 << " p1: " << p1 << endl;
-                    painter->setPen(borderColor);
-                    painter->drawLine(QPointF(mUlc.x()+p0.x+mOffsetCropRect2Roi.x(),mUlc.y()+p0.y+mOffsetCropRect2Roi.y()),QPointF(mUlc.x()+p1.x+mOffsetCropRect2Roi.x(),mUlc.y()+p1.y+mOffsetCropRect2Roi.y()));
-                }
-                painter->setPen(cornerColor);
-                painter->drawText(QPointF(mUlc.x()+currentMarker.at(0).x+mOffsetCropRect2Roi.x()+10.,mUlc.y()+currentMarker.at(0).y+mOffsetCropRect2Roi.y()+10. ), QString::number(mIds.at(i)));
-                painter->drawRect(QRectF(mUlc.x()+currentMarker.at(0).x+mOffsetCropRect2Roi.x()-3.0,mUlc.y()+currentMarker.at(0).y+mOffsetCropRect2Roi.y()-3.0,6.0,6.0));
-            }
-
+            drawMarker(mCorners.at(i), mIds.at(i), mAcceptedColor, painter);
         }
         for(int i = 0; i < nRejected; i++)
         {
-            int recoMethod = mMainWindow->getControlWidget()->getRecoMethod();
-
-            if (recoMethod == 6) // for usage of ArucoCodeMarker-Funktion (without MulticolorMarker)
-            {
-                vector<Point2f> currentMarker = mRejected.at(i);
-
-                for(int j = 0; j < 4; j++) {
-                    p0 = currentMarker.at(j);
-                    p1 = currentMarker.at((j + 1) % 4);
-    //                debout << "p0: " << p0 << " p1: " << p1 << endl;
-                    painter->setPen(textColor);
-                    painter->drawLine(QPointF(mUlc.x()+p0.x,mUlc.y()+p0.y),QPointF(mUlc.x()+p1.x,mUlc.y()+p1.y));
-                }
-                painter->setPen(borderColor);
-                painter->drawRect(QRectF(mUlc.x()+currentMarker.at(0).x-3.0,mUlc.y()+currentMarker.at(0).y-3.0,6.0,6.0));
-            }
-
-            if (recoMethod == 5) // for usage of all types of detection (except combination of multicolormarker with arucoCode)
-            {
-                vector<Point2f> currentMarker = mRejected.at(i);
-
-                for(int j = 0; j < 4; j++) {
-                    p0 = currentMarker.at(j);
-                    p1 = currentMarker.at((j + 1) % 4);
-    //                debout << "p0: " << p0 << " p1: " << p1 << endl;
-                    painter->setPen(textColor);
-                    painter->drawLine(QPointF(mUlc.x()+p0.x+mOffsetCropRect2Roi.x(),mUlc.y()+p0.y+mOffsetCropRect2Roi.y()),QPointF(mUlc.x()+p1.x+mOffsetCropRect2Roi.x(),mUlc.y()+p1.y+mOffsetCropRect2Roi.y()));
-                }
-                painter->setPen(borderColor);
-                painter->drawRect(QRectF(mUlc.x()+currentMarker.at(0).x+mOffsetCropRect2Roi.x()-3.0,mUlc.y()+currentMarker.at(0).y+mOffsetCropRect2Roi.y()-3.0,6.0,6.0));
-            }
-
+            drawMarker(mRejected.at(i), -1, mRejectedColor, painter);
         }
     }
+
     if (false) // Show min/max marker size
     {
         int minPerimeter = mMainWindow->getCodeMarkerWidget()->minMarkerPerimeter->value();
@@ -196,26 +129,72 @@ void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*
 
 }
 
-void CodeMarkerItem::setDetectedMarkers(vector<vector<Point2f> > corners, vector<int> ids)
+/**
+ * @brief Draws a aruco code marker
+ *
+ * Draws a rect with the corners of the marker, the id, and the upper left corner.
+ *
+ * @param currentMarker marker to draw
+ * @param id id of the marker to draw
+ * @param borderColor color of the rect drawn
+ * @param painter painter with which to draw
+ */
+void CodeMarkerItem::drawMarker(const OffsetMarker& currentMarker, int id, const QColor& borderColor, QPainter *painter)
 {
-    mCorners = corners;
-    mIds = ids;
-}
-
-void CodeMarkerItem::setRejectedMarkers(vector<vector<Point2f> > rejected)
-{
-    mRejected = rejected;
+    Vec2F offset = currentMarker.offset;
+    // draw marker sides
+    for(int j = 0; j < numCorners; j++) {
+        Vec2F p0 = currentMarker.corners.at(j);
+        Vec2F p1 = currentMarker.corners.at((j + 1) % numCorners);
+        painter->setPen(borderColor);
+        painter->drawLine((mUlc + p0 + offset).toQPointF(), (mUlc + p1 + offset).toQPointF());
+    }
+    Vec2F topLeftCorner {currentMarker.corners.at(0)};
+    painter->setPen(mCornerColor);
+    if(id != -1) {
+        painter->drawText((mUlc + topLeftCorner + offset + Vec2F(10,10)).toQPointF(), QString::number(id));
+    }
+    painter->drawRect(QRectF((mUlc + topLeftCorner + offset - Vec2F(3,3)).toQPointF(), QSize(6.0,6.0)));
 }
 
 /**
- * @brief sets Offset from cropRect to Roi for correct drawing of CodeMarkers in paint() when calling findCodeMarker() out of findMulticolorMarker().
+ * @brief Adds given markers as detected markers to visualization
  *
- * Explanation: when calling findCodeMarker() out of findMultiColorMarker() the transfer parameter is not the entire image but rather a small rectangle (cropRect) around the detected colorBlobb.
- * Offset additions via 'offset' and 'v' only allow addition of ONE offset for all candidates per frame, as is originates from realising the offset from the entire image to the region of interest (ROI).
- * offsetCropRect2Roi closes the resulting gap between ROI and cropRect (which is individuall for each pedestrian and frame).
- * @param offsetCropRect2Roi
+ * @pre ids[i] is the id of corners[i]
+ *
+ * @param corners corners of the markers
+ * @param ids ids of the detected markers
+ * @param offset offset from marker-coords to recognition ROI
  */
-void CodeMarkerItem::setOffsetCropRect2Roi(Vec2F offsetCropRect2Roi)
+void CodeMarkerItem::addDetectedMarkers(vector<vector<Point2f> > corners, vector<int> ids, Vec2F offset /* = (0,0)*/)
 {
-    mOffsetCropRect2Roi = offsetCropRect2Roi;
+    for(std::vector<Point2f> singleMarkerCorners : corners)
+    {
+        mCorners.emplace_back(singleMarkerCorners, offset);
+    }
+    mIds.insert(mIds.end(), ids.begin(), ids.end());
+}
+
+/**
+ * @brief Adds given markers as rejected markers to visualization
+ *
+ * @param rejected corners of the rejected markers
+ * @param offset offset from marker-coords to recognition ROI
+ */
+void CodeMarkerItem::addRejectedMarkers(vector<vector<Point2f> > rejected, Vec2F offset /* = (0,0)*/)
+{
+    for(std::vector<Point2f> singleMarkerCorners : rejected)
+    {
+        mRejected.emplace_back(singleMarkerCorners, offset);
+    }
+}
+
+/**
+ * @brief Resets detected and rejected markers for visualization
+ */
+void CodeMarkerItem::resetSavedMarkers()
+{
+    mCorners.clear();
+    mIds.clear();
+    mRejected.clear();
 }

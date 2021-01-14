@@ -29,25 +29,37 @@ class Petrack;
 class Control;
 class Tracker;
 
+struct OffsetMarker {
+    std::vector<cv::Point2f> corners;
+    Vec2F offset;
+
+    OffsetMarker(std::vector<cv::Point2f> corn, Vec2F off) : corners(corn), offset(off) {};
+};
+
 class CodeMarkerItem : public QGraphicsItem
 {
 private:
     Petrack *mMainWindow;
-//    QImage *mImage;
+    const QColor mRejectedColor = QColor(255,0,0); // red
+    const QColor mCornerColor = QColor(0,0,255); // blue
+    const QColor mAcceptedColor = QColor(0,255,0); // green
 
     std::vector<int> mIds;
-    std::vector<std::vector<cv::Point2f> > mCorners, mRejected;
+    std::vector<OffsetMarker> mCorners, mRejected;
     Vec2F mUlc;  // upper left corner to draw
-    Vec2F mOffsetCropRect2Roi; //
 
 public:
-    CodeMarkerItem(QWidget *wParent, QGraphicsItem * parent = NULL);
-    QRectF boundingRect() const;
+    CodeMarkerItem(QWidget *wParent, QGraphicsItem * parent = nullptr);
+    QRectF boundingRect() const override;
     void setRect(Vec2F& v);
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    void setDetectedMarkers(std::vector<std::vector<cv::Point2f> > corners, std::vector<int> ids);
-    void setRejectedMarkers(std::vector<std::vector<cv::Point2f> > rejected);
-    void setOffsetCropRect2Roi(Vec2F offsetCropRect2Roi);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    void addDetectedMarkers(std::vector<std::vector<cv::Point2f> > corners, std::vector<int> ids, Vec2F offset = Vec2F(0,0));
+    void addRejectedMarkers(std::vector<std::vector<cv::Point2f> > rejected, Vec2F offset = Vec2F(0,0));
+    void resetSavedMarkers();
+
+private:
+    void drawMarker(const OffsetMarker& currentMarker, int id, const QColor& borderColor, QPainter *painter);
+    static constexpr int numCorners = 4;
 };
 
 #endif
