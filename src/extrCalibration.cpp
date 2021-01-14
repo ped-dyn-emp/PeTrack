@@ -599,10 +599,14 @@ bool ExtrCalibration::calcReprojectionError()
           sum_px = 0, sum_pH = 0, sum_dH = 0;
 
     //int bS = mMainWindow->getImageBorderSize();
-    int num_points = get2DList().size();
+    size_t num_points = get2DList().size();
+    if(num_points == 0 || num_points != get3DList().size()){
+        reprojectionError = QVector<double>(13, -1);
+        return false;
+    }
 
     bool debug = false;
-    for(int i=0; i< num_points; i++)
+    for(size_t i=0; i< num_points; i++)
     {
         Point2f p2d = get2DList().at(i);
         Point3f p3d = get3DList().at(i);
@@ -642,7 +646,7 @@ bool ExtrCalibration::calcReprojectionError()
         if( debug ) debout << "Error point[" << i << "]: " << val << endl;
 
     }
-    for(int i=0; i< num_points; i++)
+    for(size_t i=0; i< num_points; i++)
     {
         Point2f p2d = get2DList().at(i);
         Point3f p3d = get3DList().at(i);
@@ -676,7 +680,7 @@ bool ExtrCalibration::calcReprojectionError()
     }
 
     if( reprojectionError.isEmpty() )
-        reprojectionError = QVector<double>(13);
+        reprojectionError = QVector<double>(13, -1);
 
     // average
     sum_pH /= num_points;

@@ -1920,17 +1920,24 @@ void Control::on_extCalibPointsShow_stateChanged(int /*arg1*/)
     if (!isLoading())
          mScene->update();
 }
+
 void Control::on_extrCalibShowError_clicked()
 {
 
     QString out;
-    QMessageBox msgBox;
+    QDialog msgBox;
+    QGridLayout* layout = new QGridLayout();
+    msgBox.setLayout(layout);
+    QLabel* tableView = new QLabel(&msgBox);
+    layout->addWidget(tableView, 1, 1);
+    QLabel* titel = new QLabel(&msgBox);
+    titel->setText("<b>Reprojection error for extrinsic calibration:</b>");
+    layout->addWidget(titel, 0,1);
 
     if( mMainWindow->getExtrCalibration()->getReprojectionError().isEmpty() )
     {
-        out = QString("No File for extrinisc calibration found!");
-        msgBox.setInformativeText( out );
-
+        out = QString("No File for extrinsic calibration found!");
+        tableView->setText(out);
     }
     else
     {
@@ -1941,28 +1948,34 @@ void Control::on_extrCalibShowError_clicked()
                       "<th>std. deviation                          &nbsp;</th>"
                       "<th>variance  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>"
                       "<th>max       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th></tr>"
-                "<tr><td>Point   height: &nbsp;&nbsp;            </td><td> %0 cm</td><td> %1 cm</td><td> %2 cm</td><td> %3 cm</td></tr>"
-                "<tr><td>Default height: <small>[%12 cm]</small> </td><td> %4 cm</td><td> %5 cm</td><td> %6 cm</td><td> %7 cm</td></tr>"
-                "<tr><td>Pixel    error: &nbsp;&nbsp;            </td><td> %8 px</td><td> %9 px</td><td> %10 px</td><td> %11 px</td></tr>"
-                "</table>");
+                      "<tr><td>Point   height: &nbsp;&nbsp;            </td><td> %0 cm</td><td> %1 cm</td><td> %2 cm</td><td> %3 cm</td></tr>"
+                      "<tr><td>Default height: <small>[%12 cm]</small> </td><td> %4 cm</td><td> %5 cm</td><td> %6 cm</td><td> %7 cm</td></tr>"
+                      "<tr><td>Pixel    error: &nbsp;&nbsp;            </td><td> %8 px</td><td> %9 px</td><td> %10 px</td><td> %11 px</td></tr>"
+                      "</table>");
         QVector<double> reproError = mMainWindow->getExtrCalibration()->getReprojectionError();
-        msgBox.setInformativeText( out.arg(reproError.at(0)).arg(reproError.at(1)).arg(reproError.at(2)).arg(reproError.at(3))
-                                   .arg(reproError.at(4)).arg(reproError.at(5)).arg(reproError.at(6)).arg(reproError.at(7))
-                                   .arg(reproError.at(8)).arg(reproError.at(9)).arg(reproError.at(10)).arg(reproError.at(11))
-                                   .arg(reproError.at(12)));
-
+        for(double value : reproError){
+            if(value == -1){
+                out = out.arg("-");
+            }else{
+                out = out.arg(value);
+            }
+        }
+        tableView->setText(out);
     }
-    QSpacerItem* horizontalSpacer = new QSpacerItem(500, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    QGridLayout* layout = (QGridLayout*)msgBox.layout();
-    msgBox.setWindowTitle("PeTrack");
-    msgBox.setIcon(QMessageBox::Information);
-    msgBox.setText("Reprojection error for extrinsic calibration:");
-    layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.setDefaultButton(QMessageBox::Ok);
-    msgBox.exec();
 
+    msgBox.setWindowTitle("PeTrack");
+    QIcon icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation);
+    QLabel* infoIcon = new QLabel(&msgBox);
+    int iconSize = msgBox.style()->pixelMetric(QStyle::PM_MessageBoxIconSize, nullptr, &msgBox);
+    infoIcon->setPixmap(icon.pixmap(iconSize, iconSize));
+    layout->addWidget(infoIcon, 0, 0);
+    QDialogButtonBox *ok = new QDialogButtonBox(QDialogButtonBox::Ok);
+    layout->addWidget(ok, 2, 1);
+    connect(ok, &QDialogButtonBox::clicked, &msgBox, &QDialog::close);
+    msgBox.setFixedSize(msgBox.sizeHint());
+    msgBox.exec();
 }
+
 void Control::on_extVanishPointsShow_stateChanged(int /*arg1*/)
 {
     if (!isLoading())
