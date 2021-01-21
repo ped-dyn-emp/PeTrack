@@ -277,7 +277,6 @@ target_sources(petrack_core PRIVATE
     include/markerCasern.h
     include/markerJapan.h
     include/markerHermes.h
-    include/markerColor.h
     include/tracker.h
     include/trackerReal.h
     include/recognition.h
@@ -328,7 +327,6 @@ target_sources(petrack_core PRIVATE
     src/markerCasern.cpp
     src/markerHermes.cpp
     src/markerJapan.cpp
-    src/markerColor.cpp
     src/tracker.cpp
     src/trackerReal.cpp
     src/recognition.cpp
