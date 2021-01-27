@@ -4,7 +4,7 @@ Software for tracking pedestrians.
 
 
 ## Installation, Uninstallation:
-To obtain the installer by following in the steps at https://www.fz-juelich.de/ias/ias-7/EN/Expertise/Software/PeTrack/petrackDownload.html.
+To obtain the installer of the latest stable version, follow the steps at https://www.fz-juelich.de/ias/ias-7/EN/Expertise/Software/PeTrack/petrackDownload.html.
 Afterwards just execute `petrack-installer_<version>.exe` and follow the instructions.
 To uninstall PeTrack execute `Uninstall.exe` in the PeTrack application folder.
 
