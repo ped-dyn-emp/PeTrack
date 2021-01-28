@@ -3374,7 +3374,7 @@ void Control::on_expandColor()
     expandRange(fromColor, toColor, clickedColor);
 
     saveChange(fromColor, toColor, map);
-};
+}
 
 /**
  * @brief Selects one color as starting point for furher additions
