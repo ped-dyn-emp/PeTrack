@@ -80,201 +80,204 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     if( !(event->modifiers() & Qt::ShiftModifier || event->modifiers() & Qt::ControlModifier || event->modifiers() & Qt::AltModifier) )
     {
-    //debout << "start contextMenuEvent..." << endl;
-    TrackPoint p((Vec2F) event->pos(), 110); // 110 ist ueber 100 (hoechste Qualitaetsstufe) und wird nach einfuegen auf 100 gesetzt
-    //debout << "p: " << p.x() << ", " << p.y() << endl;
-    bool found = false;
-    int i, iNearest = -1;
-    float dist, minDist = 1000000.;
+        //debout << "start contextMenuEvent..." << endl;
+        TrackPoint p((Vec2F) event->pos(), 110); // 110 ist ueber 100 (hoechste Qualitaetsstufe) und wird nach einfuegen auf 100 gesetzt
+        //debout << "p: " << p.x() << ", " << p.y() << endl;
+        bool found = false;
+        int i, iNearest = -1;
+        float dist, minDist = 1000000.;
 
-    QSet<int> onlyVisible = mMainWindow->getOnlyVisible();
-    int frame = mMainWindow->getAnimation()->getCurrentFrameNum();
+        QSet<int> onlyVisible = mMainWindow->getOnlyVisible();
+        int frame = mMainWindow->getAnimation()->getCurrentFrameNum();
 
-    for (i = 0; i < mTracker->size(); ++i) // !found &&  // ueber TrackPerson
-    {
-        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && mTracker->at(i).trackPointExist(frame))
+        for (i = 0; i < mTracker->size(); ++i) // !found &&  // ueber TrackPerson
         {
-            dist = mTracker->at(i).trackPointAt(frame).distanceToPoint(p);
-            if (( dist < mMainWindow->getHeadSize(NULL, i, frame)/2.) ||
-                ( (mTracker->at(i).trackPointAt(frame).distanceToPoint(p.colPoint()) < mMainWindow->getHeadSize(NULL, i, frame)/2.)))
+            if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && mTracker->at(i).trackPointExist(frame))
             {
-                if (found)
+                dist = mTracker->at(i).trackPointAt(frame).distanceToPoint(p);
+                if (( dist < mMainWindow->getHeadSize(NULL, i, frame)/2.) ||
+                    ( (mTracker->at(i).trackPointAt(frame).distanceToPoint(p.colPoint()) < mMainWindow->getHeadSize(NULL, i, frame)/2.)))
                 {
-                    debout << "Warning: more possible trackpoints for point" << endl;
-                    debout << "         " << p << " in frame " << frame << " with low distance:" << endl;
-                    debout << "         person " << i+1 << " (distance: " << dist << "), " << endl;
-                    debout << "         person " << iNearest+1 << " (distance: " << minDist << "), " << endl;
-                    if (minDist > dist)
+                    if (found)
+                    {
+                        debout << "Warning: more possible trackpoints for point" << endl;
+                        debout << "         " << p << " in frame " << frame << " with low distance:" << endl;
+                        debout << "         person " << i+1 << " (distance: " << dist << "), " << endl;
+                        debout << "         person " << iNearest+1 << " (distance: " << minDist << "), " << endl;
+                        if (minDist > dist)
+                        {
+                            minDist = dist;
+                            iNearest = i;
+                        }
+                    }
+                    else
                     {
                         minDist = dist;
                         iNearest = i;
+                        // WAR: break inner loop
+                        found = true;
                     }
-                }
-                else
-                {
-                    minDist = dist;
-                    iNearest = i;
-                    // WAR: break inner loop
-                    found = true;
                 }
             }
         }
-    }
-    QMenu menu;
-    TrackPerson tp;
-    float height = 0.f;
-    bool height_set_by_user = false;
-    QAction *delTrj = nullptr, *delFutureTrj = nullptr, *delPastTrj = nullptr, *creTrj = nullptr, *infoTrj = nullptr, *addComment = nullptr, *setHeight = nullptr, *resetHeight = nullptr;
+        QMenu menu;
+        TrackPerson tp;
+        float height = 0.f;
+        bool height_set_by_user = false;
+        QAction *delTrj = nullptr, *delFutureTrj = nullptr, *delPastTrj = nullptr, *creTrj = nullptr, *infoTrj = nullptr, *addComment = nullptr, *setHeight = nullptr, *resetHeight = nullptr;
 
-    //debout << "mTracker->size(): " << mTracker->size() << endl;
-    if(found)
-    {
-        i = iNearest;
-        //debout << "found: " << found << " iNearest: " << iNearest << endl;
-        tp = mTracker->at(i);
-        //debout << "test" << endl;
-        height = tp.height();
-        //debout << "height: " << height << endl;
-        //debout << "height<MIN_HEIGHT: " << height << endl;
-        //debout << "mTracker.color: valid? " << tp.color().isValid() << endl;
-        //debout << "tp.color: " << tp.color() << endl;
-        //QRgb col = mMainWindow->getImage()->pixel(QPoint(event->scenePos().x(),event->scenePos().y()));
-        //QColor color(qRed(col), qGreen(col), qBlue(col));
-
-        //debout << "color: " << color << endl;
-        if (height < MIN_HEIGHT+1)
+        //debout << "mTracker->size(): " << mTracker->size() << endl;
+        if(found)
         {
-            if (tp.color().isValid())
-                height = mControlWidget->getColorPlot()->map(tp.color());
+            i = iNearest;
+            //debout << "found: " << found << " iNearest: " << iNearest << endl;
+            tp = mTracker->at(i);
+            //debout << "test" << endl;
+            height = tp.height();
             //debout << "height: " << height << endl;
+            //debout << "height<MIN_HEIGHT: " << height << endl;
+            //debout << "mTracker.color: valid? " << tp.color().isValid() << endl;
+            //debout << "tp.color: " << tp.color() << endl;
+            //QRgb col = mMainWindow->getImage()->pixel(QPoint(event->scenePos().x(),event->scenePos().y()));
+            //QColor color(qRed(col), qGreen(col), qBlue(col));
+
+            //debout << "color: " << color << endl;
+            if (height < MIN_HEIGHT+1)
+            {
+                if (tp.color().isValid())
+                    height = mControlWidget->getColorPlot()->map(tp.color());
+                //debout << "height: " << height << endl;
+            }else
+            {
+                //height = mControlWidget->mapDefaultHeight->value();
+                //debout << "height(default): " << height << endl;
+                height_set_by_user = true;
+            }
+            //debout << "setHeight" << endl;
+    //        tp.setHeight(height);
+            infoTrj = menu.addAction(QString("PersonNr: %1 height: %2 frames: [%3..%4]").arg(i+1).arg(height).arg(tp.firstFrame()).arg(tp.lastFrame()));
+            delTrj = menu.addAction("Delete whole trajectory");
+            delFutureTrj = menu.addAction("Delete past part of the trajectory");
+            delPastTrj = menu.addAction("Delete future part of the trajectory");
+            setHeight = menu.addAction("Set person height");
+            if(height_set_by_user) resetHeight = menu.addAction("Reset height");
+            addComment = menu.addAction("Edit comment");
         }else
         {
-            //height = mControlWidget->mapDefaultHeight->value();
-            //debout << "height(default): " << height << endl;
-            height_set_by_user = true;
-        }
-        //debout << "setHeight" << endl;
-//        tp.setHeight(height);
-        infoTrj = menu.addAction(QString("PersonNr: %1 height: %2 frames: [%3..%4]").arg(i+1).arg(height).arg(tp.firstFrame()).arg(tp.lastFrame()));
-        delTrj = menu.addAction("Delete whole trajectory");
-        delFutureTrj = menu.addAction("Delete past part of the trajectory");
-        delPastTrj = menu.addAction("Delete future part of the trajectory");
-        setHeight = menu.addAction("Set person height");
-        if(height_set_by_user) resetHeight = menu.addAction("Reset height");
-        addComment = menu.addAction("Edit comment");
-    }else
-    {
-        creTrj = menu.addAction("Create new trajectory");
-    }
-
-    //debout << "selectedAction: " << endl;
-    QAction *selectedAction = menu.exec(event->screenPos());
-    //debout << "screenPos: " << event->scenePos() << endl;
-    if( selectedAction == creTrj )
-    {
-        //debout << "Create new trajectory..." << endl;
-        mMainWindow->addManualTrackPoint(event->scenePos());
-        //debout << "addManuelTrackPoint: " << res << endl;
-    }else if( selectedAction == delTrj )
-    {
-        //debout << "Delete trajectory..." << endl;
-        mMainWindow->deleteTrackPoint(event->scenePos(),0);
-    }else if( selectedAction == delFutureTrj )
-    {
-        //debout << "Delete future part of trajectory..." << endl;
-        mMainWindow->deleteTrackPoint(event->scenePos(),-1);
-    }else if( selectedAction == delPastTrj )
-    {
-        //debout << "Delete past part of trajectory..." << endl;
-        mMainWindow->deleteTrackPoint(event->scenePos(),1);
-    }else if( selectedAction == addComment )
-    {
-        mMainWindow->editTrackPersonComment(event->scenePos());
-    }else if( selectedAction == setHeight )
-    {
-        mMainWindow->setTrackPersonHeight(event->scenePos());
-    }else if( selectedAction == resetHeight )
-    {
-        mMainWindow->resetTrackPersonHeight(event->scenePos());
-    }else if( selectedAction == infoTrj )
-    {
-        if (found)
-        {
-        QString out;
-        QMessageBox msgBox;
-        msgBox.setText(QString("Info for trajectory number %1:").arg(i+1));
-
-        if(height_set_by_user)
-            out = QString("<table>"
-                      "<tr><td>height:</td><td>%0 cm (edited by user)</td></tr>"
-                      "<tr><td>frames:</td><td>[%1...%2]</td></tr>"
-                      "<tr><td>color:</td><td><font style='display:inline;background:%3;color:#fff;'>%4</font></td></tr>"
-                      "<tr><td>comment:</td><td>%5</td></tr>"
-                      "<tr><td></td><td></td></tr>");
-        else
-            out = QString("<table>"
-                      "<tr><td>height:</td><td>%0 cm</td></tr>"
-                      "<tr><td>frames:</td><td>[%1...%2]</td></tr>"
-                      "<tr><td>color:</td><td><font style='display:inline;background:%3;color:#fff;'>%4</font></td></tr>"
-                      "<tr><td>comment:</td><td>%5</td></tr>"
-                      "<tr><td></td><td></td></tr>");
-        if( tp.lastFrame()-tp.firstFrame() > 5 )
-        {
-            out.append(QString("<tr><td>frame [%6]:</td><td>[%7, %8]</td></tr>"
-                                            "<tr><td>frame [%9]:</td><td>[%10, %11]</td></tr>"
-                                            "<tr><td colspan='2'>...</td></tr>"
-                                            "<tr><td colspan='2'>...</td></tr>"
-                                            "<tr><td>frame [%12]:</td><td>[%13, %14]</td></tr>"
-                                            "<tr><td>frame [%15]:</td><td>[%16, %17]]</td></tr>"
-                                          "</table>").toLatin1());
-            msgBox.setInformativeText( out.arg(height)
-                                      .arg(tp.firstFrame())
-                                      .arg(tp.lastFrame())
-                                      .arg(tp.color().name())
-                                      .arg(tp.color().name())
-                                      .arg(tp.comment())
-                                      .arg(tp.firstFrame())
-                                      .arg(tp.at(0).x())
-                                      .arg(tp.at(0).y())
-                                      .arg(tp.firstFrame()+1)
-                                      .arg(tp.at(1).x())
-                                      .arg(tp.at(1).y())
-                                      .arg(tp.lastFrame()-1)
-                                      .arg(tp.at(tp.size()-2).x())
-                                      .arg(tp.at(tp.size()-2).y())
-                                      .arg(tp.lastFrame())
-                                      .arg(tp.at(tp.size()-1).x())
-                                      .arg(tp.at(tp.size()-1).y()));
-        }else
-        {
-            out.append(QString("</table>"));
-            msgBox.setInformativeText( out.arg(height)
-                                       .arg(tp.firstFrame())
-                                       .arg(tp.lastFrame())
-                                       .arg(tp.color().name())
-                                       .arg(tp.color().name())
-                                       .arg(tp.comment()));
-        }
-        out = QString();
-
-        for(int frame=tp.firstFrame(); frame<=tp.lastFrame();frame++)
-        {
-            out.append(QString("frame [%0]: [%1, %2]\n").arg(frame).arg(tp.at(frame-tp.firstFrame()).x()).arg(tp.at(frame-tp.firstFrame()).y()));
+            creTrj = menu.addAction("Create new trajectory");
         }
 
-        msgBox.setDetailedText(out);
+        //debout << "selectedAction: " << endl;
+        QAction *selectedAction = menu.exec(event->screenPos());
+        //debout << "screenPos: " << event->scenePos() << endl;
+        if( selectedAction == creTrj )
+        {
+            //debout << "Create new trajectory..." << endl;
+            mMainWindow->addManualTrackPoint(event->scenePos());
+            //debout << "addManuelTrackPoint: " << res << endl;
+        }else if( selectedAction == delTrj )
+        {
+            //debout << "Delete trajectory..." << endl;
+            mMainWindow->deleteTrackPoint(event->scenePos(),0);
+        }else if( selectedAction == delFutureTrj )
+        {
+            //debout << "Delete future part of trajectory..." << endl;
+            mMainWindow->deleteTrackPoint(event->scenePos(),-1);
+        }else if( selectedAction == delPastTrj )
+        {
+            //debout << "Delete past part of trajectory..." << endl;
+            mMainWindow->deleteTrackPoint(event->scenePos(),1);
+        }else if( selectedAction == addComment )
+        {
+            mMainWindow->editTrackPersonComment(event->scenePos());
+        }else if( selectedAction == setHeight )
+        {
+            mMainWindow->setTrackPersonHeight(event->scenePos());
+        }else if( selectedAction == resetHeight )
+        {
+            mMainWindow->resetTrackPersonHeight(event->scenePos());
+        }else if( selectedAction == infoTrj )
+        {
+            if (found)
+            {
+                QString out;
+                QMessageBox msgBox;
+                msgBox.setText(QString("Info for trajectory number %1:").arg(i+1));
 
-        QSpacerItem* horizontalSpacer = new QSpacerItem(300, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-        QGridLayout* layout = (QGridLayout*)msgBox.layout();
-        msgBox.setWindowTitle("PeTrack");
-        msgBox.setIcon(QMessageBox::Information);
-        layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setDefaultButton(QMessageBox::Ok);
-        msgBox.setEscapeButton(QMessageBox::Ok);
-        msgBox.exec();
+                if(height_set_by_user)
+                {
+                    out = QString("<table>"
+                              "<tr><td>height:</td><td>%0 cm (edited by user)</td></tr>"
+                              "<tr><td>frames:</td><td>[%1...%2]</td></tr>"
+                              "<tr><td>color:</td><td><font style='display:inline;background:%3;color:#fff;'>%4</font></td></tr>"
+                              "<tr><td>comment:</td><td>%5</td></tr>"
+                              "<tr><td></td><td></td></tr>");
+                }
+                else
+                {
+                    out = QString("<table>"
+                              "<tr><td>height:</td><td>%0 cm</td></tr>"
+                              "<tr><td>frames:</td><td>[%1...%2]</td></tr>"
+                              "<tr><td>color:</td><td><font style='display:inline;background:%3;color:#fff;'>%4</font></td></tr>"
+                              "<tr><td>comment:</td><td>%5</td></tr>"
+                              "<tr><td></td><td></td></tr>");
+                }
+
+                if( tp.lastFrame()-tp.firstFrame() > 5 )
+                {
+                    out.append(QString("<tr><td>frame [%6]:</td><td>[%7, %8]</td></tr>"
+                                                    "<tr><td>frame [%9]:</td><td>[%10, %11]</td></tr>"
+                                                    "<tr><td colspan='2'>...</td></tr>"
+                                                    "<tr><td colspan='2'>...</td></tr>"
+                                                    "<tr><td>frame [%12]:</td><td>[%13, %14]</td></tr>"
+                                                    "<tr><td>frame [%15]:</td><td>[%16, %17]]</td></tr>"
+                                                  "</table>").toLatin1());
+                    msgBox.setInformativeText( out.arg(height)
+                                              .arg(tp.firstFrame())
+                                              .arg(tp.lastFrame())
+                                              .arg(tp.color().name())
+                                              .arg(tp.color().name())
+                                              .arg(tp.comment())
+                                              .arg(tp.firstFrame())
+                                              .arg(tp.at(0).x())
+                                              .arg(tp.at(0).y())
+                                              .arg(tp.firstFrame()+1)
+                                              .arg(tp.at(1).x())
+                                              .arg(tp.at(1).y())
+                                              .arg(tp.lastFrame()-1)
+                                              .arg(tp.at(tp.size()-2).x())
+                                              .arg(tp.at(tp.size()-2).y())
+                                              .arg(tp.lastFrame())
+                                              .arg(tp.at(tp.size()-1).x())
+                                              .arg(tp.at(tp.size()-1).y()));
+                }
+                else
+                {
+                    out.append(QString("</table>"));
+                    msgBox.setInformativeText( out.arg(height)
+                                               .arg(tp.firstFrame())
+                                               .arg(tp.lastFrame())
+                                               .arg(tp.color().name())
+                                               .arg(tp.color().name())
+                                               .arg(tp.comment()));
+                }
+                out = QString();
+
+                for(int frameTrackperson=tp.firstFrame(); frameTrackperson <= tp.lastFrame(); frameTrackperson++)
+                {
+                    out.append(QString("frame [%0]: [%1, %2]\n").arg(frameTrackperson).arg(tp.at(frameTrackperson - tp.firstFrame()).x()).arg(tp.at(frameTrackperson - tp.firstFrame()).y()));
+                }
+
+                msgBox.setDetailedText(out);
+
+                msgBox.setWindowTitle("PeTrack");
+                msgBox.setIcon(QMessageBox::Information);
+                msgBox.setStandardButtons(QMessageBox::Ok);
+                msgBox.setDefaultButton(QMessageBox::Ok);
+                msgBox.setEscapeButton(QMessageBox::Ok);
+                msgBox.exec();
+            }
         }
-    }
     }
     mMainWindow->getScene()->update();
     //debout << "finished contextMenuEvent!" << endl;
