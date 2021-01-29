@@ -76,11 +76,16 @@ if(WIN32)
       WriteRegStr HKCU 'Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Explorer\\\\FileExts\\\\.pet\\\\OpenWithList' 'a' '$INSTDIR\\\\bin\\\\petrack.exe'
       ")
     set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
+      EnumRegKey $1 HKCU 'Software\\\\Forschungszentrum Juelich GmbH' 1
+      StrCmp $1 '' 0 +3
+      DeleteRegKey HKCU 'Software\\\\Forschungszentrum Juelich GmbH'
+      goto +2
       DeleteRegKey HKCU 'Software\\\\Forschungszentrum Juelich GmbH\\\\PeTrack'
       DeleteRegKey HKCR '.pet'
       DeleteRegKey HKCR 'petfile'
-      DeleteRegKey HKLM 'Software\\\\RegisteredApplications\\\\petrack'
-      DeleteRegKey HKCU 'Software\\\\RegisteredApplications\\\\petrack'
+      DeleteRegValue HKLM 'Software\\\\RegisteredApplications' 'petrack'
+      DeleteRegValue HKCU 'Software\\\\RegisteredApplications' 'petrack'
+      DeleteRegValue HKLM 'SOFTWARE\\\\WOW6432Node\\\\RegisteredApplications' 'petrack'
       DeleteRegKey HKCU 'Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Explorer\\\\FileExts\\\\.pet'
     ")
 endif()
