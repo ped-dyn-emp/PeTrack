@@ -99,7 +99,7 @@ CalibFilter::CalibFilter()
  */
 Mat CalibFilter::act(Mat &img, Mat &res)
 {
-    if(this->changed() || map1.empty() || map2.empty())
+    if(this->changed() || map1.size() != img.size())
     {
     Mat camera = (Mat_<float>(3,3) << getFx()->getValue(), 0,                   getCx()->getValue(),
                                           0,                   getFy()->getValue(), getCy()->getValue(),
