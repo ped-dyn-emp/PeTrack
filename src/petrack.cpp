@@ -4139,14 +4139,27 @@ void Petrack::splitTrackPerson(QPointF pos)
     updateControlWidget();
 }
 
+/**
+ * @brief Lets the user add a TrackPoint manually
+ *
+ * @param pos pixel position of mouse on image
+ * @return index of added person; -1 if failed
+ */
 int Petrack::addManualTrackPoint(QPointF pos) //const QPoint &pos
 {
-    int pers = -1;
-    TrackPoint tP((Vec2F) pos, 110); // 110 ist ueber 100 (hoechste Qualitaetsstufe) und wird nach einfuegen auf 100 gesetzt
-    // so kann aber ein punkt immer angepasst werden
-    mTracker->addPoint(tP, mAnimation->getCurrentFrameNum(), getOnlyVisible(), &pers);
-    updateControlWidget();
-    return pers;
+    if(getOnlyVisible().empty()){
+        int pers = -1;
+        TrackPoint tP((Vec2F) pos, 110); // 110 ist ueber 100 (hoechste Qualitaetsstufe) und wird nach einfuegen auf 100 gesetzt
+        // so kann aber ein punkt immer angepasst werden
+        mTracker->addPoint(tP, mAnimation->getCurrentFrameNum(), getOnlyVisible(), &pers);
+        updateControlWidget();
+        return pers;
+    }else{
+        QMessageBox::warning(this, tr("PeTrack"), tr("Adding a manual TrackPoint is only possible, when \"show only people\" and \"show only people list\" are disabled!\n"
+                                                     "You would not see the newly created TrackPoint otherwise."));
+        return -1;
+    }
+
 }
 
 // direction zeigt an, ob bis zum aktuellen (-1), ab dem aktuellen (1) oder ganzer trackpath (0)
