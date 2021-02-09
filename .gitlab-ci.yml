@@ -36,10 +36,10 @@ build_container:
     entrypoint: [""]
   script:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/container/arch/Dockerfile --destination $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_linux
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/container/ubuntu/Dockerfile --destination $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_linux
   rules:
     - changes:
-        - container/arch/Dockerfile
+        - container/ubuntu/Dockerfile
 
 # Build petrack and petrack unit_tests
 build_linux:
@@ -75,7 +75,7 @@ regression_test_linux:
   stage: test
   script:
     - cd tests/regression_test/tests
-    - python -m pytest --path=../../../build/petrack --junitxml=pytest_report.xml >> "RegressionTestLog.txt"
+    - python3 -m pytest --path=../../../build/petrack --junitxml=pytest_report.xml >> "RegressionTestLog.txt"
   artifacts:
     when: on_failure
     paths:
