@@ -2186,7 +2186,7 @@ bool Tracker::printHeightDistribution()
 
  /**
   * Sets the heights based on the values contained in \p heights.
-  * @param heights Map between marked ID and corresponding height
+  * @param heights Map between marker ID and corresponding height
   */
 void Tracker::setMarkerHeights(const unordered_map<int, float> &heights)
 {
@@ -2213,6 +2213,30 @@ void Tracker::setMarkerHeights(const unordered_map<int, float> &heights)
      }
 }
 
+/**
+ * Sets the marker IDs based on the internal used IDs (personID).
+ * @param markerIDs Map between internal ID and marker ID
+ */
+void Tracker::setMarkerIDs(const std::unordered_map<int, int> &markerIDs)
+{
+    for (int i = 0; i < size(); ++i) // over TrackPerson
+    {
+        // personID of current person
+        int personID = i + 1;
+        if (markerIDs.find(personID) != std::end(markerIDs))
+        {
+            int markerID = markerIDs.at(personID);
+            (*this)[i].setMarkerID(markerID);
+            for (int j = 0; j < (*this)[i].size(); ++j) // over TrackPoints
+            {
+                (*this)[i][j].setMarkerID(markerID);
+            }
+        }else
+        {
+          debout << "Warning, the following personID was not part of the markerID-file: " << personID << std::endl;
+        }
+    }
+}
 
 /**
  * @brief Deletes TrackPersons with over 80% solely tracked points

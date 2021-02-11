@@ -4418,6 +4418,17 @@
                   </property>
                  </widget>
                 </item>
+                <item>
+                 <widget class="QPushButton" name="mapReadMarkerID">
+                  <property name="toolTip">
+                   <string>Select a file with individual markerIDs mapped with personID</string>
+                  </property>
+                  <property name="text">
+                   <string>import markerIDs</string>
+                  </property>
+                 </widget>
+                </item>
+
                </layout>
               </item>
              </layout>

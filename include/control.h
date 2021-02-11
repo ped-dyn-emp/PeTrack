@@ -253,6 +253,7 @@ private slots:
     void on_mapColorRange_clicked();
     void on_colorPickerButton_clicked(bool checked);
     void on_mapReadHeights_clicked();
+    void on_mapReadMarkerID_clicked();
 
     void on_mapNr_valueChanged(int i);
     void on_mapX_valueChanged(int i);
