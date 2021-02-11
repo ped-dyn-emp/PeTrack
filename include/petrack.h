@@ -225,6 +225,14 @@ public:
     {
         mHeightFileName = fn;
     }
+    inline QString getMarkerIDFileName()
+    {
+        return mMarkerIDFileName;
+    }
+    inline void setMarkerIDFileName(const QString &fn)
+    {
+        mMarkerIDFileName = fn;
+    }
 
     inline Control* getControlWidget()
     {
@@ -515,7 +523,9 @@ private:
     QString mProFileName;
     QString mTrcFileName;
     QString mHeightFileName;
-//    IplImage *mIplImg;
+    QString mMarkerIDFileName;
+
+  //    IplImage *mIplImg;
 //     IplImage *mPrevIplImgFiltered;
 //    IplImage *mIplImgFiltered;
     cv::Mat mImg;

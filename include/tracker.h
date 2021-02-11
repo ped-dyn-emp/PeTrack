@@ -536,6 +536,8 @@ public:
 
     void setMarkerHeights(const std::unordered_map<int, float> &heights);
 
+    void setMarkerIDs(const std::unordered_map<int, int> &markerIDs);
+
     // gibt groessenverteilung der personen auf stdout aus
     // rueckgabewert false wenn keine hoeheninformationen in tracker datensatz vorliegt
     bool printHeightDistribution();

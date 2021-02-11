@@ -1479,6 +1479,28 @@ void Control::on_mapReadHeights_clicked()
     mScene->update();
 }
 
+void Control::on_mapReadMarkerID_clicked()
+{
+  QString markerFile = QFileDialog::getOpenFileName(mMainWindow, Petrack::tr("Select text file with marker information"), mMainWindow->getHeightFileName(),
+                                                    Petrack::tr("Marker File (*.txt);;All files (*.*)"));
+
+  auto markerIDs = IO::readMarkerIDFile(markerFile);
+
+  if (std::holds_alternative<std::unordered_map<int, int>>(markerIDs)) // markerIDs contains the marker information
+  {
+    mMainWindow->getTracker()->setMarkerIDs(std::get<std::unordered_map<int, int>>(markerIDs));
+      mMainWindow->setMarkerIDFileName(markerFile);
+  }
+  else //heights contains an error string
+  {
+    QMessageBox::critical(mMainWindow, Petrack::tr("PeTrack"),
+                          Petrack::tr(std::get<std::string>(markerIDs).c_str()));
+  }
+
+  mMainWindow->getTracker()->printHeightDistribution();
+  mScene->update();
+}
+
 void Control::on_performRecognition_stateChanged(int /*i*/)
 {
     mMainWindow->setRecognitionChanged(true);// flag changes of recognition parameters
@@ -2239,6 +2261,7 @@ void Control::setXml(QDomElement &elem)
         QDomElement subSubSubElem;
         QString fn;
         QString heightFile;
+        QString markerFile;
 
         elem.setAttribute("TAB", tabs->currentIndex());
 
@@ -2430,12 +2453,18 @@ void Control::setXml(QDomElement &elem)
         if (!heightFile.isEmpty()) {
             heightFile = getFileList(heightFile, mMainWindow->getProFileName());
         }
-
         subSubElem.setAttribute("HEIGHT_FILE", heightFile);
-
         subElem.appendChild(subSubElem);
 
-        // - - - - - - - - - - - - - - - - - - - 
+        subSubElem = (elem.ownerDocument()).createElement("READ_MARKER_IDS");
+        markerFile = mMainWindow->getMarkerIDFileName();
+        if (!markerFile.isEmpty()) {
+            markerFile = getFileList(markerFile, mMainWindow->getProFileName());
+        }
+        subSubElem.setAttribute("MARKER_FILE", markerFile);
+        subElem.appendChild(subSubElem);
+
+    // - - - - - - - - - - - - - - - - - - -
         subElem = (elem.ownerDocument()).createElement("TRACKING");
         elem.appendChild(subElem);
 
@@ -3023,6 +3052,18 @@ void Control::getXml(QDomElement &elem)
                         {
                             mMainWindow->setHeightFileName(heightFileName);
                         }
+                    }
+                }
+
+                else if (subSubElem.tagName() == "READ_MARKER_IDS")
+                {
+                    if (subSubElem.hasAttribute("MARKER_FILE"))
+                    {
+                        QString fm = subSubElem.attribute("MARKER_FILE");
+                        if (getExistingFile(fm, mMainWindow->getProFileName()) != "")
+                            mMainWindow->setMarkerIDFileName(getExistingFile(fm, mMainWindow->getProFileName()));
+                        else
+                            mMainWindow->setMarkerIDFileName(fm);
                     }
                 }
 

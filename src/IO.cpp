@@ -119,3 +119,86 @@ std::variant<std::unordered_map<int, float>, std::string> IO::readHeightFile(con
     }
     return "No file provided.";
 }
+
+/**
+ * @brief Reads the markerIDs of individual personIDs from a file.
+ *
+ * Reads the markerIDs for personIDs from \p markerFileName. The file consists of:<br>
+ * - lines with markerID and height separated by a whitespace. MarkerIDs may only occur once! <br>
+ * - comment lines starting with # will be skipped <br>
+ *
+ * Example: <br>
+ * # id markerID <br>
+ * 1 995 <br>
+ * 2 999 <br>
+ * 3 998 <br>
+ * # this and the following line will be ignored <br>
+ * # 4 	 994 <br>
+ *
+ * @param markerFileName name of the file containing the markerID information
+ * @return map of personID to markerID if parsing was successful, error message otherwise
+ */
+std::variant<std::unordered_map<int, int>, std::string> IO::readMarkerIDFile(const QString &markerFileName)
+{
+    if (!markerFileName.isEmpty())
+    {
+        // Import heights from txt-file
+        if (markerFileName.right(4) == ".txt")
+        {
+            QFile markerFile(markerFileName);
+            if (!markerFile.open(QIODevice::ReadOnly | QIODevice::Text))
+            {
+                return "Could not open " + markerFileName.toStdString();
+            }
+
+            std::unordered_map<int, int> markerIDs;
+
+            QTextStream in(&markerFile);
+
+            while (!in.atEnd())
+            {
+                QString line = in.readLine();
+
+                // Skip header/comment line
+                if( line.startsWith("#",Qt::CaseInsensitive))
+                {
+                    continue;
+                }
+
+                // read line with format: [personID markerID]
+                if (auto splitLine = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts); splitLine.size() == 2)
+                {
+                    bool personIDConverted = true;
+                    int personID = splitLine[0].toInt(&personIDConverted);
+                    if (!personIDConverted)
+                    {
+                        return "PersonID needs to be an integer value, but is " + splitLine[0].toStdString();
+                    }
+                    bool markerIDConverted = true;
+                    int markerID = splitLine[1].toInt(&markerIDConverted);
+
+                    if (!markerIDConverted )
+                    {
+                        return "MarkerID needs to be an integer value, but is " + splitLine[1].toStdString();
+                    }
+
+                    if (auto inserted = markerIDs.insert(std::make_pair(personID, markerID)); !inserted.second)
+                    {
+                        return "Duplicate entry for personID = " + std::to_string(personID) + ".";
+                    }
+                }
+                else
+                {
+                    return "Line should contain exactly 2 values: personID markerID. But it contains "
+                           + std::to_string(splitLine.size()) + " entries.";
+                }
+            }
+            markerFile.close();
+            return markerIDs;
+        }
+
+        return "Cannot load " + markerFileName.toStdString()
+               + " maybe because of wrong file extension. Needs to be .txt.";
+    }
+    return "No file provided.";
+}

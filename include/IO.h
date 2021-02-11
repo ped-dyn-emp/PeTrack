@@ -27,4 +27,7 @@ namespace IO
 {
     std::variant<std::unordered_map<int, float>, std::string>
     readHeightFile(const QString& heightFileName);
+
+    std::variant<std::unordered_map<int, int>, std::string>
+    readMarkerIDFile(const QString& markerFileName);
 }
