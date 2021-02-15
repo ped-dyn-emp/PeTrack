@@ -214,7 +214,7 @@ Petrack::Petrack()
     connect(mView, SIGNAL(mouseDoubleClick()), this, SLOT(openSequence()));
     connect(mView, SIGNAL(mouseShiftDoubleClick(QPointF)), this, SLOT(addManualTrackPointOnlyVisible(QPointF))); //const QPoint &pos funktionierte nicht
     connect(mView, SIGNAL(mouseShiftControlDoubleClick(QPointF)), this, SLOT(splitTrackPerson(QPointF))); //const QPoint &pos funktionierte nicht
-    connect(mView, SIGNAL(mouseControlDoubleClick(QPointF)), this, SLOT(addManualTrackPoint(QPointF))); //const QPoint &pos funktionierte nicht
+    connect(mView, SIGNAL(mouseControlDoubleClick(QPointF)), this, SLOT(addOrMoveManualTrackPoint(QPointF))); //const QPoint &pos funktionierte nicht
     connect(mView, SIGNAL(mouseRightDoubleClick(QPointF, int)), this, SLOT(deleteTrackPoint(QPointF, int))); //const QPoint &pos funktionierte nicht
     connect(mView, SIGNAL(mouseMiddleDoubleClick(int)), this, SLOT(deleteTrackPointAll(int))); //const QPoint &pos funktionierte nicht
     connect(mView, SIGNAL(mouseShiftWheel(int)), this, SLOT(skipToFrameWheel(int)));
@@ -4106,9 +4106,9 @@ QSet<int> Petrack::getOnlyVisible()
         return QSet<int>();
 }
 
-void Petrack::addManualTrackPointOnlyVisible(QPointF pos)
+void Petrack::addManualTrackPointOnlyVisible(const QPointF& pos)
 {
-    int pers = addManualTrackPoint(pos)+1;
+    int pers = addOrMoveManualTrackPoint(pos)+1;
     if (pers == 0)
         pers = mTracker->size()+1;
     pers = mControlWidget->trackShowOnlyNr->maximum();
@@ -4140,26 +4140,23 @@ void Petrack::splitTrackPerson(QPointF pos)
 }
 
 /**
- * @brief Lets the user add a TrackPoint manually
+ * @brief Lets the user add or move a TrackPoint manually
+ *
+ * There is an check inside addPoint which inhibits adding a point,
+ * if only selected trajectories are visualized, since one wouldn't
+ * see the newly added TrackPoint.
  *
  * @param pos pixel position of mouse on image
- * @return index of added person; -1 if failed
+ * @return index of person whose point was moved; -1 if failed or new trajectory is started
  */
-int Petrack::addManualTrackPoint(QPointF pos) //const QPoint &pos
+int Petrack::addOrMoveManualTrackPoint(const QPointF& pos)
 {
-    if(getOnlyVisible().empty()){
-        int pers = -1;
-        TrackPoint tP((Vec2F) pos, 110); // 110 ist ueber 100 (hoechste Qualitaetsstufe) und wird nach einfuegen auf 100 gesetzt
-        // so kann aber ein punkt immer angepasst werden
-        mTracker->addPoint(tP, mAnimation->getCurrentFrameNum(), getOnlyVisible(), &pers);
-        updateControlWidget();
-        return pers;
-    }else{
-        QMessageBox::warning(this, tr("PeTrack"), tr("Adding a manual TrackPoint is only possible, when \"show only people\" and \"show only people list\" are disabled!\n"
-                                                     "You would not see the newly created TrackPoint otherwise."));
-        return -1;
-    }
-
+    int pers = -1;
+    TrackPoint tP(Vec2F{pos}, 110); // 110 is higher than 100 (max. quality) and gets clamped to 100 after insertion
+    // allows replacemet of every point (check for better quality always passes)
+    mTracker->addPoint(tP, mAnimation->getCurrentFrameNum(), getOnlyVisible(), &pers);
+    updateControlWidget();
+    return pers;
 }
 
 // direction zeigt an, ob bis zum aktuellen (-1), ab dem aktuellen (1) oder ganzer trackpath (0)

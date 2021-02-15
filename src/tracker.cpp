@@ -1087,10 +1087,28 @@ int Tracker::calcPosition(int /*frame*/) {
     return -1;
 }
 
-// true, if new traj is inserted with point p and initial frame frame
-// p in pixel coord
-// used from recognition and manual
-bool Tracker::addPoint(TrackPoint &p, int frame, QSet<int> onlyVisible, int *pers)
+/**
+ * @brief Adds the point to the Tracker, either to exising person or creating a new one.
+ *
+ * This function find the nearest person to the given point and if the distance between point
+ * and trajectory is small enough, it gets added to this trajectory. If the point is not fitting to
+ * any trajectory, a new TrackPerson is created.
+ *
+ * It is possible for point to replace existing ones, if the quality is better. (Manual insertion,
+ * reverse tracking,...)
+ *
+ * For multicolor, the color gets added as well. For Aruco, the code of TrackPoint and TrackPerson
+ * gets synchronized.
+ *
+ * This function is used form manual insertions and from recognition.
+ *
+ * @param[in] p TrackPoint to add
+ * @param[in] frame current frame (frame in which p was detected)
+ * @param[in] onlyVisible set of selected persons, see Petrack::getOnlyVisible()
+ * @param[out] pers person the point was added to; undefined when new trajectory was created
+ * @return true if new trajectory was created; false otherwise
+ */
+bool Tracker::addPoint(TrackPoint &p, int frame, const QSet<int>& onlyVisible, int *pers)
 {
     bool found = false;
     int i, iNearest = 0.;
@@ -1214,7 +1232,12 @@ bool Tracker::addPoint(TrackPoint &p, int frame, QSet<int> onlyVisible, int *per
     if ((z > 0) && ((onlyVisible.empty()) || found))
         (*this)[iNearest].setHeight(z, mMainWindow->getControlWidget()->coordAltitude->value()); // , frame
     if ((!onlyVisible.empty()) && !found)
+    {
+        QMessageBox::warning(nullptr, "PeTrack", "Adding a manual TrackPoint is only possible, when \"show only people\" and \"show only people list\" are disabled!\n"
+                                                     "You would not see the newly created TrackPoint otherwise.");
         debout << "Warning: No manual insertion, because not all trajectories are visible!" <<endl;
+        return false;
+    }
 
     return !found;
 }

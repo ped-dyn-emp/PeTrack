@@ -173,7 +173,7 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         if( selectedAction == creTrj )
         {
             //debout << "Create new trajectory..." << endl;
-            mMainWindow->addManualTrackPoint(event->scenePos());
+            mMainWindow->addOrMoveManualTrackPoint(event->scenePos());
             //debout << "addManuelTrackPoint: " << res << endl;
         }else if( selectedAction == delTrj )
         {
