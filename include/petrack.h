@@ -141,9 +141,9 @@ public slots:
     void saveView(QString dest = "");
     void saveImage(QString dest = "");
     void setStatusPosReal();
-    void addManualTrackPointOnlyVisible(QPointF pos);   
+    void addManualTrackPointOnlyVisible(const QPointF& pos);
     void splitTrackPerson(QPointF pos);
-    int  addManualTrackPoint(QPointF pos);
+    int  addOrMoveManualTrackPoint(const QPointF& pos);
     void editTrackPersonComment(QPointF pos);
     void setTrackPersonHeight(QPointF pos);
     void resetTrackPersonHeight(QPointF pos);
