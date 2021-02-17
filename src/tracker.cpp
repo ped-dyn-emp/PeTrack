@@ -1014,7 +1014,7 @@ bool Tracker::setTrackPersonHeight(const Vec2F& p, int frame, QSet<int> onlyVisi
                 }
                 // if previous value (col_height) is negative, height was determined thru color. If manually set value is the color-map value, we do not change anything
                 // @todo: @ar.graf: check if manually set values have side-effects (maybe do not show in statistics)
-                if (!(col_height + height < 0.01))
+                if (!(std::abs(col_height + height) < 0.01))
                 {
                     (*this)[i].setHeight(height);
                     return true;
