@@ -2594,7 +2594,8 @@ void Petrack::importTracker(QString dest) //default = ""
                 else
                 {
                     debout << "Error: wrong header while reading TRC file." << endl;
-                    sz = 0;
+                    QMessageBox::critical(this, tr("PeTrack"), tr("Could not import tracker:\nNot supported trc version in file: %1.").arg(dest));
+                    return;
                 }
                 in >> sz;
             }
