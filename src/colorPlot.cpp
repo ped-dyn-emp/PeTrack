@@ -782,11 +782,8 @@ ColorPlot::ColorPlot(QWidget *parent) // default= NULL
     //setFrameShape(Box); // damit rahmen gleich wie alle anderen group boxen
     //setFrameShadow(Sunken);
 
-    QFont f("Courier", 10, QFont::Normal); //Times Helvetica, Normal Bold
     QwtText titleX("x");
     QwtText titleY("y");
-    titleX.setFont(f);
-    titleY.setFont(f);
 
     setAxisTitle(xBottom, titleX); //"x"
     setAxisTitle(yLeft, titleY); //"y"

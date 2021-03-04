@@ -461,6 +461,7 @@ private:
 
     QFrame *mCentralWidget;
     Control *mControlWidget;
+    QSplitter *mSplitter;
     StereoWidget *mStereoWidget;
     ColorRangeWidget *mColorRangeWidget;
     ColorMarkerWidget *mColorMarkerWidget;

@@ -127,10 +127,6 @@ Petrack::Petrack()
     //mImageBorderSize=0;
 
     mControlWidget = new Control(this);
-    mControlWidget->setFixedWidth(mControlWidget->geometry().width());
-    mControlWidget->setMinimumHeight(mControlWidget->geometry().height());
-    mControlWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-    //setFixedSize(mControlWidget->geometry().width(),mControlWidget->geometry().height());
     cw =  mControlWidget; // muss spaeter geloescht werden
 
     mStereoWidget = new StereoWidget(this);
@@ -227,10 +223,6 @@ Petrack::Petrack()
     vLayout->addWidget(mViewWidget);
     vLayout->addWidget(mPlayerWidget);
 
-    QVBoxLayout *vControlLayout = new QVBoxLayout;
-    //vControlLayout->setSpacing(space);
-    vControlLayout->addWidget(mControlWidget);
-
     //---------------------------
 
     mTracker = new Tracker(this);
@@ -293,9 +285,20 @@ Petrack::Petrack()
     mCentralWidget->setFrameStyle(QFrame::Sunken | QFrame::StyledPanel);
     mCentralWidget->setLayout(mCentralLayout);
     setCentralWidget(mCentralWidget);
-    mCentralLayout->addLayout(vLayout);
-    mCentralLayout->addLayout(vControlLayout);
-    //mCentralLayout->addWidget(mControlWidget); //, 0, Qt::AlignTop
+    mSplitter = new QSplitter(this);
+    // create playAndView-Widget to wrap layout, since QSplitter only accepts widgets
+    QWidget *playAndView = new QWidget(this);
+    playAndView->setLayout(vLayout);
+    mSplitter->addWidget(playAndView);
+
+    mSplitter->addWidget(mControlWidget);
+
+    mSplitter->setStretchFactor(0,1);
+    mSplitter->setStretchFactor(1,0);
+
+    mCentralLayout->addWidget(mSplitter);
+
+
     setWindowTitle(tr("PeTrack"));
 
     //---------------------------
@@ -2379,6 +2382,7 @@ void Petrack::readSettings()
     move(pos);
     antialias();
     opengl();
+    mSplitter->restoreState(settings.value("controlSplitterSizes").toByteArray());
 }
 
 /**
@@ -2396,6 +2400,7 @@ void Petrack::writeSettings()
     settings.setValue("proFilePath", QFileInfo(mProFileName).path()); // nur path, damit bei saveCurrentProject
     if (!mAutoCalib.isEmptyCalibFiles()) //!mCalibFiles.isEmpty()
         settings.setValue("calibFile", mAutoCalib.getCalibFile(0));
+    settings.setValue("controlSplitterSizes", mSplitter->saveState());
 }
 
 bool Petrack::maybeSave()

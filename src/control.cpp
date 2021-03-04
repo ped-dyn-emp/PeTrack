@@ -163,6 +163,35 @@ Control::Control(QWidget *parent)
     recoMethod->addItem("code marker"); // 6
 
     recoMethod->setCurrentIndex(5); // default multicolor marker (until 11/2016 hermes marker)
+
+    scrollArea->setMinimumWidth(
+        scrollAreaWidgetContents->sizeHint().width() +
+        2 * scrollArea->frameWidth() +
+        scrollArea->verticalScrollBar()->sizeHint().width() +
+        scrollAreaWidgetContents->layout()->margin() * 2 +
+        scrollAreaWidgetContents->layout()->spacing() * 2
+    );
+    scrollArea_2->setMinimumWidth(
+        scrollAreaWidgetContents_2->sizeHint().width() +
+        2 * scrollArea_2->frameWidth() +
+        scrollArea_2->verticalScrollBar()->sizeHint().width()+
+        scrollAreaWidgetContents_2->layout()->margin() * 2 +
+        scrollAreaWidgetContents_2->layout()->spacing() * 2
+    );
+    scrollArea_3->setMinimumWidth(
+        scrollAreaWidgetContents_3->sizeHint().width() +
+        2 * scrollArea_3->frameWidth() +
+        scrollArea_3->verticalScrollBar()->sizeHint().width()+
+        scrollAreaWidgetContents_3->layout()->margin() * 2 +
+        scrollAreaWidgetContents_3->layout()->spacing() * 2
+    );
+    scrollArea_4->setMinimumWidth(
+        scrollAreaWidgetContents_4->sizeHint().width() +
+        2 * scrollArea_4->frameWidth() +
+        scrollArea_4->verticalScrollBar()->sizeHint().width()+
+        scrollAreaWidgetContents_4->layout()->margin() * 2 +
+        scrollAreaWidgetContents_4->layout()->spacing() * 2
+    );
 }
 
 void Control::setScene(QGraphicsScene *sc)

@@ -6,25 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>380</width>
+    <width>387</width>
     <height>604</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
     <horstretch>1</horstretch>
     <verstretch>1</verstretch>
    </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>375</width>
-    <height>350</height>
+    <width>0</width>
+    <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>380</width>
+    <width>9999</width>
     <height>16777215</height>
    </size>
   </property>
@@ -32,6 +32,9 @@
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_19">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetMinimumSize</enum>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -50,15 +53,15 @@
       <bool>true</bool>
      </property>
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
        <horstretch>1</horstretch>
        <verstretch>1</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>370</width>
-       <height>350</height>
+       <width>0</width>
+       <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -81,7 +84,7 @@
      </property>
      <widget class="QWidget" name="calib">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -90,8 +93,17 @@
        <string>calibration</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_11">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinimumSize</enum>
+       </property>
        <item>
         <widget class="QScrollArea" name="scrollArea">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
@@ -110,6 +122,9 @@
          <property name="lineWidth">
           <number>1</number>
          </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
          <property name="sizeAdjustPolicy">
           <enum>QAbstractScrollArea::AdjustToContents</enum>
          </property>
@@ -121,9 +136,15 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>337</width>
-            <height>1028</height>
+            <width>361</width>
+            <height>1034</height>
            </rect>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_13">
            <item>
@@ -1877,19 +1898,6 @@
                     </item>
                    </layout>
                   </item>
-                  <item>
-                   <spacer name="verticalSpacer_2">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
                  </layout>
                 </widget>
                 <widget class="QWidget" name="coordTab2D">
@@ -3184,6 +3192,19 @@
              </layout>
             </widget>
            </item>
+           <item>
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
           </layout>
          </widget>
         </widget>
@@ -3192,7 +3213,7 @@
      </widget>
      <widget class="QWidget" name="rec">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -3201,8 +3222,20 @@
        <string>recognition</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_16">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinimumSize</enum>
+       </property>
        <item>
         <widget class="QScrollArea" name="scrollArea_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
@@ -3211,9 +3244,15 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>337</width>
-            <height>874</height>
+            <width>344</width>
+            <height>901</height>
            </rect>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_16">
            <item>
@@ -3415,7 +3454,7 @@
              </property>
              <property name="maximumSize">
               <size>
-               <width>350</width>
+               <width>999</width>
                <height>16777215</height>
               </size>
              </property>
@@ -3425,32 +3464,22 @@
              <property name="checkable">
               <bool>false</bool>
              </property>
-             <widget class="QCheckBox" name="roiShow">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>20</y>
-                <width>49</width>
-                <height>18</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>show</string>
-              </property>
-             </widget>
-             <widget class="QCheckBox" name="roiFix">
-              <property name="geometry">
-               <rect>
-                <x>80</x>
-                <y>20</y>
-                <width>36</width>
-                <height>18</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>fix</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_24">
+              <item>
+               <widget class="QCheckBox" name="roiShow">
+                <property name="text">
+                 <string>show</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="roiFix">
+                <property name="text">
+                 <string>fix</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
            <item>
@@ -3463,7 +3492,7 @@
              </property>
              <property name="maximumSize">
               <size>
-               <width>350</width>
+               <width>9999</width>
                <height>16777215</height>
               </size>
              </property>
@@ -3563,7 +3592,7 @@
            <item>
             <widget class="QGroupBox" name="colorBox">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -3576,8 +3605,8 @@
              </property>
              <property name="maximumSize">
               <size>
-               <width>350</width>
-               <height>631</height>
+               <width>9999</width>
+               <height>999</height>
               </size>
              </property>
              <property name="title">
@@ -3614,7 +3643,7 @@
                    <widget class="QPushButton" name="recoOptimizeColor">
                     <property name="maximumSize">
                      <size>
-                      <width>50</width>
+                      <width>999</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -3622,19 +3651,6 @@
                      <string>optimize</string>
                     </property>
                    </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_4">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
                   </item>
                  </layout>
                 </item>
@@ -3910,15 +3926,15 @@
                 <item>
                  <widget class="ColorPlot" name="colorPlot">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                   <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>288</width>
-                    <height>350</height>
+                    <width>230</width>
+                    <height>300</height>
                    </size>
                   </property>
                   <property name="maximumSize">
@@ -3938,7 +3954,7 @@
                 <item>
                  <widget class="QGroupBox" name="groupBox_4">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -3951,17 +3967,17 @@
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>350</width>
+                    <width>9999</width>
                     <height>222</height>
                    </size>
                   </property>
                   <property name="title">
                    <string>map</string>
                   </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_21">
+                  <layout class="QHBoxLayout" name="horizontalLayout_21">
                    <property name="spacing">
-                   <number>9</number>
-                  </property>
+                    <number>9</number>
+                   </property>
                    <item>
                     <layout class="QVBoxLayout">
                      <property name="spacing">
@@ -4217,7 +4233,7 @@
                          </property>
                          <property name="maximumSize">
                           <size>
-                           <width>40</width>
+                           <width>999</width>
                            <height>16777215</height>
                           </size>
                          </property>
@@ -4230,7 +4246,7 @@
                         <widget class="QPushButton" name="mapDel">
                          <property name="maximumSize">
                           <size>
-                           <width>40</width>
+                           <width>999</width>
                            <height>16777215</height>
                           </size>
                          </property>
@@ -4256,7 +4272,7 @@
                          </property>
                          <property name="maximumSize">
                           <size>
-                           <width>80</width>
+                           <width>999</width>
                            <height>16777215</height>
                           </size>
                          </property>
@@ -4428,21 +4444,20 @@
                   </property>
                  </widget>
                 </item>
-
                </layout>
               </item>
              </layout>
             </widget>
            </item>
            <item>
-            <spacer name="verticalSpacer_3">
+            <spacer name="verticalSpacer_2">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>20</width>
-               <height>40</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
             </spacer>
@@ -4454,23 +4469,53 @@
       </layout>
      </widget>
      <widget class="QWidget" name="track">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <attribute name="title">
        <string>tracking</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_17">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinimumSize</enum>
+       </property>
        <item>
         <widget class="QScrollArea" name="scrollArea_3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustToContents</enum>
+         </property>
          <property name="widgetResizable">
           <bool>true</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
          <widget class="QWidget" name="scrollAreaWidgetContents_3">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>337</width>
-            <height>843</height>
+            <width>348</width>
+            <height>906</height>
            </rect>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_17">
            <item>
@@ -4494,7 +4539,7 @@
               <widget class="QCheckBox" name="trackOnlineCalc">
                <property name="maximumSize">
                 <size>
-                 <width>120</width>
+                 <width>999</width>
                  <height>16777215</height>
                 </size>
                </property>
@@ -4513,7 +4558,7 @@
               <widget class="QCheckBox" name="trackRepeat">
                <property name="maximumSize">
                 <size>
-                 <width>130</width>
+                 <width>999</width>
                  <height>16777215</height>
                 </size>
                </property>
@@ -4556,19 +4601,6 @@
                </property>
               </widget>
              </item>
-             <item>
-              <spacer>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
             </layout>
            </item>
            <item>
@@ -4577,7 +4609,7 @@
               <widget class="QCheckBox" name="trackExtrapolation">
                <property name="maximumSize">
                 <size>
-                 <width>150</width>
+                 <width>999</width>
                  <height>16777215</height>
                 </size>
                </property>
@@ -4593,7 +4625,7 @@
               <widget class="QCheckBox" name="trackMerge">
                <property name="maximumSize">
                 <size>
-                 <width>75</width>
+                 <width>999</width>
                  <height>16777215</height>
                 </size>
                </property>
@@ -4606,7 +4638,7 @@
               <widget class="QCheckBox" name="trackOnlyVisible">
                <property name="maximumSize">
                 <size>
-                 <width>75</width>
+                 <width>999</width>
                  <height>16777215</height>
                 </size>
                </property>
@@ -4620,19 +4652,6 @@
                 <bool>true</bool>
                </property>
               </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_15">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
              </item>
             </layout>
            </item>
@@ -4653,22 +4672,6 @@
              <property name="spacing">
               <number>2</number>
              </property>
-             <item row="3" column="1">
-              <widget class="QLabel" name="trackNumberNow">
-               <property name="font">
-                <font>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
              <item row="1" column="0">
               <widget class="QLabel" name="label_22">
                <property name="sizePolicy">
@@ -4685,12 +4688,28 @@
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>300</width>
+                 <width>999</width>
                  <height>16777215</height>
                 </size>
                </property>
                <property name="text">
                 <string>number of all tracked and recognized people:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLabel" name="trackNumberNow">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -4710,12 +4729,28 @@
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>300</width>
+                 <width>999</width>
                  <height>16777215</height>
                 </size>
                </property>
                <property name="text">
                 <string>number of tracked people by now:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLabel" name="trackNumberVisible">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -4731,22 +4766,9 @@
                 <string>0</string>
                </property>
                <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                </property>
               </widget>
-             </item>
-             <item row="1" column="2">
-              <spacer>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>0</height>
-                </size>
-               </property>
-              </spacer>
              </item>
              <item row="2" column="0">
               <widget class="QLabel" name="label_65">
@@ -4764,28 +4786,12 @@
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>300</width>
+                 <width>999</width>
                  <height>16777215</height>
                 </size>
                </property>
                <property name="text">
                 <string>number of visible people:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QLabel" name="trackNumberVisible">
-               <property name="font">
-                <font>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>0</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -4873,32 +4879,22 @@
              <property name="title">
               <string>region of interest</string>
              </property>
-             <widget class="QCheckBox" name="trackRoiShow">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>20</y>
-                <width>49</width>
-                <height>18</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>show</string>
-              </property>
-             </widget>
-             <widget class="QCheckBox" name="trackRoiFix">
-              <property name="geometry">
-               <rect>
-                <x>70</x>
-                <y>20</y>
-                <width>36</width>
-                <height>18</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>fix</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_25">
+              <item>
+               <widget class="QCheckBox" name="trackRoiShow">
+                <property name="text">
+                 <string>show</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="trackRoiFix">
+                <property name="text">
+                 <string>fix</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
            <item>
@@ -4911,7 +4907,7 @@
              </property>
              <property name="maximumSize">
               <size>
-               <width>324</width>
+               <width>9999</width>
                <height>16777215</height>
               </size>
              </property>
@@ -4949,7 +4945,7 @@
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>100</width>
+                    <width>999</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -4974,7 +4970,7 @@
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>100</width>
+                    <width>999</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -4999,7 +4995,7 @@
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>100</width>
+                    <width>999</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -5021,7 +5017,7 @@
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>120</width>
+                    <width>999</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -5049,7 +5045,7 @@
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>120</width>
+                    <width>999</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -5077,7 +5073,7 @@
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>120</width>
+                    <width>999</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -5105,7 +5101,7 @@
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>120</width>
+                    <width>999</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -5127,7 +5123,7 @@
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>120</width>
+                    <width>999</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -5149,7 +5145,7 @@
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>120</width>
+                    <width>999</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -5171,7 +5167,7 @@
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>120</width>
+                    <width>999</width>
                     <height>16777215</height>
                    </size>
                   </property>
@@ -5193,12 +5189,12 @@
             </widget>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,0,0,0,0,0">
+            <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,0,0,0,0">
              <item>
               <widget class="QPushButton" name="trackTest">
                <property name="maximumSize">
                 <size>
-                 <width>60</width>
+                 <width>999</width>
                  <height>16777215</height>
                 </size>
                </property>
@@ -5211,7 +5207,7 @@
               <widget class="QCheckBox" name="testEqual">
                <property name="maximumSize">
                 <size>
-                 <width>60</width>
+                 <width>999</width>
                  <height>16777215</height>
                 </size>
                </property>
@@ -5233,7 +5229,7 @@
               <widget class="QCheckBox" name="testVelocity">
                <property name="maximumSize">
                 <size>
-                 <width>60</width>
+                 <width>999</width>
                  <height>16777215</height>
                 </size>
                </property>
@@ -5255,7 +5251,7 @@
               <widget class="QCheckBox" name="testInside">
                <property name="maximumSize">
                 <size>
-                 <width>60</width>
+                 <width>999</width>
                  <height>16777215</height>
                 </size>
                </property>
@@ -5277,7 +5273,7 @@
               <widget class="QCheckBox" name="testLength">
                <property name="maximumSize">
                 <size>
-                 <width>60</width>
+                 <width>999</width>
                  <height>16777215</height>
                 </size>
                </property>
@@ -5294,19 +5290,6 @@
                 <bool>true</bool>
                </property>
               </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_14">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
              </item>
             </layout>
            </item>
@@ -5326,7 +5309,7 @@
              </property>
              <property name="maximumSize">
               <size>
-               <width>324</width>
+               <width>9999</width>
                <height>16777215</height>
               </size>
              </property>
@@ -5469,7 +5452,7 @@
              </property>
              <property name="maximumSize">
               <size>
-               <width>324</width>
+               <width>9999</width>
                <height>16777215</height>
               </size>
              </property>
@@ -5542,19 +5525,6 @@
                      <string>fix</string>
                     </property>
                    </widget>
-                  </item>
-                  <item>
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
                   </item>
                  </layout>
                 </item>
@@ -5632,19 +5602,6 @@
                     </property>
                    </widget>
                   </item>
-                  <item>
-                   <spacer name="horizontalSpacer">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
                  </layout>
                 </item>
                 <item>
@@ -5686,10 +5643,13 @@
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
                   </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
                   <property name="sizeHint" stdset="0">
                    <size>
                     <width>275</width>
-                    <height>40</height>
+                    <height>20</height>
                    </size>
                   </property>
                  </spacer>
@@ -5718,7 +5678,7 @@
                    <widget class="QCheckBox" name="trackShowPath">
                     <property name="maximumSize">
                      <size>
-                      <width>170</width>
+                      <width>999</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -5769,7 +5729,7 @@
                    <widget class="QCheckBox" name="trackShowCurrentPoint">
                     <property name="maximumSize">
                      <size>
-                      <width>150</width>
+                      <width>999</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -5817,7 +5777,7 @@
                     </property>
                     <property name="maximumSize">
                      <size>
-                      <width>170</width>
+                      <width>999</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -5833,7 +5793,7 @@
                    <widget class="QCheckBox" name="trackShowColorMarker">
                     <property name="maximumSize">
                      <size>
-                      <width>170</width>
+                      <width>999</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -5849,7 +5809,7 @@
                    <widget class="QCheckBox" name="trackShowNumber">
                     <property name="maximumSize">
                      <size>
-                      <width>170</width>
+                      <width>999</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -5891,7 +5851,7 @@
                    <widget class="QCheckBox" name="trackNumberBold">
                     <property name="maximumSize">
                      <size>
-                      <width>70</width>
+                      <width>999</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -5907,7 +5867,7 @@
                    <widget class="QCheckBox" name="trackHeadSized">
                     <property name="maximumSize">
                      <size>
-                      <width>70</width>
+                      <width>999</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -5923,7 +5883,7 @@
                    <widget class="QCheckBox" name="trackShowHeightIndividual">
                     <property name="maximumSize">
                      <size>
-                      <width>70</width>
+                      <width>999</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -5938,14 +5898,14 @@
                   <item row="2" column="3">
                    <widget class="QPushButton" name="trackPathColorButton">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
                     <property name="maximumSize">
                      <size>
-                      <width>60</width>
+                      <width>999</width>
                       <height>20</height>
                      </size>
                     </property>
@@ -6428,7 +6388,7 @@
                     </property>
                     <property name="maximumSize">
                      <size>
-                      <width>170</width>
+                      <width>999</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -6444,7 +6404,7 @@
                    <widget class="QCheckBox" name="trackShowPointsColored">
                     <property name="maximumSize">
                      <size>
-                      <width>70</width>
+                      <width>999</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -6525,7 +6485,7 @@
                    <widget class="QCheckBox" name="trackShowGroundPosition">
                     <property name="maximumSize">
                      <size>
-                      <width>170</width>
+                      <width>999</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -6567,7 +6527,7 @@
                    <widget class="QCheckBox" name="trackShowGroundPath">
                     <property name="maximumSize">
                      <size>
-                      <width>170</width>
+                      <width>999</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -6608,14 +6568,14 @@
                   <item row="7" column="3">
                    <widget class="QPushButton" name="trackGroundPathColorButton">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
                     <property name="maximumSize">
                      <size>
-                      <width>60</width>
+                      <width>999</width>
                       <height>20</height>
                      </size>
                     </property>
@@ -7079,16 +7039,25 @@
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
                   </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Fixed</enum>
+                  </property>
                   <property name="sizeHint" stdset="0">
                    <size>
                     <width>20</width>
-                    <height>40</height>
+                    <height>20</height>
                    </size>
                   </property>
                  </spacer>
                 </item>
                 <item>
-                 <layout class="QGridLayout">
+                 <layout class="QFormLayout" name="formLayout">
+                  <property name="horizontalSpacing">
+                   <number>0</number>
+                  </property>
+                  <property name="verticalSpacing">
+                   <number>0</number>
+                  </property>
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -7099,9 +7068,6 @@
                    <number>0</number>
                   </property>
                   <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="spacing">
                    <number>0</number>
                   </property>
                   <item row="0" column="0">
@@ -7123,8 +7089,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="1">
-                   <widget class="QSpinBox" name="trackShowAfter">
+                  <item row="0" column="1">
+                   <widget class="QSpinBox" name="trackShowBefore">
                     <property name="maximumSize">
                      <size>
                       <width>80</width>
@@ -7158,8 +7124,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="1">
-                   <widget class="QSpinBox" name="trackShowBefore">
+                  <item row="1" column="1">
+                   <widget class="QSpinBox" name="trackShowAfter">
                     <property name="maximumSize">
                      <size>
                       <width>80</width>
@@ -7180,19 +7146,6 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="2">
-                   <spacer>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
                  </layout>
                 </item>
                </layout>
@@ -7201,14 +7154,14 @@
             </widget>
            </item>
            <item>
-            <spacer name="verticalSpacer_4">
+            <spacer name="verticalSpacer_5">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>20</width>
-               <height>40</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
             </spacer>
@@ -7220,12 +7173,30 @@
       </layout>
      </widget>
      <widget class="QWidget" name="ana">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <attribute name="title">
        <string>analysis</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_18">
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinimumSize</enum>
+       </property>
        <item>
         <widget class="QScrollArea" name="scrollArea_4">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
@@ -7234,9 +7205,15 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>354</width>
+            <width>361</width>
             <height>558</height>
            </rect>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_18">
            <item>
@@ -7383,8 +7360,8 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>20</width>
-               <height>40</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
             </spacer>
