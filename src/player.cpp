@@ -32,6 +32,7 @@
 #include "animation.h"
 #include "petrack.h"
 #include "control.h"
+#include "pMessageBox.h"
 
 
 //#define TIME_MEASUREMENT
@@ -416,7 +417,7 @@ void Player::playVideo(){
         }else{
             if( mLooping && mMainWindow->getControlWidget()->trackOnlineCalc->checkState() == Qt::Checked)
             {
-                QMessageBox::warning(this, "Error: No tracking while looping", "Looping and tracking are incompatible. Please disable one first.");
+                PWarning(this, "Error: No tracking while looping", "Looping and tracking are incompatible. Please disable one first.");
                 mState = PlayerState::PAUSE;
                 break;
             }else if(mLooping)
@@ -524,9 +525,8 @@ void Player::recStream()
 
             if (!QFile(videoTmp).copy(dest))
             {
-                QMessageBox::critical(this, tr("PeTrack"),
-                                            tr("Error: Could not save video file!"),
-                                            QMessageBox::Ok);
+                PCritical(this, tr("PeTrack"),
+                                            tr("Error: Could not save video file!"));
             }else
             {
                 mMainWindow->statusBar()->showMessage(tr("Saved video file to %1.").arg(dest), 5000);

@@ -20,10 +20,9 @@
 
 #include <QtWidgets>
 #include <QFileDialog>
-#include <QMessageBox>
 
 #include "extrCalibration.h"
-
+#include "pMessageBox.h"
 #include "petrack.h"
 #include "control.h"
 
@@ -131,7 +130,7 @@ bool ExtrCalibration::loadExtrCalibFile(){
             QFile file(mExtrCalibFile);
             if( !file.open(QIODevice::ReadOnly | QIODevice::Text) )
             {
-                QMessageBox::critical(mMainWindow, QObject::tr("Petrack"), QObject::tr("Error: Cannot open %1:\n%2.").arg(mExtrCalibFile).arg(file.errorString()));
+                PCritical(mMainWindow, QObject::tr("Petrack"), QObject::tr("Error: Cannot open %1:\n%2.").arg(mExtrCalibFile, file.errorString()));
                 return false;
             }
 
@@ -233,22 +232,25 @@ bool ExtrCalibration::loadExtrCalibFile(){
             // Check if there are more than 4 points for calibration in the file
              if( points3D_tmp.size() < 4 )
             {
-                QMessageBox::critical(mMainWindow, QObject::tr("PeTrack"), QObject::tr("Error: Not enough points given: %1 (minimum 4 needed!). Please check your extrinsic calibration file!").arg(points3D_tmp.size()));
+                PCritical(mMainWindow, QObject::tr("PeTrack"), QObject::tr("Error: Not enough points given: %1 (minimum 4 needed!). Please check your extrinsic calibration file!").arg(points3D_tmp.size()));
                 all_ok = false;
             }
 
             // Check if 2D points delivered and if the number of 2D and 3D points agree
             else if( points2D_tmp.size() > 0 && points2D_tmp.size() != points3D_tmp.size() )
             {
-                QMessageBox::critical(mMainWindow, QObject::tr("PeTrack"), QObject::tr("Error: Unsupported File Format in: %1 (number of 3D (%2) and 2D (%3) points disagree!)").arg(mExtrCalibFile).arg(points3D_tmp.size()).arg(points2D_tmp.size()));
+                PCritical(mMainWindow, QObject::tr("PeTrack"), QObject::tr("Error: Unsupported File Format in: %1 (number of 3D (%2) and 2D (%3) points disagree!)").arg(mExtrCalibFile).arg(points3D_tmp.size()).arg(points2D_tmp.size()));
                 all_ok = false;
             }
             // Check if number of loaded 3D points agree with stored 2D points
             else if( !with_2D_data && points2D.size()>0 && points3D_tmp.size() != points2D.size() )
             {
                 // ask if stored 2D points should be deleted?
-                int result = QMessageBox::warning(mMainWindow, QObject::tr("PeTrack"), QObject::tr("Number of 3D points (%1) disagree with number of stored 2D points (%2)!<br />The 2D points will be deleted! You have to fetch new ones from the image!").arg(points3D_tmp.size()).arg(points2D.size()),QMessageBox::Ok, QMessageBox::Abort);
-                if (result != QMessageBox::Ok)
+                int result = PWarning(mMainWindow,
+                                                  QObject::tr("PeTrack"),
+                                                  QObject::tr("Number of 3D points (%1) disagree with number of stored 2D points (%2)!<br />The 2D points will be deleted! You have to fetch new ones from the image!").arg(points3D_tmp.size()).arg(points2D.size()),
+                                                  PMessageBox::StandardButton::Ok | PMessageBox::StandardButton::Abort);
+                if (result != PMessageBox::StandardButton::Ok)
                     all_ok = false;
                 else
                     points2D.clear();
@@ -285,14 +287,14 @@ bool ExtrCalibration::fetch2DPoints()
     bool all_ok = true;
     if( !mMainWindow->getTracker() || mMainWindow->getTracker()->size() < 4 )
     {
-       QMessageBox::critical(mMainWindow, QObject::tr("Petrack"), QObject::tr("Error: At minimum four 3D calibration points needed for 3D calibration."));
+       PCritical(mMainWindow, QObject::tr("Petrack"), QObject::tr("Error: At minimum four 3D calibration points needed for 3D calibration."));
        all_ok = false;
     }else
     {
         size_t sz_2d = mMainWindow->getTracker()->size();
 
         if( points3D.size()>0 && sz_2d != points3D.size() ){
-            QMessageBox::critical(mMainWindow, QObject::tr("Petrack"), QObject::tr("Count of 2D-Points (%1) and 3D-Points (%2) disagree").arg(sz_2d).arg(points3D.size()));
+            PCritical(mMainWindow, QObject::tr("Petrack"), QObject::tr("Count of 2D-Points (%1) and 3D-Points (%2) disagree").arg(sz_2d).arg(points3D.size()));
             all_ok = false;
 
         }
@@ -340,23 +342,25 @@ bool ExtrCalibration::saveExtrCalibPoints()
     {
         out << "[" << QString::number(i+1,'i',0) << "]: "<< QString::number(points3D.at(i).x,'f',1) << " " << QString::number(points3D.at(i).y,'f',1) << " " << QString::number(points3D.at(i).z,'f',1) << " " << QString::number(points2D.at(i).x,'f',3) << " " << QString::number(points2D.at(i).y,'f',3) << Qt::endl;
     }
-    QMessageBox msgBox;
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.setText("The corresponding calibration points have been changed.");
-    msgBox.setInformativeText("Do you want to save your changes?");
-    msgBox.setDetailedText(out_str);
-    msgBox.setStandardButtons(QMessageBox::QMessageBox::Save | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Save);
+
+    QIcon icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning);
+    PMessageBox msgBox {nullptr, "PeTrack",
+                       "The corresponding calibration points have been changed.\n"
+                       "Do you want to save your changes?",
+                       QIcon(),
+                       out_str,
+                       PMessageBox::StandardButton::Save | PMessageBox::StandardButton::Cancel,
+                       PMessageBox::StandardButton::Save};
     int ret = msgBox.exec();
     switch (ret) {
-       case QMessageBox::Save:
+        case PMessageBox::StandardButton::Save:
         {
            // Save was clicked
             QFile file(mExtrCalibFile);
 
             if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
             {
-              QMessageBox::critical(mMainWindow, QObject::tr("Petrack"), QObject::tr("Cannot open %1:\n%2.").arg(mExtrCalibFile).arg(file.errorString()));
+              PCritical(mMainWindow, QObject::tr("Petrack"), QObject::tr("Cannot open %1:\n%2.").arg(mExtrCalibFile).arg(file.errorString()));
               return false;
             }
 
@@ -371,10 +375,10 @@ bool ExtrCalibration::saveExtrCalibPoints()
             file.close();
            break;
         }
-       case QMessageBox::Discard:
+        case PMessageBox::StandardButton::Discard:
            // Don't Save was clicked
            break;
-       case QMessageBox::Cancel:
+        case PMessageBox::StandardButton::Cancel:
            // Cancel was clicked
            break;
        default:
@@ -559,7 +563,7 @@ void ExtrCalibration::calibExtrParams()
 
             reprojectionError.clear();
 
-            QMessageBox::critical(mMainWindow, QObject::tr("Petrack"), QObject::tr("Error: Could not calculate extrinsic calibration. Please select other 2D/3D point correspondences for extrinsic calibration!"));
+            PCritical(mMainWindow, QObject::tr("Petrack"), QObject::tr("Error: Could not calculate extrinsic calibration. Please select other 2D/3D point correspondences for extrinsic calibration!"));
 
             isExtCalib = false;
 

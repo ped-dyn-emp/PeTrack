@@ -30,6 +30,7 @@
 #include "control.h"
 #include "stereoWidget.h"
 #include "multiColorMarkerWidget.h"
+#include "pMessageBox.h"
 
 using namespace::cv;
 using namespace std;
@@ -964,10 +965,10 @@ bool Tracker::editTrackPersonComment(const Vec2F& p, int frame, const QSet<int>&
 
             if (ok) {
                 if (comment.isEmpty()) {
-                    int ret = QMessageBox::warning(mMainWindow, QObject::tr("Empty comment"),
+                    int ret = PWarning(mMainWindow, QObject::tr("Empty comment"),
                                                    QObject::tr("Are you sure you want to save an empty comment?"),
-                                                   QMessageBox::Save | QMessageBox::Cancel);
-                    if (ret == QMessageBox::Cancel) {
+                                                   PMessageBox::StandardButton::Save | PMessageBox::StandardButton::Cancel);
+                    if (ret == PMessageBox::StandardButton::Cancel) {
                         return false;
                     }
                 }
