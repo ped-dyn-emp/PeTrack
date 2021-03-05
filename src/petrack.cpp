@@ -50,6 +50,7 @@
 #include "tracker.h"
 #include "trackerReal.h"
 #include "cmath"
+#include "pMessageBox.h"
 #ifdef AVI
 #include "aviFile.h"
 #else
@@ -626,14 +627,14 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
         QFile file(fileName);
         if (!file.open(QIODevice::ReadOnly))
         {
-            QMessageBox::critical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(fileName).arg(file.errorString()));
+            PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(fileName, file.errorString()));
             return;
         }
         resetSettings();
         QDomDocument doc("PETRACK"); // eigentlich Pfad zu Beschreibungsdatei fuer Dateiaufbau
         if (!doc.setContent(&file))
         {
-            QMessageBox::critical(this, tr("PeTrack"), tr("Cannot read content from %1.").arg(fileName));
+            PCritical(this, tr("PeTrack"), tr("Cannot read content from %1.").arg(fileName));
             file.close();
             return;
         }
@@ -647,7 +648,7 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
         if (root.hasAttribute("VERSION"))
             if (root.attribute("VERSION") != VERSION)
             {
-                QMessageBox::warning(this, tr("PeTrack"), tr("Reading %1:\nDifferent version numbers %2 (application) and %3 (file) may cause problems.").arg(fileName).arg(VERSION).arg(root.attribute("VERSION")));
+                PWarning(this, tr("PeTrack"), tr("Reading %1:\nDifferent version numbers %2 (application) and %3 (file) may cause problems.").arg(fileName, VERSION, root.attribute("VERSION")));
                 //tr("Cannot read content from %1\nbecause of different version numbers\n%2 (application) and %3 (file).").arg(fileName).arg(VERSION).arg(root.attribute("VERSION")));
                 //return;
             }
@@ -773,7 +774,7 @@ bool Petrack::saveProject(QString fileName) // default fileName=""
         QFile file(fileName);
         if (!file.open(QFile::WriteOnly | QFile::Truncate | QFile::Text))
         {
-            QMessageBox::critical(this, tr("PeTrack"), tr("Cannot save %1:\n%2.").arg(fileName).arg(file.errorString()));
+            PCritical(this, tr("PeTrack"), tr("Cannot save %1:\n%2.").arg(fileName, file.errorString()));
             file.close();
             return false;
         }
@@ -837,7 +838,7 @@ void Petrack::openCameraLiveStream(int camID /* =-1*/)
     }
     if (!mAnimation->openCameraStream(camID))
     {
-        QMessageBox::critical(this, tr("PeTrack"), tr("Cannot start Camera Livestream."));
+        PCritical(this, tr("PeTrack"), tr("Cannot start Camera Livestream."));
         return;
     }
     mSeqFileName = "camera live stream";
@@ -866,7 +867,7 @@ void Petrack::openSequence(QString fileName) // default fileName = ""
     {
         if (!mAnimation->openAnimation(fileName))
         {
-            QMessageBox::critical(this, tr("PeTrack"), tr("Cannot load %1.").arg(fileName));
+            PCritical(this, tr("PeTrack"), tr("Cannot load %1.").arg(fileName));
             return;
         }
 
@@ -1221,7 +1222,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 if (!writeFrameRet)
                 {
                     progress.setValue(progEnd);
-                    QMessageBox::critical(this, tr("PeTrack"), tr("Cannot save %1 maybe because of wrong file extension or unsupported codec.").arg(dest));
+                    PCritical(this, tr("PeTrack"), tr("Cannot save %1 maybe because of wrong file extension or unsupported codec.").arg(dest));
                     break;
                 }
             }
@@ -1264,7 +1265,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 if (!saveRet)
                 {
                     progress.setValue(progEnd);
-                    QMessageBox::critical(this, tr("PeTrack"), tr("Cannot save %1.").arg(fileName));
+                    PCritical(this, tr("PeTrack"), tr("Cannot save %1.").arg(fileName));
                     break;
                 }
             }
@@ -1349,7 +1350,7 @@ void Petrack::saveView(QString dest) //default = ""
                     mScene->render(&painter);
                 painter.end();
                 if (!img->save(dest)) //, "PNG"
-                    QMessageBox::critical(this, tr("PeTrack"), tr("Cannot save %1 maybe because of wrong file extension.").arg(dest));
+                    PCritical(this, tr("PeTrack"), tr("Cannot save %1 maybe because of wrong file extension.").arg(dest));
                 delete img;
             }
             lastFile = dest;
@@ -1398,7 +1399,7 @@ void Petrack::saveImage(QString dest) //default = ""
             else
             {
                 if (!mImage->save(dest)) //, "PNG"
-                    QMessageBox::critical(this, tr("PeTrack"), tr("Cannot save %1 maybe because of wrong file extension.").arg(dest));
+                    PCritical(this, tr("PeTrack"), tr("Cannot save %1 maybe because of wrong file extension.").arg(dest));
             }
             lastFile = dest;
         }
@@ -1435,7 +1436,7 @@ void Petrack::print()
         }
     }
     else
-        QMessageBox::critical(this, tr("PeTrack"), tr("Nothing to print!"));
+        PCritical(this, tr("PeTrack"), tr("Nothing to print!"));
 }
 
 void Petrack::resetSettings()
@@ -1463,18 +1464,9 @@ void Petrack::about()
 
 void Petrack::commandLineOptions()
 {
-    //QTextBrowser(this);
-    //static QMessageBox* mb = NULL;
-    //if (mb == NULL)
-    //{
-    QMessageBox* mb = new QMessageBox(this); //QMessageBox mb(this);
+    PMessageBox *mb = new PMessageBox{this, tr("Command line options"), commandLineOptionsString, QIcon()};
+    mb->setModal(false);
     mb->setAttribute(Qt::WA_DeleteOnClose);
-    mb->setWindowTitle(tr("Command line options"));
-    //mb->setWindowModality(Qt::NonModal);
-    mb->setModal(false); // if you want it non-modal
-    mb->setText(commandLineOptionsString);
-    mb->setStandardButtons(QMessageBox::Ok);
-    //}
 
     //"<style>spantab {padding-left: 4em; margin-left:5em}</style><span class=\"tab\"></span>"
     //"<p>Only to convert a video <kbd>video.avi</kbd> with settings stored in a petrack project file <kbd>project.pet</kbd> to an image sequence to be stored in the directory <kbd>folder</kbd> call:<br>"
@@ -1490,11 +1482,7 @@ void Petrack::commandLineOptions()
 
 
 
-    mb->show(); //mb->exec(); //mb->open();
-
-    //    QMessageBox::about(this, tr("Command line options"), tr(
-//"Beside the space bar all bindings only affect inside the image.<p>"
-//"Space bar<br>blavbla"));
+    mb->show();
 
 //Usage: petrack [-help|-?] [[-project] project.pet] [-sequence image_sequence_or_video] [-autoSave|-autosave image_folder_or_video|project.pet|tracker_file] [-autoTrack|-autotrack tracker_file] [-autoPlay|-autoplay tracker_file]
 
@@ -1516,31 +1504,31 @@ void Petrack::commandLineOptions()
 
 void Petrack::keyBindings()
 {
-    QMessageBox* mb = new QMessageBox(this);
+    const QString out = tr(
+        "<p>Beside the space bar all bindings only affect inside the image.</p>"
+        "<dl><dt><kbd>Space bar</kbd></dt><dd>toggles between pause and last play direction</dd>"
+        "<dt><kbd>Mouse scroll wheel</kbd></dt><dd>zooms in and out to or from the pixel of the image at the position of the mouse pointer</dd>"
+        "<dt><kbd>Shift + mouse scroll wheel</kbd></dt><dd>plays forwards or backwards frame by frame</dd>"
+        "<dt><kbd>Holding left mouse button</kbd></dt><dd>moves image</dd>"
+        "<dt><kbd>Arrows up/down</kbd></dt><dd>zoom in/out</dd>"
+        "<dt><kbd>Arrows left/right</kbd></dt><dd>frame back/forward</dd>"
+        "<dt><kbd>Double-click left mouse button</kbd></dt><dd>opens video or image sequence</dd>"
+        "<dt><kbd>Ctrl + double-click left mouse button</kbd></dt><dd>inserts new or moves near trackpoint</dd>"
+        "<dt><kbd>Ctrl + Shift + double-click left mouse button</kbd></dt><dd>splits near trackpoint before actual frame</dd>"
+        "<dt><kbd>Ctrl + double-click right mouse button</kbd></dt><dd>deletes a trajectory of a near trackpoint</dd>"
+        "<dt><kbd>Shift + double-click right mouse button</kbd></dt><dd>deletes the past part of a trajectory of a near trackpoint</dd>"
+        "<dt><kbd>Alt + double-click right mouse button</kbd></dt><dd>deletes the future part of a trajectory of a near trackpoint</dd>"
+        "<dt><kbd>Ctrl + double-click middle mouse button</kbd></dt><dd>deletes all trajectories</dd>"
+        "<dt><kbd>Shift + double-click middle mouse button</kbd></dt><dd>deletes the past part of all trajectories</dd>"
+        "<dt><kbd>Alt + double-click middle mouse button</kbd></dt><dd>deletes the future part of all trajectories</dd>"
+        "<dt><kbd>Shift + t</kbd></dt><dd>toggles tracking online calculation</dd>"
+        "<dt><kbd>Shift + double-click left mouse button</kbd></dt><dd>inserts new or moves near trackpoint and enables showing only the modified trajectory</dd></dl>"
+        "<p>Further key bindings you will find next to the entries of the menus.</p>"
+        );
+
+    PMessageBox *mb = new PMessageBox(this, tr("Key Bindings"), out, QIcon());
     mb->setAttribute(Qt::WA_DeleteOnClose);
-    mb->setWindowTitle(tr("Command line options"));
-    mb->setModal(false); // if you want it non-modal
-    mb->setText(tr(
-"<p>Beside the space bar all bindings only affect inside the image.</p>"
-"<dl><dt><kbd>Space bar</kbd></dt><dd>toggles between pause and last play direction</dd>"
-"<dt><kbd>Mouse scroll wheel</kbd></dt><dd>zooms in and out to or from the pixel of the image at the position of the mouse pointer</dd>"
-"<dt><kbd>Shift + mouse scroll wheel</kbd></dt><dd>plays forwards or backwards frame by frame</dd>"
-"<dt><kbd>Holding left mouse button</kbd></dt><dd>moves image</dd>"
-"<dt><kbd>Arrows up/down</kbd></dt><dd>zoom in/out</dd>"
-"<dt><kbd>Arrows left/right</kbd></dt><dd>frame back/forward</dd>"
-"<dt><kbd>Double-click left mouse button</kbd></dt><dd>opens video or image sequence</dd>"
-"<dt><kbd>Ctrl + double-click left mouse button</kbd></dt><dd>inserts new or moves near trackpoint</dd>"
-"<dt><kbd>Ctrl + Shift + double-click left mouse button</kbd></dt><dd>splits near trackpoint before actual frame</dd>"
-"<dt><kbd>Ctrl + double-click right mouse button</kbd></dt><dd>deletes a trajectory of a near trackpoint</dd>"
-"<dt><kbd>Shift + double-click right mouse button</kbd></dt><dd>deletes the past part of a trajectory of a near trackpoint</dd>"
-"<dt><kbd>Alt + double-click right mouse button</kbd></dt><dd>deletes the future part of a trajectory of a near trackpoint</dd>"
-"<dt><kbd>Ctrl + double-click middle mouse button</kbd></dt><dd>deletes all trajectories</dd>"
-"<dt><kbd>Shift + double-click middle mouse button</kbd></dt><dd>deletes the past part of all trajectories</dd>"
-"<dt><kbd>Alt + double-click middle mouse button</kbd></dt><dd>deletes the future part of all trajectories</dd>"
-"<dt><kbd>Shift + t</kbd></dt><dd>toggles tracking online calculation</dd>"
-"<dt><kbd>Shift + double-click left mouse button</kbd></dt><dd>inserts new or moves near trackpoint and enables showing only the modified trajectory</dd></dl>"
-"<p>Further key bindings you will find next to the entries of the menus.</p>"
-                    ));
+    mb->setModal(false);
 
 //"Beside the space bar all bindings only affect inside the image.<p>"
 //"Space bar<br>"
@@ -1575,16 +1563,14 @@ void Petrack::keyBindings()
 //"    inserts new or moves near trackpoint and enables showing only the modified trajectory<p>"
 //"Further key bindings you will find next to the entries of the menus."
 
-    mb->setStandardButtons(QMessageBox::Ok);
     mb->show();
-    //QMessageBox::about(NULL, tr("Key bindings"), tr(
 }
 
 void Petrack::onlineHelp()
 {
     static QUrl url("https://jugit.fz-juelich.de/ped-dyn-emp/petrack/-/wikis/home");
     if (!(QDesktopServices::openUrl(url)))
-        QMessageBox::critical(this, tr("PeTrack"), tr("Cannot open external browser<br>with url ") + url.toString() + "!");
+        PCritical(this, tr("PeTrack"), tr("Cannot open external browser<br>with url ") + url.toString() + "!");
 }
 
 void Petrack::antialias()
@@ -2405,23 +2391,24 @@ void Petrack::writeSettings()
 
 bool Petrack::maybeSave()
 {
-    int ret = QMessageBox::warning(this, tr("PeTrack"),
-                                   tr("Do you want to save\n"
+    int ret = PWarning(this, tr("PeTrack"),
+                                   tr("Do you want to save "
                                       "the current project?\n"
-                                      "Be sure to save trajectories, background\n"
+                                      "Be sure to save trajectories, background "
                                       "and 3D calibration point separately!"),
-                                   QMessageBox::Yes | QMessageBox::Default,
-                                   QMessageBox::No,
-                                   QMessageBox::Cancel | QMessageBox::Escape);
+                                   PMessageBox::StandardButton::Yes |
+                                    PMessageBox::StandardButton::No |
+                                    PMessageBox::StandardButton::Cancel,
+                                   PMessageBox::StandardButton::Yes);
 
-    if (ret == QMessageBox::Yes)
+    if (ret == PMessageBox::StandardButton::Yes)
     {
         if (saveSameProject())
             return true;
         else
             return false;
     }
-    else if (ret == QMessageBox::Cancel)
+    else if (ret == PMessageBox::StandardButton::Cancel)
         return false;
     else
         return true;
@@ -2568,7 +2555,7 @@ void Petrack::importTracker(QString dest) //default = ""
             if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             {
                 // errorstring ist je nach Betriebssystem in einer anderen Sprache!!!!
-                QMessageBox::critical(this, tr("PeTrack"), tr("Cannot open %1:\n%2").arg(dest).arg(file.errorString()));
+                PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2").arg(dest).arg(file.errorString()));
                 return;
             }
 
@@ -2643,7 +2630,7 @@ void Petrack::importTracker(QString dest) //default = ""
         }else
         if (dest.right(4) == ".txt") // 3D Koordinaten als Tracking-Daten importieren Zeilenformat: Personennr, Framenr, x, y, z
         {
-            QMessageBox::warning(this,tr("PeTrack"), tr("Are you sure you want to import 3D data from TXT-File? You have to make sure that the coordinate system now is exactly at the same position and orientation than at export time!"));
+            PWarning(this,tr("PeTrack"), tr("Are you sure you want to import 3D data from TXT-File? You have to make sure that the coordinate system now is exactly at the same position and orientation than at export time!"));
 
             QFile file(dest);
             // size of person list
@@ -2652,7 +2639,7 @@ void Petrack::importTracker(QString dest) //default = ""
             if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             {
                 // errorstring ist je nach Betriebssystem in einer anderen Sprache!!!!
-                QMessageBox::critical(this, tr("PeTrack"), tr("Cannot open %1:\n%2").arg(dest).arg(file.errorString()));
+                PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2").arg(dest).arg(file.errorString()));
                 return;
             }
 
@@ -2702,7 +2689,7 @@ void Petrack::importTracker(QString dest) //default = ""
                 {
                     conversionFactorTo_cm = 100.0;
                     exec_once_flag = true;
-                    QMessageBox::warning(this,tr("PeTrack"), tr("PeTrack will interpret position data as unit [m]. No header with [cm] found."));
+                    PWarning(this,tr("PeTrack"), tr("PeTrack will interpret position data as unit [m]. No header with [cm] found."));
                 }
 
                 QTextStream stream(&line);
@@ -2774,7 +2761,7 @@ void Petrack::importTracker(QString dest) //default = ""
         }
         else
         {
-            QMessageBox::critical(this, tr("PeTrack"), tr("Cannot load %1 maybe because of wrong file extension.").arg(dest));
+            PCritical(this, tr("PeTrack"), tr("Cannot load %1 maybe because of wrong file extension.").arg(dest));
         }
         lastFile = dest;
     }
@@ -3079,7 +3066,7 @@ void Petrack::exportTracker(QString dest) //default = ""
 
                 if (!file.open()/*!file.open(QIODevice::WriteOnly | QIODevice::Text)*/)
                 {
-                    QMessageBox::critical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(file.errorString()));
+                    PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(file.errorString()));
                     return;
                 }
                 QProgressDialog progress("Export TRC-File",NULL,0,mTracker->size()+1,this->window());
@@ -3127,10 +3114,9 @@ void Petrack::exportTracker(QString dest) //default = ""
                     QFile::remove(dest);
 
                 if( !file.copy(dest) )
-                    QMessageBox::critical(this, tr("PeTrack"),
-                                                   tr("Could not export tracking data.\n"
-                                                      "Please try again!"),
-                                                   QMessageBox::Ok);
+                    PCritical(this, tr("PeTrack"),
+                                                tr("Could not export tracking data.\n"
+                                                   "Please try again!"));
                 else
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
 
@@ -3167,7 +3153,7 @@ void Petrack::exportTracker(QString dest) //default = ""
 
                 if (!file.open()) //!file.open(QIODevice::WriteOnly | QIODevice::Text))
                 {
-                    QMessageBox::critical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(file.errorString()));
+                    PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(file.errorString()));
                     return;
                 }
 
@@ -3254,10 +3240,9 @@ void Petrack::exportTracker(QString dest) //default = ""
                     QFile::remove(dest);
 
                 if( !file.copy(dest) )
-                    QMessageBox::critical(this, tr("PeTrack"),
+                    PCritical(this, tr("PeTrack"),
                                                    tr("Could not export tracking data.\n"
-                                                      "Please try again!"),
-                                                   QMessageBox::Ok);
+                                                      "Please try again!"));
                 else
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
 
@@ -3297,7 +3282,7 @@ void Petrack::exportTracker(QString dest) //default = ""
 
                 if (!fileDat.open()) //!fileDat.open(QIODevice::WriteOnly | QIODevice::Text))
                 {
-                    QMessageBox::critical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(fileDat.errorString()));
+                    PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(fileDat.errorString()));
                     return;
                 }
                 // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um waehrend play mehrfachberuecksichtigung von punkten auszuschliessen, aenderungen in altitude neu in berechnung einfliessen zu lassen)
@@ -3323,10 +3308,9 @@ void Petrack::exportTracker(QString dest) //default = ""
                     QFile::remove(dest);
 
                 if( !fileDat.copy(dest) )
-                    QMessageBox::critical(this, tr("PeTrack"),
+                    PCritical(this, tr("PeTrack"),
                                                    tr("Could not export tracking data.\n"
-                                                      "Please try again!"),
-                                                   QMessageBox::Ok);
+                                                      "Please try again!"));
                 else
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
 
@@ -3393,7 +3377,7 @@ void Petrack::exportTracker(QString dest) //default = ""
                 QTemporaryFile fileXml;
                 if (!fileXml.open()) //!fileXml.open(QIODevice::WriteOnly | QIODevice::Text))
                 {
-                    QMessageBox::critical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(fileXml.errorString()));
+                    PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(fileXml.errorString()));
                     return;
                 }
                 debout << "export tracking data to " << dest << " (" << mTracker->size() << " person(s))..." << std::endl;
@@ -3421,10 +3405,9 @@ void Petrack::exportTracker(QString dest) //default = ""
                     QFile::remove(dest);
 
                 if( !fileXml.copy(dest) )
-                    QMessageBox::critical(this, tr("PeTrack"),
-                                                   tr("Could not export tracking data.\n"
-                                                      "Please try again!"),
-                                                   QMessageBox::Ok);
+                    PCritical(this, tr("PeTrack"),
+                                                tr("Could not export tracking data.\n"
+                                                    "Please try again!"));
                 else
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
 

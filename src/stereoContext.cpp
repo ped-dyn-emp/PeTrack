@@ -1018,7 +1018,7 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
         QFile file(fn);
         if (!file.open(QIODevice::ReadOnly))
         {
-            QMessageBox::information(NULL,"show","Failed to read");
+            PInformation(NULL,"show","Failed to read");
         }
         QByteArray buffer = file.readAll(); //reinterpret_cast<double *> mDisparity.height*mDisparity.width*8
         //debout << "Number of bytes in height field from virtual scene: " << buffer.size() <<endl;
@@ -1294,7 +1294,7 @@ CvMat* pet::StereoContext::getPointCloud()
         QFile file(fn);
         if (!file.open(QIODevice::ReadOnly))
         {
-            QMessageBox::information(NULL,"show","Failed to read");
+            PInformation(NULL,"show","Failed to read");
         }
         QByteArray buffer = file.readAll(); //reinterpret_cast<double *> mDisparity.height*mDisparity.width*8
         //debout << "Number of bytes in height field from virtual scene: " << buffer.size() <<endl;
@@ -1417,7 +1417,7 @@ bool pet::StereoContext::exportPointCloud(QString dest) //default = ""
 
                 if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
                 {
-                    QMessageBox::critical(mMain, QObject::tr("Petrack"), QObject::tr("Cannot open %1:\n%2.").arg(dest).arg(file.errorString()));
+                    PCritical(mMain, QObject::tr("Petrack"), QObject::tr("Cannot open %1:\n%2.").arg(dest).arg(file.errorString()));
                     return false;
                 }
 
@@ -1487,7 +1487,7 @@ bool pet::StereoContext::exportPointCloud(QString dest) //default = ""
             }
             else
             {
-                QMessageBox::critical(mMain, QObject::tr("Petrack"), QObject::tr("Cannot save %1 maybe because of wrong file extension.").arg(dest));
+                PCritical(mMain, QObject::tr("Petrack"), QObject::tr("Cannot save %1 maybe because of wrong file extension.").arg(dest));
                 return false;
             }
             lastFile = dest;
@@ -1496,7 +1496,7 @@ bool pet::StereoContext::exportPointCloud(QString dest) //default = ""
     }
     else
     {
-        QMessageBox::critical(mMain, QObject::tr("Petrack"), QObject::tr("Cannot export point cloud, because disparity has not been generated."));
+        PCritical(mMain, QObject::tr("Petrack"), QObject::tr("Cannot export point cloud, because disparity has not been generated."));
         return false;
     }
 }

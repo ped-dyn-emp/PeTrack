@@ -302,6 +302,7 @@ target_sources(petrack_core PRIVATE
     include/trackingRoiItem.h
     include/analysePlot.h
     include/IO.h
+    include/pMessageBox.h
     )
 
 target_sources(petrack_core PRIVATE
@@ -351,6 +352,7 @@ target_sources(petrack_core PRIVATE
     src/extrCalibration.cpp
     src/trackingRoiItem.cpp
     src/IO.cpp
+    src/pMessageBox.cpp
     ui/codeMarker.ui
     ui/colorMarker.ui
     ui/colorRange.ui

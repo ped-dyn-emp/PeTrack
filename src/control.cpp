@@ -37,6 +37,7 @@
 #include "multiColorMarkerWidget.h"
 #include "view.h"
 #include "IO.h"
+#include "pMessageBox.h"
 
 using namespace std;
 
@@ -1500,7 +1501,7 @@ void Control::on_mapReadHeights_clicked()
     }
     else //heights contains an error string
     {
-        QMessageBox::critical(mMainWindow, Petrack::tr("PeTrack"),
+        PCritical(mMainWindow, Petrack::tr("PeTrack"),
                               Petrack::tr(std::get<std::string>(heights).c_str()));
     }
 

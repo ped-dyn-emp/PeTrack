@@ -44,7 +44,6 @@ they can be represented in QT.
 #include <QList>
 #include <QTime>
 #include <QThread>
-#include <QMessageBox>
 
 #include <string>
 #include <fstream>
@@ -56,6 +55,7 @@ they can be represented in QT.
 
 #include "opencv2/opencv.hpp"
 
+#include "pMessageBox.h"
 #include "animation.h"
 
 using namespace::cv;
@@ -748,7 +748,7 @@ Mat Animation::getFramePhoto(int index)
             debout << "Could not load image: image size differs in image sequence" << endl;
             debout << "Please ensure to have images of the same size!" << endl;
 
-            QMessageBox::critical(NULL,"An error has occurred!",
+            PCritical(nullptr,"An error has occurred!",
                                   QString("The size of the images in the selected image sequence does not agree."
                                           "<br /><br />[0]:  %1  (%2x%3 pixel)<br />[%4]:   %5  (%6x%7 pixel)")
                                   .arg(mImgFilesList.at(0)).arg(mSize.width()).arg(mSize.height()).arg(index)

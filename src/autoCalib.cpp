@@ -20,7 +20,6 @@
 
 #include <QFileInfo>
 #include <QFileDialog>
-#include <QMessageBox>
 #include <QProgressDialog>
 #include <QApplication>
 
@@ -29,6 +28,7 @@
 #include "autoCalib.h"
 #include "petrack.h"
 #include "control.h"
+#include "pMessageBox.h"
 
 using namespace::cv;
 using namespace std;
@@ -122,7 +122,7 @@ void AutoCalib::autoCalib()
         // no files are selected for calibration
         if (mCalibFiles.isEmpty()) 
         {
-            QMessageBox::information(mMainWindow, Petrack::tr("Petrack"), Petrack::tr("At first you have to select files."));
+            PInformation(mMainWindow, Petrack::tr("Petrack"), Petrack::tr("At first you have to select files."));
             return;
         }
 
@@ -164,7 +164,7 @@ void AutoCalib::autoCalib()
             if (view.empty())
             {
                 progress.setValue(mCalibFiles.size());
-                QMessageBox::critical(mMainWindow, Petrack::tr("Petrack"), Petrack::tr("Cannot load %1.\nTerminate Calibration.").arg(mCalibFiles.at(i)));
+                PCritical(mMainWindow, Petrack::tr("Petrack"), Petrack::tr("Cannot load %1.\nTerminate Calibration.").arg(mCalibFiles.at(i)));
 #ifdef SHOW_CALIB_MAINWINDOW
                 // reset view to animation image 
                 if (!origImg.empty())
@@ -211,10 +211,9 @@ void AutoCalib::autoCalib()
         if( !min_one_pattern_found )
         {
             debout << "Calibration failed. No patterns found!" << endl;
-            QMessageBox::warning(mMainWindow,
+            PWarning(mMainWindow,
                                  QString("Calibration failed"),
-                                 QString("Chessboard pattern (%1x%2) not found in calibration files.").arg(board_size.width).arg(board_size.height),
-                                 QMessageBox::Ok);
+                                 QString("Chessboard pattern (%1x%2) not found in calibration files.").arg(board_size.width).arg(board_size.height));
             return;
         }
 
