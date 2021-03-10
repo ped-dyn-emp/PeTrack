@@ -25,7 +25,6 @@ class Petrack;
 class Control;
 
 #include "extrCalibration.h"
-#include "petrack.h"
 
 class GridItem : public QGraphicsItem
 {

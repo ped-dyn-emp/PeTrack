@@ -23,17 +23,15 @@
 #include <QPainter>
 #include <QMouseEvent>
 
-#include "qwt_plot_layout.h"
-#include "qwt_plot_zoomer.h"
-//#include "qwt_plot_panner.h"
-//#include "qwt_plot_curve.h"
-#include "qwt_symbol.h"
-#include "qwt_scale_engine.h"
-//#include "qwt_plot_canvas.h"
-#include "qwt_compat.h"
+#include <qwt_plot_layout.h>
+#include <qwt_plot_zoomer.h>
+#include <qwt_symbol.h>
+#include <qwt_scale_engine.h>
+#include <qwt_compat.h>
 
 #include "colorPlot.h"
 #include "control.h"
+#include "tracker.h"
 
 using namespace std;
 

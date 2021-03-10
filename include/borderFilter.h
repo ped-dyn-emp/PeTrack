@@ -23,7 +23,6 @@
 
 #include "filter.h"
 
-
 class BorderFilter : public Filter
 {
 private:

@@ -26,7 +26,6 @@
 #include <QSlider>
 #include <QKeyEvent>
 
-
 class Petrack;
 class QLabel;
 class QToolButton;

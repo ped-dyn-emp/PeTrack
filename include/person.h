@@ -22,11 +22,11 @@
 #define PERSON_H
 
 #include <QList>
+
 #include "ellipse.h"
 #include "stereoContext.h"
 #include "backgroundFilter.h"
 #include "tracker.h"
-//#include "opencv2/core/types_c.h"
 
 #define STEP_SIZE 5 //10 // Hoehenschritte der Isolinien in cm
 #define DISP_GAP_SIZE_TO_FILL 15 // 15 pixel innerhalb einer Zeile werden linear in disp interpoliert

@@ -26,29 +26,25 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 
-
-#include "opencv2/opencv.hpp"
-//#include "opencv2/cxcore.h"
-//#include "opencv2/cvaux.h"
-//#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 
 #ifdef STEREO
 #include "stereoContext.h"
 #include "calibStereoFilter.h"
 #endif
-#include "helper.h"
 #include "brightContrastFilter.h"
-#include "calibFilter.h"
 #include "borderFilter.h"
 #include "swapFilter.h"
 #include "backgroundFilter.h"
 #include "autoCalib.h"
 #include "coordItem.h"
-#include "gridItem.h"
-#include "recognitionRoiItem.h"
-#include "trackingRoiItem.h"
-#include "animation.h"
 #include "extrCalibration.h"
+
+class CalibFilter;
+class Animation;
+class TrackingRoiItem;
+class RecognitionRoiItem;
+class GridItem;
 
 #ifdef STEREO_DISABLED
 enum Camera {cameraLeft, cameraRight, cameraUnset};
@@ -87,8 +83,6 @@ class MultiColorMarkerItem;
 class BackgroundItem;
 class Tracker;
 class TrackerReal;
-//class ExtrCalibration;
-//enum class Dimension;
 
 class Petrack : public QMainWindow
 {

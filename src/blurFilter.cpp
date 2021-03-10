@@ -19,7 +19,7 @@
  */
 
 #include "blurFilter.h"
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 
 using namespace::cv;
 

@@ -22,7 +22,7 @@
 #define CODEMARKERWIDGET_H
 
 #include <QtWidgets>
-#include "opencv2/aruco.hpp"
+#include <opencv2/aruco.hpp>
 
 #include "ui_codeMarker.h"
 

@@ -20,24 +20,9 @@
 
 #include <QPointF>
 #include <QRect>
-#if not CV_MAJOR_VERION == 4
-#include <cv.h>
-#endif
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 #include <opencv2/aruco.hpp>
 #include <bitset>
-
-//#include "imgcodecs.hpp"
-//#include "videoio.hpp"
-//#include "highgui.hpp"
-
-//#include "opencv2/highgui/highgui.hpp"
-//#include "opencv2/imgproc/imgproc.hpp"
-
-//folgende zeile spaeter raus
-//#include <highgui.h>
-
-//using namespace::cv;
 
 #include "recognition.h"
 #include "markerCasern.h"
@@ -52,6 +37,7 @@
 #include "helper.h"
 #include "tracker.h"
 #include "control.h"
+#include "recognitionRoiItem.h"
 
 using namespace::cv;
 using namespace std;

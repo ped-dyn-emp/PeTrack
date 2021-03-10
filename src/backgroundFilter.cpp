@@ -22,7 +22,7 @@
 #include "stereoContext.h"
 
 // nur temporaer fuer anzeige
-#include "opencv2/highgui.hpp"
+#include <opencv2/highgui.hpp>
 #include "helper.h"
 
 // spaeter entfernen naechsten beiden zeilen

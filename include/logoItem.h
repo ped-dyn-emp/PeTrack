@@ -22,9 +22,6 @@
 #define LOGOITEM_H
 
 #include <QGraphicsItem>
-//#include <QtWidgets>
-//#include <QDragEnterEvent>
-//#include <QDropEvent>
 
 class Petrack;
 class LogoItem;

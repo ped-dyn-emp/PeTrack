@@ -18,23 +18,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-
-//=============================================================================
-// System Includes
-//=============================================================================
 #include <cassert>
 #include <cstdio>
-#include <limits.h>
 #include <iostream>
 
-//=============================================================================
-// Project Includes
-//=============================================================================
 #include "aviFileWriter.h"
-//#include "helper.h"
 #include <opencv2/videoio/videoio_c.h>
-
 
 using namespace::cv;
 using namespace::std;

@@ -42,13 +42,10 @@ they can be represented in QT.
 #include <QImage>
 #include <QStringList>
 #include <QTime>
+#include <QFileInfo>
 
+#include <opencv2/opencv.hpp>
 
-#include "opencv2/opencv.hpp"
-
-#include "filter.h"
-#include "helper.h"
-#include "petrack.h"
 #ifdef STEREO
 #include "pgrAviFile.h"
 #else

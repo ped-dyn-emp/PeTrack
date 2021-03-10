@@ -21,11 +21,11 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QGraphicsSceneHoverEvent>
+#include <cmath>
 
 #include "imageItem.h"
 #include "petrack.h"
 #include "control.h"
-#include "cmath"
 
 ImageItem::ImageItem(QWidget *wParent, QGraphicsItem * parent)
     : QGraphicsItem(parent)

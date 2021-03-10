@@ -21,16 +21,12 @@
 #include <QPainter>
 #include <QMouseEvent>
 
-#include "qwt_plot_layout.h"
-#include "qwt_plot_zoomer.h"
-//#include "qwt_plot_panner.h"
-//#include "qwt_plot_curve.h"
-#include "qwt_symbol.h"
-#include "qwt_scale_engine.h"
-#include "qwt_plot_grid.h"
-//#include "qwt_text.h"
-#include "qwt_compat.h"
-//#include "qwt_plot.h"
+#include <qwt_plot_layout.h>
+#include <qwt_plot_zoomer.h>
+#include <qwt_symbol.h>
+#include <qwt_scale_engine.h>
+#include <qwt_plot_grid.h>
+#include <qwt_compat.h>
 
 #include "analysePlot.h"
 #include "control.h"

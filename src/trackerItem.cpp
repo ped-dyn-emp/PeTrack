@@ -21,12 +21,14 @@
 #include <QtWidgets>
 #include <QInputDialog>
 
+#include "animation.h"
 #include "petrack.h"
 #include "control.h"
 #include "view.h"
 #include "trackerItem.h"
 #include "tracker.h"
-#include "animation.h"
+#include "recognitionRoiItem.h"
+#include "trackingRoiItem.h"
 
 using namespace::cv;
 using namespace std;

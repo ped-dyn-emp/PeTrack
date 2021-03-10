@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MarkerJapan_H
-#define MarkerJapan_H
+#ifndef MARKERJAPAN_H
+#define MARKERJAPAN_H
 
 #include <QList>
 #include <QColor>

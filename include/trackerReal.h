@@ -22,7 +22,6 @@
 #define TRACKERREAL_H
 
 #include <QList>
-//#include <QTextStream>
 
 #include "vector.h"
 #include "tracker.h"

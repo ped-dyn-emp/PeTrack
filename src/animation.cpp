@@ -31,32 +31,25 @@ Appart from that, there is a static function that converts IplImages to QImage, 
 they can be represented in QT.
 
 */
+#include "animation.h"
 
 #include <QWidget>
-#include <QPair>
-#include <QPixmap>
 #include <QSize>
-#include <QImage>
 #include <QStringList>
 #include <QRegExp>
 #include <QFileInfo>
 #include <QDir>
-#include <QList>
 #include <QTime>
-#include <QThread>
 
-#include <string>
-#include <fstream>
 #include <sstream>
-#include <cstring>
-#include <cstdlib>
 #include <iomanip>
 
-
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 
 #include "pMessageBox.h"
-#include "animation.h"
+#include "filter.h"
+#include "helper.h"
+#include "petrack.h"
 
 using namespace::cv;
 using namespace std;

@@ -18,8 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <algorithm>
-#include <math.h>
+#include <cmath>
 #include <QtWidgets>
 
 #include "petrack.h"

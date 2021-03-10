@@ -27,14 +27,7 @@
 #include <QString>
 #include <QVector>
 
-//#include <opencv.hpp>
-
-//#include "opencv/cxcore.h"
-//#include "opencv/cvaux.h"
-#include "opencv2/opencv.hpp"
-
-
-
+#include <opencv2/opencv.hpp>
 
 class Petrack;
 class Control;

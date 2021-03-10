@@ -21,8 +21,6 @@
 #ifndef RECOGNITION_H
 #define RECOGNITION_H
 
-//#include <cxcore.h>
-
 #include <QList>
 #include "vector.h"
 #include <opencv2/aruco.hpp>

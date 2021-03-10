@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MultiColorMarkerItem_H
-#define MultiColorMarkerItem_H
+#ifndef MULTICOLORMARKERITEM_H
+#define MULTICOLORMARKERITEM_H
 
 #include <QGraphicsItem>
 

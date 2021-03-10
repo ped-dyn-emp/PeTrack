@@ -18,13 +18,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef VECTOR_HH
-#define VECTOR_HH
+#ifndef VECTOR_H
+#define VECTOR_H
 
 #include "helper.h"
 
 #include <QVector3D>
-#include "opencv2/core/types_c.h"
+#include <opencv2/core/types_c.h>
 #include <QMatrix4x4>
 
 struct CvPoint;
