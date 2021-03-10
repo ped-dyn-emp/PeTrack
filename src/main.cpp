@@ -22,20 +22,19 @@
 #include <QtWidgets>
 #include <QMessageBox>
 #include <QStyleFactory>
+#include <csignal>
+#include <sstream>
+#include <string>
 
 #include "petrack.h"
 #include "helper.h"
 #include "tracker.h"
-
-using namespace std;
+#include "IO.h"
+#include "compilerInformation.h"
 
 // Aufrufbeispiel:
 // release/petrack.exe -sequence ../../einzelbilder/wert0001.png -autoSave dir|ttt.avi
 
-#include <stdio.h>  /* defines FILENAME_MAX */
-
-#include "signal.h"
-#include "IO.h"
 
 // musst be done to store fixed order of attributes in XML files
 // see: http://stackoverflow.com/questions/27378143/qt-5-produce-random-attribute-order-in-xml
@@ -51,25 +50,6 @@ void quit(int sig_number)
 int main(int argc, char *argv[])
 {
 
-//#if CV_MAJOR_VERSION == 2
-//// do opencv 2 code
-//debout << "OpenCV 2 is used..." << endl;
-//#elif CV_MAJOR_VERSION == 3
-//// do opencv 3 code
-//debout << "OpenCV 3 is used..." << endl;
-//#endif
-
-//    char cCurrentPath[FILENAME_MAX];
-//    if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
-//    {
-//        debout << "Error: could not detect working directory!" <<endl;
-//        return 1;
-//    }
-//    cCurrentPath[sizeof(cCurrentPath) - 1] = '\0'; /* not really required */
-//    printf ("The current working directory is +%s+", cCurrentPath);
-
-
-
     Q_INIT_RESOURCE(icons);
 
     QApplication app(argc, argv);
@@ -82,9 +62,8 @@ int main(int argc, char *argv[])
     gApp = &app;
     signal(SIGINT, quit); // used to catch ctrl-C and get rid of error "QObject::killTimers: timers cannot be stopped from another thread"
 
-    //app.addLibraryPath(cCurrentPath); // "./" for file platforms/qwindows.dll, which now could be stored to main prog folder // only for plugin files
-    //app.setStyle(new QCleanlooksStyle);// QMacStyle, QPlastiqueStyle, QCleanlooksStyle; kann dann nicht mehr mit "-style motif windows oder platinum" beim aufruf gesetzt werden
     app.setStyle(QStyleFactory::create("Fusion")); // added for Qt5
+
     // command line arguments ;leerzeichen zwischen option und argument wird benoetigt
     //   -project *.ptr:   um projekt zu laden
     //   -sequence *.png:  um animation zu laden (ueberschreibt projekt)
@@ -113,7 +92,7 @@ int main(int argc, char *argv[])
         {
             QTextDocument doc;
             doc.setHtml(commandLineOptionsString);
-            debout << endl << doc.toPlainText() <<endl;
+            debout << std::endl << doc.toPlainText() << std::endl;
             //debout << commandLineOptionsString <<endl;
             QMessageBox::about(NULL, QObject::tr("Command line options"), commandLineOptionsString);
             //cout << "Help:\n-----" << endl
@@ -172,14 +151,24 @@ int main(int argc, char *argv[])
         {
             // hier koennte je nach dateiendung *pet oder *avi oder *png angenommern werden
             // aber ueberpruefen, ob variable project oder sequence schon besetzt!!!
-            cout << "Option ignored (use -? for help): " << arg.at(i) << endl;
+            std::cout << "Option ignored (use -? for help): " << arg.at(i) << std::endl;
         }
     }
 
-    Petrack petrack;
-    petrack.show(); // damit bei reiner Hilfe nicht angezeigt wird, erst hier der aufruf
+    std::cout << "Starting PeTrack" << std::endl;
+    std::cout << "Version: " << PETRACK_VERSION << std::endl;
+    std::cout << "Commit id: " << GIT_COMMIT_HASH << std::endl;
+    std::cout << "Commit date: " << GIT_COMMIT_DATE << std::endl;
+    std::cout << "Build from branch: " << GIT_BRANCH << std::endl;
+    std::cout << "Compile date: " << COMPILE_TIMESTAMP << std::endl;
+    std::cout << "Build with: " << COMPILER_ID << " (" << COMPILER_VERSION << ")" << std::endl;
 
-    debout << "Starting PeTrack Version " << VERSION << " (Build " << COMPILE_DATE << " " << COMPILE_TIME << ", " << argv[0] << ")" <<endl;
+    Petrack petrack;
+    petrack.setPeTrackVersion(PETRACK_VERSION);
+    petrack.setGitInformation(GIT_COMMIT_HASH, GIT_COMMIT_DATE, GIT_BRANCH);
+    petrack.setCompileInformation(COMPILE_TIMESTAMP, COMPILER_ID, COMPILER_VERSION);
+
+    petrack.show(); // damit bei reiner Hilfe nicht angezeigt wird, erst hier der aufruf
 
     // erst nachher ausfuehren, damit reihenfolge der command line argumente keine rolle spielt
     if (!project.isEmpty())
@@ -197,7 +186,7 @@ int main(int argc, char *argv[])
             petrack.exportTracker(autoSaveDest); // projekt wird geladen und nur Trajektoprien herausgeschrieben (zB wenn sich .pet (altitude) oder .trc aendert (delrec))
         else
             petrack.saveSequence(true, false, autoSaveDest); // true spielt keine rolle, sondern wird durch dateiendung bestimmt
-        return 0;  // 0 means exit success// Programm beenden nach speichern! // 1?
+        return EXIT_SUCCESS;  // 0 means exit success// Programm beenden nach speichern! // 1?
     }
     // hat tracker_file bestimmte Dateiendung txt oder trc, dann wird nur genau diese exportiert, sonst beide
     if (autoTrack)
@@ -294,7 +283,7 @@ int main(int argc, char *argv[])
     if (autoSave && (autoSaveDest.right(4) == ".pet"))
     {
         petrack.saveProject(autoSaveDest);
-        return 0;
+        return EXIT_SUCCESS;
     }
 
     return app.exec();

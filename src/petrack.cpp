@@ -646,12 +646,14 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
 
         QDomElement root = doc.firstChildElement("PETRACK");
         if (root.hasAttribute("VERSION"))
-            if (root.attribute("VERSION") != VERSION)
+        {
+            if (root.attribute("VERSION") != mPetrackVersion)
             {
-                PWarning(this, tr("PeTrack"), tr("Reading %1:\nDifferent version numbers %2 (application) and %3 (file) may cause problems.").arg(fileName, VERSION, root.attribute("VERSION")));
+                PWarning(this, tr("PeTrack"), tr("Reading %1:\nDifferent version numbers %2 (application) and %3 (file) may cause problems.").arg(fileName, mPetrackVersion, root.attribute("VERSION")));
                 //tr("Cannot read content from %1\nbecause of different version numbers\n%2 (application) and %3 (file).").arg(fileName).arg(VERSION).arg(root.attribute("VERSION")));
                 //return;
             }
+        }
         openXml(doc, openSeq);
         updateWindowTitle();
     }
@@ -662,7 +664,7 @@ void Petrack::saveXml(QDomDocument &doc)
     QDomElement elem;
 
     QDomElement root = doc.createElement("PETRACK");
-    root.setAttribute("VERSION", VERSION);
+    root.setAttribute("VERSION", mPetrackVersion);
     doc.appendChild(root);
 
     // main settings (window size, status hight)
@@ -921,10 +923,10 @@ void Petrack::updateWindowTitle()
     QSize size = mAnimation->getSize();
 
     if (QFileInfo(mProFileName).isDir())
-        title = tr("PeTrack (v") + VERSION + tr("): ");
+        title = tr("PeTrack (v") + mPetrackVersion + tr("): ");
     else
     {
-        title = tr("PeTrack (v") + VERSION + tr("): ") + QFileInfo(mProFileName).fileName();
+        title = tr("PeTrack (v") + mPetrackVersion + tr("): ") + QFileInfo(mProFileName).fileName();
         if (mAnimation->isVideo() || mAnimation->isImageSequence())
             title +=  "; ";
     }
@@ -1448,13 +1450,19 @@ void Petrack::resetSettings()
 
 void Petrack::about()
 {
+    QString message =
+        "<p><b>PeTrack</b> - Pedestrian tracking<br>"
+        "Version: " + mPetrackVersion + "<br>"
+        "Commit hash: " + mGitCommitID + "<br>"
+        "Commit date: " + mGitCommitDate + "<br>"
+        "Commit branch: " + mGitCommitBranch + "<br>"
+        "Compiler: " + mCompilerID + " (" + mCompilerVersion + ")<br>"
+        "Compile date: " + mCompileDate + "</p>"
+        "&copy; Forschungszentrum Juelich GmbH</p>";
+
     //People/Pedestrian/Person tracking
     QMessageBox::about(this, tr("About PeTrack"),
-                       tr("<p><b>PeTrack</b> - Pedestrian tracking<br>" //&nbsp;&nbsp;&nbsp;&nbsp;
-                          "Version " VERSION "<br>"
-                          "(Build " COMPILE_DATE " " COMPILE_TIME ")</p>"
-                          "<p>by Maik Boltes, Daniel Salden<br>"
-                          "&copy; Forschungszentrum Juelich GmbH</p>"));
+                       message);
     //©  &copy; &#169; (c)
     // folgender befehl wird erst nach About-Fenster ausgefuehrt und ersetzt Icon im Hauptfenster
     //QApplication::activeWindow()->setWindowIcon(QIcon(":/icon"));
@@ -4203,6 +4211,29 @@ void Petrack::updateSourceInOutFrames()
 void Petrack::skipToFrameWheel(int delta)
 {
     mPlayerWidget->skipToFrame(mPlayerWidget->getPos()+delta);
+}
+
+void Petrack::setPeTrackVersion(const std::string& petrackVersion)
+{
+    mPetrackVersion = QString::fromStdString(petrackVersion);
+}
+
+void Petrack::setGitInformation(
+    const std::string& gitCommitID,
+    const std::string& gitCommitDate,
+    const std::string& gitCommitBranch)
+{
+    mGitCommitID= QString::fromStdString(gitCommitID);
+    mGitCommitDate = QString::fromStdString(gitCommitDate);
+    mGitCommitBranch = QString::fromStdString(gitCommitBranch);
+}
+
+void Petrack::setCompileInformation(const std::string &compileTimeStamp, const std::string &compilerID,
+                                    const std::string &compilerVersion)
+{
+    mCompileDate = QString::fromStdString(compileTimeStamp);
+    mCompilerID = QString::fromStdString(compilerID);
+    mCompilerVersion = QString::fromStdString(compilerVersion);
 }
 
 #include "moc_petrack.cpp"
