@@ -602,7 +602,7 @@ void TrackerReal::exportTxt(QTextStream &out, bool alternateHeight, bool useTrac
 //    else
 //    {
     //   out << *this;
-    QProgressDialog progress("Export TXT-File",NULL,0,size(),mMainWindow->window());
+    QProgressDialog progress("Export TXT-File",nullptr,0,size(),mMainWindow->window());
     progress.setWindowTitle("Export .txt-File");
     progress.setWindowModality(Qt::WindowModal);
     progress.setVisible(true);
@@ -651,7 +651,7 @@ void TrackerReal::exportTxt(QTextStream &out, bool alternateHeight, bool useTrac
 // old - not all export options supported!!!!
 void TrackerReal::exportDat(QTextStream &out, bool alternateHeight, bool useTrackpoints) // fuer gnuplot
 {
-    QProgressDialog progress("Export DAT-File",NULL,0,size(),mMainWindow->window());
+    QProgressDialog progress("Export DAT-File",nullptr,0,size(),mMainWindow->window());
     progress.setWindowTitle("Export .dat-File");
     progress.setWindowModality(Qt::WindowModal);
     progress.setVisible(true);
@@ -700,7 +700,7 @@ void TrackerReal::exportXml(QTextStream &outXml, bool alternateHeight, bool useT
     //TrackPointReal tp;
     int defaultPersonHeight = 176;
 
-    QProgressDialog progress("Export XML-File",NULL,0,largestLastFr,mMainWindow->window());
+    QProgressDialog progress("Export XML-File",nullptr,0,largestLastFr,mMainWindow->window());
     progress.setWindowTitle("Export .xml-File");
     progress.setWindowModality(Qt::WindowModal);
     progress.setVisible(true);

@@ -33,7 +33,7 @@
 
 Fader::Fader()
 {
-    mTimer = NULL;
+    mTimer = nullptr;
 }
 
 void Fader::fadeOut(LogoItem* lI, int frames)

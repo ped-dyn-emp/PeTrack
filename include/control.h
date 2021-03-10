@@ -35,7 +35,7 @@ class Control: public QWidget, public Ui::Control
     Q_OBJECT
 
 public:
-    Control(QWidget *parent = 0);
+    Control(QWidget *parent = nullptr);
 
     void setScene(QGraphicsScene *sc);
 

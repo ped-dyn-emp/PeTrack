@@ -56,7 +56,7 @@ public:
     }
 
     // Constructor
-    CoordItem(QWidget *wParent/*, QGraphicsScene * scene*/, QGraphicsItem * parent = 0);
+    CoordItem(QWidget *wParent/*, QGraphicsScene * scene*/, QGraphicsItem * parent = nullptr);
     // mouseMoveEvent-Trigger
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);

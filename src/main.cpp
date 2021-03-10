@@ -40,7 +40,7 @@
 // see: http://stackoverflow.com/questions/27378143/qt-5-produce-random-attribute-order-in-xml
 extern Q_CORE_EXPORT QBasicAtomicInt qt_qhash_seed;
 
-static QApplication * gApp = NULL;
+static QApplication * gApp = nullptr;
 void quit(int sig_number)
 {
     gApp->quit(); // gPetrack->close();
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
             doc.setHtml(commandLineOptionsString);
             debout << std::endl << doc.toPlainText() << std::endl;
             //debout << commandLineOptionsString <<endl;
-            QMessageBox::about(NULL, QObject::tr("Command line options"), commandLineOptionsString);
+            QMessageBox::about(nullptr, QObject::tr("Command line options"), commandLineOptionsString);
             //cout << "Help:\n-----" << endl
             //     << "Usage: petrack [-help|-?] [[-project] project.pet] [-sequence image_sequence_or_video] [-autoSave|-autosave image_folder_or_video|project.pet|tracker_file] [-autoTrack|-autotrack tracker_file] [-autoPlay|-autoplay tracker_file]" << endl << endl
            //      << "For more information see http://www.fz-juelich.de/jsc/petrack/." << endl;

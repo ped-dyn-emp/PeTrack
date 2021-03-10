@@ -47,7 +47,7 @@ public:
 class LogoItem: public QGraphicsItem
 {
 public:
-    LogoItem(QWidget *wParent, QGraphicsItem * parent = 0);
+    LogoItem(QWidget *wParent, QGraphicsItem * parent = nullptr);
 
     QRectF boundingRect() const;
 

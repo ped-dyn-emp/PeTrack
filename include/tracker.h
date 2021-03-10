@@ -498,7 +498,7 @@ public:
     // true, if new traj is inserted with point p and initial frame frame
     // p in pixel coord
     // pers wird gesetzt, wenn existierender trackpoint einer person verschoben wird
-    bool addPoint(TrackPoint &p, int frame, const QSet<int>& onlyVisible, int *pers = NULL);
+    bool addPoint(TrackPoint &p, int frame, const QSet<int>& onlyVisible, int *pers = nullptr);
 
     // hier sollte direkt die farbe mit uebergeben werden
     void addPoints(QList<TrackPoint> &pL, int frame);

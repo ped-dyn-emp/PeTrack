@@ -34,7 +34,7 @@ StereoItem::StereoItem(QWidget *wParent, QGraphicsItem * parent)
     : QGraphicsItem(parent)
 {
     mMainWindow = (class Petrack*) wParent;
-    mImage = NULL;
+    mImage = nullptr;
     mDispNew = true;
     setAcceptHoverEvents(true);
 

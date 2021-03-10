@@ -36,7 +36,7 @@ ColorMarkerItem::ColorMarkerItem(QWidget *wParent, QGraphicsItem * parent)
     : QGraphicsItem(parent)
 {
     mMainWindow = (class Petrack*) wParent;
-    mImage = NULL;
+    mImage = nullptr;
 }
 
 /**
@@ -73,12 +73,12 @@ void ColorMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */
 {
     if (!mMask.empty())
     {
-        if ((mImage != NULL) && ((mImage->width() != mMask.cols) || (mImage->height() != mMask.rows)))
+        if ((mImage != nullptr) && ((mImage->width() != mMask.cols) || (mImage->height() != mMask.rows)))
         {
             delete mImage; // delete null pointer is ok
-            mImage = NULL; // is not been done by delete
+            mImage = nullptr; // is not been done by delete
         }
-        if (mImage == NULL) // zu Beginn oder wenn sich die Groesse aendert
+        if (mImage == nullptr) // zu Beginn oder wenn sich die Groesse aendert
             mImage = new QImage(mMask.cols, mMask.rows, QImage::Format_ARGB32);
 
         int x,y;

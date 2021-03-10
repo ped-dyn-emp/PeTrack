@@ -89,17 +89,17 @@ Petrack::Petrack()
     setWindowIcon(icon); // QIcon(":/icon")fuer about und icon in windows titel bar top left
     mHeadSize = -1;
     mCmPerPixel = -1;
-    mScene = NULL;
-    mTracker = NULL;
-    mTrackerReal = NULL; // damit beim zeichnen von control mit analysePlot nicht auf einen feheler laeuft
-    mStatusLabelFPS = NULL;
-    mStatusPosRealHeight = NULL;
-    mStatusLabelPosReal = NULL;
-    mImageItem = NULL;
+    mScene = nullptr;
+    mTracker = nullptr;
+    mTrackerReal = nullptr; // damit beim zeichnen von control mit analysePlot nicht auf einen feheler laeuft
+    mStatusLabelFPS = nullptr;
+    mStatusPosRealHeight = nullptr;
+    mStatusLabelPosReal = nullptr;
+    mImageItem = nullptr;
     mRecognitionChanged = true;
     mTrackChanged = true;
-    mCoordItem = NULL;
-    mImage = NULL;
+    mCoordItem = nullptr;
+    mImage = nullptr;
 //    mIplImg = NULL;
 //    mIplImgFiltered = NULL;
     setLoading(true);
@@ -120,7 +120,7 @@ Petrack::Petrack()
     mBorderFilter.disable();
     mSwapFilter.disable();
     mBackgroundFilter.disable();
-    mStereoContext = NULL;
+    mStereoContext = nullptr;
     mCalibFilter = new CalibFilter; // schoener waere erst zu erzeugen, wenn video geladen wird, da sonst bei stereo erst normealer und dann stereo objekt erzeugt wird
     mCalibFilter->disable();        // aber control widget greift schon bei erzeugung auf alle objekte zur einstellung zurueck
     //mCalibFilter.disable(); //enable();
@@ -1017,8 +1017,8 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
         //using namespace cv; oder cv::VideoWriter *vw;
         bool formatIsSaveAble = false;
         bool saveRet;
-        QImage *viewImage = NULL; // =NULL, amit keine Warnung
-        QPainter *painter = NULL; // =NULL, amit keine Warnung
+        QImage *viewImage = nullptr; // =NULL, amit keine Warnung
+        QPainter *painter = nullptr; // =NULL, amit keine Warnung
         int progEnd = /*mAnimation->getNumFrames()-1*/mAnimation->getSourceOutFrameNum()-mPlayerWidget->getPos(); // nur wenn nicht an anfang gesprungen wird:-mPlayerWidget->getPos()
         Mat iplImgFilteredBGR;
         bool writeFrameRet = false;
@@ -1988,7 +1988,7 @@ void Petrack::resetUI()
     mControlWidget->filterBgDeleteTrj->setCheckState(Qt::Checked);
     mControlWidget->filterBgShow->setCheckState(Qt::Unchecked);
     mControlWidget->filterBgUpdate->setCheckState(Qt::Unchecked);
-    getBackgroundFilter()->setFilename(NULL);
+    getBackgroundFilter()->setFilename(nullptr);
     getBackgroundFilter()->reset();
 
     mControlWidget->filterSwap->setCheckState(Qt::Unchecked);
@@ -2028,7 +2028,7 @@ void Petrack::resetUI()
     mControlWidget->rot1->setValue(0);
     mControlWidget->rot2->setValue(0);
     mControlWidget->rot3->setValue(0);
-    getExtrCalibration()->setExtrCalibFile(NULL);
+    getExtrCalibration()->setExtrCalibFile(nullptr);
 
     /// coord system
     mControlWidget->coordShow->setCheckState(Qt::Unchecked);
@@ -2137,7 +2137,7 @@ void Petrack::resetUI()
     mControlWidget->testVelocity->setCheckState(Qt::Checked);
     mControlWidget->testInside->setCheckState(Qt::Checked);
     mControlWidget->testLength->setCheckState(Qt::Checked);
-    setTrackFileName(NULL);
+    setTrackFileName(nullptr);
 
     // search region
     mControlWidget->trackRegionScale->setValue(16);
@@ -3077,7 +3077,7 @@ void Petrack::exportTracker(QString dest) //default = ""
                     PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(file.errorString()));
                     return;
                 }
-                QProgressDialog progress("Export TRC-File",NULL,0,mTracker->size()+1,this->window());
+                QProgressDialog progress("Export TRC-File",nullptr,0,mTracker->size()+1,this->window());
                 progress.setWindowTitle("Export .trc-File");
                 progress.setWindowModality(Qt::WindowModal);
                 progress.setVisible(true);
@@ -4037,7 +4037,7 @@ double Petrack::getHeadSize(QPointF *pos, int pers, int frame)
         }
     }
 
-    if (pos != NULL)
+    if (pos != nullptr)
         return mHeadSize; // muss noch aus density map gelesen werden!!!
     else //(pos == NULL) && (pers == -1)
         return mHeadSize;

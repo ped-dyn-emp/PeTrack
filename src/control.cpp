@@ -48,7 +48,7 @@ Control::Control(QWidget *parent)
 {
     setAccessibleName("Control");
     mMainWindow = (class Petrack*) parent;
-    mScene = NULL;
+    mScene = nullptr;
     mLoading = false;
     //beim erzeugen von new colorplot absturz!!!!
     setupUi(this);

@@ -63,7 +63,7 @@ class Player : public QWidget
 {
     Q_OBJECT
 public:
-    Player(Animation *anim, QWidget *parent = 0);
+    Player(Animation *anim, QWidget *parent = nullptr);
     void setAnim(Animation *anim);
     bool getPaused();
     void setSpeedRelativeToRealtime(double factor);

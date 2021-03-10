@@ -67,7 +67,7 @@ public:
     void setStereoContext(pet::StereoContext **sc);
     pet::StereoContext** stereoContext();
 
-    cv::Mat getForeground(); ///< nutzen, wenn ueber ganzes bild foreground benutzt wird; NULL, wenn keine background subtraction aktiviert
+    cv::Mat getForeground(); ///< nutzen, wenn ueber ganzes bild foreground benutzt wird
     bool isForeground(int i, int j);
 
     void reset();

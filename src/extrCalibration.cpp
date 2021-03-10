@@ -33,8 +33,8 @@ using namespace cv;
 
 ExtrCalibration::ExtrCalibration()
 {
-    mMainWindow = NULL;
-    mControlWidget = NULL;
+    mMainWindow = nullptr;
+    mControlWidget = nullptr;
 }
 
 ExtrCalibration::~ExtrCalibration()

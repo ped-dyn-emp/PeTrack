@@ -33,7 +33,7 @@ BackgroundItem::BackgroundItem(QWidget *wParent, QGraphicsItem * parent)
     : QGraphicsItem(parent)
 {
     mMainWindow = (class Petrack*) wParent;
-    mImage = NULL;
+    mImage = nullptr;
     //    setEnabled(false); // all mouse events connot access this item, but it will be seen
     // einzig move koennte interessant sein, um grid zu verschieben?!
 //     setAcceptsHoverEvents(true);
@@ -66,9 +66,9 @@ void BackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*
 
     if (!fg.empty())
     {
-        if ((mImage != NULL) && ((mImage->width() != fg.cols) || (mImage->height() != fg.rows)))
+        if ((mImage != nullptr) && ((mImage->width() != fg.cols) || (mImage->height() != fg.rows)))
             delete mImage;
-        if (mImage == NULL) // zu Beginn oder wenn sich die Groesse aendert
+        if (mImage == nullptr) // zu Beginn oder wenn sich die Groesse aendert
             mImage = new QImage(fg.cols, fg.rows, QImage::Format_ARGB32);
 
         int x,y;

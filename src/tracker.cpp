@@ -708,7 +708,7 @@ bool Tracker::splitPersonAt(const Vec2F& p, int frame, QSet<int> onlyVisible)
     int i;
 
     for (i = 0; i < size(); ++i) // ueber TrackPerson
-        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(NULL, i, frame)/2.))) // war: MIN_DISTANCE)) // 30 ist abstand zwischen kopfen
+        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(nullptr, i, frame)/2.))) // war: MIN_DISTANCE)) // 30 ist abstand zwischen kopfen
         {
             splitPerson(i, frame);
 
@@ -763,7 +763,7 @@ bool Tracker::delPoint(const Vec2F& p, int direction, int frame, QSet<int> onlyV
     int i;
 
     for (i = 0; i < size(); ++i) // ueber TrackPerson
-        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(NULL, i, frame)/2.))) // war: MIN_DISTANCE)) // 30 ist abstand zwischen kopfen
+        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(nullptr, i, frame)/2.))) // war: MIN_DISTANCE)) // 30 ist abstand zwischen kopfen
         {
             delPointOf(i, direction, frame);
             return true;
@@ -986,7 +986,7 @@ bool Tracker::setTrackPersonHeight(const Vec2F& p, int frame, QSet<int> onlyVisi
 
     for (i = 0; i < size(); ++i) // ueber TrackPerson
     {
-        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(NULL, i, frame)/2.))) // war: MIN_DISTANCE)) // 30 ist abstand zwischen kopfen
+        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(nullptr, i, frame)/2.))) // war: MIN_DISTANCE)) // 30 ist abstand zwischen kopfen
         {
             bool ok;
 
@@ -1031,7 +1031,7 @@ bool Tracker::resetTrackPersonHeight(const Vec2F& p, int frame, QSet<int> onlyVi
 
     for (i = 0; i < size(); ++i) // ueber TrackPerson
     {
-        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(NULL, i, frame)/2.))) // war: MIN_DISTANCE)) // 30 ist abstand zwischen kopfen
+        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(nullptr, i, frame)/2.))) // war: MIN_DISTANCE)) // 30 ist abstand zwischen kopfen
         {
 
             (*this)[i].setHeight(MIN_HEIGHT);
@@ -1168,10 +1168,10 @@ bool Tracker::addPoint(TrackPoint &p, int frame, const QSet<int>& onlyVisible, i
 //            }
             dist = at(i).trackPointAt(frame).distanceToPoint(p);
             if (( //(!multiColorWithDot || !p.color().isValid()) && //|| !at(i).trackPointAt(frame).color().isValid()
-                 dist < scaleHead*mMainWindow->getHeadSize(NULL, i, frame)/2.) ||
+                 dist < scaleHead*mMainWindow->getHeadSize(nullptr, i, frame)/2.) ||
                 // fuer multifarbmarker mit schwarzem punkt wird nur farbmarker zur Abstandbetrachtung herangezogen
                 // at(i).trackPointAt(frame).colPoint() existiert nicht an dieser stelle, da bisher nur getrackt wurde!!!!
-                (multiColorWithDot && p.color().isValid() && (at(i).trackPointAt(frame).distanceToPoint(p.colPoint()) < mMainWindow->getHeadSize(NULL, i, frame)/2.)))
+                (multiColorWithDot && p.color().isValid() && (at(i).trackPointAt(frame).distanceToPoint(p.colPoint()) < mMainWindow->getHeadSize(nullptr, i, frame)/2.)))
             {
                 if (found)
                 {
@@ -1213,7 +1213,7 @@ bool Tracker::addPoint(TrackPoint &p, int frame, const QSet<int>& onlyVisible, i
             }
         }
 
-        if (pers != NULL)
+        if (pers != nullptr)
             *pers = iNearest;
 
         (*this)[iNearest].setNewReco(true);
@@ -1960,7 +1960,7 @@ void Tracker::recalcHeight(float altitude)
 void Tracker::checkPlausibility(QList<int> &pers, QList<int> &frame,
                                 bool testEqual, bool testVelocity, bool testInside, bool testLength)
     {
-    QProgressDialog progress("Check Plausibility",NULL,0,400,mMainWindow->window());
+    QProgressDialog progress("Check Plausibility",nullptr,0,400,mMainWindow->window());
     progress.setWindowTitle("Check plausibility");
     progress.setWindowModality(Qt::WindowModal);
     progress.setVisible(true);
@@ -2111,7 +2111,7 @@ void Tracker::checkPlausibility(QList<int> &pers, QList<int> &frame,
                 {
                     if (at(i).trackPointExist(f) && at(j).trackPointExist(f))
                     {
-                        if (at(i).trackPointAt(f).distanceToPoint(at(j).trackPointAt(f)) < mMainWindow->getHeadSize(NULL, i, f)/2.)
+                        if (at(i).trackPointAt(f).distanceToPoint(at(j).trackPointAt(f)) < mMainWindow->getHeadSize(nullptr, i, f)/2.)
                         {
                             debout << "Warning: Person " << i+1 << " and " << j+1 << " are very close to each other at frame " << f << "!" << endl;
                             pers.append(i+1);

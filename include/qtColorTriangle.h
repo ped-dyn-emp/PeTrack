@@ -76,7 +76,7 @@ class QT_QTCOLORTRIANGLE_EXPORT QtColorTriangle : public QWidget
     Q_OBJECT
 
 public:
-    QtColorTriangle(QWidget *parent = 0);
+    QtColorTriangle(QWidget *parent = nullptr);
     ~QtColorTriangle();
 
     QSize sizeHint() const;

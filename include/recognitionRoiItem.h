@@ -43,7 +43,7 @@ private:
     enum pressLocation mPressLocation;
 
 public:
-    RecognitionRoiItem(QWidget *wParent, QGraphicsItem * parent = 0);
+    RecognitionRoiItem(QWidget *wParent, QGraphicsItem * parent = nullptr);
     void mousePressEvent(QGraphicsSceneMouseEvent * event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);

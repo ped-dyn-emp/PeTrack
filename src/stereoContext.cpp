@@ -190,7 +190,7 @@ pet::StereoContext::StereoContext(Petrack* main)
 //    triclopsGetBaseline(mTriclopsContext, &base);
 //    debout << base<<endl;
 
-    mPointCloud = NULL;
+    mPointCloud = nullptr;
 }
 
 pet::StereoContext::~StereoContext()

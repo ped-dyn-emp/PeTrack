@@ -225,7 +225,7 @@ bool BackgroundFilter::load(QString dest) //default = ""
         // if no destination file or folder is given
         if (dest.isEmpty())
         {
-            dest = QFileDialog::getOpenFileName(NULL, "Select file for background subtraction in stereo mode", mLastFile,
+            dest = QFileDialog::getOpenFileName(nullptr, "Select file for background subtraction in stereo mode", mLastFile,
                                                 "Background picture (*.png);;All files (*.*)");
         }
 

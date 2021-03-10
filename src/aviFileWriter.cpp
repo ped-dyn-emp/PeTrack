@@ -48,8 +48,8 @@ AviFileWriter::AviFileWriter()
   // m_pavifile		= NULL;
   // m_pstream		= NULL;
   // m_pstreamcompressed	= NULL;
-   m_pTempBMPBuffer	= NULL;
-   m_pTempBuffer	= NULL;
+   m_pTempBMPBuffer	= nullptr;
+   m_pTempBuffer	= nullptr;
   // m_pBitmapInfo        = NULL;
 
    m_iTimeIndex	     = 0;
@@ -87,16 +87,16 @@ AviFileWriter::~AviFileWriter()
       m_pBitmapInfo = NULL;
    }*/
 
-   if( m_pTempBuffer != NULL )
+   if( m_pTempBuffer != nullptr )
    {
       delete [] m_pTempBuffer;
-      m_pTempBuffer = NULL;
+      m_pTempBuffer = nullptr;
    }
 
-   if( m_pTempBMPBuffer != NULL )
+   if( m_pTempBMPBuffer != nullptr )
    {
       delete [] m_pTempBMPBuffer;
-      m_pTempBMPBuffer = NULL;
+      m_pTempBMPBuffer = nullptr;
    }
 
    /*if( m_compvars.lpState != NULL )
@@ -156,7 +156,7 @@ bool AviFileWriter::open(const char*  pszFilename, int iCols, int iRows, int ibp
       return false;
    }
 
-   if(pszFilename == NULL || iRows <= 0 || iCols <= 0 || dFramerate <= 0.0)
+   if(pszFilename == nullptr || iRows <= 0 || iCols <= 0 || dFramerate <= 0.0)
    {
       assert( false );
       return false;
@@ -187,22 +187,22 @@ bool AviFileWriter::open(const char*  pszFilename, int iCols, int iRows, int ibp
       //
       // Allocate temp image buffers.
       //
-      if(m_pTempBMPBuffer != NULL)
+      if(m_pTempBMPBuffer != nullptr)
       {
          delete [] m_pTempBMPBuffer;
-         m_pTempBMPBuffer = NULL;
+         m_pTempBMPBuffer = nullptr;
       }
       m_pTempBMPBuffer = new unsigned char[m_iSize + EXTRA_TEMP_SPACE];
 
-      if(m_pTempBuffer != NULL)
+      if(m_pTempBuffer != nullptr)
       {
          delete [] m_pTempBuffer;
-         m_pTempBuffer = NULL;
+         m_pTempBuffer = nullptr;
       }
       m_pTempBuffer = new unsigned char[ m_iSize ];
    }
 
-   if (m_pTempBMPBuffer == NULL || m_pTempBuffer == NULL)
+   if (m_pTempBMPBuffer == nullptr || m_pTempBuffer == nullptr)
       return false;
 
    //

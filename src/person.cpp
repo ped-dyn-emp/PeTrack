@@ -34,7 +34,7 @@ using namespace::cv;
 
 PersonList::PersonList()
 {
-    mSc = NULL;
+    mSc = nullptr;
 }
 
 #ifndef STEREO_DISABLED

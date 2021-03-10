@@ -175,13 +175,13 @@ public:
 // die kreise liegen mgl nicht genau auf kreuz - noch zu testen
 TrackerRealPlotItem::TrackerRealPlotItem()
 {
-    mTrackerReal = NULL;
+    mTrackerReal = nullptr;
 }
 
 void TrackerRealPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& /*re*/) const
 {
     Control *controlWidget = ((AnalysePlot *) plot())->getControlWidget();
-    if (mTrackerReal && (mTrackerReal->size() > 0) && controlWidget != NULL)
+    if (mTrackerReal && (mTrackerReal->size() > 0) && controlWidget != nullptr)
     {
         QRectF rect;
         double sx = (mapX.p2() - mapX.p1())/(mapX.s2() - mapX.s1());
@@ -417,7 +417,7 @@ AnalysePlot::AnalysePlot(QWidget *parent) // default= NULL
     //setTitle("Frequency Response of a Second-Order System");
     setCanvasBackground(QColor(QColor(220, 220, 255)));
 
-    mControlWidget = NULL;
+    mControlWidget = nullptr;
     mSymbolSize = 3.;
     mActFrame = 0;
 

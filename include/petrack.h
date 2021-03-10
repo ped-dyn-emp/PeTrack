@@ -179,7 +179,7 @@ public:
     void testTracker();
     void trackAll();
     void playAll();
-    int winSize(QPointF *pos=NULL, int pers=-1, int frame=-1, int level=-1);
+    int winSize(QPointF *pos=nullptr, int pers=-1, int frame=-1, int level=-1);
     void updateImage(bool imageChanged = false);
     void updateImage(const cv::Mat &img);
 //    void updateImage(IplImage *iplImg);
@@ -188,7 +188,7 @@ public:
     QSet<int> getOnlyVisible();
     double getCmPerPixel();
     void setHeadSize(double hS=-1);
-    double getHeadSize(QPointF *pos=NULL, int pers=-1, int frame=-1);
+    double getHeadSize(QPointF *pos=nullptr, int pers=-1, int frame=-1);
 
     //------------------------------
     // inline function
