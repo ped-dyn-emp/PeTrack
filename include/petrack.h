@@ -412,9 +412,9 @@ public:
 
     inline int getImageBorderSize()
     {
-        if (getBorderFilter()->getEnabled()) 
+        if (getBorderFilter()->getEnabled())
             return (int) getBorderFilter()->getBorderSize()->getValue();
-        else 
+        else
             return 0;
         //mImageBorderSize;
     }
@@ -439,6 +439,34 @@ public:
 
 
     void updateWindowTitle();
+
+    /**
+     * @brief Sets the information about the compiled PeTrack version.
+     * @param petrackVersion current PeTrack version
+     */
+    void setPeTrackVersion(const std::string& petrackVersion);
+
+    /**
+     * @brief Sets the information about the compiled git commit hash, commit date,
+     * and commit branch
+     * @param gitCommitID commit hash of current version
+     * @param gitCommitDate commit date of current version
+     * @param gitCommitBranch commit branch of current version
+     */
+    void setGitInformation(
+                           const std::string& gitCommitID,
+                           const std::string& gitCommitDate,
+                           const std::string& gitCommitBranch);
+
+    /**
+     * @brief Sets the information about the used compiler and time stamp
+     * @param compileTimeStamp time the program was compiled
+     * @param compilerID name of the used compiler
+     * @param compilerVersion version of the used compiler
+     */
+    void setCompileInformation(const std::string &compileTimeStamp,
+                               const std::string &compilerID,
+                               const std::string &compilerVersion);
 
 private:
     void createActions();
@@ -591,6 +619,16 @@ private:
     bool mAutoBackTrack;
     bool mAutoTrackOptimizeColor;
     bool mLoading;
+
+
+    QString mPetrackVersion{"Unknown"}; ///< Version of PeTrack used to compile
+    QString mGitCommitID{"Unknown"}; ///< Commit hash used to compile
+    QString mGitCommitDate{"Unknown"}; ///< Commit date used to compile
+    QString mGitCommitBranch{"Unknown"}; ///< Branch used to compile
+
+    QString mCompileDate{"Unknown"}; ///< Compile date
+    QString mCompilerID{"Unknown"}; ///< Used compiler
+    QString mCompilerVersion{"Unknown"}; ///< Used compiler version
 };
 
 

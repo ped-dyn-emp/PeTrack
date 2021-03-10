@@ -151,9 +151,11 @@ set(AUTOGEN_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/${NAME}_autogen")
 #**********************************************************
 # Create library and exectuable                           *
 #**********************************************************
+get_git_info()
 add_library(petrack_core STATIC)
 add_executable(petrack src/main.cpp)
-target_link_libraries(petrack PRIVATE petrack_core)
+target_link_libraries(petrack PRIVATE petrack_core git-info)
+target_compile_definitions(petrack PUBLIC PETRACK_VERSION="${PROJECT_VERSION}")
 
 target_compile_options(petrack_core PRIVATE ${COMMON_COMPILE_OPTIONS})
 target_compile_definitions(petrack_core PUBLIC STEREO_DISABLED)
@@ -235,7 +237,9 @@ if(BUILD_UNIT_TESTS)
     find_package(Qt5Test REQUIRED)
 
     add_subdirectory(${CMAKE_SOURCE_DIR}/tests/unit_test)
-    target_link_libraries(petrack_tests PRIVATE petrack_core)
+    target_link_libraries(petrack_tests PRIVATE petrack_core git-info)
+
+    target_compile_definitions(petrack_tests PUBLIC PETRACK_VERSION="${PROJECT_VERSION}")
 
     target_link_libraries(petrack_tests PRIVATE Catch2::Catch2 Qt5::Test trompeloeil)
     target_include_directories(petrack_tests PRIVATE
@@ -258,6 +262,7 @@ target_sources(petrack_core PRIVATE
     include/petrack.h
     include/helper.h
     include/control.h
+    include/compilerInformation.h
     include/stereoWidget.h
     include/colorRangeWidget.h
     include/colorMarkerWidget.h

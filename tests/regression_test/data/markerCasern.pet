@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE PETRACK>
-<PETRACK VERSION="0.8">
+<PETRACK VERSION="0.8.14">
     <MAIN SRC="P:/ped/regressiontest_petrack/acceptedTruth/input\markerCasern.avi;markerCasern.avi" STATUS_HEIGHT="180"/>
     <CONTROL TAB="0">
         <CALIBRATION>

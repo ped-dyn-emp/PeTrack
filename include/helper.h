@@ -62,9 +62,6 @@ inline std::ostream& operator<<(std::ostream& s, const QString& t)
     return s;
 }
 
-#define VERSION "0.8"
-#define COMPILE_TIME __TIME__
-#define COMPILE_DATE __DATE__
 
 #ifndef MIN
 #define	MIN(a, b) ((a)<(b)?(a):(b))
@@ -280,4 +277,3 @@ inline clock_t getElapsedTime()
 }
 
 #endif
-
