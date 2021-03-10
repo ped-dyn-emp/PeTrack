@@ -34,7 +34,7 @@ private:
     QImage *mImage;
 
 public:
-    BackgroundItem(QWidget *wParent, QGraphicsItem * parent = NULL);
+    BackgroundItem(QWidget *wParent, QGraphicsItem * parent = nullptr);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };

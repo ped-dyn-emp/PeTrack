@@ -185,13 +185,13 @@ class ColorPlot: public QwtPlot
     Q_OBJECT
 
 public:
-    ColorPlot(QWidget *parent = NULL);
+    ColorPlot(QWidget *parent = nullptr);
 
     void replot();
 
     void setCursor(const QColor &col);
 
-    QPoint getPos(const QColor &col, int *z=NULL) const;
+    QPoint getPos(const QColor &col, int *z=nullptr) const;
 
     bool isGrey(const QColor &col) const;
 

@@ -38,8 +38,8 @@ using namespace std;
 
 AutoCalib::AutoCalib()
 {
-    mMainWindow = NULL;
-    mControlWidget = NULL;
+    mMainWindow = nullptr;
+    mControlWidget = nullptr;
 
     // 6x8 und 4.6cm passen zu dem Schachbrettmuster auf der Eisenplatte mit Griff
     mBoardSizeX = 6;

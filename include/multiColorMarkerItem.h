@@ -38,7 +38,7 @@ private:
     Vec2F mUlc;  // upper left corner to draw
 
 public:
-    MultiColorMarkerItem(QWidget *wParent, QGraphicsItem * parent = NULL);
+    MultiColorMarkerItem(QWidget *wParent, QGraphicsItem * parent = nullptr);
     QRectF boundingRect() const;
     void setRect(Vec2F& v);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

@@ -36,7 +36,7 @@ private:
     bool mDispNew; // indicates that a new disparity has been generated after the last drawing
 
 public:
-    StereoItem(QWidget *wParent, QGraphicsItem * parent = NULL);
+    StereoItem(QWidget *wParent, QGraphicsItem * parent = nullptr);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
 #ifndef STEREO_DISABLED

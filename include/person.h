@@ -65,11 +65,11 @@ public:
     {
         return mDistTopEllipse;
     }
-    const MyEllipse *getHeadEllipse() const // muss pointer sein, da sonst NULL nicht moeglich
+    const MyEllipse *getHeadEllipse() const // muss pointer sein, da sonst nullptr nicht moeglich
     {
         if (size() > (10/STEP_SIZE)) // war 1 //
             return &at(10/STEP_SIZE);
-        return NULL;
+        return nullptr;
     }
 };
 

@@ -158,7 +158,7 @@ private:
 // die kreise liegen mgl nicht genau auf kreuz - noch zu testen
 TrackerPlotItem::TrackerPlotItem()
 {
-    mTracker = NULL;
+    mTracker = nullptr;
 }
 
 /**
@@ -773,7 +773,7 @@ private:
 ColorPlot::ColorPlot(QWidget *parent) // default= NULL
         : QwtPlot(parent)
 {
-    mControlWidget = NULL;
+    mControlWidget = nullptr;
 //     mTracker = NULL;
     mGreyDiff = 50;
     mSymbolSize = 10.;
@@ -933,7 +933,7 @@ QPoint ColorPlot::getPos(const QColor &col, int *z) const
                 p.setY(ymax-col.saturation());
             else
                 p.setY(ymax-col.value());
-            if (z != NULL)
+            if (z != nullptr)
             {
                 if (x!=0 && y!=0)
                     *z = col.hue();
@@ -957,7 +957,7 @@ QPoint ColorPlot::getPos(const QColor &col, int *z) const
                 p.setY(ymax-col.green());
             else
                 p.setY(ymax-col.blue());
-            if (z != NULL)
+            if (z != nullptr)
             {
                 if (x!=0 && y!=0)
                     *z = col.red();

@@ -32,8 +32,8 @@ ImageItem::ImageItem(QWidget *wParent, QGraphicsItem * parent)
 {
     mMainWindow = (class Petrack*) wParent;
     mControlWidget = mMainWindow->getControlWidget();
-    mImage = NULL;
-    mCoordItem = NULL;
+    mImage = nullptr;
+    mCoordItem = nullptr;
     setCursor(Qt::CrossCursor);
     setAcceptHoverEvents(true);
 //    setAcceptDrops(true);

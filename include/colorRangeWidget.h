@@ -32,7 +32,7 @@ class ColorRangeWidget: public QWidget, public Ui::ColorRange
     Q_OBJECT
 
 public:
-    ColorRangeWidget(QWidget *parent = 0);
+    ColorRangeWidget(QWidget *parent = nullptr);
 
     int fromHue;
     int fromSat;

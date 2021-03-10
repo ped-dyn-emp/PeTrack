@@ -28,7 +28,7 @@ Parameter::Parameter()
 {
     mValue = mMinimum = mMaximum = 0;
     mChg = false;
-    mFilter = NULL;
+    mFilter = nullptr;
 }
 
 void Parameter::setFilter(Filter *filter)

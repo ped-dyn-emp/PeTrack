@@ -36,7 +36,7 @@ MultiColorMarkerItem::MultiColorMarkerItem(QWidget *wParent, QGraphicsItem * par
     : QGraphicsItem(parent)
 {
     mMainWindow = (class Petrack*) wParent;
-    mImage = NULL;
+    mImage = nullptr;
 //    mMask = NULL;
     //setAcceptsHoverEvents(true);
 

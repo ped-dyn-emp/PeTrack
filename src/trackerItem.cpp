@@ -95,8 +95,8 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && mTracker->at(i).trackPointExist(frame))
             {
                 dist = mTracker->at(i).trackPointAt(frame).distanceToPoint(p);
-                if (( dist < mMainWindow->getHeadSize(NULL, i, frame)/2.) ||
-                    ( (mTracker->at(i).trackPointAt(frame).distanceToPoint(p.colPoint()) < mMainWindow->getHeadSize(NULL, i, frame)/2.)))
+                if (( dist < mMainWindow->getHeadSize(nullptr, i, frame)/2.) ||
+                    ( (mTracker->at(i).trackPointAt(frame).distanceToPoint(p.colPoint()) < mMainWindow->getHeadSize(nullptr, i, frame)/2.)))
                 {
                     if (found)
                     {
@@ -451,7 +451,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
             if (mTracker->at(i).trackPointExist(curFrame))
             {
                 if (mControlWidget->trackHeadSized->checkState() == Qt::Checked)
-                    pSP = mMainWindow->getHeadSize(NULL, i, curFrame); //headSize;
+                    pSP = mMainWindow->getHeadSize(nullptr, i, curFrame); //headSize;
                 const TrackPoint &tp = (*mTracker)[i][curFrame-mTracker->at(i).firstFrame()];
                 if (mControlWidget->trackShowCurrentPoint->checkState() == Qt::Checked) //(mControlWidget->recoShowColor->checkState() == Qt::Checked)
                 {
@@ -470,7 +470,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                 {
                     painter->setBrush(Qt::NoBrush);
                     painter->setPen(Qt::yellow);
-                    hS = mMainWindow->winSize(NULL, i, curFrame); //headSize * 1.6 * (mControlWidget->trackRegionScale->value() / 10.);
+                    hS = mMainWindow->winSize(nullptr, i, curFrame); //headSize * 1.6 * (mControlWidget->trackRegionScale->value() / 10.);
                     if (hS < 2) 
                         hS = 2; // entspricht Vorgehen in tracker.cpp
                     for (j = 0; j <= mControlWidget->trackRegionLevels->value(); ++j)

@@ -63,7 +63,7 @@ class AnalysePlot: public QwtPlot
     Q_OBJECT
 
 public:
-    AnalysePlot(QWidget *parent = NULL);
+    AnalysePlot(QWidget *parent = nullptr);
 
     void setCursor(const QColor &col);
 

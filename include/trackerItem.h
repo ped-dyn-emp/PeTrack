@@ -35,7 +35,7 @@ private:
     Tracker *mTracker;
 
 public:
-    TrackerItem(QWidget *wParent, Tracker *tracker, QGraphicsItem * parent = 0);
+    TrackerItem(QWidget *wParent, Tracker *tracker, QGraphicsItem * parent = nullptr);
 //    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 //    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
     void updateData();

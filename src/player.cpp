@@ -497,7 +497,7 @@ void Player::recStream()
 
             QFileDialog fileDialog(this,
                                    tr("Select file for saving video output"),
-                                   NULL,
+                                   nullptr,
                                    tr("Video (*.*);;AVI-File (*.avi);;All supported types (*.avi *.mp4);;All files (*.*)"));
             fileDialog.setAcceptMode(QFileDialog::AcceptSave);
             fileDialog.setFileMode(QFileDialog::AnyFile);
@@ -506,13 +506,13 @@ void Player::recStream()
             if( fileDialog.exec() )
                 dest = fileDialog.selectedFiles().at(0);
 
-            if (dest == NULL)
+            if (dest == nullptr)
                 return;
 
             if (QFile::exists(dest))
                 QFile::remove(dest);
 
-            QProgressDialog progress("Save Video File",NULL,0,2,mMainWindow);
+            QProgressDialog progress("Save Video File",nullptr,0,2,mMainWindow);
             progress.setWindowTitle("Save Video File");
             progress.setWindowModality(Qt::WindowModal);
             progress.setVisible(true);

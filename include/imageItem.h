@@ -38,7 +38,7 @@ private:
     QImage *mImage;
     QGraphicsItem *mCoordItem;
 public:
-    ImageItem(QWidget *wParent, QGraphicsItem * parent = 0);
+    ImageItem(QWidget *wParent, QGraphicsItem * parent = nullptr);
 
     QRectF boundingRect() const; 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

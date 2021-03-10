@@ -32,7 +32,7 @@ class ColorMarkerWidget: public QWidget, public Ui::ColorMarker
     Q_OBJECT
 
 public:
-    ColorMarkerWidget(QWidget *parent = 0);
+    ColorMarkerWidget(QWidget *parent = nullptr);
 
     // store data in xml node
     void setXml(QDomElement &elem);

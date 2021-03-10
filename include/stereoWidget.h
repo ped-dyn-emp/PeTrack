@@ -32,7 +32,7 @@ class StereoWidget: public QWidget, public Ui::Stereo
     Q_OBJECT
 
 public:
-    StereoWidget(QWidget *parent = 0);
+    StereoWidget(QWidget *parent = nullptr);
 
     // store data in xml node
     void setXml(QDomElement &elem);

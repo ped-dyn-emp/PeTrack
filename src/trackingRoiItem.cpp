@@ -148,7 +148,7 @@ void TrackingRoiItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         QPoint diff = QPoint(myRound((event->pos()-mPressPos).x()), myRound((event->pos()-mPressPos).y()));
         // raender des bildes nicht ueberscheiten
         // swappen des rechtecks vermeiden, damit keine negativen width...
-        if (img != NULL)
+        if (img != nullptr)
         {
             if (mPressLocation == inside || mPressLocation == topLeft || mPressLocation == left || mPressLocation == bottomLeft)
             {

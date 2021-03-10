@@ -35,7 +35,7 @@ class CodeMarkerWidget: public QWidget, public Ui::CodeMarker
     Q_OBJECT
 
 public:
-    CodeMarkerWidget(QWidget *parent = 0);
+    CodeMarkerWidget(QWidget *parent = nullptr);
 
     // store data in xml node
     void setXml(QDomElement &elem);

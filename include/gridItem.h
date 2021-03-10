@@ -46,7 +46,7 @@ public:
     {
         return this->gridDimension;
     }
-    GridItem(QWidget *wParent, QGraphicsItem * parent = 0);
+    GridItem(QWidget *wParent, QGraphicsItem * parent = nullptr);
     QRectF boundingRect() const;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);

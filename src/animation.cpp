@@ -81,7 +81,7 @@ Animation::Animation(QWidget *wParent)
     mFirstMicroSec = -1;
     ////mCapture = NULL;
 #ifndef STEREO_DISABLED
-    mCaptureStereo = NULL;
+    mCaptureStereo = nullptr;
 #endif
 //    mImage = NULL;
 
@@ -509,7 +509,7 @@ void Animation::reset()
     mFirstMicroSec = -1;
     ////mCapture = NULL;
 #ifndef STEREO_DISABLED
-    mCaptureStereo = NULL;
+    mCaptureStereo = nullptr;
 #endif
 
 
@@ -562,7 +562,7 @@ bool Animation::isCameraLiveStream()
 #ifndef STEREO_DISABLED
 enum Camera Animation::getCamera()
 {
-    if (mCaptureStereo != NULL)
+    if (mCaptureStereo != nullptr)
         return mCaptureStereo->getCamera();
     else
         return cameraUnset;
@@ -570,7 +570,7 @@ enum Camera Animation::getCamera()
 
 void Animation::setCamera(enum Camera c)
 {
-    if (mCaptureStereo != NULL)
+    if (mCaptureStereo != nullptr)
         return mCaptureStereo->setCamera(c);
     //else   //keine Warnung, damit bei Projekt ohne direkt geladenem Video aber setzen von Stereo-Einstellungen keine Warnung ausgegeben wird
     //    debout << "Warning: Setting camera is only allowed for loaded stereo videos!" << endl;

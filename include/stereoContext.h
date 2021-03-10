@@ -64,7 +64,7 @@ public:
 #ifndef STEREO_DISABLED
     IplImage *getRectified(enum Camera camera=cameraRight);
 
-    IplImage *getDisparity(bool *dispNew = NULL);
+    IplImage *getDisparity(bool *dispNew = nullptr);
 #endif
 
     // von person.cpp benoetigt, um frame nummer zu erhalten

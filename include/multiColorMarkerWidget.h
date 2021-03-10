@@ -35,7 +35,7 @@ class MultiColorMarkerWidget: public QWidget, public Ui::MultiColorMarker
     Q_OBJECT
 
 public:
-    MultiColorMarkerWidget(QWidget *parent = 0);
+    MultiColorMarkerWidget(QWidget *parent = nullptr);
 
     // store data in xml node
     void setXml(QDomElement &elem);

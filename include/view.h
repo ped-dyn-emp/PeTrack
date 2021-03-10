@@ -68,7 +68,7 @@ class ViewWidget : public QFrame
 {
     Q_OBJECT
 public:
-    ViewWidget(QWidget *parent = 0);
+    ViewWidget(QWidget *parent = nullptr);
 
     GraphicsView *view() const;
 
