@@ -18,6 +18,9 @@
  * along with this program.  If not, see <https://cdwww.gnu.org/licenses/>.
  */
 
+#ifndef IO_H
+#define IO_H
+
 #include <variant>
 #include <unordered_map>
 #include <string>
@@ -31,3 +34,5 @@ namespace IO
     std::variant<std::unordered_map<int, int>, std::string>
     readMarkerIDFile(const QString& markerFileName);
 }
+
+#endif
