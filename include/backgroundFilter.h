@@ -23,17 +23,13 @@
 
 #include "filter.h"
 
-
-#include "opencv2/opencv.hpp"
-#include "opencv2/video/background_segm.hpp"
-
-
 #include <QString>
 
-#include "stereoContext.h"
-//#include "opencv2/video/background_segm.hpp"
+#include <opencv2/opencv.hpp>
+#include <opencv2/video/background_segm.hpp>
 
-//class pet::StereoContext;
+#include "stereoContext.h"
+
 
 class BackgroundFilter : public Filter
 {

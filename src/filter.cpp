@@ -19,7 +19,6 @@
  */
 
 #include "filter.h"
-#include "helper.h"
 
 using namespace::cv;
 

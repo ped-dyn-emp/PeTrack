@@ -19,8 +19,7 @@
  */
 
 #include <QtWidgets>
-#include <math.h>
-#include <stdlib.h>
+#include <cmath>
 
 #include "petrack.h"
 #include "control.h"

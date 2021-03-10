@@ -38,6 +38,9 @@
 #include "view.h"
 #include "IO.h"
 #include "pMessageBox.h"
+#include "calibFilter.h"
+#include "trackingRoiItem.h"
+#include "recognitionRoiItem.h"
 
 using namespace std;
 

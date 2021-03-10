@@ -49,8 +49,10 @@
 #include "backgroundItem.h"
 #include "tracker.h"
 #include "trackerReal.h"
-#include "cmath"
 #include "pMessageBox.h"
+#include "trackingRoiItem.h"
+#include "recognitionRoiItem.h"
+
 #ifdef AVI
 #include "aviFile.h"
 #else
@@ -58,13 +60,11 @@
 #endif
 #include "person.h"
 
-#include <time.h>
-
-#include <cstdlib>
-
+#include <ctime>
 #include <iomanip>
+#include <cmath>
 
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 
 // Zeitausgabe aktivieren
 //#define TIME_MEASUREMENT

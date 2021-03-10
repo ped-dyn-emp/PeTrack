@@ -19,7 +19,7 @@
  */
 
 //folgende zeile spaeter raus
-#include "opencv2/highgui.hpp"
+#include <opencv2/highgui.hpp>
 
 // spaeter entfernen naechsten beiden zeilen
 //#include "control.h"

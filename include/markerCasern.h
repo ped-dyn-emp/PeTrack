@@ -27,7 +27,6 @@
 #include "ellipse.h"
 
 
-
 class TrackPoint;
 
 class MarkerCasern

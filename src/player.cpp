@@ -35,8 +35,6 @@
 #include "pMessageBox.h"
 
 
-//#define TIME_MEASUREMENT
-
 Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
 {
     int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);

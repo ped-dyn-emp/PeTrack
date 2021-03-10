@@ -19,11 +19,7 @@
  */
 
 //folgende zeile spaeter raus
-#include "opencv2/highgui.hpp"
-
-// spaeter entfernen naechsten beiden zeilen
-//#include "control.h"
-//extern Control *cw;
+#include <opencv2/highgui.hpp>
 
 //// radius fuer japan ellipsen
 //#define HEAD_SIZE_MIN 8

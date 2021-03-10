@@ -1,4 +1,4 @@
-/*
+﻿/*
  * PeTrack - Software for tracking pedestrians movement in videos
  * Copyright (C) 2010-2020 Forschungszentrum Jülich GmbH,
  * Maik Boltes, Juliane Adrian, Ricardo Martin Brualla, Arne Graf, Paul Häger, Daniel Hillebrand,
@@ -20,8 +20,7 @@
 
 #include "helper.h"
 
-//#include <opencv.hpp>
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 
 using namespace::cv;
 using namespace std;

@@ -26,11 +26,11 @@
 #include <qwt_plot.h>
 
 #include "helper.h"
-#include "tracker.h"
 
 #define DEFAULT_HEIGHT 180.0
 
 class ImagePlotItem;
+class Tracker;
 class TrackerPlotItem;
 class Control;
 class Zoomer;

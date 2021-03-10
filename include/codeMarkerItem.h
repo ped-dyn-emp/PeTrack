@@ -18,8 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CodeMarkerItem_H
-#define CodeMarkerItem_H
+#ifndef CODEMARKERITEM_H
+#define CODEMARKERITEM_H
 
 #include <QGraphicsItem>
 

@@ -20,7 +20,6 @@
 
 #include "person.h"
 #include "helper.h"
-//#include "highgui.h"
 
 //#define SHOWELLIPSES // gibt die einzelnen schritte der personen detektion pyramide graphisch aus
 //#define SAVEELLIPSES // ob alle ellips in datei geschrieben werden sollen

@@ -23,6 +23,7 @@
 #include <QMessageBox>
 #include <QStyleFactory>
 #include <csignal>
+#include <cstdio>
 #include <sstream>
 #include <string>
 
@@ -35,10 +36,6 @@
 // Aufrufbeispiel:
 // release/petrack.exe -sequence ../../einzelbilder/wert0001.png -autoSave dir|ttt.avi
 
-
-// musst be done to store fixed order of attributes in XML files
-// see: http://stackoverflow.com/questions/27378143/qt-5-produce-random-attribute-order-in-xml
-extern Q_CORE_EXPORT QBasicAtomicInt qt_qhash_seed;
 
 static QApplication * gApp = nullptr;
 void quit(int sig_number)

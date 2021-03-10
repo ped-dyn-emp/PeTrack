@@ -23,7 +23,7 @@
 #include <QProgressDialog>
 #include <QApplication>
 
-#include "opencv2/highgui.hpp"
+#include <opencv2/highgui.hpp>
 
 #include "autoCalib.h"
 #include "petrack.h"

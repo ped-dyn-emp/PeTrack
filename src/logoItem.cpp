@@ -26,7 +26,7 @@
 #include "logoItem.h"
 #include "petrack.h"
 
-#include <time.h>
+#include <ctime>
 
 // minimale Zeit zwischen zwei Blendenstufen in Millisekunden
 #define FRAME_INTERVAL 40

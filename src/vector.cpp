@@ -18,10 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 
 #include <QPointF>
-#include <QPoint>
 
 #include "vector.h"
 #include "helper.h"

@@ -22,7 +22,6 @@
 
 #include <cmath>
 
-#include "helper.h"
 #include "view.h"
 #include "vector.h"
 #include "petrack.h"

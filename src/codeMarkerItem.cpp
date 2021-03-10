@@ -25,7 +25,6 @@
 #include "codeMarkerItem.h"
 #include "codeMarkerWidget.h"
 #include "tracker.h"
-#include "animation.h"
 #include "control.h"
 
 using namespace::cv;

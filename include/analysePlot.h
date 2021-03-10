@@ -21,8 +21,6 @@
 #ifndef ANALYSEPLOT_H
 #define ANALYSEPLOT_H
 
-//#ifdef QWT // kann nicht nur in .pro ausgeschlossen werden, da auch von ui benutzt wird
-
 #include <QPen>
 
 #include <qwt_plot.h>

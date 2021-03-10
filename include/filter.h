@@ -21,8 +21,7 @@
 #ifndef FILTER_H
 #define FILTER_H
 
-
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 
 class Filter;
 

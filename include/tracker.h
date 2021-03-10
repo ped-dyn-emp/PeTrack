@@ -25,11 +25,7 @@
 #include <QColor>
 #include <QTextStream>
 
-//#include <opencv2/core/core.hpp>
-
-
 #include "vector.h"
-
 #include "petrack.h"
 
 #define EXTRAPOLATE_FACTOR 3. // war 1.5, aber bei bildauslassungen kann es ungewollt zuschlagen (bei 3 ist ein ausgelassener frame mgl, bei 2 wieder ein problem)

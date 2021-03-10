@@ -22,7 +22,8 @@
 #define HELPER_H
 
 #include <opencv2/opencv.hpp>
-#include "QFileInfo"
+#include <QFileInfo>
+#include <QString>
 
 extern QString commandLineOptionsString;
 
@@ -266,7 +267,7 @@ inline QString getFileList(const QString &fileName, const QString &relToFileName
         return fileName+";"+seqRelToPro;
 }
 
-#include "time.h"
+#include <ctime>
 inline clock_t getElapsedTime()
 {
     static clock_t lastTime = clock();

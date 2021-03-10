@@ -24,7 +24,6 @@
 #include "filter.h"
 #include "stereoContext.h"
 
-
 class CalibStereoFilter : public Filter
 {
 private:
