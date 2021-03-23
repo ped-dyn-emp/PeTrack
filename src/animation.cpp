@@ -255,11 +255,11 @@ bool Animation::openTimeFile(QString &timeFileName)
 }
 
 /// returns -1, if not set by time file
-int Animation::getFirstFrameSec()
+int Animation::getFirstFrameSec() const
 {
     return mFirstSec;
 }
-int Animation::getFirstFrameMicroSec()
+int Animation::getFirstFrameMicroSec() const
 {
     return mFirstMicroSec;
 }
@@ -368,7 +368,7 @@ int Animation::getNumFrames()
     return 0;
 }
 
-int Animation::getMaxFrames()
+int Animation::getMaxFrames() const
 {
     if (mVideo || mImgSeq)
         return mMaxFrames;
@@ -376,7 +376,7 @@ int Animation::getMaxFrames()
 }
 
 /// Returns the index of the current frame
-int Animation::getCurrentFrameNum()
+int Animation::getCurrentFrameNum() const
 {
     return mCurrentFrame;
 }
@@ -391,7 +391,7 @@ void Animation::setSourceInFrameNum(int in)
     mMainWindow->updateSourceInOutFrames();
 }
 /// Returns the sourceIn frame number
-int Animation::getSourceInFrameNum()
+int Animation::getSourceInFrameNum() const
 {
     return mSourceInFrame;
 }
@@ -406,7 +406,7 @@ void Animation::setSourceOutFrameNum(int out)
     mMainWindow->updateSourceInOutFrames();
 }
 /// Returns the sourceOut frame number
-int Animation::getSourceOutFrameNum()
+int Animation::getSourceOutFrameNum() const
 {
     return mSourceOutFrame;
 }
@@ -449,7 +449,7 @@ double Animation::getFPS()
         return -1;
 }
 
-double Animation::getOriginalFPS()
+double Animation::getOriginalFPS() const
 {
     return mOriginalFps;
 }
@@ -532,22 +532,22 @@ QFileInfo Animation::getFileInfo()
     return mFileInfo;
 }
 
-bool Animation::isVideo()
+bool Animation::isVideo() const
 {
     return mVideo;
 }
 
-bool Animation::isStereoVideo()
+bool Animation::isStereoVideo() const
 {
     return mStereo;
 }
 
-bool Animation::isImageSequence()
+bool Animation::isImageSequence() const
 {
     return mImgSeq;
 }
 
-bool Animation::isCameraLiveStream()
+bool Animation::isCameraLiveStream() const
 {
     return mCameraLiveStream;
 }

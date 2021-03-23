@@ -92,7 +92,7 @@ public:
       double  iFramerate );
 
    /** Get the the bytes written */
-   long int bytesWritten();
+   long int bytesWritten() const;
 
    /**
     * Load a bitmap from a file and append it to the current open .avi.

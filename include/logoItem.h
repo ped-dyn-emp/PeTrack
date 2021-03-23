@@ -52,7 +52,7 @@ public:
 //    void dropEvent(QDropEvent *event);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    inline float getOpacity()
+    inline float getOpacity() const
     {
         return mOpacity;
     }

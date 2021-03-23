@@ -327,7 +327,7 @@ void BackgroundFilter::setUpdate(bool b)
     mUpdate = b;
 }
 
-bool BackgroundFilter::update()
+bool BackgroundFilter::update() const
 {
     return mUpdate;
 }

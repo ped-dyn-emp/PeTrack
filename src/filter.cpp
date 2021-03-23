@@ -39,11 +39,11 @@ Filter * Parameter::getFilter()
     return mFilter;
 }
 
-double Parameter::value()
+double Parameter::value() const
 {
     return mValue;
 }
-double Parameter::getValue()
+double Parameter::getValue() const
 {
     return mValue;
 }
@@ -56,7 +56,7 @@ void Parameter::setValue(double d)
     }
 }
 
-double Parameter::getMinimum()
+double Parameter::getMinimum() const
 {
     return mMinimum;
 }
@@ -64,7 +64,7 @@ void Parameter::setMinimum(double d)
 {
     mMinimum = d;
 }
-double Parameter::getMaximum()
+double Parameter::getMaximum() const
 {
     return mMaximum;
 }
@@ -73,11 +73,11 @@ void Parameter::setMaximum(double d)
     mMaximum = d;
 }
 
-bool Parameter::changed()
+bool Parameter::changed() const
 {
     return mChg;
 }
-bool Parameter::getChanged()
+bool Parameter::getChanged() const
 {
     return mChg;
 }
@@ -110,7 +110,7 @@ Filter::Filter()
  *
  * @return true, if a parameter changed
  */
-bool Filter::changed()
+bool Filter::changed() const
 {
     return mChg;
 }
@@ -184,7 +184,7 @@ void Filter::setEnabled(bool b)
     mChg = true;
     mEnable = b;
 }
-bool Filter::getEnabled()
+bool Filter::getEnabled() const
 {
     return mEnable;
 }
@@ -194,7 +194,7 @@ void Filter::setOnCopy(bool b)
     mChg = true;
     mOnCopy = b;
 }
-bool Filter::getOnCopy()
+bool Filter::getOnCopy() const
 {
     return mOnCopy;
 }

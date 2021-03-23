@@ -180,13 +180,13 @@ public:
     void updateSequence();
 //    void calcBackground();
     QSet<int> getOnlyVisible();
-    double getCmPerPixel();
+    double getCmPerPixel() const;
     void setHeadSize(double hS=-1);
     double getHeadSize(QPointF *pos=nullptr, int pers=-1, int frame=-1);
 
     //------------------------------
     // inline function
-    bool isLoading()
+    bool isLoading() const
     {
         return mLoading;
     }
@@ -349,7 +349,7 @@ public:
     {
         mRecognitionChanged = b;
     }
-    inline bool recognitionChanged()
+    inline bool recognitionChanged() const
     {
         return mRecognitionChanged;
     }
@@ -358,7 +358,7 @@ public:
     {
         mTrackChanged = b;
     }
-    inline bool trackChanged()
+    inline bool trackChanged() const
     {
         return mTrackChanged;
     }
@@ -426,7 +426,7 @@ public:
     {
         return &mExtrCalibration;
     }
-    inline double getStatusFPS()
+    inline double getStatusFPS() const
     {
         return mShowFPS;
     }

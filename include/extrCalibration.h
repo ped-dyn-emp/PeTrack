@@ -186,7 +186,7 @@ public:
     {
         this->points2D = list2D;
     }
-    inline float getCamHeight()
+    inline float getCamHeight() const
     {
         return camHeight;
     }

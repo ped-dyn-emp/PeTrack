@@ -192,7 +192,7 @@ public:
     int getCalibGrid3DResolution();
     void setCalibGrid3DResolution(int i);
 
-    void expandRange(QColor& fromColor, QColor& toColor, const QColor& clickedColor);
+    void expandRange(QColor& fromColor, QColor& toColor, const QColor& clickedColor) const;
     void saveChange(const QColor& fromColor, const QColor& toColor, RectPlotItem* map);
     bool getColors(QColor& clickedColor, QColor& toColor, QColor& fromColor, RectPlotItem*& map);
 

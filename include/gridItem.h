@@ -41,7 +41,7 @@ public:
     {
         this->gridDimension = gDimension;
     }
-    inline int/*Petrack::Dimension*/ getGridDimension()
+    inline int/*Petrack::Dimension*/ getGridDimension() const
     {
         return this->gridDimension;
     }
