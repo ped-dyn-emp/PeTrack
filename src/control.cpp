@@ -3520,7 +3520,7 @@ void Control::saveChange(const QColor& fromColor, const QColor& toColor, RectPlo
  * @param toColor[in,out] toColor of the map, gets changed!
  * @param clickedColor[in]
  */
-void Control::expandRange(QColor& fromColor, QColor& toColor, const QColor& clickedColor)
+void Control::expandRange(QColor& fromColor, QColor& toColor, const QColor& clickedColor) const
 {
     // NOTE BUFFER in Klassenebene verschieben und bei setColor auch nutzen? (verschiedene Größe vllt. gewünscht?)
     constexpr int BUFFER = 10;

@@ -49,17 +49,17 @@ public:
     void setFilter(Filter *filter);
     Filter * getFilter();
 
-    double value();
-    double getValue();
+    double value() const;
+    double getValue() const;
     void setValue(double d);
 
-    double getMinimum();
+    double getMinimum() const;
     void setMinimum(double d);
-    double getMaximum();
+    double getMaximum() const;
     void setMaximum(double d);
 
-    bool changed();
-    bool getChanged();
+    bool changed() const;
+    bool getChanged() const;
     void setChanged(bool b);
 };
 
@@ -93,7 +93,7 @@ public:
     Filter();
     virtual ~Filter() {};
 
-    bool changed();
+    bool changed() const;
     bool getChanged();
     void setChanged(bool b);
 
@@ -110,10 +110,10 @@ public:
     void enable();
     void disable();
     void setEnabled(bool b);
-    bool getEnabled();
+    bool getEnabled() const;
 
     void setOnCopy(bool b);
-    bool getOnCopy();
+    bool getOnCopy() const;
 };
 
 #endif

@@ -81,7 +81,7 @@ public slots:
     void setFPS(double fps=-1.);
     void togglePlayerSpeedLimited();
     void setPlayerSpeedLimited(bool fixed);
-    bool getPlayerSpeedLimited();
+    bool getPlayerSpeedLimited() const;
     void setPlayerSpeedFixed(bool fixed);
     void setLooping(bool looping);
     void setFrameInNum(int in=-1.);

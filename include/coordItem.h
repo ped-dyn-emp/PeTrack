@@ -49,7 +49,7 @@ public:
     {
         this->coordDimension = dim;
     }
-    inline int /*Dimension*/ getCoordDimension()
+    inline int /*Dimension*/ getCoordDimension() const
     {
         return this->coordDimension;
     }

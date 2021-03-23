@@ -265,7 +265,7 @@ bool AviFileWriter::open(
   //return m_vWriter.open(pszFilename,CV_FOURCC('P', 'I', 'M', '1'),(double) iFramerate,Size(iCols,iRows),m_isColor);
 }
 
-long int AviFileWriter::bytesWritten()
+long int AviFileWriter::bytesWritten() const
 {
    return m_liBytesWritten;
    //return m_iTimeIndex * m_iSize;

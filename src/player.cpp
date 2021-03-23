@@ -202,7 +202,7 @@ void Player::togglePlayerSpeedLimited()
 {
     setPlayerSpeedLimited(!mPlayerSpeedLimited);
 }
-bool Player::getPlayerSpeedLimited()
+bool Player::getPlayerSpeedLimited() const
 {
     return mPlayerSpeedLimited;
 }

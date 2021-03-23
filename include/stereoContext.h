@@ -97,20 +97,20 @@ public:
         return mTriclopsContext;
     }
 #endif
-    inline unsigned char getSurfaceValue()
+    inline unsigned char getSurfaceValue() const
     {
         return mSurfaceValue;
     }
-    inline unsigned char getBackForthValue()
+    inline unsigned char getBackForthValue() const
     {
         return mBackForthValue;
     }
 
-    inline unsigned short int getMin()
+    inline unsigned short int getMin() const
     {
         return mMin;
     }
-    inline unsigned short int getMax()
+    inline unsigned short int getMax() const
     {
         return mMax;
     }

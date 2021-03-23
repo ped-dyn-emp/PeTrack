@@ -3959,7 +3959,7 @@ void Petrack::updateSequence()
  * @brief Gets cm per pixel. Only recalculates when calculating head size.
  * @return cm per pixel
  */
-double Petrack::getCmPerPixel()
+double Petrack::getCmPerPixel() const
 {
     return mCmPerPixel;
 }

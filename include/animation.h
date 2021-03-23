@@ -114,25 +114,25 @@ public:
     int getNumFrames(); 
 
     // Returns the maximum number of frames in the source file
-    int getMaxFrames();
+    int getMaxFrames() const;
  
     // Returns the index of the current frame  
-    int getCurrentFrameNum();
+    int getCurrentFrameNum() const;
 
     // Sets the sourceIn/Out frame numbers
     void updateSourceInFrameNum(int in=-1);
     void updateSourceOutFrameNum(int out=-1);
 
     // Returns the sourceIn/Out frame numbers
-    int getSourceInFrameNum();
-    int getSourceOutFrameNum();
+    int getSourceInFrameNum() const;
+    int getSourceOutFrameNum() const;
  
     // Returns the filename of the current frame  
     QString getCurrentFileName();
  
     // Returns the FPS of the current animation if it is a video
     double getFPS();
-    double getOriginalFPS();
+    double getOriginalFPS() const;
 
     void setFPS(double fps);
  
@@ -144,17 +144,17 @@ public:
 
     void reset();
  
-    bool isVideo();
-    bool isStereoVideo();
-    bool isImageSequence();
-    bool isCameraLiveStream();
+    bool isVideo() const;
+    bool isStereoVideo() const;
+    bool isImageSequence() const;
+    bool isCameraLiveStream() const;
 
 #ifndef STEREO_DISABLED
     enum Camera getCamera();
     void setCamera(enum Camera);
 #endif
-    int getFirstFrameSec();
-    int getFirstFrameMicroSec();
+    int getFirstFrameSec() const;
+    int getFirstFrameMicroSec() const;
 
     QString getFileBase();
     QFileInfo getFileInfo();

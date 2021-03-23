@@ -52,7 +52,7 @@ public:
     void setDefaultHeight(double h);
 
     void setUpdate(bool b);
-    bool update();
+    bool update() const;
 
     QString getFilename();
     void setFilename(const QString &fn);
