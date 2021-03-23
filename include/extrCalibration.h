@@ -23,14 +23,90 @@
 
 #include <iostream>
 #include <vector>
+#include <array>
 
 #include <QString>
-#include <QVector>
+#include <QDomElement>
 
 #include <opencv2/opencv.hpp>
 
 class Petrack;
 class Control;
+
+
+class ReprojectionError{
+private:
+    bool mValid = false;
+    double mPointHeightAvg;
+    double mPointHeightStdDev;
+    double mPointHeightVariance;
+    double mPointHeightMax;
+
+    double mDefaultHeightAvg;
+    double mDefaultHeightStdDev;
+    double mDefaultHeightVariance;
+    double mDefaultHeightMax;
+
+    double mPixelAvg;
+    double mPixelStdDev;
+    double mPixelVariance;
+    double mPixelMax;
+
+    double mUsedDefaultHeight;
+public:
+    ReprojectionError() = default;
+
+    ReprojectionError(double pointHeightAvg, double pointHeightStdDev,
+                      double pointHeightVariance, double pointHeightMax,
+                      double defaultHeightAvg, double defaultHeightStdDev,
+                      double defaultHeightVariance, double defaultHeightMax,
+                      double pixelAvg, double pixelStdDev,
+                      double pixelVariance, double pixelMax,
+                      double defaultHeight):
+        mPointHeightAvg(pointHeightAvg), mPointHeightStdDev(pointHeightStdDev),
+        mPointHeightVariance(pointHeightVariance), mPointHeightMax(pointHeightMax),
+        mDefaultHeightAvg(defaultHeightAvg), mDefaultHeightStdDev(defaultHeightStdDev),
+        mDefaultHeightVariance(defaultHeightVariance), mDefaultHeightMax(defaultHeightMax),
+        mPixelAvg(pixelAvg), mPixelStdDev(pixelStdDev),
+        mPixelVariance(pixelVariance), mPixelMax(pixelMax),
+        mUsedDefaultHeight(defaultHeight)
+    {
+        auto data = getData();
+        mValid = !std::any_of(data.begin(), data.end(), [](double a){return !std::isfinite(a) || a < 0;});
+    }
+
+    void getXml(QDomElement& elem);
+    void setXml(QDomElement& elem) const;
+
+    double pointHeightAvg() const;
+    double pointHeightStdDev() const;
+    double pointHeightVariance() const;
+    double pointHeightMax() const;
+
+    double defaultHeightAvg() const;
+    double defaultHeightStdDev() const;
+    double defaultHeightVariance() const;
+    double defaultHeightMax() const;
+
+    double pixelAvg() const;
+    double pixelStdDev() const;
+    double pixelVariance() const;
+    double pixelMax() const;
+
+    double usedDefaultHeight() const;
+
+    std::array<double, 13> getData() const {
+        return {mPointHeightAvg, mPointHeightStdDev, mPointHeightVariance, mPointHeightMax,
+         mDefaultHeightAvg, mDefaultHeightStdDev, mDefaultHeightVariance, mDefaultHeightMax,
+         mPixelAvg, mPixelStdDev, mPixelVariance, mPixelMax,
+         mUsedDefaultHeight};
+    }
+
+    bool isValid() const{
+        return mValid;
+    }
+};
+
 
 /**
  * @brief The ExtrCalibration class manages the extrinsic calibration
@@ -67,7 +143,7 @@ private:
     bool isExtCalib;
     float camHeight;
 
-    QVector<double> reprojectionError;
+    ReprojectionError reprojectionError;
     QString mExtrCalibFile;
     void init();
 
@@ -118,13 +194,16 @@ public:
     {
         this->camHeight = cHeight;
     }
-    inline QVector<double> getReprojectionError()
+    inline ReprojectionError getReprojectionError()
     {
-        if( reprojectionError.size() < 12 )
+        if(!reprojectionError.isValid())
             calcReprojectionError();
-        return this->reprojectionError;
+        return reprojectionError;
     }
 
+
+    void setXml(QDomElement &elem);
+    void getXml(QDomElement &elem);
 };
 
 #endif // EXTRCALIBRATION_H
