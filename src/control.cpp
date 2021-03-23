@@ -1989,7 +1989,7 @@ void Control::on_extrCalibShowError_clicked()
     titel->setText("<b>Reprojection error for extrinsic calibration:</b>");
     layout->addWidget(titel, 0,1);
 
-    if( mMainWindow->getExtrCalibration()->getReprojectionError().isEmpty() )
+    if( !mMainWindow->getExtrCalibration()->getReprojectionError().isValid() )
     {
         out = QString("No File for extrinsic calibration found!");
         tableView->setText(out);
@@ -2007,9 +2007,9 @@ void Control::on_extrCalibShowError_clicked()
                       "<tr><td>Default height: <small>[%12 cm]</small> </td><td> %4 cm</td><td> %5 cm</td><td> %6 cm</td><td> %7 cm</td></tr>"
                       "<tr><td>Pixel    error: &nbsp;&nbsp;            </td><td> %8 px</td><td> %9 px</td><td> %10 px</td><td> %11 px</td></tr>"
                       "</table>");
-        QVector<double> reproError = mMainWindow->getExtrCalibration()->getReprojectionError();
+        const auto& reproError = mMainWindow->getExtrCalibration()->getReprojectionError().getData();
         for(double value : reproError){
-            if(value == -1){
+            if(value < 0){
                 out = out.arg("-");
             }else{
                 out = out.arg(value);

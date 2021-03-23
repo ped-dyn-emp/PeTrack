@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE PETRACK>
-<PETRACK VERSION="0.8.14">
+<PETRACK VERSION="0.8.15">
     <MAIN SRC="P:/ped/regressiontest_petrack/acceptedTruth/input/CodeMarkerTests.mp4;codeMarker.mp4" STATUS_HEIGHT="0"/>
     <CONTROL TAB="2">
         <CALIBRATION>

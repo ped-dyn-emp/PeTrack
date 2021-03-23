@@ -480,6 +480,10 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
             if (tmpElem.hasAttribute("ONLY_PEOPLE_NR_LIST"))
                 onlyPeopleNrList = tmpElem.attribute("ONLY_PEOPLE_NR_LIST");
         }
+        else if (elem.tagName() == "EXTR_CALIBRATION")
+        {
+            mExtrCalibration.getXml(elem);
+        }
         else if (elem.tagName() == "PLAYER")
         {
             if (elem.hasAttribute("FRAME"))
@@ -680,6 +684,11 @@ void Petrack::saveXml(QDomDocument &doc)
     // control settings (right control widget)
     elem = doc.createElement("CONTROL");
     mControlWidget->setXml(elem);
+    root.appendChild(elem);
+
+    // Reprojection error extrinsic calib
+    elem = doc.createElement("EXTR_CALIBRATION");
+    mExtrCalibration.setXml(elem);
     root.appendChild(elem);
 
     // settings for stereo

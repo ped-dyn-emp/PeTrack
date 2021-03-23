@@ -561,7 +561,7 @@ void ExtrCalibration::calibExtrParams()
             mControlWidget->setCalibExtrTrans2(translation_vector2[1]);
             mControlWidget->setCalibExtrTrans3(translation_vector2[2]);
 
-            reprojectionError.clear();
+            reprojectionError = ReprojectionError{};
 
             PCritical(mMainWindow, QObject::tr("Petrack"), QObject::tr("Error: Could not calculate extrinsic calibration. Please select other 2D/3D point correspondences for extrinsic calibration!"));
 
@@ -598,14 +598,14 @@ bool ExtrCalibration::calcReprojectionError()
     //////
     /// \brief error measurements
     ///
-    float val, max_px = -1.0, max_pH = -1.0, max_dH = -1.0,
+    double val, max_px = -1.0, max_pH = -1.0, max_dH = -1.0,
           var_px = 0, sd_px = 0, var_pH = 0, sd_pH = 0, var_dH = 0, sd_dH = 0,
           sum_px = 0, sum_pH = 0, sum_dH = 0;
 
     //int bS = mMainWindow->getImageBorderSize();
     size_t num_points = get2DList().size();
     if(num_points == 0 || num_points != get3DList().size()){
-        reprojectionError = QVector<double>(13, -1);
+        reprojectionError = ReprojectionError{};
         return false;
     }
 
@@ -683,43 +683,31 @@ bool ExtrCalibration::calcReprojectionError()
 
     }
 
-    if( reprojectionError.isEmpty() )
-        reprojectionError = QVector<double>(13, -1);
-
     // average
     sum_pH /= num_points;
     var_pH /= num_points;
     sd_pH = sqrt(var_pH);
     debout << "Reprojection error (pointHeight) average: " << sum_pH << "cm (standard deviation: " << sd_pH << " variance: " << var_pH << " Max error: " << max_pH << "cm)" << endl;
-    reprojectionError[0] = sum_pH;
-    reprojectionError[1] = sd_pH;
-    reprojectionError[2] = var_pH;
-    reprojectionError[3] = max_pH;
 
     // average
     sum_dH /= num_points;
     var_dH /= num_points;
     sd_dH = sqrt(var_dH);
     debout << "Reprojection error (defaultHeight=" << mControlWidget->mapDefaultHeight->value() << ") average: " << sum_dH << "cm (standard deviation: " << sd_dH << " variance: " << var_dH << " Max error: " << max_dH << "cm)" << endl;
-    reprojectionError[4] = sum_dH;
-    reprojectionError[5] = sd_dH;
-    reprojectionError[6] = var_dH;
-    reprojectionError[7] = max_dH;
 
     // average
     sum_px /= num_points;
     var_px /= num_points;
     sd_px = sqrt(var_px);
     debout << "Reprojection error (Pixel) average: " << sum_px << "px (standard deviation: " << sd_px << " variance: " << var_px << " Max error: " << max_px << "px)" << endl;
-    reprojectionError[8] = sum_px;
-    reprojectionError[9] = sd_px;
-    reprojectionError[10] = var_px;
-    reprojectionError[11] = max_px;
 
-    // default height
-    reprojectionError[12] = mControlWidget->mapDefaultHeight->value();
+    reprojectionError = ReprojectionError{
+        sum_pH, sd_pH, var_pH, max_pH,
+        sum_dH, sd_dH, var_dH, max_dH,
+        sum_px, sd_px, var_px, max_px,
+        mControlWidget->mapDefaultHeight->value()};
 
-    return reprojectionError[0] > MAX_AV_ERROR ? false : true; // Falls pixel fehler im schnitt > 20 ist das Ergebnis nicht akzeptabel
+    return reprojectionError.pointHeightAvg() > MAX_AV_ERROR ? false : true; // Falls pixel fehler im schnitt > 20 ist das Ergebnis nicht akzeptabel
 }
 
 /**
@@ -1069,4 +1057,160 @@ bool ExtrCalibration::isOutsideImage(Point2f p2d)
     {
         return false;
     }
+}
+
+
+void ExtrCalibration::setXml(QDomElement &elem)
+{
+    reprojectionError.setXml(elem);
+}
+
+void ExtrCalibration::getXml(QDomElement &elem)
+{
+    QDomElement subElem;
+    QString styleString;
+
+    for(subElem = elem.firstChildElement(); !subElem.isNull(); subElem = subElem.nextSiblingElement())
+    {
+        if (subElem.tagName() == "REPROJECTION_ERROR")
+        {
+            reprojectionError.getXml(subElem);
+        }
+    }
+}
+
+void ReprojectionError::getXml(QDomElement &subElem)
+{
+    if (subElem.hasAttribute("SUM_PH"))
+    {
+        mPointHeightAvg = subElem.attribute("AVG_PH").toDouble();
+    }
+    if (subElem.hasAttribute("SD_PH"))
+    {
+        mPointHeightStdDev = subElem.attribute("SD_PH").toDouble();
+        if(mPointHeightStdDev < 0)
+        {
+            mPointHeightVariance = -1;
+        }else
+        {
+            mPointHeightVariance = pow(mPointHeightStdDev, 2);
+        }
+    }
+    if (subElem.hasAttribute("MAX_PH"))
+    {
+        mPointHeightMax = subElem.attribute("MAX_PH").toDouble();
+    }
+    if (subElem.hasAttribute("SUM_DH"))
+    {
+        mDefaultHeightAvg = subElem.attribute("AVG_DH").toDouble();
+    }
+    if (subElem.hasAttribute("SD_DH"))
+    {
+        mDefaultHeightStdDev = subElem.attribute("SD_DH").toDouble();
+        if(mDefaultHeightStdDev < 0){
+            mDefaultHeightVariance = -1;
+        }else{
+            mDefaultHeightVariance = pow(mDefaultHeightStdDev, 2);
+        }
+    }
+    if (subElem.hasAttribute("MAX_DH"))
+    {
+        mDefaultHeightMax = subElem.attribute("MAX_DH").toDouble();
+    }
+    if (subElem.hasAttribute("SUM_PX"))
+    {
+        mPixelAvg = subElem.attribute("AVG_PX").toDouble();
+    }
+    if (subElem.hasAttribute("SD_PX"))
+    {
+        mPixelStdDev = subElem.attribute("SD_PX").toDouble();
+        if(mPixelStdDev < 0)
+        {
+            mPixelVariance = -1;
+        }else
+        {
+            mPixelVariance = pow(mPixelStdDev, 2);
+        }
+    }
+    if (subElem.hasAttribute("MAX_PX"))
+    {
+        mPixelMax = subElem.attribute("MAX_PX").toDouble();
+    }
+    if (subElem.hasAttribute("USED_HEIGHT"))
+    {
+        mUsedDefaultHeight = subElem.attribute("USED_HEIGHT").toDouble();
+    }
+
+    auto data = getData();
+    mValid = !std::any_of(data.begin(), data.end(), [](double a){return !std::isfinite(a) || a < 0;});
+}
+
+void ReprojectionError::setXml(QDomElement &elem) const
+{
+    QDomElement subElem = elem.ownerDocument().createElement("REPROJECTION_ERROR");
+
+    subElem.setAttribute("AVG_PH", mPointHeightAvg);
+    subElem.setAttribute("SD_PH", mPointHeightStdDev);
+    subElem.setAttribute("MAX_PH", mPointHeightMax);
+    subElem.setAttribute("AVG_DH", mDefaultHeightAvg);
+    subElem.setAttribute("SD_DH", mDefaultHeightStdDev);
+    subElem.setAttribute("MAX_DH", mDefaultHeightMax);
+    subElem.setAttribute("AVG_PX", mPixelAvg);
+    subElem.setAttribute("SD_PX", mPixelStdDev);
+    subElem.setAttribute("MAX_PX", mPixelMax);
+    subElem.setAttribute("USED_HEIGHT", mUsedDefaultHeight);
+
+    elem.appendChild(subElem);
+}
+
+double ReprojectionError::pointHeightAvg() const{
+    return mPointHeightAvg;
+}
+
+double ReprojectionError::pointHeightStdDev() const{
+    return mPointHeightStdDev;
+}
+
+double ReprojectionError::pointHeightVariance() const{
+    return mPointHeightVariance;
+}
+
+double ReprojectionError::pointHeightMax() const{
+    return mPointHeightMax;
+}
+
+double ReprojectionError::defaultHeightAvg() const{
+    return mDefaultHeightAvg;
+}
+
+double ReprojectionError::defaultHeightStdDev() const{
+    return mDefaultHeightStdDev;
+}
+
+double ReprojectionError::defaultHeightVariance() const{
+    return mDefaultHeightVariance;
+}
+
+double ReprojectionError::defaultHeightMax() const{
+    return mDefaultHeightMax;
+}
+
+double ReprojectionError::pixelAvg() const{
+    return mPixelAvg;
+}
+
+double ReprojectionError::pixelStdDev() const{
+    return mPixelStdDev;
+}
+
+double ReprojectionError::pixelVariance() const{
+    return mPixelVariance;
+}
+
+double ReprojectionError::pixelMax() const{
+    return mPixelMax;
+}
+
+double ReprojectionError::usedDefaultHeight() const{
+    return mUsedDefaultHeight;
 }

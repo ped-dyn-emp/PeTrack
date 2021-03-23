@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE PETRACK>
-<PETRACK VERSION="0.8.14">
+<PETRACK VERSION="0.8.15">
     <MAIN SRC="C:/temp/petrack/tests/regression_test/data/multiColorMarkerWithAruco_dictMip36h12.mp4;multiColorMarkerWithAruco_dictMip36h12.mp4" STATUS_HEIGHT="0"/>
     <CONTROL TAB="1">
         <CALIBRATION>
