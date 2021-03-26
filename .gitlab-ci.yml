@@ -31,15 +31,15 @@ stages:
 # from the repository
 build_container:
   stage: build_environment
-  image: 
+  image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   script:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/container/arch/Dockerfile --destination $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_linux
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/container/ubuntu/Dockerfile --destination $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_linux
   rules:
     - changes:
-        - container/arch/Dockerfile
+        - container/ubuntu/Dockerfile
 
 # Build petrack and petrack unit_tests
 build_linux:
@@ -75,7 +75,7 @@ regression_test_linux:
   stage: test
   script:
     - cd tests/regression_test/tests
-    - python -m pytest --path=../../../build/petrack --junitxml=pytest_report.xml >> "RegressionTestLog.txt"
+    - python3 -m pytest --path=../../../build/petrack --junitxml=pytest_report.xml >> "RegressionTestLog.txt"
   artifacts:
     when: on_failure
     paths:
@@ -155,6 +155,26 @@ build_windows_installer:
     paths:
       - "build/petrack-installer-*"
     expire_in: 2hrs
+
+build_windows_installer_tags:
+  stage: build_installer
+  only:
+    refs:
+      - tags
+  tags:
+    - windows
+  script:
+    - mkdir -Force build
+    - $env:Path += ";C:\Program Files\CMake\bin"
+    - cd build
+    - Remove-Item -Force -Recurse -Path *
+    - cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -DUSE_3RD_PARTY=ON ..
+    - cpack -C Release
+  artifacts:
+    paths:
+      - "build/petrack-installer-*"
+    expire_in: never
+
 
 make_release:
   image: alpine
