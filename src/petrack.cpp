@@ -3789,7 +3789,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                     //                    getMarkerPos(mIplImgFiltered, rect, &persList, mControlWidget->markerBrightness->value(),
                     //                                getImageBorderSize(), (mControlWidget->markerIgnoreWithout->checkState() == Qt::Checked),
                     //                                (mControlWidget->recoAutoWB->checkState() == Qt::Checked), getBackgroundFilter(), recoMethod); //#tempImg
-                    getMarkerPos(mImgFiltered, rect, &persList, mControlWidget, getImageBorderSize(), getBackgroundFilter());
+                    reco::getMarkerPos(mImgFiltered, rect, &persList, mControlWidget, getImageBorderSize(), getBackgroundFilter());
 //                    markerLess = false;
 //                    debout << "Testausgabe persList: [Frame " << frameNum << "] " << endl;
 //                    for (int i = 0; i < persList.size(); ++i)
