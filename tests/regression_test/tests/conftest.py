@@ -28,7 +28,7 @@ def pytest_addoption(parser):
 
 
 # "codeMarker"
-@pytest.fixture(params=["markerCasern", "multicolor", "markerJapan", "multiColorMarkerWithAruco", "multiColorMarkerWithAruco_dictMip36h12"], scope='session')
+@pytest.fixture(params=["markerCasern", "multicolor", "markerJapan", "multiColorMarkerWithAruco", "multiColorMarkerWithAruco_dictMip36h12", "blackdotMarker"], scope='session')
 def petrack_on_testdata(request, pytestconfig):
     petrack_path = pytestconfig.getoption("path")
 
