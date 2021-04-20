@@ -324,12 +324,6 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
 //    IplImage *subImg;
 //    IplImage *subGray;
 //    IplImage *subBW;
-    unsigned char* dataImg;
-    unsigned char* yDataImg;
-    unsigned char* data;
-    unsigned char* yData;
-    int dd;
-    float scaleR, scaleG, scaleB, scaleSum;
 
     int minGrey; // minimaler Grauwert
     Vec2F subCenter;
@@ -569,32 +563,20 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
 //                    subImg = img.clone();
                     subImg = img(cropRect);
 
-//                    subGray = cvCreateImage(cvGetSize(subImg), IPL_DEPTH_8U, 1);
-                    subGray.create(Size(subImg.rows,subImg.cols),CV_8UC1);
-                    // liefert sehr dunkle bilder insbesondere bei rottoenen
-                    //cvCvtColor(subImg, subGray, CV_BGR2GRAY);
-                    // gewichtete umwandlung RGB nach Grey
-                    dataImg = ((unsigned char*) subImg.data);
-                    yDataImg = dataImg;
-                    data = ((unsigned char*) subGray.data);
-                    yData = data;
-                    scaleR = midHue.redF(); scaleG = midHue.greenF(); scaleB = midHue.blueF();
-                    scaleSum = scaleR+scaleG+scaleB;
-                    scaleR/=scaleSum; scaleG/=scaleSum; scaleB/=scaleSum;
+                    // Compute weighted conversion from RGB to gray, as CV_BGR2GRAY results in very dark images
+                    // especially for red shades
+                    float scaleR = midHue.redF();
+                    float scaleG = midHue.greenF();
+                    float scaleB = midHue.blueF();
+                    float scaleSum = scaleR+scaleG+scaleB;
+                    scaleR/=scaleSum;
+                    scaleG/=scaleSum;
+                    scaleB/=scaleSum;
+                    cv::Mat bgrToGray = (Mat_<double>(1,3) << scaleB, scaleG, scaleR);
 
-                    for (int y = 0; y < subGray.rows; ++y)
-                    {
-                        for (int x = 0; x < subGray.cols; ++x)
-                        {
-                            dd = scaleB*dataImg[0]+scaleG*dataImg[1]+scaleR*dataImg[2];
-                            *data = dd<256?dd:255;
-
-                            ++data;
-                            dataImg+=3;
-                        }
-                        data = (yData += subGray.cols/sizeof(char)); //width);
-                        dataImg = (yDataImg += subImg.cols/sizeof(char)); //width);
-                    }
+                    // Performs the matrix-vector multiplication MxN for each pixel of subImg, where M is bgrToGray
+                    // and N is a vector of all channels of a pixel, the result will be saved in subGray.
+                    cv::transform(subImg, subGray, bgrToGray);
 
 
 //IplImage *tmpAusgabe = cvCloneImage(subImg);//subImg subGray
@@ -635,7 +617,7 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
                     maxThreshold = max(max(getValue(subGray, subGray.cols/2, subGray.rows/2).value(),
                                            getValue(subGray, subGray.cols/4, subGray.rows/2).value()),
                                            getValue(subGray, 3*subGray.cols/4, subGray.rows/2).value());
-                    step = (maxThreshold-5)/5;
+                    step = std::max((maxThreshold-5)/5, 1);
                     minGrey = 300;
                     //for (threshold = 40; threshold < 251 ; threshold += 30) // 40, 70, 100, 130, 160, 190, 220, 250
                     for (threshold = 5; threshold < maxThreshold; threshold += step) // col.value()
