@@ -363,7 +363,7 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
 
                             Vec2F moveDir(0,0);
                             if (exportAutoCorrect)
-                                moveDir += autoCorrectColorMarker((*tracker)[i][j], mMainWindow->getControlWidget());
+                                moveDir += reco::autoCorrectColorMarker((*tracker)[i][j], mMainWindow->getControlWidget());
 
                             pos = imageItem->getPosReal(((*tracker)[i][j]+moveDir+br).toQPointF(), bestZ);
 
@@ -380,7 +380,7 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                     {
                         Vec2F moveDir(0,0);
                         if (exportAutoCorrect)
-                            moveDir += autoCorrectColorMarker((*tracker)[i][j], mMainWindow->getControlWidget());
+                            moveDir += reco::autoCorrectColorMarker((*tracker)[i][j], mMainWindow->getControlWidget());
 
                         pos = imageItem->getPosReal(((*tracker)[i][j]+moveDir+br).toQPointF(), height);
                         // die frame nummer der animation wird TrackPoint der PersonReal mitgegeben,
@@ -436,7 +436,7 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                             {
                                 Vec2F moveDir(0,0);
                                 if (exportAutoCorrect)
-                                    moveDir += autoCorrectColorMarker((*tracker)[i][j], mMainWindow->getControlWidget());
+                                    moveDir += reco::autoCorrectColorMarker((*tracker)[i][j], mMainWindow->getControlWidget());
 
                                 pos2 = (imageItem->getPosReal(((*tracker)[i][j+1]+moveDir+br).toQPointF(), height) - pos)/(anz+1);
                                 for (f = 1; f <= anz; ++f)

@@ -42,6 +42,9 @@
 using namespace::cv;
 using namespace std;
 
+namespace reco {
+using namespace detail;
+
 //#include "Psapi.h"
 
 //#define WITH_RECT
@@ -53,13 +56,13 @@ using namespace std;
 
 struct ColorParameters
 {
-    int	h_low;
-    int	h_high;
-    int	s_low;
-    int	s_high;
-    int	v_low;
-    int	v_high;
-    bool inversHue;
+    int	h_low = 0;
+    int	h_high = 359;
+    int	s_low = 0;
+    int	s_high = 255;
+    int	v_low = 0;
+    int	v_high = 255;
+    bool inversHue = false;
 };
 
 /*!
@@ -251,6 +254,462 @@ Vec2F autoCorrectColorMarker(Vec2F &boxImageCentre, Control *controlWidget)
     return (0.12*angle/cmPerPixel.length())*moveDir; // Maik Dissertation Seite 138
 }
 
+/**
+ * @brief Detects and filters colorBlobs in the given image
+ *
+ * This function takes the given colors from the color map and
+ * searches for blobs in this color. This is done by thresholding and
+ * detecting contours. To reduce noise, open and close operations can be
+ * performed.
+ *
+ * These contours are then checkefor whether they fulfill following criteria:
+ * 1. Area inside user-specified bounds
+ * 2. Ratio of sides of the bounding rect inside user-specified bounds
+ * 3. Blob is not at the edge of the image
+ *
+ * @param options all options, mostly forwarded from the UI
+ * @return vector of detected ColorBlobs (see struct ColorBlob for details)
+ */
+[[nodiscard]] std::vector<ColorBlob> detail::findColorBlob(const ColorBlobDetectionParams &options){
+    std::vector<ColorBlob> colorBlobs;
+    ColorParameters	param;
+
+    setColorParameter(options.fromColor, options.toColor, options.invHue, param);
+
+    cv::Mat img = options.img;
+    cv::Mat binary = options.binary;
+
+    // color thresholding
+    thresholdHSV(img , binary, param);
+
+    // close small holes: radius ( hole ) < radius ( close )
+    if (options.useClose)
+    {
+        const int radiusClose = options.radiusClose;
+        cv::morphologyEx(binary,binary,MORPH_CLOSE,getStructuringElement(MORPH_ELLIPSE,Size(2*radiusClose+1, 2*radiusClose+1),Point(radiusClose, radiusClose)));
+    }
+
+    // remove small blobs: radius ( blob ) < radius ( open )
+    if (options.useOpen)
+    {
+        const int radiusOpen = options.radiusOpen;
+        cv::morphologyEx(binary,binary,MORPH_OPEN,getStructuringElement(MORPH_ELLIPSE,Size(2*radiusOpen+1, 2*radiusOpen+1),Point(radiusOpen, radiusOpen)));
+    }
+
+    std::vector<std::vector<cv::Point>> contours;
+    cv::findContours(binary,contours,cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
+
+    for(const auto& contour : contours){
+        double area = cv::contourArea(contour);
+
+        cv::RotatedRect box = cv::minAreaRect(contour);
+
+        float maxExpansion;
+        double ratio;
+        if (box.size.height > box.size.width)
+        {
+            ratio = static_cast<double>(box.size.height/box.size.width);
+            maxExpansion = box.size.height;
+        }
+        else
+        {
+            ratio = static_cast<double>(box.size.width/box.size.height);
+            maxExpansion = box.size.width;
+        }
+
+        // contour at border of roi, than neglect because of object going out of region has moving center
+        bool atEdge = std::any_of(contour.cbegin(), contour.cend(), [&](const cv::Point& p){
+            return (p.x <= 1) || (p.x >= img.cols-2) ||
+                   (p.y <= 1) || (p.y >= img.rows-2);
+        });
+
+        if(atEdge){
+            continue;
+        }
+        if(area < options.minArea || area > options.maxArea){
+            continue;
+        }
+        if(ratio > options.maxRatio){
+            continue;
+        }
+
+        int cx = static_cast<int>(std::lround(box.center.x));
+        int cy = static_cast<int>(std::lround(box.center.y));
+        int add = static_cast<int>(min(box.size.height,box.size.width)/4);
+
+        QColor col, col2;
+        // color for hat measured at 3 points
+        col.setRgb(getValue(img,cx,cy).rgb());
+        col2.setRgb(getValue(img,cx+add,cy).rgb());
+        if (col.value()<col2.value()) // take brighter color
+        {
+            col = col2;
+        }
+        col2.setRgb(getValue(img,cx-add,cy).rgb());
+        if (col.value()<col2.value()) // take brighter color
+        {
+            col = col2;
+        }
+
+        // centre of rect in the coordinates of the whole image (instead of ROI)
+        Vec2F boxImageCentre = options.offset;
+        boxImageCentre.setX(boxImageCentre.x()+static_cast<double>(box.center.x));
+        boxImageCentre.setY(boxImageCentre.y()+static_cast<double>(box.center.y));
+
+        // TODO maybe use move constructor to increase perf for contour(then not const anymore)
+        colorBlobs.push_back({box, boxImageCentre, col, contour, static_cast<double>(maxExpansion)});
+    }
+    return colorBlobs;
+}
+
+/**
+ * @brief Restricts the position in which the black dot should be according to position in image.
+ *
+ * @param[in] blob ColorBlob for which to restrict the position
+ * @param[in] mainWindow pointer to Petrack for getImageItem
+ * @param[in] bS bordersize
+ * @param[in,out] cropRect cropRect to restrict/resize
+ */
+void detail::restrictPositionBlackDot(ColorBlob& blob, ImageItem *imageItem, int bS, cv::Rect& cropRect)
+{
+    double xy,x1, x2, y1, y2;
+
+    Vec2F &boxImageCentre = blob.imageCenter;
+    xy=imageItem->getAngleToGround(boxImageCentre.x()+bS, boxImageCentre.y()+bS, 175);
+    x1=imageItem->getAngleToGround(boxImageCentre.x()+bS+10, boxImageCentre.y()+bS, 175);
+    x2=imageItem->getAngleToGround(boxImageCentre.x()+bS-10, boxImageCentre.y()+bS, 175);
+    y1=imageItem->getAngleToGround(boxImageCentre.x()+bS, boxImageCentre.y()+bS+10, 175);
+    y2=imageItem->getAngleToGround(boxImageCentre.x()+bS, boxImageCentre.y()+bS-10, 175);
+
+    double subFactorBig = 1.-.75*(90.-xy)/90.; //  -.5 //in 1.0..0.25 // xy in 0..90
+    constexpr double subFactorSmall = .85; // .9
+    if (x1>x2) // Person links von Achse
+    {
+        if (y1>y2) // Person links oben von Achse
+        {
+            if (x1>y1) // starker Beschnitt rechts, kleiner Beschnitt unten
+            {
+                cropRect.width *= subFactorBig; // ist int
+                cropRect.height *= subFactorSmall; // ist int
+            }
+            else // starker Beschnitt unten, kleiner Beschnitt rechts
+            {
+                cropRect.width *= subFactorSmall; // ist int
+                cropRect.height *= subFactorBig; // ist int
+            }
+        }
+        else // Person links unten von Achse
+        {
+            if (x1>y2) // starker Beschnitt rechts, kleiner Beschnitt oben
+            {
+                cropRect.y = cropRect.y+cropRect.height*(1-subFactorSmall);
+                cropRect.width *= subFactorBig; // ist int
+                cropRect.height *= subFactorSmall; // ist int
+            }
+            else // starker Beschnitt oben, kleiner Beschnitt rechts
+            {
+                cropRect.y = cropRect.y+cropRect.height*(1-subFactorBig);
+                cropRect.width *= subFactorSmall; // ist int
+                cropRect.height *= subFactorBig; // ist int
+            }
+        }
+    }
+    else // Person rechts von Achse
+    {
+        if (y1>y2) // Person rechts oben von Achse
+        {
+            if (x2>y1) // starker Beschnitt links, kleiner Beschnitt unten
+            {
+                cropRect.x = cropRect.x+cropRect.width*(1-subFactorBig);
+                cropRect.width *= subFactorBig; // ist int
+                cropRect.height *= subFactorSmall; // ist int
+            }
+            else // starker Beschnitt unten, kleiner Beschnitt links
+            {
+                cropRect.x = cropRect.x+cropRect.width*(1-subFactorSmall);
+                cropRect.width *= subFactorSmall; // ist int
+                cropRect.height *= subFactorBig; // ist int
+            }
+        }
+        else // Person rechts unten von Achse
+        {
+            if (x2>y2) // starker Beschnitt links, kleiner Beschnitt oben
+            {
+                cropRect.x = cropRect.x+cropRect.width*(1-subFactorBig);
+                cropRect.y = cropRect.y+cropRect.height*(1-subFactorSmall);
+                cropRect.width *= subFactorBig; // ist int
+                cropRect.height *= subFactorSmall; // ist int
+            }
+            else // starker Beschnitt oben, kleiner Beschnitt links
+            {
+                cropRect.x = cropRect.x+cropRect.width*(1-subFactorSmall);
+                cropRect.y = cropRect.y+cropRect.height*(1-subFactorBig);
+                cropRect.width *= subFactorSmall; // ist int
+                cropRect.height *= subFactorBig; // ist int
+            }
+        }
+    }
+}
+
+/**
+ * @brief Custom BGR to Gray conversion weighted via midHue
+ *
+ * This conversion is used instead of cvtColor for the detection of the
+ * black dot, since cvtColor makes red result in too dark shade.
+ *
+ * @param subImg BGR image to convert into Grayscale
+ * @param midHue midHue used for weigthed conversion
+ * @return image converted to grayscale
+ */
+cv::Mat detail::customBgr2Gray(const cv::Mat& subImg, const QColor& midHue)
+{
+    cv::Mat subGray;
+
+    float scaleR = midHue.redF();
+    float scaleG = midHue.greenF();
+    float scaleB = midHue.blueF();
+    float scaleSum = scaleR+scaleG+scaleB;
+    scaleR/=scaleSum;
+    scaleG/=scaleSum;
+    scaleB/=scaleSum;
+    cv::Mat bgrToGray = (Mat_<double>(1,3) << scaleB, scaleG, scaleR);
+
+    // Performs the matrix-vector multiplication MxN for each pixel of subImg, where M is bgrToGray
+    // and N is a vector of all channels of a pixel, the result will be saved in subGray.
+    cv::transform(subImg, subGray, bgrToGray);
+    return subGray;
+}
+
+/**
+ * @brief Refines the detection of multicolor-markers with a black dot
+ *
+ * A black dot is searched inside the bounding rect of the detected head.
+ * This bounding rect might be resized according to the position in the image,
+ * when the restrict posititon option is enabled.
+ *
+ * If a black dot is found, its position is used instead of the multcolor-detection.
+ * This is saved with a quality of 100, as with contour markers. When the black dot
+ * is not found, the ColorBlob might still count as detection, if the ignoreWithoutMarker
+ * option is disabled.
+ *
+ * @param blobs detected color blobs
+ * @param img img in which the color blobs were detected
+ * @param crossList list of all detected people
+ * @param options BlackDotOptions struct mostly forwarding all options from UI
+ */
+void detail::refineWithBlackDot(std::vector<ColorBlob>& blobs, const cv::Mat& img, QList<TrackPoint>& crossList, const BlackDotOptions& options)
+{
+    constexpr int border=4; // zusaetzlicher rand um subrects
+    const int bS = options.borderSize;
+    const bool restrictPosition = options.restrictPosition;
+    ImageItem *imageItem = options.imageItem;
+    const QColor midHue = options.midHue;
+    const double dotSize = options.dotSize;
+    const bool ignoreWithoutMarker = options.ignoreWithoutMarker;
+    const bool autoCorrect = options.autoCorrect;
+    const bool autoCorrectOnlyExport = options.autoCorrectOnlyExport;
+    Control *controlWidget = options.controlWidget;
+
+    for(ColorBlob& blob : blobs)
+    {
+        cv::Rect cropRect;
+        cv::RotatedRect &box = blob.box;
+        cropRect.x = max(1, myRound(box.center.x-box.size.width/2-border));
+        cropRect.y = max(1, myRound(box.center.y-box.size.height/2-border));
+        // 1. rundet kaufmaennisch, 2. dann rundet zur naechst kleiner geraden zahl
+        // min wegen bildrand
+        cropRect.width = min(img.cols-cropRect.x-1, 2*border+(myRound(blob.maxExpansion) & -2));
+        cropRect.height = min(img.rows-cropRect.y-1, 2*border+(myRound(blob.maxExpansion) & -2));//cropRect.height = cropRect.width;
+
+        if (restrictPosition)
+        {
+            restrictPositionBlackDot(blob, imageItem, bS, cropRect);
+        }
+
+        // cvtColor results in really dark images, especially with red shades
+        // so using custom conversion weighted by midHue
+        cv::Mat subImg = img(cropRect);
+        cv::Mat subGray = customBgr2Gray(subImg, midHue);
+        cv::Mat subBW;
+
+        double maxThreshold = max(max(getValue(subGray, subGray.cols/2, subGray.rows/2).value(),
+                               getValue(subGray, subGray.cols/4, subGray.rows/2).value()),
+                           getValue(subGray, 3*subGray.cols/4, subGray.rows/2).value());
+        int step = static_cast<int>((maxThreshold-5))/5;
+        int minGrey = 300;
+        Vec2F subCenter;
+        for (int threshold = 5; threshold < maxThreshold; threshold += step)
+        {
+            cv::threshold(subGray,subBW,threshold,255,cv::THRESH_BINARY);
+
+            // find contours and store them all as a list
+            std::vector<std::vector<cv::Point>> subContours;
+            cv::findContours(subBW,subContours,cv::RETR_LIST,cv::CHAIN_APPROX_SIMPLE);
+
+            // test each contour
+            for(auto& subContour : subContours)
+            {
+                if (subContour.size() > 5) // This is number point in contour
+                {
+                    cv::RotatedRect subBox = cv::minAreaRect(subContour);
+                    double subRatio;
+                    double subMaxExpansion;
+                    if (subBox.size.height > subBox.size.width)
+                    {
+                        subRatio = subBox.size.height/subBox.size.width;
+                        subMaxExpansion = subBox.size.height;
+                    }
+                    else
+                    {
+                        subRatio = subBox.size.width/subBox.size.height;
+                        subMaxExpansion = subBox.size.width;
+                    }
+
+                    QPointF cmPerPixel =imageItem->getCmPerPixel(cropRect.x+subBox.center.x, cropRect.y+subBox.center.y, controlWidget->mapDefaultHeight->value());
+                    double cmPerPixelAvg = (cmPerPixel.x()+cmPerPixel.y())/2.;
+                    double markerSize = dotSize/cmPerPixelAvg;//war: 5cm// war WDG: = 16; war GymBay: = headSize / 4.5;
+
+                    // maximalseitenverhaeltnis && minimal und maximaldurchmesser
+                    if (subRatio < 1.8 && subMaxExpansion < markerSize*1.5 && subMaxExpansion > markerSize/2)//1.5
+                    {
+                        double subContourArea = cv::contourArea(subContour,true);
+                        int cx = myRound(subBox.center.x);
+                        int cy = myRound(subBox.center.y);
+
+                        // darker inside && dark inside &&  mittelpunkt in kopfkontur
+                        int xygrey = getValue(subGray, cx, cy).value();
+                        //                                    debout << "xygrey: " << xygrey << endl;
+                        if (subContourArea>0 && xygrey<min(150.,2*maxThreshold/3) && (0<cv::pointPolygonTest(blob.contour,Point2f(cropRect.x+subBox.center.x, cropRect.y+subBox.center.y),false))) // dark inside
+                        {
+                            if (minGrey > xygrey)
+                            {
+                                minGrey = xygrey;
+                                subCenter.set(cropRect.x+subBox.center.x, cropRect.y+subBox.center.y);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (minGrey <260) // mit gefundenem schwarzem punkt
+        {
+            crossList.append(TrackPoint(subCenter, 100, Vec2F(box.center.x, box.center.y), blob.color)); // 100 beste qualitaet
+        }
+        else if (!ignoreWithoutMarker)
+        {
+            if (autoCorrect && !autoCorrectOnlyExport)
+            {
+                Vec2F moveDir = autoCorrectColorMarker(blob.imageCenter, controlWidget);
+
+                crossList.append(TrackPoint(Vec2F(box.center.x, box.center.y)+moveDir, 100, Vec2F(box.center.x, box.center.y), blob.color)); // 100 beste qualitaet
+            }
+            else
+                crossList.append(TrackPoint(Vec2F(box.center.x, box.center.y), 90, Vec2F(box.center.x, box.center.y), blob.color)); // 100 beste qualitaet
+        }
+
+    }
+}
+
+/**
+ * @brief Refined colorBlobs with Aruco Markers
+ *
+ * An aruco marker inside the detected bounding rect is searched. If it is found,
+ * the position of the marker is taken for the detected person. This results in a
+ * quality of 100 as with contour markers.
+ *
+ * If no valid aruco marker is detected, the colorBlob might still count as person,
+ * if the ignoreWithoutMarker option is disabled. Missing frames where code is not
+ * recognized are interpolated in trackerReal.cpp and Marker ID is set to -1
+ *
+ * @param blobs detected color blobs
+ * @param img img in which the color blobs were detected
+ * @param crossList list of all detected people
+ * @param options all options, mostly forwarded from the GUI
+ */
+void detail::refineWithAruco(std::vector<ColorBlob> &blobs, const cv::Mat& img, QList<TrackPoint> &crossList, ArucoOptions& options)
+{
+    constexpr int border=4; // zusaetzlicher rand um subrects
+
+    Control *controlWidget = options.controlWidget;
+    bool ignoreWithoutMarker = options.ignoreWithoutMarker;
+    bool autoCorrect = options.autoCorrect;
+    bool autoCorrectOnlyExport = options.autoCorrectOnlyExport;
+
+    for(ColorBlob& blob : blobs)
+    {
+        // cropRect has coordinates of rechtangele around color blob with respect to lower left corner (as in the beginning of useBlackDot)
+        cv::Rect cropRect;
+        const cv::RotatedRect &box = blob.box;
+        int extendRect = myRound(blob.maxExpansion*.3); // scalar to increase area of cropRect for better detection of codemarkers when marker appears to stick out of the colored head because of tilted heads; value of .3 chosen arbitrarily after discussion
+        cropRect.x = max(1, myRound(box.center.x-box.size.width/2.-border));
+        cropRect.y = max(1, myRound(box.center.y-box.size.height/2.-border));
+        cropRect.width = min(img.cols-cropRect.x-extendRect-1, 2*border+((myRound(blob.maxExpansion)+extendRect) & -2));
+        cropRect.height = min(img.rows-cropRect.y-extendRect-1, 2*border+((myRound(blob.maxExpansion)+extendRect) & -2));
+        cv::Mat subImg = img(cropRect); // --> shallow copy (points to original data)
+
+        int lengthini = crossList.size(); // initial length of crossList (before findCodeMarker() is called)
+
+        Vec2F offsetCropRect2Roi; // needed for drawing detected ArucoCode-Candidates correctly -> passed on to findCodeMarker()-Function
+        offsetCropRect2Roi.setX(cropRect.x);
+        offsetCropRect2Roi.setY(cropRect.y);
+
+        if (subImg.empty())
+            continue;
+        findCodeMarker(subImg, &crossList, controlWidget, offsetCropRect2Roi);
+
+        // The next three statements each:
+        // - set the offset of subImg with regards to ROI //(ROI to original image is archieved later in the code for all methods)
+        // - add the functionality of autocorrection
+        // - deal with functionality of ignore/not ignore heads without identified ArucoMarker
+        if (ignoreWithoutMarker && lengthini!=crossList.size()) // if CodeMarker-Call returns crossList containing a new element (identified the ArucoMarker)
+        {
+            Vec2F moveDir;
+            if (autoCorrect && !autoCorrectOnlyExport)
+            {
+                moveDir = autoCorrectColorMarker(blob.imageCenter, controlWidget);
+            }
+            else
+            {
+                moveDir = Vec2F(0, 0);
+            }
+            crossList.back().setCol(blob.color);
+            crossList.back().setColPoint(Vec2F(box.center.x, box.center.y));
+            crossList.back() = crossList.back() + (Vec2F(cropRect.x, cropRect.y) + moveDir);
+        }
+        else if(!ignoreWithoutMarker && (lengthini==crossList.size())) // in case ignoreWithoutMarker is checked and CodeMarker-Call returns empty crossList (could not identify a marker) the center of the smallest rectangle around the colorblobb is used as position
+        {
+            offsetCropRect2Roi.setX(0); // set to zero as cooridinates are directly used from cropRect
+            offsetCropRect2Roi.setY(0);
+
+            Vec2F moveDir;
+            if (autoCorrect && !autoCorrectOnlyExport)
+            {
+                moveDir = autoCorrectColorMarker(blob.imageCenter, controlWidget);
+            }
+            else
+            {
+                moveDir = Vec2F(0,0);
+            }
+            crossList.append(TrackPoint(Vec2F(box.center.x, box.center.y) + moveDir, 90, Vec2F(box.center.x, box.center.y), blob.color)); // 100 beste qualitaet
+        }
+        else if(!ignoreWithoutMarker && (crossList.size()!=lengthini)) // in case ignoreWithoutMarker is checked and CodeMarker-Call returns non-empty crossList (could identify a marker)
+        {
+            Vec2F moveDir;
+            if (autoCorrect && !autoCorrectOnlyExport)
+            {
+                moveDir = autoCorrectColorMarker(blob.imageCenter, controlWidget);
+            }
+            else
+            {
+                moveDir = Vec2F(0, 0);
+            }
+            crossList.back().setCol(blob.color);
+            crossList.back().setColPoint(Vec2F(box.center.x, box.center.y));
+            crossList.back() = crossList.back() + (Vec2F(cropRect.x, cropRect.y) + moveDir);
+        }
+    }
+}
 
 /**
  * @brief Run color blob detection on an image to find features
@@ -262,29 +721,22 @@ Vec2F autoCorrectColorMarker(Vec2F &boxImageCentre, Control *controlWidget)
  * @param img
  * @param crossList
  * @param controlWidget
- * @param ignoreWithoutMarker
+ * @param ignoreWithoutMarker (is ignored->overwritten by cmWidget->ignoreWithoutDot->isChecked())
  * @param offset
  */
 void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, bool ignoreWithoutMarker, Vec2F &offset)
 {
-    ColorParameters	param;
     Petrack *mainWindow = controlWidget->getMainWindow();
     MultiColorMarkerItem* cmItem = mainWindow->getMultiColorMarkerItem();
     MultiColorMarkerWidget* cmWidget = mainWindow->getMultiColorMarkerWidget();
     int bS = mainWindow->getImageBorderSize();
 
-    //QColor fromColor = cmWidget->fromColor->palette().color(QPalette::Button);
-    //QColor toColor   = cmWidget->toColor->palette().color(QPalette::Button);
     RectPlotItem *rectPlotItem = controlWidget->getColorPlot()->getMapItem();
     bool useClose = cmWidget->useClose->isChecked();
     bool useOpen = cmWidget->useOpen->isChecked();
-    int radius_close = cmWidget->closeRadius->value();
-    int radius_open  = cmWidget->openRadius->value();
-    double dot_size = cmWidget->dotSize->value();
-    Mat	binary;
-    // siehe : http://opencv.willowgarage.com/documentation/c/image_filtering.html#createstructuringelementex
-//    IplConvKernel* closeKernel = cvCreateStructuringElementEx(2*radius_close+1, 2*radius_close+1, radius_close, radius_close, CV_SHAPE_ELLIPSE);
-//    IplConvKernel* openKernel = cvCreateStructuringElementEx(2*radius_open+1, 2*radius_open+1, radius_open, radius_open, CV_SHAPE_ELLIPSE);
+    int radiusClose = cmWidget->closeRadius->value();
+    int radiusOpen  = cmWidget->openRadius->value();
+    double dotSize = cmWidget->dotSize->value();
     int minArea = cmWidget->minArea->value(), maxArea = cmWidget->maxArea->value();
     double maxRatio = cmWidget->maxRatio->value();
     bool useBlackDot = cmWidget->useDot->isChecked();
@@ -294,49 +746,9 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
     bool autoCorrect = cmWidget->autoCorrect->isChecked();
     bool autoCorrectOnlyExport = cmWidget->autoCorrectOnlyExport->isChecked();
 
-    vector<vector<Point> > contours;
-    vector<vector<Point> > subContours;//, *subFirstContour;
-//    CvSeq *contour;
-//    CvSeq *firstContour;
-    double area;
-//    CvMemStorage *storage;
-    QColor col, col2, midHue;
-//    CvBox2D box; //float: center, size, angle
-    RotatedRect box;
-    double ratio;
-    double maxExpansion;
-//    CvPoint* pointArray;
-    bool atEdge;
-    int threshold;
-
-    RotatedRect subBox;
-
-    int cx, cy, add;
-    int nr;
-
-    Rect oriRect;
-    Rect cropRect;
-    double subRatio, subMaxExpansion, subContourArea;
-    int border=4; // zusaetzlicher rand um subrects
-    Mat subImg;
-    Mat subGray;
-    Mat subBW;
-//    IplImage *subImg;
-//    IplImage *subGray;
-//    IplImage *subBW;
-
-    int minGrey; // minimaler Grauwert
-    Vec2F subCenter;
-    int maxThreshold;
-    int step;
-    bool foundHead;
-    Vec2F moveDir, boxImageCentre;
-    int xygrey;
-    double markerSize, cmPerPixelAvg;
-    QPointF cmPerPixel;
-
     for (int j = 0; j < rectPlotItem->mapNum(); j++)
     {
+        int nr;
         if (j == controlWidget->mapNr->value())
             nr = rectPlotItem->mapNum()-1;
         else if (j == rectPlotItem->mapNum()-1)
@@ -344,510 +756,76 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
         else
             nr = j;
 
-        setColorParameter(rectPlotItem->getMap(nr).fromColor(), rectPlotItem->getMap(nr).toColor(), rectPlotItem->getMap(nr).invHue(), param);
+        ColorBlobDetectionParams param;
+        param.fromColor = rectPlotItem->getMap(nr).fromColor();
+        param.toColor = rectPlotItem->getMap(nr).toColor();
+        param.invHue = rectPlotItem->getMap(nr).invHue();
+        param.minArea = minArea;
+        param.maxArea = maxArea;
+        param.maxRatio = maxRatio;
+        param.useClose = useClose;
+        param.radiusClose = radiusClose;
+        param.useOpen = useOpen;
+        param.radiusOpen = radiusOpen;
+        param.offset = offset;
+        param.img = img;
+        param.binary = cmItem->createMask(img.cols, img.rows);
 
-        // zentralen farbton heraussuchen
-        if (param.inversHue)
-            midHue.setHsv(2*((param.h_low+(param.h_high-param.h_low)/2+90)%180),255,255);
-        else
-            midHue.setHsv(2*(param.h_low+(param.h_high-param.h_low)/2),255,255);
-//        debout << "midhue --------------------------------------: "<< param.h_low*2 <<" "<< param.h_high*2 <<" "<<param.inversHue<<" " <<midHue.hue()<<endl;
+        auto blobs = findColorBlob(param);
 
-        // erzeuge speicherplatz fuer mask
-        // abfrage wird in createMask gemacht
-        //if (cmItem->getMask() == NULL || (cmItem->getMask() != NULL && (cmItem->getMask()->width != img->width || cmItem->getMask()->height != img->height)))
-        binary = cmItem->createMask(img.cols, img.rows); // erzeugt binary mask mit groesse von img
 
-        // color thresholding
-        thresholdHSV(img , binary, param);
-
-        // close small holes: radius ( hole ) < radius ( close )
-        if (useClose)
+        if (useBlackDot)
         {
-//            morphologyEx(binary,binary,NULL,closeKernel,...);
-            cv::morphologyEx(binary,binary,MORPH_CLOSE,getStructuringElement(MORPH_ELLIPSE,Size(2*radius_close+1, 2*radius_close+1),Point(radius_close, radius_close)));
-//            cvMorphologyEx(binary, binary, NULL, closeKernel, CV_MOP_CLOSE);
-        }
-        // remove small blobs: radius ( blob ) < radius ( open )
-        if (useOpen)
-        {
-//            morphologyEx(binary,binary,NULL,openKernel,...);
-            cv::morphologyEx(binary,binary,MORPH_OPEN,getStructuringElement(MORPH_ELLIPSE,Size(2*radius_open+1, 2*radius_open+1),Point(radius_open, radius_open)));
-//            cvMorphologyEx(binary, binary, NULL, openKernel, CV_MOP_OPEN);
-        }
-
-        Mat clone = binary.clone();
-//        IplImage *clone = cvCloneImage(binary); // clone, da binary sonst veraendert wird
-//        Mat clone(binary);
-//        storage = cvCreateMemStorage(0);
-        cv::findContours(clone,contours,cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
-//        cvFindContours(clone, storage, &contour, sizeof(CvContour), CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE); // clone wird auch veraendert!!!
-//        findContours(clone,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_SIMPLE);
-//        firstContour = contour;
-//        cvReleaseImage(&clone);
-
-        // test each contour
-        while (!contours.empty())
-        {
-            vector<Point> contour = contours.back();
-//            area = cvContourArea(contour, CV_WHOLE_SEQ);
-            area = cv::contourArea(contour);//,CV_WHOLE_SEQ);
-
-            foundHead = false;
-
-            box = cv::minAreaRect(contour);
-//            box = cvMinAreaRect2(contour);
-
-            if (box.size.height > box.size.width)
-            {
-                ratio = box.size.height/box.size.width;
-                maxExpansion = box.size.height;
-            }
+            ColorParameters colParam;
+            setColorParameter(rectPlotItem->getMap(nr).fromColor(), rectPlotItem->getMap(nr).toColor(), rectPlotItem->getMap(nr).invHue(), colParam);
+            // zentralen farbton heraussuchen
+            QColor midHue;
+            if (colParam.inversHue)
+                midHue.setHsv(2*((colParam.h_low+(colParam.h_high-colParam.h_low)/2+90)%180),255,255);
             else
+                midHue.setHsv(2*(colParam.h_low+(colParam.h_high-colParam.h_low)/2),255,255);
+
+            BlackDotOptions options;
+            options.ignoreWithoutMarker = ignoreWithoutMarker;
+            options.autoCorrect = autoCorrect;
+            options.autoCorrectOnlyExport = autoCorrectOnlyExport;
+            options.restrictPosition = restrictPosition;
+            options.borderSize = bS;
+            options.midHue = midHue;
+            options.dotSize = dotSize;
+            options.controlWidget = controlWidget;
+            options.imageItem = mainWindow->getImageItem();
+
+            // adds to crosslist
+            refineWithBlackDot(blobs, img, *crossList, options);
+        }else if (useCodeMarker)
+        {
+            ArucoOptions options;
+            options.autoCorrect = autoCorrect;
+            options.autoCorrectOnlyExport = autoCorrectOnlyExport;
+            options.ignoreWithoutMarker = ignoreWithoutMarker;
+            options.controlWidget = controlWidget;
+
+            // adds to crosslist
+            refineWithAruco(blobs, img, *crossList, options);
+        }else
+        {
+            Vec2F moveDir;
+            for(ColorBlob& blob : blobs)
             {
-                ratio = box.size.width/box.size.height;
-                maxExpansion = box.size.width;
-            }
-
-            // contour at border of roi, than neglect because of object going out of region has moving center
-//            pointArray = (CvPoint*)malloc(contour->total*sizeof(CvPoint));
-//            cvCvtSeqToArray(contour, pointArray, CV_WHOLE_SEQ);// Get contour point set.
-            atEdge = false;
-            for(size_t i=0; i<contour.size(); i++)
-                if ((contour.at(i).x <= 1) || (contour.at(i).x >= img.cols-2) ||
-                    (contour.at(i).y <= 1) || (contour.at(i).y >= img.rows-2))
-                    atEdge = true;
-//            free(pointArray);
-
-            if (!atEdge && area >= minArea && area <= maxArea && ratio <= maxRatio)
-            {
-                foundHead = true;
-                cx = myRound(box.center.x);
-                cy = myRound(box.center.y);
-                add = min(box.size.height,box.size.width)/4.;
-                // farbe der Kopfbedeckung // an 3 punkten gemassen
-                col.setRgb(getValue(img,cx,cy).rgb());//getR(img, cx, cy), getG(img, cx, cy), getB(img, cx, cy));
-                col2.setRgb(getValue(img,cx+add,cy).rgb());//getR(img, cx+add, cy), getG(img, cx+add, cy), getB(img, cx+add, cy));
-                if (col.value()<col2.value()) // die hellere Farbe nehmen
-                    col = col2;
-                col2.setRgb(getValue(img,cx-add,cy).rgb());//getR(img, cx-add, cy), getG(img, cx-add, cy), getB(img, cx-add, cy));
-                if (col.value()<col2.value()) // die hellere Farbe nehmen
-                    col = col2;
-
-                // centre von gefundenem rect aber nicht in roi sondern in gesamtbild
-                boxImageCentre = offset;
-                boxImageCentre.setX(boxImageCentre.x()+box.center.x);
-                boxImageCentre.setY(boxImageCentre.y()+box.center.y);
-
-                if (useBlackDot)
+                if (autoCorrect && !autoCorrectOnlyExport)
                 {
-                    // oriRect = cv::Rect(Point(0,0),Size(img.cols,img.rows));//     img.cvGetImageROI(img);;
-                    // cropRect ist orthogonal und verzichtet auf rotation, genauer waere:
-                    // http://answers.opencv.org/question/38452/how-to-extract-pixels-from-a-rotated-box2d/
-                    // max wegen bildrand
-                    cropRect.x = max(1, myRound(box.center.x-box.size.width/2.-border));
-                    cropRect.y = max(1, myRound(box.center.y-box.size.height/2.-border));
-                    // 1. rundet kaufmaennisch, 2. dann rundet zur naechst kleiner geraden zahl
-                    // min wegen bildrand
-                    cropRect.width = min(img.cols-cropRect.x-1, 2*border+(myRound(maxExpansion) & -2));
-                    cropRect.height = min(img.rows-cropRect.y-1, 2*border+(myRound(maxExpansion) & -2));//cropRect.height = cropRect.width;
+                    moveDir = autoCorrectColorMarker(blob.imageCenter, controlWidget);
 
-                    if (restrictPosition)
-                    {
-                        double xy,x1, x2, y1, y2;
-                        //debout << boxImageCentre <<endl;
-                        //debout << "box: x/y/w/h "<< box.center.x << " "<< box.center.y<< " " <<box.size.height << " "<< box.size.width <<endl;
-                        //debout << "cropRect: x/y/w/h "<< cropRect.x<< " " << cropRect.y<< "  "<<cropRect.width<< " " << cropRect.height <<endl;
-                        //debout << "subImg: w/h " << subImg->width<< " " << subImg->height <<endl;
-                        // getAngleToGround = 90 senkrecht zum Boden
-                        //debout << bS << endl;
-                        xy=mainWindow->getImageItem()->getAngleToGround(boxImageCentre.x()+bS, boxImageCentre.y()+bS, 175);// getAngleToGround(float px, float py, float height)
-                        x1=mainWindow->getImageItem()->getAngleToGround(boxImageCentre.x()+bS+10, boxImageCentre.y()+bS, 175);// getAngleToGround(float px, float py, float height)
-                        x2=mainWindow->getImageItem()->getAngleToGround(boxImageCentre.x()+bS-10, boxImageCentre.y()+bS, 175);// getAngleToGround(float px, float py, float height)
-                        y1=mainWindow->getImageItem()->getAngleToGround(boxImageCentre.x()+bS, boxImageCentre.y()+bS+10, 175);// getAngleToGround(float px, float py, float height)
-                        y2=mainWindow->getImageItem()->getAngleToGround(boxImageCentre.x()+bS, boxImageCentre.y()+bS-10, 175);// getAngleToGround(float px, float py, float height)
-                        //debout << x1 <<" "<<x2<<endl;
-                        //debout << y1 << " " <<y2<<endl;
-
-                        double subFactorBig = 1.-.75*(90.-xy)/90.; //  -.5 //in 1.0..0.25 // xy in 0..90
-                        double subFactorSmall = .85; // .9
-                        if (x1>x2) // Person links von Achse
-                        {
-                            if (y1>y2) // Person links oben von Achse
-                            {
-                                if (x1>y1) // starker Beschnitt rechts, kleiner Beschnitt unten
-                                {
-                                    cropRect.width *= subFactorBig; // ist int
-                                    cropRect.height *= subFactorSmall; // ist int
-                                }
-                                else // starker Beschnitt unten, kleiner Beschnitt rechts
-                                {
-                                    cropRect.width *= subFactorSmall; // ist int
-                                    cropRect.height *= subFactorBig; // ist int
-                                }
-                                //debout << "links oben"<<endl;
-                            }
-                            else // Person links unten von Achse
-                            {
-                                if (x1>y2) // starker Beschnitt rechts, kleiner Beschnitt oben
-                                {
-                                    cropRect.y = cropRect.y+cropRect.height*(1-subFactorSmall);
-                                    cropRect.width *= subFactorBig; // ist int
-                                    cropRect.height *= subFactorSmall; // ist int
-                                }
-                                else // starker Beschnitt oben, kleiner Beschnitt rechts
-                                {
-                                    cropRect.y = cropRect.y+cropRect.height*(1-subFactorBig);
-                                    cropRect.width *= subFactorSmall; // ist int
-                                    cropRect.height *= subFactorBig; // ist int
-                                }
-                                //debout << "links unten"<<endl;
-                            }
-                        }
-                        else // Person rechts von Achse
-                        {
-                            if (y1>y2) // Person rechts oben von Achse
-                            {
-                                if (x2>y1) // starker Beschnitt links, kleiner Beschnitt unten
-                                {
-                                    cropRect.x = cropRect.x+cropRect.width*(1-subFactorBig);
-                                    cropRect.width *= subFactorBig; // ist int
-                                    cropRect.height *= subFactorSmall; // ist int
-                                }
-                                else // starker Beschnitt unten, kleiner Beschnitt links
-                                {
-                                    cropRect.x = cropRect.x+cropRect.width*(1-subFactorSmall);
-                                    cropRect.width *= subFactorSmall; // ist int
-                                    cropRect.height *= subFactorBig; // ist int
-                                }
-                                //debout << "rechts oben"<<endl;
-                            }
-                            else // Person rechts unten von Achse
-                            {
-                                if (x2>y2) // starker Beschnitt links, kleiner Beschnitt oben
-                                {
-                                    cropRect.x = cropRect.x+cropRect.width*(1-subFactorBig);
-                                    cropRect.y = cropRect.y+cropRect.height*(1-subFactorSmall);
-                                    cropRect.width *= subFactorBig; // ist int
-                                    cropRect.height *= subFactorSmall; // ist int
-                                }
-                                else // starker Beschnitt oben, kleiner Beschnitt links
-                                {
-                                    cropRect.x = cropRect.x+cropRect.width*(1-subFactorSmall);
-                                    cropRect.y = cropRect.y+cropRect.height*(1-subFactorBig);
-                                    cropRect.width *= subFactorSmall; // ist int
-                                    cropRect.height *= subFactorBig; // ist int
-                                }
-                                //debout << "rechts unten"<<endl;
-                            }
-                        }
-
-                        //debout << mainWindow->getExtrCalibration()->getImagePoint(Point3f(0,0,0))<<endl;
-                        //Point3f p3d(0,0,0);
-                        //p3d.x += controlWidget->getCalibCoord3DTransX();
-                        //p3d.y += controlWidget->getCalibCoord3DTransY();
-                        //p3d.z += controlWidget->getCalibCoord3DTransZ();
-                        //p3d.x *= controlWidget->getCalibCoord3DSwapX() ? -1 : 1;
-                        //p3d.y *= controlWidget->getCalibCoord3DSwapY() ? -1 : 1;
-                        //p3d.z *= controlWidget->getCalibCoord3DSwapZ() ? -1 : 1;
-                        //debout <<mainWindow->getExtrCalibration()->getImagePoint(p3d)<<endl<<endl;
-
-                    }
-
-
-//                    cvSetImageROI(img, cropRect);
-//                    subImg = cvCreateImage(cvGetSize(img), img->depth, img->nChannels);
-//                    cvCopy(img, subImg, NULL);
-//                    cvSetImageROI(img, oriRect);
-
-//                    subImg = img.clone();
-                    subImg = img(cropRect);
-
-                    // Compute weighted conversion from RGB to gray, as CV_BGR2GRAY results in very dark images
-                    // especially for red shades
-                    float scaleR = midHue.redF();
-                    float scaleG = midHue.greenF();
-                    float scaleB = midHue.blueF();
-                    float scaleSum = scaleR+scaleG+scaleB;
-                    scaleR/=scaleSum;
-                    scaleG/=scaleSum;
-                    scaleB/=scaleSum;
-                    cv::Mat bgrToGray = (Mat_<double>(1,3) << scaleB, scaleG, scaleR);
-
-                    // Performs the matrix-vector multiplication MxN for each pixel of subImg, where M is bgrToGray
-                    // and N is a vector of all channels of a pixel, the result will be saved in subGray.
-                    cv::transform(subImg, subGray, bgrToGray);
-
-
-//IplImage *tmpAusgabe = cvCloneImage(subImg);//subImg subGray
-
-                    subBW = subGray.clone();
-//                    subBW = cvCloneImage(subGray);
-//                    cvReleaseImage(&subImg);
-
-                    //        // smooth it, otherwise a lot of false circles may be detected
-                    //        //GaussianBlur( gray, gray, Size(9, 9), 2, 2 );
-                    //        vector<cv::Vec3f> circles;
-                    //        cv::HoughCircles(gray, circles, CV_HOUGH_GRADIENT, 2, 10, 100, 50, 2, 20); // 22==minDist // , 1, 20
-                    ////        cvHoughCircles(CvArr* image, void* circle_storage, int method, double dp, double min_dist, double param1=100, double param2=100, int min_radius=0, int max_radius=0 )
-                    ////                image - 8-bit, single-channel, grayscale input image.
-                    ////                circles - Output vector of found circles. Each vector is encoded as a 3-element floating-point vector (x, y, radius) .
-                    ////                circle_storage - In C function this is a memory storage that will contain the output sequence of found circles.
-                    ////                method - Detection method to use. Currently, the only implemented method is CV_HOUGH_GRADIENT , which is basically 21HT , described in [Yuen90].
-                    ////                dp - Inverse ratio of the accumulator resolution to the image resolution. For example, if dp=1 , the accumulator has the same resolution as the input image. If dp=2 , the accumulator has half as big width and height.
-                    ////                minDist - Minimum distance between the centers of the detected circles. If the parameter is too small, multiple neighbor circles may be falsely detected in addition to a true one. If it is too large, some circles may be missed.
-                    ////                param1 - First method-specific parameter. In case of CV_HOUGH_GRADIENT , it is the higher threshold of the two passed to the Canny() edge detector (the lower one is twice smaller).
-                    ////                param2 - Second method-specific parameter. In case of CV_HOUGH_GRADIENT , it is the accumulator threshold for the circle centers at the detection stage. The smaller it is, the more false circles may be detected. Circles, corresponding to the larger accumulator values, will be returned first.
-                    ////                minRadius - Minimum circle radius.
-                    ////                maxRadius - Maximum circle radius.
-                    //        for( size_t i = 0; i < circles.size(); i++ )
-                    //        {
-                    //             cv::Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-                    //             int radius = cvRound(circles[i][2]);
-                    //             // draw the circle center
-                    //             //cvCircle(gray, center, 3, Scalar(0,255,0));
-                    //             //cv::circle( gray, center, 3, Scalar(0,255,0), -1, 8, 0 );
-                    //             // draw the circle outline
-                    //             cvCircle( gray, center, radius, Scalar(0,0,255),1, 8, 0 );
-                    //        }
-                    //        debout << circles.size()<<endl;
-
-//                    CvMemStorage *subStorage = cvCreateMemStorage(0);
-
-                    maxThreshold = max(max(getValue(subGray, subGray.cols/2, subGray.rows/2).value(),
-                                           getValue(subGray, subGray.cols/4, subGray.rows/2).value()),
-                                           getValue(subGray, 3*subGray.cols/4, subGray.rows/2).value());
-                    step = std::max((maxThreshold-5)/5, 1);
-                    minGrey = 300;
-                    //for (threshold = 40; threshold < 251 ; threshold += 30) // 40, 70, 100, 130, 160, 190, 220, 250
-                    for (threshold = 5; threshold < maxThreshold; threshold += step) // col.value()
-                    {
-                        cv::threshold(subGray,subBW,threshold,255,cv::THRESH_BINARY);
-//                        cvThreshold(subGray, subBW, threshold, 255, CV_THRESH_BINARY);
-
-                        // find contours and store them all as a list
-                        cv::findContours(subBW,subContours,cv::RETR_LIST,cv::CHAIN_APPROX_SIMPLE);
-//                      cvFindContours(subBW, subStorage, &subFirstContour, sizeof(CvContour), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE); // gray wird auch veraendert!!!
-
-                        // test each contour
-                        while (!subContours.empty())
-                        {
-                            vector<Point> subContour = subContours.back();
-
-                            if (subContour.size() > 5) // This is number point in contour
-                            {
-
-// in rot contouren in eine drehrichtung, in gruen andere
-//cvDrawContours(tmpAusgabe,subContours,CV_RGB(255,0,0),CV_RGB(0,255,0),0,1,8,cvPoint(0,0));
-
-                                subBox = cv::minAreaRect(subContour);//cvMinAreaRect2(subContours);
-
-                                if (subBox.size.height > subBox.size.width)
-                                {
-                                    subRatio = subBox.size.height/subBox.size.width;
-                                    subMaxExpansion = subBox.size.height;
-                                }
-                                else
-                                {
-                                    subRatio = subBox.size.width/subBox.size.height;
-                                    subMaxExpansion = subBox.size.width;
-                                }
-
-                                //QPointF pp(100, 100);
-                                //debout << "headsize: "<<mainWindow->getHeadSize(&pp)<<endl; // 44 pixel fuer schulexperiment
-                                //QPointF ww(1400, 1400);
-                                //debout << "headsize: "<<mainWindow->getHeadSize(&ww)<<endl; // 44 pixel fuer schulexperiment
-                                //double headSize = 44.5; // Kopflaenge in Pixel // spaeter berechnen -> funktion von daniel an bestimmten pixel
-                                //double markerSize = headSize / 4.5; // fuer schule 5cm // markerdurchmesser in pixel //spaeter berechnen
-                                cmPerPixel = mainWindow->getImageItem()->getCmPerPixel(cropRect.x+subBox.center.x, cropRect.y+subBox.center.y, controlWidget->mapDefaultHeight->value());
-                                cmPerPixelAvg = (cmPerPixel.x()+cmPerPixel.y())/2.;
-                                //debout << 21./cmPerPixelAvg<<endl;
-                                //debout << 5./cmPerPixelAvg<<endl;
-                                //debout << PI*0.25 * HEAD_SIZE/cmPerPixelAvg * 14./cmPerPixelAvg<<endl;
-                                markerSize = dot_size/cmPerPixelAvg;//war: 5cm// war WDG: = 16; war GymBay: = headSize / 4.5;
-                                //debout << markerSize<<endl;
-
-                                // maximalseitenverhaeltnis && minimal und maximaldurchmesser
-//                                debout << "subRatio: "<<subRatio<<endl;
-//                                debout << "subMaxExpansion: "<<subMaxExpansion<<endl;
-//                                debout << "markerSizeminmax: "<<markerSize*1.5<<" " << markerSize/1.5 <<endl;
-                                if (subRatio < 1.8 && subMaxExpansion < markerSize*1.5 && subMaxExpansion > markerSize/2)//1.5
-                                {
-                                    // IN OPENCV2.1 liefert cvContourArea KEIN VORZEICHEN ZUM ERKENNEN DER DREHRICHTUNG!!!! es ist ein optionaler paramter hinzugefuegt worden!!!!
-
-                                    //else
-                                    subContourArea = cv::contourArea(subContour,true);
-//                                    subContourArea = cvContourArea(subContours,CV_WHOLE_SEQ, true);
-                                    cx = myRound(subBox.center.x);
-                                    cy = myRound(subBox.center.y);
-
-                                    //If third argument is True, it finds the signed distance.
-                                    //If False, it finds whether the point is inside or outside or on the contour +100, -100, 0 (it returns +1, -1, 0 respectively).
-                                    // ist schwarzer punkt innerhalb kopfkontur
-                                    //CvPoint2D32f pt;
-//                                    if (subContourArea>0)
-//                                    {
-//                                        debout <<endl<< "Inside head: "<<cvPointPolygonTest(contour,cvPoint2D32f(cropRect.x+subBox.center.x, cropRect.y+subBox.center.y),false) <<endl; // liegt pt inside contour?
-//                                        debout << "value: "<<getGrey(subGray, cx, cy)<<endl;
-//                                        debout << "maxThreshold: "<<maxThreshold<<endl;
-//                                    }
-                                    // darker inside && dark inside &&  mittelpunkt in kopfkontur
-                                    xygrey = getValue(subGray, cx, cy).value();
-//                                    debout << "xygrey: " << xygrey << endl;
-                                    if (subContourArea>0 && xygrey<min(150,2*maxThreshold/3) && (0<cv::pointPolygonTest(contour,Point2f(cropRect.x+subBox.center.x, cropRect.y+subBox.center.y),false))) // dark inside
-                                    {
-                                        if (minGrey > xygrey)
-                                        {
-                                            minGrey = xygrey;
-                                            subCenter.set(cropRect.x+subBox.center.x, cropRect.y+subBox.center.y);
-                                        }
-//cvDrawContours(tmpAusgabe,subContours,CV_RGB(255,255,255),CV_RGB(255,255,255),0,1,8,cvPoint(0,0));
-                                    }
-                                }
-                            }
-
-                            // take the next contour
-//                            subContours = subContours->h_next;
-                            subContours.pop_back();
-                        }
-//                        if (subFirstContour)
-//                            cvClearSeq(subFirstContour); // not free only available for next push
-                    }
-//                    cvReleaseMemStorage(&subStorage);
-//                    cvReleaseImage(&subGray);
-//                    cvReleaseImage(&subBW);
-
-//////if (restrictPosition) // (j==0)
-////{
-//    static int zaehler = 0;
-//    QString imgfn = QString("D:\\image%1.jpg").arg(zaehler);
-//    zaehler+=1;
-////    //QByteArray ba = imgfn.toLatin1().data();
-////    //const char *c_str2 = ba.data();
-
-////    debout << imgfn.toLatin1().data() <<endl;
-//    cv::imwrite(imgfn.toLatin1().data(), tmpAusgabe);
-////    //cvNamedWindow("subGray", CV_WND_PROP_ASPECTRATIO| CV_WINDOW_KEEPRATIO ); // 0 wenn skalierbar sein soll  CV_WINDOW_AUTOSIZE
-////    //cv::imshow("subGray", tmpAusgabe);
-////    //cvWaitKey(1000); // zahl statt null, wenn nach bestimmter zeit in Millisekunden weitergegangen werden soll
-////}
+                    crossList->append(TrackPoint(Vec2F(blob.box.center.x, blob.box.center.y)+moveDir, 100, Vec2F(blob.box.center.x, blob.box.center.y), blob.color)); // 100 beste qualitaet
                 }
-//                debout << "contours.size(): " << contours.size() << "Color: " << col << endl;
-                if (useCodeMarker && foundHead)
+                else
                 {
-                    // Goal of the following part: implement useage of ArucoCode instead of "useBlackDot"
-                    // Output of findCodeMarker-Funktion: crossList->append(TrackPoint(Vec2F(x,y), 100, ids.at(i)));
-                    // where x,y are coordinates of the CodeMarkers and i is the running index over all detected marker
-                    // missing frames where Code is not recognized are interpolated in trackerReal.cpp and Marker ID is set to -1
-
-                    // cropRect has coordinates of rechtangele around color blob with respect to lower left corner (as in the beginning of useBlackDot)
-                    int extendRect = myRound(maxExpansion*.3); // scalar to increase area of cropRect for better detection of codemarkers when marker appears to stick out of the colored head because of tilted heads; value of .3 chosen arbitrarily after discussion
-                    cropRect.x = max(1, myRound(box.center.x-box.size.width/2.-border));
-                    cropRect.y = max(1, myRound(box.center.y-box.size.height/2.-border));
-                    cropRect.width = min(img.cols-cropRect.x-extendRect-1, 2*border+((myRound(maxExpansion)+extendRect) & -2));
-                    cropRect.height = min(img.rows-cropRect.y-extendRect-1, 2*border+((myRound(maxExpansion)+extendRect) & -2));
-                    subImg=img(cropRect); // --> shallow copy (points to original data)
-
-                    int lengthini = crossList->size(); // initial length of crossList (before findCodeMarker() is called)
-
-                    Vec2F offsetCropRect2Roi; // needed for drawing detected ArucoCode-Candidates correctly -> passed on to findCodeMarker()-Function
-                    offsetCropRect2Roi.setX(cropRect.x);
-                    offsetCropRect2Roi.setY(cropRect.y);
-
-                    if (subImg.empty())
-                        return;
-                    findCodeMarker(subImg, crossList, controlWidget, offsetCropRect2Roi);
-
-                    // The next tree statements each:
-                    // - set the offset of subImg with regards to ROI //(ROI to original image is archieved later in the code for all methods)
-                    // - add the functionality of autocorrection
-                    // - deal with functionality of ignore/not ignore heads without identified ArucoMarker
-                    if (ignoreWithoutMarker && lengthini!=crossList->size()) // if CodeMarker-Call returns crossList containing a new element (identified the ArucoMarker)
-                    {
-                        auto ii = crossList->size()-1;
-                        if (autoCorrect && !autoCorrectOnlyExport)
-                        {
-                            moveDir = autoCorrectColorMarker(boxImageCentre, controlWidget);
-                        }
-                        else
-                        {
-                            moveDir = Vec2F(0, 0);
-                        }
-                        (*crossList)[ii].setCol(col);
-                        (*crossList)[ii].setColPoint(Vec2F(box.center.x, box.center.y));
-                        (*crossList)[ii] = (*crossList)[ii] + (Vec2F(cropRect.x, cropRect.y) + moveDir);
-                    }
-                    else if(!ignoreWithoutMarker && (lengthini==crossList->size())) // in case ignoreWithoutMarker is checked and CodeMarker-Call returns empty crossList (could not identify a marker) the center of the smallest rectangle around the colorblobb is used as position
-                    {
-                        offsetCropRect2Roi.setX(0); // set to zero as cooridinates are directly used from cropRect
-                        offsetCropRect2Roi.setY(0);
-
-                        if (autoCorrect && !autoCorrectOnlyExport)
-                        {
-                            moveDir = autoCorrectColorMarker(boxImageCentre, controlWidget);
-                        }
-                        else
-                        {
-                            moveDir = Vec2F(0,0);
-                        }
-                        crossList->append(TrackPoint(Vec2F(box.center.x, box.center.y) + moveDir, 90, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
-                    }
-                    else if(!ignoreWithoutMarker && (crossList->size()!=lengthini)) // in case ignoreWithoutMarker is checked and CodeMarker-Call returns non-empty crossList (could identify a marker)
-                    {
-                        auto ii = crossList->size()-1;
-                        if (autoCorrect && !autoCorrectOnlyExport)
-                        {
-                            moveDir = autoCorrectColorMarker(boxImageCentre, controlWidget);
-                        }
-                        else
-                        {
-                           moveDir = Vec2F(0, 0);
-                        }
-                        (*crossList)[ii].setCol(col);
-                        (*crossList)[ii].setColPoint(Vec2F(box.center.x, box.center.y));
-                        (*crossList)[ii] = (*crossList)[ii] + (Vec2F(cropRect.x, cropRect.y) + moveDir);
-                    }
-
-                }
-                if (!useBlackDot && foundHead && !useCodeMarker)
-                {
-                    if (autoCorrect && !autoCorrectOnlyExport)
-                    {
-                        moveDir = autoCorrectColorMarker(boxImageCentre, controlWidget);
-
-                        crossList->append(TrackPoint(Vec2F(box.center.x, box.center.y)+moveDir, 100, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
-                    }
-                    else
-                        crossList->append(TrackPoint(Vec2F(box.center.x, box.center.y), 100, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
-                }
-                else if (minGrey <260 && !useCodeMarker) // mit gefundenem schwarzem punkt
-                {
-                    crossList->append(TrackPoint(subCenter, 100, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
-                }
-                else if (!ignoreWithoutMarker && foundHead && !useCodeMarker)
-                {
-                    if (autoCorrect && !autoCorrectOnlyExport)
-                    {
-                        moveDir = autoCorrectColorMarker(boxImageCentre, controlWidget);
-
-                        crossList->append(TrackPoint(Vec2F(box.center.x, box.center.y)+moveDir, 100, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
-                    }
-                    else
-                        crossList->append(TrackPoint(Vec2F(box.center.x, box.center.y), 90, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
+                    crossList->append(TrackPoint(Vec2F(blob.box.center.x, blob.box.center.y), 100, Vec2F(blob.box.center.x, blob.box.center.y), blob.color)); // 100 beste qualitaet
                 }
             }
-            // take the next contour
-            contours.pop_back();
         }
-//        if (firstContour)
-//            cvClearSeq(firstContour);
-//        cvReleaseMemStorage(&storage);
-
-        //debout << "Found " << crossList->size() << " features.\n";
     }
-
-//    cvReleaseStructuringElement(&closeKernel);
-//    cvReleaseStructuringElement(&openKernel);
 }
 
 /**
@@ -1066,7 +1044,7 @@ void findColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWid
  * @param crossList[out] list of detected TrackPoints
  * @param controlWidget
  */
-void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, Vec2F offsetCropRect2Roi /*=(0,0)*/)
+void detail::findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, Vec2F offsetCropRect2Roi /*=(0,0)*/)
 {
 //#if 0 // Maik temporaer, damit es auf dem Mac laeuft
 
@@ -1077,7 +1055,7 @@ void findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidg
 
     if (codeMarkerWidget->dictList->currentIndex() == 17) //for usage of DICT_mip_36h12 as it is not predifined in opencv
     {
-        dictionary = getDictMip36h12();
+        dictionary = detail::getDictMip36h12();
     }
 
     Ptr<aruco::DetectorParameters> detectorParams = aruco::DetectorParameters::create();
@@ -1773,7 +1751,7 @@ void getMarkerPos(Mat &img, QRect &roi, QList<TrackPoint> *crossList, Control *c
  * markers consist of 0s and 1s, built from upper left to lower right corner in hexadecimal notation.
  * aruco markers availlable via https://sourceforge.net/projects/aruco/files/
  */
-cv::Ptr<cv::aruco::Dictionary> getDictMip36h12()
+cv::Ptr<cv::aruco::Dictionary> detail::getDictMip36h12()
 {
     std::array<uint64_t, 250> bitListDictMip36h12 {0xd2b63a09dUL,0x6001134e5UL,0x1206fbe72UL,0xff8ad6cb4UL,0x85da9bc49UL,0xb461afe9cUL,0x6db51fe13UL,0x5248c541fUL,0x8f34503UL,0x8ea462eceUL,0xeac2be76dUL,0x1af615c44UL,0xb48a49f27UL,0x2e4e1283bUL,0x78b1f2fa8UL,0x27d34f57eUL,0x89222fff1UL,0x4c1669406UL,0xbf49b3511UL,0xdc191cd5dUL,0x11d7c3f85UL,0x16a130e35UL,0xe29f27effUL,0x428d8ae0cUL,0x90d548477UL,0x2319cbc93UL,0xc3b0c3dfcUL,0x424bccc9UL,0x2a081d630UL,0x762743d96UL,0xd0645bf19UL,0xf38d7fd60UL,0xc6cbf9a10UL,0x3c1be7c65UL,0x276f75e63UL,0x4490a3f63UL,0xda60acd52UL,0x3cc68df59UL,0xab46f9daeUL,0x88d533d78UL,0xb6d62ec21UL,0xb3c02b646UL,0x22e56d408UL,0xac5f5770aUL,0xaaa993f66UL,0x4caa07c8dUL,0x5c9b4f7b0UL,0xaa9ef0e05UL,0x705c5750UL,0xac81f545eUL,0x735b91e74UL,0x8cc35cee4UL,0xe44694d04UL,0xb5e121de0UL,0x261017d0fUL,0xf1d439eb5UL,0xa1a33ac96UL,0x174c62c02UL,0x1ee27f716UL,0x8b1c5ece9UL,0x6a05b0c6aUL,0xd0568dfcUL,0x192d25e5fUL,0x1adbeccc8UL,0xcfec87f00UL,0xd0b9dde7aUL,0x88dcef81eUL,0x445681cb9UL,0xdbb2ffc83UL,0xa48d96df1UL,0xb72cc2e7dUL,0xc295b53fUL,0xf49832704UL,0x9968edc29UL,0x9e4e1af85UL,0x8683e2d1bUL,0x810b45c04UL,0x6ac44bfe2UL,0x645346615UL,0x3990bd598UL,0x1c9ed0f6aUL,0xc26729d65UL,0x83993f795UL,0x3ac05ac5dUL,0x357adff3bUL,0xd5c05565UL,0x2f547ef44UL,0x86c115041UL,0x640fd9e5fUL,0xce08bbcf7UL,0x109bb343eUL,0xc21435c92UL,0x35b4dfce4UL,0x459752cf2UL,0xec915b82cUL,0x51881eed0UL,0x2dda7dc97UL,0x2e0142144UL,0x42e890f99UL,0x9a8856527UL,0x8e80d9d80UL,0x891cbcf34UL,0x25dd82410UL,0x239551d34UL,0x8fe8f0c70UL,0x94106a970UL,0x82609b40cUL,0xfc9caf36UL,0x688181d11UL,0x718613c08UL,0xf1ab7629UL,0xa357bfc18UL,0x4c03b7a46UL,0x204dedce6UL,0xad6300d37UL,0x84cc4cd09UL,0x42160e5c4UL,0x87d2adfa8UL,0x7850e7749UL,0x4e750fc7cUL,0xbf2e5dfdaUL,0xd88324da5UL,0x234b52f80UL,0x378204514UL,0xabdf2ad53UL,0x365e78ef9UL,0x49caa6ca2UL,0x3c39ddf3UL,0xc68c5385dUL,0x5bfcbbf67UL,0x623241e21UL,0xabc90d5ccUL,0x388c6fe85UL,0xda0e2d62dUL,0x10855dfe9UL,0x4d46efd6bUL,0x76ea12d61UL,0x9db377d3dUL,0xeed0efa71UL,0xe6ec3ae2fUL,0x441faee83UL,0xba19c8ff5UL,0x313035eabUL,0x6ce8f7625UL,0x880dab58dUL,0x8d3409e0dUL,0x2be92ee21UL,0xd60302c6cUL,0x469ffc724UL,0x87eebeed3UL,0x42587ef7aUL,0x7a8cc4e52UL,0x76a437650UL,0x999e41ef4UL,0x7d0969e42UL,0xc02baf46bUL,0x9259f3e47UL,0x2116a1dc0UL,0x9f2de4d84UL,0xeffac29UL,0x7b371ff8cUL,0x668339da9UL,0xd010aee3fUL,0x1cd00b4c0UL,0x95070fc3bUL,0xf84c9a770UL,0x38f863d76UL,0x3646ff045UL,0xce1b96412UL,0x7a5d45da8UL,0x14e00ef6cUL,0x5e95abfd8UL,0xb2e9cb729UL,0x36c47dd7UL,0xb8ee97c6bUL,0xe9e8f657UL,0xd4ad2ef1aUL,0x8811c7f32UL,0x47bde7c31UL,0x3adadfb64UL,0x6e5b28574UL,0x33e67cd91UL,0x2ab9fdd2dUL,0x8afa67f2bUL,0xe6a28fc5eUL,0x72049cdbdUL,0xae65dac12UL,0x1251a4526UL,0x1089ab841UL,0xe2f096ee0UL,0xb0caee573UL,0xfd6677e86UL,0x444b3f518UL,0xbe8b3a56aUL,0x680a75cfcUL,0xac02baea8UL,0x97d815e1cUL,0x1d4386e08UL,0x1a14f5b0eUL,0xe658a8d81UL,0xa3868efa7UL,0x3668a9673UL,0xe8fc53d85UL,0x2e2b7edd5UL,0x8b2470f13UL,0xf69795f32UL,0x4589ffc8eUL,0x2e2080c9cUL,0x64265f7dUL,0x3d714dd10UL,0x1692c6ef1UL,0x3e67f2f49UL,0x5041dad63UL,0x1a1503415UL,0x64c18c742UL,0xa72eec35UL,0x1f0f9dc60UL,0xa9559bc67UL,0xf32911d0dUL,0x21c0d4ffcUL,0xe01cef5b0UL,0x4e23a3520UL,0xaa4f04e49UL,0xe1c4fcc43UL,0x208e8f6e8UL,0x8486774a5UL,0x9e98c7558UL,0x2c59fb7dcUL,0x9446a4613UL,0x8292dcc2eUL,0x4d61631UL,0xd05527809UL,0xa0163852dUL,0x8f657f639UL,0xcca6c3e37UL,0xcb136bc7aUL,0xfc5a83e53UL,0x9aa44fc30UL,0xbdec1bd3cUL,0xe020b9f7cUL,0x4b8f35fb0UL,0xb8165f637UL,0x33dc88d69UL,0x10a2f7e4dUL,0xc8cb5ff53UL,0xde259ff6bUL,0x46d070dd4UL,0x32d3b9741UL,0x7075f1c04UL,0x4d58dbea0UL};
 
@@ -1798,3 +1776,5 @@ cv::Ptr<cv::aruco::Dictionary> getDictMip36h12()
 
     return dictionary;
 }
+
+} // namespace reco
