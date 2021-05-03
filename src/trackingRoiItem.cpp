@@ -25,8 +25,6 @@
 #include "view.h"
 #include "trackingRoiItem.h"
 
-using namespace::cv;
-
 TrackingRoiItem::TrackingRoiItem(QWidget *wParent, QGraphicsItem *parent)
     : QGraphicsRectItem(parent)
 {
@@ -270,7 +268,7 @@ void TrackingRoiItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 // check rect because bordersize changes and without mouse event nothing changes the rect
 void TrackingRoiItem::checkRect()
 {
-    Mat img = mMainWindow->getImageFiltered();
+    cv::Mat img = mMainWindow->getImageFiltered();
     // nicht QImage *img = mMainWindow->getImage(); da groesse noch nicht angepasst
     if (!img.empty())
     {

@@ -75,9 +75,6 @@ Control *cw;
 
 int Petrack::trcVersion = 0;
 
-using namespace::cv;
-using namespace std;
-
 // Reihenfolge des anlegens der objekte ist sehr wichtig
 Petrack::Petrack()
 {
@@ -551,7 +548,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
             }
         }
         else
-            debout << "Unknown PETRACK tag " << elem.tagName() << endl;
+            debout << "Unknown PETRACK tag " << elem.tagName() << std::endl;
     }
     // open koennte am schluss passieren, dann wuerde nicht erst unveraendertes bild angezeigt,
     // dafuer koennte es aber sein, dass werte zb bei fx nicht einstellbar sind!
@@ -568,7 +565,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     if (!mBackgroundFilter.getFilename().isEmpty())
     {
         if (!(loaded = mBackgroundFilter.load(mBackgroundFilter.getFilename())))
-            debout << "Error: loading background file " << mBackgroundFilter.getFilename() << "!" << endl;
+            debout << "Error: loading background file " << mBackgroundFilter.getFilename() << "!" << std::endl;
     }
 
     mPlayerWidget->setFrameInNum( sourceFrameIn == -1 ? mAnimation->getSourceInFrameNum() : sourceFrameIn );
@@ -644,7 +641,7 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
         }
 
 //        resetUI();
-        debout << "open " << fileName << endl;
+        debout << "open " << fileName << std::endl;
         file.close();
         mProFileName = fileName;
 
@@ -793,7 +790,7 @@ bool Petrack::saveProject(QString fileName) // default fileName=""
         file.close(); // also flushes the file
 
         statusBar()->showMessage(tr("Saved project to %1.").arg(fileName), 5000);
-        debout << "save project to " << fileName << endl;
+        debout << "save project to " << fileName << std::endl;
 
         mProFileName = fileName;
         updateWindowTitle();
@@ -843,7 +840,7 @@ void Petrack::openCameraLiveStream(int camID /* =-1*/)
     {
         // if more than one camera connected show to choose
         //camID = selectedID;
-        debout << "No camera ID delivered: Set CameraID to 0 (default Camera)" << endl;
+        debout << "No camera ID delivered: Set CameraID to 0 (default Camera)" << std::endl;
         camID = 0; // default
 
     }
@@ -853,7 +850,7 @@ void Petrack::openCameraLiveStream(int camID /* =-1*/)
         return;
     }
     mSeqFileName = "camera live stream";
-    debout << "open " << mSeqFileName << " (" << mAnimation->getNumFrames() << " frames; " << mAnimation->getFPS() << " fps; " << mAnimation->getSize().width() << "x" << mAnimation->getSize().height() << " pixel)" << endl; //size
+    debout << "open " << mSeqFileName << " (" << mAnimation->getNumFrames() << " frames; " << mAnimation->getFPS() << " fps; " << mAnimation->getSize().width() << "x" << mAnimation->getSize().height() << " pixel)" << std::endl; //size
     updateSequence();
     updateWindowTitle();
     mPlayerWidget->setFPS(mAnimation->getFPS());
@@ -914,7 +911,7 @@ void Petrack::openSequence(QString fileName) // default fileName = ""
         }
 #endif
         mSeqFileName = fileName;
-        debout << "open " << mSeqFileName << " (" << mAnimation->getNumFrames() << " frames; " << mAnimation->getFPS() << " fps; " << mAnimation->getSize().width() << "x" << mAnimation->getSize().height() << " pixel)" << endl; //size
+        debout << "open " << mSeqFileName << " (" << mAnimation->getNumFrames() << " frames; " << mAnimation->getFPS() << " fps; " << mAnimation->getSize().width() << "x" << mAnimation->getSize().height() << " pixel)" << std::endl; //size
         updateSequence();
         updateWindowTitle();
         mPlayerWidget->setFPS(mAnimation->getFPS());
@@ -1023,13 +1020,12 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
         AviFileWriter aviFile;
 #endif
         //CvVideoWriter* videoWriter;
-        //using namespace cv; oder cv::VideoWriter *vw;
         bool formatIsSaveAble = false;
         bool saveRet;
         QImage *viewImage = nullptr; // =NULL, amit keine Warnung
         QPainter *painter = nullptr; // =NULL, amit keine Warnung
         int progEnd = /*mAnimation->getNumFrames()-1*/mAnimation->getSourceOutFrameNum()-mPlayerWidget->getPos(); // nur wenn nicht an anfang gesprungen wird:-mPlayerWidget->getPos()
-        Mat iplImgFilteredBGR;
+        cv::Mat iplImgFilteredBGR;
         bool writeFrameRet = false;
         bool convert8To24bit = false;
         int mult;
@@ -1115,7 +1111,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
             //    return;
             if (!ok)
             {
-                debout << "Error: opening AVI file: " << dest.toStdString().c_str() << endl;
+                debout << "Error: opening AVI file: " << dest.toStdString().c_str() << std::endl;
                 return;
             }
         }
@@ -1167,7 +1163,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
         }
         else if ((mImgFiltered.channels() == 1)  /*&& convert8To24bit*/)
         {
-            Size size;
+            cv::Size size;
             size.width = mImgFiltered.cols;
             size.height = mImgFiltered.rows;
             iplImgFilteredBGR.create(size, CV_8UC3);
@@ -1214,7 +1210,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 if ((mImgFiltered.channels() == 1) /* && convert8To24bit*/)
                 {
                     //cvCvtColor(mIplImgFiltered, iplImgFilteredBGR, CV_GRAY2BGR);
-                    cvtColor(mImg, iplImgFilteredBGR, COLOR_GRAY2BGR);
+                    cv::cvtColor(mImg, iplImgFilteredBGR, cv::COLOR_GRAY2BGR);
                     if( saveView )
                         writeFrameRet = aviFile.appendFrame((const unsigned char*) viewImage->bits(), true); // 2. param besagt, ob vertikal gespiegel werden soll
                     else
@@ -1291,7 +1287,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
 
         // bei abbruch koennen es auch mPlayerWidget->getPos() frames sein, die bisher geschrieben wurden
         //-memPos nur, wenn nicht an den anfang gesprungen wird
-        debout << "wrote " << mPlayerWidget->getPos()+1-memPos << " of " << mAnimation->getNumFrames() << " frames." << endl;
+        debout << "wrote " << mPlayerWidget->getPos()+1-memPos << " of " << mAnimation->getNumFrames() << " frames." << std::endl;
         progress.setValue(progEnd);
 
         if (saveVideo)
@@ -2507,7 +2503,7 @@ void Petrack::mousePressEvent(QMouseEvent *event)
 }
 
 /// update control widget, if image size changed (especially because of changing border)
-void Petrack::updateControlImage(Mat &img)
+void Petrack::updateControlImage(cv::Mat &img)
 {
 
     // auch moeglich hoehe und breite von bild stat border veraenderungen zu checken
@@ -2602,7 +2598,7 @@ void Petrack::importTracker(QString dest) //default = ""
                 }
                 else
                 {
-                    debout << "Error: wrong header while reading TRC file." << endl;
+                    debout << "Error: wrong header while reading TRC file." << std::endl;
                     QMessageBox::critical(this, tr("PeTrack"), tr("Could not import tracker:\nNot supported trc version in file: %1.").arg(dest));
                     return;
                 }
@@ -2612,7 +2608,7 @@ void Petrack::importTracker(QString dest) //default = ""
                 trcVersion = 1;
 
             if ((sz > 0) && (mTracker->size() != 0))
-                debout << "Warning: Overlapping trajectories will be joined not until tracking adds new trackpoints." << endl;
+                debout << "Warning: Overlapping trajectories will be joined not until tracking adds new trackpoints." << std::endl;
             for (i = 0; i < sz; ++i)
             {
                 if( trcVersion == 2)
@@ -2642,7 +2638,7 @@ void Petrack::importTracker(QString dest) //default = ""
             mControlWidget->trackNumberVisible->setText(QString("%1").arg(mTracker->visible(mAnimation->getCurrentFrameNum())));
             mControlWidget->colorPlot->replot();
             file.close();
-            debout << "import " << dest << " (" << sz << " person(s), file version " << trcVersion << ")" << endl;
+            debout << "import " << dest << " (" << sz << " person(s), file version " << trcVersion << ")" << std::endl;
             mTrcFileName = dest; // fuer Project-File, dann koennte track path direkt mitgeladen werden, wenn er noch da ist
         }else
         if (dest.right(4) == ".txt") // 3D Koordinaten als Tracking-Daten importieren Zeilenformat: Personennr, Framenr, x, y, z
@@ -2668,7 +2664,7 @@ void Petrack::importTracker(QString dest) //default = ""
             QTextStream in(&file);
             TrackPerson tp;
             TrackPoint tPoint;
-            Point2f p2d;
+            cv::Point2f p2d;
 
             QString line;
             QString headerline;
@@ -2726,7 +2722,7 @@ void Petrack::importTracker(QString dest) //default = ""
                 // 3-dimensionale Berechnung/Anzeige des Punktes
                 if( mControlWidget->getCalibCoordDimension() == 0 )
                 {
-                    p2d = mExtrCalibration.getImagePoint(Point3f(x,y,z));
+                    p2d = mExtrCalibration.getImagePoint(cv::Point3f(x,y,z));
                 }
                 // 2-dimensionale Berechnung/Anzeige des Punktes
                 else
@@ -2773,7 +2769,7 @@ void Petrack::importTracker(QString dest) //default = ""
             mControlWidget->trackNumberVisible->setText(QString("%1").arg(mTracker->visible(mAnimation->getCurrentFrameNum())));
             mControlWidget->colorPlot->replot();
             file.close();
-            debout << "import " << dest << " (" << sz << " person(s) )" << endl;
+            debout << "import " << dest << " (" << sz << " person(s) )" << std::endl;
             mTrcFileName = dest; // fuer Project-File, dann koennte track path direkt mitgeladen werden, wenn er noch da ist
         }
         else
@@ -3174,7 +3170,7 @@ void Petrack::exportTracker(QString dest) //default = ""
                     return;
                 }
 
-                debout << "export tracking data to " << dest << " (" << mTracker->size() << " person(s))..." << endl;
+                debout << "export tracking data to " << dest << " (" << mTracker->size() << " person(s))..." << std::endl;
 
 #ifdef TIME_MEASUREMENT
                 double time1 = 0.0, tstart;
@@ -3232,7 +3228,7 @@ void Petrack::exportTracker(QString dest) //default = ""
                     {
                         auto commentSplit = mTracker->at(i).comment().split("\n", Qt::KeepEmptyParts);
                         out << "#" << qSetFieldWidth(3) << (i+1) << qSetFieldWidth(0) << "|" << commentSplit.at(0) << Qt::endl;
-                        std::cout  << setw(4) << (i+1) << "|" << commentSplit.at(0) << std::endl;
+                        std::cout  << std::setw(4) << (i+1) << "|" << commentSplit.at(0) << std::endl;
 
                         commentSplit.pop_front();
                         for (const auto& line : commentSplit)
@@ -3428,7 +3424,7 @@ void Petrack::exportTracker(QString dest) //default = ""
                 else
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
 
-                cout << " finished" << endl;
+                std::cout << " finished" << std::endl;
             }
             else
             { // wenn keine Dateiendung, dann wird trc und txt herausgeschrieben
@@ -3654,7 +3650,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         {
             // abfrage hinzugenommen, damit beim laden von .pet bg-file angegeben werden kann fuer mehrere versuche und beim nachladen von versuch nicht bg geloescht wird
             if (mBackgroundFilter.getFilename() != "")
-                debout << "Warning: No background reset, because of explicit loaded background image!" <<endl;
+                debout << "Warning: No background reset, because of explicit loaded background image!" <<std::endl;
             else
                 mBackgroundFilter.reset(); // alle gesammelten hintergrundinfos werden verworfen und bg.changed auf true gesetzt
         }
@@ -3682,7 +3678,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             mTracker->clear();
             mTracker->reset();
             if( !isLoading() )
-                debout << "Warning: deleted all tracking pathes because intrinsic parameters have changed." << endl;
+                debout << "Warning: deleted all tracking pathes because intrinsic parameters have changed." << std::endl;
         }
         else
         {
@@ -3712,7 +3708,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
             if (borderChangedForTracking)
             {
-                Size size;
+                cv::Size size;
                 size.width = mImgFiltered.cols;
                 size.height = mImgFiltered.rows;
                 mTracker->resize(size);
@@ -3725,7 +3721,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                 mStereoContext->getDisparity();
 #endif
 
-            Rect rect;
+            cv::Rect rect;
             getRoi(mImgFiltered, roi, rect);
             // Ignore all tracking points outside of rect
 
@@ -3871,7 +3867,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
 //    debout << "mIplImage ok ? " << (mIplImg != NULL) << " +++ mIplImageFiltered ok ? " << (mIplImgFiltered != NULL) << endl;
 }
-void Petrack::updateImage(const Mat &img)
+void Petrack::updateImage(const cv::Mat &img)
 {
     mImg = img;
 //    namedWindow("Test");
@@ -3931,7 +3927,7 @@ void Petrack::updateSequence()
             (oldImage && ((oldImage->width() != mImage->width()) || (oldImage->height() != mImage->height()))))
         mTrackingRoiItem->setRect(-getImageBorderSize(), -getImageBorderSize(), mImage->width(), mImage->height());
 
-    Size size2;
+    cv::Size size2;
     size2.width = mTrackingRoiItem->rect().width();
     size2.height = mTrackingRoiItem->rect().height();
     mTracker->init(size2);
@@ -4010,7 +4006,7 @@ double Petrack::getHeadSize(QPointF *pos, int pers, int frame)
 //            debout << "mControlWidget->mapDefaultHeight->value(): " << mControlWidget->mapDefaultHeight->value() << endl;
 //            debout << "mControlWidget->mapHeight->value(): " << mControlWidget->mapHeight->value() << endl;
             int diff;
-            Point3f p3d = getExtrCalibration()->get3DPoint(Point2f(mTracker->at(pers).trackPointAt(frame).x(),
+            cv::Point3f p3d = getExtrCalibration()->get3DPoint(cv::Point2f(mTracker->at(pers).trackPointAt(frame).x(),
                                                             mTracker->at(pers).trackPointAt(frame).y()),
                                                            mControlWidget->mapDefaultHeight->value());
                                                            //mTracker->at(pers).height()); // mStatusPosRealHeight->value());
@@ -4020,12 +4016,12 @@ double Petrack::getHeadSize(QPointF *pos, int pers, int frame)
 
             //debout << "3D Punkt: x: " << p3d.x << ", y: " << p3d.y << ", z: " << p3d.z << endl;
 
-            Point2f p3d_x1 = getExtrCalibration()->getImagePoint( Point3f(p3d.x+HEAD_SIZE*0.5, p3d.y, p3d.z) );
-            Point2f p3d_x2 = getExtrCalibration()->getImagePoint( Point3f(p3d.x-HEAD_SIZE*0.5, p3d.y, p3d.z) );
-            Point2f p3d_y1 = getExtrCalibration()->getImagePoint( Point3f(p3d.x, p3d.y+HEAD_SIZE*0.5, p3d.z) );
-            Point2f p3d_y2 = getExtrCalibration()->getImagePoint( Point3f(p3d.x, p3d.y-HEAD_SIZE*0.5, p3d.z) );
+            cv::Point2f p3d_x1 = getExtrCalibration()->getImagePoint( cv::Point3f(p3d.x+HEAD_SIZE*0.5, p3d.y, p3d.z) );
+            cv::Point2f p3d_x2 = getExtrCalibration()->getImagePoint( cv::Point3f(p3d.x-HEAD_SIZE*0.5, p3d.y, p3d.z) );
+            cv::Point2f p3d_y1 = getExtrCalibration()->getImagePoint( cv::Point3f(p3d.x, p3d.y+HEAD_SIZE*0.5, p3d.z) );
+            cv::Point2f p3d_y2 = getExtrCalibration()->getImagePoint( cv::Point3f(p3d.x, p3d.y-HEAD_SIZE*0.5, p3d.z) );
 
-            diff = (int) max(sqrt(pow(p3d_x2.x-p3d_x1.x,2)+pow(p3d_x2.y-p3d_x1.y,2)),
+            diff = (int) std::max(sqrt(pow(p3d_x2.x-p3d_x1.x,2)+pow(p3d_x2.y-p3d_x1.y,2)),
                            sqrt(pow(p3d_y2.x-p3d_y1.x,2)+pow(p3d_y2.y-p3d_y1.y,2)));
 //                    max(abs(getExtrCalibration()->getImagePoint(Point3f(p3d.x+HEAD_SIZE*0.5, p3d.y,               p3d.z)).x-
 //                                 getExtrCalibration()->getImagePoint(Point3f(p3d.x-HEAD_SIZE*0.5, p3d.y,               p3d.z)).x)
@@ -4098,7 +4094,7 @@ QSet<int> Petrack::getOnlyVisible()
 
                 }
                 if(!ok)
-                    debout << "Warning: error while reading showOnlyVisible list from input line!" << endl;
+                    debout << "Warning: error while reading showOnlyVisible list from input line!" << std::endl;
             }
             return onlyVisible; //in anzeige wird ab 1 gezaehlt, in datenstruktur ab 0
 

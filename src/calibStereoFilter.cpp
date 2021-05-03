@@ -20,8 +20,6 @@
 
 #include "calibStereoFilter.h"
 
-using namespace::cv;
-
 CalibStereoFilter::CalibStereoFilter()
     :Filter()
 {
@@ -30,9 +28,9 @@ CalibStereoFilter::CalibStereoFilter()
 
 
 
-Mat CalibStereoFilter::act(Mat &/*img*/, Mat &/*res*/)
+cv::Mat CalibStereoFilter::act(cv::Mat &/*img*/, cv::Mat &/*res*/)
 {
-    return Mat();
+    return cv::Mat();
 
 }
 void CalibStereoFilter::setStereoContext(pet::StereoContext* stereoContext)

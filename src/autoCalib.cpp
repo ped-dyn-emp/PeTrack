@@ -30,9 +30,6 @@
 #include "control.h"
 #include "pMessageBox.h"
 
-using namespace::cv;
-using namespace std;
-
 #define SHOW_CALIB_MAINWINDOW   ///< definieren, wenn das Schachbrett im Mainwindow und nicht separat angezeigt werden soll:
                                 // fuehrt nach Calibration dazu dass play des originalvideos abstuerzt, insb wenn intr apply nicht ausgewaehlt war
 
@@ -126,20 +123,20 @@ void AutoCalib::autoCalib()
             return;
         }
 
-        Size board_size(mBoardSizeX, mBoardSizeY); //{6, 9};  //{6, 8}; // passt zu meinem Schachbrett, was ich ausgedruckt habe
+        cv::Size board_size(mBoardSizeX, mBoardSizeY); //{6, 9};  //{6, 8}; // passt zu meinem Schachbrett, was ich ausgedruckt habe
         float square_size = mSquareSize; //5.25f; // 3.f;   // da 3x3cm hat Schachbrett, was ich ausgedruckt habe
         float aspect_ratio = 1.f;
         int flags = 0;
-        vector<Point2f> corners;
-        vector<vector<Point2f> > image_points;
-        Mat camera_matrix = Mat::eye(3, 3, CV_64F);
-        Mat dist_coeffs = Mat::zeros(1, 8, CV_64F);
-        Mat extr_params;
+        std::vector<cv::Point2f> corners;
+        std::vector<std::vector<cv::Point2f> > image_points;
+        cv::Mat camera_matrix = cv::Mat::eye(3, 3, CV_64F);
+        cv::Mat dist_coeffs = cv::Mat::zeros(1, 8, CV_64F);
+        cv::Mat extr_params;
         double reproj_errs;
-        Mat view, view_gray;
+        cv::Mat view, view_gray;
         bool found = false;
-        Mat origImg;
-        Size imgSize;
+        cv::Mat origImg;
+        cv::Size imgSize;
 
 #ifdef SHOW_CALIB_MAINWINDOW
         if (!mMainWindow->getImg().empty())
@@ -149,7 +146,7 @@ void AutoCalib::autoCalib()
         QProgressDialog progress("Calculating intrinsic camera parameters...", "Abort calculation", 0, mCalibFiles.size(), mMainWindow);
         progress.setWindowModality(Qt::WindowModal); // blocks main window
 
-        debout << "Search for cheesboard pattern (" << board_size.width << "x" << board_size.height << ") with square size: " << square_size << "cm..." << endl;
+        debout << "Search for cheesboard pattern (" << board_size.width << "x" << board_size.height << ") with square size: " << square_size << "cm..." << std::endl;
         bool min_one_pattern_found = false;
         // search for chessbord corners in every image
         for (int i = 0; i < mCalibFiles.size(); ++i)
@@ -160,7 +157,7 @@ void AutoCalib::autoCalib()
                 break;
 
             // cannot load image
-            view = imread(mCalibFiles.at(i).toStdString(),IMREAD_COLOR);
+            view = cv::imread(mCalibFiles.at(i).toStdString(),cv::IMREAD_COLOR);
             if (view.empty())
             {
                 progress.setValue(mCalibFiles.size());
@@ -177,17 +174,17 @@ void AutoCalib::autoCalib()
 
             // muss nur bei einem bild gemacht werden
             if (i==0)
-                imgSize = Size(view.rows,view.cols);
+                imgSize = cv::Size(view.rows,view.cols);
 
             // search for chessboard corners
-            found = findChessboardCorners(view,board_size,corners,CALIB_CB_ADAPTIVE_THRESH);
+            found = findChessboardCorners(view,board_size,corners,cv::CALIB_CB_ADAPTIVE_THRESH);
 
             if (found)
             {
                 // improve the found corners' coordinate accuracy
-                cvtColor(view,view_gray,COLOR_BGR2GRAY);
-                cornerSubPix(view_gray,corners,Size(11,11),
-                             Size(-1,-1),TermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER,30,0.1));
+                cv::cvtColor(view,view_gray,cv::COLOR_BGR2GRAY);
+                cv::cornerSubPix(view_gray,corners,cv::Size(11,11),
+                             cv::Size(-1,-1),cv::TermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER,30,0.1));
             
                 image_points.push_back(corners);
                 drawChessboardCorners(view,board_size,corners,found);
@@ -205,12 +202,12 @@ void AutoCalib::autoCalib()
                 min_one_pattern_found = true;
             }
             else
-                debout << "Calibration pattern not found in: "<< mCalibFiles.at(i).toStdString() << endl;
+                debout << "Calibration pattern not found in: "<< mCalibFiles.at(i).toStdString() << std::endl;
         }
 
         if( !min_one_pattern_found )
         {
-            debout << "Calibration failed. No patterns found!" << endl;
+            debout << "Calibration failed. No patterns found!" << std::endl;
             PWarning(mMainWindow,
                                  QString("Calibration failed"),
                                  QString("Chessboard pattern (%1x%2) not found in calibration files.").arg(board_size.width).arg(board_size.height));
@@ -229,21 +226,21 @@ void AutoCalib::autoCalib()
         bool ok = runCalibration( image_points, view.size(), board_size,
             square_size, aspect_ratio, flags, camera_matrix, dist_coeffs, &reproj_errs);//, extr_params);//,
 //            &reproj_errs);//, &avg_reproj_err );
-        debout << (ok ? "Calibration succeeded." : "Calibration failed.") << endl; //  "Avgage reprojection error is "  << avg_reproj_err << endl;
-        debout << "Intrinsic reprojection error is: " << reproj_errs << endl;
+        debout << (ok ? "Calibration succeeded." : "Calibration failed.") << std::endl; //  "Avgage reprojection error is "  << avg_reproj_err << endl;
+        debout << "Intrinsic reprojection error is: " << reproj_errs << std::endl;
 
         progress.setValue(mCalibFiles.size());
 
-        debout << "Cameramatrix: " << endl;
-        debout << "( " << camera_matrix.at<double>(0,0) << " " << camera_matrix.at<double>(0,1) << " " << camera_matrix.at<double>(0,2) << ")" << endl;
-        debout << "( " << camera_matrix.at<double>(1,0) << " " << camera_matrix.at<double>(1,1) << " " << camera_matrix.at<double>(1,2) << ")" << endl;
-        debout << "( " << camera_matrix.at<double>(2,0) << " " << camera_matrix.at<double>(2,1) << " " << camera_matrix.at<double>(2,2) << ")" << endl;
+        debout << "Cameramatrix: " << std::endl;
+        debout << "( " << camera_matrix.at<double>(0,0) << " " << camera_matrix.at<double>(0,1) << " " << camera_matrix.at<double>(0,2) << ")" << std::endl;
+        debout << "( " << camera_matrix.at<double>(1,0) << " " << camera_matrix.at<double>(1,1) << " " << camera_matrix.at<double>(1,2) << ")" << std::endl;
+        debout << "( " << camera_matrix.at<double>(2,0) << " " << camera_matrix.at<double>(2,1) << " " << camera_matrix.at<double>(2,2) << ")" << std::endl;
         //        debout << camera_matrix << endl;
 
-        debout << "Distortioncoefficients: " << endl;
-        debout << "r2: " << dist_coeffs.at<double>(0,0) << " r4: " << dist_coeffs.at<double>(0,1) << " r6: " << dist_coeffs.at<double>(0,4) << endl;
-        debout << "tx: " << dist_coeffs.at<double>(0,2) << " ty: " << dist_coeffs.at<double>(0,3) << endl;
-        debout << "k4: " << dist_coeffs.at<double>(0,5) << " k5: " << dist_coeffs.at<double>(0,6) << " k6: " << dist_coeffs.at<double>(0,7) << endl;
+        debout << "Distortioncoefficients: " << std::endl;
+        debout << "r2: " << dist_coeffs.at<double>(0,0) << " r4: " << dist_coeffs.at<double>(0,1) << " r6: " << dist_coeffs.at<double>(0,4) << std::endl;
+        debout << "tx: " << dist_coeffs.at<double>(0,2) << " ty: " << dist_coeffs.at<double>(0,3) << std::endl;
+        debout << "k4: " << dist_coeffs.at<double>(0,5) << " k5: " << dist_coeffs.at<double>(0,6) << " k6: " << dist_coeffs.at<double>(0,7) << std::endl;
         //        debout << dist_coeffs << endl;
 
         // set calibration values
@@ -287,27 +284,27 @@ void AutoCalib::autoCalib()
  * @param reproj_errs[out]
  * @return
  */
-int AutoCalib::runCalibration(vector<vector<Point2f> > image_points, Size img_size, Size board_size,
+int AutoCalib::runCalibration(std::vector<std::vector<cv::Point2f> > image_points, cv::Size img_size, cv::Size board_size,
     float square_size, float aspect_ratio, int flags,
-    Mat &camera_matrix, Mat &dist_coeffs, double *reproj_errs)
+    cv::Mat &camera_matrix, cv::Mat &dist_coeffs, double *reproj_errs)
 {
     int code;
 
-    vector<vector<Point3f> > object_points;
+    std::vector<std::vector<cv::Point3f> > object_points;
 
     // initialize arrays of points
     for(size_t j=0; j<image_points.size();j++)
     {
-        vector<Point3f> points_3d;
+        std::vector<cv::Point3f> points_3d;
         for(int i=0; i<board_size.width*board_size.height;i++)
         {
-           points_3d.push_back(Point3f(float((i/board_size.width)*square_size),float((i%board_size.width)*square_size),0));
+           points_3d.push_back(cv::Point3f(float((i/board_size.width)*square_size),float((i%board_size.width)*square_size),0));
 
         }
         object_points.push_back(points_3d);
     }
 
-    vector<Mat> rot_vects, trans_vects;
+    std::vector<cv::Mat> rot_vects, trans_vects;
 
     if(flags & CV_CALIB_FIX_ASPECT_RATIO)
     {

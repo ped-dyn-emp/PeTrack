@@ -21,8 +21,6 @@
 #include "swapFilter.h"
 #include "helper.h"
 
-using namespace::cv;
-
 SwapFilter::SwapFilter()
     :Filter()
 {
@@ -40,7 +38,7 @@ SwapFilter::SwapFilter()
     //    setOnCopy(false);
 }
 
-Mat SwapFilter::act(Mat &img, Mat &res)
+cv::Mat SwapFilter::act(cv::Mat &img, cv::Mat &res)
 {
 
 //    Mat img = cvarrToMat(imgIpl),

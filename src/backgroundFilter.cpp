@@ -39,9 +39,6 @@ extern Control *cw;
 
 //#define SHOW_TMP_IMG
 
-using namespace::cv;
-using namespace std;
-
 BackgroundFilter::BackgroundFilter()
     :Filter()
 {
@@ -63,7 +60,7 @@ BackgroundFilter::~BackgroundFilter()
 }
 
 
-Mat BackgroundFilter::getForeground() // nutzen, wenn ueber ganzes bild foreground benutzt wird; NULL, wenn keine background subtraction aktiviert
+cv::Mat BackgroundFilter::getForeground() // nutzen, wenn ueber ganzes bild foreground benutzt wird; NULL, wenn keine background subtraction aktiviert
 {
 
     return mForeground;
@@ -91,7 +88,7 @@ void BackgroundFilter::reset()
 {
     // funktioniert nicht wirklich
 //    if (!mBgModel.empty())
-    if (!mForeground.empty()) mForeground = Scalar::all(0);
+    if (!mForeground.empty()) mForeground = cv::Scalar::all(0);
 //      mBgModel = createBackgroundSubtractorMOG2();//->initialize(mForeground.size, mForeground.type());
     if (!mBgModel.empty()) mBgModel->clear();
 
@@ -218,7 +215,7 @@ bool BackgroundFilter::save(QString /*dest*/) //default = ""
 bool BackgroundFilter::load(QString dest) //default = ""
 {
     if (!mBgPointCloud.empty() || mBgModel != nullptr) // initialisierung
-        debout << "Warning: Eliminate existing background!" <<endl;
+        debout << "Warning: Eliminate existing background!" <<std::endl;
 
     if (1) // (*stereoContext()) // auskommentiert, damit bg auch angelegt werden kann, wenn noch kein video geladen wurde
     {
@@ -235,11 +232,11 @@ bool BackgroundFilter::load(QString dest) //default = ""
             //* CV_LOAD_IMAGE_GRAYSCALE the loaded image is forced to be grayscale
             //* CV_LOAD_IMAGE_UNCHANGED the loaded image will be loaded as is.
 
-            Mat bgImg = imread(dest.toStdString(),IMREAD_GRAYSCALE);
+            cv::Mat bgImg = cv::imread(dest.toStdString(),cv::IMREAD_GRAYSCALE);
 //            IplImage *bgImg = cvLoadImage(dest.toStdString().c_str(), CV_LOAD_IMAGE_GRAYSCALE);
             if (bgImg.empty())
             {
-                debout << "Error: could not read background subtraction file " << dest << "!" <<endl;
+                debout << "Error: could not read background subtraction file " << dest << "!" <<std::endl;
                 return false;
             }
 
@@ -265,7 +262,7 @@ bool BackgroundFilter::load(QString dest) //default = ""
 //cvShowImage("CVdisp", bgImg);
 
             if (sizeof(float) != 4)
-                debout << "Warning: the height range coded inside the background picture is not portable!" << endl;
+                debout << "Warning: the height range coded inside the background picture is not portable!" << std::endl;
 
             // uebetragen der z-werte in 8-bit-bild ---------------------------------------------------------
             // quantisierung fuehrt dazu, dass bei 10m maximaler spannweite pro grauwertstufe 4cm
@@ -303,9 +300,9 @@ bool BackgroundFilter::load(QString dest) //default = ""
             mLastFile = dest;
 
             if (mForeground.empty()) // wenn zuvor noch keine background subtraction an war oder ist
-                mForeground.create(Size(bgImg.cols,bgImg.rows),CV_8UC1);// = cvCreateImage(cvSize(bgImg->width, bgImg->height), IPL_DEPTH_8U, 1); // CV_8UC1 8, 1
+                mForeground.create(cv::Size(bgImg.cols,bgImg.rows),CV_8UC1);// = cvCreateImage(cvSize(bgImg->width, bgImg->height), IPL_DEPTH_8U, 1); // CV_8UC1 8, 1
 
-            debout << "import background subtraction file (min "<<min<<", max "<<max<<") for stereo mode: " << dest << "." << endl;
+            debout << "import background subtraction file (min "<<min<<", max "<<max<<") for stereo mode: " << dest << "." << std::endl;
         }
         else
             return false; // keine dest ausgesucht
@@ -347,7 +344,7 @@ pet::StereoContext** BackgroundFilter::stereoContext()
 // http://opencvlibrary.sourceforge.net/VideoSurveillance
 // opencv buch: S. 265
 // opencv pdf: S. 414
-Mat BackgroundFilter::act(Mat &img, Mat &res)
+cv::Mat BackgroundFilter::act(cv::Mat &img, cv::Mat &res)
 {
 //    Mat img = cvarrToMat(imgIpl);
 //        res = cvarrToMat(resIpl);
@@ -454,7 +451,7 @@ waitKey();
         if(!mBgModel.empty())
             mBgModel->clear();
 
-        mBgModel = createBackgroundSubtractorMOG2();//.dynamicCast<BackgroundSubtractor>();
+        mBgModel = cv::createBackgroundSubtractorMOG2();//.dynamicCast<BackgroundSubtractor>();
 //        mBgModel->setVarThreshold(10);
 //        mBgModel->setNMixtures(5);
 //        mBgModel->setHistory(75);
@@ -465,7 +462,7 @@ waitKey();
 //        mForeground = mBgModel->getForegroundImage();
 
 
-        mForeground.create(Size(img.cols,img.rows),CV_8UC1);
+        mForeground.create(cv::Size(img.cols,img.rows),CV_8UC1);
         //Mat temp_img, temp_foreg_img;
 
         mBgModel->apply(img,mForeground,1);
@@ -667,22 +664,22 @@ waitKey();
 #endif
         // einfache methode, um kleine gebiete in maske zu eliminieren und ausfransungen zu entfernen ---------------------------------------------------
 
-            cv::erode(mForeground,mForeground,cv::getStructuringElement(MORPH_RECT,Size(3,3)),Point(-1,-1),1);
+            cv::erode(mForeground,mForeground,cv::getStructuringElement(cv::MORPH_RECT,cv::Size(3,3)),cv::Point(-1,-1),1);
 #ifdef SHOW_TMP_IMG
 imshow("BackgroundFilter",mForeground);
 waitKey();
 #endif
-            cv::dilate(mForeground,mForeground,cv::getStructuringElement(MORPH_RECT,Size(3,3)),Point(-1,-1),2);
+            cv::dilate(mForeground,mForeground,cv::getStructuringElement(cv::MORPH_RECT,cv::Size(3,3)),cv::Point(-1,-1),2);
 #ifdef SHOW_TMP_IMG
 imshow("BackgroundFilter",mForeground);
 waitKey();
 #endif
-            cv::GaussianBlur(mForeground,mForeground,Size(11,11),3.5,3.5);
+            cv::GaussianBlur(mForeground,mForeground,cv::Size(11,11),3.5,3.5);
 #ifdef SHOW_TMP_IMG
 imshow("BackgroundFilter",mForeground);
 waitKey();
 #endif
-            cv::threshold(mForeground,mForeground,20,255,THRESH_BINARY);
+            cv::threshold(mForeground,mForeground,20,255,cv::THRESH_BINARY);
 
 #ifdef SHOW_TMP_IMG
 imshow("BackgroundFilter",mForeground);
@@ -694,7 +691,7 @@ waitKey();
 
         // loecher schliessen ------------------------------------------------------------------------------------------------------------
              // floodfill den aussenbereich und suchen nach ungefuelltem koennte auch loechder finden alssen
-             vector<vector<Point> > contours;
+            std::vector<std::vector<cv::Point> > contours;
              double contourArea;
 //             CvPoint* pointArray;
              // find contours and store them all as a list
@@ -706,7 +703,7 @@ waitKey();
 
              while (!contours.empty())
              {
-                 vector<Point> contour = contours.back();
+                 std::vector<cv::Point> contour = contours.back();
 
                  contourArea = cv::contourArea(contour, true);
                  if (contourArea > 0 && contourArea < 400) // kleine innere loecher schliessen
@@ -715,7 +712,7 @@ waitKey();
                      // Get contour point set.
 //                     cvCvtSeqToArray(contour, pointArray, CV_WHOLE_SEQ);
                      //debout << contourArea << " " << pointArray->x << " " << pointArray->y <<   endl;
-                     cv::fillPoly(mForeground,Mat(contour),Scalar::all(1));
+                     cv::fillPoly(mForeground,cv::Mat(contour),cv::Scalar::all(1));
 //                     cvFillPoly(mForeground, &pointArray , &(contour->total), 1, cvScalar(1,1,1,1)); // int line_type CV_DEFAULT(8), int shift CV_DEFAULT(0));
                      // folgende fkt nur fuer konvexe, daher bleiben einige bereiche nicht eingezeichnet
                      //cvFillConvexPoly(mForeground, pointArray , contour->total, cvScalar(1,1,1,1)); // int line_type CV_DEFAULT(8), int shift CV_DEFAULT(0));
@@ -727,7 +724,7 @@ waitKey();
                      // Get contour point set.
 //                     cvCvtSeqToArray(contour, pointArray, CV_WHOLE_SEQ);
                      //debout << contourArea << " " << pointArray->x << " " << pointArray->y <<   endl;
-                     cv::fillPoly(mForeground,Mat(contour),Scalar::all(0));
+                     cv::fillPoly(mForeground,cv::Mat(contour),cv::Scalar::all(0));
 //                     cvFillPoly(mForeground, &pointArray , &(contour->total), 1, cvScalar(0,0,0,0)); // int line_type CV_DEFAULT(8), int shift CV_DEFAULT(0));
 //                     free(pointArray);
                  }
@@ -922,7 +919,7 @@ waitKey();
 // setzt in mat alle bg pixel auf val
 // bei mehreren Kanaelen nur den letzten Kanal
 // bisher nur fuer float
-void BackgroundFilter::maskBg(Mat &mat, float val)
+void BackgroundFilter::maskBg(cv::Mat &mat, float val)
 {
     if (getEnabled() && !mForeground.empty())
     {

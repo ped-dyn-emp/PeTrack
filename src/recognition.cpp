@@ -39,8 +39,6 @@
 #include "control.h"
 #include "recognitionRoiItem.h"
 
-using namespace::cv;
-using namespace std;
 
 namespace reco {
 using namespace detail;
@@ -75,19 +73,19 @@ struct ColorParameters
  *  Each component H, S and V must be in a given range, defined by the parameters.
  */
 
-void thresholdHSV (const Mat &src, Mat &bin, const ColorParameters &param)
+void thresholdHSV (const cv::Mat &src, cv::Mat &bin, const ColorParameters &param)
 {
 //    IplImage *hsvIpl;
     int h, s, v;
     int x, y;
 
-    Mat hsv {src.size(), src.type()};
+    cv::Mat hsv {src.size(), src.type()};
 
 //    hsvIpl = cvCloneImage(srcIpl); // make a copy
 
 //    cvCvtColor(srcIpl ,hsvIpl, CV_BGR2HSV); // convert to HSV color space
 
-    cvtColor(src, hsv, COLOR_BGR2HSV);
+    cv::cvtColor(src, hsv, cv::COLOR_BGR2HSV);
 
 //    unsigned char* dataImg = ((unsigned char*) hsvIpl->imageData);
 //    unsigned char* yDataImg = dataImg;
@@ -98,7 +96,7 @@ void thresholdHSV (const Mat &src, Mat &bin, const ColorParameters &param)
     {
         for (x = 0; x < bin.cols/*binIpl->width*/; ++x)
         {
-            Vec3b intensity = hsv.at<Vec3b>(Point(x,y));
+            cv::Vec3b intensity = hsv.at<cv::Vec3b>(cv::Point(x,y));
             h = intensity.val[0];
             s = intensity.val[1];
             v = intensity.val[2];
@@ -114,11 +112,11 @@ void thresholdHSV (const Mat &src, Mat &bin, const ColorParameters &param)
                 (s < param.s_low || param.s_high < s) ||
                 (v < param.v_low || param.v_high < v))
             {
-                bin.at<uchar>(Point(x, y)) = 0;
+                bin.at<uchar>(cv::Point(x, y)) = 0;
 //                *data = 0;
             }else
             {
-                bin.at<uchar>(Point(x, y)) = 255;
+                bin.at<uchar>(cv::Point(x, y)) = 255;
 //                *data = 255;
             }
 //            ++data;
@@ -224,8 +222,8 @@ void setColorParameter(const QColor &fromColor, const QColor &toColor, bool inve
 Vec2F autoCorrectColorMarker(Vec2F &boxImageCentre, Control *controlWidget)
 {
     Petrack *mainWindow = controlWidget->getMainWindow();
-    Point2f tp = mainWindow->getExtrCalibration()->getImagePoint(
-                Point3f(-controlWidget->getCalibCoord3DTransX()-controlWidget->getCalibExtrTrans1(),
+    cv::Point2f tp = mainWindow->getExtrCalibration()->getImagePoint(
+            cv::Point3f(-controlWidget->getCalibCoord3DTransX()-controlWidget->getCalibExtrTrans1(),
                         -controlWidget->getCalibCoord3DTransY()-controlWidget->getCalibExtrTrans2(), 0));
     Vec2F pixUnderCam(tp.x, tp.y); // CvPoint
     Vec2F boxImageCentreWithBorder = boxImageCentre;
@@ -242,9 +240,9 @@ Vec2F autoCorrectColorMarker(Vec2F &boxImageCentre, Control *controlWidget)
     moveDir.normalize();
     //debout << "Movedir: " << moveDir <<endl;
 
-    Point3f p3x1, p3x2;
-    p3x1 = mainWindow->getExtrCalibration()->get3DPoint(Point2f(boxImageCentre.x(),boxImageCentre.y()),175);
-    p3x2 = mainWindow->getExtrCalibration()->get3DPoint(Point2f(boxImageCentre.x()+moveDir.x(),boxImageCentre.y()+moveDir.y()),175);
+    cv::Point3f p3x1, p3x2;
+    p3x1 = mainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(boxImageCentre.x(),boxImageCentre.y()),175);
+    p3x2 = mainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(boxImageCentre.x()+moveDir.x(),boxImageCentre.y()+moveDir.y()),175);
     p3x1 = p3x1-p3x2;
     Vec2F cmPerPixel(p3x1.x, p3x1.y);
 
@@ -286,14 +284,14 @@ Vec2F autoCorrectColorMarker(Vec2F &boxImageCentre, Control *controlWidget)
     if (options.useClose)
     {
         const int radiusClose = options.radiusClose;
-        cv::morphologyEx(binary,binary,MORPH_CLOSE,getStructuringElement(MORPH_ELLIPSE,Size(2*radiusClose+1, 2*radiusClose+1),Point(radiusClose, radiusClose)));
+        cv::morphologyEx(binary,binary,cv::MORPH_CLOSE,getStructuringElement(cv::MORPH_ELLIPSE,cv::Size(2*radiusClose+1, 2*radiusClose+1),cv::Point(radiusClose, radiusClose)));
     }
 
     // remove small blobs: radius ( blob ) < radius ( open )
     if (options.useOpen)
     {
         const int radiusOpen = options.radiusOpen;
-        cv::morphologyEx(binary,binary,MORPH_OPEN,getStructuringElement(MORPH_ELLIPSE,Size(2*radiusOpen+1, 2*radiusOpen+1),Point(radiusOpen, radiusOpen)));
+        cv::morphologyEx(binary,binary,cv::MORPH_OPEN,getStructuringElement(cv::MORPH_ELLIPSE,cv::Size(2*radiusOpen+1, 2*radiusOpen+1),cv::Point(radiusOpen, radiusOpen)));
     }
 
     std::vector<std::vector<cv::Point>> contours;
@@ -335,7 +333,7 @@ Vec2F autoCorrectColorMarker(Vec2F &boxImageCentre, Control *controlWidget)
 
         int cx = static_cast<int>(std::lround(box.center.x));
         int cy = static_cast<int>(std::lround(box.center.y));
-        int add = static_cast<int>(min(box.size.height,box.size.width)/4);
+        int add = static_cast<int>(std::min(box.size.height,box.size.width)/4);
 
         QColor col, col2;
         // color for hat measured at 3 points
@@ -472,7 +470,7 @@ cv::Mat detail::customBgr2Gray(const cv::Mat& subImg, const QColor& midHue)
     scaleR/=scaleSum;
     scaleG/=scaleSum;
     scaleB/=scaleSum;
-    cv::Mat bgrToGray = (Mat_<double>(1,3) << scaleB, scaleG, scaleR);
+    cv::Mat bgrToGray = (cv::Mat_<double>(1,3) << scaleB, scaleG, scaleR);
 
     // Performs the matrix-vector multiplication MxN for each pixel of subImg, where M is bgrToGray
     // and N is a vector of all channels of a pixel, the result will be saved in subGray.
@@ -514,12 +512,12 @@ void detail::refineWithBlackDot(std::vector<ColorBlob>& blobs, const cv::Mat& im
     {
         cv::Rect cropRect;
         cv::RotatedRect &box = blob.box;
-        cropRect.x = max(1, myRound(box.center.x-box.size.width/2-border));
-        cropRect.y = max(1, myRound(box.center.y-box.size.height/2-border));
+        cropRect.x = std::max(1, myRound(box.center.x-box.size.width/2-border));
+        cropRect.y = std::max(1, myRound(box.center.y-box.size.height/2-border));
         // 1. rundet kaufmaennisch, 2. dann rundet zur naechst kleiner geraden zahl
         // min wegen bildrand
-        cropRect.width = min(img.cols-cropRect.x-1, 2*border+(myRound(blob.maxExpansion) & -2));
-        cropRect.height = min(img.rows-cropRect.y-1, 2*border+(myRound(blob.maxExpansion) & -2));//cropRect.height = cropRect.width;
+        cropRect.width = std::min(img.cols-cropRect.x-1, 2*border+(myRound(blob.maxExpansion) & -2));
+        cropRect.height = std::min(img.rows-cropRect.y-1, 2*border+(myRound(blob.maxExpansion) & -2));//cropRect.height = cropRect.width;
 
         if (restrictPosition)
         {
@@ -532,7 +530,7 @@ void detail::refineWithBlackDot(std::vector<ColorBlob>& blobs, const cv::Mat& im
         cv::Mat subGray = customBgr2Gray(subImg, midHue);
         cv::Mat subBW;
 
-        double maxThreshold = max(max(getValue(subGray, subGray.cols/2, subGray.rows/2).value(),
+        double maxThreshold = std::max(std::max(getValue(subGray, subGray.cols/2, subGray.rows/2).value(),
                                getValue(subGray, subGray.cols/4, subGray.rows/2).value()),
                            getValue(subGray, 3*subGray.cols/4, subGray.rows/2).value());
         int step = static_cast<int>((maxThreshold-5))/5;
@@ -579,7 +577,7 @@ void detail::refineWithBlackDot(std::vector<ColorBlob>& blobs, const cv::Mat& im
                         // darker inside && dark inside &&  mittelpunkt in kopfkontur
                         int xygrey = getValue(subGray, cx, cy).value();
                         //                                    debout << "xygrey: " << xygrey << endl;
-                        if (subContourArea>0 && xygrey<min(150.,2*maxThreshold/3) && (0<cv::pointPolygonTest(blob.contour,Point2f(cropRect.x+subBox.center.x, cropRect.y+subBox.center.y),false))) // dark inside
+                        if (subContourArea>0 && xygrey<std::min(150.,2*maxThreshold/3) && (0<cv::pointPolygonTest(blob.contour,cv::Point2f(cropRect.x+subBox.center.x, cropRect.y+subBox.center.y),false))) // dark inside
                         {
                             if (minGrey > xygrey)
                             {
@@ -642,10 +640,10 @@ void detail::refineWithAruco(std::vector<ColorBlob> &blobs, const cv::Mat& img, 
         cv::Rect cropRect;
         const cv::RotatedRect &box = blob.box;
         int extendRect = myRound(blob.maxExpansion*.3); // scalar to increase area of cropRect for better detection of codemarkers when marker appears to stick out of the colored head because of tilted heads; value of .3 chosen arbitrarily after discussion
-        cropRect.x = max(1, myRound(box.center.x-box.size.width/2.-border));
-        cropRect.y = max(1, myRound(box.center.y-box.size.height/2.-border));
-        cropRect.width = min(img.cols-cropRect.x-extendRect-1, 2*border+((myRound(blob.maxExpansion)+extendRect) & -2));
-        cropRect.height = min(img.rows-cropRect.y-extendRect-1, 2*border+((myRound(blob.maxExpansion)+extendRect) & -2));
+        cropRect.x = std::max(1, myRound(box.center.x-box.size.width/2.-border));
+        cropRect.y = std::max(1, myRound(box.center.y-box.size.height/2.-border));
+        cropRect.width = std::min(img.cols-cropRect.x-extendRect-1, 2*border+((myRound(blob.maxExpansion)+extendRect) & -2));
+        cropRect.height = std::min(img.rows-cropRect.y-extendRect-1, 2*border+((myRound(blob.maxExpansion)+extendRect) & -2));
         cv::Mat subImg = img(cropRect); // --> shallow copy (points to original data)
 
         int lengthini = crossList.size(); // initial length of crossList (before findCodeMarker() is called)
@@ -724,7 +722,7 @@ void detail::refineWithAruco(std::vector<ColorBlob> &blobs, const cv::Mat& img, 
  * @param ignoreWithoutMarker (is ignored->overwritten by cmWidget->ignoreWithoutDot->isChecked())
  * @param offset
  */
-void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, bool ignoreWithoutMarker, Vec2F &offset)
+void findMultiColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, bool ignoreWithoutMarker, Vec2F &offset)
 {
     Petrack *mainWindow = controlWidget->getMainWindow();
     MultiColorMarkerItem* cmItem = mainWindow->getMultiColorMarkerItem();
@@ -838,7 +836,7 @@ void findMultiColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *contr
  * @param crossList
  * @param controlWidget
  */
-void findColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidget)
+void findColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *controlWidget)
 {
     ColorParameters	param;
     ColorMarkerItem*     cmItem = controlWidget->getMainWindow()->getColorMarkerItem();
@@ -850,7 +848,7 @@ void findColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWid
     setColorParameter(fromColor, toColor, cmWidget->inversHue->isChecked(), param);
 
     // run detection
-    Mat	binary;
+    cv::Mat	binary;
     //cv::Mat	kernel;
 //    IplConvKernel* kernel;
 
@@ -880,10 +878,10 @@ void findColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWid
         // siehe : http://opencv.willowgarage.com/documentation/c/image_filtering.html#createstructuringelementex
 //        kernel = cvCreateStructuringElementEx(2*radius_close+1, 2*radius_close+1, radius_close, radius_close, CV_SHAPE_ELLIPSE);
 //        cvMorphologyEx(binary, binary, NULL, kernel, CV_MOP_CLOSE);
-        cv::morphologyEx(binary,binary,MORPH_OPEN,
-                         getStructuringElement( MORPH_ELLIPSE,
-                                                Size(2*radius_close+1,2*radius_close+1),
-                                                Point(radius_close,radius_close)));
+        cv::morphologyEx(binary,binary,cv::MORPH_OPEN,
+                         getStructuringElement( cv::MORPH_ELLIPSE,
+                                                cv::Size(2*radius_close+1,2*radius_close+1),
+                                                cv::Point(radius_close,radius_close)));
     }
     // remove small blobs: radius ( blob ) < radius ( open )
     if (cmWidget->useOpen->isChecked())
@@ -891,10 +889,10 @@ void findColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWid
         int radius_open  = cmWidget->openRadius->value();
 //        kernel = cvCreateStructuringElementEx(2*radius_open+1, 2*radius_open+1, radius_open, radius_open, CV_SHAPE_ELLIPSE);
 //        cvMorphologyEx(binary, binary, NULL, kernel, CV_MOP_OPEN);
-        cv::morphologyEx(binary,binary,MORPH_CLOSE,
-                         getStructuringElement( MORPH_ELLIPSE,
-                                                Size(2*radius_open+1,2*radius_open+1),
-                                                Point(radius_open)));
+        cv::morphologyEx(binary,binary,cv::MORPH_CLOSE,
+                         getStructuringElement( cv::MORPH_ELLIPSE,
+                                                cv::Size(2*radius_open+1,2*radius_open+1),
+                                                cv::Point(radius_open)));
     }
 #ifdef SHOW_TMP_IMG
     imshow("image", binary);
@@ -903,14 +901,14 @@ void findColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWid
 
 //    CvSeq *contour;
 //    CvSeq *firstContour;
-    vector<vector<Point> > contours;
+    std::vector<std::vector<cv::Point> > contours;
     double area;
 //    CvMemStorage *storage = cvCreateMemStorage(0);
     QColor col;
 //    CvMoments moments;
 //    double m00, m01, m10;
 //    int count;
-    RotatedRect box;
+    cv::RotatedRect box;
     double ratio;
 //    CvPoint* pointArray;
     bool atEdge;
@@ -921,7 +919,7 @@ void findColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWid
 #endif
 
 //    IplImage *clone = cvCloneImage(binary); // clone, da binary sonst veraendert wird
-    Mat clone = binary.clone();//(cvarrToMat(binary),true);
+    cv::Mat clone = binary.clone();//(cvarrToMat(binary),true);
 
     cv::findContours(clone,contours,cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
 //    cvFindContours(clone, storage, &contour, sizeof(CvContour),
@@ -943,7 +941,7 @@ void findColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWid
     // test each contour
     while (!contours.empty())
     {
-        vector<Point> contour = contours.back();
+        std::vector<cv::Point> contour = contours.back();
         //count = contour->total; // This is number of point in one contour
         area = cv::contourArea(contour);
 //        area = cvContourArea(contour, CV_WHOLE_SEQ);
@@ -1044,21 +1042,21 @@ void findColorMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWid
  * @param crossList[out] list of detected TrackPoints
  * @param controlWidget
  */
-void detail::findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, Vec2F offsetCropRect2Roi /*=(0,0)*/)
+void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, Vec2F offsetCropRect2Roi /*=(0,0)*/)
 {
 //#if 0 // Maik temporaer, damit es auf dem Mac laeuft
 
     CodeMarkerItem* codeMarkerItem = controlWidget->getMainWindow()->getCodeMarkerItem();
     CodeMarkerWidget* codeMarkerWidget = controlWidget->getMainWindow()->getCodeMarkerWidget();
 
-    cv::Ptr<cv::aruco::Dictionary> dictionary = aruco::getPredefinedDictionary(aruco::PREDEFINED_DICTIONARY_NAME(codeMarkerWidget->dictList->currentIndex()));
+    cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::PREDEFINED_DICTIONARY_NAME(codeMarkerWidget->dictList->currentIndex()));
 
     if (codeMarkerWidget->dictList->currentIndex() == 17) //for usage of DICT_mip_36h12 as it is not predifined in opencv
     {
         dictionary = detail::getDictMip36h12();
     }
 
-    Ptr<aruco::DetectorParameters> detectorParams = aruco::DetectorParameters::create();
+    cv::Ptr<cv::aruco::DetectorParameters> detectorParams = cv::aruco::DetectorParameters::create();
 
     double minMarkerPerimeterRate = 0.03, maxMarkerPerimeterRate = 4, minCornerDistanceRate = 0.05, minMarkerDistanceRate = 0.05;
 
@@ -1080,13 +1078,13 @@ void detail::findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *con
                     p3 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value()),
                     p4 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value());
 
-            double cmPerPixel_min = min(min(min(p1.x(), p1.y()), min(p2.x(), p2.y())),
-                                        min(min(p3.x(), p3.y()), min(p4.x(), p4.y())));
-            double cmPerPixel_max = max(max(max(p1.x(), p1.y()), max(p2.x(), p2.y())),
-                                        max(max(p3.x(), p3.y()), max(p4.x(), p4.y())));
+            double cmPerPixel_min = std::min(std::min(std::min(p1.x(), p1.y()), std::min(p2.x(), p2.y())),
+                                             std::min(std::min(p3.x(), p3.y()), std::min(p4.x(), p4.y())));
+            double cmPerPixel_max = std::max(std::max(std::max(p1.x(), p1.y()), std::max(p2.x(), p2.y())),
+                                             std::max(std::max(p3.x(), p3.y()), std::max(p4.x(), p4.y())));
 
-            minMarkerPerimeterRate = (codeMarkerWidget->minMarkerPerimeter->value()*4./cmPerPixel_max)/max(rect.width(),rect.height());
-            maxMarkerPerimeterRate = (codeMarkerWidget->maxMarkerPerimeter->value()*4./cmPerPixel_min)/max(rect.width(),rect.height());
+            minMarkerPerimeterRate = (codeMarkerWidget->minMarkerPerimeter->value()*4./cmPerPixel_max)/std::max(rect.width(),rect.height());
+            maxMarkerPerimeterRate = (codeMarkerWidget->maxMarkerPerimeter->value()*4./cmPerPixel_min)/std::max(rect.width(),rect.height());
         }
 
         if (recoMethod == 5)   // for usage of codemarker with MulticolorMarker
@@ -1105,8 +1103,8 @@ void detail::findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *con
     else // 2D
     {
         double cmPerPixel = mainWindow->getImageItem()->getCmPerPixel();
-        minMarkerPerimeterRate = (codeMarkerWidget->minMarkerPerimeter->value()*4/cmPerPixel)/max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
-        maxMarkerPerimeterRate = (codeMarkerWidget->maxMarkerPerimeter->value()*4/cmPerPixel)/max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
+        minMarkerPerimeterRate = (codeMarkerWidget->minMarkerPerimeter->value()*4/cmPerPixel)/std::max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
+        maxMarkerPerimeterRate = (codeMarkerWidget->maxMarkerPerimeter->value()*4/cmPerPixel)/std::max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
 
         minCornerDistanceRate = codeMarkerWidget->minCornerDistance->value();
         minMarkerDistanceRate = codeMarkerWidget->minMarkerDistance->value();
@@ -1138,8 +1136,8 @@ void detail::findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *con
     detectorParams->minOtsuStdDev                         = codeMarkerWidget->minOtsuStdDev->value();
     detectorParams->errorCorrectionRate                   = codeMarkerWidget->errorCorrectionRate->value();
 
-    vector<int> ids;
-    vector<vector<Point2f> > corners, rejected;
+    std::vector<int> ids;
+    std::vector<std::vector<cv::Point2f> > corners, rejected;
     ids.clear();
     corners.clear();
     rejected.clear();
@@ -1149,7 +1147,7 @@ void detail::findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *con
     debout << "start detectCodeMarkers : " << getElapsedTime() <<endl;
 #endif
 
-    aruco::detectMarkers(img/*copy.clone()*/, dictionary, corners, ids, detectorParams, rejected);
+    cv::aruco::detectMarkers(img/*copy.clone()*/, dictionary, corners, ids, detectorParams, rejected);
 
 #ifdef TIME_MEASUREMENT
     //        "==========: "
@@ -1191,7 +1189,7 @@ void detail::findCodeMarker(Mat &img, QList<TrackPoint> *crossList, Control *con
 //#endif
 }
 
-void findContourMarker(Mat &img, QList<TrackPoint> *crossList, int markerBrightness, bool ignoreWithoutMarker, bool autoWB, int recoMethod, float headSize)
+void findContourMarker(cv::Mat &img, QList<TrackPoint> *crossList, int markerBrightness, bool ignoreWithoutMarker, bool autoWB, int recoMethod, float headSize)
 {
     int threshold, plus, count;
     double angle;
@@ -1209,21 +1207,21 @@ void findContourMarker(Mat &img, QList<TrackPoint> *crossList, int markerBrightn
 //        markerList = (MarkerHermesList *) new MarkerHermesList;
 //    else
 //        debout << "Error: this should never happen!" <<endl;
-    Size sz = Size(img.cols & -2, img.rows & -2);
-    Mat gray = Mat(sz,CV_8UC1);
-    Mat tgray;
-    Mat grayFix;
+    cv::Size sz = cv::Size(img.cols & -2, img.rows & -2);
+    cv::Mat gray = cv::Mat(sz,CV_8UC1);
+    cv::Mat tgray;
+    cv::Mat grayFix;
 //    IplImage *gray = cvCreateImage(sz, 8, 1);
 //    IplImage *tgray;
 //    IplImage *grayFix;
 //    CvPoint* PointArray;
-    vector<vector<Point> > contours;
+    std::vector<std::vector<cv::Point> > contours;
 //    CvSeq *contours;
 //    CvSeq *firstContour;
 
 
 //    Mat PointArray2D32f;
-    RotatedRect box;
+    cv::RotatedRect box;
     //CvBox2D box;
 //     CvPoint center;
     int expansion;
@@ -1243,7 +1241,7 @@ void findContourMarker(Mat &img, QList<TrackPoint> *crossList, int markerBrightn
     //     cvPyrUp(pyr, timg, 7);
     if (img.channels() == 3)
     {
-        tgray = Mat(sz,CV_8UC1);//cvCreateImage(sz, 8, 1);
+        tgray = cv::Mat(sz,CV_8UC1);//cvCreateImage(sz, 8, 1);
         // folgende Zeilen erledigen das gleiche wie cvCvtColor(img, tgray, CV_RGB2GRAY);
         // noetig gewesen, da opencv Probleme machte
         //Y=0.299*R + 0.587*G + 0.114*B;
@@ -1260,7 +1258,7 @@ void findContourMarker(Mat &img, QList<TrackPoint> *crossList, int markerBrightn
         //            greyData = (yGreyData += tgray->widthStep); // because sometimes widthStep != width
         //
         //        }
-        cvtColor(img,tgray,COLOR_RGB2GRAY);
+        cv::cvtColor(img,tgray,cv::COLOR_RGB2GRAY);
 //        cvCvtColor(img, tgray, CV_RGB2GRAY);
     }
     //debout << "Threshold" << endl;
@@ -1326,7 +1324,7 @@ namedWindow("img", CV_WINDOW_AUTOSIZE); // 0 wenn skalierbar sein soll
         else if (img.channels() == 1)
             cv::threshold(img,gray,threshold,255, cv::THRESH_BINARY);//cvThreshold(img, gray, threshold, 255, CV_THRESH_BINARY);
         else
-            debout << "Error: Wrong number of channels: " << img.channels() <<endl;
+            debout << "Error: Wrong number of channels: " << img.channels() <<std::endl;
         grayFix = gray.clone();// = cvCloneImage(gray); // make a copy
 
 
@@ -1372,7 +1370,7 @@ namedWindow("img", CV_WINDOW_AUTOSIZE); // 0 wenn skalierbar sein soll
         // test each contour
         while (!contours.empty())
         {
-            vector<Point> contour = contours.back();
+            std::vector<cv::Point> contour = contours.back();
             //koennten auch interessant sein:
             //MinAreaRect2
             //MinEnclosingCircle
@@ -1416,8 +1414,8 @@ cvWaitKey();
                 //debout << "FitEllipse" << endl;
                 // Fits ellipse to current contour.
                 //debout << "count: " << count << endl;
-                Mat pointsf;
-                Mat(contour).convertTo(pointsf, CV_32F);
+                cv::Mat pointsf;
+                cv::Mat(contour).convertTo(pointsf, CV_32F);
                 box = fitEllipse(pointsf);
 
 //                box = fitEllipse(PointArray2D32f);//, count, &box);
@@ -1624,15 +1622,15 @@ imShow("img2", tmpAusgabe2);
  * @param borderSize
  * @param bgFilter
  */
-void getMarkerPos(Mat &img, QRect &roi, QList<TrackPoint> *crossList, Control *controlWidget, int borderSize, BackgroundFilter *bgFilter)
+void getMarkerPos(cv::Mat &img, QRect &roi, QList<TrackPoint> *crossList, Control *controlWidget, int borderSize, BackgroundFilter *bgFilter)
 {
     int markerBrightness = controlWidget->markerBrightness->value();
     bool ignoreWithoutMarker = (controlWidget->markerIgnoreWithout->checkState() == Qt::Checked);
     bool autoWB = (controlWidget->recoAutoWB->checkState() == Qt::Checked);
     int recoMethod = controlWidget->getRecoMethod();
 
-    Mat tImg;
-    Rect rect;
+    cv::Mat tImg;
+    cv::Rect rect;
     //debout << "recoMethod: " << recoMethod << endl;
 //    tImg = getRoi(img, roi, rect, !((recoMethod == 3)||(recoMethod == 5)||(recoMethod == 6)));
     tImg = getRoi(img, roi, rect, !((recoMethod == 3) || (recoMethod == 5) || (recoMethod == 6)));

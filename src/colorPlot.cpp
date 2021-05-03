@@ -33,8 +33,6 @@
 #include "control.h"
 #include "tracker.h"
 
-using namespace std;
-
 // class SpectrogramData: public QwtRasterData
 // {
 // public:
@@ -114,9 +112,9 @@ public:
             for (i = 0; i < (x==0?360:256); ++i)
                 for (j = 0; j < (y==0?360:256); ++j)
                 {
-                    col.setHsv(x==0?(y==0?min(i, j):i):(y==0?j:myRound(z*360./256.)), 
-                               x==1?(y==1?min(i, j):i):(y==1?j:z), 
-                               x==2?(y==2?min(i, j):i):(y==2?j:z));
+                    col.setHsv(x==0?(y==0?std::min(i, j):i):(y==0?j:myRound(z*360./256.)),
+                               x==1?(y==1?std::min(i, j):i):(y==1?j:z),
+                               x==2?(y==2?std::min(i, j):i):(y==2?j:z));
                     mImage->setPixel(i, (y==0?359:255)-j, col.rgb());
                 }
         }
@@ -125,9 +123,9 @@ public:
             for (i = 0; i < 256; ++i)
                 for (j = 0; j < 256; ++j)
                 {
-                    col.setRgb(x==0?(y==0?min(i, j):i):(y==0?j:z), 
-                               x==1?(y==1?min(i, j):i):(y==1?j:z), 
-                               x==2?(y==2?min(i, j):i):(y==2?j:z));
+                    col.setRgb(x==0?(y==0?std::min(i, j):i):(y==0?j:z),
+                               x==1?(y==1?std::min(i, j):i):(y==1?j:z),
+                               x==2?(y==2?std::min(i, j):i):(y==2?j:z));
                     mImage->setPixel(i, 255-j, col.rgb());
                 }
         }
@@ -863,7 +861,7 @@ bool ColorPlot::printDistribution() const
         return false;
     j = dict.constBegin();
     while (j != dict.constEnd()) {
-        debout << "height " << fixed << setprecision(1) << setw(5) << j.key() << " - number " << setw(3) << j.value() << " (" << setw(4) << (100.*j.value())/anz << "%)" << endl;
+        debout << "height " << std::fixed << std::setprecision(1) << std::setw(5) << j.key() << " - number " << std::setw(3) << j.value() << " (" << std::setw(4) << (100.*j.value())/anz << "%)" << std::endl;
         ++j;
     }
     return true;

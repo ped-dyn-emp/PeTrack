@@ -20,7 +20,6 @@
 
 #include "filter.h"
 
-using namespace::cv;
 
 // // muesste fuer double und int existieren
 Parameter::Parameter()
@@ -135,13 +134,13 @@ void Filter::setChanged(bool b)
  * @param img image to be transformed
  * @return if enabled the transformed image else just img without changes (still gets cached)
  */
-Mat Filter::apply(Mat &img)
+cv::Mat Filter::apply(cv::Mat &img)
 {
     if (getEnabled())
     {
         if (getOnCopy())
         {
-            Mat res(Size(img.cols,img.rows),CV_8UC(img.channels()));
+            cv::Mat res(cv::Size(img.cols,img.rows),CV_8UC(img.channels()));
             mRes = act(img,res);
             mChg = false;
             return mRes;
@@ -159,7 +158,7 @@ Mat Filter::apply(Mat &img)
     }
 }
 
-Mat Filter::getLastResult()
+cv::Mat Filter::getLastResult()
 {
     return mRes;
 }

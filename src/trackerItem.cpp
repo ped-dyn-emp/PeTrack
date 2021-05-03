@@ -30,9 +30,6 @@
 #include "recognitionRoiItem.h"
 #include "trackingRoiItem.h"
 
-using namespace::cv;
-using namespace std;
-
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,
 // so dass pixel quadratisch 
@@ -102,10 +99,10 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
                 {
                     if (found)
                     {
-                        debout << "Warning: more possible trackpoints for point" << endl;
-                        debout << "         " << p << " in frame " << frame << " with low distance:" << endl;
-                        debout << "         person " << i+1 << " (distance: " << dist << "), " << endl;
-                        debout << "         person " << iNearest+1 << " (distance: " << minDist << "), " << endl;
+                        debout << "Warning: more possible trackpoints for point" << std::endl;
+                        debout << "         " << p << " in frame " << frame << " with low distance:" << std::endl;
+                        debout << "         person " << i+1 << " (distance: " << dist << "), " << std::endl;
+                        debout << "         person " << iNearest+1 << " (distance: " << minDist << "), " << std::endl;
                         if (minDist > dist)
                         {
                             minDist = dist;
@@ -370,7 +367,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
     QPen ellipsePen;
     QRectF rect;
     Vec2F n;
-    Subdiv2D subdiv;
+    cv::Subdiv2D subdiv;
     int i, j;
     QPen linePen;
     QPen numberPen;
@@ -427,19 +424,19 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
         QRectF qrect = mMainWindow->getRecoRoiItem()->rect();
 //        debout << "rect: " << rect.left() << ", " << rect.top() << ", " << rect.right() << ", " << rect.bottom() << endl;
 
-        Point3f leftTop = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(qrect.left(),qrect.top()),0);
-        Point3f rightBottom = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(qrect.right(),qrect.bottom()),0);
+        cv::Point3f leftTop = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(qrect.left(),qrect.top()),0);
+        cv::Point3f rightBottom = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(qrect.right(),qrect.bottom()),0);
 
         //        subdiv.initDelaunay(Rect(mMainWindow->getRecoRoiItem()->rect().left(),mMainWindow->getRecoRoiItem()->rect().top(),mMainWindow->getRecoRoiItem()->rect().width(),mMainWindow->getRecoRoiItem()->rect().height()));
-        x_offset = -min(leftTop.x,rightBottom.x);
-        y_offset = -min(leftTop.y,rightBottom.y);
+        x_offset = -std::min(leftTop.x,rightBottom.x);
+        y_offset = -std::min(leftTop.y,rightBottom.y);
         x_switch = rightBottom.x < leftTop.x ? abs(rightBottom.x-leftTop.x) : 0;
         y_switch = rightBottom.y < leftTop.y ? abs(leftTop.y-rightBottom.y) : 0;
-        debout << "x_offset: " << x_offset << ", y_offset: " << y_offset << ", x_switch: " << x_switch << ", y_switch: " << y_switch << endl;
+        debout << "x_offset: " << x_offset << ", y_offset: " << y_offset << ", x_switch: " << x_switch << ", y_switch: " << y_switch << std::endl;
 //        debout << "leftTop: " << leftTop.x+x_offset << ", " << leftTop.y+y_offset << " rightBottom: " << rightBottom.x+x_offset << ", " << rightBottom.y+y_offset << endl;
 
-        Rect rect(Rect(leftTop.x+x_offset,leftTop.y+y_offset,x_switch>0 ? x_switch : (rightBottom.x-leftTop.x),y_switch>0 ? y_switch : (rightBottom.y-leftTop.y)));
-        debout << "Rect size: P(" << rect.x << ", " << rect.y << "), width: " << rect.width << ", height: " << rect.height << endl;
+        cv::Rect rect(cv::Rect(leftTop.x+x_offset,leftTop.y+y_offset,x_switch>0 ? x_switch : (rightBottom.x-leftTop.x),y_switch>0 ? y_switch : (rightBottom.y-leftTop.y)));
+        debout << "Rect size: P(" << rect.x << ", " << rect.y << "), width: " << rect.width << ", height: " << rect.height << std::endl;
 
         subdiv.initDelaunay(rect);
     }
@@ -615,20 +612,20 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                         double cross_size = 15+pSG*0.25;
                         //debout << "2D Point: (" << tp.x() << ", " << tp.y() << "), height: " << height << endl;
                         //debout << "mTracker.at(i).height(): " << mTracker->at(i).height() << " tp.sp().z(): " << tp.sp().z() << endl;
-                        Point3f p3d_height;
+                        cv::Point3f p3d_height;
                         if (height < MIN_HEIGHT+1)
                         {
-                            p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(tp.x(),tp.y()),mControlWidget->getColorPlot()->map(mTracker->at(i).color()));
+                            p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(tp.x(),tp.y()),mControlWidget->getColorPlot()->map(mTracker->at(i).color()));
                         }else
                         {
                             if ( tp.sp().z() > 0 )
-                                p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(tp.x(),tp.y()),-mControlWidget->getCalibExtrTrans3()-tp.sp().z());
+                                p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(tp.x(),tp.y()),-mControlWidget->getCalibExtrTrans3()-tp.sp().z());
                             else
-                                p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(tp.x(),tp.y()),height/*mControlWidget->mapDefaultHeight->value()*/);
+                                p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(tp.x(),tp.y()),height/*mControlWidget->mapDefaultHeight->value()*/);
                         }
                         //debout << "3D Point: (" << p3d_height.x << ", " << p3d_height.y << ", " << p3d_height.z << ")" << endl;
                         p3d_height.z = 0;
-                        Point2f p2d_ground = mMainWindow->getExtrCalibration()->getImagePoint(p3d_height);
+                        cv::Point2f p2d_ground = mMainWindow->getExtrCalibration()->getImagePoint(p3d_height);
                         QPointF axis = mMainWindow->getImageItem()->getCmPerPixel(p2d_ground.x, p2d_ground.y, 0);
                         //debout << "2D Point: (" << p2d_ground.x << ", " << p2d_ground.y << ")" << endl;
                         //rect.setRect(p2d_ground.x-cross_size/2., p2d_ground.y-cross_size/2., cross_size, cross_size);
@@ -650,21 +647,21 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                 {
                     if( mControlWidget->getCalibCoordDimension() == 0 ) // 3D
                     {
-                        Point3f p3d_height;
+                        cv::Point3f p3d_height;
                         if (height < MIN_HEIGHT+1)
                         {
-                            p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(tp.x(),tp.y()),mControlWidget->getColorPlot()->map(mTracker->at(i).color()));
+                            p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(tp.x(),tp.y()),mControlWidget->getColorPlot()->map(mTracker->at(i).color()));
                         }else
                         {
                             if ( tp.sp().z() > 0 )
-                                p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(tp.x(),tp.y()),-mControlWidget->getCalibExtrTrans3()-tp.sp().z());
+                                p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(tp.x(),tp.y()),-mControlWidget->getCalibExtrTrans3()-tp.sp().z());
                             else
-                                p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(tp.x(),tp.y()),height/*mControlWidget->mapDefaultHeight->value()*/);
+                                p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(tp.x(),tp.y()),height/*mControlWidget->mapDefaultHeight->value()*/);
                         }
 
-                        debout << "insert P(" << p3d_height.x+x_offset << ", " << p3d_height.y+y_offset << ") to subdiv" << endl;
+                        debout << "insert P(" << p3d_height.x+x_offset << ", " << p3d_height.y+y_offset << ") to subdiv" << std::endl;
 
-                        subdiv.insert(Point2f(x_switch>0 ? x_switch-p3d_height.x+x_offset : p3d_height.x+x_offset, y_switch>0 ? y_switch-p3d_height.y+y_offset : p3d_height.y+y_offset));// p2d_ground);
+                        subdiv.insert(cv::Point2f(x_switch>0 ? x_switch-p3d_height.x+x_offset : p3d_height.x+x_offset, y_switch>0 ? y_switch-p3d_height.y+y_offset : p3d_height.y+y_offset));// p2d_ground);
 
                     }
                 }
@@ -724,28 +721,28 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                             {
                                 //debout << "2D Point: (" << tp.x() << ", " << tp.y() << "), height: " << height << endl;
                                 //debout << "mTracker.at(i).height(): " << mTracker->at(i).height() << " tp.sp().z(): " << tp.sp().z() << endl;
-                                Point3f p3d_height_p1, p3d_height_p2;
+                                cv::Point3f p3d_height_p1, p3d_height_p2;
                                 if (mTracker->at(i).height() < MIN_HEIGHT+1)
                                 {
-                                    p3d_height_p1 = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(mTracker->at(i).at(j-1).x(),mTracker->at(i).at(j-1).y()),mControlWidget->getColorPlot()->map(mTracker->at(i).color()));
-                                    p3d_height_p2 = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(mTracker->at(i).at(j).x(),mTracker->at(i).at(j).y()),mControlWidget->getColorPlot()->map(mTracker->at(i).color()));
+                                    p3d_height_p1 = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(mTracker->at(i).at(j-1).x(),mTracker->at(i).at(j-1).y()),mControlWidget->getColorPlot()->map(mTracker->at(i).color()));
+                                    p3d_height_p2 = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(mTracker->at(i).at(j).x(),mTracker->at(i).at(j).y()),mControlWidget->getColorPlot()->map(mTracker->at(i).color()));
                                 }else
                                 {
                                     if ( mTracker->at(i).at(j-1).sp().z() > 0 && mTracker->at(i).at(j).sp().z() > 0 )
                                     {
-                                        p3d_height_p1 = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(mTracker->at(i).at(j-1).x(),mTracker->at(i).at(j-1).y()),-mControlWidget->getCalibExtrTrans3()-mTracker->at(i).at(j-1).sp().z());
-                                        p3d_height_p2 = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(mTracker->at(i).at(j).x(),mTracker->at(i).at(j).y()),-mControlWidget->getCalibExtrTrans3()-mTracker->at(i).at(j).sp().z());
+                                        p3d_height_p1 = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(mTracker->at(i).at(j-1).x(),mTracker->at(i).at(j-1).y()),-mControlWidget->getCalibExtrTrans3()-mTracker->at(i).at(j-1).sp().z());
+                                        p3d_height_p2 = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(mTracker->at(i).at(j).x(),mTracker->at(i).at(j).y()),-mControlWidget->getCalibExtrTrans3()-mTracker->at(i).at(j).sp().z());
                                     }else
                                     {
-                                        p3d_height_p1 = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(mTracker->at(i).at(j-1).x(),mTracker->at(i).at(j-1).y()),mTracker->at(i).height()/*mControlWidget->mapDefaultHeight->value()*/);
-                                        p3d_height_p2 = mMainWindow->getExtrCalibration()->get3DPoint(Point2f(mTracker->at(i).at(j).x(),mTracker->at(i).at(j).y()),mTracker->at(i).height()/*mControlWidget->mapDefaultHeight->value()*/);
+                                        p3d_height_p1 = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(mTracker->at(i).at(j-1).x(),mTracker->at(i).at(j-1).y()),mTracker->at(i).height()/*mControlWidget->mapDefaultHeight->value()*/);
+                                        p3d_height_p2 = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(mTracker->at(i).at(j).x(),mTracker->at(i).at(j).y()),mTracker->at(i).height()/*mControlWidget->mapDefaultHeight->value()*/);
                                     }
                                 }
                                 //debout << "3D Point: (" << p3d_height.x << ", " << p3d_height.y << ", " << p3d_height.z << ")" << endl;
                                 p3d_height_p1.z = 0;
                                 p3d_height_p2.z = 0;
-                                Point2f p2d_ground_p1 = mMainWindow->getExtrCalibration()->getImagePoint(p3d_height_p1);
-                                Point2f p2d_ground_p2 = mMainWindow->getExtrCalibration()->getImagePoint(p3d_height_p2);
+                                cv::Point2f p2d_ground_p1 = mMainWindow->getExtrCalibration()->getImagePoint(p3d_height_p1);
+                                cv::Point2f p2d_ground_p2 = mMainWindow->getExtrCalibration()->getImagePoint(p3d_height_p2);
                                 //QPointF axis = mMainWindow->getImageItem()->getCmPerPixel(p2d_ground.x, p2d_ground.y, 0);
                                 //debout << "2D Point: (" << p2d_ground.x << ", " << p2d_ground.y << ")" << endl;
                                 //rect.setRect(p2d_ground.x-pSG/2., p2d_ground.y-pSG/2., pSG, pSG);
@@ -796,11 +793,11 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
     if( mControlWidget->showVoronoiCells->checkState() == Qt::Checked && !mTracker->isEmpty() )
     {
 
-        vector<vector<Point2f> > facets3D;
-        vector<Point2f> centers3D;
+        std::vector<std::vector<cv::Point2f> > facets3D;
+        std::vector<cv::Point2f> centers3D;
 
         // get Voronoi cell info from subDiv in 3D coordinates on ground (z=0)
-        subdiv.getVoronoiFacetList(vector<int>(), facets3D, centers3D);
+        subdiv.getVoronoiFacetList(std::vector<int>(), facets3D, centers3D);
 
         painter->setClipRect(mMainWindow->getRecoRoiItem()->rect());//0,0,mMainWindow->getImage()->width(),mMainWindow->getImage()->height());
 
@@ -810,10 +807,10 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
             centers3D.at(i).x = x_switch>0 ? x_switch-centers3D.at(i).x-x_offset : centers3D.at(i).x-x_offset;
             centers3D.at(i).y = y_switch>0 ? y_switch-centers3D.at(i).y-y_offset : centers3D.at(i).y-y_offset;
             // voronoi cell center in 2D
-            Point2f center2D = mMainWindow->getExtrCalibration()->getImagePoint(Point3f(centers3D.at(i).x,
+            cv::Point2f center2D = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(centers3D.at(i).x,
                                                                                         centers3D.at(i).y,0));
 
-            vector<QPointF> ifacet2D;//[facets[i].size()];//.resize(facets[i].size());
+            std::vector<QPointF> ifacet2D;//[facets[i].size()];//.resize(facets[i].size());
             QPointF circleStart, circleEnd;
             float area = 0;
             float r = 50, m = 0, n = 0, s1_x = 0, s2_x = 0, s1_y = 0, s2_y = 0;
@@ -823,10 +820,10 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                 facets3D.at(i).at(j).x = x_switch>0 ? x_switch-facets3D.at(i).at(j).x-x_offset : facets3D.at(i).at(j).x-x_offset;
                 facets3D.at(i).at(j).y = y_switch>0 ? y_switch-facets3D.at(i).at(j).y-y_offset : facets3D.at(i).at(j).y-y_offset;
 
-                Point2f point2D = mMainWindow->getExtrCalibration()->getImagePoint(Point3f(facets3D.at(i).at(j).x,facets3D.at(i).at(j).y,0));
+                cv::Point2f point2D = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(facets3D.at(i).at(j).x,facets3D.at(i).at(j).y,0));
 
-                debout << "facets3D.at(" << i << ").at(" << j << ").x = " << facets3D.at(i).at(j).x << ", .y = " << facets3D.at(i).at(j).y << endl;
-                debout << "point2D.x = " << point2D.x << " , .y = " << point2D.y << endl;
+                debout << "facets3D.at(" << i << ").at(" << j << ").x = " << facets3D.at(i).at(j).x << ", .y = " << facets3D.at(i).at(j).y << std::endl;
+                debout << "point2D.x = " << point2D.x << " , .y = " << point2D.y << std::endl;
                 //            ifacet[j] = QPointF(facets.at(i).at(j).x,facets.at(i).at(j).y);//facets[i][j];
 
                 if ( false && sqrt(pow((facets3D.at(i).at(j).x - centers3D.at(i).x),2) +
@@ -855,9 +852,9 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                         s2_x = p - q;
                         s2_y = m*s2_x+n;
 
-                        facets3D[i][j] = Point2f(s1_x,s1_y);
+                        facets3D[i][j] = cv::Point2f(s1_x,s1_y);
 
-                        point2D = mMainWindow->getExtrCalibration()->getImagePoint(Point3f(s1_x,s1_y,0));
+                        point2D = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(s1_x,s1_y,0));
                         circleEnd = QPointF(point2D.x,point2D.y);
                         //
                         //                    painter->setBrush(Qt::blue);
@@ -870,7 +867,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                         ifacet2D.push_back(QPointF(point2D.x,point2D.y));
                         //
                         //                      painter->drawLine(circleEnd,QPointF(center2D.x,center2D.y));
-                        debout << "End point: (" << s1_x << ", " << s1_y << ")" << endl;
+                        debout << "End point: (" << s1_x << ", " << s1_y << ")" << std::endl;
                         //                    area += (M_PI*pow(r,2)*angle/360);
 
                     }else
@@ -893,19 +890,19 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                         s2_x = p - q;
                         s2_y = m*s2_x+n;
 
-                        debout << "x=" << s1_x << " G(x)=" << (m*s1_x+n) << " K(x)=" << pow(s1_x-centers3D.at(i).x,2)+pow(s1_y-centers3D.at(i).y,2) << " = " << pow(r,2) << endl;
-                        debout << "x=" << s2_x << " G(x)=" << (m*s2_x+n) << " K(x)=" << pow(s2_x-centers3D.at(i).x,2)+pow(s2_y-centers3D.at(i).y,2) << " = " << pow(r,2) << endl;
+                        debout << "x=" << s1_x << " G(x)=" << (m*s1_x+n) << " K(x)=" << pow(s1_x-centers3D.at(i).x,2)+pow(s1_y-centers3D.at(i).y,2) << " = " << pow(r,2) << std::endl;
+                        debout << "x=" << s2_x << " G(x)=" << (m*s2_x+n) << " K(x)=" << pow(s2_x-centers3D.at(i).x,2)+pow(s2_y-centers3D.at(i).y,2) << " = " << pow(r,2) << std::endl;
 
-                        facets3D[i][j] = Point2f(s1_x,s1_y);
+                        facets3D[i][j] = cv::Point2f(s1_x,s1_y);
 
-                        point2D = mMainWindow->getExtrCalibration()->getImagePoint(Point3f(s1_x,s1_y,0));
+                        point2D = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(s1_x,s1_y,0));
                         ifacet2D.push_back(QPointF(point2D.x,point2D.y));
                         //                    facets3D[i][j] = Point2f(s1_x,m*s1_x+n);
                         circleStart = QPointF(point2D.x,point2D.y);
                         circleStarted = true;
                         //                    painter->drawLine(circleStart,QPointF(center2D.x,center2D.y));
 
-                        debout << "Start point: (" << s1_x << ", " << s1_y << ")" << endl;
+                        debout << "Start point: (" << s1_x << ", " << s1_y << ")" << std::endl;
                     }
 
                 }else

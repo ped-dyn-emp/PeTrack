@@ -37,8 +37,6 @@
 #include "helper.h"
 #include "tracker.h"
 
-using namespace::cv;
-
 // bei marker koennnte sich fuer jeden spot eine liste gemerkt werden und spaeter ausgleich 
 // regressionsgrade legen um optimale linie durch marker zu erhalten
 MarkerHermes::MarkerHermes(MyEllipse head)
@@ -138,7 +136,7 @@ void MarkerHermes::deleteSpot(int i)
 }
 
 // nach organize gibt es entweder 0 oder 1 spots pro kopf
-void MarkerHermes::organize(const Mat &img, bool /*autoWB*/)
+void MarkerHermes::organize(const cv::Mat &img, bool /*autoWB*/)
 {
     int i, j, k;
 
@@ -268,7 +266,7 @@ MyEllipse MarkerHermes::getCenterSpot() const
         return mSpots[mCenterIndex];
 }
 
-void MarkerHermes::draw(Mat &img) const
+void MarkerHermes::draw(cv::Mat &img) const
 {
     int i;
 
@@ -294,7 +292,7 @@ void MarkerHermes::draw(Mat &img) const
 
 // img is 1 channel black/white
 // gibt zurueck, ob ellipse mgl als spot oder kopf eingefuegt wurde oder zur modifizierung mgl beigetragen hat
-bool MarkerHermesList::mayAddEllipse(const Mat &img, const MyEllipse& e, bool blackInside)
+bool MarkerHermesList::mayAddEllipse(const cv::Mat &img, const MyEllipse& e, bool blackInside)
 {
     int i;
 
@@ -372,7 +370,7 @@ bool MarkerHermesList::mayAddEllipse(const Mat &img, const MyEllipse& e, bool bl
 }
 
 // organize every marker and delete marker without head
-void MarkerHermesList::organize(const Mat &img, bool autoWB)
+void MarkerHermesList::organize(const cv::Mat &img, bool autoWB)
 {
     int i, j, k, s;
 //     for (i = 0; i < size(); ++i)
@@ -414,7 +412,7 @@ void MarkerHermesList::organize(const Mat &img, bool autoWB)
 
 //draw ... Qt
 
-void MarkerHermesList::draw(Mat &img) const
+void MarkerHermesList::draw(cv::Mat &img) const
 {
     for (int i = 0; i < size(); ++i)
         at(i).draw(img);

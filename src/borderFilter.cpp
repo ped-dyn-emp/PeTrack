@@ -20,7 +20,6 @@
 
 #include "borderFilter.h"
 
-using namespace::cv;
 
 BorderFilter::BorderFilter()
     :Filter()
@@ -49,7 +48,7 @@ BorderFilter::BorderFilter()
 //    setOnCopy(true);
 }
 
-Mat BorderFilter::act(Mat &img, Mat &res)
+cv::Mat BorderFilter::act(cv::Mat &img, cv::Mat &res)
 {
     //return img;
 

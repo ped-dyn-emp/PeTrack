@@ -27,8 +27,6 @@
 #include "coordItem.h"
 #include "extrCalibration.h"
 
-using namespace::cv;
-
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,
 // so dass pixel quadratisch 
@@ -101,20 +99,20 @@ QRectF CoordItem::boundingRect() const
         else // 3D view
         {
             //debout << x.x << " " << y.x << " " << z.x << " " << ursprung.x << " " << calibPointsMin.x << " " << calibPointsMax.x << endl;
-            double min_x = min(min(x.x,y.x),min(z.x,ursprung.x));
-            double max_x = max(max(x.x,y.x),max(z.x,ursprung.x));
+            double min_x = std::min(std::min(x.x,y.x),std::min(z.x,ursprung.x));
+            double max_x = std::max(std::max(x.x,y.x),std::max(z.x,ursprung.x));
 
             //debout << x.y << " " << y.y << " " << z.y << " " << ursprung.y << " " << calibPointsMin.y << " " << calibPointsMax.y << endl;
-            double min_y = min(min(x.y,y.y),min(z.y,ursprung.y));
-            double max_y = max(max(x.y,y.y),max(z.y,ursprung.y));
+            double min_y = std::min(std::min(x.y,y.y),std::min(z.y,ursprung.y));
+            double max_y = std::max(std::max(x.y,y.y),std::max(z.y,ursprung.y));
 
             if( mControlWidget->getCalibExtrCalibPointsShow() )
             {
-                min_x = min(float(min_x),calibPointsMin.x);
-                max_x = max(float(max_x),calibPointsMax.x);
+                min_x = std::min(float(min_x),calibPointsMin.x);
+                max_x = std::max(float(max_x),calibPointsMax.x);
 
-                min_y = min(float(min_y),calibPointsMin.y);
-                max_y = max(float(max_y),calibPointsMax.y);
+                min_y = std::min(float(min_y),calibPointsMin.y);
+                max_y = std::max(float(max_y),calibPointsMax.y);
             }
             //debout << "Bounding Rect: x: " << min_x << " y: " << min_y << ", width: " << max_x << " height: " << max_y << endl;
             //debout << "Bounding Rect: " << mapToScene(min_x,min_y) << ", " << mapToItem(this,max_x-min_x,max_y-min_y) << endl;
@@ -166,10 +164,10 @@ void CoordItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 //debout << "P_cur: " << event->scenePos().x() << "," << event->scenePos().y() << endl;
                 //debout << "P_last: " << event->lastScenePos().x() << "," << event->lastScenePos().y() << endl;
 
-                Point3f p_cur = extCalib->get3DPoint(Point2f(event->scenePos().x(),
+                cv::Point3f p_cur = extCalib->get3DPoint(cv::Point2f(event->scenePos().x(),
                                                              event->scenePos().y()),
                                                      mControlWidget->getCalibCoord3DTransZ());
-                Point3f p_last = extCalib->get3DPoint(Point2f(mouse_x/*event->lastScenePos().x()*/,
+                cv::Point3f p_last = extCalib->get3DPoint(cv::Point2f(mouse_x/*event->lastScenePos().x()*/,
                                                               mouse_y/*event->lastScenePos().y()*/),
                                                       mControlWidget->getCalibCoord3DTransZ());
                 // ToDo:
@@ -308,11 +306,11 @@ void CoordItem::updateData()
             //debout << "Y: swap: " << swapY << " T2: " << mControlWidget->getCalibExtrTrans2() << " tY3D: " << tY3D << endl;
             //debout << "Z: swap: " << swapZ << " T3: " << mControlWidget->getCalibExtrTrans3() << " tZ3D: " << tZ3D << endl;
 
-            ursprung = extCalib->getImagePoint(Point3f(0,0,0));
+            ursprung = extCalib->getImagePoint(cv::Point3f(0,0,0));
 
-            x3D = Point3f(axeLen,0,0);
-            y3D = Point3f(0,axeLen,0);
-            z3D = Point3f(0,0,axeLen);
+            x3D = cv::Point3f(axeLen,0,0);
+            y3D = cv::Point3f(0,axeLen,0);
+            z3D = cv::Point3f(0,0,axeLen);
 
             // Tests if the origin-point of the coordinate-system is outside the image
             if( extCalib->isOutsideImage(ursprung) )
@@ -387,7 +385,7 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
                 painter->setPen(Qt::red);
                 painter->setBrush(Qt::NoBrush);
                 // Original 2D-Pixel-Points
-                Point2f p2 = extCalib->get2DList().at(i);
+                cv::Point2f p2 = extCalib->get2DList().at(i);
                 painter->drawEllipse(p2.x-8,p2.y-8,16,16);
 
                 // general configuration
@@ -395,7 +393,7 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
                 painter->setBrush(Qt::blue);
 
                 // Projected 3D-Points
-                Point3f p3d = extCalib->get3DList().at(i);
+                cv::Point3f p3d = extCalib->get3DList().at(i);
                 p3d.x -= mControlWidget->getCalibCoord3DTransX();
                 p3d.y -= mControlWidget->getCalibCoord3DTransY();
                 p3d.z -= mControlWidget->getCalibCoord3DTransZ();
@@ -404,7 +402,7 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
                 p3d.y *= (mControlWidget->getCalibCoord3DSwapY() ? -1 : 1);
                 p3d.z *= (mControlWidget->getCalibCoord3DSwapZ() ? -1 : 1);
 
-                Point2f p3 = extCalib->getImagePoint(p3d);
+                cv::Point2f p3 = extCalib->getImagePoint(p3d);
 
                 //QPointF axis = mMainWindow->getImageItem()->getCmPerPixel(p3.x,p3.y,p3d.z);
 
@@ -577,7 +575,7 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             if( extCalib->isSetExtrCalib() ){
 
             QPointF points[4];
-            Point2f p[4];
+            cv::Point2f p[4];
             char coordinaten[50];
 
             /////////////////////////////////////////////////////
@@ -589,43 +587,43 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             if( drawCube ){
                 painter->setPen(Qt::green);
                 // Boden
-                p[0] = extCalib->getImagePoint(Point3f(100,100,0));
-                p[1] = extCalib->getImagePoint(Point3f(200,100,0));
+                p[0] = extCalib->getImagePoint(cv::Point3f(100,100,0));
+                p[1] = extCalib->getImagePoint(cv::Point3f(200,100,0));
                 painter->drawLine(QPointF(p[0].x,p[0].y), QPointF(p[1].x, p[1].y));
-                p[0] = extCalib->getImagePoint(Point3f(200,100,0));
-                p[1] = extCalib->getImagePoint(Point3f(200,200,0));
+                p[0] = extCalib->getImagePoint(cv::Point3f(200,100,0));
+                p[1] = extCalib->getImagePoint(cv::Point3f(200,200,0));
                 painter->drawLine(QPointF(p[0].x,p[0].y), QPointF(p[1].x, p[1].y));
-                p[0] = extCalib->getImagePoint(Point3f(200,200,0));
-                p[1] = extCalib->getImagePoint(Point3f(100,200,0));
+                p[0] = extCalib->getImagePoint(cv::Point3f(200,200,0));
+                p[1] = extCalib->getImagePoint(cv::Point3f(100,200,0));
                 painter->drawLine(QPointF(p[0].x,p[0].y), QPointF(p[1].x, p[1].y));
-                p[0] = extCalib->getImagePoint(Point3f(100,200,0));
-                p[1] = extCalib->getImagePoint(Point3f(100,100,0));
+                p[0] = extCalib->getImagePoint(cv::Point3f(100,200,0));
+                p[1] = extCalib->getImagePoint(cv::Point3f(100,100,0));
                 painter->drawLine(QPointF(p[0].x,p[0].y), QPointF(p[1].x, p[1].y));
                 // Seiten
-                p[0] = extCalib->getImagePoint(Point3f(100,100,0));
-                p[1] = extCalib->getImagePoint(Point3f(100,100,100));
+                p[0] = extCalib->getImagePoint(cv::Point3f(100,100,0));
+                p[1] = extCalib->getImagePoint(cv::Point3f(100,100,100));
                 painter->drawLine(QPointF(p[0].x,p[0].y), QPointF(p[1].x, p[1].y));
-                p[0] = extCalib->getImagePoint(Point3f(200,100,0));
-                p[1] = extCalib->getImagePoint(Point3f(200,100,100));
+                p[0] = extCalib->getImagePoint(cv::Point3f(200,100,0));
+                p[1] = extCalib->getImagePoint(cv::Point3f(200,100,100));
                 painter->drawLine(QPointF(p[0].x,p[0].y), QPointF(p[1].x, p[1].y));
-                p[0] = extCalib->getImagePoint(Point3f(100,200,0));
-                p[1] = extCalib->getImagePoint(Point3f(100,200,100));
+                p[0] = extCalib->getImagePoint(cv::Point3f(100,200,0));
+                p[1] = extCalib->getImagePoint(cv::Point3f(100,200,100));
                 painter->drawLine(QPointF(p[0].x,p[0].y), QPointF(p[1].x, p[1].y));
-                p[0] = extCalib->getImagePoint(Point3f(200,200,0));
-                p[1] = extCalib->getImagePoint(Point3f(200,200,100));
+                p[0] = extCalib->getImagePoint(cv::Point3f(200,200,0));
+                p[1] = extCalib->getImagePoint(cv::Point3f(200,200,100));
                 painter->drawLine(QPointF(p[0].x,p[0].y), QPointF(p[1].x, p[1].y));
                 // Oben
-                p[0] = extCalib->getImagePoint(Point3f(100,100,100));
-                p[1] = extCalib->getImagePoint(Point3f(200,100,100));
+                p[0] = extCalib->getImagePoint(cv::Point3f(100,100,100));
+                p[1] = extCalib->getImagePoint(cv::Point3f(200,100,100));
                 painter->drawLine(QPointF(p[0].x,p[0].y), QPointF(p[1].x, p[1].y));
-                p[0] = extCalib->getImagePoint(Point3f(200,100,100));
-                p[1] = extCalib->getImagePoint(Point3f(200,200,100));
+                p[0] = extCalib->getImagePoint(cv::Point3f(200,100,100));
+                p[1] = extCalib->getImagePoint(cv::Point3f(200,200,100));
                 painter->drawLine(QPointF(p[0].x,p[0].y), QPointF(p[1].x, p[1].y));
-                p[0] = extCalib->getImagePoint(Point3f(200,200,100));
-                p[1] = extCalib->getImagePoint(Point3f(100,200,100));
+                p[0] = extCalib->getImagePoint(cv::Point3f(200,200,100));
+                p[1] = extCalib->getImagePoint(cv::Point3f(100,200,100));
                 painter->drawLine(QPointF(p[0].x,p[0].y), QPointF(p[1].x, p[1].y));
-                p[0] = extCalib->getImagePoint(Point3f(100,200,100));
-                p[1] = extCalib->getImagePoint(Point3f(100,100,100));
+                p[0] = extCalib->getImagePoint(cv::Point3f(100,200,100));
+                p[1] = extCalib->getImagePoint(cv::Point3f(100,100,100));
                 painter->drawLine(QPointF(p[0].x,p[0].y), QPointF(p[1].x, p[1].y));
 
 
@@ -658,11 +656,11 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 
             if( paintRectCoordArea )
             {
-                int min_x = min(min(x.x,y.x),min(z.x,ursprung.x));
-                int max_x = max(max(x.x,y.x),max(z.x,ursprung.x));
+                int min_x = std::min(std::min(x.x,y.x),std::min(z.x,ursprung.x));
+                int max_x = std::max(std::max(x.x,y.x),std::max(z.x,ursprung.x));
 
-                int min_y = min(min(x.y,y.y),min(z.y,ursprung.y));
-                int max_y = max(max(x.y,y.y),max(z.y,ursprung.y));
+                int min_y = std::min(std::min(x.y,y.y),std::min(z.y,ursprung.y));
+                int max_y = std::max(std::max(x.y,y.y),std::max(z.y,ursprung.y));
 
                 painter->setFont(QFont("Arial", 20));
 
@@ -689,12 +687,12 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             //////////////////////////////
 
             painter->setPen(QPen(QBrush(Qt::blue),coordLineWidth));
-            p[0] = extCalib->getImagePoint(Point3f(0,0,0));
-            p[1] = extCalib->getImagePoint(Point3f(x3D.x,x3D.y,x3D.z));
+            p[0] = extCalib->getImagePoint(cv::Point3f(0,0,0));
+            p[1] = extCalib->getImagePoint(cv::Point3f(x3D.x,x3D.y,x3D.z));
             painter->drawLine(QPointF(p[0].x,p[0].y),QPointF(p[1].x,p[1].y));
-            p[1] = extCalib->getImagePoint(Point3f(y3D.x,y3D.y,y3D.z));
+            p[1] = extCalib->getImagePoint(cv::Point3f(y3D.x,y3D.y,y3D.z));
             painter->drawLine(QPointF(p[0].x,p[0].y),QPointF(p[1].x,p[1].y));
-            p[1] = extCalib->getImagePoint(Point3f(z3D.x,z3D.y,z3D.z));
+            p[1] = extCalib->getImagePoint(cv::Point3f(z3D.x,z3D.y,z3D.z));
             painter->drawLine(QPointF(p[0].x,p[0].y),QPointF(p[1].x,p[1].y));
 //            painter->drawLine(QPointF(ursprung.x,ursprung.y),QPointF(x.x,x.y));
 //            painter->drawLine(QPointF(ursprung.x,ursprung.y),QPointF(y.x,y.y));
@@ -707,11 +705,11 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             painter->setPen(QPen(QBrush(Qt::black),coordLineWidth));
             painter->setFont(QFont("Arial", 15 ));
 
-            p[0] = extCalib->getImagePoint(Point3f(x3D.x+10, x3D.y, x3D.z));
+            p[0] = extCalib->getImagePoint(cv::Point3f(x3D.x+10, x3D.y, x3D.z));
             painter->drawText(QPointF(p[0].x-5,p[0].y+5), QString("X"));
-            p[0] = extCalib->getImagePoint(Point3f(y3D.x, y3D.y+10, y3D.z));
+            p[0] = extCalib->getImagePoint(cv::Point3f(y3D.x, y3D.y+10, y3D.z));
             painter->drawText(QPointF(p[0].x-5,p[0].y+5), QString("Y"));
-            p[0] = extCalib->getImagePoint(Point3f(z3D.x, z3D.y, z3D.z+10));
+            p[0] = extCalib->getImagePoint(cv::Point3f(z3D.x, z3D.y, z3D.z+10));
             painter->drawText(QPointF(p[0].x-5,p[0].y+5), QString("Z"));
 
 
@@ -733,30 +731,30 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
                 // Solange Achsen-Ende noch nicht erreicht: Markierung zeichnen
                 if( i+tickLength < x3D.x )
                 {
-                    p[0] = extCalib->getImagePoint(Point3f(i,-tickLength,0));
-                    p[1] = extCalib->getImagePoint(Point3f(i, tickLength,0));
+                    p[0] = extCalib->getImagePoint(cv::Point3f(i,-tickLength,0));
+                    p[1] = extCalib->getImagePoint(cv::Point3f(i, tickLength,0));
                     painter->drawLine(QPointF(p[0].x,p[0].y),QPointF(p[1].x,p[1].y));
-                    p[0] = extCalib->getImagePoint(Point3f(i,0,-tickLength));
-                    p[1] = extCalib->getImagePoint(Point3f(i,0, tickLength));
+                    p[0] = extCalib->getImagePoint(cv::Point3f(i,0,-tickLength));
+                    p[1] = extCalib->getImagePoint(cv::Point3f(i,0, tickLength));
                     painter->drawLine(QPointF(p[0].x,p[0].y),QPointF(p[1].x,p[1].y));
-                    p[0] = extCalib->getImagePoint(Point3f(i,0,0));
+                    p[0] = extCalib->getImagePoint(cv::Point3f(i,0,0));
                 }
                 if( i+tickLength < y3D.y )
                 {
-                    p[0] = extCalib->getImagePoint(Point3f(-tickLength,i,0));
-                    p[1] = extCalib->getImagePoint(Point3f( tickLength,i,0));
+                    p[0] = extCalib->getImagePoint(cv::Point3f(-tickLength,i,0));
+                    p[1] = extCalib->getImagePoint(cv::Point3f( tickLength,i,0));
                     painter->drawLine(QPointF(p[0].x,p[0].y),QPointF(p[1].x,p[1].y));
-                    p[0] = extCalib->getImagePoint(Point3f(0,i,-tickLength));
-                    p[1] = extCalib->getImagePoint(Point3f(0,i, tickLength));
+                    p[0] = extCalib->getImagePoint(cv::Point3f(0,i,-tickLength));
+                    p[1] = extCalib->getImagePoint(cv::Point3f(0,i, tickLength));
                     painter->drawLine(QPointF(p[0].x,p[0].y),QPointF(p[1].x,p[1].y));
                 }
                 if( i+tickLength < z3D.z )
                 {
-                    p[0] = extCalib->getImagePoint(Point3f(-tickLength,0,i));
-                    p[1] = extCalib->getImagePoint(Point3f( tickLength,0,i));
+                    p[0] = extCalib->getImagePoint(cv::Point3f(-tickLength,0,i));
+                    p[1] = extCalib->getImagePoint(cv::Point3f( tickLength,0,i));
                     painter->drawLine(QPointF(p[0].x,p[0].y),QPointF(p[1].x,p[1].y));
-                    p[0] = extCalib->getImagePoint(Point3f(0,-tickLength,i));
-                    p[1] = extCalib->getImagePoint(Point3f(0, tickLength,i));
+                    p[0] = extCalib->getImagePoint(cv::Point3f(0,-tickLength,i));
+                    p[1] = extCalib->getImagePoint(cv::Point3f(0, tickLength,i));
                     painter->drawLine(QPointF(p[0].x,p[0].y),QPointF(p[1].x,p[1].y));
                 }
             }
@@ -781,9 +779,9 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             // X //
             ///////
 
-            p[0] = extCalib->getImagePoint(Point3f(x3D.x,0,0));
-            p[1] = extCalib->getImagePoint(Point3f(x3D.x-peakSize,-peakSize,0));
-            p[2] = extCalib->getImagePoint(Point3f(x3D.x-peakSize, peakSize,0));
+            p[0] = extCalib->getImagePoint(cv::Point3f(x3D.x,0,0));
+            p[1] = extCalib->getImagePoint(cv::Point3f(x3D.x-peakSize,-peakSize,0));
+            p[2] = extCalib->getImagePoint(cv::Point3f(x3D.x-peakSize, peakSize,0));
             points[0] = QPointF(p[0].x,p[0].y);
             points[1] = QPointF(p[1].x,p[1].y);
             points[2] = QPointF(p[2].x,p[2].y);
@@ -793,10 +791,10 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             painter->drawLine(points[0],points[1]);
             painter->drawLine(points[0],points[2]);
             painter->drawLine(points[2],points[1]);
-            p[0] = extCalib->getImagePoint(Point3f(x3D.x,0,0));
-            p[1] = extCalib->getImagePoint(Point3f(x3D.x-peakSize,0,-peakSize));
-            p[2] = extCalib->getImagePoint(Point3f(x3D.x-peakSize,0, peakSize));
-            p[3] = extCalib->getImagePoint(Point3f(x3D.x+peakSize,0,0));
+            p[0] = extCalib->getImagePoint(cv::Point3f(x3D.x,0,0));
+            p[1] = extCalib->getImagePoint(cv::Point3f(x3D.x-peakSize,0,-peakSize));
+            p[2] = extCalib->getImagePoint(cv::Point3f(x3D.x-peakSize,0, peakSize));
+            p[3] = extCalib->getImagePoint(cv::Point3f(x3D.x+peakSize,0,0));
             points[0] = QPointF(p[0].x,p[0].y);
             points[1] = QPointF(p[1].x,p[1].y);
             points[2] = QPointF(p[2].x,p[2].y);
@@ -817,9 +815,9 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             // Y //
             ///////
 
-            p[0] = extCalib->getImagePoint(Point3f(0,y3D.y,0));
-            p[1] = extCalib->getImagePoint(Point3f(-peakSize,y3D.y-peakSize,0));
-            p[2] = extCalib->getImagePoint(Point3f( peakSize,y3D.y-peakSize,0));
+            p[0] = extCalib->getImagePoint(cv::Point3f(0,y3D.y,0));
+            p[1] = extCalib->getImagePoint(cv::Point3f(-peakSize,y3D.y-peakSize,0));
+            p[2] = extCalib->getImagePoint(cv::Point3f( peakSize,y3D.y-peakSize,0));
             points[0] = QPointF(p[0].x,p[0].y);
             points[1] = QPointF(p[1].x,p[1].y);
             points[2] = QPointF(p[2].x,p[2].y);
@@ -829,10 +827,10 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             painter->drawLine(points[0],points[1]);
             painter->drawLine(points[0],points[2]);
             painter->drawLine(points[2],points[1]);
-            p[0] = extCalib->getImagePoint(Point3f(0,y3D.y,0));
-            p[1] = extCalib->getImagePoint(Point3f(0,y3D.y-peakSize,-peakSize));
-            p[2] = extCalib->getImagePoint(Point3f(0,y3D.y-peakSize, peakSize));
-            p[3] = extCalib->getImagePoint(Point3f(0,y3D.y+peakSize,0));
+            p[0] = extCalib->getImagePoint(cv::Point3f(0,y3D.y,0));
+            p[1] = extCalib->getImagePoint(cv::Point3f(0,y3D.y-peakSize,-peakSize));
+            p[2] = extCalib->getImagePoint(cv::Point3f(0,y3D.y-peakSize, peakSize));
+            p[3] = extCalib->getImagePoint(cv::Point3f(0,y3D.y+peakSize,0));
             points[0] = QPointF(p[0].x,p[0].y);
             points[1] = QPointF(p[1].x,p[1].y);
             points[2] = QPointF(p[2].x,p[2].y);
@@ -853,9 +851,9 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             // Z //
             ///////
 
-            p[0] = extCalib->getImagePoint(Point3f(0,0,z3D.z));
-            p[1] = extCalib->getImagePoint(Point3f(0,-peakSize,z3D.z-peakSize));
-            p[2] = extCalib->getImagePoint(Point3f(0, peakSize,z3D.z-peakSize));
+            p[0] = extCalib->getImagePoint(cv::Point3f(0,0,z3D.z));
+            p[1] = extCalib->getImagePoint(cv::Point3f(0,-peakSize,z3D.z-peakSize));
+            p[2] = extCalib->getImagePoint(cv::Point3f(0, peakSize,z3D.z-peakSize));
             points[0] = QPointF(p[0].x,p[0].y);
             points[1] = QPointF(p[1].x,p[1].y);
             points[2] = QPointF(p[2].x,p[2].y);
@@ -865,10 +863,10 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             painter->drawLine(points[0],points[1]);
             painter->drawLine(points[0],points[2]);
             painter->drawLine(points[2],points[1]);
-            p[0] = extCalib->getImagePoint(Point3f(0,0,z3D.z));
-            p[1] = extCalib->getImagePoint(Point3f(-peakSize,0,z3D.z-peakSize));
-            p[2] = extCalib->getImagePoint(Point3f( peakSize,0,z3D.z-peakSize));
-            p[3] = extCalib->getImagePoint(Point3f(0,0,z3D.z+peakSize));
+            p[0] = extCalib->getImagePoint(cv::Point3f(0,0,z3D.z));
+            p[1] = extCalib->getImagePoint(cv::Point3f(-peakSize,0,z3D.z-peakSize));
+            p[2] = extCalib->getImagePoint(cv::Point3f( peakSize,0,z3D.z-peakSize));
+            p[3] = extCalib->getImagePoint(cv::Point3f(0,0,z3D.z+peakSize));
             points[0] = QPointF(p[0].x,p[0].y);
             points[1] = QPointF(p[1].x,p[1].y);
             points[2] = QPointF(p[2].x,p[2].y);
