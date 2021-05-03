@@ -1863,7 +1863,7 @@ void Petrack::resetUI()
     mControlWidget->trackRepeatQual->setValue(50);
     mControlWidget->trackExtrapolation->setCheckState(Qt::Checked);
     mControlWidget->trackMerge->setCheckState(Qt::Unchecked);
-    mControlWidget->trackOnlyVisible->setCheckState(Qt::Checked);
+    mControlWidget->trackOnlySelected->setCheckState(Qt::Checked);
     getTrackRoiItem()->setRect(0,0,0,0);
 
     // export options
@@ -3375,7 +3375,7 @@ double Petrack::getHeadSize(QPointF *pos, int pers, int frame)
  */
 QSet<int> Petrack::getOnlyVisible()
 {
-    if  ((mControlWidget->trackOnlyVisible->checkState() == Qt::Checked) && (mControlWidget->trackShowOnly->checkState() == Qt::Checked || mControlWidget->trackShowOnlyList->checkState() == Qt::Checked))
+    if  ((mControlWidget->trackOnlySelected->checkState() == Qt::Checked) && (mControlWidget->trackShowOnly->checkState() == Qt::Checked || mControlWidget->trackShowOnlyList->checkState() == Qt::Checked))
     {
         if( mControlWidget->trackShowOnlyList->checkState() == Qt::Checked)
         {

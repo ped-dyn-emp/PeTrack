@@ -4635,7 +4635,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QCheckBox" name="trackOnlyVisible">
+              <widget class="QCheckBox" name="trackOnlySelected">
                <property name="maximumSize">
                 <size>
                  <width>999</width>
@@ -4646,7 +4646,7 @@
                 <string>online tracking and manual deletion and moving only for trajectories, which are visable (see &quot;show only people&quot;)</string>
                </property>
                <property name="text">
-                <string>only visible</string>
+                <string>only selected</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
@@ -7453,7 +7453,7 @@
   <tabstop>trackRepeatQual</tabstop>
   <tabstop>trackExtrapolation</tabstop>
   <tabstop>trackMerge</tabstop>
-  <tabstop>trackOnlyVisible</tabstop>
+  <tabstop>trackOnlySelected</tabstop>
   <tabstop>trackExport</tabstop>
   <tabstop>trackCalc</tabstop>
   <tabstop>trackImport</tabstop>
