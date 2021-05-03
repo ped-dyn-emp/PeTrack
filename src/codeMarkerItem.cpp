@@ -27,9 +27,6 @@
 #include "tracker.h"
 #include "control.h"
 
-using namespace::cv;
-using namespace std;
-
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,
 // so dass pixel quadratisch 
@@ -82,7 +79,7 @@ void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*
         int nRejected = mRejected.size();
 
 //        debout << "#markers: " << nMarkers << " #rejected: " << nRejected << endl;
-        Point2f p0, p1;
+        cv::Point2f p0, p1;
         for(int i = 0; i < nMarkers; i++) // draws green square/ circle around head if person recognized
         {
             drawMarker(mCorners.at(i), mIds.at(i), mAcceptedColor, painter);
@@ -99,12 +96,12 @@ void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*
         int maxPerimeter = mMainWindow->getCodeMarkerWidget()->maxMarkerPerimeter->value();
         double height = mMainWindow->getStatusPosRealHeight();
 
-        Point2f p0,p1,p2,p3;
+        cv::Point2f p0,p1,p2,p3;
 
-        p0 = mMainWindow->getExtrCalibration()->getImagePoint(Point3f(0,0,height));
-        p1 = mMainWindow->getExtrCalibration()->getImagePoint(Point3f(maxPerimeter,0,height));
-        p2 = mMainWindow->getExtrCalibration()->getImagePoint(Point3f(maxPerimeter,maxPerimeter,height));
-        p3 = mMainWindow->getExtrCalibration()->getImagePoint(Point3f(0,maxPerimeter,height));
+        p0 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(0,0,height));
+        p1 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(maxPerimeter,0,height));
+        p2 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(maxPerimeter,maxPerimeter,height));
+        p3 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(0,maxPerimeter,height));
 
         painter->setPen(qRgb(0,0,0));
         painter->drawLine(p0.x,+p0.y,p1.x,p1.y);
@@ -113,10 +110,10 @@ void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*
         painter->drawLine(p3.x,p3.y,p0.x,p0.y);
 
 
-        p0 = mMainWindow->getExtrCalibration()->getImagePoint(Point3f(0,0,height));
-        p1 = mMainWindow->getExtrCalibration()->getImagePoint(Point3f(minPerimeter,0,height));
-        p2 = mMainWindow->getExtrCalibration()->getImagePoint(Point3f(minPerimeter,minPerimeter,height));
-        p3 = mMainWindow->getExtrCalibration()->getImagePoint(Point3f(0,minPerimeter,height));
+        p0 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(0,0,height));
+        p1 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(minPerimeter,0,height));
+        p2 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(minPerimeter,minPerimeter,height));
+        p3 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(0,minPerimeter,height));
 
         painter->setPen(qRgb(255,255,255));
         painter->drawLine(p0.x,p0.y,p1.x,p1.y);
@@ -165,9 +162,9 @@ void CodeMarkerItem::drawMarker(const OffsetMarker& currentMarker, int id, const
  * @param ids ids of the detected markers
  * @param offset offset from marker-coords to recognition ROI
  */
-void CodeMarkerItem::addDetectedMarkers(vector<vector<Point2f> > corners, vector<int> ids, Vec2F offset /* = (0,0)*/)
+void CodeMarkerItem::addDetectedMarkers(std::vector<std::vector<cv::Point2f> > corners, std::vector<int> ids, Vec2F offset /* = (0,0)*/)
 {
-    for(std::vector<Point2f> singleMarkerCorners : corners)
+    for(std::vector<cv::Point2f> singleMarkerCorners : corners)
     {
         mCorners.emplace_back(singleMarkerCorners, offset);
     }
@@ -180,9 +177,9 @@ void CodeMarkerItem::addDetectedMarkers(vector<vector<Point2f> > corners, vector
  * @param rejected corners of the rejected markers
  * @param offset offset from marker-coords to recognition ROI
  */
-void CodeMarkerItem::addRejectedMarkers(vector<vector<Point2f> > rejected, Vec2F offset /* = (0,0)*/)
+void CodeMarkerItem::addRejectedMarkers(std::vector<std::vector<cv::Point2f> > rejected, Vec2F offset /* = (0,0)*/)
 {
-    for(std::vector<Point2f> singleMarkerCorners : rejected)
+    for(std::vector<cv::Point2f> singleMarkerCorners : rejected)
     {
         mRejected.emplace_back(singleMarkerCorners, offset);
     }

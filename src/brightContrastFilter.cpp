@@ -20,7 +20,6 @@
 
 #include "brightContrastFilter.h"
 
-using namespace::cv;
 
 BrightContrastFilter::BrightContrastFilter()
     :Filter()
@@ -40,7 +39,7 @@ BrightContrastFilter::BrightContrastFilter()
 //    setOnCopy(true);
 }
 
-Mat BrightContrastFilter::act(Mat &img, Mat &res)
+cv::Mat BrightContrastFilter::act(cv::Mat &img, cv::Mat &res)
 {
 
     double delta, a, b;

@@ -21,11 +21,10 @@
 #include "blurFilter.h"
 #include <opencv2/opencv.hpp>
 
-using namespace::cv;
 
-Mat BlurFilter::act(Mat &img, Mat &res){
+cv::Mat BlurFilter::act(cv::Mat &img, cv::Mat &res){
 
-    GaussianBlur(img,res,Size(0,0),p*10+1,p*10+1);
+    GaussianBlur(img,res,cv::Size(0,0),p*10+1,p*10+1);
 
     return res;
 }

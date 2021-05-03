@@ -22,9 +22,6 @@
 
 #include <opencv2/opencv.hpp>
 
-using namespace::cv;
-using namespace std;
-
 QString commandLineOptionsString = QObject::tr(
 "<p><code>petrack [-help|-?] [[-project] project.pet] </code><br>"
 "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>[-sequence imageSequenceOrVideo]</code><br>"
@@ -73,13 +70,13 @@ void copyToQImage(QImage &qImg, cv::Mat &img) // war static functin in animatiol
             // set pointer to value before, because ++p is faster than p++
             for (int x = 0; x < img.cols; x++)
             {
-                Scalar colour = img.at<uchar>(Point(x, y));
+                cv::Scalar colour = img.at<uchar>(cv::Point(x, y));
                 qImg.setPixel(x,y,colour.val[0]);
             }
         }
     }
     else
-        cout << "Error: " << channels << " channels are not supported!" << endl;
+        std::cout << "Error: " << channels << " channels are not supported!" << std::endl;
 }
 
 #ifndef STEREO_DISABLED
@@ -111,7 +108,7 @@ rect wird veraendert, roi nicht
 @param[in] Rect &rect
 @return img(rect)
 */
-Mat getRoi(Mat &img, const QRect &roi, Rect &rect, bool evenPixelNumber)
+cv::Mat getRoi(cv::Mat &img, const QRect &roi, cv::Rect &rect, bool evenPixelNumber)
 {
 //    Mat tImg;
 //    IplImage *header;

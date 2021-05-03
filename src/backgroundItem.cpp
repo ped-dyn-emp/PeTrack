@@ -24,8 +24,6 @@
 #include "view.h"
 #include "backgroundItem.h"
 
-using namespace::cv;
-
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,
 // so dass pixel quadratisch 
@@ -57,7 +55,7 @@ QRectF BackgroundItem::boundingRect() const
     
 void BackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-    Mat fg;
+    cv::Mat fg;
 
     if (mMainWindow->getBackgroundFilter())
         fg = mMainWindow->getBackgroundFilter()->getForeground();

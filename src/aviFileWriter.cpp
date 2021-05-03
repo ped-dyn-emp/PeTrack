@@ -25,8 +25,6 @@
 #include "aviFileWriter.h"
 #include <opencv2/videoio/videoio_c.h>
 
-using namespace::cv;
-using namespace::std;
 //
 // Extra temp data bytes.
 //
@@ -234,7 +232,7 @@ bool AviFileWriter::open(const char*  pszFilename, int iCols, int iRows, int ibp
 //      printf("NO UNICODE\n");
 //#endif
    //m_vWriter.open(pszFilename, CV_FOURCC_DEFAULT, dFramerate, Size(iCols,iRows), m_isColor);
-   return m_vWriter.open(pszFilename, CV_FOURCC_DEFAULT/*PROMPT*/, dFramerate, Size(iCols,iRows), m_isColor);
+   return m_vWriter.open(pszFilename, CV_FOURCC_DEFAULT/*PROMPT*/, dFramerate, cv::Size(iCols,iRows), m_isColor);
    //m_vWriter.open(pszFilename, CV_FOURCC('H', 'F', 'Y', 'U'), dFramerate, Size(iCols,iRows), m_isColor);
    //m_vWriter.open(pszFilename, CV_FOURCC('X', 'V', 'I', 'D'), dFramerate, Size(iCols,iRows), m_isColor);
    //m_vWriter.open(pszFilename, CV_FOURCC('I', '4', '2', '0'), dFramerate, Size(iCols,iRows), m_isColor);
@@ -257,7 +255,7 @@ bool AviFileWriter::open(
                  int	      iFramerate )
 {
   //return m_vWriter.open(pszFilename,CV_FOURCC_DEFAULT,(double) iFramerate,Size(iCols,iRows),m_isColor);
-    return m_vWriter.open(pszFilename,CV_FOURCC_PROMPT,(double) iFramerate,Size(iCols,iRows),m_isColor);
+    return m_vWriter.open(pszFilename,CV_FOURCC_PROMPT,(double) iFramerate,cv::Size(iCols,iRows),m_isColor);
   //return m_vWriter.open(pszFilename,CV_FOURCC('H', 'F', 'Y', 'U'),(double) iFramerate,Size(iCols,iRows),m_isColor);
   //return m_vWriter.open(pszFilename,CV_FOURCC('X', 'V', 'I', 'D'),(double) iFramerate,Size(iCols,iRows),m_isColor);
   //return m_vWriter.open(pszFilename,CV_FOURCC('I', '4', '2', '0'),(double) iFramerate,Size(iCols,iRows),m_isColor);
@@ -280,7 +278,7 @@ bool AviFileWriter::appendFrame(const unsigned char* pBuffer, bool /*bInvert*/)
 
 
    unsigned char* pWriteBuffer = (unsigned char*) pBuffer;
-   Mat frame;
+   cv::Mat frame;
 
 //   cout << "m_iRowInc: " << m_iRowInc << endl;
 //   cout << "rows: " << m_iRows << " cols: " << m_iCols << endl;
@@ -288,22 +286,22 @@ bool AviFileWriter::appendFrame(const unsigned char* pBuffer, bool /*bInvert*/)
 
    if( (m_iRowInc / m_iCols) == 1 )
    {
-       frame = Mat(m_iRows, m_iCols, CV_8UC1, pWriteBuffer, m_iRowInc);// = imread(pszFilename);
+       frame = cv::Mat(m_iRows, m_iCols, CV_8UC1, pWriteBuffer, m_iRowInc);// = imread(pszFilename);
    }else if ( (m_iRowInc / m_iCols) == 3 )
    {
-       frame = Mat(m_iRows, m_iCols, CV_8UC3, pWriteBuffer, m_iRowInc);// = imread(pszFilename);
+       frame = cv::Mat(m_iRows, m_iCols, CV_8UC3, pWriteBuffer, m_iRowInc);// = imread(pszFilename);
    }else if ( (m_iRowInc / m_iCols) == 4 )
    {
-       frame = Mat(m_iRows, m_iCols, CV_8UC4, pWriteBuffer, m_iRowInc);// = imread(pszFilename);
-       cvtColor(frame,frame,COLOR_RGBA2RGB); // need for right image interpretation
+       frame = cv::Mat(m_iRows, m_iCols, CV_8UC4, pWriteBuffer, m_iRowInc);// = imread(pszFilename);
+       cv::cvtColor(frame,frame,cv::COLOR_RGBA2RGB); // need for right image interpretation
    }else
    {
-       cout << "error: unkown video format." << endl;
+       std::cout << "error: unkown video format." << std::endl;
        return false;
    }
    if( !frame.data )
    {
-       cout << "error: while saving video data." << endl;
+       std::cout << "error: while saving video data." << std::endl;
        return false;
    }
 
@@ -372,7 +370,7 @@ bool AviFileWriter::close()
 bool AviFileWriter::appendBMP( const char* pszFilename )
 {
 
-   Mat bmpFrame = imread(pszFilename);
+   cv::Mat bmpFrame = cv::imread(pszFilename);
 
    m_vWriter.write(bmpFrame);
 

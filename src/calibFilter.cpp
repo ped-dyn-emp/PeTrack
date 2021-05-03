@@ -21,7 +21,6 @@
 #include "calibFilter.h"
 #include "helper.h"
 
-using namespace::cv;
 
 CalibFilter::CalibFilter()
     :Filter()
@@ -97,25 +96,25 @@ CalibFilter::CalibFilter()
  * @param res[out]
  * @return undistorted image
  */
-Mat CalibFilter::act(Mat &img, Mat &res)
+cv::Mat CalibFilter::act(cv::Mat &img, cv::Mat &res)
 {
     if(this->changed() || map1.size() != img.size())
     {
-    Mat camera = (Mat_<float>(3,3) << getFx()->getValue(), 0,                   getCx()->getValue(),
+        cv::Mat camera = (cv::Mat_<float>(3,3) << getFx()->getValue(), 0,                   getCx()->getValue(),
                                           0,                   getFy()->getValue(), getCy()->getValue(),
                                           0,                   0,                   1                   );
-    Mat dist = (Mat_<float>(1,8) << getR2()->getValue(), getR4()->getValue(),
+        cv::Mat dist = (cv::Mat_<float>(1,8) << getR2()->getValue(), getR4()->getValue(),
                                         getTx()->getValue(), getTy()->getValue(),
                                         getR6()->getValue(),
                                         getK4()->getValue(), getK5()->getValue(), getK6()->getValue());
 
 
-        initUndistortRectifyMap(camera, dist, Mat_<double>::eye(3,3),
+        initUndistortRectifyMap(camera, dist, cv::Mat_<double>::eye(3,3),
                                 camera,
                                 img.size(), CV_16SC2, map1, map2);
     }
 
-    remap(img, res, map1, map2, INTER_LINEAR, BORDER_CONSTANT);
+    cv::remap(img, res, map1, map2, cv::INTER_LINEAR, cv::BORDER_CONSTANT);
     return res;
 }
 

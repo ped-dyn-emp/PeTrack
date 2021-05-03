@@ -42,8 +42,6 @@
 #include "trackingRoiItem.h"
 #include "recognitionRoiItem.h"
 
-using namespace std;
-
 #define DEFAULT_HEIGHT 180.0
 
 Control::Control(QWidget *parent)
@@ -2064,7 +2062,7 @@ void Control::on_extrCalibShowPoints_clicked()
     out << "<table><tr><th>Nr.</th><th>3D.x</th><th>3D.y</th><th>3D.z</th><th>2D.x</th><th>2D.y</th></tr>" << Qt::endl;
 
 
-    for (i = 0; i < max(mMainWindow->getExtrCalibration()->get3DList().size(),mMainWindow->getExtrCalibration()->get2DList().size()); ++i)
+    for (i = 0; i < std::max(mMainWindow->getExtrCalibration()->get3DList().size(),mMainWindow->getExtrCalibration()->get2DList().size()); ++i)
     {
         out << "<tr>";
         if( i < mMainWindow->getExtrCalibration()->get3DList().size() )
@@ -2742,7 +2740,7 @@ void Control::getXml(QDomElement &elem)
                                 mMainWindow->getBackgroundFilter()->setFilename(getExistingFile(subSubElem.attribute("FILE"), mMainWindow->getProFileName()));
                             }
                             else
-                                debout << "Warning: Background subtracting file not readable!" << endl;
+                                debout << "Warning: Background subtracting file not readable!" << std::endl;
                         }
                     }
                     if (subSubElem.hasAttribute("DELETE"))
@@ -2944,7 +2942,7 @@ void Control::getXml(QDomElement &elem)
                         grid3DResolution->setValue(subSubElem.attribute("GRID3D_RESOLUTION").toInt());
                 }
                 else
-                    debout << "Unknown CALIBRATION tag " << subSubElem.tagName() << endl;
+                    debout << "Unknown CALIBRATION tag " << subSubElem.tagName() << std::endl;
 
         }
         else if (subElem.tagName() == "RECOGNITION")
@@ -3061,7 +3059,7 @@ void Control::getXml(QDomElement &elem)
                         }
 
                         else
-                            debout << "Unknown RECOGNITION MAP tag " << subSubElem.tagName() << endl;
+                            debout << "Unknown RECOGNITION MAP tag " << subSubElem.tagName() << std::endl;
 
                     mapNr->setMaximum(colorPlot->getMapItem()->mapNum()-1);
                     if (subSubElem.hasAttribute("MAP_NUMBER")) // hiermit werden aus map-datenstruktur richtige map angezeigt, daher am ende
@@ -3101,7 +3099,7 @@ void Control::getXml(QDomElement &elem)
                 }
 
                 else
-                    debout << "Unknown RECOGNITION tag " << subSubElem.tagName() << endl;
+                    debout << "Unknown RECOGNITION tag " << subSubElem.tagName() << std::endl;
         }
         else if (subElem.tagName() == "TRACKING")
         {
@@ -3331,7 +3329,7 @@ void Control::getXml(QDomElement &elem)
                         trackShowAfter->setValue(subSubElem.attribute("AFTER").toInt());
                 }
                 else
-                    debout << "Unknown TRACKING tag " << subSubElem.tagName() << endl;
+                    debout << "Unknown TRACKING tag " << subSubElem.tagName() << std::endl;
         }
         else if (subElem.tagName() == "ANALYSIS")
         {
@@ -3362,10 +3360,10 @@ void Control::getXml(QDomElement &elem)
                         showVoronoiCells->setCheckState(subSubElem.attribute("SHOW_VORONOI").toInt() ? Qt::Checked : Qt::Unchecked);
                 }
                 else
-                    debout << "Unknown ANAYSIS tag " << subSubElem.tagName() << endl;
+                    debout << "Unknown ANAYSIS tag " << subSubElem.tagName() << std::endl;
         }
         else
-            debout << "Unknown CONTROL tag " << subElem.tagName() << endl;
+            debout << "Unknown CONTROL tag " << subElem.tagName() << std::endl;
 
     mMainWindow->updateCoord();
 }
@@ -3485,8 +3483,8 @@ void Control::on_setColor()
         minHue = clickedColor.hue() - BUFFER;
         //map->changeActMapInvHue(false);
     }
-    toColor.setHsv(maxHue, min((clickedColor.saturation()+BUFFER),255), min(clickedColor.value()+BUFFER, 255));
-    fromColor.setHsv(minHue, max(clickedColor.saturation()-BUFFER,0), max(clickedColor.value()-BUFFER,0));
+    toColor.setHsv(maxHue, std::min((clickedColor.saturation()+BUFFER),255), std::min(clickedColor.value()+BUFFER, 255));
+    fromColor.setHsv(minHue, std::max(clickedColor.saturation()-BUFFER,0), std::max(clickedColor.value()-BUFFER,0));
 
     //debout << "Inv Hue nach setCol: " <<  map->getActMapInvHue() << std::endl;
     saveChange(fromColor, toColor, map);
@@ -3608,19 +3606,19 @@ void Control::expandRange(QColor& fromColor, QColor& toColor, const QColor& clic
             int buffer = fromColorArr[i] - clickedColorArr[i] < 0 ? BUFFER : -BUFFER;
             if(i==0) // Hue
             {
-                fromColorArr[i] = min(359, max(0, clickedColorArr[i] + buffer));
+                fromColorArr[i] = std::min(359, std::max(0, clickedColorArr[i] + buffer));
             }else
             {
-                fromColorArr[i] = min(255, max(0, clickedColorArr[i] + buffer));
+                fromColorArr[i] = std::min(255, std::max(0, clickedColorArr[i] + buffer));
             }
         }else{
             int buffer = toColorArr[i] - clickedColorArr[i] < 0 ? BUFFER : -BUFFER;
             if(i==0) // Hue
             {
-                toColorArr[i] = min(359, max(0, clickedColorArr[i] + buffer));
+                toColorArr[i] = std::min(359, std::max(0, clickedColorArr[i] + buffer));
             }else
             {
-                toColorArr[i] = min(255, max(0, clickedColorArr[i] + buffer));
+                toColorArr[i] = std::min(255, std::max(0, clickedColorArr[i] + buffer));
             }
         }
     }

@@ -51,9 +51,6 @@ they can be represented in QT.
 #include "helper.h"
 #include "petrack.h"
 
-using namespace::cv;
-using namespace std;
-
 /**********************************************************************/
 /* Constructors & Destructors                                        **/
 /**********************************************************************/
@@ -104,30 +101,30 @@ Animation::~Animation()
 /**********************************************************************/
 
 /// Returns the next frame of the animation
-Mat Animation::getNextFrame()
+cv::Mat Animation::getNextFrame()
 {
     return getFrameAtIndex(mCurrentFrame+1);
 }
 
 /// Returns the previous frame of the animation
-Mat Animation::getPreviousFrame()
+cv::Mat Animation::getPreviousFrame()
 {
     return getFrameAtIndex(mCurrentFrame-1);
 }
 
 /// Returns the frame at the index index
-Mat Animation::getFrameAtIndex(int index)
+cv::Mat Animation::getFrameAtIndex(int index)
 {
     if (mCameraLiveStream)
         return getFrameVideo(index);
     // geaendert: We make sure first the index is valid.
     //            If not, it will be set the first or the last index
     if (index<getSourceInFrameNum()){
-        return Mat();
+        return cv::Mat();
         //index=0;
     }
     if (index>getSourceOutFrameNum()){
-        return Mat();
+        return cv::Mat();
         //index = getNumFrames()-1;
     }
     // Call the own methods to get it done
@@ -135,7 +132,7 @@ Mat Animation::getFrameAtIndex(int index)
         return getFrameVideo(index);
     if (mImgSeq)
         return getFramePhoto(index);
-    return Mat();
+    return cv::Mat();
 }
 
 /**
@@ -144,13 +141,13 @@ Mat Animation::getFrameAtIndex(int index)
  * @param position double between 0 and 1 that indicates the position in the animation
  * @return the frame at the indicated position
  */
-Mat Animation::getFrameAtPos(double position)
+cv::Mat Animation::getFrameAtPos(double position)
 {
     return getFrameAtIndex((int) (getSourceInFrameNum()+(position*(getNumFrames()-1))));
 }
 
 /// Returns the current frame
-Mat Animation::getCurrentFrame()
+cv::Mat Animation::getCurrentFrame()
 {
     return mImage;
 }
@@ -190,11 +187,11 @@ bool Animation::openTimeFile(QString &timeFileName)
     double fps, dif, difMin=1000., difMax=-1000.;
     int minFrame=-1, maxFrame=-1;
 
-    debout << "Found corresponding time file " << timeFileName << endl;
+    debout << "Found corresponding time file " << timeFileName << std::endl;
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        debout << "  Error: Cannot open existing time file " << timeFileName << ":" << endl << "  " << file.errorString() << endl;
+        debout << "  Error: Cannot open existing time file " << timeFileName << ":" << std::endl << "  " << file.errorString() << std::endl;
         return false;
     }
     else
@@ -211,7 +208,7 @@ bool Animation::openTimeFile(QString &timeFileName)
                 fcycSec=cycSec; fcycCount=cycCount;
                 dt.setTime_t(sec);
                 debout << "  Recording starts at " << dt.toString("dd.MM.yyyy hh:mm:ss.");
-                cout << setw(6) << setfill('0') << microSec << endl;
+                std::cout << std::setw(6) << std::setfill('0') << microSec << std::endl;
                 mFirstSec = sec;
                 mFirstMicroSec = microSec;
             }
@@ -243,8 +240,8 @@ bool Animation::openTimeFile(QString &timeFileName)
         //fps = frame/((sec-fsec)+0.000001*microSec-0.000001*fmicroSec); // nicht frame+1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         fps = frame/((cycSec-fcycSec+add)+(cycCount-fcycCount)/8000.); //((sec-fsec)+0.000001*microSec-0.000001*fmicroSec);
         debout << "  Recording ends   at " << dt.toString("dd.MM.yyyy hh:mm:ss."); // entspricht nicht der in statusbar angezeigten zeit des letzten frames, da in statusbar fps und frameanzahl herangezogen wird (genauer)!!!
-        cout << setw(6) << setfill('0') << microSec << endl;
-        debout << "  Fps with "<< frame+1 <<" frames: " << fps << " (min "<<1./difMax<<" at frame "<<maxFrame<<" to "<<maxFrame+1<<", max "<<1./difMin<<" at frame "<<minFrame<<" to "<<minFrame+1<<")" << endl;
+        std::cout << std::setw(6) << std::setfill('0') << microSec << std::endl;
+        debout << "  Fps with "<< frame+1 <<" frames: " << fps << " (min "<<1./difMax<<" at frame "<<maxFrame<<" to "<<maxFrame+1<<", max "<<1./difMin<<" at frame "<<minFrame<<" to "<<minFrame+1<<")" << std::endl;
         setFPS(fps);
         mStereo = true;
         mSourceOutFrame = frame; //mNumFrames = frame+1;
@@ -327,7 +324,7 @@ bool Animation::openAnimation(QString fileName)
         if (openRet == false) // es konnte keine Bildsequenz geladen werden
             openRet = openAnimationVideo(fileName);
         if (mTimeFileLoaded && !openRet)
-            debout << "Warning: New loaded time file do not correspond to untouched sequence, because new sequence was not loadable!" << endl;
+            debout << "Warning: New loaded time file do not correspond to untouched sequence, because new sequence was not loadable!" << std::endl;
         mTimeFileLoaded = false; // reset for new open stereo video sequence
         return openRet;
     }
@@ -433,8 +430,8 @@ double Animation::getFPS()
 {
     if (mCameraLiveStream)
     {
-        if (mVideoCapture.get(CAP_PROP_FPS))
-            setFPS(mVideoCapture.get(CAP_PROP_FPS));
+        if (mVideoCapture.get(cv::CAP_PROP_FPS))
+            setFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
     }
     if (mVideo)
         return mFps;
@@ -581,8 +578,8 @@ bool Animation::openAnimationPhoto(QString fileName)
     //if (!cvLoadImage((fileName.toStdString()).c_str(), -1))
     //    return false;
 
-    Mat tempMat;
-    tempMat = imread(fileName.toStdString(),IMREAD_UNCHANGED);//, IMREAD_UNCHANGED);//CV_LOAD_IMAGE_UNCHANGED);
+    cv::Mat tempMat;
+    tempMat = cv::imread(fileName.toStdString(),cv::IMREAD_UNCHANGED);//, IMREAD_UNCHANGED);//CV_LOAD_IMAGE_UNCHANGED);
 
     if(! tempMat.data )                              // Check for invalid input
     {
@@ -594,9 +591,9 @@ bool Animation::openAnimationPhoto(QString fileName)
 //    waitKey();
 //    debout << "fileName: " << fileName.toStdString() << " channels: " << tempMat.channels() << " depth: " << tempMat.depth() << endl;
     if( tempMat.channels() == 4 ){
-        cout << "Warning: PNG-Alpha channel will be ignored." << endl;
+        std::cout << "Warning: PNG-Alpha channel will be ignored." << std::endl;
 //        tempMat.release();
-        tempMat = imread(fileName.toStdString(),IMREAD_COLOR);
+        tempMat = cv::imread(fileName.toStdString(),cv::IMREAD_COLOR);
     }
 
 
@@ -707,13 +704,13 @@ bool Animation::openAnimationPhoto(QString fileName)
  * @param index
  * @return the frame at given index in the series
  */
-Mat Animation::getFramePhoto(int index)
+cv::Mat Animation::getFramePhoto(int index)
 {
     if ((index != mCurrentFrame) || mImage.empty())
     {
         // Check if the index is valid
         if(index < getSourceInFrameNum() || index > getSourceOutFrameNum())
-            return Mat();
+            return cv::Mat();
         // Load the image at a temporary IplImage structure
         // We need to do this because a loaded IplImage cannot be accessed directly
         // = cvLoadImage((mImgFilesList.at(index).toStdString()).c_str(), -1);
@@ -722,24 +719,24 @@ Mat Animation::getFramePhoto(int index)
 //        Mat tempMat;
 
 //        tempMat
-        mImage = imread(mImgFilesList.at(index).toStdString(),IMREAD_UNCHANGED);//CV_LOAD_IMAGE_UNCHANGED);
+        mImage = cv::imread(mImgFilesList.at(index).toStdString(),cv::IMREAD_UNCHANGED);//CV_LOAD_IMAGE_UNCHANGED);
 
         if( mImage.empty() )                              // Check for invalid input
         {
             debout <<  "Could not open or find the image" << std::endl ;
-            return Mat();
+            return cv::Mat();
         }
 
         if( mImage.channels() == 4 )
         {
-            mImage = imread(mImgFilesList.at(index).toStdString(),IMREAD_COLOR);
+            mImage = imread(mImgFilesList.at(index).toStdString(),cv::IMREAD_COLOR);
         }
         // Check image size of each frame
         //debout << "mat.cols: " << tempMat.cols << " : " << mSize.width() << " tempMat.rows: " << tempMat.rows << " : " << mSize.height() << endl;
         if( (mSize.width() > 0 && mSize.height() > 0) && (mImage.cols != mSize.width() || mImage.rows != mSize.height()) )
         {
-            debout << "Could not load image: image size differs in image sequence" << endl;
-            debout << "Please ensure to have images of the same size!" << endl;
+            debout << "Could not load image: image size differs in image sequence" << std::endl;
+            debout << "Please ensure to have images of the same size!" << std::endl;
 
             PCritical(nullptr,"An error has occurred!",
                                   QString("The size of the images in the selected image sequence does not agree."
@@ -747,7 +744,7 @@ Mat Animation::getFramePhoto(int index)
                                   .arg(mImgFilesList.at(0)).arg(mSize.width()).arg(mSize.height()).arg(index)
                                   .arg(mImgFilesList.at(index)).arg(mImage.cols).arg(mImage.rows));
 
-            return Mat();
+            return cv::Mat();
         }
 
 
@@ -797,7 +794,7 @@ Mat Animation::getFramePhoto(int index)
 bool Animation::getInfoPhoto()
 {
     bool rc = false;
-    Mat tempImg;
+    cv::Mat tempImg;
     // Set the number of frames
     mMaxFrames = mImgFilesList.size();
     setSourceInFrameNum(0);
@@ -810,7 +807,7 @@ bool Animation::getInfoPhoto()
         // 1 or 3 channel and 8 bit per pixel
         if (!(((tempImg.channels() == 1) || (tempImg.channels() == 3)) && (tempImg.depth() == CV_8U)))
         {
-            debout << "Error: Only 1 or 3 channels (you are using "<< tempImg.channels() <<") and 8 bpp (you are using "<< tempImg.depth() <<") are supported!" << endl;
+            debout << "Error: Only 1 or 3 channels (you are using "<< tempImg.channels() <<") and 8 bpp (you are using "<< tempImg.depth() <<") are supported!" << std::endl;
         }
         else
         {
@@ -829,7 +826,7 @@ void Animation::freePhoto()
     if (!mImage.empty())
     {
 //        cvReleaseImage(&mImage);
-        mImage = Mat();
+        mImage = cv::Mat();
     }
     // Clear the list of filenames in the serie
     mImgFilesList.clear();
@@ -1001,9 +998,9 @@ bool Animation::openAnimationVideo(QString fileName)
         ////int width  = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH);
         ////int height = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT);
         ////int fps    = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FPS);
-        int width  = (int) mVideoCapture.get(CAP_PROP_FRAME_WIDTH);
-        int height = (int) mVideoCapture.get(CAP_PROP_FRAME_HEIGHT);
-        int fps    = (int) mVideoCapture.get(CAP_PROP_FPS);
+        int width  = (int) mVideoCapture.get(cv::CAP_PROP_FRAME_WIDTH);
+        int height = (int) mVideoCapture.get(cv::CAP_PROP_FRAME_HEIGHT);
+        int fps    = (int) mVideoCapture.get(cv::CAP_PROP_FPS);
         //int fourcc = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FOURCC);
         //int frameCount = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FRAME_COUNT);
         //int propFormat = (int) cvGetCaptureProperty(capture, CV_CAP_PROP_FORMAT);
@@ -1052,7 +1049,7 @@ bool Animation::openAnimationVideo(QString fileName)
         else
             return false;
 #else
-        debout << "Stereo videos temporary not supported!" << endl;
+        debout << "Stereo videos temporary not supported!" << std::endl;
         return false;
 
 #endif
@@ -1092,7 +1089,7 @@ bool Animation::openAnimationVideo(QString fileName)
 
 /// Implementation of getFrameAtIndex for videos
 /// Returns the frame at given index in the video
-Mat Animation::getFrameVideo(int index)
+cv::Mat Animation::getFrameVideo(int index)
 {
 
     if (mCameraLiveStream)
@@ -1105,7 +1102,7 @@ Mat Animation::getFrameVideo(int index)
 //            tempImg->imageData = (char *) tempMat.data;
 
             if (mImage.empty())//tempImg == NULL)
-                return Mat();
+                return cv::Mat();
 
 //            cvReleaseImage(&mImage);
 //            mImage = cvCloneImage(tempImg);
@@ -1119,13 +1116,13 @@ Mat Animation::getFrameVideo(int index)
     {
         // Check if we have a valid index
         if (index < getSourceInFrameNum() || (index > getSourceOutFrameNum() && getSourceOutFrameNum() != -1) )
-            return Mat();
+            return cv::Mat();
         if (mVideo && !mStereo)
         {
             // Check if we have a valid capture device
             ////if (mCapture == NULL)
             if (!mVideoCapture.isOpened())
-                return Mat();
+                return cv::Mat();
             // Now we need to see if it is necessary to seek for the frame or if we can use
             // directly the cvQueryFrame function
             // This is tested since the seek function takes a lot of time!
@@ -1134,10 +1131,10 @@ Mat Animation::getFrameVideo(int index)
                 // OLD
                 ////cvSetCaptureProperty(mCapture, CV_CAP_PROP_POS_FRAMES, index);
                 // NEW
-                if( !mVideoCapture.set(CAP_PROP_POS_FRAMES, index) )
+                if( !mVideoCapture.set(cv::CAP_PROP_POS_FRAMES, index) )
                 {
-                    debout << "Error: video file does not support skipping." << endl;
-                    return Mat();
+                    debout << "Error: video file does not support skipping." << std::endl;
+                    return cv::Mat();
                 }
             }
             // Query the frame
@@ -1150,14 +1147,14 @@ Mat Animation::getFrameVideo(int index)
 //                tempImg->imageData = (char *) tempMat.data;
 
                 if (mImage.empty())//tempImg == NULL)
-                    return Mat();
+                    return cv::Mat();
             }else
             {
-                debout << "Warning: number of frames in the video seems to be incorrect. Frame[" << index << "] is not loadable! Set number of Frames to " << index << "." << endl;
+                debout << "Warning: number of frames in the video seems to be incorrect. Frame[" << index << "] is not loadable! Set number of Frames to " << index << "." << std::endl;
                 mSourceOutFrame = index-1;
                 setSourceOutFrameNum(mSourceOutFrame);
                 //mNumFrames = index - getSourceInFrameNum();
-                return Mat();
+                return cv::Mat();
             }
             // --------------------------------------------------------- diese zwei zeilen
 
@@ -1257,16 +1254,16 @@ bool Animation::getInfoVideo(QString /*fileName*/)
     // We will grab the information from a frame of the animation
     //mNumFrames = 1000;
     setSourceInFrameNum(0);
-    Mat tempImg = getFrameVideo(getSourceInFrameNum());
+    cv::Mat tempImg = getFrameVideo(getSourceInFrameNum());
     if (tempImg.empty())
     {
-        debout << "Error: No frame could be retrieved from the capture during getInfoVideo." << endl;
+        debout << "Error: No frame could be retrieved from the capture during getInfoVideo." << std::endl;
         return false;
     }
     // 1 or 3 channel and 8 bit per pixel
     if (!(((tempImg.channels() == 1) || (tempImg.channels() == 3)) && (tempImg.depth() == CV_8U)))
     {
-        debout << "Warning: Only 1 or 3 channels (you are using "<< tempImg.channels() <<") and 8 bpp (you are using "<< tempImg.depth() <<") are supported!" << endl;
+        debout << "Warning: Only 1 or 3 channels (you are using "<< tempImg.channels() <<") and 8 bpp (you are using "<< tempImg.depth() <<") are supported!" << std::endl;
     }
     // Set the size in the QSize structure
     mSize.setHeight(tempImg.rows);
@@ -1275,9 +1272,9 @@ bool Animation::getInfoVideo(QString /*fileName*/)
     // We get the FPS number with the cvGetCaptureProperty function
     // Note that this doesn't work if no frame has already retrieved!!
     ////setFPS(cvGetCaptureProperty(mCapture,CV_CAP_PROP_FPS));
-    if (mVideoCapture.get(CAP_PROP_FPS)){
-        setFPS(mVideoCapture.get(CAP_PROP_FPS));
-        mOriginalFps = mVideoCapture.get(CAP_PROP_FPS);
+    if (mVideoCapture.get(cv::CAP_PROP_FPS)){
+        setFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
+        mOriginalFps = mVideoCapture.get(cv::CAP_PROP_FPS);
     }
 
  
@@ -1336,7 +1333,7 @@ bool Animation::getInfoVideo(QString /*fileName*/)
 //#endif
 
     // detect the used video codec
-    int fourCC = static_cast<int>( mVideoCapture.get(CAP_PROP_FOURCC) );
+    int fourCC = static_cast<int>( mVideoCapture.get(cv::CAP_PROP_FOURCC) );
     char FOURCC[] = {(char)( fourCC & 0XFF) ,
                      (char)((fourCC & 0XFF00) >> 8),
                      (char)((fourCC & 0XFF0000) >> 16),
@@ -1345,32 +1342,32 @@ bool Animation::getInfoVideo(QString /*fileName*/)
     //debout << "used video codec: " << FOURCC << endl;
 
     ////mNumFrames = (int) cvGetCaptureProperty(mCapture,CV_CAP_PROP_FRAME_COUNT);
-    mMaxFrames = (int) mVideoCapture.get(CAP_PROP_FRAME_COUNT); //mNumFrame
+    mMaxFrames = (int) mVideoCapture.get(cv::CAP_PROP_FRAME_COUNT); //mNumFrame
     mSourceOutFrame = mMaxFrames-1;
     //debout << "OpenCV FRAME_COUNT: " << mMaxFrames << endl;
 
     // Set videocapture to the last frame if CV_CAP_PROP_POS_FRAMES is supported by used video codec
-    if( mVideoCapture.set(CAP_PROP_POS_FRAMES, mMaxFrames) > 0 )
+    if( mVideoCapture.set(cv::CAP_PROP_POS_FRAMES, mMaxFrames) > 0 )
     {
         // Set videoCapture to the really correct last frame
-        mVideoCapture.set(CAP_PROP_POS_FRAMES, mVideoCapture.get(CAP_PROP_POS_FRAMES)-1);
+        mVideoCapture.set(cv::CAP_PROP_POS_FRAMES, mVideoCapture.get(cv::CAP_PROP_POS_FRAMES)-1);
 
 
         // Check if mNumFrames agrees with last readable frame
-        if( mMaxFrames != (mVideoCapture.get(CAP_PROP_POS_FRAMES)+1) )
+        if( mMaxFrames != (mVideoCapture.get(cv::CAP_PROP_POS_FRAMES)+1) )
         {
-            debout << "Warning: number of frames detected by OpenCV library (" << mMaxFrames << ") seems to be incorrect! (set to estimated value: "<< (mVideoCapture.get(CAP_PROP_POS_FRAMES)+1) << ") [video codec: " << FOURCC << "]" << endl;
-            mMaxFrames = mVideoCapture.get(CAP_PROP_POS_FRAMES)+1;
+            debout << "Warning: number of frames detected by OpenCV library (" << mMaxFrames << ") seems to be incorrect! (set to estimated value: "<< (mVideoCapture.get(cv::CAP_PROP_POS_FRAMES)+1) << ") [video codec: " << FOURCC << "]" << std::endl;
+            mMaxFrames = mVideoCapture.get(cv::CAP_PROP_POS_FRAMES)+1;
             mSourceOutFrame = mMaxFrames-1;
         }
 
         // Check if the last frame of the video is readable/OK?
-        Mat frame;
+        cv::Mat frame;
         while( !mVideoCapture.read(frame) ){
-            mVideoCapture.set(CAP_PROP_POS_FRAMES,mVideoCapture.get(CAP_PROP_POS_FRAMES)-2);
-            mMaxFrames = mVideoCapture.get(CAP_PROP_POS_FRAMES)+1;
-            if( mVideoCapture.get(CAP_PROP_POS_FRAMES) < 0 ){
-                cerr << "Warning: video file seems to be broken!" << endl;
+            mVideoCapture.set(cv::CAP_PROP_POS_FRAMES,mVideoCapture.get(cv::CAP_PROP_POS_FRAMES)-2);
+            mMaxFrames = mVideoCapture.get(cv::CAP_PROP_POS_FRAMES)+1;
+            if( mVideoCapture.get(cv::CAP_PROP_POS_FRAMES) < 0 ){
+                std::cerr << "Warning: video file seems to be broken!" << std::endl;
                 mMaxFrames = -1;
                 mSourceOutFrame = mMaxFrames-1;
                 return false;
@@ -1383,13 +1380,13 @@ bool Animation::getInfoVideo(QString /*fileName*/)
     int maxFrames = 9999999; // > 111 h @ 25fps
     if (getNumFrames() <= 0)
     {
-        debout << "Error: Incorrect number ("<<getNumFrames()<<") of frames. Setting it to "<<defaultFrames<<"." << endl;
+        debout << "Error: Incorrect number ("<<getNumFrames()<<") of frames. Setting it to "<<defaultFrames<<"." << std::endl;
         mSourceOutFrame = getSourceInFrameNum()+defaultFrames;
         //mNumFrames = defaultFrames;
     }
     if (getNumFrames() > maxFrames)// = 6h * 60mins * 60 secs * 25 frames
     {
-        debout << "Warning: Number of frames ("<<getNumFrames()<<") seems to be incorrect. Setting it to "<<defaultFrames<<"." << endl;
+        debout << "Warning: Number of frames ("<<getNumFrames()<<") seems to be incorrect. Setting it to "<<defaultFrames<<"." << std::endl;
         mSourceOutFrame = getSourceInFrameNum()+defaultFrames;
     }
     setSourceOutFrameNum(mSourceOutFrame);
@@ -1401,16 +1398,16 @@ bool Animation::getInfoVideo(QString /*fileName*/)
 
 bool Animation::getCameraInfo()
 {
-    Mat tempImg = getFrameVideo(0);
+    cv::Mat tempImg = getFrameVideo(0);
     if (tempImg.empty())
     {
-        debout << "Error: No frame could be retrieved from the capture during getInfoVideo." << endl;
+        debout << "Error: No frame could be retrieved from the capture during getInfoVideo." << std::endl;
         return false;
     }
     // 1 or 3 channel and 8 bit per pixel
     if (!(((tempImg.channels() == 1) || (tempImg.channels() == 3)) && (tempImg.depth() == CV_8U)))
     {
-        debout << "Warning: Only 1 or 3 channels (you are using "<< tempImg.channels() <<") and 8 bpp (you are using "<< tempImg.depth() <<") are supported!" << endl;
+        debout << "Warning: Only 1 or 3 channels (you are using "<< tempImg.channels() <<") and 8 bpp (you are using "<< tempImg.depth() <<") are supported!" << std::endl;
     }
     // Set the size in the QSize structure
     mSize.setHeight(tempImg.rows);
@@ -1419,9 +1416,9 @@ bool Animation::getCameraInfo()
     // We get the FPS number with the cvGetCaptureProperty function
     // Note that this doesn't work if no frame has already retrieved!!
     ////setFPS(cvGetCaptureProperty(mCapture,CV_CAP_PROP_FPS));
-    if (mVideoCapture.get(CAP_PROP_FPS)){
-        setFPS(mVideoCapture.get(CAP_PROP_FPS));
-        mOriginalFps = mVideoCapture.get(CAP_PROP_FPS);
+    if (mVideoCapture.get(cv::CAP_PROP_FPS)){
+        setFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
+        mOriginalFps = mVideoCapture.get(cv::CAP_PROP_FPS);
     }
 
 
@@ -1447,7 +1444,7 @@ void Animation::freeVideo()
     if (!mImage.empty())
     {
 //        cvReleaseImage(&mImage);
-        mImage = Mat();
+        mImage = cv::Mat();
     }
 
 }

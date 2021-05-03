@@ -27,7 +27,6 @@
 #include "tracker.h"
 #include "animation.h"
 
-using namespace::cv;
 
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,
@@ -118,13 +117,13 @@ void MultiColorMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 }
 
 // only pointer is set, no copy of data
-void MultiColorMarkerItem::setMask(Mat &mask)
+void MultiColorMarkerItem::setMask(cv::Mat &mask)
 {
     mMask = mask;
 }
 
 // original width w and height h must be given
-Mat MultiColorMarkerItem::createMask(int w, int h)
+cv::Mat MultiColorMarkerItem::createMask(int w, int h)
 {
     if (w>0 && h>0 && (mMask.empty() || (!mMask.empty() && (w != mMask.cols || h != mMask.rows))))
     {

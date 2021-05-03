@@ -37,9 +37,6 @@
 #include "helper.h"
 #include "tracker.h"
 
-using namespace::cv;
-using namespace std;
-
 // bei marker koennnte sich fuer jeden spot eine liste gemerkt werden und spaeter ausgleich 
 // regressionsgrade legen um optimale linie durch marker zu erhalten
 MarkerCasern::MarkerCasern(MyEllipse head)
@@ -170,7 +167,7 @@ void MarkerCasern::modifyQuadrangle(const Vec2F v[4])
 
 
 // nach organize gibt es entweder 0 oder 3 spots pro kopf
-void MarkerCasern::organize(const Mat &img, bool autoWB)
+void MarkerCasern::organize(const cv::Mat &img, bool autoWB)
 {
     int i, j, k;
 
@@ -463,7 +460,7 @@ void MarkerCasern::organize(const Mat &img, bool autoWB)
             colOther.setRgb((int) MIN(((255./avgWhiteR)*colOther.red()), 255.), (int) MIN(((255./avgWhiteG)*colOther.green()), 255.), (int) MIN(((255./avgWhiteB)*colOther.blue()), 255.));
         }
         else
-            debout << "weiss ist zu dunkel!!!!!!!!!!!!!!"<<endl;
+            debout << "weiss ist zu dunkel!!!!!!!!!!!!!!"<<std::endl;
 
         // eigentlich muesset saettigung ueber histogramm angepasst werden!!
     }
@@ -638,13 +635,13 @@ void MarkerCasern::draw(cv::Mat &img) const
     if (hasQuadrangle())
     {
 //        CvPoint pt[4], *rect = pt;
-        vector<Point> pt;
+        std::vector<cv::Point> pt;
 //        int count = 4;
         for (i = 0; i < 4; ++i)
-            pt.push_back(Point(mQuadrangle[i].x(),mQuadrangle[i].y()));
+            pt.push_back(cv::Point(mQuadrangle[i].x(),mQuadrangle[i].y()));
 //            pt[i] = mQuadrangle[i].toCvPoint();
         // draw the square as a closed polyline 
-        cv::polylines(img,pt,true,CV_RGB(0,255,0),1,LINE_AA,0);
+        cv::polylines(img,pt,true,CV_RGB(0,255,0),1,cv::LINE_AA,0);
 //        cvPolyLine(img, &rect, &count, 1, 1, CV_RGB(0,255,0), 1, CV_AA, 0); //3, CV_AA, 0
     }
 }
@@ -653,7 +650,7 @@ void MarkerCasern::draw(cv::Mat &img) const
 
 // img is 1 channel black/white
 // gibt zurueck, ob ellipse mgl als spot oder kopf eingefuegt wurde oder zur modifizierung mgl beigetragen hat
-bool MarkerCasernList::mayAddEllipse(const Mat &img, const MyEllipse& e, bool blackInside)
+bool MarkerCasernList::mayAddEllipse(const cv::Mat &img, const MyEllipse& e, bool blackInside)
 {
     int i;
 
@@ -794,7 +791,7 @@ void MarkerCasernList::organize(const cv::Mat &img, bool autoWB)
 
 //draw ... Qt
 
-void MarkerCasernList::draw(Mat &img) const
+void MarkerCasernList::draw(cv::Mat &img) const
 {
     for (int i = 0; i < size(); ++i)
         at(i).draw(img);
