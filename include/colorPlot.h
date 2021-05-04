@@ -55,7 +55,6 @@ public:
 
 private:
     Tracker *mTracker;
-//     int mModel, mX, mY;
     QPen mPen;
 };
 
@@ -133,7 +132,6 @@ public:
 
     bool mColored;
     double mMapHeight;
-    // bool contains ( qreal x, qreal y ) const gibt zurueck, ob pkt x, y in rect liegt
     QColor mFromCol;
     QColor mToCol;
     bool mInversHue;
@@ -201,7 +199,6 @@ public:
     void setControlWidget(Control *control);
     void setTracker(Tracker *tracker);
     void setScale();
-//     void updateTracker();
     void generateImage();
 
     inline double symbolSize() const
@@ -239,10 +236,6 @@ public:
     {
         return mRectItem;
     }
-//     inline ImagePlotItem *getImageItem() const
-//     {
-//         return mImageItem;
-//     }
 
 private:
     double mSymbolSize;
@@ -255,15 +248,6 @@ private:
     ViewColorPlotItem *mViewColorItem;
     Zoomer *mZoomer;
     int mGreyDiff;
-//     QwtPlotCurve *mTpc;
-//     Tracker *mTracker;
-
-// public slots:
-//     void showContour(bool on);
-//     void showSpectrogram(bool on);
-
-// private:
-//     QwtPlotSpectrogram *d_spectrogram;
 };
 
 #endif

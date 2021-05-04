@@ -108,7 +108,6 @@ public:
     void organize(const cv::Mat &img, bool autoWB);
 
     //draw ... Qt
-
     void draw(cv::Mat &img) const;
 
     void toCrossList(QList<TrackPoint> *crossList, bool ignoreWithoutMarker) const;

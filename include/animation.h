@@ -18,20 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/*
-
-Class Animation
-First setup: Ricardo Martin Brualla, 01.02.2007
-Later: Maik Boltes
-
-This class will hold an animation in form of a video or a sequence of images.
-In case of a video, you can only get the next frame. If it is a sequence of images,
-you can select the frame you want to get.
-Appart from that, there is a static function that converts IplImages to QPixmaps, so 
-they can be represented in QT.
-
-*/
-
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
@@ -73,25 +59,20 @@ public:
     Animation(QWidget *wParent);
     ~Animation();
  
-    // Returns a pointer to the next frame of the animation 
-//    IplImage* getNextFrame();
+    // Returns the next frame of the animation
     cv::Mat getNextFrame();
  
-    // Returns a pointer to the previous frame of the animation
-//    IplImage* getPreviousFrame();
+    // Returns the previous frame of the animation
     cv::Mat getPreviousFrame();
  
-    // Returns a pointer to the frame at the index index
-//    IplImage* getFrameAtIndex(int index);
+    // Returns the frame at the index index
     cv::Mat getFrameAtIndex(int index);
  
-    // Returns a pointer to the frame at the position position
+    // Returns the frame at the position position
     // positions is a double between 0 and 1 that indicates the position in the animation
-//    IplImage* getFrameAtPos(double position);
     cv::Mat getFrameAtPos(double position);
 
-    // Returns a pointer to the current frame 
-//    IplImage* getCurrentFrame();
+    // Returns the current frame
     cv::Mat getCurrentFrame();
 
     void skipFrame(int num = 1);
@@ -184,8 +165,7 @@ private:
     enum Camera mCamera;
  #endif
 
-    // Pointer that will be used by the animation and that will be returned in the public functions 
-//    IplImage *mImage;
+    // Image that will be used by the animation and that will be returned in the public functions
     cv::Mat mImage;
  
     // Size of the frame 
@@ -226,8 +206,7 @@ private:
     bool openAnimationPhoto(QString fileName);
  
     // Implementation of getFrameAtIndex for photo series
-    // Returns a pointer to the frame at index index in the serie 
-//    IplImage* getFramePhoto(int index);
+    // Returns the frame at index index in the serie
     cv::Mat getFramePhoto(int index);
 
     // Gets Size and Frame number information of the recently open animation
@@ -267,8 +246,7 @@ private:
     bool openAnimationVideo(QString fileName);
  
     // Implementation of getFrameAtIndex for videos
-    // Returns a pointer to the frame at index index in the video 
-//    IplImage* getFrameVideo(int index);
+    // Returns the frame at index index in the video
     cv::Mat getFrameVideo(int index);
  
     // Gets Size and Frame number information of the recently open animation
@@ -293,9 +271,6 @@ private:
     StereoAviFile *mCaptureStereo;
 #endif
     // stereo image allocated in animation to use space for a sequence of stereo files
-//    IplImage* mStereoImgLeft;
-//    IplImage* mStereoImgRight;
-
     cv::Mat mStereoImgLeft;
     cv::Mat mStereoImgRight;
 

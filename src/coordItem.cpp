@@ -36,7 +36,6 @@ CoordItem::CoordItem(QWidget *wParent,/* QGraphicsScene * scene,*/ QGraphicsItem
     mMainWindow = (class Petrack*) wParent;
     extCalib = mMainWindow->getExtrCalibration();
     mControlWidget = mMainWindow->getControlWidget();
-    //mScene = scene;
 
     //Set Min and Max
     calibPointsMin.x = 50000;
@@ -45,10 +44,6 @@ CoordItem::CoordItem(QWidget *wParent,/* QGraphicsScene * scene,*/ QGraphicsItem
     calibPointsMax.y = 0;
 
     updateData(); // um zB setFlags(ItemIsMovable) je nach anzeige zu aendern
-    //setEnabled(false); // all mouse events connot access this item, but it will be seen
-    //einzig move koennte interessant sein, um grid zu verschieben?!
-
-    //setAcceptsHoverEvents(true);
 }
 
 /**
@@ -61,48 +56,18 @@ CoordItem::CoordItem(QWidget *wParent,/* QGraphicsScene * scene,*/ QGraphicsItem
  */
 QRectF CoordItem::boundingRect() const
 {
-   /* double sc = mControlWidget->getCalibCoordScale()/10;
-    double tX = mControlWidget->getCalibCoordTransX();
-    double tY = mControlWidget->getCalibCoordTransY();
-    double tZ = mControlWidget->getCalibCoordRotate();
-    double cU = mControlWidget->getCalibCoordUnit();
-
-    Point2f p[4];
-    p[0] = extCalib->getImagePoint(Point3f(tX+cU,tY,tZ));
-    p[1] = extCalib->getImagePoint(Point3f(tX,tY+cU,tZ));
-    p[2] = extCalib->getImagePoint(Point3f(tX,tY,tZ+cU));
-    p[3] = extCalib->getImagePoint(Point3f(0,0,0));
-    double min_x = 1000, min_y = 1000, max_x = -1000, max_y = -1000;
-
-    double x,y;
-
-    for(int i=0;i<4;i++)
-    {
-        x = p[i].x;
-        y = p[i].y;
-        max_x = x > max_x ? x : max_x;
-        min_x = x < min_x ? x : min_x;
-        max_y = y > max_y ? y : max_y;
-        min_y = y < min_y ? y : min_y;
-    }*/
-
     // bounding box wird in lokalen koordinaten angegeben!!! (+-10 wegen zahl "1")
-
-    if (mControlWidget->getCalibCoordShow() /*|| mControlWidget->getCalibExtrCalibPointsShow()*/)
+    if (mControlWidget->getCalibCoordShow())
     {
-        //debout << "Items pos: " << this->pos() << " scenePos(): " << this->scenePos() << endl;
-
         if( mControlWidget->getCalibCoordDimension() != 0 ) // 2D view
         {
             return QRectF(-110., -110., 220., 220.);
         }
         else // 3D view
         {
-            //debout << x.x << " " << y.x << " " << z.x << " " << ursprung.x << " " << calibPointsMin.x << " " << calibPointsMax.x << endl;
             double min_x = std::min(std::min(x.x,y.x),std::min(z.x,ursprung.x));
             double max_x = std::max(std::max(x.x,y.x),std::max(z.x,ursprung.x));
 
-            //debout << x.y << " " << y.y << " " << z.y << " " << ursprung.y << " " << calibPointsMin.y << " " << calibPointsMax.y << endl;
             double min_y = std::min(std::min(x.y,y.y),std::min(z.y,ursprung.y));
             double max_y = std::max(std::max(x.y,y.y),std::max(z.y,ursprung.y));
 
@@ -114,30 +79,13 @@ QRectF CoordItem::boundingRect() const
                 min_y = std::min(float(min_y),calibPointsMin.y);
                 max_y = std::max(float(max_y),calibPointsMax.y);
             }
-            //debout << "Bounding Rect: x: " << min_x << " y: " << min_y << ", width: " << max_x << " height: " << max_y << endl;
-            //debout << "Bounding Rect: " << mapToScene(min_x,min_y) << ", " << mapToItem(this,max_x-min_x,max_y-min_y) << endl;
-            //return QRectF(mapToItem( this, min_x, min_y),mapToItem( this,max_x-min_x,max_y-min_y));
-            //double delta_x = max_x-min_x, delta_y = max_y-min_y;
-            //return QRectF(-0.5*delta_x,-0.5*delta_y,delta_x, delta_y);
             return QRectF(min_x-25, min_y-25, max_x-min_x+50, max_y-min_y+50);
-//            return QRectF(-mMainWindow->getImageBorderSize(),
-//                          -mMainWindow->getImageBorderSize(),
-//                          mControlWidget->getMainWindow()->getImage()->width()
-//                          + 2*mMainWindow->getImageBorderSize(),
-//                          mControlWidget->getMainWindow()->getImage()->height()
-//                          + 2*mMainWindow->getImageBorderSize());
-            //return QRectF(-img->width(),-img->height(),img->width()*2,img->height()*2);
         }
     }
     else
     {
         return QRectF(0., 0., 0., 0.);
     }
-
-    // sicher ware diese boundingbox, da alles
-    //     return QRectF(xMin, yMin, xMax-xMin, yMax-yMin);
-    // eigentlich muesste folgende Zeile reichen, aber beim ranzoomen verschwindet dann koord.sys.
-    //     return QRectF(mControlWidget->getCalibCoordTransX()/10.-scale, mControlWidget->getCalibCoordTransY()/10.-scale, 2*scale, 2*scale);
 }
 
 // event, of moving mouse while button is pressed
@@ -154,16 +102,11 @@ void CoordItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         if (event->buttons() == Qt::RightButton) // event->button() doesnt work
         {
             mControlWidget->setCalibCoordRotate(mControlWidget->getCalibCoordRotate()-(int)(3.*(diff.x()+diff.y()))); //10* nicht noetig, da eh nur relativ
-                //cout << diff.x()-diff.y() <<endl; //globalPos()
         }
         else if (event->buttons() == Qt::LeftButton)
         {
             if( mControlWidget->getCalibCoordDimension() == 0 ) // 3D
             {
-
-                //debout << "P_cur: " << event->scenePos().x() << "," << event->scenePos().y() << endl;
-                //debout << "P_last: " << event->lastScenePos().x() << "," << event->lastScenePos().y() << endl;
-
                 cv::Point3f p_cur = extCalib->get3DPoint(cv::Point2f(event->scenePos().x(),
                                                              event->scenePos().y()),
                                                      mControlWidget->getCalibCoord3DTransZ());
@@ -177,11 +120,8 @@ void CoordItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 // das Kooridnatensystem bewegt sich nicht. Effekt wird noch verstrkt, da das stndig passiert
                 // Besonders schnelle Mausbewegungen lindern den Effekt
 
-                mControlWidget->setCalibCoord3DTransX(coordTrans_x/*mControlWidget->getCalibCoord3DTransX()*/-(mControlWidget->getCalibCoord3DSwapX() ? -1 : 1)*round(p_last.x-p_cur.x));
-                mControlWidget->setCalibCoord3DTransY(coordTrans_y/*mControlWidget->getCalibCoord3DTransY()*/-(mControlWidget->getCalibCoord3DSwapY() ? -1 : 1)*round(p_last.y-p_cur.y));
-
-//                mControlWidget->setCalibExtrTrans1(mControlWidget->getCalibExtrTrans1()+round(p_cur.x-p_last.x));
-//                mControlWidget->setCalibExtrTrans2(mControlWidget->getCalibExtrTrans2()+round(p_cur.y-p_last.y));
+                mControlWidget->setCalibCoord3DTransX(coordTrans_x-(mControlWidget->getCalibCoord3DSwapX() ? -1 : 1)*round(p_last.x-p_cur.x));
+                mControlWidget->setCalibCoord3DTransY(coordTrans_y-(mControlWidget->getCalibCoord3DSwapY() ? -1 : 1)*round(p_last.y-p_cur.y));
 
             }else
             {
@@ -204,8 +144,6 @@ void CoordItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     {
         QGraphicsItem::mouseMoveEvent(event); // drag mach ich selber
     }
-    //mMainWindow->updateSceneRect();
-
 }
 
 void CoordItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -219,32 +157,12 @@ void CoordItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
             coordTrans_x = mControlWidget->getCalibCoord3DTransX();
             coordTrans_y = mControlWidget->getCalibCoord3DTransY();
-
-           //debout << ">>>>>>>>MousePressEvent: " << mouse_x << ", " << mouse_y << endl;
         }
     }else
     {
         QGraphicsItem::mousePressEvent(event);
     }
 }
-
-
-// event, of moving mouse
-//void CoordItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
-//{
-//    QPointF pos = event->scenePos();
-//    pos.setX(pos.x() + mMainWindow->getImageBorderSize());
-//    pos.setY(pos.y() + mMainWindow->getImageBorderSize());
-//    if (pos.x() >=0 && pos.x() <= mMainWindow->getImage()->width() && pos.y() >=0 && pos.y() <= mMainWindow->getImage()->height())
-//        mMainWindow->setMousePosOnImage(pos);
-
-//    if (!mControlWidget->getCalibCoordFix())
-//        setCursor(Qt::OpenHandCursor);
-//    else
-//        setCursor(Qt::CrossCursor);
-
-//    QGraphicsItem::hoverMoveEvent(event);
-//}
 
 void CoordItem::updateData()
 {
@@ -277,7 +195,6 @@ void CoordItem::updateData()
         if( mMainWindow->getImage())
         {
 
-        //prepareGeometryChange();
         // Reset Matrix - No Matrix Transformations for 3D Coordsystem
         // aktualisierung der transformationsmatrix
         QTransform matrix;
@@ -285,26 +202,13 @@ void CoordItem::updateData()
         matrix.translate(0, 0);
         matrix.rotate(0);
         matrix.scale(1, 1);
-        //matrix.shear(tX,tY);
         setTransform(matrix);
 
-//        double tX3D = mControlWidget->getCalibCoord3DTransX();
-//        double tY3D = mControlWidget->getCalibCoord3DTransY();
-//        double tZ3D = mControlWidget->getCalibCoord3DTransZ();
         double axeLen = mControlWidget->getCalibCoord3DAxeLen();
         int bS = mMainWindow->getImageBorderSize();
-//        int swapX = 1;//mControlWidget->getCalibCoord3DSwapX() ? -1 : 1;
-//        int swapY = 1;//mControlWidget->getCalibCoord3DSwapY() ? -1 : 1;
-//        int swapZ = 1;//mControlWidget->getCalibCoord3DSwapZ() ? -1 : 1;
 
-
-        //debout << "Before isSetExtrCalib..." << endl;
         // Coordinate-system origin at (tX,tY,tZ)
         if( extCalib->isSetExtrCalib() ){
-
-            //debout << "X: swap: " << swapX << " T1: " << mControlWidget->getCalibExtrTrans1() << " tX3D: " << tX3D << endl;
-            //debout << "Y: swap: " << swapY << " T2: " << mControlWidget->getCalibExtrTrans2() << " tY3D: " << tY3D << endl;
-            //debout << "Z: swap: " << swapZ << " T3: " << mControlWidget->getCalibExtrTrans3() << " tZ3D: " << tZ3D << endl;
 
             ursprung = extCalib->getImagePoint(cv::Point3f(0,0,0));
 
@@ -315,13 +219,8 @@ void CoordItem::updateData()
             // Tests if the origin-point of the coordinate-system is outside the image
             if( extCalib->isOutsideImage(ursprung) )
             {
-                //debout << "Ursprung: " << ursprung.x << ", " <<ursprung.y << endl;
                 return;
             }
-            //debout << "Test" << endl;
-//            x3D.x += swapX;
-//            y3D.y += swapY;
-//            z3D.z += swapZ;
             x3D.x++;
             y3D.y++;
             z3D.z++;
@@ -330,26 +229,18 @@ void CoordItem::updateData()
             do{
                 x3D.x--;
                 x = extCalib->getImagePoint(x3D);
-                //if( ursprungOutside ){ break; }
-                //debout << x.x << ", " << x.y << endl;
                 // tests if the coord system axis are inside the view or outside, if outside short them till they are inside the image
             }while( x.x < -bS || x.x > mMainWindow->getImage()->width()-bS || x.y < -bS || x.y > mMainWindow->getImage()->height()-bS );
             do{
                 y3D.y--;
                 y = extCalib->getImagePoint(y3D);
-                //if( ursprungOutside ){ break; }
-                //debout << y.x << ", " << y.y << endl;
             }while( y.x < -bS || y.x > mMainWindow->getImage()->width()-bS || y.y < -bS || y.y > mMainWindow->getImage()->height()-bS );
             do{
                 z3D.z--;
                 z = extCalib->getImagePoint(z3D);
-                //if( ursprungOutside ){ break; }
-                //debout << z.x << ", " << z.y << endl;
             }while( z.x < -bS || z.x > mMainWindow->getImage()->width()-bS || z.y < -bS || z.y > mMainWindow->getImage()->height()-bS );
         }
         }
-    //}
-
         prepareGeometryChange();
 
     }
@@ -404,8 +295,6 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 
                 cv::Point2f p3 = extCalib->getImagePoint(p3d);
 
-                //QPointF axis = mMainWindow->getImageItem()->getCmPerPixel(p3.x,p3.y,p3d.z);
-
                 painter->drawEllipse(p3.x-4,p3.y-4,8,8);
 
                 // Connecting-line Pixel-3D-Points
@@ -416,17 +305,6 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
                 painter->setBrush(Qt::black);
                 painter->drawText(QPointF(p2.x+10,p2.y+font.pixelSize()), QObject::tr("%1").arg((i+1)));
 
-                //painter->setPen(Qt::blue);
-                //painter->setBrush(Qt::blue);
-
-                // min/max of calibration points for bounding box
-//                if( i == 0)
-//                {
-//                    calibPointsMin.x = p2.x;
-//                    calibPointsMin.y = p2.y;
-//                    calibPointsMax.x = p2.x;
-//                    calibPointsMax.y = p2.y;
-//                }
                 if( p2.x < calibPointsMin.x ) calibPointsMin.x = p2.x;
                 if( p2.x > calibPointsMax.x ) calibPointsMax.x = p2.x;
                 if( p3.x < calibPointsMin.x ) calibPointsMin.x = p3.x;
@@ -454,34 +332,17 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             //////////////////////////
 
             painter->setPen(QPen(QBrush(Qt::blue),0));
-//            double sc = mControlWidget->getCalibCoordScale();
-//            double tX = mControlWidget->getCalibCoordTransX();
-//            double tY = mControlWidget->getCalibCoordTransY();
-//            double tZ = mControlWidget->getCalibCoordRotate();
-//            double cU = mControlWidget->getCalibCoordUnit();
 
             static QPointF points[3];
-
-            //         //eigentliche BoundingBox: painter->drawRect(QRectF(mControlWidget->getCalibCoordTransX()/10.-scale, mControlWidget->getCalibCoordTransY()/10.-scale, 2*scale, 2*scale));
-            //         matrix.translate(mControlWidget->getCalibCoordTransX()/10., mControlWidget->getCalibCoordTransY()/10.);
-            //         matrix.rotate((mControlWidget->getCalibCoordRotate())/10.);
-            // mit folgender zeile wuerde nur der painter bewegt, nicht aber das koord des items!!!
-            //         painter->setWorldMatrix(matrix, true); // true sagt, dass relativ und nicht absolut (also zusaetzlichj zur uebergeordneten matrizen)
 
             // Koordinatenachsen
             points[0].setX(-10.); points[0].setY(0.);
             points[1].setX(100.);     points[1].setY(0.);
             painter->drawLine(points[0], points[1]);
 
-            //debout << "1. Points[0]: " << points[0].x() << " " << points[0].y() << endl;
-            //debout << "1. Points[1]: " << points[1].x() << " " << points[1].y() << endl;
-
             points[0].setX(0.); points[0].setY(10.);
             points[1].setX(0.); points[1].setY(-100.);
             painter->drawLine(points[0], points[1]);
-
-            //debout << "2. Points[0]: " << points[0].x() << " " << points[0].y() << endl;
-            //debout << "2. Points[1]: " << points[1].x() << " " << points[1].y() << endl;
 
             // Ticks
             for (int i=1; i<11; i++) // i=10 zeichnen sieht ungewoehnlich aus, laeest sich aber besser mit messen
@@ -513,61 +374,12 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             points[1].setX(2.);  points[1].setY(-95.);
             points[2].setX(-2.); points[2].setY(-95.);
             painter->drawPolygon(points, 3);
-
-            /*
-            //         // Koordinatenachsen
-            //         painter->setPen(Qt::blue);
-
-            //         points[0].setX(-.1*scale); points[0].setY(0.);
-            //         points[1].setX(scale);     points[1].setY(0.);
-            //         painter->drawLine(points[0], points[1]);
-
-            //         points[0].setX(0.); points[0].setY(.1*scale);
-            //         points[1].setX(0.); points[1].setY(-scale);
-            //         painter->drawLine(points[0], points[1]);
-
-            //         // Ticks
-            //         for (int i=1; i<10; i++)
-            //         {
-            //             points[0].setX(0.02*scale);  points[0].setY(-i*scale/10.);
-            //             points[1].setX(-0.02*scale); points[1].setY(-i*scale/10.);
-            //             painter->drawLine(points[0], points[1]);
-            //             points[0].setX(i*scale/10.); points[0].setY(0.02*scale);
-            //             points[1].setX(i*scale/10.); points[1].setY(-0.02*scale);
-            //             painter->drawLine(points[0], points[1]);
-            //         }
-
-            //         // Beschriftung
-            //         points[0].setX(0.97*scale); points[0].setY(0.12*scale);
-            //         painter->drawText(points[0], QObject::tr("1"));
-            //         points[0].setX(-0.08*scale); points[0].setY(-0.97*scale);
-            //         painter->drawText(points[0], QObject::tr("1"));
-
-            //         // Pfeilspitzen
-            //         painter->setPen(Qt::NoPen);
-            //         painter->setBrush(Qt::blue);
-
-            //         points[0].setX(scale);      points[0].setY(0.);
-            //         points[1].setX(0.95*scale); points[1].setY(0.02*scale);
-            //         points[2].setX(0.95*scale); points[2].setY(-0.02*scale);
-            //         painter->drawPolygon(points, 3);
-
-            //         points[0].setX(0.);           points[0].setY(-scale);
-            //         points[1].setX(0.02*scale);  points[1].setY(-0.95*scale);
-            //         points[2].setX(-0.02*scale); points[2].setY(-0.95*scale);
-            //         painter->drawPolygon(points, 3);
-            */
-
         }else
         {
             double tX3D = mControlWidget->getCalibCoord3DTransX();
             double tY3D = mControlWidget->getCalibCoord3DTransY();
             double tZ3D = mControlWidget->getCalibCoord3DTransZ();
             double axeLen = mControlWidget->getCalibCoord3DAxeLen();
-
-//            int swapX = mControlWidget->getCalibCoord3DSwapX() ? -1 : 1;
-//            int swapY = mControlWidget->getCalibCoord3DSwapY() ? -1 : 1;
-//            int swapZ = mControlWidget->getCalibCoord3DSwapZ() ? -1 : 1;
 
             qreal coordLineWidth = 2.0;
 
@@ -694,9 +506,6 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             painter->drawLine(QPointF(p[0].x,p[0].y),QPointF(p[1].x,p[1].y));
             p[1] = extCalib->getImagePoint(cv::Point3f(z3D.x,z3D.y,z3D.z));
             painter->drawLine(QPointF(p[0].x,p[0].y),QPointF(p[1].x,p[1].y));
-//            painter->drawLine(QPointF(ursprung.x,ursprung.y),QPointF(x.x,x.y));
-//            painter->drawLine(QPointF(ursprung.x,ursprung.y),QPointF(y.x,y.y));
-//            painter->drawLine(QPointF(ursprung.x,ursprung.y),QPointF(z.x,z.y));
 
             /////////////////////////////////
             // Drawing the X,Y,Z - Symbols //
@@ -716,7 +525,6 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             if( debug ) debout << "Ursprungskoordinaten: " << ursprung.x << ", " << ursprung.y << std::endl;
             if( debug ) debout << "Bildsize: " << mMainWindow->getImage()->width() << "x" << mMainWindow->getImage()->height() << std::endl;
             if( debug ) sprintf (coordinaten, "(%f  %f %f)", tX3D, tY3D, tZ3D);
-            //painter->drawText(QPoint(ursprung.x+25,ursprung.y),QString(coordinaten));
 
             //////////////////////////////
             // Drawing the tick-markers //
@@ -786,7 +594,6 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             points[1] = QPointF(p[1].x,p[1].y);
             points[2] = QPointF(p[2].x,p[2].y);
             painter->setPen(Qt::green);
-//            painter->drawPolygon(points,3,Qt::WindingFill);
             painter->setPen(QPen(QBrush(Qt::blue),coordLineWidth));
             painter->drawLine(points[0],points[1]);
             painter->drawLine(points[0],points[2]);
@@ -799,7 +606,6 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             points[1] = QPointF(p[1].x,p[1].y);
             points[2] = QPointF(p[2].x,p[2].y);
             painter->setPen(Qt::green);
-//            painter->drawPolygon(points,3,Qt::WindingFill);
             painter->setPen(QPen(QBrush(Qt::blue),coordLineWidth));
             painter->drawLine(points[0],points[1]);
             painter->drawLine(points[0],points[2]);
@@ -822,7 +628,6 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             points[1] = QPointF(p[1].x,p[1].y);
             points[2] = QPointF(p[2].x,p[2].y);
             painter->setPen(Qt::green);
-//            painter->drawPolygon(points,3,Qt::WindingFill);
             painter->setPen(QPen(QBrush(Qt::blue),coordLineWidth));
             painter->drawLine(points[0],points[1]);
             painter->drawLine(points[0],points[2]);
@@ -835,7 +640,6 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             points[1] = QPointF(p[1].x,p[1].y);
             points[2] = QPointF(p[2].x,p[2].y);
             painter->setPen(Qt::green);
-//            painter->drawPolygon(points,3,Qt::WindingFill);
             painter->setPen(QPen(QBrush(Qt::blue),coordLineWidth));
             painter->drawLine(points[0],points[1]);
             painter->drawLine(points[0],points[2]);
@@ -858,7 +662,6 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             points[1] = QPointF(p[1].x,p[1].y);
             points[2] = QPointF(p[2].x,p[2].y);
             painter->setPen(Qt::green);
-//            painter->drawPolygon(points,3,Qt::WindingFill);
             painter->setPen(QPen(QBrush(Qt::blue),coordLineWidth));
             painter->drawLine(points[0],points[1]);
             painter->drawLine(points[0],points[2]);
@@ -871,7 +674,6 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             points[1] = QPointF(p[1].x,p[1].y);
             points[2] = QPointF(p[2].x,p[2].y);
             painter->setPen(Qt::green);
-//            painter->drawPolygon(points,3,Qt::WindingFill);
             painter->setPen(QPen(QBrush(Qt::blue),coordLineWidth));
             painter->drawLine(points[0],points[1]);
             painter->drawLine(points[0],points[2]);

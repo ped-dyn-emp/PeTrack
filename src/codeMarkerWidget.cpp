@@ -50,12 +50,10 @@ CodeMarkerWidget::CodeMarkerWidget(QWidget *parent)
     dictList->addItem("DICT_ARUCO_ORGINAL"); // 16
     dictList->addItem("DICT_mip_36h12");//17
 
-    // Add some other marker dictionaries
-    //dictList->addItem("ARTOOLKIT");
-
     dictList->setCurrentIndex(16);
 
 }
+
 //<COLOR_MARKER>
 //    <MASK SHOW="0" OPACITY="100" MASK="1"/>
 //    <FROM_COLOR HUE="0" SATURATION="0" VALUE="0"/>

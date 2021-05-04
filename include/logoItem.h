@@ -48,9 +48,6 @@ public:
 
     QRectF boundingRect() const;
 
-//    void dragEnterEvent(QDragEnterEvent *event);
-//    void dropEvent(QDropEvent *event);
-
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     inline float getOpacity() const
     {
@@ -64,7 +61,6 @@ public:
 
 private:
     Petrack *mMainWindow;
-    //QGraphicsScene *mScene; erhaelt man mit scene()
     QImage *mImage;
     float mOpacity;
     Fader fader;

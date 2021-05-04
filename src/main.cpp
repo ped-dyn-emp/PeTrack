@@ -40,7 +40,7 @@
 static QApplication * gApp = nullptr;
 void quit(int sig_number)
 {
-    gApp->quit(); // gPetrack->close();
+    gApp->quit();
     return;
 }
 
@@ -84,17 +84,12 @@ int main(int argc, char *argv[])
 
     for (int i = 1; i < arg.size(); ++i) // i=0 ist Programmname
     {
-        //cout << arg.at(i).toStdString() << endl;
         if (arg.at(i) == "-help" || arg.at(i) == "-?")
         {
             QTextDocument doc;
             doc.setHtml(commandLineOptionsString);
             debout << std::endl << doc.toPlainText() << std::endl;
-            //debout << commandLineOptionsString <<endl;
             QMessageBox::about(nullptr, QObject::tr("Command line options"), commandLineOptionsString);
-            //cout << "Help:\n-----" << endl
-            //     << "Usage: petrack [-help|-?] [[-project] project.pet] [-sequence image_sequence_or_video] [-autoSave|-autosave image_folder_or_video|project.pet|tracker_file] [-autoTrack|-autotrack tracker_file] [-autoPlay|-autoplay tracker_file]" << endl << endl
-           //      << "For more information see http://www.fz-juelich.de/jsc/petrack/." << endl;
             return 0; // 0 means exit success // 1?
         }
         else if (arg.at(i) == "-project") 
@@ -222,7 +217,6 @@ int main(int argc, char *argv[])
         }
 
         petrack.exportTracker(autoTrackDest);
-
         if (autoSave && (autoSaveDest.right(4) == ".pet"))
         {
             petrack.saveProject(autoSaveDest);

@@ -43,10 +43,6 @@ public:
     // read data from xml node
     void getXml(QDomElement &elem);
 
-#if 0 // Maik temporaer, damit es auf dem Mac laeuft
-    aruco::Dictionary usedDictionary;
-    aruco::DetectorParameters detectParams;
-#endif
 
 private slots:
 
@@ -54,9 +50,6 @@ private slots:
     {
 
         mMainWindow->getCodeMarkerItem()->setVisible(i);
-//        mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
-//        mMainWindow->getCodeMarkerItem()->setVisible(mMainWindow->getCodeMarkerWidget()->showDetectedCandidates->isChecked() || mMainWindow->getCodeMarkerWidget()->showMask->isChecked());
-//        mMainWindow->getScene()->update();
         if( !mMainWindow->isLoading() )
             mMainWindow->getScene()->update();
     }

@@ -22,10 +22,6 @@
 #include "helper.h"
 #include "recognition.h"
 
-// TrackPointReal::TrackPointReal()
-//     : mQual(0)
-// {
-// }
 TrackPointReal::TrackPointReal(const Vec3F &p, int frameNum)
     : Vec3F(p), mFrameNum(frameNum)
 {
@@ -39,22 +35,6 @@ TrackPointReal::TrackPointReal(const Vec3F &p, int frameNum, const Vec2F &d)
     mAngleOfView = -1;
     mMarkerID = -1;
 }
-
-// const TrackPointReal& TrackPointReal::operator=(const Vec2F& v)
-// {
-//     Vec2F::operator=(v);
-//     return *this;
-// }
-
-// const TrackPointReal& TrackPointReal::operator+=(const Vec2F& v)
-// {
-//     Vec2F::operator+=(v);
-//     return *this;
-// }
-// const TrackPointReal TrackPointReal::operator+(const Vec2F& v) const
-// {
-//     return TrackPointReal(*this) += v; //Vec2F(mX + v.mX, mY + v.mY);
-// }
 
 //--------------------------------------------------------------------------
 
@@ -83,10 +63,7 @@ bool TrackPersonReal::trackPointExist(int frame) const
 }
 const TrackPointReal& TrackPersonReal::trackPointAt(int frame) const // & macht bei else probleme, sonst mit [] zugreifbar
 {
-//     if (frame >= mFirstFrame && frame <= mLastFrame) ////!!!! muss vorher ueberprueft werden, ob es existiert!!!
         return at(frame-mFirstFrame);
-//     else              
-//         return TrackPointReal();
 }
 
 // gibt -1 zurueck, wenn frame oder naechster frame nicht existiert
@@ -111,8 +88,6 @@ void TrackPersonReal::addEnd(const QPointF& pos, int frame)
 {
     Vec3F p(pos.x(), pos.y(), -1.);
     addEnd(p, frame);
-    //++mLastFrame;
-    //append(TrackPointReal(p, frame));
 }
 void TrackPersonReal::addEnd(const Vec3F& pos, int frame)
 {
@@ -137,11 +112,6 @@ TrackerReal::TrackerReal(QWidget *wParent)
         mMainWindow = (class Petrack*) wParent;
 }
 
-
-// TrackerReal::~TrackerReal()
-// {
-// }
-
 // default: int imageBorderSize = 0, bool missingFramesInserted = true, bool useTrackpoints = false
 int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *colorPlot, int imageBorderSize, bool missingFramesInserted,
                            bool useTrackpoints, bool alternateHeight, double altitude, bool useCalibrationCenter,
@@ -153,11 +123,6 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
         if (size() > 0)
         {
             clear();
-//             debout << "Recalculating real tracking data" <<endl;
-        }
-        else
-        {
-//             debout << "Calculating real tracking data" <<endl;
         }
 
         int i, j, f;
@@ -212,7 +177,6 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
         }
 
         // fps ist nicht aussagekraeftig, da sie mgl von ausgelassenen herruehren - besser immer 25,01 fps annehmen
-        //                 out << tracker->size() << " " << mAnimation->getFPS() << endl << endl;
 
         double height; // groesse in cm
         int firstFrame, addFrames, anz;
@@ -250,7 +214,6 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                 {
                     tmpMissingList.removeFirst(); // frame
                     addFrames += tmpMissingListAnz.takeFirst(); // anzahl
-                    //tmpMissingListAnz.removeFirst(); // anzahl
                 }
             }
 
@@ -272,24 +235,9 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                             nrFor++;
                         while ((j-nrRew >= 0) && ((*tracker)[i].at(j-nrRew).sp().z() < 0)) // nach && wird nur ausgefuehrt, wenn erstes true == size() also nicht
                             nrRew++;
-                        //if ((j+nrFor == tsize) && (j-nrRew < 0)) // gar keine Hoeheninfo in trj gefunden
 
                         if (((j-nrRew >= 0) && (j+nrFor == tsize)) || ((j-nrRew >= 0) && (nrRew < nrFor))) // nur oder eher in Vergangenheit hoeheninfo gefunden
                         {
-//if (i == 175) // N:\tagDerNeugier\14.19.21.trc
-//{
-//    debout << i+1 << endl;
-//    debout << (*tracker)[i] << endl;
-//    debout << (*tracker)[i].size() << endl;
-//    debout << j << " " << nrRew << endl;
-////    (*tracker)[i]
-////    0 138.869 2927 2928 1 -1 -1 -1 2
-////    952.885 550.538 -1 -1 -1 100 0 0 -1 -1 -1
-////    965.469 564.862 104.295 28.3304 316.131 100 0 0 -1 -1 -1
-////    i j nrRew:
-////    175 1 2
-//}
-// in diesem if kam es zum Absturz, da j = 1 und nrRew = 2
                             if(fabs((*tracker)[i].at(j-nrRew).sp().z()-(*tracker)[i].at(j).sp().z()) > nrRew*40.) // 40cm
                             {
                                 (*tracker)[i][j].setSp((*tracker)[i].at(j).sp().x(),(*tracker)[i].at(j).sp().y(),(*tracker)[i].at(j-nrRew).sp().z());
@@ -298,7 +246,6 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                         }
                         else if (((j+nrFor != tsize) && (j-nrRew < 0)) || ((j+nrFor != tsize) && (nrFor < nrRew))) // nur oder eher in der zukunft hoeheninfo gefunden
                         {
-                            //debout << nrRew << " " << nrFor << " " << (*tracker)[i].at(j+nrFor).sp().z() << " " << (*tracker)[i].at(j).sp().z() << " " << endl;
                             if(fabs((*tracker)[i].at(j+nrFor).sp().z()-(*tracker)[i].at(j).sp().z()) > nrFor*40.) // 40cm
                             {
                                 (*tracker)[i][j].setSp((*tracker)[i].at(j).sp().x(),(*tracker)[i].at(j).sp().y(),(*tracker)[i].at(j+nrFor).sp().z());
@@ -310,7 +257,6 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                             // median genommen um zwei fehlmessungen nebeneinander nicht dazu fuehren zu lassen, dass bessere daten veraendert werden
                             zMedian = getMedianOf3((*tracker)[i].at(j).sp().z(), (*tracker)[i].at(j-nrRew).sp().z(), (*tracker)[i].at(j+nrFor).sp().z());
                             // lineare interpolation
-                            //zInter=(*tracker)[i].at(j-nrRew).sp().z()+nrRew*((*tracker)[i].at(j+nrFor).sp().z()-(*tracker)[i].at(j-nrRew).sp().z())/(nrFor+nrRew);
                             if(fabs(zMedian-(*tracker)[i].at(j).sp().z()) > 20.*(nrFor+nrRew)) // 20cm
                             {
                                 (*tracker)[i][j].setSp((*tracker)[i].at(j).sp().x(),(*tracker)[i].at(j).sp().y(),zMedian);
@@ -402,8 +348,6 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                         {
                             trackPersonReal.last().setMarkerID((*tracker)[i][j].getMarkerID());
                         }
-
-                        // firstFrame+j+addFrames    //ist die kontinuierliche frame number
                     }
                 }
 
@@ -418,7 +362,6 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                             // border unberuecksichtigt
                             for (f = 1; f <= anz; ++f)
                             {
-                                //trackPersonReal.addEnd((*tracker)[i][j].sp()+f*((*tracker)[i][j+1].sp()-(*tracker)[i][j].sp())/(anz+1), -1); // -1 zeigt an, dass nur interpoliert
                                 sp = (*tracker)[i][j].sp()+f*((*tracker)[i][j+1].sp()-(*tracker)[i][j].sp())/(anz+1);
                                 if (useCalibrationCenter)
                                     trackPersonReal.addEnd(Vec3F(sp.x()+center.x(), center.y()-sp.y(), altitude-sp.z()), firstFrame+j);
@@ -441,14 +384,12 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                                 pos2 = (imageItem->getPosReal(((*tracker)[i][j+1]+moveDir+br).toQPointF(), height) - pos)/(anz+1);
                                 for (f = 1; f <= anz; ++f)
                                     trackPersonReal.addEnd(pos+f*pos2, -1); // -1 zeigt an, dass nur interpoliert
-                                //addFrames += anz;
                             }
                         }
                     } 
                     else if (tmpMissingList.first() < firstFrame) // while, wenn nicht kontinuierlich waere
                     {
                         tmpMissingList.removeFirst(); // frame
-                        //addFrames += tmpMissingListAnz.takeFirst(); // anzahl
                         tmpMissingListAnz.removeFirst(); // anzahl
                     }
                 }
@@ -465,7 +406,6 @@ int TrackerReal::calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *co
                 if ((j < numBorderPoints) && ((trackPersonReal.at(j).z()-trackPersonReal.at(j-1).z()) > maxHeightDiff))
                 {
                     delNumFront = j;
-                    //debout << i << " " << j << " " <<trackPersonReal.at(j).z()-trackPersonReal.at(j-1).z() <<endl;
                 }
                 else if (((tsize - numBorderPoints) < j) && ((trackPersonReal.at(j).z()-trackPersonReal.at(j-1).z()) > maxHeightDiff))
                 {
@@ -591,17 +531,6 @@ void TrackerReal::exportTxt(QTextStream &out, bool alternateHeight, bool useTrac
     else
         scale = 1.;
 
-//    if (useTrackpoints)
-//    {
-//        for (int i = 0; i < size(); ++i)
-//            for (int j = 0; j < at(i).size(); ++j)
-//                // Umrechnung in coordSystem fehlt, auch camera altitude unberuecksichtigt!!!
-//                out << i+1 << " " << at(i).firstFrame()+j << " " << at(i).at(j).x() << " " << at(i).at(j).y() << " " << at(i).at(j).z()*scale <<endl;
-//   war:         out << i+1 << " " << at(i).firstFrame()+j << " " << at(i).at(j) << " " << at(i).at(j).z()*scale <<endl;
-//    }  //<< " " << tp.qual();
-//    else
-//    {
-    //   out << *this;
     QProgressDialog progress("Export TXT-File",nullptr,0,size(),mMainWindow->window());
     progress.setWindowTitle("Export .txt-File");
     progress.setWindowModality(Qt::WindowModal);
@@ -619,7 +548,6 @@ void TrackerReal::exportTxt(QTextStream &out, bool alternateHeight, bool useTrac
         for (int j = 0; j < at(i).size(); ++j)
         {
             out << i+1 << " " << at(i).firstFrame()+j << " " << at(i).at(j).x()*scale << " " << at(i).at(j).y()*scale << " ";
-            //out << i+1 << " " << at(i).firstFrame()+j << " " << at(i).at(j).x()*scale << " " << at(i).at(j).y()*scale << " ";
 
             if (alternateHeight || useTrackpoints)
                 out << at(i).at(j).z()*scale;
@@ -639,14 +567,6 @@ void TrackerReal::exportTxt(QTextStream &out, bool alternateHeight, bool useTrac
         }
     }
 }
-
-//    inline QTextStream& operator<<(QTextStream& s, const TrackerReal& trackerReal)
-//    {
-//        for (int i = 0; i < trackerReal.size(); ++i)
-//            for (int j = 0; j < trackerReal.at(i).size(); ++j)
-//                s << i+1 << " " << trackerReal.at(i).firstFrame()+j << " " << trackerReal.at(i).at(j) << " " << trackerReal.at(i).height() <<endl; //<< " " << tp.qual();
-//        return s;
-//    }
 
 // old - not all export options supported!!!!
 void TrackerReal::exportDat(QTextStream &out, bool alternateHeight, bool useTrackpoints) // fuer gnuplot
@@ -697,7 +617,6 @@ void TrackerReal::exportXml(QTextStream &outXml, bool alternateHeight, bool useT
 {
     int i, j, largestLastFr = largestLastFrame();
     double z;
-    //TrackPointReal tp;
     int defaultPersonHeight = 176;
 
     QProgressDialog progress("Export XML-File",nullptr,0,largestLastFr,mMainWindow->window());
@@ -708,7 +627,6 @@ void TrackerReal::exportXml(QTextStream &outXml, bool alternateHeight, bool useT
     progress.setLabelText(QString("Export tracking data ..."));
     qApp->processEvents();
 
-    // j = person
     outXml << "    <shape>" << Qt::endl;
     for (j = 0; j < size(); ++j)
     {
@@ -749,38 +667,4 @@ void TrackerReal::exportXml(QTextStream &outXml, bool alternateHeight, bool useT
         }
         outXml << "    </frame>" << Qt::endl;
     }
-
-    // alte Version der trav datei
-//    // j = person
-//    outXml << "    <persons>" << endl;
-//    for (j = 0; j < size(); ++j)
-//    {
-//        outXml << "    " << j+1 << " " << at(j).height() << endl;
-//    }
-//    outXml << "    </persons>" << endl <<endl;
-
-//    // i = frame; j = person
-//    for (i = smallestFirstFrame(); i <= largestLastFr; ++i)
-//    {
-//        outXml << "    <data>" << endl;
-//        for (j = 0; j < size(); ++j)
-//        {
-//            if (at(j).trackPointExist(i))
-//            {
-//                // z-wert ist hier ausnahmsweise nicht der kopf, sondern der boden, die prsonengroesse wird dem obigem person-datenentnommen
-//                //personID, Frame ID(?) , X , Y , Z
-//                if (useTrackpoints)
-//                    z = at(j).trackPointAt(i).z()+at(j).height();
-//                else
-//                {
-//                    if (alternateHeight)
-//                        z = at(j).trackPointAt(i).z()-at(j).height();
-//                    else
-//                        z = 0; //at(j).height();
-//                }
-//                outXml << "    " << j+1 << " " << i << " " << at(j).trackPointAt(i) << " " << z << " 1" << endl; // z Koordinate ist Boden
-//            }
-//        }
-//        outXml << "    </data>" << endl;
-//    }
 }

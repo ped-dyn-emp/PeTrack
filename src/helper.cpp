@@ -110,11 +110,6 @@ rect wird veraendert, roi nicht
 */
 cv::Mat getRoi(cv::Mat &img, const QRect &roi, cv::Rect &rect, bool evenPixelNumber)
 {
-//    Mat tImg;
-//    IplImage *header;
-//    CvSize size;
-//    CvMat *p = NULL;
-
     rect.x = roi.x();
     rect.y = roi.y();
     rect.width = roi.width();
@@ -157,68 +152,5 @@ cv::Mat getRoi(cv::Mat &img, const QRect &roi, cv::Rect &rect, bool evenPixelNum
         rect.height -= (rect.y+rect.height-img.rows);
     }
 
-//    PROCESS_MEMORY_COUNTERS pMC;
-//    DWORD a;
-//    GetProcessMemoryInfo(GetCurrentProcess(),&pMC, a);
-//    debout << a << endl;
-//    debout << pMC.cb << endl;
-//    debout << pMC.PageFaultCount << endl;
-//    debout << pMC.PeakWorkingSetSize << endl;
-//    debout << pMC.WorkingSetSize << endl;
-//    debout << pMC.QuotaPeakPagedPoolUsage << endl;
-//    debout << pMC.QuotaPagedPoolUsage << endl;
-//    debout << pMC.QuotaPeakNonPagedPoolUsage << endl;
-//    debout << pMC.QuotaNonPagedPoolUsage << endl;
-//    debout << pMC.PagefileUsage << endl;
-//    debout << pMC.PeakPagefileUsage << endl;
-
-// ----------------------------------------- folgende Zeilen -----------------------------------------------------------
-//    //cvSetImageROI(img, rect); - absturz!
-//    // no copy of data, only new header which allows to access rect
-//    // must be done with mat, no image equivalents!
-//    if (img->nChannels == 3)
-//        p = cvCreateMatHeader(rect.height, rect.width, CV_32SC4); // CV_32SC4 mgl Problem bei graubildern
-//    else if (img->nChannels == 1)
-//        p = cvCreateMatHeader(rect.height, rect.width, CV_8SC1);
-//    else
-//    {
-//        debout << "Error: wrong number of channels: " << img->nChannels << endl;
-//        return NULL;
-//    }
-//    cvGetSubRect(img, p, rect); // rect ausschnitt von img wird in imageheader p gepackt (keine Datenkopie noetig)
-//    size.width = rect.width;
-//    size.height = rect.height;
-//    header = cvCreateImageHeader(size, img->depth, img->nChannels);
-//    tImg = cvGetImage(p, header);
-//    cvFree(&p); // (void**) only header
-// -------------------------- durch diese ersetzt, da es beim Verschieben des linken ROI Randes zum Absturz bei Zugriff auf tImg kam!!!!!!!!!!!
-    /* copy ROI to subimg */
-//    tImg = cvCreateImage(cvSize(rect.width,rect.height), img->depth, img->nChannels);
-//    cvSetImageROI(img, rect);
-//    cvCopy(img, tImg, NULL); // kopiert nur ROI
-//    cvResetImageROI(img);
-    // am schoensten waere natuerlich man wuerde roi setzen und die find-routinen wuerden nur diesen Bereich beachten
-//-------------------------------------------------------------------------------------------------------
-
     return img(rect);
-
-    //int x, y;
-    //int channels = img->nChannels;
-    //// Pointer to the data information in the IplImage
-    //unsigned char *data  = (unsigned char *) img->imageData;
-    //     // mark white regions green
-    //     for (y = 0; y < img->height; ++y)
-    //     {
-    //         for (x = 0; x < img->width; ++x)
-    //         {
-    //             if (data[0] > 150 && data[1] > 150 && data[2] > 150)
-    //                 // eher grautoene statt farben: && data[0]-data[1] < 5 && data[1]-data[2] < 5)
-    //             {
-    //                 data[0] = 0;
-    //                 data[1] = 255;
-    //                 data[2] = 0;
-    //             }
-    //             data += channels;
-    //         }
-    //     }
 }

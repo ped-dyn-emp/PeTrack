@@ -36,12 +36,10 @@
 // kann auch schief stehen, hat aber keine abfragen, ob punkt innerhalb
 
 MyEllipse::MyEllipse()
-    : // mC(0, 0), default 
+    :
     mR1(0),
     mR2(0),
     mAngle(0)
-    // mF1(0, 0), default 
-    // mF2(0, 0), default 
 {
 }
 MyEllipse::MyEllipse(double x, double y, double r1, double r2, double angle)
@@ -61,14 +59,12 @@ MyEllipse::MyEllipse(QPointF center, QSizeF size, double angle)
 
 Vec2F MyEllipse::center() const
 {
-    //return QPointF(mC.x(), mC.y());
     return mC;
 }
 QSizeF MyEllipse::size() const
 {
     return QSizeF(mR1, mR2);
 }
-// inline fkt muessen im header definiert werden!!!
 
 double MyEllipse::area() const
 {
@@ -104,12 +100,10 @@ bool MyEllipse::isNearlyCircle() const
 void MyEllipse::draw(cv::Mat &img, int r, int g, int b) const
 {
     cv::Size size;
-//    CvSize size;
     size.width = myRound(mR1);
     size.height = myRound(mR2);
     Vec2F centerVec = center();
     cv::Point centerPoint(centerVec.x(), centerVec.y());
-//    cvEllipse(img, center().toCvPoint(), size, 180*mAngle/PI, 0, 360, CV_RGB(r, g, b), 1, CV_AA, 0);
     cv::ellipse(img, centerPoint, size, 180*mAngle/PI, 0, 360, cv::Scalar(r,g,b), 1, cv::LINE_AA, 0);
 }
 

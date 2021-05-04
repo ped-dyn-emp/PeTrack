@@ -85,7 +85,6 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
 
     //slider
     mSlider = new QSlider(Qt::Horizontal);
-    //mSlider->setRange(0, anim->getNumFrames()>1 ? anim->getNumFrames()-1 : 0); 0 ist default unf setAnim macht rest
     mSlider->setTickPosition(QSlider::TicksAbove);
     mSlider->setMinimumWidth(100);
     connect(mSlider,SIGNAL(valueChanged(int)),this,SLOT(skipToFrame(int)));
@@ -114,10 +113,8 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
 
     mFrameNum = new QLineEdit("0");
     mFrameNum->setMaxLength(8); // bedeutet maxminal 1,1 stunden
-//     QSize sz = mFrameNum->minimumSizeHint(); //mFrameNum->minimumSizeHint(); // mFrameNum->sizeHint();
     mFrameNum->setMaximumWidth(75); //5*sz.width() //62
     mFrameNum->setAlignment(Qt::AlignRight);
-//     mFrameNum->setInputMask ("99999");
     mFrameNum->setValidator(mFrameNumValidator);
     mFrameNum->setFont(f);
     connect(mFrameNum,SIGNAL(editingFinished()),this,SLOT(skipToFrame()));
@@ -125,21 +122,15 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     //frame number
     mFpsNum = new QLineEdit(QString::number(DEFAULT_FPS));
     mFpsNum->setMaxLength(8); // bedeutet maxminal 999,99
-//     QSize sz = mFrameNum->minimumSizeHint(); //mFrameNum->minimumSizeHint(); // mFrameNum->sizeHint();
     mFpsNum->setMaximumWidth(62); //5*sz.width()
     mFpsNum->setAlignment(Qt::AlignRight);
-//     mFrameNum->setInputMask ("99999");
     mFpsNumValidator = new QDoubleValidator(0.0, 999.99, 2, this);
     mFpsNum->setValidator(mFpsNumValidator);
     mFpsNum->setFont(f);
     connect(mFpsNum,SIGNAL(editingFinished()),this,SLOT(setFPS()));
-//     mFpsLabel = new QLabel();
-//     mFpsLabel->setFont(f2);
 
-    //static QLabel atLabel("@");
     QFont f2("Courier", 12, QFont::Normal); //Times Helvetica, Normal
     mAtLabel = new QLabel("@");
-    //mAtLabel->setText();
     mAtLabel->setFont(f2);
 
     mSourceInLabel = new QLabel("In:");
@@ -148,9 +139,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mSourceOutLabel = new QLabel("Out:");
     mSourceOutLabel->setFont(f2);
 
-    //static QLabel fpsLabel("fps");
     mFpsLabel = new QLabel("fps");
-    //mFpsLabel->setText("fps");
     mFpsLabel->setFont(f2);
     // default value
     mPlayerSpeedLimited = false;
@@ -234,8 +223,6 @@ void Player::setAnim(Animation *anim)
         mFrameNumValidator->setTop(max);
         mFrameInNumValidator->setTop(anim->getSourceOutFrameNum());
         mFrameOutNumValidator->setTop(anim->getMaxFrames());
-//        mFpsLabel->setText(QString("@ %1 fps").arg(anim->getFPS()));
-//        mIplImg = NULL; // release?
     }
 }
 
@@ -262,8 +249,6 @@ bool Player::updateImage()
     if (mImg.empty())
     {
         pause();
-        //cerr<<"No valid image to update"<<endl;
-//        mMainWindow->updateImage(Mat(mImg.rows,mImg.cols,CV_8UC3,Scalar(0,0,0)));
         return false;
     }
     qApp->processEvents();
@@ -271,13 +256,10 @@ bool Player::updateImage()
     double time1 = 0.0, tstart;
     tstart = clock();
 #endif
-//    debout << "test" << endl;
     mMainWindow->updateImage(mImg);
-//    debout << "test" << endl;
     if (mRec)
     {
         mAviFile.appendFrame((const unsigned char*) mImg.data, true);
-        //mAviWriter.append(mIplImg);
     }
 #ifdef TIME_MEASUREMENT
     time1 += clock() - tstart;
@@ -552,11 +534,10 @@ bool Player::skipTo(int proMil) // proMil = [0..1000]
 {
     if (mSliderSet)
     {
-//         mSliderSet = false;
         return false;
     }
     pause();
-    mImg = mAnimation->getFrameAtPos(proMil/1000.0);//cvarrToMat(mAnimation->getFrameAtPos(proMil/1000.0)); // value between 0..1
+    mImg = mAnimation->getFrameAtPos(proMil/1000.0); // value between 0..1
     return updateImage();
 }
 
@@ -564,31 +545,19 @@ bool Player::skipToFrame(int f) // [0..mAnimation->getNumFrames()-1]
 {
     if (mSliderSet)
     {
-//        mSliderSet = false;
         return false;
     }
     pause();
-//    debout << "test" << endl;
-    mImg = mAnimation->getFrameAtIndex(f);//cvarrToMat(mAnimation->getFrameAtIndex(f));
-//    debout << "test" << endl;
+    mImg = mAnimation->getFrameAtIndex(f);
     return updateImage();
 }
 
 bool Player::skipToFrame() // [0..mAnimation->getNumFrames()-1]
 {
-//     if (mSliderSet)
-//     {
-// //         mSliderSet = false;
-//         return false;
-//     }
-    //debout << "num: " << mFrameNum->text().toInt() << endl;
        if (mFrameNum->text().toInt() < getFrameInNum())
            mFrameNum->setText(QString::number(getFrameInNum()));
        if (mFrameNum->text().toInt() > getFrameOutNum())
            mFrameNum->setText(QString::number(getFrameOutNum()));
-//     pause();
-//     mIplImg = mAnimation->getFrameAtIndex(mFrameNum->text().toInt());
-//     return updateImage();
 
     return skipToFrame(mFrameNum->text().toInt());
 }
@@ -659,8 +628,6 @@ void Player::setFrameOutNum(int out)
     mFrameInNumValidator->setTop(/*out*/getFrameOutNum()-1);
     mFrameNumValidator->setBottom(getFrameInNum());
     mFrameNumValidator->setTop(/*out*/getFrameOutNum());
-
-    //update();
 }
 
 int Player::getPos()

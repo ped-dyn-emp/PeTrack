@@ -33,10 +33,6 @@
 #include "pMessageBox.h"
 #include "recognitionRoiItem.h"
 
-// Measure Time spending in functions
-//#define TIME_MEASUREMENT
-
-
 #define MIN_WIN_SIZE 3.
 
 /**
@@ -95,15 +91,6 @@ TrackPoint::TrackPoint(const Vec2F &p, int qual, const Vec2F &colPoint, const QC
 {
 }
 
-// const TrackPoint& TrackPoint::operator=(const TrackPoint& tp)
-// {
-//     Vec2F::operator=(tp);
-//     mQual = tp.qual();
-//     mColPoint = tp.colPoint();
-//     mCol = tp.color();
-//     return *this;
-// }
-
 const TrackPoint& TrackPoint::operator=(const Vec2F& v)
 {
     Vec2F::operator=(v);
@@ -136,17 +123,6 @@ TrackPerson::TrackPerson()
       mColCount(0)
 {
 }
-// TrackPerson::TrackPerson(int nr, int frame, const Vec2F &p)
-//     : mNr(0),
-//       mHeight(MIN_HEIGHT),
-//       mFirstFrame(frame),
-//       mLastFrame(frame),
-//       mNewReco(true)
-// {
-//     //TrackPoint t = p;
-//     //for (int i = 0; i <= frame; ++i)
-//     append(p);
-// }
 TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p)
     : mNr(nr),
       mMarkerID(-1),
@@ -223,7 +199,6 @@ void TrackPerson::optimizeColor()
             vBefore = v;
         }
     }
-    //debout << anz1 << "  " << anz2 <<endl;
     swap = false;
     if (at(i).color().isValid())
         vBefore = at(i).colPoint() - at(i);
@@ -276,11 +251,10 @@ void TrackPerson::optimizeColor()
 void TrackPerson::recalcHeight(float altitude)
 {
     double z = 0;
-    //double h = 0;
     // median statt mittelwert nehmen (bei gerader anzahl an werten den kleiner als mitte)
     QList<double> zList;
 
-    resetHeight(); // mHeight = MIN_HEIGHT, mHeightCount = 0
+    resetHeight();
 
     for (int i = 0; i < size(); ++i)
     {
@@ -295,7 +269,6 @@ void TrackPerson::recalcHeight(float altitude)
     if (mHeightCount > 0)
     {
         std::sort(zList.begin(), zList.end());
-        //mHeight = h / mHeightCount;
         mHeight = zList[mHeightCount/2];
         mHeight = altitude - mHeight;
     }
@@ -363,14 +336,10 @@ double TrackPerson::getNearestZ(int i, int *extrapolated)
  */
 bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool extrapolate)
 {
-//         if (frame == mLastFrame+1) //included in following lines
-//             append(p);
     int i;
     Vec2F tmp; // ua. zur linearen Interpolation
     TrackPoint tp; // default: 0 = ist schlechteste qualitaet
     double distance;
-
-//    debout << "frame: " << frame << " first: " << mFirstFrame << " last: " << mLastFrame << endl;
 
     if (frame > mLastFrame)
     {
@@ -381,7 +350,6 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool
             tmp.setY((p.y()-last().y())/(frame-mLastFrame));
             tp = last();
             tp.setQual(0);
-            //tp.setZdistanceToCam(p.zDistanceToCam()); keine Interpolation der Groesse
             for (i = 0; i < frame-mLastFrame-1; ++i)
             {
                 tp += tmp;
@@ -400,15 +368,10 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool
                 if (!((last().qual() == 0) && (at(size()-2).qual() == 0))) // das vorherige einfuegen ist 2x nicht auch schon schlecht gewesen
                 {
                     tp = p;
-//                     if (tp.qual() == 100) // reco oder haendisch - KOMMT NIE VOR, DA VOR RECO AUCH IMMER GETRACKT WIRD !!!!!!!
-//                         debout << "Warning: Big difference from tracked point in speed and direction between frame " << mLastFrame << " and " << mLastFrame+1 << "!" << endl;
-//                     else
-//                     {
                     debout << "Warning: Extrapolation instaed of tracking because of big difference from tracked point in speed and direction of person " << persNr+1 << " between frame " << mLastFrame << " and " << mLastFrame+1 << "!" << std::endl;
                         tp = last()+tmp; // nur vektor wird hier durch + geaendert
                         tp.setQual(0);
                         // im anschluss koennte noch dunkelster pkt in umgebung gesucht werden!!!
-//                     }
                         // keine Extrapolation der Groesse
                     append(tp);
                 }
@@ -474,7 +437,6 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool
         // dieser Zweig wird insbesondere von reco durchlaufen, da vorher immer auch noch getrackt wird und reco draufgesetzt wird!!!
 
         tp = p;
-//        debout << "qual: " << p.qual() << endl;
         if (p.qual()<100 && p.qual()>80) // erkannte Person aber ohne strukturmarker
         {
             // wenn in angrenzenden Frames qual groesse 90 (100 oder durch vorheriges verschieben entstanden), dann verschieben
@@ -485,11 +447,6 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool
                 tp.set(tmp.x(),tmp.y());
                 debout << "Warning: move trackpoint according to last distance of structur marker and color marker of person "<< persNr+1 << ":"<< std::endl;
                 debout << "         "<< p <<" -> "<< tp << std::endl;
-                //debout <<trackPointAt(frame-1)<<endl;
-                //debout <<trackPointAt(frame)<<endl;
-
-                //debout << trackPointAt(frame).colPoint()<<endl;
-                //at(frame-mFirstFrame)
             }
             else if (trackPointExist(frame+1) && trackPointAt(frame+1).qual()>90)
             {
@@ -500,11 +457,9 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool
                 debout << "         "<< p <<" -> "<< tp << std::endl;
             }
         }
-//        debout << tp.qual()<<endl;
-//        debout << at(frame-mFirstFrame).qual()<<endl;
 
         // ueberprueft, welcher punkt besser
-        if (tp.qual() > at(frame-mFirstFrame).qual()) // at(frame-mFirstFrame) == trackPointAt(frame)
+        if (tp.qual() > at(frame-mFirstFrame).qual())
         {
             // warnung ausgeben, wenn replacement (fuer gewoehnlich von reco) den pfadverlauf abrupt aendert
             if (trackPointExist(frame-1))
@@ -532,7 +487,6 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &p, int persNr, bool
 
             if (tp.qual() > 100) // manual add // after inserting, because p ist const
                 (*this)[frame-mFirstFrame].setQual(100); // so moving of a point is possible
-            //debout << "Warning: frame exists already in trajectory!" << endl;
         }
         else
             return false;
@@ -549,19 +503,8 @@ bool TrackPerson::trackPointExist(int frame) const
 }
 const TrackPoint& TrackPerson::trackPointAt(int frame) const // & macht bei else probleme, sonst mit [] zugreifbar
 {
-//     if (frame >= mFirstFrame && frame <= mLastFrame) ////!!!! muss vorher ueberprueft werden, ob es existiert!!!
         return at(frame-mFirstFrame);
-//     else
-//         return TrackPoint();
 }
-
-//     ~TrackerPerson();
-
-//     inline const MyEllipse& head() const
-//     {
-//         return mHead;
-//     }
-    //void draw(IplImage *img) const;
 
 /**
  * @brief Absolute distance to next frame
@@ -589,31 +532,8 @@ double TrackPerson::distanceToNextFrame(int frame) const
 // 7. recalc coord with real coord with known height
 
 Tracker::Tracker(QWidget *wParent)
-//         : QList::QList()
 {
     mMainWindow = (class Petrack*) wParent;
-
-//    mGrey = NULL;
-//    mPrevGrey = NULL;
-//    mPyramid = NULL;
-//    mPrevPyramid = NULL;
-//     mPrevImg = NULL;
-
-//    mPrevFeaturePoints.resize(MAX_COUNT);// = vector<Point2f>(MAX_COUNT);
-//    mPrevFeaturePointsIdx.resize(MAX_COUNT);// = vector<int>(MAX_COUNT);
-//    mFeaturePoints.resize(MAX_COUNT);// = vector<Point2f>(MAX_COUNT);
-//    mStatus.resize(MAX_COUNT);// = vector<uchar>(MAX_COUNT);
-//    mTrackError.resize(MAX_COUNT);// = vector<float>(MAX_COUNT);
-
-//    mPrevFeaturePoints = (CvPoint2D32f*) cvAlloc(MAX_COUNT*sizeof(CvPoint2D32f)); //points[0]
-////    mPrevColorFeaturePoints = (CvPoint2D32f*) cvAlloc(MAX_COUNT*sizeof(CvPoint2D32f)); //points[0]
-//    mFeaturePoints = (CvPoint2D32f*) cvAlloc(MAX_COUNT*sizeof(CvPoint2D32f)); //points[1]
-////    mColorFeaturePoints = (CvPoint2D32f*) cvAlloc(MAX_COUNT*sizeof(CvPoint2D32f)); //points[1]
-//    mStatus = (char*) cvAlloc(MAX_COUNT);
-////    mColorStatus = (char*) cvAlloc(MAX_COUNT);
-//    mPrevFeaturePointsIdx = (int*) cvAlloc(MAX_COUNT*sizeof(int));
-//    mTrackError = (float*) cvAlloc(MAX_COUNT*sizeof(float));
-////    mColorTrackError = (float*) cvAlloc(MAX_COUNT*sizeof(float));
     mTermCriteria = cv::TermCriteria(cv::TermCriteria::COUNT|cv::TermCriteria::EPS, 20, 0.03); ///< maxIter=20 and epsilon=0.03
 
     reset();
@@ -625,23 +545,10 @@ void Tracker::init(cv::Size size)
 {
     clear(); // loescht liste aller getrackten personen
     // nicht mehr noetig, da nicht mehr in track selber // jetzt start, war prevImg == NULL && prevFrame == -1 zeigt an, dass ein neuer Trackingprozess beginnt / neue Bildfolge
-//    if (mGrey)
-//        cvReleaseImage(&mGrey);
-//    if (mPrevGrey)
-//        cvReleaseImage(&mPrevGrey);
-//    if (mPyramid)
-//        cvReleaseImage(&mPyramid);
-//    if (mPrevPyramid)
-//        cvReleaseImage(&mPrevPyramid);
-//debout << "test" << endl;
-    mGrey.create(size,CV_8UC1);// = cvCreateImage(size, 8, 1);
-    mPrevGrey.create(size,CV_8UC1);// = cvCreateImage(size, 8, 1);
-//    debout << "test" << endl;
-//    mPyramid.create(size,CV_8UC1);// = cvCreateImage(size, 8, 1);
-//    mPrevPyramid.create(size,CV_8UC1);// = cvCreateImage(size, 8, 1);
 
-//if (mGrey) debout << "mGrey: " << mGrey << " " << (void *) mGrey->imageData<<endl;
-//if (mMainWindow->getIplImage()) debout << "mImage: " << mMainWindow->getIplImage()<< " " << (void *) mMainWindow->getIplImage()->imageData<<endl;
+    mGrey.create(size,CV_8UC1);
+    mPrevGrey.create(size,CV_8UC1);
+
     reset();
 }
 
@@ -668,8 +575,6 @@ void Tracker::resize(cv::Size size)
                 mPrevGrey = mPrevGrey(cv::Rect(-s,-s,mPrevGrey.cols+2*s,mPrevGrey.rows+2*s));
         }
     }
-//             ; //anpassungen von prev bildmaterial (und punkten selber?)
-//         // -getImgBorderSize() nutzen
 }
 
 /// split trajectorie pers before frame frame
@@ -706,7 +611,7 @@ bool Tracker::splitPersonAt(const Vec2F& p, int frame, QSet<int> onlyVisible)
     int i;
 
     for (i = 0; i < size(); ++i) // ueber TrackPerson
-        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(nullptr, i, frame)/2.))) // war: MIN_DISTANCE)) // 30 ist abstand zwischen kopfen
+        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(nullptr, i, frame)/2.)))
         {
             splitPerson(i, frame);
 
@@ -761,7 +666,7 @@ bool Tracker::delPoint(const Vec2F& p, int direction, int frame, QSet<int> onlyV
     int i;
 
     for (i = 0; i < size(); ++i) // ueber TrackPerson
-        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(nullptr, i, frame)/2.))) // war: MIN_DISTANCE)) // 30 ist abstand zwischen kopfen
+        if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(nullptr, i, frame)/2.)))
         {
             delPointOf(i, direction, frame);
             return true;
@@ -863,65 +768,6 @@ void Tracker::delPointROI()
         }
     }
     debout << "deleted "<<anz<<" trajectories!"<< std::endl;
-
-//                for (i = 0; i < size(); ++i) // ueber TrackPerson
-//                {
-//                    for (j = 0; j < at(i).lastFrame(); ++j)
-//                        (*this)[i].  removeLast();
-//                    if (rect.contains(at(i).at(j).x(), at(i).at(j).y())
-
-
-//                    if (at(i).trackPointExist(frame)) //
-//                    {
-//                        if (direction == -1)
-//                        {
-//                            for (j = 0; j < frame-at(i).firstFrame(); ++j)
-//                                (*this)[i].removeFirst();
-//                            (*this)[i].setFirstFrame(frame);
-//                        }
-//                        else if (direction == 0)
-//                            removeAt(i--); // nach Loeschen wird i um 1 erniedrigt
-//                        else if (direction == 1)
-//                        {
-//                            for (j = 0; j < at(i).lastFrame()-frame; ++j)
-//                                (*this)[i].removeLast();
-//                            (*this)[i].setLastFrame(frame);
-//                        }
-//                    }
-//                    else if (((direction == -1) && (frame > at(i).lastFrame())) ||
-//                             (direction == 0) ||
-//                             ((direction == 1) && (frame < at(i).firstFrame())))
-//                    {
-//                        removeAt(i--); // nach Loeschen wird i um 1 erniedrigt
-//                    }
-
-
-
-//                    x = (*this)[i].first().x();
-//                    y = (*this)[i].first().y();
-//                    // mGrey hat gleiche groesse wie zuletzt getracktes bild
-//                    if ((*this)[i].firstFrame() != 0 && x >= MAX(margin, rect.x()) && y >= MAX(margin, rect.y()) && x <= MIN(mGrey->width-1-2*bS-margin, rect.x()+rect.width()) && y <= MIN(mGrey->height-1-2*bS-margin, rect.y()+rect.height()))
-//                    {
-//                        debout << "Warning: Start of trajectory inside picture and recognition area of person " << i+1 << "!" << endl;
-//                        pers.append(i+1);
-//                        frame.append((*this)[i].firstFrame());
-//                    }
-
-//                    x = (*this)[i].last().x();
-//                    y = (*this)[i].last().y();
-//                    // mGrey hat gleiche groesse wie zuletzt getracktes bild
-//                    if ((*this)[i].lastFrame() != lastFrame && x >= MAX(margin, rect.x()) && y >= MAX(margin, rect.y()) && x <= MIN(mGrey->width-1-2*bS-margin, rect.x()+rect.width()) && y <= MIN(mGrey->height-1-2*bS-margin, rect.y()+rect.height()))
-//                    {
-//                        debout << "Warning: End of trajectory inside picture and recognition area of person " << i+1 << "!" << endl;
-//                        pers.append(i+1);
-//                        frame.append((*this)[i].lastFrame());
-//                    }
-
-
-
-//                }
-
-
 }
 
 /**
@@ -987,10 +833,6 @@ bool Tracker::setTrackPersonHeight(const Vec2F& p, int frame, QSet<int> onlyVisi
         if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && (at(i).trackPointExist(frame) && (at(i).trackPointAt(frame).distanceToPoint(p) < mMainWindow->getHeadSize(nullptr, i, frame)/2.))) // war: MIN_DISTANCE)) // 30 ist abstand zwischen kopfen
         {
             bool ok;
-
-//            if (at(i).height() > MIN_HEIGHT)
-            //QString comment = QInputDialog::getMultiLineText(mMainWindow, QObject::tr("Add Comment"),
-            //                                                 QObject::tr("Comment:"), at(i).comment() , &ok);
 
             double col_height;
             // col_height is negative, if height is determined through color and not yet set manually
@@ -1148,25 +990,9 @@ bool Tracker::addPoint(TrackPoint &p, int frame, const QSet<int>& onlyVisible, i
     for (i = 0; i < size(); ++i) // !found &&  // ueber TrackPerson
     {
         if (((onlyVisible.empty()) || (onlyVisible.contains(i))) && at(i).trackPointExist(frame))
-            //&& (!multiColorWithDot && (at(i).trackPointAt(frame).distanceToPoint(p) < scaleHead*mMainWindow->getHeadSize(NULL, i, frame)/2.)) &&
-            //((mMainWindow->getControlWidget()->getRecoMethod() == 5 && // multicolor marker
-            //  mMainWindow->getMultiColorMarkerWidget()->useDot->isChecked() && // nutzung von black dot
-            //  !mMainWindow->getMultiColorMarkerWidget()->ignoreWithoutDot->isChecked()) && // auch reine farbige muetze wird akzeptiert
-            // (at(i).trackPointAt(frame).colPoint().distanceToPoint(p.colPoint())  < scaleHead*mMainWindow->getHeadSize(NULL, i, frame)/2.))) // ist kaserne: 52/2 war: MIN_DISTANCE)) // 30 ist Abstand zwischen Koepfen
         {
-//            if (i+1 == 14)
-//            {
-//                debout << i+1 << " " << multiColorWithDot << endl;
-//                debout << at(i).trackPointAt(frame)<<endl;
-//                debout << p << endl;
-//                debout << mMainWindow->getHeadSize(NULL, i, frame)/2.<<endl;
-//                debout << at(i).trackPointAt(frame).distanceToPoint(p)<<endl;
-//                debout << at(i).trackPointAt(frame).distanceToPoint(p.colPoint())<<endl;
-
-//            }
             dist = at(i).trackPointAt(frame).distanceToPoint(p);
-            if (( //(!multiColorWithDot || !p.color().isValid()) && //|| !at(i).trackPointAt(frame).color().isValid()
-                 dist < scaleHead*mMainWindow->getHeadSize(nullptr, i, frame)/2.) ||
+            if ((dist < scaleHead*mMainWindow->getHeadSize(nullptr, i, frame)/2.) ||
                 // fuer multifarbmarker mit schwarzem punkt wird nur farbmarker zur Abstandbetrachtung herangezogen
                 // at(i).trackPointAt(frame).colPoint() existiert nicht an dieser stelle, da bisher nur getrackt wurde!!!!
                 (multiColorWithDot && p.color().isValid() && (at(i).trackPointAt(frame).distanceToPoint(p.colPoint()) < mMainWindow->getHeadSize(nullptr, i, frame)/2.)))
@@ -1218,14 +1044,13 @@ bool Tracker::addPoint(TrackPoint &p, int frame, const QSet<int>& onlyVisible, i
 
     }
 
-    //--i;
     if ((onlyVisible.empty()) && !found)
     {
-        iNearest = size(); //  << " (new) ";
+        iNearest = size();
 
         if (p.qual() > 100) //manual add
             p.setQual(100);
-        append(TrackPerson(/*p.markerID()>0 ? p.markerID() :*/ 0, frame, p, p.getMarkerID())); // 0 is person number/markerID; newReco is set to true by default
+        append(TrackPerson(0, frame, p, p.getMarkerID())); // 0 is person number/markerID; newReco is set to true by default
 
     }
     if ((z > 0) && ((onlyVisible.empty()) || found))
@@ -1256,11 +1081,6 @@ void Tracker::addPoints(QList<TrackPoint> &pL, int frame)
         addPoint(pL[i], frame, QSet<int>());
     }
 }
-
-// calculate height of person
-
-// convert all trajectory coordinates in real coordinate (height needed)
-
 
 int Tracker::visible(int frameNum)
 {
@@ -1430,13 +1250,13 @@ int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int bord
                     }
 #endif
 
-//                     // wenn bei punkten, die nicht am rand liegen, der fehler gross ist,
-//                     // wird geguckt, ob der sprung sich zur vorherigen richtung stark veraendert hat
-//                     // wenn sprung sehr unterschiedlich, wird lieber interpoliert oder stehen geblieben
-//                     // ist richtung ok, dann wird dunkelstes pixel gesucht
-//                     // (subpixel aufgrund von nachbarpixel)
-//                     // oder einfach bei schlechtem fehler mit groesserem winSize=30 den Problempunkt nochmal machen
-                    // NOTE Wird gerade eben nicht gemacht. Sollten wir???
+                    // wenn bei punkten, die nicht am rand liegen, der fehler gross ist,
+                    // wird geguckt, ob der sprung sich zur vorherigen richtung stark veraendert hat
+                    // wenn sprung sehr unterschiedlich, wird lieber interpoliert oder stehen geblieben
+                    // ist richtung ok, dann wird dunkelstes pixel gesucht
+                    // (subpixel aufgrund von nachbarpixel)
+                    // oder einfach bei schlechtem fehler mit groesserem winSize=30 den Problempunkt nochmal machen
+                    // TODO Wird gerade eben nicht gemacht. Sollten wir???
 
 
                     // ueberpruefen, ob tracking ziel auf anderem tracking path landet, dann beide trackpaths verschmelzen lassen
@@ -1559,8 +1379,6 @@ bool Tracker::tryMergeTrajectories(const TrackPoint& v, size_t i, int frame)
  */
 int Tracker::track(cv::Mat &img, cv::Rect &rect, int frame, bool reTrack, int reQual, int borderSize, int level, QSet<int> onlyVisible, int errorScaleExponent)
 {
-//    debout << "frame="<<frame<<" reTrack="<<reTrack<<" reQual="<<reQual<<" borderSize="<<borderSize<<" level="<<level<<" errorScaleExponent="<<errorScaleExponent << endl;
-    [[maybe_unused]] int inserted = 0;
     QList<int> trjToDel;
     float errorScale = pow(1.5,errorScaleExponent); // 0 waere neutral
 
@@ -1624,7 +1442,7 @@ int Tracker::track(cv::Mat &img, cv::Rect &rect, int frame, bool reTrack, int re
             refineViaNearDarkPoint();
         }
 
-        inserted = insertFeaturePoints(frame, numOfPeopleToTrack, img, borderSize, errorScale);
+        insertFeaturePoints(frame, numOfPeopleToTrack, img, borderSize, errorScale);
     }
 
     cv::swap(mPrevGrey, mGrey);
@@ -2002,7 +1820,6 @@ void Tracker::checkPlausibility(QList<int> &pers, QList<int> &frame,
 #endif
     }
 
-//     debout << rect.x() << " " <<rect.y() << " " <<rect.width() << " " <<rect.height() << " " <<endl;
     // check, if trajectory starts and ends outside the recognition area
     if (testInside)
     {
@@ -2017,11 +1834,6 @@ void Tracker::checkPlausibility(QList<int> &pers, QList<int> &frame,
         {
             qApp->processEvents();
             progress.setValue(100+i*100./size());
-            //         if (i == 11)
-            //         {
-            //             debout << (*this)[i].first().x() << " " << (*this)[i].first().y() <<endl;
-            //             debout << MAX(margin, rect.x()) << " " << MAX(margin, rect.y()) << " " << MIN(mGrey->width-1-2*bS-margin, rect.x()+rect.width()) << " " << MIN(mGrey->height-1-2*bS-margin, rect.y()+rect.height())<<endl;
-            //         }
             x = (*this)[i].first().x();
             y = (*this)[i].first().y();
             // mGrey hat gleiche groesse wie zuletzt getracktes bild
@@ -2189,7 +2001,6 @@ bool Tracker::printHeightDistribution()
         anz += j.value();
         ++j;
     }
-    //debout << "Attention: persons with height lower 0 are ignored!" << endl;
     debout << "number of persons with measured height                            : " << anz << std::endl;
     debout << "person without measured height (not included in calculated values): " << noHeight << " (using default height for export)" << std::endl;
     if (anz == 0)
@@ -2285,21 +2096,10 @@ void Tracker::purge(int frame)
             {
                 if (at(i).at(j).qual() < 100.)
                     ++count;
-                //debout << i << " " << j << " " << at(i).at(j).qual() <<endl;
             }
             if (count/at(i).size() > 0.8) // Achtung, wenn roi klein, dann viele tp nur getrackt
                 removeAt(i); // delete trj
         }
-
-        // wenn x/y/z gesetzt ist, dann koennte auch eine hoehenschwankung zum eliminieren fuehren
-
-//        if ((*this)[i].height() > MIN_HEIGHT) // !=-1// insbesondere von hand eingefuegte trackpoint/persons haben keine farbe
-//        {
-//            ++dict[(((int) (*this)[i].height())/heightStep)*heightStep];
-//            avg += (*this)[i].height();
-//        }
-//        else
-//            ++noHeight;
     }
 }
 

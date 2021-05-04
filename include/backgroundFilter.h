@@ -36,7 +36,6 @@ class BackgroundFilter : public Filter
 private:
 
     cv::Ptr<cv::BackgroundSubtractorMOG2> mBgModel;
-    //Ptr<BackgroundSubtractor> mBgModel;
 
     bool mUpdate; // if 0, kein update des models, sonst schon
     pet::StereoContext** mStereoContext; ///< zeiger auf den zeiger in petrack mit stereocontext

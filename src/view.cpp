@@ -34,55 +34,12 @@ GraphicsView::GraphicsView(ViewWidget *viewWidget)
 
     setTransformationAnchor(AnchorUnderMouse); // for wheel
     setResizeAnchor(AnchorUnderMouse); // for scroll?
-
-    // alignment kann man nicht komplett ausstellen!
-    //transformationAnchor
-// QGraphicsView::NoAnchor
-// QGraphicsView::AnchorViewCenter
-// QGraphicsView::AnchorUnderMouse
 }
-
-//     void mousePressEvent ( QMouseEvent * event )
-//     {
-//         if (event->button() == Qt::RightButton) {
-//             setDragMode(ScrollHandDrag);
-//         }
-//     }
-//     void mouseReleaseEvent ( QMouseEvent * event )
-//     {
-//         if (event->button() == Qt::RightButton) {
-//             setDragMode(RubberBandDrag);
-//         }
-//     }
-//     void mouseMoveEvent(QMouseEvent *event)
-//     {
-//         if (event->buttons() & Qt::RightButton)
-//             setDragMode(QGraphicsView::ScrollHandDrag);
-//     }
 
 
 void GraphicsView::wheelEvent(QWheelEvent * event)
 {
     QPoint numDegrees = event->angleDelta() / 8;
-
-    // hier koennte man einstellen, dass das pixel unter cursor stehen bleibt das dort bereits steht
-    // (dorhin gezoomt wird, wo mouse steht!!!)
-    // nicht noetig, denn es gibt: setTransformationAnchor(AnchorUnderMouse); (siehe constructor)
-    //fitInView(rect)
-    //ensureVisible(rect)
-
-
-//     QMatrix mat = matrix();
-//     debout << "----------------------" <<endl;
-//     debout << mat.m11() << " " << mat.m22() <<endl;
-//     QPointF sp = mapToScene(event->pos());
-//     debout << sp.x() << " " << sp.y() <<endl;
-//     debout << event->pos().x() << " " << event->pos().y() <<endl;
-// //     debout << event->globalPos().x() << " " << event->globalPos().x() <<endl;
-// //     QRectF sr = sceneRect();
-// //     debout << sr.x() << " " << sr.width() <<endl;
-//     debout << numDegrees/2 <<endl;
-// //     centerOn(mapToScene(event->pos()));
 
     if (event->modifiers() == Qt::ShiftModifier) // nur shift zugelassen ...
     {
@@ -100,37 +57,7 @@ void GraphicsView::wheelEvent(QWheelEvent * event)
         else
             mViewWidget->zoomOut(numDegrees.y()/2);
     }
-
-//     mat = matrix();
-//     debout << mat.m11() << " " << mat.m22() <<endl;
-
-//     qreal factor = matrix().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
-//      if (factor < 0.07 || factor > 100)
-//          return;
-
-//      scale(scaleFactor, scaleFactor);
-
-//     QGraphicsView::wheelEvent(event); LANGE NACH GESUCHT: UNBEDINGT RAUS, DA NACH ZOOM NOCH EIN SCROLLEN GEMACHT WIRD
 }
-
-//void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
-//{
-//    if (event->button() == Qt::LeftButton)
-//    {
-
-//    }
-//    else if (event->button() == Qt::RightButton)
-//    {
-//        emit mouseRightClick(mapToScene(event->pos()));
-//    }
-//    else if (event->button() == Qt::MiddleButton)
-//    {
-
-//    }
-//    scene()->update();
-
-//    //QGraphicsScene::mouseReleaseEvent(event);
-//}
 
 void GraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
 {
@@ -174,7 +101,6 @@ void GraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void GraphicsView::keyPressEvent(QKeyEvent *event)
 {
-//    debout << "key: " << event->key() << endl;
     // forward the arrow keys for handling in petrack player
     switch(event->key())
     {
@@ -214,13 +140,9 @@ ViewWidget::ViewWidget(QWidget *parent)
 {
     mMainWindow = (class Petrack*) parent;
     setContentsMargins(0, 0, 0, 0);
-    //setFrameStyle(Sunken | StyledPanel);
     mGraphicsView = new GraphicsView(this);
     mGraphicsView->setRenderHint(QPainter::Antialiasing, false);
     mGraphicsView->setDragMode(QGraphicsView::ScrollHandDrag); //RubberBandDrag
-//     mGraphicsView->setFrameStyle(QFrame::StyledPanel|QFrame::Plain);
-//     mGraphicsView->setLineWidth(0);
-//     mGraphicsView->setMidLineWidth(0);
 
     int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
     QSize iconSize(size, size);
@@ -247,7 +169,6 @@ ViewWidget::ViewWidget(QWidget *parent)
     rotateRightIcon->setIcon(QPixmap(":/rotright"));
     rotateRightIcon->setIconSize(iconSize);
     mRotateSlider = new QSlider;
-    //mRotateSlider->setOrientation(Qt::Horizontal);
     mRotateSlider->setMinimum(-180); //-360
     mRotateSlider->setMaximum(180); // 360
     mRotateSlider->setValue(0);
@@ -326,10 +247,6 @@ void ViewWidget::fitInView()
 
 void ViewWidget::fitInROI(QRectF rect)
 {
-
-    //QRect rect(myRound(mRecognitionRoiItem->rect().x()+getImageBorderSize()), myRound(mRecognitionRoiItem->rect().y()+getImageBorderSize()), myRound(mRecognitionRoiItem->rect().width()), myRound(mRecognitionRoiItem->rect().height()));
-
-
     mGraphicsView->fitInView(rect, Qt::KeepAspectRatio); // Qt::KeepAspectRatioByExpanding wuerde nur in eine dimension passend machen
     // doesnt work: mGraphicsView->fitInView(mGraphicsView->sceneRect(), Qt::KeepAspectRatio); // two times, while in the first run possibly the scrollbars have been there for calculation
     QTransform matrix = mGraphicsView->transform();
@@ -347,21 +264,8 @@ void ViewWidget::setupMatrix()
     matrix.scale(scale, scale);
     matrix.rotate(mRotateSlider->value());
 
-//     debout << matrix.m11() << " " << matrix.m12() <<endl;
-//     debout << matrix.m21() << " " << matrix.m22() <<endl;
-//     debout << matrix.dx() << " " << matrix.dy() <<endl;
     mGraphicsView->setTransform(matrix);
 }
-
-//  void View::print()
-//  {
-//      QPrinter printer;
-//      QPrintDialog dialog(&printer, this);
-//      if (dialog.exec() == QDialog::Accepted) {
-//          QPainter painter(&printer);
-//          mGraphicsView->render(&painter);
-//      }
-//  }
 
 void ViewWidget::zoomIn(int i) //default i = 1
 {

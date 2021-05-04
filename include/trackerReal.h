@@ -33,12 +33,10 @@ class TrackPointReal : public Vec3F
 {
 private:
     int mFrameNum; // frame number in animation sequence possibly with missing frames
-    // TrackPoint* mTrackPoint // NULL, wenn nicht einem TrackPoint zugeordnet, sondern durch Interpolation entstanden
     Vec2F mViewDir;
     float mAngleOfView; // angle of view of camera to point
     int mMarkerID;
 public:
-//     TrackPointReal();
     TrackPointReal(const Vec3F &p, int frameNum);
     TrackPointReal(const Vec3F &p, int frameNum, const Vec2F &d);
 
@@ -70,45 +68,13 @@ public:
     {
         mMarkerID = markerID;
     }
-
-//     const TrackPointReal& operator=(const TrackPointReal& tp); // Zuweisungsoperator
-//     const TrackPointReal& operator=(const Vec2F& v);
-//     const TrackPointReal& operator+=(const Vec2F& v);
-//     const TrackPointReal operator+(const Vec2F& v) const;
 };
 
-// inline ostream& operator<< (ostream& s, const TrackPointReal& tp)
-// {
-//     s << "(" << tp.x() << ", " << tp.y() << ") " << tp.qual() << " - (" << tp.colPoint().x() << ", " << tp.colPoint().y() << ") (" << tp.color().red() << ", " << tp.color().green() << ", " << tp.color().blue() << ")";
-//     return s;
-// }
-
-//inline QTextStream& operator>>(QTextStream& s, TrackPointReal& tp)
-//{
-//     double d;
-//     int i;
-
-//     s >> i;
-//     tp.setFrameNum(i);
-//     s >> d;
-//     tp.setX(d);
-//     s >> d;
-//     tp.setY(d);
-//     s >> d;
-//     tp.setZ(d);
-
-//     return s;
-//}
 inline QTextStream& operator<<(QTextStream& s, const TrackPointReal& tp)
 {
     s << tp.x() << " " << tp.y(); // nur x, y wird ausgegeben, z wird nur bei Bedarf mit ausgegeben!!!
     return s;
 }
-// inline ostream& operator<<(ostream& s, const TrackPointReal& tp)
-// {
-//     s << tp.x() << " " << tp.y() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color();
-//     return s;
-// }
 
 //--------------------------------------------------------------------------
 
@@ -124,7 +90,6 @@ private:
 
 public:
     TrackPersonReal();
-//     TrackPersonReal(int nr, int frame, const Vec2F &p);
     TrackPersonReal(int frame, const TrackPointReal &p);
 
     inline double height() const
@@ -164,45 +129,11 @@ public:
     // gibt -1 zurueck, wenn frame oder naechster frame nicht existiert
     // entfernung ist absolut
     double distanceToNextFrame(int frame) const;
-//     double distanceBetweenFrames(int fromFrame, int toFrame) const;
-//     double distanceXBetweenFrames(int fromFrame, int toFrame) const;
-//     double distanceYBetweenFrames(int fromFrame, int toFrame) const;
-//     double velocityToNextFrame(int frame) const;
     void init(int firstFrame, double height, int markerID);
     void addEnd(const QPointF& pos, int frame);
     void addEnd(const Vec3F& pos, int frame);
     void addEnd(const QPointF& pos, int frame, const QPointF &dir);
 };
-
-// // keine Konsistenzueberpruefung
-// inline QTextStream& operator>>(QTextStream& s, TrackPersonReal& tp)
-// {
-//     double d;
-//     QColor col;
-//     int n;
-//     TrackPointReal p;
-
-//     s >> n; 
-//     tp.setNr(n);
-//     s >> d; 
-//     tp.setHeight(d);
-//     s >> n; 
-//     tp.setFirstFrame(n);
-//     s >> n; 
-//     tp.setLastFrame(n);
-//     s >> n; 
-//     tp.setColCount(n);
-//     s >> col; 
-//     tp.setColor(col);
-//     s >> n; // size of list
-
-//     for (int i = 0; i < n; ++i)
-//     {
-//         s >> p;
-//         tp.append(p);
-//     }
-//     return s;
-// }
 
 inline QTextStream& operator<<(QTextStream& s, const TrackPersonReal& tp)
 {
@@ -211,15 +142,6 @@ inline QTextStream& operator<<(QTextStream& s, const TrackPersonReal& tp)
         s << firstFrame+i << tp.at(i) << tp.height() << Qt::endl;
     return s;
 }
-
-
-// inline ostream& operator<<(ostream& s, const TrackPersonReal& tp)
-// {
-//     s << tp.nr() << " " << tp.height() << " " << tp.firstFrame() << " " << tp.lastFrame() << " " << tp.colCount() << " " << tp.color() << " " << tp.size() << endl;
-//     for (int i = 0; i < tp.size(); ++i)
-//         s << tp.at(i) << endl;
-//     return s;
-// }
 
 //----------------------------------------------------------------------------
 
@@ -237,9 +159,6 @@ class TrackerReal : public QList<TrackPersonReal>
 private:
     double mXMin, mXMax, mYMin, mYMax;
     Petrack *mMainWindow;
-    // int double mFps;
-//     Tracker* mTracker;
-//     bool mMissingFramesInserted;
 
 public:
     inline double xMin() const
@@ -261,27 +180,6 @@ public:
 
     TrackerReal(QWidget *wParent);
 
-//     ~TrackerReal();
-
-//     inline const Tracker* tracker() const
-//     {
-//         return mTracker;
-//     }
-//     inline void setTracker(Tracker* tracker)
-//     {
-//         mTracker = tracker;
-//     }
-//     inline const bool missingFramesInserted() const
-//     {
-//         return mMissingFramesInserted;
-//     }
-//     inline void setMissingFramesInserted(bool b)
-//     {
-//         mMissingFramesInserted = b;
-//     }
-
-//     void init(CvSize size);
-//     void resize(CvSize size);
 
     // calculate height of person
 
@@ -307,13 +205,5 @@ public:
     void exportDat(QTextStream &out,    bool alternateHeight, bool useTrackpoints); // fuer gnuplot
     void exportXml(QTextStream &outXml, bool alternateHeight, bool useTrackpoints);
 };
-
-//inline QTextStream& operator<<(QTextStream& s, const TrackerReal& trackerReal)
-//{
-//    for (int i = 0; i < trackerReal.size(); ++i)
-//        for (int j = 0; j < trackerReal.at(i).size(); ++j)
-//            s << i+1 << " " << trackerReal.at(i).firstFrame()+j << " " << trackerReal.at(i).at(j) << " " << trackerReal.at(i).height() <<endl; //<< " " << tp.qual();
-//    return s;
-//}
 
 #endif

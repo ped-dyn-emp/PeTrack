@@ -27,14 +27,11 @@
 
 // Byte Number (nicht alle Zahlen gehen?: 2*1280*960*32*20) enstehen avi mit einem bild
 // unter 2GB fuer reader und unter 4 GB fuer writer bleiben!!!
-//#define AVI_FILE_SPLIT_SIZE ( (__int64)( 1024 * 1024 * 1024 ) )
-//#define AVI_FILE_SPLIT_SIZE ( (__int64)( 2*1280*960*32*20 ) )
 #define AVI_FILE_SPLIT_SIZE ( ( 2*1280*960*32*20 ) )
 // 2*1280*960*32*20 = 1,5 GB = 40 Sekunden = 640 Bilder
 
 /**
  * A simple wrapper for an .AVI file .
- *
  */
 class AviFileWriter
 {
@@ -153,7 +150,6 @@ protected:
    std::string m_szAVIDestFile;
 
    char* m_fourCC;
-   //int m_fourCC;
 
    /** Defines is color avi */
    bool m_isColor;
@@ -168,8 +164,6 @@ private:
 
    /** Writes to the opened AVI-File */
    cv::VideoWriter m_vWriter;
-
 };
-
 
 #endif // #ifndef AVIFILEWRITER_H

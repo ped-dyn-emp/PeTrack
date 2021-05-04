@@ -47,7 +47,6 @@ public:
     void setControlWidget(int toHue, int fromHue, int toSat, int fromSat);
 
 private slots:
-
     // functions which force a new recognition
     void on_inversHue_stateChanged(int i);
 
@@ -58,9 +57,6 @@ private slots:
     void on_toColor_clicked();
 
 private:
-
-
-
     Petrack *mMainWindow;
     ColorPlot *mColorPlot;
 };

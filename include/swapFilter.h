@@ -33,7 +33,6 @@ private:
 public:
     SwapFilter();
 
-//    IplImage* act(IplImage *img, IplImage *res);
     cv::Mat act(cv::Mat &img, cv::Mat &res);
 
     Parameter *getSwapHorizontally();

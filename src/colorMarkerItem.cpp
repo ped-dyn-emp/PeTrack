@@ -101,7 +101,6 @@ void ColorMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */
             data = (yData += mMask.cols/sizeof(char)); // because sometimes widthStep != width
         }
         painter->setOpacity(mMainWindow->getColorMarkerWidget()->opacity->value()/100.);
-        //painter->drawImage(mMainWindow->getRecoRoiItem()->rect().x(),mMainWindow->getRecoRoiItem()->rect().y(), *mImage); // during hoverMoveEvent of recognitionRect the painting moves with rect
         painter->drawImage(mUlc.x(),mUlc.y(), *mImage);
 
     }

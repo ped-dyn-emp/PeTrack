@@ -43,14 +43,7 @@
 namespace reco {
 using namespace detail;
 
-//#include "Psapi.h"
-
-//#define WITH_RECT
 #define ELLIPSE_DISTANCE_TO_BORDER 10
-
-//#define SHOW_TMP_IMG
-
-//#define TIME_MEASUREMENT
 
 struct ColorParameters
 {
@@ -75,22 +68,11 @@ struct ColorParameters
 
 void thresholdHSV (const cv::Mat &src, cv::Mat &bin, const ColorParameters &param)
 {
-//    IplImage *hsvIpl;
     int h, s, v;
     int x, y;
 
     cv::Mat hsv {src.size(), src.type()};
-
-//    hsvIpl = cvCloneImage(srcIpl); // make a copy
-
-//    cvCvtColor(srcIpl ,hsvIpl, CV_BGR2HSV); // convert to HSV color space
-
     cv::cvtColor(src, hsv, cv::COLOR_BGR2HSV);
-
-//    unsigned char* dataImg = ((unsigned char*) hsvIpl->imageData);
-//    unsigned char* yDataImg = dataImg;
-//    unsigned char* data = ((unsigned char*) binIpl->imageData);
-//    unsigned char* yData = data;
 
     for (y = 0; y < bin.rows/*binIpl->height*/; ++y)
     {
@@ -100,11 +82,6 @@ void thresholdHSV (const cv::Mat &src, cv::Mat &bin, const ColorParameters &para
             h = intensity.val[0];
             s = intensity.val[1];
             v = intensity.val[2];
-//            debout << "h:" << h << ", s:" << s << ", v:" << v << endl;
-//            h = dataImg[0];
-//            s = dataImg[1];
-//            v = dataImg[2];
-//            debout << "h:" << h << ", s:" << s << ", v:" << v << endl;
 
             // apply the thresholds
             if ((!param.inversHue && (h < param.h_low || param.h_high < h)) ||
@@ -113,25 +90,12 @@ void thresholdHSV (const cv::Mat &src, cv::Mat &bin, const ColorParameters &para
                 (v < param.v_low || param.v_high < v))
             {
                 bin.at<uchar>(cv::Point(x, y)) = 0;
-//                *data = 0;
             }else
             {
                 bin.at<uchar>(cv::Point(x, y)) = 255;
-//                *data = 255;
             }
-//            ++data;
-//            dataImg+=3;
         }
-//        data = (yData += binIpl->widthStep/sizeof(char)); //width);
-//        dataImg = (yDataImg += hsvIpl->widthStep/sizeof(char)); //width);
     }
-//    cvNamedWindow("hsv", CV_WINDOW_AUTOSIZE ); // 0 wenn skalierbar sein soll
-//    cvShowImage("hsv", hsv);
-//    binIpl = cvCreateImage(cvSize(bin.cols,bin.rows),8,3);
-//    IplImage tmpIpl = bin;
-//    cvCopy(&tmpIpl,binIpl);
-
-//    cvReleaseImage(&hsvIpl);
 }
 #ifndef STEREO_DISABLED
 void thresholdHSV (const IplImage *srcIpl, IplImage *binIpl, const ColorParameters &param)
@@ -185,31 +149,6 @@ void setColorParameter(const QColor &fromColor, const QColor &toColor, bool inve
     param.inversHue = inversHue;
 }
 
-//A good starting point would be GetProcessMemoryInfo, which reports various memory info about the specified process.
-//You can pass GetCurrentProcess() as the process handle in order to get information about the calling process.
-//Probably the WorkingSetSize member of PROCESS_MEMORY_COUNTERS is the closest match to the Mem Usage coulmn in task manager,
-//but it is not going to be exactly the same.
-//I would experiment with the different values to find the one that is closest to your needs.
-////Usage:
-//#include "windows.h"
-//#include "psapi.h"
-//    PROCESS_MEMORY_COUNTERS pmc;
-//    GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc));
-//    debout << pmc.WorkingSetSize/1000 <<"KB Usage of the process"<< endl;
-////    typedef struct _PROCESS_MEMORY_COUNTERS {
-////        DWORD cb;
-////        DWORD PageFaultCount;
-////        DWORD PeakWorkingSetSize;
-////        DWORD WorkingSetSize;
-////        DWORD QuotaPeakPagedPoolUsage;
-////        DWORD QuotaPagedPoolUsage;
-////        DWORD QuotaPeakNonPagedPoolUsage;
-////        DWORD QuotaNonPagedPoolUsage;
-////        DWORD PagefileUsage;
-////        DWORD PeakPagefileUsage;
-////    } PROCESS_MEMORY_COUNTERS,*PPROCESS_MEMORY_COUNTERS;
-
-
 /**
  * @brief calculates pixel-displacement due to oblique/angular view
  *
@@ -230,24 +169,15 @@ Vec2F autoCorrectColorMarker(Vec2F &boxImageCentre, Control *controlWidget)
     boxImageCentreWithBorder += Vec2F(mainWindow->getImageBorderSize(), mainWindow->getImageBorderSize());
     pixUnderCam += Vec2F(mainWindow->getImageBorderSize(), mainWindow->getImageBorderSize());
     float angle = 90 - mainWindow->getImageItem()->getAngleToGround(boxImageCentreWithBorder.x(), boxImageCentreWithBorder.y(), 175);// Hoehe 175 cm ist egal, da auf jeder Hoehe gleicher Winkel
-    //debout << "Bordersize: " << mainWindow->getImageBorderSize() <<endl;
-    //debout << "Angle: " << angle <<endl;
-    //debout << "Pixel unter der Camera: " << pixUnderCam.x() << ", " << pixUnderCam.y() << endl;
-
-    //QPointF cmPerPixel = mainWindow->getImageItem()->getCmPerPixel(boxImageCentre.x(), boxImageCentre.y(), 175); // durchschnittsgroesse von 175cm angenommen
 
     Vec2F moveDir = boxImageCentreWithBorder-pixUnderCam;
     moveDir.normalize();
-    //debout << "Movedir: " << moveDir <<endl;
 
     cv::Point3f p3x1, p3x2;
     p3x1 = mainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(boxImageCentre.x(),boxImageCentre.y()),175);
     p3x2 = mainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(boxImageCentre.x()+moveDir.x(),boxImageCentre.y()+moveDir.y()),175);
     p3x1 = p3x1-p3x2;
     Vec2F cmPerPixel(p3x1.x, p3x1.y);
-
-    //debout << "cmPerPixel: " << p3x1 <<endl;
-    //debout << "Boximgcentre: " <<boxImageCentreWithBorder.x()  <<" "<< boxImageCentreWithBorder.y() <<endl<<endl;
 
     return (0.12*angle/cmPerPixel.length())*moveDir; // Maik Dissertation Seite 138
 }
@@ -849,13 +779,6 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *contro
 
     // run detection
     cv::Mat	binary;
-    //cv::Mat	kernel;
-//    IplConvKernel* kernel;
-
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "start col : " << getElapsedTime() <<endl;
-#endif
 
     // erzeuge speicherplatz fuer mask
     // abfrage wird in createMask gemacht
@@ -865,19 +788,11 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *contro
     // color thresholding
     thresholdHSV(img , binary, param);
 
-#ifdef SHOW_TMP_IMG
-    namedWindow("image", CV_WINDOW_AUTOSIZE ); // 0 wenn skalierbar sein soll
-    imshow("image", binary);
-    waitKey();
-#endif
-
     // close small holes: radius ( hole ) < radius ( close )
     if (cmWidget->useClose->isChecked())
     {
         int radius_close = cmWidget->closeRadius->value();
         // siehe : http://opencv.willowgarage.com/documentation/c/image_filtering.html#createstructuringelementex
-//        kernel = cvCreateStructuringElementEx(2*radius_close+1, 2*radius_close+1, radius_close, radius_close, CV_SHAPE_ELLIPSE);
-//        cvMorphologyEx(binary, binary, NULL, kernel, CV_MOP_CLOSE);
         cv::morphologyEx(binary,binary,cv::MORPH_OPEN,
                          getStructuringElement( cv::MORPH_ELLIPSE,
                                                 cv::Size(2*radius_close+1,2*radius_close+1),
@@ -887,74 +802,28 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *contro
     if (cmWidget->useOpen->isChecked())
     {
         int radius_open  = cmWidget->openRadius->value();
-//        kernel = cvCreateStructuringElementEx(2*radius_open+1, 2*radius_open+1, radius_open, radius_open, CV_SHAPE_ELLIPSE);
-//        cvMorphologyEx(binary, binary, NULL, kernel, CV_MOP_OPEN);
         cv::morphologyEx(binary,binary,cv::MORPH_CLOSE,
                          getStructuringElement( cv::MORPH_ELLIPSE,
                                                 cv::Size(2*radius_open+1,2*radius_open+1),
                                                 cv::Point(radius_open)));
     }
-#ifdef SHOW_TMP_IMG
-    imshow("image", binary);
-    waitKey();
-#endif
-
-//    CvSeq *contour;
-//    CvSeq *firstContour;
     std::vector<std::vector<cv::Point> > contours;
     double area;
-//    CvMemStorage *storage = cvCreateMemStorage(0);
     QColor col;
-//    CvMoments moments;
-//    double m00, m01, m10;
-//    int count;
     cv::RotatedRect box;
     double ratio;
-//    CvPoint* pointArray;
     bool atEdge;
 
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "vor cont  : " << getElapsedTime() << endl;
-#endif
-
-//    IplImage *clone = cvCloneImage(binary); // clone, da binary sonst veraendert wird
     cv::Mat clone = binary.clone();//(cvarrToMat(binary),true);
 
     cv::findContours(clone,contours,cv::RETR_EXTERNAL,cv::CHAIN_APPROX_SIMPLE);
-//    cvFindContours(clone, storage, &contour, sizeof(CvContour),
-//        CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE); // clone wird auch veraendert!!!
 
-#ifdef SHOW_TMP_IMG
-    drawContours(clone,contours,0,CV_RGB(255,255,255));
-    imshow("image", clone);
-    waitKey();
-#endif
-
-//    CV_RETR_EXTERNAL gives "outer" contours, so if you have (say) one contour enclosing another (like concentric circles), only the outermost is given.
-//    CV_RETR_LIST gives all the contours and doesn't even bother calculating the hierarchy -- good if you only want the contours and don't care whether one is nested inside another.
-//    CV_RETR_CCOMP gives contours and organises them into outer and inner contours. Every contour is either the outline of an object, or the outline of an object inside another object (i.e. hole). The hierarchy is adjusted accordingly. This can be useful if (say) you want to find all holes.
-//    CV_RETR_TREE calculates the full hierarchy of the contours. So you can say that object1 is nested 4 levels deep within object2 and object3 is also nested 4 levels deep.
-
-//    firstContour = contour;
-//    cvReleaseImage(&clone);
     // test each contour
     while (!contours.empty())
     {
         std::vector<cv::Point> contour = contours.back();
-        //count = contour->total; // This is number of point in one contour
         area = cv::contourArea(contour);
-//        area = cvContourArea(contour, CV_WHOLE_SEQ);
-
-//#if ((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 1)))
-//                    //if  ((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 1)))
-//                        contourArea = cvContourArea(contours,CV_WHOLE_SEQ);
-//#else
-//                    //else
-//                        contourArea = cvContourArea(contours,CV_WHOLE_SEQ, true);
-//#endif
-
-        box = cv::minAreaRect(contour);//cvMinAreaRect2(contour);
+        box = cv::minAreaRect(contour);
 
         if (box.size.height > box.size.width)
         {
@@ -965,75 +834,23 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *contro
             ratio = box.size.width/box.size.height;
         }
 
-//        debout << box.center.x << " "<< box.center.y <<endl;
-//        debout << box.size.height << " "<< box.size.width <<endl;
-//        debout << img->width<< " " << img->height <<endl;
-//        if ((box.center.x+maxExpansion/2 > img->width-2)  || (box.center.x-maxExpansion/2 < 2) ||
-//            (box.center.y+maxExpansion/2 > img->height-2) || (box.center.y-maxExpansion/2 < 2))
-//            debout << box.center.x << " "<< box.center.y <<endl;
-
         // contour at border of roi, than neglect because of object going out of region has moving center
-//        pointArray = (CvPoint*)malloc(contour->total*sizeof(CvPoint));
-//        cvCvtSeqToArray(contour, pointArray, CV_WHOLE_SEQ);// Get contour point set.
         atEdge = false;
         for(size_t i=0; i<contour.size(); i++)
             if ((contour.at(i).x <= 1) || (contour.at(i).x >= img.cols-2) ||
                 (contour.at(i).y <= 1) || (contour.at(i).y >= img.rows-2))
                 atEdge = true;
-//        free(pointArray);
-
-//        cvMoments(contour, &moments);
-//        //moments.m00;
-//        m00 = cvGetCentralMoment(&moments, 0, 0); // == area
-//        m01 = cvGetCentralMoment(&moments, 0, 1); // irgendwie immer 0
-//        m10 = cvGetCentralMoment(&moments, 1, 0); // irgendwie immer 0
-//        crossList->append(TrackPoint(Vec2F(m10/m00, m01/m00), 100, col)); // 100 beste qualitaet
 
         if (!atEdge && area >= cmWidget->minArea->value() && area <= cmWidget->maxArea->value() && ratio <= cmWidget->maxRatio->value())
         {
             // eine mittelung waere ggf sinnvoll, aber am rand aufpassen
             col.setRgb(getValue(img,myRound(box.center.x),myRound(box.center.y)).rgb());
-//                       getR(img, myRound(box.center.x), myRound(box.center.y)),
-//                       getG(img, myRound(box.center.x), myRound(box.center.y)),
-//                       getB(img, myRound(box.center.x), myRound(box.center.y)));
             crossList->append(TrackPoint(Vec2F(box.center.x, box.center.y), 100, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
         }
 
         // take the next contour
         contours.pop_back();
-//        contour = contour->h_next;
     }
-//    if (firstContour)
-//        cvClearSeq(firstContour);
-//    cvReleaseMemStorage(&storage);
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "nach cont : " << getElapsedTime() <<endl;
-#endif
-
-
-//    if (contours.size() == 0)
-//        return;
-
-//    // go through all the connected components
-//    assert(hierarchy[0][3] < 0);   // first entry on top level (no parent)
-
-//    while (idx >= 0)
-//    {
-
-//        //mmnt = moments(contours[idx], false);
-
-//        crossList->append(TrackPoint(Vec2F(contours[idx][0].x, contours[idx][0].y), 100, col)); // 100 beste qualitaet
-//        //crossList->append(TrackPoint(Vec2F(mmnt.m10/mmnt.m00 , mmnt.m01/mmnt.m00), 100, col)); // 100 beste qualitaet
-//        // save more information about the blob and filter later or
-//        // filter the blobs by size, shape, ...
-//        // ...
-
-//        idx = hierarchy[idx][0];   // jump to next contour
-//    }
-
-    // results
-    //cout << "Found " << crossList->size() << " features.\n";
 }
 
 /**
@@ -1044,8 +861,6 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *contro
  */
 void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, Vec2F offsetCropRect2Roi /*=(0,0)*/)
 {
-//#if 0 // Maik temporaer, damit es auf dem Mac laeuft
-
     CodeMarkerItem* codeMarkerItem = controlWidget->getMainWindow()->getCodeMarkerItem();
     CodeMarkerWidget* codeMarkerWidget = controlWidget->getMainWindow()->getCodeMarkerWidget();
 
@@ -1069,8 +884,8 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control 
     {
         if (recoMethod == RecognitionMethod::Code)  // for usage of codemarker with CodeMarker-function (-> without MulticolorMarker)
         {
-            QRect rect(myRound(mainWindow->getRecoRoiItem()->rect().x()),//+controlWidget->getMainWindow()->getImageBorderSize()),
-                       myRound(mainWindow->getRecoRoiItem()->rect().y()),//+controlWidget->getMainWindow()->getImageBorderSize()),
+            QRect rect(myRound(mainWindow->getRecoRoiItem()->rect().x()),
+                       myRound(mainWindow->getRecoRoiItem()->rect().y()),
                        myRound(mainWindow->getRecoRoiItem()->rect().width()),
                        myRound(mainWindow->getRecoRoiItem()->rect().height()));
             QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y(),controlWidget->mapDefaultHeight->value()),
@@ -1125,7 +940,6 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control 
     if(codeMarkerWidget->doCornerRefinement->isChecked()){
         detectorParams->cornerRefinementMethod            = cv::aruco::CornerRefineMethod::CORNER_REFINE_SUBPIX;
     }
-    //detectorParams->cornerRefinementMethod                = codeMarkerWidget->doCornerRefinement->isChecked();
     detectorParams->cornerRefinementWinSize               = codeMarkerWidget->cornerRefinementWinSize->value();
     detectorParams->cornerRefinementMaxIterations         = codeMarkerWidget->cornerRefinementMaxIterations->value();
     detectorParams->cornerRefinementMinAccuracy           = codeMarkerWidget->cornerRefinementMinAccuracy->value();
@@ -1142,17 +956,7 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control 
     corners.clear();
     rejected.clear();
 
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "start detectCodeMarkers : " << getElapsedTime() <<endl;
-#endif
-
-    cv::aruco::detectMarkers(img/*copy.clone()*/, dictionary, corners, ids, detectorParams, rejected);
-
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "end detectCodeMarkers  : " << getElapsedTime() <<endl;
-#endif
+    cv::aruco::detectMarkers(img, dictionary, corners, ids, detectorParams, rejected);
 
     codeMarkerItem->addDetectedMarkers(corners,ids, offsetCropRect2Roi);
     codeMarkerItem->addRejectedMarkers(rejected, offsetCropRect2Roi);
@@ -1160,212 +964,54 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control 
     // detected code markers
     for(size_t i = 0; i<ids.size(); i++)
     {
-//        debout << "Detected MarkerID: " << ids.at(i) << " [( " << corners.at(i).at(0).x << "," << corners.at(i).at(0).y << "),( "
-//                                                               << corners.at(i).at(1).x << "," << corners.at(i).at(1).y << "),( "
-//                                                               << corners.at(i).at(2).x << "," << corners.at(i).at(2).y << "),( "
-//                                                               << corners.at(i).at(3).x << "," << corners.at(i).at(3).y << ")]" <<  endl;
-
-//        if (codeMarkerWidget->showMask->isChecked())
-//        {
-//            detected_points[0] = CvPoint(corners.at(i).at(0).x, corners.at(i).at(0).y);
-//            detected_points[1] = CvPoint(corners.at(i).at(1).x, corners.at(i).at(1).y);
-//            detected_points[2] = CvPoint(corners.at(i).at(2).x, corners.at(i).at(2).y);
-//            detected_points[3] = CvPoint(corners.at(i).at(3).x, corners.at(i).at(3).y);
-
-//            cvFillConvexPoly(binary,detected_points,4,RGB(255,255,255));
-//        }
-
         double x = (corners.at(i).at(0).x+corners.at(i).at(1).x+corners.at(i).at(2).x+corners.at(i).at(3).x)*0.25;
         double y = (corners.at(i).at(0).y+corners.at(i).at(1).y+corners.at(i).at(2).y+corners.at(i).at(3).y)*0.25;
 
         crossList->append(TrackPoint(Vec2F(x,y), 100, ids.at(i))); // 100 beste qualitaet
     }
-
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "nach cont : " << getElapsedTime() <<endl;
-#endif
-
-//#endif
 }
 
 void findContourMarker(cv::Mat &img, QList<TrackPoint> *crossList, int markerBrightness, bool ignoreWithoutMarker, bool autoWB, RecognitionMethod recoMethod, float headSize)
 {
     int threshold, plus, count;
     double angle;
-    //MarkerCasernList markerList;
-    //MarkerHermesList markerList;
     MarkerHermesList markerHermesList;
     MarkerCasernList markerCasernList;
     MarkerJapanList markerJapanList(headSize);
-    //MarkerColorList markerList;
-//    void * markerList;
-    // 0 == Kaserne, 1 == Hermes, 2 == Ohne
-//    if (recoMethod == 0)
-//        markerList = (MarkerHermesList *) new MarkerHermesList;
-//    else if (recoMethod == 1)
-//        markerList = (MarkerHermesList *) new MarkerHermesList;
-//    else
-//        debout << "Error: this should never happen!" <<endl;
     cv::Size sz = cv::Size(img.cols & -2, img.rows & -2);
     cv::Mat gray = cv::Mat(sz,CV_8UC1);
     cv::Mat tgray;
     cv::Mat grayFix;
-//    IplImage *gray = cvCreateImage(sz, 8, 1);
-//    IplImage *tgray;
-//    IplImage *grayFix;
-//    CvPoint* PointArray;
     std::vector<std::vector<cv::Point> > contours;
-//    CvSeq *contours;
-//    CvSeq *firstContour;
 
-
-//    Mat PointArray2D32f;
     cv::RotatedRect box;
-    //CvBox2D box;
-//     CvPoint center;
     int expansion;
     double contourArea;
-    //debout << "MemStorage" << endl;
-//    CvMemStorage *storage = cvCreateMemStorage(0);
-    bool added = false;
 
-#ifdef WITH_RECT
-            double area, length;
-            CvSeq* result;
-            Vec2F v[4];
-#endif
-    
-    //     // down-scale and upscale the image to filter out the noise
-    //     cvPyrDown(timg, pyr, 7); // 7 =? CV_GAUSSIAN_5x5
-    //     cvPyrUp(pyr, timg, 7);
     if (img.channels() == 3)
     {
         tgray = cv::Mat(sz,CV_8UC1);//cvCreateImage(sz, 8, 1);
-        // folgende Zeilen erledigen das gleiche wie cvCvtColor(img, tgray, CV_RGB2GRAY);
-        // noetig gewesen, da opencv Probleme machte
-        //Y=0.299*R + 0.587*G + 0.114*B;
-        //        int x,y;
-        //        char *data = img->imageData;
-        //        char *greyData = tgray->imageData;
-        //        char *yData = data;
-        //        char *yGreyData = greyData;
-        //        for (y = 0; y < img->height; y++)
-        //        {
-        //            for (x = 0; x < img->width; x++)
-        //                *(greyData) = 0.299*data[0]+0.587*data[1]+0.114*data[2];
-        //            data = (yData += img->widthStep); // because sometimes widthStep != width
-        //            greyData = (yGreyData += tgray->widthStep); // because sometimes widthStep != width
-        //
-        //        }
         cv::cvtColor(img,tgray,cv::COLOR_RGB2GRAY);
-//        cvCvtColor(img, tgray, CV_RGB2GRAY);
     }
-    //debout << "Threshold" << endl;
-
-#ifdef SHOW_TMP_IMG
-namedWindow("img", CV_WINDOW_AUTOSIZE); // 0 wenn skalierbar sein soll
-//IplImage *tmpAusgabe = cvCreateImage(cvGetSize(img), 8, 3);
-//cvCvtColor(img ,tmpAusgabe, CV_GRAY2RGB);
-    Mat tmpAusgabe = img.clone(); // nur grauweert, wenn grauwertbild!!!
-    Mat tmpAusgabe2 = img.clone(); // nur grauweert, wenn grauwertbild!!!
-
-    imShow("img", img);
-    waitKey();
-#endif
-
     // try several threshold levels
     plus = (250-72)/10;
     // andere richtung der schwellwertanpassung koennte andere ergebnisse leifern
     // cw->markerBrightness->value()==markerBrightness hat default 50
     for (threshold = 60+markerBrightness; threshold < 251 ; threshold += plus) //70..255, 20 //155+cw->temp2->value()
     {
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "vor hellig: " << getElapsedTime() <<endl;
-#endif
-
-        //// hack: use Canny instead of zero threshold level.
-        //// Canny helps to catch squares with gradient shading   
-        //if(l == 0)
-        //{
-        //    // apply Canny. Take the upper threshold from slider
-        //    // and set the lower to 0 (which forces edges merging) 
-        //    cvCanny(tgray, gray, 0, thresh, 5);
-        //    // dilate canny output to remove potential
-        //    // holes between edge segments 
-        //    cvDilate(gray, gray, 0, 1);
-        //}
-        // cvCanny(tgray, gray, 4000, 2500, 5); guter kantenoperator aber keine geschlossene contour
         if (img.channels() == 3)
         {
-            // folgende Zeilen erledigen das gleiche wie cvThreshold(tgray, gray, threshold, 255, CV_THRESH_BINARY);
-            // noetig gewesen, da opencv Probleme machte
-            //            int x, y;
-            //            char *data = gray->imageData;
-            //            char *greyData = tgray->imageData;
-            //            char *yData = data;
-            //            char *yGreyData = greyData;
-            //            for (y = 0; y < gray->height; y++)
-            //            {
-            //                for (x = 0; x < gray->width; x++)
-            //                {
-            //                    if (*(greyData) > threshold)
-            //                        *(data) = 255;
-            //                    else
-            //                        *(data) = 0;
-            //                }
-            //                data = (yData += gray->widthStep); // because sometimes widthStep != width
-            //                greyData = (yGreyData += tgray->widthStep); // because sometimes widthStep != width
-            //            }
             cv::threshold(tgray,gray,threshold, 255, cv::THRESH_BINARY);
-//            cvThreshold(tgray, gray, threshold, 255, CV_THRESH_BINARY);
         }
         else if (img.channels() == 1)
             cv::threshold(img,gray,threshold,255, cv::THRESH_BINARY);//cvThreshold(img, gray, threshold, 255, CV_THRESH_BINARY);
         else
             debout << "Error: Wrong number of channels: " << img.channels() <<std::endl;
-        grayFix = gray.clone();// = cvCloneImage(gray); // make a copy
+        grayFix = gray.clone();
 
 
-        //cvShowImage("img", grayFix);
-        //cvWaitKey();
-
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "vor    iso: " << getElapsedTime() <<endl;
-#endif
         // find contours and store them all as a list
-//#if CV_MAJOR_VERSION == 2
         findContours(gray,contours,cv::RETR_LIST,cv::CHAIN_APPROX_SIMPLE);
-//        cvFindContours(gray, storage, &firstContour, sizeof(CvContour),
-//            CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE); // gray wird auch veraendert!!!
-//        contours = firstContour;
-
-//        int count_contours = 0;
-
-//        while(contours){
-
-//            debout << "contour[" << ++count_contours << "]: " << contours->total << endl;
-//            contours = contours->h_next;
-//        }
-//        debout << "firstContour" << endl;
-//        contours = firstContour;
-//#elif CV_MAJOR_VERSION == 3
-    //Mat threshold_output;
-    //vector<Vec4i> hierarchy;
-    //threshold(cvarrToMat(tgray), threshold_output, threshold, 255, THRESH_BINARY);
-    //vector<vector<Point> > v_contours;
-
-    //findContours(cvarrToMat(gray), contours,/* hierarchy,*/ CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0) );
-//#endif
-//IplImage *tmpAusgabe = cvCloneImage(img); // make a copy
-// char outstr[256];
-
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "nach   iso: " << getElapsedTime() <<endl;
-#endif
 
         // test each contour
         while (!contours.empty())
@@ -1377,205 +1023,41 @@ namedWindow("img", CV_WINDOW_AUTOSIZE); // 0 wenn skalierbar sein soll
             // um kreise zu suchen koennte auch cvHoughCircles genutzt werden
 
             count = contour.size();
-//            count = contours->total; // This is number point in contour
 
             // man koennte das Seitenverhaeltnis, contour-gesamtlaenge vorher ueberpruefen, um cont rauszuwerfen
-            //for (int iii=0; iii<contours->total; ++iii)
-            //{
-            //    CvPoint* ppp = (CvPoint*) cvGetSeqElem(contours, iii);
-            //    printf("(%d,%d)\n", ppp->x, ppp->y);
-            //}
-            //printf("\n");
-            //debout << "count: " << count << endl;
+
             if (count > 5)
             {
-#ifdef SHOW_TMP_IMG
-// in rot contouren in eine drehrichtung, in gruen andere
-cvDrawContours(tmpAusgabe,contours,CV_RGB(255,0,0),CV_RGB(0,255,0),0,1,8,cvPoint(0,0));
-cvShowImage("img", tmpAusgabe);
-cvWaitKey();
-
-////// in weiss alle konturen - behindern jedoch weitere untersuchungen
-////cvDrawContours(img,contours,CV_RGB(255,255,255),CV_RGB(255,255,255),0,1,8,cvPoint(0,0));
-#endif
-
-
-//                PointArray2D32f.create(count,2, CV_32F);
-//                //Mat(cvarrToMat(contours)).convertTo(PointArray2D32f.at(i), CV_32F);
-//                // Convert CvPoint set to Mat set.
-//                for(i=0; i<count; i++)
-//                {
-//                    //debout << "in for" << endl;
-//                    //debout << "(" << i << ") " << PointArray[i].x << ", " << PointArray[i].y << endl;
-//                    PointArray2D32f.at<float>(i,0) = (float)PointArray[i].x;
-//                    PointArray2D32f.at<float>(i,1) = (float)PointArray[i].y;
-//                    //debout << "[" << i << "] " << PointArray2D32f.at<double>(i,0) << ", " << PointArray2D32f.at<double>(i,1) << endl;
-//                }
-                //debout << "FitEllipse" << endl;
                 // Fits ellipse to current contour.
-                //debout << "count: " << count << endl;
                 cv::Mat pointsf;
                 cv::Mat(contour).convertTo(pointsf, CV_32F);
                 box = fitEllipse(pointsf);
 
-//                box = fitEllipse(PointArray2D32f);//, count, &box);
-
-                // neuer:
-                //// Fits ellipse to current contour.
-                //CvBox2D box = cvFitEllipse2(PointArray2D32f);
-                //debout << "expansion" << endl;
-                //ellipses are not allowed near border !!!
                 expansion = box.size.width > box.size.height ? myRound(box.size.width*0.5) : myRound(box.size.height*0.5);
-                //debout << "if" << endl;
+
                 if (box.center.x-expansion > ELLIPSE_DISTANCE_TO_BORDER && box.center.x+expansion < gray.cols-ELLIPSE_DISTANCE_TO_BORDER &&
                     box.center.y-expansion > ELLIPSE_DISTANCE_TO_BORDER && box.center.y+expansion < gray.rows-ELLIPSE_DISTANCE_TO_BORDER)
                 {
-                  //  debout << "in if" << endl;
-//                     // Convert ellipse data from float to integer representation.
-//                     center.x = myRound(box.center.x);
-//                     center.y = myRound(box.center.y);
-                    //box.angle = -box.angle; // war wohl in aelteren opencv versionen noetig
-
                     angle = (box.angle)/180.*PI;
                     if (box.size.width<box.size.height) {
                       angle -= PI / 2;
                     }
-                    //debout << "contourArea" << endl;
-                    //cvContourArea(contours,CV_WHOLE_SEQ) koennte mit MyEllipse.are() verglichen werden und bei grossen abweichungen verworfenwerden!!!
-                    // IN OPENCV2.1 liefert cvContourArea KEIN VORZEICHEN ZUM ERKENNEN DER DREHRICHTUNG!!!! es ist ein optionaler paramter hinzugefuegt worden!!!!
 
-                    //else
                     contourArea = cv::contourArea(contour,true);
-//                        contourArea = cvContourArea(contours,CV_WHOLE_SEQ, true);
 
-                    //contourArea koennte mit MyEllipse.area() verglichen werden und bei grossen abweichungen verworfenwerden!!!
-                    //debout << contourArea << " " << box.center.x << " " << box.center.y << " " << box.size.width <<" " << box.size.height <<endl;
-                    //debout << e.area() << " " << fabs(contourArea)<<  endl;
-                    //debout << "MyEllipse" << endl;
+                    //contourArea koennte mit MyEllipse.area() verglichen werden und bei grossen abweichungen verworfen werden!!!
                     MyEllipse e(box.center.x, box.center.y, box.size.width*0.5, box.size.height*0.5, angle);
                     if (recoMethod == RecognitionMethod::Casern) // Casern
-                        added = markerCasernList.mayAddEllipse(grayFix, e, (contourArea > 0));
+                        markerCasernList.mayAddEllipse(grayFix, e, (contourArea > 0));
                     else if (recoMethod == RecognitionMethod::Hermes) // Hermes
-                        added = markerHermesList.mayAddEllipse(grayFix, e, (contourArea > 0));
+                        markerHermesList.mayAddEllipse(grayFix, e, (contourArea > 0));
                     else if (recoMethod == RecognitionMethod::Japan) // Japan
-                        added = markerJapanList.mayAddEllipse(grayFix, e, (contourArea > 0));
-
-                    if (added)
-{
-//  debout << cvContourArea(contours,CV_WHOLE_SEQ) << endl; // PointArray gerichteter Flaecheninhalt von const CvArr*
-
-#ifdef SHOW_TMP_IMG
-Size sizeTmp;
-Point ctr;
-sizeTmp.width = myRound(box.size.width*0.5);
-sizeTmp.height = myRound(box.size.height*0.5);
-ctr.x = myRound(box.center.x);
-ctr.y = myRound(box.center.y);
-
-//  MyEllipse e(box.center.x, box.center.y, box.size.width*0.5, box.size.height*0.5, angle);
-// int cx = myRound(e.center().x());
-// int cy = myRound(e.center().y());
-
-// //  debout << "****" << getR(img, 0, 0) << " " << getG(img, 0, 0) << " " << getB(img, 0, 0) << endl;
-// //  debout << cvGetDims(img)<<endl;
-// //  debout << ch<<endl;
-// //  debout << img->width<<endl;
-// //  debout << img->widthStep<<endl;
-// //  debout << cvGet2D(img, cx, cy).val[2] << " " << cvGet2D(img, cx, cy).val[1] << " " << cvGet2D(img, cx, cy).val[0] << endl;
-// // QRgb col = qRgb(((int)(*(data+ch*(cx+cy*iw)+2)))+127, ((int)(*(data+ch*(cx+cy*iw)+1)))+127, ((int)(*(data+ch*(cx+cy*iw))))+127);
-//  QRgb col = qRgb(getR(img, cx, cy), getG(img, cx, cy), getB(img, cx, cy));
-//  QString s("#%1%2%3");
-//  s = s.arg(qRed(col), 2, 16, QChar('0')).arg(qGreen(col), 2, 16, QChar('0')).arg(qBlue(col), 2, 16, QChar('0'));
-//  debout << cx+1 << " " << cy+1 << ": ";
-//  cout << s <<endl;
-//  QColor col2 = QColor(getR(img, cx, cy), getG(img, cx, cy), getB(img, cx, cy));
-//  // hue: 0..359, 
-//  debout << "Farbe: " << col2.hue() << ", Saettigung: " << col2.saturation() << ", Helligkeit: " << col2.value() << endl; 
-// //  debout << cx << " " << cy+1 << ": ";
-// //  cout << (int)*(data+ch*(cx+cy*iw-1)+2)+127 << " " << (int)*(data+ch*(cx+cy*iw-1)+1)+127 << " " << (int)*(data+ch*(cx+cy*iw-1))+127 << endl;
-// //  debout << cx+1 << " " << cy+1 << ": ";
-// //  cout << (int)*(data+ch*(cx+cy*iw)+2)+127 << " " << (int)*(data+ch*(cx+cy*iw)+1)+127 << " " << (int)*(data+ch*(cx+cy*iw))+127 << endl;
-// //  debout << cx+2 << " " << cy+1 << ": ";
-// //  cout << (int)*(data+ch*(cx+cy*iw+1)+2)+127 << " " << (int)*(data+ch*(cx+cy*iw+1)+1)+127 << " " << (int)*(data+ch*(cx+cy*iw+1))+127 << endl;
-
-
-if (contourArea > 0)
-    ellipse(tmpAusgabe2, ctr, sizeTmp, box.angle, 0, 360, CV_RGB(0, 255, 0), 1, CV_AA, 0);
-else
-    ellipse(tmpAusgabe2, ctr, sizeTmp, box.angle, 0, 360, CV_RGB(255, 0, 0), 1, CV_AA, 0);
-namedWindow("img", CV_WINDOW_AUTOSIZE); // 0 wenn skalierbar sein soll
-imShow("img", tmpAusgabe);
-namedWindow("img2", CV_WINDOW_AUTOSIZE); // 0 wenn skalierbar sein soll
-imShow("img2", tmpAusgabe2);
-//static QLabel imgLabel;
-//showImg(& imgLabel, tmpAusgabe2);
-//cvWaitKey(0); // zahl statt null, wenn nach bestimmter zeit weitergegangen werden soll
-#endif
-}
-
+                        markerJapanList.mayAddEllipse(grayFix, e, (contourArea > 0));
                 }
-                //debout << "FreePointArray" << endl;
-//                free(PointArray);
-
-//                PointArray2D32f.release();
             }
-            //debout << "Free PointArray" << endl;
-
-#ifdef WITH_RECT
-            // approximate contour with accuracy proportional
-            // to the contour perimeter
-            approxPolyDP(Mat(contour, contour, 0.08*cv::arcLength(contour,true), false);
-//            result = cvApproxPoly(contours.at(k), sizeof(CvContour), storage,
-//                CV_POLY_APPROX_DP, 0.08*cvContourPerimeter(contours), 0); //cvContourPerimeter(contours)*0.02
-            // square contours should have 4 vertices after approximation
-            // relatively large area (to filter out noisy contours)
-            // and be convex.
-            // Note: absolute value of an area is used because
-            // area may be positive or negative - in accordance with the
-            // contour orientation
-            area = cv::contourArea(contour);
-            length = cv::arcLength(result,false);
-            // cvContourPerimeter(contours) ist immer etwas groesser als length - warum?
-            if(contour.size() == 4 &&//&&result->total < 11 &&
-                area > 1500 && area < 10000 && //cvCheckContourConvexity(result)
-                length >150 && length < 500)
-            {
-                for(i = 0; i < 4; ++i)
-                    v[i] = (Vec2F)(CvPoint*) cvGetSeqElem(contours.at(k), i);
-                if (recoMethod == 0) // Casern
-                    markerCasernList.mayAddQuadrangle(v);
-                else if (recoMethod == 1) // Hermes
-                    markerHermesList.mayAddQuadrangle(v);
-                else if (recoMethod == 4) // Japan
-                    markerJapanList.mayAddQuadrangle(v);
-
-            }
-#endif
-            //debout << "total number of contours: " << contours->total << endl;
-            // take the next contour
-//            contours = contours->h_next;
             contours.pop_back();
         }
-       // debout << "after contours" << endl;
-
-//cvNamedWindow("img", CV_WINDOW_AUTOSIZE ); // 0 wenn skalierbar sein soll
-//cvShowImage("img", tmpAusgabe);
-//  sprintf(outstr,"c:/%d.png",threshold);
-// cvSaveImage(outstr, tmpAusgabe);
-//cvWaitKey( 0 ); // zahl statt null, wenn nach bestimmter zeit weitergegangen werden soll
-
-        // nicht noetig, aber so kann der neu erzeugte speicherplatz reduziert werden
-        // freigabe des speicherplatz erst bei cvClearMemStorage(storage)
-//        if (firstContour)
-//            cvClearSeq(firstContour); // not free only available for next push
-//        cvReleaseImage(&grayFix);
     }
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "nach ellip: " << getElapsedTime() <<endl;
-#endif
-
-    //cvReleaseMemStorage()
     if (recoMethod == RecognitionMethod::Casern) // Casern
     {
         markerCasernList.organize(img, autoWB);
@@ -1591,24 +1073,6 @@ imShow("img2", tmpAusgabe2);
         markerJapanList.organize(img, autoWB);
         markerJapanList.toCrossList(crossList, ignoreWithoutMarker);
     }
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "nach ident: " << getElapsedTime() <<endl;
-#endif
-
-#ifdef SHOW_TMP_IMG
-//markerList.draw(tmpAusgabe);    //diese zeile zeichnet alle marker, nun aber in trackeritem.cpp
-//cvReleaseImage(&tmpAusgabe);
-//cvReleaseImage(&tmpAusgabe2);
-#endif
-
-    // release all the temporary images
-//    cvReleaseImage(&gray);
-//    if (img->nChannels == 3)
-//        cvReleaseImage(&tgray);
-
-//    cvReleaseMemStorage(&storage); // stand vorher in uebergeordneter Funktion
-//    //cvClearMemStorage(storage); // gibt nicht speicher an bs frei, sondern nur fuer neue sequenzen
 }
 
 
@@ -1631,8 +1095,6 @@ void getMarkerPos(cv::Mat &img, QRect &roi, QList<TrackPoint> *crossList, Contro
 
     cv::Mat tImg;
     cv::Rect rect;
-    //debout << "recoMethod: " << recoMethod << endl;
-//    tImg = getRoi(img, roi, rect, !((recoMethod == 3)||(recoMethod == 5)||(recoMethod == 6)));
     tImg = getRoi(img, roi, rect, !((recoMethod == RecognitionMethod::Color) || (recoMethod == RecognitionMethod::MultiColor) || (recoMethod == RecognitionMethod::Code)));
 
     if (tImg.empty())
@@ -1640,7 +1102,6 @@ void getMarkerPos(cv::Mat &img, QRect &roi, QList<TrackPoint> *crossList, Contro
 
     // offset of rect
     Vec2F v(rect.x-borderSize, rect.y-borderSize);
-    //debout << "method: " << recoMethod << endl;
     if (recoMethod == RecognitionMethod::MultiColor)
         findMultiColorMarker(tImg, crossList, controlWidget, ignoreWithoutMarker, v);
     else if (recoMethod == RecognitionMethod::Color)
@@ -1649,8 +1110,6 @@ void getMarkerPos(cv::Mat &img, QRect &roi, QList<TrackPoint> *crossList, Contro
         findCodeMarker(tImg, crossList, controlWidget);
     else
         findContourMarker(tImg, crossList, markerBrightness, ignoreWithoutMarker, autoWB, recoMethod, controlWidget->getMainWindow()->getHeadSize());
-    //debout << "releaseImage" << endl;
-//    cvReleaseImage(&tImg); //war: cvFree(&tImg); // war: cvFree(&header); // (void**) only header
 
     // must be set because else hovermoveevent of recognitionRec moves also the colorMaskItem
     controlWidget->getMainWindow()->getColorMarkerItem()->setRect(v);
@@ -1676,67 +1135,6 @@ void getMarkerPos(cv::Mat &img, QRect &roi, QList<TrackPoint> *crossList, Contro
             }
         }
     }
-
-
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // rauschen durch median-filter verringern
-    // subtract background - bringt bei den aufnahmen wenig
-    //farbwerte ausblenden (schwarz/rot?), da weisse pappe gesucht und sonst in grauwert knallrot ueberbewerttet
-    // segmentation
-    // floodfill -> minarea rect um pappe zu finden
-    // laplace -> fitellipse (auch fuer ohne marker)
-    // tracking: lkdemo, motemp, 
-    // matchcontours matchtemplate matchshapes cvcamshift cvkalman (unter estimators)
-    // squere.exe
-    // motion templates
-    //optical flow
-    //back projection sagt voraus, wie das naechste bild aussehen wird
-    // richtige contour in graubild waere schoener als bi-bild, da bessere angleichung
-
-    // color mapping - tracking nutzen und in allen bildern nach farbe suchen - addieren und durchschnitt?
-
-    // wenn keine marker gefunden wurden, sollte ellipsenmitte genommen werden aber als schlechter bewertet werden
-
-    //aequidensiten 2. ordnung (s.409) interessant
-    //cvAdaptiveThreshold nicht so interessant, da gerad enur extrme gesucht und nicht lokale kleinere aenderungen
-    //versch algorithmen zur auswahl stellen, die kreuz finden
-
-    // die untere schwelle fuer threshold um 72 einstellbat machen !!!!!!!!!!!!!!!!!!!!
-
-    // farben herausfiltern: wenn kanaele sich stark unterscheiden, dann pixel schwarz, wenn umgebung dunkel und
-    // weiss wenn umgebung hell
-
-            // suchen vom KREUZ:
-            // MatchTemplate
-            // MatchShapes
-
-    //     int i, bin_w;
-    //     float max_value = 0;
-    //     static IplImage *hist_image = 0;
-    //     CvHistogram *hist;
-    //     int hist_size = 64;
-    //     float range_0[]={0,256};
-    //     float* ranges[] = { range_0 };
-
-    //     cvReleaseHist(&hist); // vom vorherigen lauf
-    //     hist_image = cvCreateImage(cvSize(320,200), 8, 1);
-    //     hist = cvCreateHist(1, &hist_size, CV_HIST_ARRAY, ranges, 1);
-    //     cvNamedWindow("histogram", 0);
-    //     hist = cvCreateHist(1, &hist_size, CV_HIST_ARRAY, ranges, 1);
-    //     cvCalcHist(&img, hist, 0, NULL);
-    //     cvGetMinMaxHistValue(hist, 0, &max_value, 0, 0);
-    //     cvScale(hist->bins, hist->bins, ((double)hist_image->height)/max_value, 0);
-    //     /*cvNormalizeHist(hist, 1000);*/
-
-    //     cvSet(hist_image, cvScalarAll(255), 0);
-    //     bin_w = myRound((double)hist_image->width/hist_size);
-
-    //     autoStart" value="1"for(i = 0; i < hist_size; i++)
-    //         cvRectangle(hist_image, cvPoint(i*bin_w, hist_image->height),
-    //                      cvPoint((i+1)*bin_w, hist_image->height - myRound(cvGetReal1D(hist->bins,i))),
-    //                      cvScalarAll(0), -1, 8, 0);
-   
-    //     cvShowImage("histogram", hist_image);
 }
 
 
@@ -1773,5 +1171,4 @@ cv::Ptr<cv::aruco::Dictionary> detail::getDictMip36h12()
 
     return dictionary;
 }
-
 } // namespace reco

@@ -34,7 +34,6 @@ private:
 public:
     BorderFilter();
 
-//    IplImage* act(IplImage *img, IplImage *res);
     cv::Mat act(cv::Mat &img, cv::Mat &res);
 
     Parameter *getBorderSize();

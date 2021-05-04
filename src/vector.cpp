@@ -37,32 +37,6 @@ Vec3F::Vec3F(double x, double y, double z)
       mZ(z)
 {
 }
-// Vec3F::Vec3F(const QPointF& v)
-//     : mX(v.x()),
-//       mY(v.y())
-// {
-// }
-// Vec3F::Vec3F(const CvPoint* v)
-//     : mX(v->x),
-//       mY(v->y)
-// {
-// }
-
-// CvPoint Vec3F::toCvPoint() const
-// {
-//     CvPoint p;
-//     p.x = myRound(mX);
-//     p.y = myRound(mY);
-//     return p;
-// }
-// QPoint Vec3F::toQPoint() const
-// {
-//     return QPoint(myRound(mX), myRound(mY));
-// }
-// QPointF Vec3F::toQPointF() const
-// {
-//     return QPointF(mX, mY);
-// }
 
 double Vec3F::x() const
 {
@@ -96,13 +70,6 @@ void Vec3F::set(double x, double y, double z)
     mY = y;
     mZ = z;
 }
-
-// automatisch vom compiler (komponentenweise)
-//Vec3F Vec3F::operator=(const Vec3F& v)
-// Vec3F Vec3F::operator=(const CvPoint *v)
-// {
-//     return Vec3F(v->x, v->y);
-// }
 
 Vec3F Vec3F::operator+(const Vec3F& v) const
 {
@@ -150,11 +117,6 @@ double Vec3F::operator*(const Vec3F& v) const
     return mX * v.mX + mY * v.mY;
 }
 
-// double Vec3F::operator%(const Vec3F& v) const
-// {
-//     return mX * v.mY - mY * v.mX;
-// }
-
 bool Vec3F::operator==(const Vec3F& v) const
 {
     return mX == v.mX && mY == v.mY && mZ == v.mZ;
@@ -170,11 +132,6 @@ double Vec3F::length() const
     return sqrt(mX*mX+mY*mY+mZ*mZ);
 }
 
-// double Vec3F::angle() const
-// {
-//     return atan2(mY, mX);
-// }
-
 Vec3F Vec3F::unit() const
 {
     if(mX == 0 && mY == 0)
@@ -184,10 +141,6 @@ Vec3F Vec3F::unit() const
     return Vec3F(mX / len, mY / len, mZ / len);
 }
 
-// Vec3F Vec3F::normal() const
-// {
-//     return Vec3F(-mY, mX);
-// }
 void Vec3F::normalize()
 {
     double len = length();
@@ -204,21 +157,6 @@ double Vec3F::distanceToPoint(const Vec3F& p) const
     return ((operator-)(p)).length();
 }
 
-// double Vec3F::distanceToLine(const Vec3F& p1, const Vec3F& p2) const
-// {
-//     Vec3F n = (p2-p1).normal(); // normal vector
-//     n.normalize(); // normalized normal vector
-//     return fabs((operator*)(n) - p1*n);
-// }
-// double Vec3F::angleBetweenVec(const Vec3F& v) const
-// {
-//     return acos((operator*)(v)/(length()*v.length()));
-// }
-
-// Vec3F Vec3F::fromAngle(double angle)
-// {
-//     return Vec3F(cos(angle), sin(angle));
-// }
 
 //---------------------------------------------------------------------------
 
@@ -303,7 +241,6 @@ void Vec2F::set(double x, double y)
 }
 
 // automatisch vom compiler (komponentenweise)
-//Vec2F Vec2F::operator=(const Vec2F& v)
 Vec2F Vec2F::operator=(const CvPoint *v)
 {
     return Vec2F(v->x, v->y);
@@ -317,7 +254,7 @@ const Vec2F& Vec2F::operator+=(const Vec2F& v)
 }
 const Vec2F Vec2F::operator+(const Vec2F& v) const
 {
-    return Vec2F(*this) += v; //Vec2F(mX + v.mX, mY + v.mY);
+    return Vec2F(*this) += v;
 }
 
 const Vec2F Vec2F::operator-=(const Vec2F& v)
@@ -325,11 +262,10 @@ const Vec2F Vec2F::operator-=(const Vec2F& v)
     mX -= v.mX;
     mY -= v.mY;
     return *this;
-    //    return Vec2F(mX - v.mX, mY - v.mY);
 }
 const Vec2F Vec2F::operator-(const Vec2F& v) const
 {
-    return Vec2F(*this) -= v; //Vec2F(mX - v.mX, mY - v.mY);
+    return Vec2F(*this) -= v;
 }
 
 Vec2F Vec2F::operator-() const
@@ -351,11 +287,6 @@ double Vec2F::operator*(const Vec2F& v) const
 {
     return mX * v.mX + mY * v.mY;
 }
-
-// double Vec2F::operator%(const Vec2F& v) const // eher det
-// {
-//     return mX * v.mY - mY * v.mX;
-// }
 
 bool Vec2F::operator==(const Vec2F& v) const
 {

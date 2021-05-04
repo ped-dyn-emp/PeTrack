@@ -36,9 +36,6 @@ private:
 
 public:
     TrackerItem(QWidget *wParent, Tracker *tracker, QGraphicsItem * parent = nullptr);
-//    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-//    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
-    void updateData();
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

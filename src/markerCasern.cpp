@@ -45,10 +45,6 @@ MarkerCasern::MarkerCasern(MyEllipse head)
       mHasQuadrangle(false),
       mCenterIndex(-1),
       mColorIndex(-1)
-//       quadrangle[0](0,0),
-//       quadrangle[1](0,0),
-//       quadrangle[2](0,0),
-//       quadrangle[3](0,0)
 {
 }
 MarkerCasern::MarkerCasern()
@@ -147,7 +143,7 @@ void MarkerCasern::modifyQuadrangle(const Vec2F v[4])
     if (mHasQuadrangle)
     {
         // seitenverhaeltnis 2:3 koennte auch bedacht werden
-        // angle on opposed edge is nearer to 90� 
+        // angle on opposed edge is nearer to 90
         if ((fabs((v[3]-v[2]).angleBetweenVec(v[0]-v[3])-PI/2.)+
              fabs((v[1]-v[0]).angleBetweenVec(v[2]-v[1])-PI/2.)) <
             (fabs((mQuadrangle[3]-mQuadrangle[2]).angleBetweenVec(mQuadrangle[0]-mQuadrangle[3])-PI/2.)+
@@ -174,9 +170,6 @@ void MarkerCasern::organize(const cv::Mat &img, bool autoWB)
     // direkt herausspringen, da nichts zu tun ist
     if (mSpots.size() == 0)
         return;
-
-//     for (i = 0; i < mSpots.size(); ++i)
-//             mSpots[i].draw(img, 0, 255, 0);
 
     // durch mgl wachsen der spots muss ueberprueft werden, ob sich im nachhinnein Ueberlagerungen ergeben
     for (i = 0; i < mSpots.size(); ++i)
@@ -226,7 +219,7 @@ void MarkerCasern::organize(const cv::Mat &img, bool autoWB)
             cx = myRound(mSpots[i].x());
             cy = myRound(mSpots[i].y());
             r = myRound((mSpots[i].r1()+mSpots[i].r2())/2.); // mittlerer radius
-// debout << cx+1 << " " << cy+1 << ": ";
+
             int minVal = 256; // groesser als komplett weiss (255)
             // bildrand muss nicht ueberprueft werden, da sie gar nicht erst hereingekommen waeren
             for (j = -r; j < r+1; ++j)
@@ -237,7 +230,6 @@ void MarkerCasern::organize(const cv::Mat &img, bool autoWB)
                         minVal = col.value(); // Helligkeit
                 }
             minValList.append(minVal);
-// cout << minVal << endl;
         }
         // loeschen aller zu hellen spots
         QList<int> minValListSort = minValList;
@@ -245,15 +237,11 @@ void MarkerCasern::organize(const cv::Mat &img, bool autoWB)
         for (i = 0; i < mSpots.size(); ++i)
             if (minValList[i] > minValListSort[3])
             {
-// debout << i << " groesser als " << minValListSort[3]<< endl;
                 deleteSpot(i);
                 minValList.removeAt(i);
                 --i;
             }
     }
-
-// for (i = 0; i < mSpots.size(); ++i)
-// mSpots[i].draw(img, 255, 0, 0);
 
     // sort spot list: wird nicht gemacht!!!!!!!!
     // 1. bullet marker spot
@@ -350,21 +338,19 @@ void MarkerCasern::organize(const cv::Mat &img, bool autoWB)
             if (!colSet)
             {
                 colSet = true;
-                mCol.setRgb(getValue(img,cx,cy).rgb());//getR(img, cx, cy), getG(img, cx, cy), getB(img, cx, cy));
+                mCol.setRgb(getValue(img,cx,cy).rgb());
                 mColorIndex = i;
             }
             else
             {
-                colOther.setRgb(getValue(img,cx,cy).rgb());//getR(img, cx, cy), getG(img, cx, cy), getB(img, cx, cy));
+                colOther.setRgb(getValue(img,cx,cy).rgb());
                 mOtherIndex = i;
             }
             // bildrand muss nicht ueberprueft werden, da sie gar nicht erst hereingekommen waeren
             for (j = -1; j < 2; ++j) // 3x3 feld wird ueberprueft
                 for (k = -1; k < 2; ++k)
                 {
-//j=0, k=0;
-                    col.setRgb(getValue(img,cx+j,cy+k).rgb());//getR(img, cx+j, cy+k), getG(img, cx+j, cy+k), getB(img, cx+j, cy+k));
-//debout << mCol << ", " << col << ", " << colOther <<endl;
+                    col.setRgb(getValue(img,cx+j,cy+k).rgb());
                     // faktor, um die mitte hoeher zu gewichten, da bei fd der schwarze rand mit dem weiss gemischt oft hell ist
                     if (col.value()/(1. + .5*(abs(j)+abs(k))) > mCol.value()) // wenn Helligkeit maximal
                     {
@@ -384,33 +370,23 @@ void MarkerCasern::organize(const cv::Mat &img, bool autoWB)
         // weissabgleich
         // 1. Dynamik der Helligkeit
         // 2. farbverschiebung entsprechend weisswertes
-//         int ocx = myRound(mSpots[mOtherIndex].x());
-//         int ocy = myRound(mSpots[mOtherIndex].y());
         // bildrand muss nicht ueberprueft werden, da sie gar nicht erst hereingekommen waeren
-//         // schwarzwert bestimmen
-//         QColor black(255,255,255); // dunkelster fleck
-//         for (j = -1; j < 2; ++j) // 3x3 feld um ocx,ocy wird ueberprueft
-//             for (k = -1; k < 2; ++k)
-//             {
-//                 col.setRgb(getR(img, ocx+j, ocy+k), getG(img, ocx+j, ocy+k), getB(img, ocx+j, ocy+k));
-//                 if (col.value() < black.value()) // wenn Helligkeit geringer
-//                     black = col;
-//             }
+
         // weisswert und durchschnittlichen weisswert bestimmen
         // 2 bereiche neben farbmarker in weisser flaeche auf kopfpappe
         int wcx = myRound(mSpots[mColorIndex].x()+0.356*(mSpots[mColorIndex].y()-mSpots[mOtherIndex].y()));
         int wcy = myRound(mSpots[mColorIndex].y()+0.356*(mSpots[mColorIndex].x()-mSpots[mOtherIndex].x()));
         QColor white(0,0,0); // hellster fleck
-        //QColor avgWhite; // durchschnittlichen weisswert
+
         int avgWhiteR=0, avgWhiteG=0, avgWhiteB=0; // durchschnittlichen weisswert
         for (j = -1; j < 2; ++j) // 3x3 feld um ocx,ocy wird ueberprueft
             for (k = -1; k < 2; ++k)
             {
                 QColor color = getValue(img,wcx+j,wcy+k);
-                avgWhiteR+=color.red();//getR(img, wcx+j, wcy+k);
-                avgWhiteG+=color.green();//getG(img, wcx+j, wcy+k);
-                avgWhiteB+=color.blue();//getB(img, wcx+j, wcy+k);
-                col.setRgb(getValue(img,wcx+j,wcy+k).rgb());//getR(img, wcx+j, wcy+k), getG(img, wcx+j, wcy+k), getB(img, wcx+j, wcy+k));
+                avgWhiteR+=color.red();
+                avgWhiteG+=color.green();
+                avgWhiteB+=color.blue();
+                col.setRgb(getValue(img,wcx+j,wcy+k).rgb());
                 if (col.value() > white.value()) // wenn Helligkeit groesser
                     white = col;
             }
@@ -420,40 +396,16 @@ void MarkerCasern::organize(const cv::Mat &img, bool autoWB)
             for (k = -1; k < 2; ++k)
             {
                 QColor color = getValue(img,wcx+j,wcy+k);
-                avgWhiteR+=color.red();//getR(img, wcx+j, wcy+k);
-                avgWhiteG+=color.green();//getG(img, wcx+j, wcy+k);
-                avgWhiteB+=color.blue();//getB(img, wcx+j, wcy+k);
-                col.setRgb(getValue(img,wcx+j,wcy+k).rgb());//getR(img, wcx+j, wcy+k), getG(img, wcx+j, wcy+k), getB(img, wcx+j, wcy+k));
+                avgWhiteR+=color.red();
+                avgWhiteG+=color.green();
+                avgWhiteB+=color.blue();
+                col.setRgb(getValue(img,wcx+j,wcy+k).rgb());
                 if (col.value() > white.value()) // wenn Helligkeit groesser
                     white = col;
             }
-        //avgWhite.setRgb();
+
         avgWhiteR/=18; avgWhiteG/=18; avgWhiteB/=18;
-        
-        //     debout << black <<endl;    
-        //     debout << white <<endl;    
-        //     debout << avgWhiteR << " " << avgWhiteG << " " << avgWhiteB <<endl;    
-        //     debout << mCol <<endl;    
-        //debout << avgWhite <<endl;    
-        
-        // Anpassung
-        // Value / Helligkeit anpassen
-        // schwarzton wird nicht beruecksichtigt, weil dadurch alles dunkler wurde,
-        // da verwischte aufnahmen den schwarzen pkt nicht sehr schwarz wiedergeben
-        // DOCH, BEI RGB und HSV kam es zu ueberschreitungen, was mit warnungen einherging:
-        //                  eine unwahrscheinliche uebersteuerung (zahlen > 255) wurde nicht abgefangen
-        // mCol.setHsv(mCol.hue(), mCol.saturation(), (int)((mCol.value()-black.value())*(255./(white.value()-black.value()))));    //colOther.setHsv(colOther.hue(), colOther.saturation(), (int)((colOther.value()-black.value())*(255./(white.value()-black.value()))));
-   
-        //passiert nun im einen schritt      
-//         // helligkeit hochsetzen, so dass weiss maximal hell
-//         mCol.setHsv(mCol.hue(), mCol.saturation(), MIN(MAX((int)(mCol.value()*(255./white.value())), 0),255));
-//         colOther.setHsv(colOther.hue(), colOther.saturation(), MIN(MAX((int)(colOther.value()*(255./white.value())), 0),255));
-        
-        //passiert nun im einen schritt und mit einem faktor statt einer summand
-//         // Farbton anpassen
-//         // uebersteuerung wird einfach gedeckelt und nicht angepasst!!!
-//         mCol.setRgb(MIN(MAX(mCol.red()+(avgWhiteB-avgWhiteR), 0),255), MIN(MAX(mCol.green()+(avgWhiteB-avgWhiteG), 0),255), mCol.blue());
-//         colOther.setRgb(MIN(MAX(colOther.red()+(avgWhiteB-avgWhiteR), 0),255), MIN(MAX(colOther.green()+(avgWhiteB-avgWhiteG), 0),255), colOther.blue());
+
         if ((avgWhiteR !=0) && (avgWhiteG !=0) && (avgWhiteB !=0))
         {
             mCol.setRgb((int) MIN(((255./avgWhiteR)*mCol.red()), 255.), (int) MIN(((255./avgWhiteG)*mCol.green()), 255.), (int) MIN(((255./avgWhiteB)*mCol.blue()), 255.));
@@ -464,53 +416,12 @@ void MarkerCasern::organize(const cv::Mat &img, bool autoWB)
 
         // eigentlich muesset saettigung ueber histogramm angepasst werden!!
     }
-    
-    // darauffolgende methode ist nach versuchen besser und sowieso schneller
-    //     // wenn auf markern farbe nahezu identisch
-    //     // weisst dies auf einen schwarzen marker hin,
-    //     // dann wird der marker genommen, der die groesste Flaeche beansprucht
-    //     if (abs(mCol.value()-colOther.value()) < 30) //&& abs(mCol.saturation()-colOther.saturation()) < 40
-    //     {
-    //         int count[3] = {0, 0, 0};
-    //         int maxVal = (mCol.value()+colOther.value())/2 + 10;
-    //         int maxCount = 0;
-    //         int maxIdx = -1;
-    //         for (i = 0; i < mSpots.size(); ++i)
-    //             if (i != mCenterIndex)
-    //             {
-    //                 cx = myRound(mSpots[i].x());
-    //                 cy = myRound(mSpots[i].y());
-    //                 // bildrand muss nicht ueberprueft werden, da sie gar nicht erst hereingekommen waeren
-    //                 for (j = -7; j < 8; ++j) // 15x15 feld wird ueberprueft
-    //                     for (k = -7; k < 8; ++k)
-    //                     {
-    //                         col.setRgb(getR(img, cx+j, cy+k), getG(img, cx+j, cy+k), getB(img, cx+j, cy+k));
-    //                         if (col.value() < maxVal)
-    //                             count[i]++;
-    //                     }
-    //                 if (count[i] > maxCount)
-    //                 {
-    //                     maxCount = count[i];
-    //                     maxIdx = i;
-    //                 }
-    //             }
-    //         mColorIndex = maxIdx;
-    //         if (maxIdx != -1)
-    //             debout << "Warning: Blackpoint at " << mSpots[maxIdx].x() << ", " << mSpots[maxIdx].y() << "!" << endl;
-    //     }
-    
+
     // wenn auf markern farbe nahezu identisch
     // weisst dies auf einen schwarzen marker hin,
     // dann wird der marker genommen, der den groessten radius hat
     if (abs(mCol.value()-colOther.value()) < 30) //&& abs(mCol.saturation()-colOther.saturation()) < 40
     {
-//     if (mCenterIndex != -1)
-//         debout << myRound(mSpots[mCenterIndex].x())+1 << " " <<myRound(mSpots[mCenterIndex].y())+1<<endl;
-// //     debout << mColorIndex <<" " << mCenterIndex << " " << mSpots.size()<<endl;
-// //     debout << mCol.red() <<" "<< mCol.green() <<" "<< mCol.blue() <<endl;
-// //     debout << colOther.red() <<" "<< colOther.green() <<" "<< colOther.blue() <<endl;
-//     debout << mCol.hue() <<" "<< mCol.saturation() <<" "<< mCol.value() <<endl;
-//     debout << colOther.hue() <<" "<< colOther.saturation() <<" "<< colOther.value() <<endl;
         double maxRadius = 0, rad;
         int maxIdx = -1;
         for (i = 0; i < mSpots.size(); ++i)
@@ -530,68 +441,7 @@ void MarkerCasern::organize(const cv::Mat &img, bool autoWB)
             // wird im verlaufe nicht mehr benoetigt: colOther = mCol;
             mCol = colOther;
         }
-//         if (mColorIndex != maxIdx)
-//             debout << "Warning: Method radius has other result than method blackpoint at point " << mSpots[maxIdx].x() << ", " << mSpots[maxIdx].y() << " and " << mSpots[mColorIndex].x() << ", " << mSpots[mColorIndex].y() << "!" << endl;
     }
-
-//     // koennten so bei schlechter beleuchtung graue bereiche auf muetze eigentliche marker ueberlagern?
-//     // delete all without 4 with most counts and sort them
-//     int max[4] = {-1, -1, -1, -1}; // max[0] is biggest
-//     int maxIndex[4] = {-1, -1, -1, -1};
-//     for (i = 0; i < mSpots.size(); ++i)
-//     {
-//         for (j = 0; j < 4; ++j)
-//         {
-//             if (mSpotCount[i] > max[j])
-//             {
-//                 for (k = j; k < 3; ++k)
-//                 {
-//                     max[k+1] = max[k];
-//                     maxIndex[k+1] = maxIndex[k];
-//                 }
-//                 max[j] = mSpotCount[i];
-//                 maxIndex[j] = i;
-//                 break;
-//             }
-//         }
-//         // ==
-//         //             if (mSpotCount[i] > max[0])
-//         //             {
-//         //                 max[3] = max[2]; max[2] = max[1]; max[1] = max[0];
-//         //                 maxIndex[3] = maxIndex[2]; maxIndex[2] = maxIndex[1]; maxIndex[1] = maxIndex[0];
-//         //                 max[0] = mSpotCount[i];
-//         //                 maxIndex[0] = i;
-//         //             } else if (mSpotCount[i] > max[1])
-//         //             {
-//         //                 max[3] = max[2]; max[2] = max[1];
-//         //                 maxIndex[3] = maxIndex[2]; maxIndex[2] = maxIndex[1];
-//         //                 max[1] = mSpotCount[i];
-//         //                 maxIndex[1] = i;
-//         //             } else if (mSpotCount[i] > max[2])
-//         //             {
-//         //                 max[3] = max[2];
-//         //                 maxIndex[3] = maxIndex[2];
-//         //                 max[2] = mSpotCount[i];
-//         //                 maxIndex[2] = i;
-//         //             } else if (mSpotCount[i] > max[3])
-//         //             {
-//         //                 max[3] = mSpotCount[i];
-//         //                 maxIndex[3] = i;
-//         //             }
-//     }
-//     for (j = 0, i = 0; i < 4 && maxIndex[i] > -1; ++i)
-//     {
-//         mSpots.append(mSpots[maxIndex[i]]);
-//         mSpotCount.append(max[i]);
-//         j++; // number of max
-//     }
-//     k = mSpots.size();
-//     for (i = 0; i < k-j; ++i)
-//     {
-//         mSpots.removeFirst();
-//         mSpotCount.removeFirst();
-//     }
-//     //         debout << max[0] << " " << max[1] << " " << max[2] << " " << max[3] << " " <<endl;
 }
 
 MyEllipse MarkerCasern::getCenterSpot() const
@@ -634,15 +484,11 @@ void MarkerCasern::draw(cv::Mat &img) const
     // quadrangle
     if (hasQuadrangle())
     {
-//        CvPoint pt[4], *rect = pt;
         std::vector<cv::Point> pt;
-//        int count = 4;
         for (i = 0; i < 4; ++i)
             pt.push_back(cv::Point(mQuadrangle[i].x(),mQuadrangle[i].y()));
-//            pt[i] = mQuadrangle[i].toCvPoint();
         // draw the square as a closed polyline 
         cv::polylines(img,pt,true,CV_RGB(0,255,0),1,cv::LINE_AA,0);
-//        cvPolyLine(img, &rect, &count, 1, 1, CV_RGB(0,255,0), 1, CV_AA, 0); //3, CV_AA, 0
     }
 }
 
@@ -656,19 +502,11 @@ bool MarkerCasernList::mayAddEllipse(const cv::Mat &img, const MyEllipse& e, boo
 
     int cx = myRound(e.center().x());
     int cy = myRound(e.center().y());
-//     char *data = img->imageData; 
-//     int iw = img->width;
 
     // maybe spot
     if (blackInside && // marker have to be black inside
         (e.r1()>SPOT_SIZE_MIN && e.r1()<SPOT_SIZE_MAX && e.r2()>SPOT_SIZE_MIN && e.r2()<SPOT_SIZE_MAX && e.ratio()<2.) && // ellipse size
         ((cx < img.cols-3) && (cx > 1) && (cy < img.rows-3) && (cy > 1))) // && // not near the image border
-// folgende abfragen werden jetzt ueber blackInside abgefragt, was ueber die flaechenberechung erstellt wird 
-//         ((*(data+cx+cy*iw) != -1) || // ellipse color must be somehow black inside (-1 == weiss, 0 == schwarz)
-//          (*(data+cx+1+cy*iw) != -1) || (*(data+cx-1+cy*iw) != -1) ||
-//          (*(data+cx+(cy+1)*iw) != -1) || (*(data+cx+(cy-1)*iw) != -1)))
-//         // die suche nach schwarz fkt nicht immer: quadrat mit farbmarker koennte herausfallen
-//         // oder geschwungene kontur wie bumerang koennte in der mitte der ellipse schwarz sein, obwohl bumerang weiss
     {
         int s = -1;
         for (i = 0; i < size(); ++i)
@@ -691,14 +529,6 @@ bool MarkerCasernList::mayAddEllipse(const cv::Mat &img, const MyEllipse& e, boo
             MarkerCasern m;
             m.addSpot(e);
             append(m);
-// if (cx > 141 && cx < 147 && cy > 185 && cy < 191)
-// {
-//     debout << "falsche ellipse!!"<<endl;
-// cvNamedWindow("img", CV_WINDOW_AUTOSIZE ); // 0 wenn skalierbar sein soll
-// cvShowImage("img", img);
-// // // //cvWaitKey( 0 ); // zahl statt null, wenn nach bestimmter zeit weitergegangen werden soll
-// }
-
         }
         return true;
     // maybe head
@@ -752,7 +582,6 @@ bool MarkerCasernList::mayAddQuadrangle(const Vec2F v[4]) //Vec2F p1, Vec2F p2, 
 void MarkerCasernList::organize(const cv::Mat &img, bool autoWB)
 {
     int i, j, k, s;
-//     for (i = 0; i < size(); ++i)
 
     // delete marker without head and organize every marker
     for (i = 0; i < size(); )

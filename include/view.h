@@ -44,7 +44,6 @@ public:
 
     void wheelEvent(QWheelEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
-    //void mouseReleaseEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
 
@@ -58,7 +57,6 @@ signals:
     void mouseShiftWheel(int delta);
     void colorSelected();
     void setColorEvent();
-    //void mouseRightClick(QPointF pos);
 };
 
 // -------------------------------

@@ -32,7 +32,6 @@ private:
 public:
     CalibStereoFilter();
 
-//    IplImage* act(IplImage *img, IplImage *res);
     cv::Mat act(cv::Mat &img, cv::Mat &res);
 
     void setStereoContext(pet::StereoContext* stereoContext);

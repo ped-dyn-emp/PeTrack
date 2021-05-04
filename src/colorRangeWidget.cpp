@@ -58,11 +58,9 @@ void ColorRangeWidget::on_inversHue_stateChanged(int i)
     mColorPlot->replot();
 }
 
-// WARNING Setzt voraus, dass x als Hue und y als Saturation ausgewählt ist
-// Zwar Standardeinstellung, aber nicht zwingend der Fall
 /**
  * @brief sets x and y slider from colormap widget
- *
+ * @pre x is hue, and y saturation
  * Sets the x and y slider to the right values according to fromColor and toColor,
  * which were selected via the color picker.
  */
@@ -100,7 +98,6 @@ void ColorRangeWidget::on_fromTriangle_colorChanged(const QColor &col)
 {
     fromHue = col.hue(); fromSat = col.saturation(); fromVal = col.value();
     QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(fromHue).arg(fromSat).arg(fromVal);
-    //QString styleString = QString("background-color: rgb(%1,%2,%3)").arg(col.red()).arg(col.green()).arg(col.blue());
     fromColor->setStyleSheet(styleString);
 
     mColorPlot->getMapItem()->changeActMapFromColor(col);
@@ -114,7 +111,6 @@ void ColorRangeWidget::on_toTriangle_colorChanged(const QColor &col)
 {
     toHue = col.hue(); toSat = col.saturation(); toVal = col.value();
     QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(toHue).arg(toSat).arg(toVal);
-    //QString styleString = QString("background-color: rgb(%1,%2,%3)").arg(col.red()).arg(col.green()).arg(col.blue());
     toColor->setStyleSheet(styleString);
 
     mColorPlot->getMapItem()->changeActMapToColor(col);
@@ -130,7 +126,7 @@ void ColorRangeWidget::on_fromColor_clicked()
     // QWindowsXpStyle uses native theming engine which causes some palette modifications not to have any effect.
     // ueber palette war der button ausser initial nicht zu aendern!!!
 
-    QColor colBefore;//fromColor->palette().color(QPalette::Button);
+    QColor colBefore;
     colBefore = QColor::fromHsv(fromHue, fromSat, fromVal);
     QColor col = (QColorDialog::getColor(colBefore, this, "Select color from which value a pixel belongs to marker")).convertTo(QColor::Hsv);
     if (col.isValid() && col != colBefore)
@@ -144,39 +140,19 @@ void ColorRangeWidget::on_toColor_clicked()
 {
     // QWindowsXpStyle uses native theming engine which causes some palette modifications not to have any effect.
     // ueber palette war der button ausser initial nicht zu aendern!!!
-    QColor colBefore;//toColor->palette().color(QPalette::Button);
+    QColor colBefore;
     colBefore = QColor::fromHsv(toHue, toSat, toVal);
     QColor col = (QColorDialog::getColor(colBefore, this, "Select color to which value a pixel belongs to marker")).convertTo(QColor::Hsv);
-    //QPalette palette = toColor->palette();
-    //palette.setColor(QPalette::Button, col);
-    //toColor->setPalette(palette);
-    //toColor->setAutoFillBackground(true);
     if (col.isValid() && col != colBefore)
     {
         on_toTriangle_colorChanged(col);
         toTriangle->setColor(col);
     }
-// Versuch mit hsv stabil werte einzugeben - wandern in hsv und rgb zur folge, wenn auch wenig
-//        // QWindowsXpStyle uses native theming engine which causes some palette modifications not to have any effect.
-//        // ueber palette war der button ausser initial nicht zu aendern!!!
-//        QColor col = QColorDialog::getColor(toColor->palette().color(QPalette::Button).toHsv(), this, "").toHsv();
-//        //debout << col.hue()<<endl;
-//        //debout << col.saturation()<<endl;
-//        //debout << col.value()<<endl;
-//        //QPalette palette = toColor->palette();
-//        //palette.setColor(QPalette::Button, col);
-//        //toColor->setPalette(palette);
-//        //toColor->setAutoFillBackground(true);
-//        if (col.isValid())
-//        {
-//            QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(col.hue()).arg(col.saturation()).arg(col.value());
-//            toColor->setStyleSheet(styleString);
-//        }
 }
 
 void ColorRangeWidget::setInvHue(bool b)
 {
-    inversHue->setChecked(b);//setCheckState();
+    inversHue->setChecked(b);
 }
 
 void ColorRangeWidget::setFromColor(const QColor &col)

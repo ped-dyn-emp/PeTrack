@@ -93,7 +93,6 @@ public slots:
 
 
 private:
-//     void paintEvent(QPaintEvent *event);
     void setSliderMax(int max);
     bool updateImage();
     bool forward();
@@ -119,7 +118,6 @@ private:
     //GUI 
     QToolButton *mFrameForwardButton, *mFrameBackwardButton, *mPlayForwardButton, *mPlayBackwardButton, *mPauseButton;
     QToolButton *mRecButton;
-//    IplImage *mIplImg;
     cv::Mat mImg;
     QHBoxLayout *mPlayerLayout;
     Petrack *mMainWindow;
@@ -136,7 +134,6 @@ private:
     QIntValidator *mFrameInNumValidator;
     QIntValidator *mFrameOutNumValidator;
     QDoubleValidator *mFpsNumValidator;
-
 };
 
 #endif

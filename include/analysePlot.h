@@ -44,13 +44,10 @@ public:
 
     void setPen(const QPen &pen);
 
-//     void setModel(int model, int x, int y);
-
     void setTrackerReal(TrackerReal* trackerReal);
 
 private:
     TrackerReal *mTrackerReal;
-//     int mModel, mX, mY;
     QPen mPen;
 };
 
@@ -63,11 +60,7 @@ class AnalysePlot: public QwtPlot
 public:
     AnalysePlot(QWidget *parent = nullptr);
 
-    void setCursor(const QColor &col);
-
     QPoint getPos(const QColor &col) const;
-
-//     double map(const QColor &col) const;
 
     inline void setControlWidget(Control *control)
     {
@@ -87,7 +80,6 @@ public:
     }
     void setTrackerReal(TrackerReal* TR);
     void setScale();
-//     void updateTracker();
 
     inline double symbolSize() const
     {
@@ -116,19 +108,9 @@ private:
     double mXMin, mXMax, mYMin, mYMax;
     Control *mControlWidget;
     TrackerReal *mTrackerReal;
-//     ImagePlotItem *mImageItem;
     TrackerRealPlotItem *mTrackerRealItem;
-//     RectPlotItem *mRectItem;
-//     ViewAnalysePlotItem *mViewAnalyseItem;
     QwtPlotZoomer *mZoomer;
     int mActFrame;
 };
-
-//#else // QWT nicht verfuegbar
-//class AnalysePlot: public QWidget
-//{
-//    Q_OBJECT
-//}
-//#endif
 
 #endif

@@ -30,7 +30,6 @@
 
 #define EXTRAPOLATE_FACTOR 3. // war 1.5, aber bei bildauslassungen kann es ungewollt zuschlagen (bei 3 ist ein ausgelassener frame mgl, bei 2 wieder ein problem)
 #define MAX_COUNT 1500 // maximale anzahl an gleichzeitig getrackten personen
-//#define MIN_DISTANCE 30 // abstand zwischen kopfen !!!! wird nun ueber berechnung der kopfgroesse geregelt !!!!
 #define MAX_STEP_TRACK 5 // maximale zahl an frames zwischen denen noch getrackt wird
 #define MAX_TRACK_ERROR 200 // maximaler fehler beim tracken, so das noch punkt hinzugefuegt wird
                             // um am ende des tracking nicht am bildrand herumzukrakseln!
@@ -61,10 +60,6 @@ public:
     {
         mColPoint = cp;
     }
-//     inline Vec2F& colPoint()
-//     {
-//         return mColPoint;
-//     }
     inline const QColor& color() const
     {
         return mCol;
@@ -73,10 +68,6 @@ public:
     {
         mCol = col;
     }
-//     inline QColor color()
-//     {
-//         return mCol;
-//     }
     inline void setColPoint(const Vec2F &colPoint)
     {
         mColPoint = colPoint;
@@ -117,26 +108,11 @@ public:
         mSp.setZ(z);
     }
 
-//    inline void setZdistanceToCam(float z)
-//    {
-//        mZdistanceToCam = z;
-//    }
-//    inline float zDistanceToCam() const
-//    {
-//        return mZdistanceToCam;
-//    }
-
-//     const TrackPoint& operator=(const TrackPoint& tp); // Zuweisungsoperator
     const TrackPoint& operator=(const Vec2F& v);
     const TrackPoint& operator+=(const Vec2F& v);
     const TrackPoint operator+(const Vec2F& v) const;
 };
 
-// inline ostream& operator<< (ostream& s, const TrackPoint& tp)
-// {
-//     s << "(" << tp.x() << ", " << tp.y() << ") " << tp.qual() << " - (" << tp.colPoint().x() << ", " << tp.colPoint().y() << ") (" << tp.color().red() << ", " << tp.color().green() << ", " << tp.color().blue() << ")";
-//     return s;
-// }
 
 inline QTextStream& operator>>(QTextStream& s, TrackPoint& tp)
 {
@@ -158,7 +134,7 @@ inline QTextStream& operator>>(QTextStream& s, TrackPoint& tp)
         s >> d;
         sp.setY(d);
         s >> d;
-        sp.setZ(d); //setZdistanceToCam(d);
+        sp.setZ(d);
         tp.setSp(sp);
     }
     s >> qual; 
@@ -220,7 +196,6 @@ private:
 
 public:
     TrackPerson();
-//     TrackPerson(int nr, int frame, const Vec2F &p);
     TrackPerson(int nr, int frame, const TrackPoint &p);
 
     TrackPerson(int nr, int frame, const TrackPoint &p, int markerID);
@@ -250,15 +225,11 @@ public:
     // altitude is height of the camera over floor
     inline void setHeight(float z, float altitude) // , int frame
     {
-        //(*this)[frame-mFirstFrame].setZdistanceToCam(z);
-
         mHeight = (mHeight*mHeightCount+(altitude-z))/(mHeightCount+1);
         ++mHeightCount;
     }
     inline void resetHeight()
     {
-        //(*this)[frame-mFirstFrame].setZdistanceToCam(z);
-
         mHeight = MIN_HEIGHT;
         mHeightCount = 0;
     }
@@ -364,26 +335,19 @@ inline QTextStream& operator>>(QTextStream& s, TrackPerson& tp)
     QString str = s.readLine();
 
     QTextStream trjInfoLine(&str);
-    //debout << str << endl;
 
     trjInfoLine >> n;
     tp.setNr(n);
-    //debout << "Nr: " << tp.nr();
     trjInfoLine >> d;
     tp.setHeight(d);
-    //cout << " Height: " << tp.height();
     trjInfoLine >> n;
     tp.setFirstFrame(n);
-    //cout << " 1th frame: " << tp.firstFrame();
     trjInfoLine >> n;
     tp.setLastFrame(n);
-    //cout << " last frame: " << tp.lastFrame();
     trjInfoLine >> n;
     tp.setColCount(n);
-    //cout << " ColCount: " << tp.colCount();
     trjInfoLine >> col;
     tp.setColor(col);
-    //cout << " col: " << tp.color();
     if (Petrack::trcVersion > 3)
     {
         trjInfoLine >> markerID;
@@ -392,13 +356,9 @@ inline QTextStream& operator>>(QTextStream& s, TrackPerson& tp)
     trjInfoLine >> n; // size of list
     if (Petrack::trcVersion > 2) // Reading the comment line
     {
-        //s.skipWhiteSpace(); // skip white spaces for reading the comment line without this the reading makes some problems
         // Kommentarzeile lesen
         str = s.readLine();
         tp.setComment(str.replace(QRegularExpression("<br>"), "\n"));
-        //cout << " comment: " << tp.comment() << endl;
-        //if ( !comment.isEmpty())
-        //    s.skipWhiteSpace();
     }
 
 
