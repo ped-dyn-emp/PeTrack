@@ -23,9 +23,6 @@
 
 #include <QGraphicsItem>
 
-//class Petrack;
-//class Control;
-//class Tracker;
 #include "petrack.h"
 
 class StereoItem : public QGraphicsItem

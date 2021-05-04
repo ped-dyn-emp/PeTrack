@@ -78,7 +78,6 @@ void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*
         int nMarkers = mCorners.size();
         int nRejected = mRejected.size();
 
-//        debout << "#markers: " << nMarkers << " #rejected: " << nRejected << endl;
         cv::Point2f p0, p1;
         for(int i = 0; i < nMarkers; i++) // draws green square/ circle around head if person recognized
         {

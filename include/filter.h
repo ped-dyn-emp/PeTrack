@@ -80,13 +80,10 @@ private:
     bool mChg;       // if filter paramater were changed
     bool mEnable;    // if filter is actice
     bool mOnCopy;    // if filter works on a copy 
-//    bool mResStored; // if storage space was allocated
-//    IplImage *mRes;  // result of filter
     cv::Mat mRes;
     
     // pure virtual function, where to implement the filter conversion
     // returns the result over pointer res and as result
-//    virtual IplImage* act(IplImage *img, IplImage *res)=0;
     virtual cv::Mat act(cv::Mat &img, cv::Mat &res)=0;
 
 public:
@@ -97,14 +94,11 @@ public:
     bool getChanged();
     void setChanged(bool b);
 
-//    void setResStored(bool b);
 
     // apply on original Data
-//    IplImage* apply(IplImage *img);
     cv::Mat apply(cv::Mat &img);
 
     cv::Mat getLastResult();
-//    IplImage* getLastResult();
     void freeLastResult();
 
     void enable();

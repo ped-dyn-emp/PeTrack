@@ -45,8 +45,6 @@ public:
     Person(const MyEllipse &e, float d)
         : mDistTopEllipse(d), mActLevel(false)
     {
-//        if (d < mDistTopEllipse) // naeher dran an Kamera
-//            mDistTopEllipse = d;
         append(e);
     }
     inline void setActLevel(bool b)
@@ -79,7 +77,6 @@ private:
     pet::StereoContext *mSc;
 public:
     PersonList();
-    //~PersonList();
 
     void searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFilter* bgFilter);
 

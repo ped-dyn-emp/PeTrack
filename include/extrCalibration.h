@@ -129,11 +129,6 @@ private:
     std::vector<cv::Point3f> points3D;
     std::vector<cv::Point2f> points2D;
 
-//    Mat mRotation;
-//    Mat mTranslation;
-//    Mat mCamera;
-//    Mat mDistCoeffs;
-
     double *rotation_matrix;
     double *translation_vector;
     double *translation_vector2;

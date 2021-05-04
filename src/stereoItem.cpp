@@ -37,10 +37,6 @@ StereoItem::StereoItem(QWidget *wParent, QGraphicsItem * parent)
     mImage = nullptr;
     mDispNew = true;
     setAcceptHoverEvents(true);
-
-    //    setEnabled(false); // all mouse events connot access this item, but it will be seen
-    // einzig move koennte interessant sein, um grid zu verschieben?!
-//     setAcceptsHoverEvents(true);
 }
 
 
@@ -56,46 +52,13 @@ QRectF StereoItem::boundingRect() const
 {
     if (mMainWindow->getImage())
         return QRectF(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize(), mMainWindow->getImage()->width(), mMainWindow->getImage()->height());
-//         return QRectF(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize(), mImage->width(), mImage->height());
     else
         return QRectF(0, 0, 0, 0);
-//     // bounding box wird in lokalen koordinaten angegeben!!! (+-10 wegen zahl "1")
-//     if (mControlWidget->getCalibCoordShow())
-//         return QRectF(-110., -110., 220., 220.);
-//     else                    ;
-
-//         return QRectF(0., 0., 0., 0.);
-
-//     // sicher ware diese boundingbox, da alles
-//     //     return QRectF(xMin, yMin, xMax-xMin, yMax-yMin);
-//     // eigentlich muesste folgende Zeile reichen, aber beim ranzoomen verschwindet dann koord.sys.
-//     //     return QRectF(mControlWidget->getCalibCoordTransX()/10.-scale, mControlWidget->getCalibCoordTransY()/10.-scale, 2*scale, 2*scale);
 }
 
 // event, of moving mouse while button is pressed
 void StereoItem::mouseMoveEvent(QGraphicsSceneMouseEvent */*event*/)
 {
-//    if (!mControlWidget->getCalibCoordFix())
-//    {
-//        setCursor(Qt::ClosedHandCursor);
-//        QPointF diff = event->scenePos()-event->lastScenePos(); //screenPos()-buttonDownScreenPos(Qt::RightButton) also interesting
-//        if (event->buttons() == Qt::RightButton) // event->button() doesnt work
-//        {
-//            mControlWidget->setCalibCoordRotate(mControlWidget->getCalibCoordRotate()+(int)(3.*(diff.x()+diff.y()))); //10* nicht noetig, da eh nur relativ
-//            //cout << diff.x()-diff.y() <<endl; //globalPos()
-//        }
-//        else if (event->buttons() == Qt::LeftButton)
-//        {
-//            mControlWidget->setCalibCoordTransX(mControlWidget->getCalibCoordTransX()+(int)(10.*diff.x()));
-//            mControlWidget->setCalibCoordTransY(mControlWidget->getCalibCoordTransY()+(int)(10.*diff.y()));
-//        }
-//        else if (event->buttons() == Qt::MidButton)
-//        {
-//            mControlWidget->setCalibCoordScale(mControlWidget->getCalibCoordScale()+(int)(10.*(diff.x()-diff.y())));
-//        }
-//    }
-//    else
-//        QGraphicsItem::mouseMoveEvent(event); // drag mach ich selber
 }
 
 // event, of moving mouse
@@ -128,21 +91,7 @@ void StereoItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 #endif
     }
 
-    // ACHTUNG: border nicht beachtet!!!
-    //QPointF pos = event->scenePos();
-    //pos.setX(pos.x() + mMainWindow->getImageBorderSize());
-    //pos.setY(pos.y() + mMainWindow->getImageBorderSize());
-    mMainWindow->setMousePosOnImage(event->scenePos()); //pos);
-
-//    if (pos.x() >=0 && pos.x() <= mMainWindow->getImage()->width() && pos.y() >=0 && pos.y() <= mMainWindow->getImage()->height())
-//        mMainWindow->setMousePosOnImage(pos);
-//
-//    if (!mControlWidget->getCalibCoordFix())
-//        setCursor(Qt::OpenHandCursor);
-//    else
-//        setCursor(Qt::CrossCursor);
-//
-
+    mMainWindow->setMousePosOnImage(event->scenePos());
     QGraphicsItem::hoverMoveEvent(event);
 }
 

@@ -3276,22 +3276,11 @@ void Control::getXml(QDomElement &elem)
                         trackShowOnlyVisible->setCheckState(subSubElem.attribute("ONLY_VISIBLE").toInt() ? Qt::Checked : Qt::Unchecked);
                     if (subSubElem.hasAttribute("ONLY_PEOPLE"))
                         trackShowOnly->setCheckState(subSubElem.attribute("ONLY_PEOPLE").toInt() ? Qt::Checked : Qt::Unchecked);
+
                     if (subSubElem.hasAttribute("ONLY_PEOPLE_LIST"))
                         trackShowOnlyList->setCheckState(subSubElem.attribute("ONLY_PEOPLE_LIST").toInt() ? Qt::Checked : Qt::Unchecked);
 
-                    // wird in petrack.cpp abgewickelt, da es nach dem laden der trajektorien gemacht werden muss
-//                     if (subSubElem.hasAttribute("ONLY_PEOPLE_NR"))
-//                     {
-//                         trackShowOnlyNr->setValue(subSubElem.attribute("ONLY_PEOPLE_NR").toInt());
-//                     }
-//                     if (subSubElem.hasAttribute("ONLY_PEOPLE_NR"))
-//                     {
-//                         int peopleNr = subSubElem.attribute("ONLY_PEOPLE_NR").toInt();
-//                         // nur so kann nr vor laden von trajectorien richtig gesetzt werden
-//                         // nicht ganz sauber
-//                         trackShowOnlyNr->setMaximum(peopleNr);
-//                         trackShowOnlyNr->setValue(peopleNr);
-//                     }
+                    // IMPORTANT: reading ONLY_PEOPLE_NR is done in petrack.cpp, as the trajectories need to be loaded before!
                     if (subSubElem.hasAttribute("SHOW_CURRENT_POINT"))
                         trackShowCurrentPoint->setCheckState(subSubElem.attribute("SHOW_CURRENT_POINT").toInt() ? Qt::Checked : Qt::Unchecked);
                     if (subSubElem.hasAttribute("SHOW_POINTS"))

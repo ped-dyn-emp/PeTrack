@@ -36,38 +36,12 @@ TrackingRoiItem::TrackingRoiItem(QWidget *wParent, QGraphicsItem *parent)
     setAcceptHoverEvents(true);
     setFlags(ItemIsMovable); // default in control
     hide(); // default in control
-    //   setEnabled(false); // all mouse events connot access this item, but it will be seen
 }
-
-// QRectF RecognitionRoiItem::boundingRect() const
-// {
-//     // QRectF rect = QGraphicsRectItem::boundingRect();
-//     // debout << rect.x() << " " << rect.y() << " " << rect.width() << " " << rect.height() <<endl;
-//     return QGraphicsRectItem::boundingRect();
-// }
-// // bounding box wird durch linke obere ecke und breite/hoehe angegeben
-// // wenn an den rand gescrollt wurde im view, dann wird durch das dynamische anpassen
-// // bei trans und scale zwar zuerst alles neu gezeichnet durch update,
-// // aber beim verkleinern des scrollbereichs nur der teil von coord neu gezeichnet
-// QRectF RecognitionRoiItem::boundingRect() const
-// {
-//     // bounding box wird in lokalen koordinaten angegeben!!! (+-10 wegen zahl "1")
-//     if (mControlWidget->getCalibCoordShow())
-//         return QRectF(-110., -110., 220., 220.);
-//     else
-//         return QRectF(0., 0., 0., 0.);
-
-//     // sicher ware diese boundingbox, da alles
-//     //     return QRectF(xMin, yMin, xMax-xMin, yMax-yMin);
-//     // eigentlich muesste folgende Zeile reichen, aber beim ranzoomen verschwindet dann koord.sys.
-//     //     return QRectF(mControlWidget->getCalibCoordTransX()/10.-scale, mControlWidget->getCalibCoordTransY()/10.-scale, 2*scale, 2*scale);
-// }
 
 void TrackingRoiItem::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
     if (!mControlWidget->getTrackRoiFix())
     {
-        //mPressRect = rect();
         mPressRect = QRect(myRound(rect().left()), myRound(rect().top()), myRound(rect().width()), myRound(rect().height()));
         mPressPos = event->pos();
         if ((event->pos()).x() < DISTANCE_TO_BORDER+mPressRect.x())
@@ -142,7 +116,6 @@ void TrackingRoiItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     if (!mControlWidget->getTrackRoiFix())
     {
         QImage *img = mMainWindow->getImage();
-        //QPointF diff = event->pos()-mPressPos;
         QPoint diff = QPoint(myRound((event->pos()-mPressPos).x()), myRound((event->pos()-mPressPos).y()));
         // raender des bildes nicht ueberscheiten
         // swappen des rechtecks vermeiden, damit keine negativen width...
@@ -179,7 +152,6 @@ void TrackingRoiItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         }
         if (mPressLocation == topLeft)
             setRect(mPressRect.x()+diff.x(), mPressRect.y()+diff.y(), mPressRect.width()-diff.x(), mPressRect.height()-diff.y());
-        //            setRect(mPressRect.x()+diff.x(), mPressRect.y()+mPressRect.x()+diff.x(), mPressRect.y()+diff.y(), mPressRect.width()-diff.x(), mPressRect.height()-diff.y()diff.y(), mPressRect.width()-diff.x(), mPressRect.height()-diff.y());
         else if (mPressLocation == topRight)
             setRect(mPressRect.x(), mPressRect.y()+diff.y(), mPressRect.width()+diff.x(), mPressRect.height()-diff.y());
         else if (mPressLocation == bottomLeft)
@@ -202,19 +174,6 @@ void TrackingRoiItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         QGraphicsRectItem::mouseMoveEvent(event);
 }
 
-// // waere noetig, da sonst beim ersten pixel, wenn man objekt betritt, der cursor noch nicht richtig ist
-// void RecognitionRoiItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-// {
-//     hoverMoveEvent(event);
-//     QGraphicsRectItem::hoverEnterEvent(event);
-// }
-// void RecognitionRoiItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-// {
-//     //hoverMoveEvent(event);
-//     setCursor(Qt::CrossCursor);
-//     QGraphicsRectItem::hoverLeaveEvent(event);
-// }
-
 // event, of moving mouse
 void TrackingRoiItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
@@ -230,7 +189,6 @@ void TrackingRoiItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 
         if (!mControlWidget->getTrackRoiFix())
         {
-            //QRectF r = rect();
             QRect r = QRect(myRound(rect().left()), myRound(rect().top()), myRound(rect().width()), myRound(rect().height()));
             if ((event->pos()).x() < DISTANCE_TO_BORDER+r.x())
             {
@@ -268,8 +226,9 @@ void TrackingRoiItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 // check rect because bordersize changes and without mouse event nothing changes the rect
 void TrackingRoiItem::checkRect()
 {
+    // not QImage *img = mMainWindow->getImage(); as size is not adapted yet
     cv::Mat img = mMainWindow->getImageFiltered();
-    // nicht QImage *img = mMainWindow->getImage(); da groesse noch nicht angepasst
+
     if (!img.empty())
     {
         QRect r = QRect(myRound(rect().left()), myRound(rect().top()), myRound(rect().width()), myRound(rect().height()));
@@ -286,7 +245,6 @@ void TrackingRoiItem::checkRect()
                 setRect(r.x(), -mMainWindow->getImageBorderSize(), r.width(), r.height()+(mMainWindow->getImageBorderSize()+r.y()));
             if (r.x()+mMainWindow->getImageBorderSize()+r.width() > img.cols)
             {
-                //debout << r.x()+mMainWindow->getImageBorderSize()+r.width() << endl;
                 setRect(r.x(), r.y(), img.cols-r.x()-mMainWindow->getImageBorderSize(), r.height());
             }
             if (r.y()+mMainWindow->getImageBorderSize()+r.height() > img.rows)

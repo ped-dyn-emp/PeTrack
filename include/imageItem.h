@@ -31,7 +31,6 @@ class ImageItem: public QGraphicsItem
 private:
     Petrack *mMainWindow;
     Control *mControlWidget;
-//     QPixmap *mImage;
     QImage *mImage;
     QGraphicsItem *mCoordItem;
 public:
@@ -40,7 +39,6 @@ public:
     QRectF boundingRect() const; 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-//     void setLogo(QImage *img);
     void setImage(QImage *img);
     void setCoordItem(QGraphicsItem *ci);
     double getCmPerPixel();
@@ -49,11 +47,8 @@ public:
     QPointF getPosImage(QPointF pos, float height = 0.);
     QPointF getPosReal(QPointF pos, double height = 0.);
 
-//    void dragEnterEvent(QDragEnterEvent *event);
-//    void dropEvent(QDropEvent * event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
     void hoverMoveEvent(QGraphicsSceneHoverEvent * event);
-//     bool sceneEvent(QEvent * event);
 };
 
 #endif

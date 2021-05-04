@@ -54,13 +54,7 @@ private slots:
     {
         mMainWindow->getColorMarkerItem()->setVisible(i);
         mMainWindow->getScene()->update();
-        // mMainWindow->updateImage();
     }
-//    void on_colorMarkerColor_currentIndexChanged(int i)
-//    {
-//        if (mMainWindow && (mMainWindow->getScene()))
-//            mMainWindow->getScene()->update();
-//    }
     void on_maskMask_stateChanged(int /*i*/)
     {
         mMainWindow->getScene()->update();

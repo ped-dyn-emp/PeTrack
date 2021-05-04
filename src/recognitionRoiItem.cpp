@@ -36,38 +36,12 @@ RecognitionRoiItem::RecognitionRoiItem(QWidget *wParent, QGraphicsItem *parent)
     setAcceptHoverEvents(true);
     setFlags(ItemIsMovable); // default in control
     hide(); // default in control
-    //   setEnabled(false); // all mouse events connot access this item, but it will be seen
 }
-
-// QRectF RecognitionRoiItem::boundingRect() const
-// {
-//     // QRectF rect = QGraphicsRectItem::boundingRect();
-//     // debout << rect.x() << " " << rect.y() << " " << rect.width() << " " << rect.height() <<endl;
-//     return QGraphicsRectItem::boundingRect();
-// }
-// // bounding box wird durch linke obere ecke und breite/hoehe angegeben
-// // wenn an den rand gescrollt wurde im view, dann wird durch das dynamische anpassen
-// // bei trans und scale zwar zuerst alles neu gezeichnet durch update, 
-// // aber beim verkleinern des scrollbereichs nur der teil von coord neu gezeichnet
-// QRectF RecognitionRoiItem::boundingRect() const
-// {
-//     // bounding box wird in lokalen koordinaten angegeben!!! (+-10 wegen zahl "1")
-//     if (mControlWidget->getCalibCoordShow())
-//         return QRectF(-110., -110., 220., 220.);
-//     else
-//         return QRectF(0., 0., 0., 0.);
-
-//     // sicher ware diese boundingbox, da alles
-//     //     return QRectF(xMin, yMin, xMax-xMin, yMax-yMin);
-//     // eigentlich muesste folgende Zeile reichen, aber beim ranzoomen verschwindet dann koord.sys.
-//     //     return QRectF(mControlWidget->getCalibCoordTransX()/10.-scale, mControlWidget->getCalibCoordTransY()/10.-scale, 2*scale, 2*scale);
-// }
 
 void RecognitionRoiItem::mousePressEvent(QGraphicsSceneMouseEvent * event)
 {
     if (!mControlWidget->getRecoRoiFix())
     {
-        //mPressRect = rect();
         mPressRect = QRect(myRound(rect().left()), myRound(rect().top()), myRound(rect().width()), myRound(rect().height()));
         mPressPos = event->pos();
         if ((event->pos()).x() < DISTANCE_TO_BORDER+mPressRect.x())
@@ -141,7 +115,6 @@ void RecognitionRoiItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     if (!mControlWidget->getRecoRoiFix())
     {
         QImage *img = mMainWindow->getImage();
-        //QPointF diff = event->pos()-mPressPos;
         QPoint diff = QPoint(myRound((event->pos()-mPressPos).x()), myRound((event->pos()-mPressPos).y()));
         // raender des bildes nicht ueberscheiten
         // swappen des rechtecks vermeiden, damit keine negativen width...
@@ -201,19 +174,6 @@ void RecognitionRoiItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         QGraphicsRectItem::mouseMoveEvent(event);
 }
 
-// // waere noetig, da sonst beim ersten pixel, wenn man objekt betritt, der cursor noch nicht richtig ist
-// void RecognitionRoiItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-// {
-//     hoverMoveEvent(event);
-//     QGraphicsRectItem::hoverEnterEvent(event);
-// }
-// void RecognitionRoiItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-// {
-//     //hoverMoveEvent(event);
-//     setCursor(Qt::CrossCursor);
-//     QGraphicsRectItem::hoverLeaveEvent(event);
-// }
-
 // event, of moving mouse
 void RecognitionRoiItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
@@ -229,7 +189,6 @@ void RecognitionRoiItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 
         if (!mControlWidget->getRecoRoiFix())
         {
-            //QRectF r = rect();
             QRect r = QRect(myRound(rect().left()), myRound(rect().top()), myRound(rect().width()), myRound(rect().height()));
             if ((event->pos()).x() < DISTANCE_TO_BORDER+r.x())
             {
@@ -268,9 +227,9 @@ void RecognitionRoiItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 void RecognitionRoiItem::checkRect()
 {
     cv::Mat img = mMainWindow->getImageFiltered();
-    // nicht QImage *img = mMainWindow->getImage(); da groesse noch nicht angepasst
     if (!img.empty())
     {
+        // not QImage *img = mMainWindow->getImage(); as size is not adapted yet
         QRect r = QRect(myRound(rect().left()), myRound(rect().top()), myRound(rect().width()), myRound(rect().height()));
         if (r.x() > img.cols-mMainWindow->getImageBorderSize()-MIN_SIZE ||
             r.y() > img.rows-mMainWindow->getImageBorderSize()-MIN_SIZE ||

@@ -37,7 +37,6 @@ class RecognitionRoiItem : public QGraphicsRectItem
 private:
     Petrack *mMainWindow;
     Control *mControlWidget;
-    //QRectF mPressRect;
     QRect mPressRect;
     QPointF mPressPos;
     enum pressLocation mPressLocation;
@@ -47,12 +46,7 @@ public:
     void mousePressEvent(QGraphicsSceneMouseEvent * event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-//     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-//     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
-//     void updateData();
-//     QRectF boundingRect() const;
-//     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void checkRect();
 };
 

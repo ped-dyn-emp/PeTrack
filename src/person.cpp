@@ -27,8 +27,6 @@
 //#define SAVE_IMG_DETECTION_STEPS // setzen, wenn die gezeigten Bilder (SHOWELLIPSES) auch als Bildsequenz weggeschrieben werden soll
 //#define SAVE_IMG_FILEBASE "D:/diss/personModel/ownPerson/petrack/density/d4.5_"
 
-//#define TIME_MEASUREMENT
-
 using namespace::cv;
 
 PersonList::PersonList()

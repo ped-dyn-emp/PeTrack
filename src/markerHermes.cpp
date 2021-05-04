@@ -21,11 +21,6 @@
 //folgende zeile spaeter raus
 #include <opencv2/highgui.hpp>
 
-// spaeter entfernen naechsten beiden zeilen
-//#include "control.h"
-//extern Control *cw;
-
-//mMainWindow->getHeadSize() waere besser zu nmutzen, aber window in dioeser Klasse nicht bekannt!
 // an Treppen koennen grosse unterschiede da sein!!!!
 #define HEAD_SIZE_MIN 7
 #define HEAD_SIZE_MAX 30
@@ -144,9 +139,6 @@ void MarkerHermes::organize(const cv::Mat &img, bool /*autoWB*/)
     if (mSpots.size() == 0)
         return;
 
-//     for (i = 0; i < mSpots.size(); ++i)
-//             mSpots[i].draw(img, 0, 255, 0);
-
     // durch mgl wachsen der spots muss ueberprueft werden, ob sich im nachhinnein Ueberlagerungen ergeben
     for (i = 0; i < mSpots.size(); ++i)
         for (j = i+1; j < mSpots.size(); ++j)
@@ -163,15 +155,7 @@ void MarkerHermes::organize(const cv::Mat &img, bool /*autoWB*/)
 
     // spots loeschen, die selten erkannt wurden
     // mind 5 stehen lassen
-//    int count = 100, anz = 0;
-//    while (count > 4)
-//    {
-//        ++anz;
-//        count = 0;
-//        for (i = 0; i < mSpotCount.size(); ++i)
-//            if (mSpotCount[i] > anz)
-//                count++;
-//    }
+
     // nur die spots mit am meisten treffern stehen lassen
     int maxCount = 0;
     for (i = 0; i < mSpotCount.size(); ++i)
@@ -220,9 +204,6 @@ void MarkerHermes::organize(const cv::Mat &img, bool /*autoWB*/)
             }
     }
 
-// for (i = 0; i < mSpots.size(); ++i)
-// mSpots[i].draw(img, 255, 0, 0);
-
     // ab hier nur noch 0 oder 1 spots!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // bei 0 muss keine farbe mehr bestimmt werden
     if (mSpots.size() == 1)
@@ -248,13 +229,10 @@ void MarkerHermes::organize(const cv::Mat &img, bool /*autoWB*/)
         if (maxVal-minVal < MIN_CONTRAST) // war 150bei zu geringem Kontrast wird spot geloescht
         {
             deleteSpot(0);
-            //debout << cx << " " << cy<< " " <<maxVal-minVal<<endl;
             return;
         }
 
         mCenterIndex = 0;
-        //debout << "dunkelster Wert: " <<minVal<<endl;
-        //debout << "hellster Wert: " <<maxVal<<endl;
     }
 }
 
@@ -298,8 +276,6 @@ bool MarkerHermesList::mayAddEllipse(const cv::Mat &img, const MyEllipse& e, boo
 
     int cx = myRound(e.center().x());
     int cy = myRound(e.center().y());
-//     char *data = img->imageData; 
-//     int iw = img->width;
 
     // maybe spot
     if (blackInside && // marker have to be black inside
@@ -327,14 +303,6 @@ bool MarkerHermesList::mayAddEllipse(const cv::Mat &img, const MyEllipse& e, boo
             MarkerHermes m;
             m.addSpot(e);
             append(m);
-// if (cx > 141 && cx < 147 && cy > 185 && cy < 191)
-// {
-//     debout << "falsche ellipse!!"<<endl;
-// cvNamedWindow("img", CV_WINDOW_AUTOSIZE ); // 0 wenn skalierbar sein soll
-// cvShowImage("img", img);
-// // // //cvWaitKey( 0 ); // zahl statt null, wenn nach bestimmter zeit weitergegangen werden soll
-// }
-
         }
         return true;
     // maybe head
@@ -373,7 +341,6 @@ bool MarkerHermesList::mayAddEllipse(const cv::Mat &img, const MyEllipse& e, boo
 void MarkerHermesList::organize(const cv::Mat &img, bool autoWB)
 {
     int i, j, k, s;
-//     for (i = 0; i < size(); ++i)
 
     // delete marker without head and organize every marker
     for (i = 0; i < size(); )

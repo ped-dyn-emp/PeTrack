@@ -32,8 +32,6 @@ GridItem::GridItem(QWidget *wParent, QGraphicsItem * parent)
     mMainWindow = (class Petrack*) wParent;
     extCalib = mMainWindow->getExtrCalibration();
     mControlWidget = mMainWindow->getControlWidget();
-    //setEnabled(false); // all mouse events connot access this item, but it will be seen
-    // einzig move koennte interessant sein, um grid zu verschieben?!
 }
 
 /**
@@ -59,24 +57,17 @@ QRectF GridItem::boundingRect() const
 // event, of moving mouse while pressing a mouse button
 void GridItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-
-    //debout << ">>>>>>>>MouseMoveEvent: " << mouse_x << ", " << mouse_y << endl;
-
     if (!mControlWidget->getCalibGridFix())
     {
         setCursor(Qt::SizeBDiagCursor);
-        //setCursor(QPixmap("/home/zam/salden/Desktop/grid_small.png"));
-        //         setCursor(Qt::ClosedHandCursor);
         QPointF diff = event->scenePos()-event->lastScenePos(); //screenPos()-buttonDownScreenPos(Qt::RightButton) also interesting
         if (event->buttons() == Qt::RightButton) // event->button() doesnt work
         {
 
             mControlWidget->setCalibGridRotate(mControlWidget->getCalibGridRotate()+(int)(3.*(diff.x()+diff.y())));
-            //cout << diff.x()-diff.y() <<endl; //globalPos()
         }
         else if (event->buttons() == Qt::LeftButton)
         {
-            //debout << "Grid Dimension: " << mControlWidget->getCalibGridDimension() << endl;
             if( mControlWidget->getCalibGridDimension() == 0 )
             {
                 cv::Point3f p3d = extCalib->get3DPoint(cv::Point2f(event->scenePos().x(),
@@ -121,31 +112,12 @@ void GridItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
             gridTrans_x = mControlWidget->getCalibGrid3DTransX();
             gridTrans_y = mControlWidget->getCalibGrid3DTransY();
-
-            //debout << ">>>>>>>>MousePressEvent: " << mouse_x << ", " << mouse_y << endl;
         }
     }else
     {
         QGraphicsItem::mousePressEvent(event);
     }
 }
-
-//// event, of moving mouse
-//void GridItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
-//{
-//    QPointF pos = event->scenePos();
-//    pos.setX3D(pos.x() + mMainWindow->getImageBorderSize());
-//    pos.setY3D(pos.y() + mMainWindow->getImageBorderSize());
-//    mMainWindow->setMousePosOnImage(pos);
-//
-//    // cursor doesnt change like coord and roi because complex handling if fixed!!!
-////     if (!mControlWidget->getCalibGridFix())
-////         setCursor(Qt::OpenHandCursor);
-////     else
-////         setCursor(Qt::CrossCursor);
-//
-//    QGraphicsItem::hoverMoveEvent(event);
-
 
 int GridItem::drawLine(QPainter *painter, cv::Point2f *p, int y_offset){
 
@@ -171,9 +143,6 @@ int GridItem::drawLine(QPainter *painter, cv::Point2f *p, int y_offset){
     // Steigung m und Achsenabschnitt b der Geraden berechnen: g(x) = m * x + b
     double m = (p[1].y-p[0].y)/(p[1].x-p[0].x), // Steigung
             b = p[1].y-m*p[1].x;                // Achsenabschnitt
-
-    //debout << "P1(" << p[0].x << "," << p[0].y << "), P2(" << p[1].x << "," << p[1].y << ")" << endl;
-    //debout << "Steigung m=" << m << " Achsenabschnitt b=" << b << endl;
 
     // boolean Werte fuer beide Endpunkte der Geraden, am Ende schauen, ob beide gesetzt wurden
     bool p1IsSet = false, p2IsSet = false;
@@ -233,7 +202,7 @@ int GridItem::drawLine(QPainter *painter, cv::Point2f *p, int y_offset){
             p1IsSet = true;
         }
     }
-    //debout << "p1: " << p1IsSet << " p2: " << p2IsSet << endl;
+
     // Schauen, ob beide Endpunkte der Geraden gesetzt wurden
     if( p1IsSet && p2IsSet )
     {
@@ -247,30 +216,13 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option
 {
 
     bool debug = false;
-//    bool debug = true;
-
-    //     QMatrix matrix;
-    //     matrix.translate(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize());
-    //     setMatrix(matrix);
-
-    // folgende zeilen waren mal noetig und haben 50% CPU load verursacht,
-    // weil wahrscheinlich mit setmatrix ein neues paint angestossen wurde
-    // cpu load 0 war alleine mit grid.setvisible(false) zu erzeugen
-    //     //FAKE!!!!!!!!!!!!!!!!!!!!!!!!
-    //     QMatrix matrix;
-    //     matrix.translate(1, 1); // FEHLER IN QT ????? noetig, damit trotz recognitionroiitem auch image auch ohne border komplett neu gezeichnet wird // wird 2 zeilen weiter zurueckgesetzt, aber mit 0, 0 geht es nicht
-    //     setMatrix(matrix);
-    //     matrix.translate(-1, -1);
-    //     setMatrix(matrix);
 
     if (!mControlWidget->getCalibGridFix() && mControlWidget->getCalibGridShow())
     {
-        //setFlags(ItemIsMovable); // noetig, damit mouseEvent leftmousebutton weitergegeben wird, aber drag mach ich selber
         setFlag(ItemIsMovable); // noetig, damit mouseEvent leftmousebutton weitergegeben wird, aber drag mach ich selber
     }
     else
     {
-        //setFlags(!ItemIsMovable);
         setFlag(ItemIsMovable, false);
     }
 
@@ -308,7 +260,6 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option
             debout << "A2d x=" << a2d.x << ", y=" << a2d.y << std::endl;
             debout << "B2d x=" << b2d.x << ", y=" << b2d.y << std::endl;
             debout << "C2d x=" << c2d.x << ", y=" << c2d.y << std::endl;
-            //            debout << "D2d x=" << d2d.x << ", y=" << d2d.y << endl;
         }
         // y = m*x+n
         float m1 = (b2d.y-a2d.y)/(b2d.x-a2d.x),
@@ -431,21 +382,10 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option
             double ro = mControlWidget->getCalibGridRotate()/10.;
 
             // transformation nicht des koordinatensystems wie bei coorditem sondern bei grid der painter
-
-            //         // aktualisierung der transformationsmatrix
-            //         QMatrix matrix;
-            //         // matrix wird nur bei aenderungen neu bestimmt
-            //         matrix.translate(mControlWidget->getCalibGridTransX()/10., mControlWidget->getCalibGridTransY()/10.);
-            //         matrix.rotate(mControlWidget->getCalibGridRotate()/10.);
-            //         //matrix.scale(sc/100., sc/100.);
-            //         setMatrix(matrix);
-
             // grid
             painter->save(); // wie opengl matrix aber auch pen etc auf stack
             matrixPaint.translate(tX, tY); // hier ist translate zusaetzlich auf matrix, bei translate-fkt von item ist absolut
-            //matrixPaint.translate(iW/2.-bS, iH/2.-bS);
             matrixPaint.rotate(ro);
-            //matrixPaint.translate(-iW/2.+bS, -iH/2.+bS);
             painter->setWorldTransform(matrixPaint, true); // true sagt, dass relativ und nicht absolut (also zusaetzlich zur uebergeordneten matrizen)
             painter->setPen(Qt::red);
 
@@ -475,7 +415,6 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option
             };
             painter->setPen(Qt::NoPen);
             painter->setBrush(Qt::white);
-            //painter->setBrush(Qt::green);
 
             bool drawPolygon = true;
 
@@ -488,29 +427,7 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option
         {
             if( extCalib->isSetExtrCalib() ){
 
-                /*char text[100];
-
-            painter->setPen(Qt::blue);
-            Point3f mousePoint = extCalib->get3DPoint(Point2f(mouse_x,mouse_y),tZ3D);
-
-            debout << ">>>>>>>>Mouse Point: " << mousePoint.x << ", " << mousePoint.y << ", " << mousePoint.z << endl;
-
-            sprintf (text, "3D: (%.2f, %.2f, %.2f)", mousePoint.x, mousePoint.y, mousePoint.z);
-            painter->drawText(mouse_x, mouse_y, QString(text));
-
-            painter->setPen(Qt::red);
-            */
                 double min_x = INT_MAX, min_y = INT_MAX, max_x = INT_MIN, max_y = INT_MIN;
-
-
-
-                /*
-            Point2f p2f[4];
-            p2f[0] = Point2f(0-bS,0-bS);
-            p2f[0] = Point2f(0-bS,0-bS);
-            p2f[0] = Point2f(0-bS,0-bS);
-            p2f[0] = Point2f(0-bS,0-bS);
-            */
                 int y_offset = -bS;
 
                 if( vanishPointXIsInsideImage ){
@@ -536,22 +453,6 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option
 
                 painter->setPen(Qt::green);
 
-                //            painter->drawLine(QPointF(0-bS+2,y_offset+2),QPointF(iW-bS-2,y_offset+2));
-                //            painter->drawLine(QPointF(iW-bS-2,y_offset+2),QPointF(iW-bS-2,iH-bS-2));
-                //            painter->drawLine(QPointF(iW-bS-2,iH-bS-2),QPointF(0-bS+2,iH-bS-2));
-                //            painter->drawLine(QPointF(0-bS+2,iH-bS-2),QPointF(0-bS+2,y_offset+2));
-
-                //debout << "Width: " << iW << ", Height: " << iH << endl;
-
-                //            painter->setPen(Qt::green);
-                //            painter->drawLine(QPointF(points[0].x,points[0].y),QPointF(points[1].x,points[1].y));
-                //            painter->drawLine(QPointF(points[3].x,points[3].y),QPointF(points[1].x,points[1].y));
-                //            painter->drawLine(QPointF(points[2].x,points[2].y),QPointF(points[3].x,points[3].y));
-                //            painter->drawLine(QPointF(points[0].x,points[0].y),QPointF(points[2].x,points[2].y));
-                //            painter->setPen(Qt::red);
-
-                //debout << ">>>>>>>>>Eckpunkte: " << endl;
-
                 for(int i=0;i<4;i++)
                 {
                     x = points[i].x;
@@ -570,10 +471,7 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option
                 if( debug ) std::cout << "X: min=" << min_x << " min:" << max_x << std::endl;
                 if( debug ) std::cout << "Y: min=" << min_y << " max:" << max_y << std::endl;
 
-                //mControlWidget->setGridMinMaxTranslation(min_x, max_x, min_y, max_y);
-
-                cv::Point3f ursprung(0,0,0);// = extCalib->getImagePoint(Point3f(tX3D,tY3D,tZ3D));
-                int res = -1;
+                cv::Point3f ursprung(0,0,0);
 
                 cv::Point3f xl, xr, yo, yu;
                 cv::Point2f p[4];
@@ -642,8 +540,6 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option
                     int swapY = mControlWidget->getCalibCoord3DSwapY() ? -1 : 1;
                     int grid_height = tZ3D-mControlWidget->getCalibCoord3DTransZ(); // Da extCalibration immer vom Koordinatensystemursprung ausgeht (Das Grid soll aber unabhngig davon gezeichnet werden)
 
-                    //int vorzeichenX = 1, vorzeichenY = 1;
-
                     if( debug ) debout << "Grid x: " << tX3D << " y: " << tY3D << " z: " << tZ3D <<  " y_offset: "
                            << y_offset << " bS: " << bS << " iW: " << iW << " iH: " << iH
                            << " min_x: " << min_x << " max_x: " << max_x << " min_y: " << min_y << " max_y: " << max_y << std::endl;
@@ -651,67 +547,40 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option
                     // horizontal lines from the left to the right on height tZ3D the lines start from origin point (tY3D)
                     // until max_y or if tY3D < min_y it starts with min_y because otherwise it is outside the image
 
-                    //Point3f p3d_center = extCalib->get3DPoint(Point2f(iW/2,iH/2),tZ3D);
-
-                    //if( debug ) debout << "Centerpoint 2D: (" << iW/2 << "," << iH/2 << "), 3D: (" << p3d_center.x << "," << p3d_center.y << "," << p3d_center.z << ")" << endl;
-                    // y+
-//                    for(int i = p3d_center.y+tY3D; i<max_y; i+=resolution)
                     for(int i = -mControlWidget->getCalibCoord3DTransY()+tY3D; i < (swapY > 0 ? max_y : -min_y); i+=resolution)
                     {
-
-                        //debout << "i=" << -mControlWidget->getCalibCoord3DTransY()+tY3D << "; i<" << (swapY > 0 ? max_y : min_y) << "; i+=" << resolution << endl;
                         // Bildpunkte zu den Endpunkten der Linie holen
                         p[0] = extCalib->getImagePoint(cv::Point3f(min_x,swapY*i,grid_height));
-                        //if( debug ) debout << "p[0] x: " << p[0].x << " y: " << p[0].y << endl;
                         p[1] = extCalib->getImagePoint(cv::Point3f(max_x,swapY*i,grid_height));
-                        //if( debug ) debout << "p[1] x: " << p[1].x << " y: " << p[1].y << endl;
-                        res = drawLine(painter,p,y_offset);
-                        if (debug) debout << "Zeichnung? " << res << std::endl;
-                        //if( debug ) debout << "i: " << i << endl;
-
+                        drawLine(painter,p,y_offset);
                     }
                     // see above but now the lines start from origin point (tY3D) until min_y
                     // y-
-//                    for(int i = p3d_center.y+tY3D-resolution; i>min_y; i-=resolution)
                     for(int i = -mControlWidget->getCalibCoord3DTransY()+tY3D-resolution; i > (swapY > 0 ? min_y : -max_y); i-=resolution)
                     {
-                        //debout << "i=" << -mControlWidget->getCalibCoord3DTransY()+tY3D-resolution << "; i<" << (swapY > 0 ? min_y : -max_y) << "; i-=" << resolution << endl;
                         // Bildpunkte zu den Endpunkten der Linie holen
                         p[0] = extCalib->getImagePoint(cv::Point3f(min_x,swapY*i,grid_height));
                         p[1] = extCalib->getImagePoint(cv::Point3f(max_x,swapY*i,grid_height));
-                        res = drawLine(painter,p,y_offset);
-                        if (debug) debout << "Zeichnung? " << res << std::endl;
-
-
+                        drawLine(painter,p,y_offset);
                     }
                     // vertical lines from the top to the bottom on height tZ3D the lines start from origin point(tX3D)
                     // until max_x of if tX3D < minx it starts with min_x because otherwise the lines are outside the image
                     // x+
-//                    for(int i = p3d_center.x+tX3D; i<max_x; i+=resolution)
                     for(int i = -mControlWidget->getCalibCoord3DTransX()+tX3D; i < (swapX > 0 ? max_x : -min_x); i+=resolution)
                     {
-                        //debout << "i=" << -mControlWidget->getCalibCoord3DTransX()+tX3D << "; i<" << (swapX > 0 ? max_x : -min_x) << "; i+=" << resolution << endl;
-                        //debout << "x+ " << i << endl;
                         // Bildpunkte zu den Endpunkten der Linie holen
                         p[0] = extCalib->getImagePoint(cv::Point3f(swapX*i,min_y,grid_height));
                         p[1] = extCalib->getImagePoint(cv::Point3f(swapX*i,max_y,grid_height));
-                        res = drawLine(painter,p,y_offset);
-                        if (debug) debout << "Zeichnung? " << res << std::endl;
-
+                        drawLine(painter,p,y_offset);
                     }
                     // see above but now the lines start from origin point until min_x
                     // x-
-//                    for(int i = p3d_center.x+tX3D-resolution; i>min_x; i-=resolution)
                     for(int i = -mControlWidget->getCalibCoord3DTransX()+tX3D-resolution; i > (swapX > 0 ? min_x : -max_x); i-=resolution)
                     {
-                        //debout << "i=" << -mControlWidget->getCalibCoord3DTransX()+tX3D-resolution << "; i<" << (swapX > 0 ? min_x : -max_x) << "; i-=" << resolution << endl;
-                        //debout << "x- " << i << endl;
                         // Bildpunkte zu den Endpunkten der Linie holen
                         p[0] = extCalib->getImagePoint(cv::Point3f(swapX*i,min_y,grid_height));
                         p[1] = extCalib->getImagePoint(cv::Point3f(swapX*i,max_y,grid_height));
-                        res = drawLine(painter,p,y_offset);
-                        if (debug) debout << "Zeichnung? " << res << std::endl;
-
+                        drawLine(painter,p,y_offset);
                     }
 
 
@@ -721,5 +590,4 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option
         }
 
     }
-    //setVisible(false);
 }

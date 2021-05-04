@@ -36,7 +36,6 @@ ImageItem::ImageItem(QWidget *wParent, QGraphicsItem * parent)
     mCoordItem = nullptr;
     setCursor(Qt::CrossCursor);
     setAcceptHoverEvents(true);
-//    setAcceptDrops(true);
 }
 
 /**
@@ -51,26 +50,16 @@ QRectF ImageItem::boundingRect() const
 {
     if (mImage)
     {
-//        debout << "mImage: w=" << mImage->width() << ", h=" << mImage->height() << endl;
         return QRectF(0, 0, mImage->width(), mImage->height());
-//         return QRectF(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize(), mImage->width(), mImage->height());
     }else
         return QRectF(0, 0, 0, 0);
 }
     
 void ImageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
-//     painter->drawImage(-mMainWindow->getImageBorderSize(),-mMainWindow->getImageBorderSize(),*mImage);
     if (mImage)
         painter->drawImage(0,0,*mImage);
 }
-        
-// // separate fkt, damit nicht wie bei setimage control-zahlen neu gerechnet werden und recognition-rect angepasst wird
-// void ImageItem::setLogo(QImage *img)
-// {
-//     mImage = img;
-//     mScene->update();
-// }
 
 void ImageItem::setImage(QImage *img)
 {
@@ -82,8 +71,6 @@ void ImageItem::setImage(QImage *img)
     matrix.translate(-mMainWindow->getImageBorderSize()-1, -mMainWindow->getImageBorderSize()-1);
     setTransform(matrix);
 
-    //debout << "mControlWidget->setCalibCxMin(MAX(0," << mImage->width() << "/2.-50)); (" << MAX(0,mImage->width()/2.-50) << ")" << endl;
-    //debout << "mControlWidget->setCalibCyMin(MAX(0," << mImage->height() << "/2.-50)); (" << MAX(0,mImage->height()/2.-50) << ")" << endl;
     // value nicht setzen, da mgl mehrere videos mit gleichem objektiv erzeugt
     mControlWidget->setCalibCxMin(0 /*MAX(0,mImage->width()/2.-50)*/);
     mControlWidget->setCalibCxMax(mImage->width() /*mImage->width()/2.+50*/);
@@ -97,8 +84,6 @@ void ImageItem::setImage(QImage *img)
     mControlWidget->setCalibCoordTransYMax(10*(mImage->height()-mMainWindow->getImageBorderSize()));
 
     mMainWindow->updateSceneRect();
-
-    //mScene->update();
 }
 
 void ImageItem::setCoordItem(QGraphicsItem *ci)
@@ -141,8 +126,8 @@ QPointF ImageItem::getCmPerPixel(float px, float py, float h){
     if( debug ) debout << "Punkte: " << p3y1.x << ", " << p3y1.y << ", " << p3y1.z << std::endl;
     if( debug ) debout << "Punkte: " << p3y2.x << ", " << p3y2.y << ", " << p3y2.z << std::endl;
 
-    double x_dir = norm(p3x1-p3x2); //abs(p3x1.x-p3x2.x);
-    double y_dir = norm(p3y1-p3y2); //abs(p3y1.y-p3y2.y);
+    double x_dir = norm(p3x1-p3x2);
+    double y_dir = norm(p3y1-p3y2);
 
     if( debug ) debout << "x_dir: " << x_dir << ", y_dir: " << y_dir << " Durchschnitt: " << (0.5*(x_dir+y_dir)) << std::endl;
 
@@ -237,12 +222,6 @@ QPointF ImageItem::getPosImage(QPointF pos, float height)
 
 
 }
-// Liefert die Pixel-Koordinaten zum Punkt senkrecht unter der Kamera
-//QPointF ImageItem::getPixelUnderCamera()
-//{
-
-
-//}
 
 // eingabe pos als pixelkoordinate des bildes
 // result in cm (mit y-Achse nach oben gerichtet)
@@ -279,7 +258,6 @@ QPointF ImageItem::getPosReal(QPointF pos, double height)
         {
             if( debug ) debout << "########## INFO ###############" << std::endl;
             if( debug ) debout << "Org. 2D Point: (" << pos.x() << ", " << pos.y() << ") Hoehe: "<< height << std::endl;
-            //double a; // camera altitude
             // statt mControlWidget->getCalibFx() muesste spaeter wert stehen, der im verzerrten Bild fX=fY angibt
             //a = mControlWidget->getCalibFxValue()*getMeterPerPixel();
             //a = mControlWidget->coordAltitude->value();
@@ -335,9 +313,6 @@ void ImageItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
  */
 void ImageItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
-//     // real coordinate
-//     mMainWindow->setStatusPosReal(getPosReal(event->pos(), mMainWindow->getStatusPosRealHeight()));
-
     // sets pixel coord on image for further use
 
     bool debug = false;
@@ -379,33 +354,5 @@ void ImageItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
     //QPointF pos = event->pos();
     mMainWindow->setMousePosOnImage(event->pos());
 
-//     // pixel coordinate
-//     //s.sprintf("%4dx%4d", event->pos().x(), event->pos().y());
-//     //QTextStream(&s) << event->pos().x() << "x" << event->pos().y();
-//     QPoint pos1((int)((event->pos()).x())+1, (int)((event->pos()).y())+1);
-//     mMainWindow->setStatusPos(pos1);  //QString("%1x%2").arg((int)event->pos().x()+1, 4).arg((int)event->pos().y()+1, 4)
-//     //== event->scenePos().x()
-//     // Koordinaten auf dem Bildschirm: event->screenPos().x(), event->screenPos().y()
-
-//     // pixel color
-//     QPoint pos2((int)((event->pos()).x()), (int)((event->pos()).y()));
-//     mMainWindow->setStatusColor(mImage->pixel(pos2));//(mImage->toImage()).pixel(pos... wenn pixmap
-
     QGraphicsItem::hoverMoveEvent(event);
 }
-
-// bool ImageItem::sceneEvent(QEvent * event)
-// {
-//     cout << "event vor allen anderen" <<endl;
-//     return QGraphicsItem::sceneEvent(event);
-// }
-//void ImageItem::dragEnterEvent(QDragEnterEvent *event)
-//{
-//    mMainWindow->dragEnterEvent(event);
-//}
-
-//void ImageItem::dropEvent(QDropEvent * event)
-//{
-//    mMainWindow->dropEvent(event);
-//}
-

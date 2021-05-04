@@ -34,7 +34,6 @@ class ColorMarkerItem : public QGraphicsItem
 private:
     Petrack *mMainWindow;
     QImage *mImage;
-//    IplImage *mMask;
     cv::Mat mMask;
     Vec2F mUlc;  // upper left corner to draw
 

@@ -45,6 +45,8 @@ ColorMarkerWidget::ColorMarkerWidget(QWidget *parent)
     col.setHsv(toHue, toSat, toVal);
     toTriangle->setColor(col);
 }
+
+// store data in xml node, as:
 //<COLOR_MARKER>
 //    <MASK SHOW="0" OPACITY="100" MASK="1"/>
 //    <FROM_COLOR HUE="0" SATURATION="0" VALUE="0"/>
@@ -173,19 +175,15 @@ void ColorMarkerWidget::on_fromTriangle_colorChanged(const QColor &col)
 {
     fromHue = col.hue(); fromSat = col.saturation(); fromVal = col.value();
     QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(fromHue).arg(fromSat).arg(fromVal);
-    //QString styleString = QString("background-color: rgb(%1,%2,%3)").arg(col.red()).arg(col.green()).arg(col.blue());
     fromColor->setStyleSheet(styleString);
     mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
     if( !mMainWindow->isLoading() )
         mMainWindow->updateImage();
-
-    //debout << col.hue() << " " << col.saturation() << " " << col.value() << endl;
 }
 void ColorMarkerWidget::on_toTriangle_colorChanged(const QColor &col)
 {
     toHue = col.hue(); toSat = col.saturation(); toVal = col.value();
     QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(toHue).arg(toSat).arg(toVal);
-    //QString styleString = QString("background-color: rgb(%1,%2,%3)").arg(col.red()).arg(col.green()).arg(col.blue());
     toColor->setStyleSheet(styleString);
     mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
     if( !mMainWindow->isLoading() )
@@ -196,8 +194,7 @@ void ColorMarkerWidget::on_fromColor_clicked()
 {
     // QWindowsXpStyle uses native theming engine which causes some palette modifications not to have any effect.
     // ueber palette war der button ausser initial nicht zu aendern!!!
-
-    QColor colBefore;//fromColor->palette().color(QPalette::Button);
+    QColor colBefore;
     colBefore = QColor::fromHsv(fromHue, fromSat, fromVal);
     QColor col = (QColorDialog::getColor(colBefore, this, "Select color from which value a pixel belongs to marker")).convertTo(QColor::Hsv);
     if (col.isValid() && col != colBefore)
@@ -211,34 +208,14 @@ void ColorMarkerWidget::on_toColor_clicked()
 {
     // QWindowsXpStyle uses native theming engine which causes some palette modifications not to have any effect.
     // ueber palette war der button ausser initial nicht zu aendern!!!
-    QColor colBefore;//toColor->palette().color(QPalette::Button);
+    QColor colBefore;
     colBefore = QColor::fromHsv(toHue, toSat, toVal);
     QColor col = (QColorDialog::getColor(colBefore, this, "Select color to which value a pixel belongs to marker")).convertTo(QColor::Hsv);
-    //QPalette palette = toColor->palette();
-    //palette.setColor(QPalette::Button, col);
-    //toColor->setPalette(palette);
-    //toColor->setAutoFillBackground(true);
     if (col.isValid() && col != colBefore)
     {
         on_toTriangle_colorChanged(col);
         toTriangle->setColor(col);
     }
-// Versuch mit hsv stabil werte einzugeben - wandern in hsv und rgb zur folge, wenn auch wenig
-//        // QWindowsXpStyle uses native theming engine which causes some palette modifications not to have any effect.
-//        // ueber palette war der button ausser initial nicht zu aendern!!!
-//        QColor col = QColorDialog::getColor(toColor->palette().color(QPalette::Button).toHsv(), this, "").toHsv();
-//        //debout << col.hue()<<endl;
-//        //debout << col.saturation()<<endl;
-//        //debout << col.value()<<endl;
-//        //QPalette palette = toColor->palette();
-//        //palette.setColor(QPalette::Button, col);
-//        //toColor->setPalette(palette);
-//        //toColor->setAutoFillBackground(true);
-//        if (col.isValid())
-//        {
-//            QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(col.hue()).arg(col.saturation()).arg(col.value());
-//            toColor->setStyleSheet(styleString);
-//        }
 }
 
 #include "moc_colorMarkerWidget.cpp"

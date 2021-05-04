@@ -21,11 +21,6 @@
 //folgende zeile spaeter raus
 #include <opencv2/highgui.hpp>
 
-//// radius fuer japan ellipsen
-//#define HEAD_SIZE_MIN 8
-//#define HEAD_SIZE_MAX 20
-//#define SPOT_SIZE_MIN 1
-//#define SPOT_SIZE_MAX 5
 #define SPOT_COLOR 0 // HUE==0, hier ROT // fuehrt zu folgendem range: 0-20 + 340-359
 
 // Marker Size is a A4 copy of file (from takahiro from japan, nishinari group)
@@ -113,14 +108,6 @@ void MarkerJapan::modifyHead(const MyEllipse &head, float headSize)
         mHasHead = true;
         mHead = head;
     }
-
-//    debout << headSize << endl;
-//    debout << outlineMin << endl;
-//    debout << outlineMax << endl;
-//    debout "x: "<<mHead.center().x()<<endl;
-//    debout "y: "<<mHead.center().y()<<endl;
-//    debout "o: "<<mHead.outline()<<endl;
-
 }
 
 void MarkerJapan::modifySpot(int i, const MyEllipse &spot)
@@ -179,9 +166,6 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
     if (mSpots.size() == 0)
         return;
 
-//     for (i = 0; i < mSpots.size(); ++i)
-//             mSpots[i].draw(img, 0, 255, 0);
-
     // durch mgl wachsen der spots muss ueberprueft werden, ob sich im nachhinnein Ueberlagerungen ergeben
     for (i = 0; i < mSpots.size(); ++i)
         for (j = i+1; j < mSpots.size(); ++j)
@@ -227,37 +211,30 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
             cx = myRound(mSpots[i].x());
             cy = myRound(mSpots[i].y());
             r = 1; // fuehrte dazu, das zuweit gesucht wird und inangrenzenden marker hineingesuct wurde: myRound((mSpots[i].r1()+mSpots[i].r2())/2.); // mittlerer radius
-// debout << cx+1 << " " << cy+1 << ": ";
             int minVal = 256; // groesser als komplett weiss (255)
             // bildrand muss nicht ueberprueft werden, da sie gar nicht erst hereingekommen waeren
             for (j = -r; j < r+1; ++j)
                 for (k = -r; k < r+1; ++k)
                 {
-                    col.setRgb(getValue(img,cx+j,cy+k).rgb());//getRGB(img,cx+j,cy+k));//getR(img, cx+j, cy+k), getG(img, cx+j, cy+k), getB(img, cx+j, cy+k));
+                    col.setRgb(getValue(img,cx+j,cy+k).rgb());
                     if (col.value() < minVal)
                         minVal = col.value(); // Helligkeit
                 }
             minValList.append(minVal);
-// cout << minVal << endl;
         }
         // loeschen aller zu hellen spots
         QList<int> minValListSort = minValList;
         std::sort(minValListSort.begin(), minValListSort.end()); // sortiert aufsteigend
         for (i = 0; i < mSpots.size(); ++i)
         {
-//debout << mSpots[i].center().x()<< " "<< minValList[i] <<endl;
             if (minValList[i] > minValListSort[numberRemaining-1])
             {
-//debout << i << " groesser als " << minValListSort[numberRemaining-1]<< endl;
                 deleteSpot(i);
                 minValList.removeAt(i);
                 --i;
             }
         }
     }
-
-// for (i = 0; i < mSpots.size(); ++i)
-// mSpots[i].draw(img, 255, 0, 0);
 
     // bei 0 muss keine farbe mehr bestimmt werden
     if (mSpots.size() < 2)
@@ -274,21 +251,19 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
             if (!colSet)
             {
                 colSet = true;
-                mCol.setRgb(getValue(img,cx,cy).rgb());//getRGB(img,cx,cy));//getR(img, cx, cy), getG(img, cx, cy), getB(img, cx, cy));
+                mCol.setRgb(getValue(img,cx,cy).rgb());
                 mColorIndex = i;
             }
             else
             {
-                colOther.setRgb(getValue(img,cx,cy).rgb());//getRGB(img,cx,cy));//getR(img, cx, cy), getG(img, cx, cy), getB(img, cx, cy));
+                colOther.setRgb(getValue(img,cx,cy).rgb());
                 mOtherIndex = i;
             }
             // bildrand muss nicht ueberprueft werden, da sie gar nicht erst hereingekommen waeren
             for (j = -1; j < 2; ++j) // 3x3 feld wird ueberprueft
                 for (k = -1; k < 2; ++k)
                 {
-//j=0, k=0;
-                    col.setRgb(getValue(img,cx+j,cy+k).rgb());//getRGB(img,cx+j,cy+k));//getR(img, cx+j, cy+k), getG(img, cx+j, cy+k), getB(img, cx+j, cy+k));
-//debout << mCol << ", " << col << ", " << colOther <<endl;
+                    col.setRgb(getValue(img,cx+j,cy+k).rgb());
                     // faktor, um die mitte hoeher zu gewichten, da bei fd der schwarze rand mit dem weiss gemischt oft hell ist
                     if (col.value()/(1. + .5*(abs(j)+abs(k))) > mCol.value()) // wenn Helligkeit maximal
                     {
@@ -323,9 +298,6 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
         deleteSpot(1);
     }
 
-    // mColorIndex, mOtherIndex are correct // mCenterIndex == -1 !!!
-    //debout << mColorIndex << " " << mOtherIndex << " " << mCenterIndex <<endl;
-
     if (autoWB)
     {
         // weissabgleich
@@ -337,16 +309,15 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
         int wcx = myRound(mSpots[mColorIndex].x()+0.356*(mSpots[mColorIndex].y()-mSpots[mOtherIndex].y()));
         int wcy = myRound(mSpots[mColorIndex].y()+0.356*(mSpots[mColorIndex].x()-mSpots[mOtherIndex].x()));
         QColor white(0,0,0); // hellster fleck
-        //QColor avgWhite; // durchschnittlichen weisswert
         int avgWhiteR=0, avgWhiteG=0, avgWhiteB=0; // durchschnittlichen weisswert
         for (j = -1; j < 2; ++j) // 3x3 feld um ocx,ocy wird ueberprueft
             for (k = -1; k < 2; ++k)
             {
                 QColor color = getValue(img,wcx+j,wcy+k);
-                avgWhiteR+=color.red();//getR(img, wcx+j, wcy+k);
-                avgWhiteG+=color.green();//getG(img, wcx+j, wcy+k);
-                avgWhiteB+=color.blue();//getB(img, wcx+j, wcy+k);
-                col.setRgb(getValue(img,wcx+j,wcy+k).rgb());//getR(img, wcx+j, wcy+k), getG(img, wcx+j, wcy+k), getB(img, wcx+j, wcy+k));
+                avgWhiteR+=color.red();
+                avgWhiteG+=color.green();
+                avgWhiteB+=color.blue();
+                col.setRgb(getValue(img,wcx+j,wcy+k).rgb());
                 if (col.value() > white.value()) // wenn Helligkeit groesser
                     white = col;
             }
@@ -356,14 +327,14 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
             for (k = -1; k < 2; ++k)
             {
                 QColor color = getValue(img,wcx+j,wcy+k);
-                avgWhiteR+=color.red();//getR(img, wcx+j, wcy+k);
-                avgWhiteG+=color.green();//getG(img, wcx+j, wcy+k);
-                avgWhiteB+=color.blue();//getB(img, wcx+j, wcy+k);
-                col.setRgb(getValue(img,wcx+j,wcy+k).rgb());//getR(img, wcx+j, wcy+k), getG(img, wcx+j, wcy+k), getB(img, wcx+j, wcy+k));
+                avgWhiteR+=color.red();
+                avgWhiteG+=color.green();
+                avgWhiteB+=color.blue();
+                col.setRgb(getValue(img,wcx+j,wcy+k).rgb());
                 if (col.value() > white.value()) // wenn Helligkeit groesser
                     white = col;
             }
-        //avgWhite.setRgb();
+
         avgWhiteR/=18; avgWhiteG/=18; avgWhiteB/=18;
         
         if ((avgWhiteR !=0) && (avgWhiteG !=0) && (avgWhiteB !=0))
@@ -435,15 +406,11 @@ void MarkerJapan::draw(cv::Mat &img) const
     // quadrangle
     if (hasQuadrangle())
     {
-//        CvPoint pt[4], *rect = pt;
         std::vector<cv::Point> pt;
-//        int count = 4;
         for (i = 0; i < 4; ++i)
             pt.push_back(cv::Point(mQuadrangle[i].x(),mQuadrangle[i].y()));
-//            pt[i] = mQuadrangle[i].toCvPoint();
         // draw the square as a closed polyline 
         cv::polylines(img,pt,true,CV_RGB(0,255,0),1,cv::LINE_AA,0);
-//        cvPolyLine(img, &rect, &count, 1, 1, CV_RGB(0,255,0), 1, CV_AA, 0); //3, CV_AA, 0
     }
 }
 
@@ -465,7 +432,6 @@ bool MarkerJapanList::mayAddEllipse(const cv::Mat &img, const MyEllipse& e, bool
     float SPOT_SIZE_MAX = mHeadSize/4.;
     int iHead = -1;
 
-    //debout << mHeadSize << endl; // == 19.1259
     // maybe spot
     if (blackInside && // marker have to be black inside
         (e.r1()>SPOT_SIZE_MIN && e.r1()<SPOT_SIZE_MAX && e.r2()>SPOT_SIZE_MIN && e.r2()<SPOT_SIZE_MAX && e.ratio()<2.) && // ellipse size
@@ -556,7 +522,6 @@ bool MarkerJapanList::mayAddQuadrangle(const Vec2F v[4]) //Vec2F p1, Vec2F p2, V
 void MarkerJapanList::organize(const cv::Mat &img, bool autoWB)
 {
     int i, j, k, s;
-//     for (i = 0; i < size(); ++i)
 
     // delete marker without head and organize every marker
     for (i = 0; i < size(); )
@@ -620,12 +585,10 @@ void MarkerJapanList::toCrossList(QList<TrackPoint> *crossList, bool ignoreWitho
     {
         if (at(i).hasHead())
         {
-            //debout << at(i).head().outline()<<endl;
             if (at(i).spots().size() == 0)
             {
                 if (!ignoreWithoutMarker)
                 {
-                    //v1 = at(i).head().center();
                     v1 = at(i).getCenter();
                     crossList->append(TrackPoint(v1, 0)); // 0 schlechteste qualitaet
                 }

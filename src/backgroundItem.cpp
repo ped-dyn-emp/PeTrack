@@ -32,9 +32,8 @@ BackgroundItem::BackgroundItem(QWidget *wParent, QGraphicsItem * parent)
 {
     mMainWindow = (class Petrack*) wParent;
     mImage = nullptr;
-    //    setEnabled(false); // all mouse events connot access this item, but it will be seen
+    //    setEnabled(false); // all mouse events cannot access this item, but it will be seen
     // einzig move koennte interessant sein, um grid zu verschieben?!
-//     setAcceptsHoverEvents(true);
 }
 
 /**
@@ -80,15 +79,6 @@ void BackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*
             auto* p = mImage->scanLine(y)-1;
             for (x = 0; x < fg.cols; x++)
             {
-//                if (*data == 1)
-//                {
-//                        value = ((*data-min)*255)/(max-min); // for greyscale
-//                        color.setHsv(0, 0, value<0?0:(value>255?255:value), 255); // 0=rot, 240=blau, nicht 359, da sich Farbkreis wieder schliesst
-//                }
-//                else
-//                {
-//                    color.setRgb(0, 0, 0, (!mMainWindow->getStereoWidget()->hideWrong->isChecked())*255); //.setAlpha(0);
-//                }
                 *(++p) = 255; // color.red();
                 *(++p) = 255; // color.green();
                 *(++p) = 255; // color.blue();

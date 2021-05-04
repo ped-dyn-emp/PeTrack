@@ -27,7 +27,6 @@
 #include "recognition.h"
 
 class Petrack;
-//class Image;
 class QGraphicsScene;
 class QDomElement;
 
@@ -227,13 +226,6 @@ public:
     }
 
 private slots:
-    //temp:
-//     void on_temp1_valueChanged(int i);
-//     void on_temp2_valueChanged(int i);
-//     void on_temp3_valueChanged(int i);
-//     void on_temp4_valueChanged(int i);
-//     void on_temp5_valueChanged(int i);
-
     void on_anaCalculate_clicked();
     void on_anaStep_valueChanged(int i);
     void on_anaMarkAct_stateChanged(int i);
@@ -287,7 +279,6 @@ private slots:
     void on_trackShowSearchSize_stateChanged(int i);
 
     void on_trackShowOnlyVisible_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-//    void on_trackShowOnlyNr_valueChanged(int i) { if (!isLoading()) mScene->update(); }
     void on_trackShowCurrentPoint_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
     void on_trackGotoNr_clicked();
     void on_trackGotoStartNr_clicked();
@@ -324,14 +315,11 @@ private slots:
     void on_roiFix_stateChanged(int i);
 
     void on_filterBrightContrast_stateChanged(int i);
-//     void on_filterContrast_stateChanged(int i);
     void on_filterContrastParam_valueChanged(int i);
-//     void on_filterBright_stateChanged(int i);
     void on_filterBrightParam_valueChanged(int i);
     void on_filterBorder_stateChanged(int i);
     void on_filterBorderParamSize_valueChanged(int i);
     void on_filterBorderParamCol_clicked();
-//    void on_filterBgCalc_clicked();
     void on_filterBg_stateChanged(int i);
     void on_filterBgShow_stateChanged(int i);
     void on_filterBgUpdate_stateChanged(int i);
@@ -352,10 +340,6 @@ private slots:
     void on_r6_valueChanged(double d);
     void on_tx_valueChanged(double d);
     void on_ty_valueChanged(double d);
-    /// Weitere Entzerrungsparameter fuer spaeter
-    //void on_k4_valueChanged(double d);
-    //void on_k5_valueChanged(double d);
-    //void on_k6_valueChanged(double d);
     void on_quadAspectRatio_stateChanged(int i);
     void on_fixCenter_stateChanged(int i);
     void on_tangDist_stateChanged(int i);
@@ -429,8 +413,6 @@ private slots:
     void on_trackRoiShow_stateChanged(int arg1);
 
     void on_trackRoiFix_stateChanged(int arg1);
-
-    //void on_trackExport_released();
 
 private:
     Petrack *mMainWindow;

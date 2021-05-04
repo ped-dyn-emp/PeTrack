@@ -31,13 +31,9 @@ private:
     Parameter mB;
     Parameter mC;
 
-//    uchar mLut[256];
-//    CvMat* mLutMat;
-
 public:
     BrightContrastFilter();
 
-//    IplImage* act(IplImage *img, IplImage *res);
     cv::Mat act(cv::Mat &img, cv::Mat &res);
 
     Parameter *getBrightness();

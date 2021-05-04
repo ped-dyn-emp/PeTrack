@@ -92,15 +92,9 @@ public:
     Petrack();
     ~Petrack();
     static int trcVersion; // version numbr for writing TRC-Trajectorie files
-//    enum class Dimension
-//    {
-//        dim2D=2,
-//        dim3D=3
-//    };
 
 protected:
     void closeEvent(QCloseEvent *event);
-    //void contextMenuEvent(QContextMenuEvent *event) Q_DECL_OVERRIDE;
 
 private slots:
     void saveVideo();
@@ -168,7 +162,6 @@ public:
     void updateControlImage(cv::Mat &img);
     int calculateRealTracker();
     void exportTracker(QString dest = "");
-//    void load3DCalibPoints(QString src = "");
     void importTracker(QString dest = "");
     void testTracker();
     void trackAll();
@@ -176,9 +169,7 @@ public:
     int winSize(QPointF *pos=nullptr, int pers=-1, int frame=-1, int level=-1);
     void updateImage(bool imageChanged = false);
     void updateImage(const cv::Mat &img);
-//    void updateImage(IplImage *iplImg);
     void updateSequence();
-//    void calcBackground();
     QSet<int> getOnlyVisible();
     double getCmPerPixel() const;
     void setHeadSize(double hS=-1);
@@ -264,21 +255,13 @@ public:
     {
         return mImage;
     }
-//    inline IplImage* getIplImage()
-//    {
-//        return mIplImg;
-//    }
     inline cv::Mat getImg()
     {
-        return mImg;// = cvarrToMat(mIplImg);
+        return mImg;
     }
-//    inline IplImage* getIplImageFiltered()
-//    {
-//        return mIplImgFiltered;
-//    }
     inline cv::Mat getImageFiltered()
     {
-        return mImgFiltered;// = cvarrToMat(mIplImgFiltered);
+        return mImgFiltered;
     }
     inline Tracker* getTracker()
     {
@@ -383,14 +366,6 @@ public:
     {
         return &mBrightContrastFilter;
     }
-    // ContrastFilter *getContrastFilter()
-    // {
-    //     return &mContrastFilter;
-    // }
-    // BrightFilter *getBrightFilter()
-    // {
-    //     return &mBrightFilter;
-    // }
     inline BorderFilter* getBorderFilter()
     {
         return &mBorderFilter;
@@ -410,12 +385,10 @@ public:
             return (int) getBorderFilter()->getBorderSize()->getValue();
         else
             return 0;
-        //mImageBorderSize;
     }
     inline void setImageBorderSize(int sz)
     {
         getBorderFilter()->getBorderSize()->setValue(sz);
-        //mImageBorderSize = sz;
     }
 
     inline AutoCalib* getAutoCalib()
@@ -465,7 +438,6 @@ public:
 private:
     void createActions();
     void createMenus();
-    //void createToolBars();
     void createStatusBar();
     void readSettings();
     void writeSettings();
@@ -548,9 +520,6 @@ private:
     QString mHeightFileName;
     QString mMarkerIDFileName;
 
-  //    IplImage *mIplImg;
-//     IplImage *mPrevIplImgFiltered;
-//    IplImage *mIplImgFiltered;
     cv::Mat mImg;
     cv::Mat mImgFiltered;
     QImage *mImage;
@@ -584,11 +553,8 @@ private:
 
     QPointF mMousePosOnImage;
 
-    //CalibFilter mCalibFilter;
     Filter *mCalibFilter;
     BrightContrastFilter mBrightContrastFilter;
-//     BrightFilter mBrightFilter;
-//     ContrastFilter mContrastFilter;
     BorderFilter mBorderFilter;
     SwapFilter mSwapFilter;
     BackgroundFilter mBackgroundFilter;
@@ -604,11 +570,9 @@ private:
     double mHeadSize;
     double mCmPerPixel;
 
-//    QString mDefaultSettings;
     QDomDocument mDefaultSettings;
 
     double mShowFPS;
-//    clock_t mLastTime;
 
     bool mAutoBackTrack;
     bool mAutoTrackOptimizeColor;
@@ -624,6 +588,5 @@ private:
     QString mCompilerID{"Unknown"}; ///< Used compiler
     QString mCompilerVersion{"Unknown"}; ///< Used compiler version
 };
-
 
 #endif

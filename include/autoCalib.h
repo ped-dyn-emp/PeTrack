@@ -84,8 +84,7 @@ public:
 private:
     int runCalibration(std::vector<std::vector<cv::Point2f> > corners, cv::Size img_size, cv::Size board_size,
         float square_size, float aspect_ratio, int flags,
-        cv::Mat &camera_matrix, cv::Mat &dist_coeffs, double *reproj_errs);//, Mat *extr_params);//,
-       // double &reproj_errs);//, double* avg_reproj_err);
+        cv::Mat &camera_matrix, cv::Mat &dist_coeffs, double *reproj_errs);
 
     Petrack *mMainWindow;
     Control *mControlWidget;

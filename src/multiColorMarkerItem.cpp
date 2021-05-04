@@ -36,12 +36,6 @@ MultiColorMarkerItem::MultiColorMarkerItem(QWidget *wParent, QGraphicsItem * par
 {
     mMainWindow = (class Petrack*) wParent;
     mImage = nullptr;
-//    mMask = NULL;
-    //setAcceptsHoverEvents(true);
-
-    //    setEnabled(false); // all mouse events connot access this item, but it will be seen
-    // einzig move koennte interessant sein, um grid zu verschieben?!
-//     setAcceptsHoverEvents(true);
 }
 
 /**
@@ -56,20 +50,8 @@ QRectF MultiColorMarkerItem::boundingRect() const
 {
     if (mMainWindow->getImage())
         return QRectF(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize(), mMainWindow->getImage()->width(), mMainWindow->getImage()->height());
-//         return QRectF(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize(), mImage->width(), mImage->height());
     else
         return QRectF(0, 0, 0, 0);
-//     // bounding box wird in lokalen koordinaten angegeben!!! (+-10 wegen zahl "1")
-//     if (mControlWidget->getCalibCoordShow())
-//         return QRectF(-110., -110., 220., 220.);
-//     else                    ;
-
-//         return QRectF(0., 0., 0., 0.);
-
-//     // sicher ware diese boundingbox, da alles
-//     //     return QRectF(xMin, yMin, xMax-xMin, yMax-yMin);
-//     // eigentlich muesste folgende Zeile reichen, aber beim ranzoomen verschwindet dann koord.sys.
-//     //     return QRectF(mControlWidget->getCalibCoordTransX()/10.-scale, mControlWidget->getCalibCoordTransY()/10.-scale, 2*scale, 2*scale);
 }
 
 void MultiColorMarkerItem::setRect(Vec2F& v)
@@ -101,16 +83,15 @@ void MultiColorMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
             auto* p = mImage->scanLine(y)-1;
             for (x = 0; x < mMask.cols; x++)
             {
-                *(++p) = *data; // color.blue();
-                *(++p) = *data; // color.green();
-                *(++p) = *data; // color.red();
-                *(++p) = *data ? notMaskMask : 255; // color.alpha(); // 255;
+                *(++p) = *data;
+                *(++p) = *data;
+                *(++p) = *data;
+                *(++p) = *data ? notMaskMask : 255;
                 ++data;
             }
             data = (yData += mMask.cols/sizeof(char)); // because sometimes widthStep != width
         }
         painter->setOpacity(mMainWindow->getMultiColorMarkerWidget()->opacity->value()/100.);
-        //painter->drawImage(mMainWindow->getRecoRoiItem()->rect().x(),mMainWindow->getRecoRoiItem()->rect().y(), *mImage); // during hoverMoveEvent of recognitionRect the painting moves with rect
         painter->drawImage(mUlc.x(),mUlc.y(), *mImage);
 
     }
@@ -128,8 +109,6 @@ cv::Mat MultiColorMarkerItem::createMask(int w, int h)
     if (w>0 && h>0 && (mMask.empty() || (!mMask.empty() && (w != mMask.cols || h != mMask.rows))))
     {
         mMask.create(h,w,CV_8UC1);
-//        cvReleaseImage(&mMask);
-//        mMask = cvCreateImage(cvSize(w, h), 8, 1);
     }
     return mMask;
 }

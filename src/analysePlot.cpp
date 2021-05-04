@@ -42,10 +42,6 @@ public:
     {
 
 
-////// Macht Probleme mit Qwt 6
-//////       setSelectionFlags(QwtPicker::DragSelection | QwtPicker::CornerToCorner);
-        // default: setRubberBand(QwtPicker::NoRubberBand);
-
         // RightButton: zoom out by 1
         // Ctrl+RightButton: zoom out to full size
 
@@ -54,31 +50,8 @@ public:
         setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
 
         setRubberBand(QwtPicker::RectRubberBand);
-        //mZoomer->setRubberBandPen(QColor(Qt::green));
         setTrackerMode(QwtPicker::AlwaysOn); //ActiveOnly (only when the selection is active), AlwaysOff
-        //mZoomer->setTrackerPen(QColor(Qt::white));
     }
-
-//     // ueberschrieben, da so kommazahlen unterdrueckt werden, da intervall mindestens 5 umfasst
-//     QwtDoubleSize minZoomSize() const //QwtPlotZoomer::
-//     {
-//         return QwtDoubleSize(5., 5.);
-//     }
-
-// QwtPlot *plot()
-// {
-//     QObject *w = canvas();
-//     if ( w )
-//     {
-//         w = w->parent();
-//         if ( w && w->inherits("QwtPlot") )
-//             return (QwtPlot *)w;
-//     }
-
-//     return NULL;
-// }
-
-//widgetWheelEvent  	(   	QWheelEvent *   	 e  	 )
 
     void widgetMouseMoveEvent(QMouseEvent *e) override
     {
@@ -115,14 +88,6 @@ public:
                         d2 = map.invTransform(i2 - dy);
                     }
 
-                    //debout << zoomBase().width() << " " << zoomBase().height() << endl;
-                    //debout << plot()->axisScaleDiv(axis)->lBound() << " " << plot()->axisScaleDiv(axis)->hBound() << endl;
-//                     if (d1 < 0)
-//                     {
-//                         d2 = d2-d1;
-//                         d1 = 0;
-//                     } 
-//                     else 
                     if ((axis == QwtPlot::xBottom) && (d2 > zoomBase().width()))
                     {
                         d1 = d1-(d2-zoomBase().width());
@@ -142,21 +107,6 @@ public:
         }
         QwtPlotZoomer::widgetMouseMoveEvent(e);
     }
-//     // damit bei pan nicht text angezeigt wird // wenn eingebauter pan benutzt wird!!!
-//     void widgetMousePressEvent(QMouseEvent *e)
-//     {
-//         if (e->button() == Qt::MidButton)
-//             setTrackerMode(QwtPicker::AlwaysOff);
-
-//         QwtPlotZoomer::widgetMousePressEvent(e);
-//     }
-//     void widgetMouseReleaseEvent(QMouseEvent *e)
-//     {
-//         if (e->button() == Qt::MidButton)
-//             setTrackerMode(QwtPicker::AlwaysOn);
-
-//         QwtPlotZoomer::widgetMouseReleaseEvent(e);
-//     }
 
     QwtText trackerTextF(const QPointF &pos) const override
     {
@@ -186,22 +136,10 @@ void TrackerRealPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtSc
         int i, j;
         QPointF point, lastPoint;
 
-        //     debout << "---" <<endl;
-        //     debout << re.x() << " " << re.y() << " " << re.width() << " " << re.height()<<endl;
-        //     debout << "x:" <<endl;
-        //     debout << mapX.p1() << " "<< mapX.p2() << " " << mapX.s1() << " "<< mapX.s2() << " "<<endl;
-        //     debout << "y:" <<endl;
-        //     debout << mapY.p1() << " "<< mapY.p2() << " " << mapY.s1() << " "<< mapY.s2() << " "<<endl;
-
         p->save();
         p->translate(mapX.p1(), mapY.p2()); // in pixelkoordinaten vor skalierung
         p->scale(sx, sy);
         p->translate(-mapX.s1(), -mapY.s2());
-
-        //     p->drawLine(QPointF(-10, -10), QPointF(-10, 10));
-        //     p->drawLine(QPointF(-10, 10), QPointF(10, 10));
-        //     p->drawLine(QPointF(10, 10), QPointF(10, -10));
-        //     p->drawLine(QPointF(10, -10), QPointF(-10, -10));
 
         p->setPen(Qt::red);
 
@@ -221,11 +159,6 @@ void TrackerRealPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtSc
         QwtText titleY;
         if (anaConsiderX && anaConsiderY)
         {
-//             if (anaConsiderAbs)
-//                 titleY.setText("|v| [m/s]", QwtText::RichText);
-//             else if (anaConsiderRev)
-//                 titleY.setText("-v [m/s]", QwtText::RichText);
-//             else
             titleY.setText("v [m/s]", QwtText::RichText);
         }
         else if (anaConsiderX)
@@ -246,53 +179,22 @@ void TrackerRealPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtSc
             else
                 titleY.setText("v<sub>y</sub> [m/s]", QwtText::RichText);
         }
-        //QwtText titleY("v<sub>y</sub> [m/s]", QwtText::RichText); //"y"
         titleX.setFont(f);
         titleY.setFont(f);
         ((AnalysePlot *) plot())->setAxisTitle(QwtPlot::xBottom, titleX); //"x"
         ((AnalysePlot *) plot())->setAxisTitle(QwtPlot::yLeft, titleY); //"y"
-        //setAxisFont(xBottom, f);
-        //setAxisFont(yLeft, f);
-
-        //         for (i = 0; i < mTrackerReal->size(); ++i)
-//         {
-//             for (j = 0; j < mTrackerReal->at(i).size(); ++j)
-//             {
-//                 point = mTrackerReal->at(i).at(j).toQPointF();
-//                 if (j!=0)
-//                     ;//p->drawLine(point, lastPoint);
-//                 rect.moveLeft(point.x()-sx);
-//                 rect.moveTop(point.y()-sy);
-//                 //p->setPen(Qt::red);
-//                 //p->setBrush(QBrush((*mTracker)[i].color()));
-//                 //p->drawEllipse(rect);
-//                 p->drawPoint(point);
-//                 p->drawRect(rect);
-//                 lastPoint = point;
-//             }
-//         }
 
         int step = controlWidget->anaStep->value(); //1
         int frame, animFrame, velVecActIdx = -1;
         double vel; // geschwindigkeit
         int largestLastFrame = mTrackerReal->largestLastFrame();
-        QVector<int> velAnzVec(largestLastFrame, 0); //mControlWidget->getMainWindow()->getAnimation()->getNumFrames()
+        QVector<int> velAnzVec(largestLastFrame, 0);
         QVector<double> velVec(largestLastFrame, 0.);
         int actFrame = ((AnalysePlot *) plot())->getActFrame();
-        //int actFrame = ((AnalysePlot *) plot())->getControlWidget()->getMainWindow()->getAnimation()->getCurrentFrameNum();
         bool markAct = controlWidget->anaMarkAct->isChecked();
         double fps = controlWidget->getMainWindow()->getAnimation()->getFPS();
         if (fps < 0)
             fps =DEFAULT_FPS;
-
-//         QPen linePen;
-//         linePen.setColor(Qt::red);
-//         linePen.setWidthF(3/sx);
-//         p->setPen(linePen);
-//         p->pen().setWidth(3); // geht nicht
-//         p->setPen(Qt::red);
-//         p->setBrush(Qt::red);
-        //p->setBrush(Qt::red); //QBrush(Qt::red)
 
         if (!markAct)
         {
@@ -322,9 +224,6 @@ void TrackerRealPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtSc
 
                 if (anaConsiderX && anaConsiderY)
                 {
-//                     if (anaConsiderAbs)
-//                     else if (anaConsiderRev)
-//                     else
                     vel = (mTrackerReal->at(i).at(j+step).distanceToPoint(mTrackerReal->at(i).at(j)));
                 }
                 else if (anaConsiderX)
@@ -352,15 +251,12 @@ void TrackerRealPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtSc
                 rect.moveLeft(point.x()-sx);
                 rect.moveTop(point.y()-sy);
                 p->drawEllipse(rect);
-                //p->drawPoint(point);
 
                 // j - j+step, da gegen die x-achse gelaufen wird
 
                 ++velAnzVec[frame];
                 velVec[frame] += vel;
             }
-//         p->setPen(Qt::red);
-//         p->setBrush(Qt::red);
         }
 
         rect.setWidth(2*rect.width());
@@ -384,11 +280,6 @@ void TrackerRealPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtSc
                 }
             }
         }
-        //0..getAnimation()->getNumFrames();
-        //smallestFirstFrame()..largestLastFrame()
-        //int smallestFirstFrame = mTrackerReal->smallestFirstFrame();
-        //int largestLastFrame = mTrackerReal->largestLastFrame();
-        //for (i = smallestFirstFrame; i <= largestLastFrame; ++i)
 
         p->restore();
     }
@@ -410,7 +301,6 @@ AnalysePlot::AnalysePlot(QWidget *parent) // default= NULL
         : QwtPlot(parent)
 {
     setAutoReplot(false);
-    //setTitle("Frequency Response of a Second-Order System");
     setCanvasBackground(QColor(QColor(220, 220, 255)));
 
     mControlWidget = nullptr;
@@ -426,47 +316,14 @@ AnalysePlot::AnalysePlot(QWidget *parent) // default= NULL
 
     setAxisTitle(xBottom, titleX); //"x"
     setAxisTitle(yLeft, titleY); //"y"
-    //setAxisFont(xBottom, f);
-    //setAxisFont(yLeft, f);
 
     plotLayout()->setAlignCanvasToScales(true);
-    //axisScaleEngine(xBottom)->setAttribute(QwtScaleEngine::Floating, false);
-    //axisScaleEngine(yLeft)->setAttribute(QwtScaleEngine::Floating, false);
-    //canvas()->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    //canvas()->setFixedWidth(400); //geometry().width()-
-    //canvas()->setFixedHeight(400); //geometry().height()-
 
     mZoomer = new AnalyseZoomer(xBottom, yLeft, canvas()); //QwtPlotZoomer
-
-    //(new QwtPlotPanner(canvas()))->setMouseButton(Qt::MidButton);
-
-//     mTpc = new QwtPlotCurve("color of tracking points");
-//     mTpc->attach(this);
-//     mTpc->setStyle(QwtPlotCurve::NoCurve);
-//     mTpc->setSymbol(QwtSymbol(QwtSymbol::XCross, QBrush(Qt::white), QPen(Qt::black), QSize(4, 4)));
-//     // Ellipse, Rect, Diamond, Triangle, DTriangle, UTriangle, LTriangle, RTriangle, Cross, XCross, HLine, VLine, Star1, Star2, Hexagon, StyleCnt 
-//     //    mTpc->setPen(...);
 
     mTrackerRealItem = new TrackerRealPlotItem();
     mTrackerRealItem->setZ(1);
     mTrackerRealItem->attach(this);
-
-//      mRectItem = new RectPlotItem();
-//      mRectItem->attach(this);
-
-//      mViewAnalyseItem = new ViewAnalysePlotItem();
-//      mViewAnalyseItem->attach(this);
-
-//  test:    mRectItem->addMap(10, 10, 100, 100, true, 1.40);
-
-     //paintEngine()->hasFeature(QPaintEngine::Antialiasing);
-    //setAutoReplot(true);
-
-//      setMouseTracking(true); // mouse move events werden auch bei nichtdruecken einer moustaste ausgeloest
-//         setAxisAutoScale(QwtPlot::xBottom);
-//         setAxisAutoScale(QwtPlot::yLeft);
-//         setAxisAutoScale(QwtPlot::xTop);
-//         setAxisAutoScale(QwtPlot::yRight);
 
     // grid 
     QwtPlotGrid *grid = new QwtPlotGrid;
@@ -477,30 +334,6 @@ AnalysePlot::AnalysePlot(QWidget *parent) // default= NULL
     grid->setZ(0);
     grid->attach(this);
 
-}
-
-// double AnalysePlot::map(const QColor &col) const
-// {
-//     double height = 1.;
-//     if (height < 0)
-//         return mControlWidget->mapDefaultHeight->value();
-//     else
-//         return height;
-// }
-
-// void AnalysePlot::mouseMoveEvent(QMouseEvent *event) 
-// {
-//     QFrame::mouseMoveEvent(event);
-//     debout << "moveEvent" << endl;
-// }
-
-void AnalysePlot::setCursor(const QColor &/*col*/)
-{
-    //QPoint pos = getPos(col);
-    //QMouseEvent event(QEvent::MouseMove, pos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
-//     mViewAnalyseItem->setPoint(getPos(col));
-    //mZoomer->mouseMoveEvent(&event); //widgetM
-    //QFrame::mouseMoveEvent(&event);
 }
 
 QPoint AnalysePlot::getPos(const QColor &col) const
@@ -558,30 +391,8 @@ void AnalysePlot::setScale()
 {
     if (mControlWidget)
     {
-//         int model = mControlWidget->recoColorModel->currentIndex();
-//         int x = mControlWidget->recoColorX->currentIndex();
-//         int y = mControlWidget->recoColorY->currentIndex();
-        
-//         mXMax = 255.;
-//         mYMax = 255.;
-//         if (model == 0) // HSV //mControlWidget->recoColorModel->currentIndex()
-//         {
-//             if (x==0)
-//                 mXMax = 359.;
-//             if (y==0)
-//                 mYMax = 359.;
-//         }
-
-//         double spacerX = (mTrackerReal->xMax()-mTrackerReal->xMin())/20.;
-//         double spacerY = (mTrackerReal->yMax()-mTrackerReal->yMin())/20.;
-//         mXMin = mTrackerReal->xMin()-spacerX; 
-//         mXMax = mTrackerReal->xMax()+spacerX; 
-//         mYMin = mTrackerReal->yMin()-spacerY; 
-//         mYMax = mTrackerReal->yMax()+spacerY;
 
         int frameNum = mTrackerReal->largestLastFrame(); //mControlWidget->getMainWindow()->getAnimation()->getNumFrames();
-        //double spacerX = frameNum/20.;
-        //double spacerY = 0.5;
         mXMin = mTrackerReal->smallestFirstFrame()-10; //0-spacerX; 
         mXMax = frameNum+10; //frameNum+spacerX; 
         mYMin = -0.2; //0-spacerY; 
@@ -591,13 +402,6 @@ void AnalysePlot::setScale()
         setAxisScale(QwtPlot::yLeft, mYMin, mYMax);
         replot(); // why, see: file:///C:/Programme/qwt-5.0.2/doc/html/class_qwt_plot_zoomer.html#7a1711597f441223efdb7d9931fe19b9
         mZoomer->setZoomBase(QwtDoubleRect(mXMin, mYMin, mXMax-mXMin, mYMax-mYMin));
-
-//         setAutoReplot(false); // hiermit koennte temporaer das automatische skalieren auf werte von setaxisscale unterdrueckt werden
-//         setAutoReplot(true);
-//         setAxisAutoScale(QwtPlot::xBottom);
-//         setAxisAutoScale(QwtPlot::yLeft);
-
-
     }
 }
 

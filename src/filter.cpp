@@ -91,11 +91,9 @@ void Parameter::setChanged(bool b)
 
 Filter::Filter()
 {
-    mEnable = true; //enable();
-    mOnCopy = true; //setOnCopy(true);
-//    mRes = NULL;
+    mEnable = true;
+    mOnCopy = true;
     mChg = false;
-//    mResStored = false;
 }
 
 /**
@@ -165,8 +163,8 @@ cv::Mat Filter::getLastResult()
 
 void Filter::freeLastResult()
 {
-//    cvReleaseImage(&mRes);
-} //free oder delete? - beides falsch
+  //free oder delete? - beides falsch
+}
 
 void Filter::enable()
 {
@@ -197,17 +195,3 @@ bool Filter::getOnCopy() const
 {
     return mOnCopy;
 }
-
-// void Filter::addParam(QString *name, min, max, default)
-// {
-// }
-
-// flag zur Anzeige, ob auf Originaldaten Filter angewendet werden kann und somit setoncop(false) moeglich ist
-
-// flag zur Anzeige, ob Filter Bildgroesse veraendert
-
-// widget, mit dem parameter einstellbar sind
-// grundlegender rahmen mit ok, cancel und preview wie in photoshop
-// inneres kann von abgeleiteter klasse kommen
-
-// einstellen welche parameter: anzahl, name, wertebereich, default

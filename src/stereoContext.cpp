@@ -50,8 +50,6 @@
 
 using namespace::cv;
 
-//#define TIME_MEASUREMENT
-
 pet::StereoContext::StereoContext(Petrack* main)
 {
     mMain = main;
@@ -103,7 +101,6 @@ pet::StereoContext::StereoContext(Petrack* main)
     calFp.open(QIODevice::WriteOnly);
     calFp.write(calFpInt.readAll());
     calFp.close();
-    //debout << QFile::copy(":/calibCam1", calFile) <<endl;
     if (!QFile::exists(calFile))
     {
         debout << "Error: Calibration file "<< calFile <<" could not be created!" << std::endl;
@@ -174,21 +171,6 @@ pet::StereoContext::StereoContext(Petrack* main)
 #endif
     mBMdisparity16 = NULL;
 #endif
-//    unsigned char value;
-//    triclopsGetSurfaceValidationMapping(mTriclopsContext, &value);
-//    debout << (int) value <<endl;
-//    triclopsGetBackForthValidationMapping(mTriclopsContext, &value);
-//    debout << (int) value <<endl;
-
-//    int nrows, ncols;
-//    triclopsError = triclopsGetResolution(mTriclopsContext, &nrows, &ncols);
-//    if (triclopsError != TriclopsErrorOk)
-//        debout << triclopsErrorToString(triclopsError) << endl;
-//    debout << nrows << ncols <<endl;
-
-//    float base;
-//    triclopsGetBaseline(mTriclopsContext, &base);
-//    debout << base<<endl;
 
     mPointCloud = nullptr;
 }
@@ -199,7 +181,6 @@ pet::StereoContext::~StereoContext()
     if (mTriclopsContext)
         triclopsDestroyContext(mTriclopsContext);
 #endif
-      //delete [] m_pTempBuffer;
 }
 
 #ifndef STEREO_DISABLED
@@ -997,7 +978,7 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
 
         if (dispNew != NULL)
             *dispNew = true;
-        mMain->getStereoItem()->setDispNew(true); //  ->updateData(); // das zu zeichnende Bild neu berechnen
+        mMain->getStereoItem()->setDispNew(true); // das zu zeichnende Bild neu berechnen
 
 
 

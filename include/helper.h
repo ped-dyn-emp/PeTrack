@@ -27,14 +27,6 @@
 
 extern QString commandLineOptionsString;
 
-// debug Beispiel - keines besonders gut
-//qDebug() << "Widget" << this << "at position" << this->pos();
-//Q_ASSERT(1);
-//dumpObjectTree();
-//dumpObjectInfo();
-// stefans ansatz steht in svt_system (nicht besser); noetig: #include "imagehlp.h"
-// this ausserhalb von objekt nicht verfuegbar: #define debout cout << typeid(this).name() << "." << __func__ << " in " << __FILE__ << " line " << __LINE__ << ": "
-
 constexpr const char* file_name(const char* path) {
     const char* file = path;
     while (*path) {
@@ -118,12 +110,6 @@ inline double getMedianOf3(double a, double b, double c)
     }
 }
 
-// // round double to int
-// inline int round(double d)
-// {
-//   return (int) (d<0 ? d-.5 : d+.5);
-// }
-// da obige Fkt manchmal schon existiert:
 // d darf keine seiteneffekte haben!!!
 // myround genommen, da round manchmal in math.h existiert, aber nicht immer
 #define myRound(d) (static_cast<int>(((d)<0 ? (d)-.5 : (d)+.5)))
@@ -134,10 +120,8 @@ inline double getMedianOf3(double a, double b, double c)
 #define getG(img,x,y) ((int)*(uchar*)((img)->imageData + (img)->widthStep*(y) + (img)->nChannels*(x) + 1))
 #define getB(img,x,y) ((int)*(uchar*)((img)->imageData + (img)->widthStep*(y) + (img)->nChannels*(x)))
 
-//#define getRGB(img,x,y) ((QRgb) QColor(img.at<Vec3b>(y,x)[2],img.at<Vec3b>(y,x)[1],img.at<Vec3b>(y,x)[0]).rgb());
 // get image grey value from grey-images with values 0..255 (may be also 3 channels???)
 #define getGrey(img,x,y) ((int)*(uchar*)((img)->imageData + (img)->widthStep*(y) + (x)))
-//#define getGreyS(img,x,y) ((int) img.at<int>(y,x))
 
 inline cv::Scalar qcolor2scalar(QColor color)
 {
@@ -175,17 +159,6 @@ inline QColor getValue(const cv::Mat &img ,int x, int y)
 }
 #include <QColor>
 #include <QTextStream>
-// inline QTextStream& operator<<(QTextStream& s, const QColor& col)
-// {
-//     //    s << "RGB "<< col.red() << " " << col.green() << " " << col.blue() << " / HSV " << col.hue() << " " << col.saturation() << " " << col.value();
-//     s << col.hue() << " " << col.saturation() << " " << col.value();
-//     return s;
-// } 
-// inline ostream& operator<<(ostream& s, const QColor& col)
-// {
-//     s << "RGB "<< col.red() << " " << col.green() << " " << col.blue() << " / HSV " << col.hue() << " " << col.saturation() << " " << col.value();
-//     return s;
-// }
 inline std::ostream& operator<<(std::ostream& s, const QColor& col)
 {
     if (col.isValid())

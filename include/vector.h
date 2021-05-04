@@ -56,12 +56,6 @@ public:
     Vec3F();
     Vec3F(double x, double y, double z);
     Vec3F(const Vec3F& v) = default;
-//     Vec3F(const QPointF& v);
-//     Vec3F(const CvPoint* v);
-
-//     CvPoint toCvPoint() const;
-//     QPoint toQPoint() const;
-//     QPointF toQPointF() const;
 
     double x() const;
     double y() const;
@@ -70,8 +64,6 @@ public:
     void setY(double y);
     void setZ(double z);
     void set(double x, double y, double z);
-
-//     Vec3F operator=(const CvPoint *v);
 
     Vec3F operator+(const Vec3F& v) const;
     Vec3F operator-(const Vec3F& v) const;
@@ -83,24 +75,15 @@ public:
 	Vec3F operator/(double n) const; // scalar divide
 
 	double operator*(const Vec3F& v) const; // dot product
-// 	double operator%(const Vec3F& v) const; // cross product
 
 	bool operator==(const Vec3F& v) const;
 	bool operator!=(const Vec3F& v) const;
 
 	double length() const;
-// 	double angle() const;
 	Vec3F unit() const;
-// 	Vec3F normal() const;
 	void normalize();
 
     double distanceToPoint(const Vec3F& p) const;
-
-//     // return distance from vec to line between p1 and p2
-//     double distanceToLine(const Vec3F& p1, const Vec3F& p2) const;
-//     double angleBetweenVec(const Vec3F& v) const;
-
-// 	static Vec3F fromAngle(double angle);
 };
 
 
@@ -156,7 +139,6 @@ public:
 	Vec2F operator/(double n) const; // scalar divide
 
 	double operator*(const Vec2F& v) const; // dot product
-// 	double operator%(const Vec2F& v) const; // cross product
 
 	bool operator==(const Vec2F& v) const;
 	bool operator!=(const Vec2F& v) const;

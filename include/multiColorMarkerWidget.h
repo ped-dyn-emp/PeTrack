@@ -95,13 +95,7 @@ private slots:
     {
         mMainWindow->getMultiColorMarkerItem()->setVisible(i);
         mMainWindow->getScene()->update();
-        // mMainWindow->updateImage();
     }
-//    void on_colorMarkerColor_currentIndexChanged(int i)
-//    {
-//        if (mMainWindow && (mMainWindow->getScene()))
-//            mMainWindow->getScene()->update();
-//    }
     void on_maskMask_stateChanged(int /*i*/)
     {
         mMainWindow->getScene()->update();
@@ -159,17 +153,12 @@ private slots:
                 QPointF cmPerPixel1 = mMainWindow->getImageItem()->getCmPerPixel(0, 0, mMainWindow->getControlWidget()->mapDefaultHeight->value());
                 QPointF cmPerPixel2 = mMainWindow->getImageItem()->getCmPerPixel(mMainWindow->getImage()->width()-1, mMainWindow->getImage()->height()-1, mMainWindow->getControlWidget()->mapDefaultHeight->value());
                 double cmPerPixelAvg = (cmPerPixel1.x()+cmPerPixel1.y()+cmPerPixel2.x()+cmPerPixel2.y())/4.;
-                //debout <<cmPerPixel1.x()<<" "<<cmPerPixel1.y()<<" "<<cmPerPixel2.x()<<" "<<cmPerPixel2.y()<<endl;
-                //debout << 21./cmPerPixelAvg<<endl;
                 if (cmPerPixelAvg > 0)
                 {
                     double area = PI*0.25 * HEAD_SIZE/cmPerPixelAvg * 14./cmPerPixelAvg; // 14. Kopfbreite // Elipse: A=Pi*a*b (a,b Halbachsen)
-                    //debout <<area <<endl;
                     mOldMinArea = minArea->value();
                     mOldMaxArea = maxArea->value();
 
-                    //debout << oldMinArea <<endl;
-                    //debout << oldMaxArea <<endl;
                     minArea->setValue(area*0.75);
                     maxArea->setValue(area*2.5);
                 }

@@ -33,49 +33,15 @@
 #include "control.h"
 #include "tracker.h"
 
-// class SpectrogramData: public QwtRasterData
-// {
-// public:
-//     SpectrogramData():
-//         QwtRasterData(QwtDoubleRect(-1.5, -1.5, 3.0, 3.0))
-//     {
-//     }
-
-//     virtual QwtRasterData *copy() const
-//     {
-//         return new SpectrogramData();
-//     }
-
-//     virtual QwtDoubleInterval range() const
-//     {
-//         return QwtDoubleInterval(0.0, 10.0);
-//     }
-
-//     virtual double value(double x, double y) const
-//     {
-//         const double c = 0.842;
-
-//         const double v1 = x * x + (y-c) * (y+c);
-//         const double v2 = x * (y+c) + x * (y+c);
-
-//         return 1.0 / (v1 * v1 + v2 * v2);
-//     }
-// };
 
 class ImagePlotItem: public QwtPlotItem
 {
 public:
     ImagePlotItem()
-//         : mControlWidget(NULL)
     {
         mImage = new QImage(360,360,QImage::Format_RGB32);
-//         setAxis(QwtPlot::xBottom, QwtPlot::yLeft);
     }
 
-//     QwtDoubleRect boundingRect() const
-//     {
-//         return QwtDoubleRect(0., 0., 200., 200.);
-//     }
     /**
      * @brief Draws the mImage at the right position in correct size.
      * @param p
@@ -131,13 +97,6 @@ public:
         }
     }
 
-//     void setControlWidget(Control *control)
-//     {
-//         mControlWidget = control;
-
-//         generateImage();
-//     }
-
     inline QImage *getImage() const
     {
         return mImage;
@@ -145,7 +104,6 @@ public:
     
 private:
     QImage *mImage;
-//     Control *mControlWidget;
 };
 
 
@@ -175,17 +133,7 @@ void TrackerPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleM
     int plotZ = ((ColorPlot *) plot())->zValue();
     double diff;
 
-    //         debout << "---" <<endl;
-    //         debout << re.x() << " " << re.y() << " " << re.width() << " " << re.height()<<endl;
-    //         debout << "x:" <<endl;
-    //         debout << mapX.p1() << " "<< mapX.p2() << " " << mapX.s1() << " "<< mapX.s2() << " "<<endl;
-    //         debout << "y:" <<endl;
-    //         debout << mapY.p1() << " "<< mapY.p2() << " " << mapY.s1() << " "<< mapY.s2() << " "<<endl;
-    //         debout << mModel << " "<< mX << " " << mY<<endl;
-
-    //         p->setPen(mPen);
-
-    // ganu leicht verschiebung: eigentlich muessten noch andere werte wie diese einfliessen:
+    // TODO ganz leicht verschiebung: eigentlich muessten noch andere werte wie diese einfliessen:
     //         p->scale((mx.p2() - mx.p1())/(mx.s2() - mx.s1()), (my.p1() - my.p2())/(my.s2() - my.s1()));//
     //mx.p1()-mx.s1(), my.s2()+my.p2()-((ColorPlot *) plot())->yMax()
 
@@ -227,13 +175,6 @@ void TrackerPlotItem::setPen(const QPen &pen)
     mPen = pen;
 }
 
-// void TrackerPlotItem::setModel(int model, int x, int y)
-// {
-//     mModel = model;
-//     mX = x;
-//     mY = y;
-// }
-
 void TrackerPlotItem::setTracker(Tracker *tracker)
 {
     mTracker = tracker;
@@ -243,64 +184,6 @@ Tracker * TrackerPlotItem::getTracker()
     return mTracker;
 }
 
-//     // wird auch missbraucht, um mX etc zu setzen, da updTr immer bei aenderung aufgerufen werden muss
-// void TrackerPlotItem::updateTracker(int model, int x, int y)
-// {
-//     if (mTracker)
-//     {
-//         int i;
-
-//         QwtArray<double> xData; // == QVector
-//         QwtArray<double> yData;
-
-//         // die for-schleife innerhalb der if und nicht anders herum aus performance gruenden
-//         if (model == 0) // HSV
-//         {
-//             if (x==0)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     xData.append((*mTracker)[i].color().hue());
-//             else if (x==1)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     xData.append((*mTracker)[i].color().saturation());
-//             else
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     xData.append((*mTracker)[i].color().value());
-//             if (y==0)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     yData.append((*mTracker)[i].color().hue());
-//             else if (y==1)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     yData.append((*mTracker)[i].color().saturation());
-//             else
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     yData.append((*mTracker)[i].color().value());
-//         }
-//         else // RGB
-//         {
-//             if (x==0)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     xData.append((*mTracker)[i].color().red());
-//             else if (x==1)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     xData.append((*mTracker)[i].color().green());
-//             else
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     xData.append((*mTracker)[i].color().blue());
-//             if (y==0)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     yData.append((*mTracker)[i].color().red());
-//             else if (y==1)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     yData.append((*mTracker)[i].color().green());
-//             else
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     yData.append((*mTracker)[i].color().blue());
-//         }
-
-//         //mTpc->setData(xData, yData);
-//         debout << "data " << xData.size() << " " << yData.size()<<endl;
-//     }    
-// }
 
 //-----------------------------------------------------------------------------------------
 
@@ -334,14 +217,11 @@ double RectPlotItem::map(const QColor &col) const //const TrackPerson &tp RectMa
                    rightMap(map.x()+map.width(),0,360-map.x()-map.width(),map.height());
             contains = leftMap.contains(((ColorPlot *) plot())->getPos(col)) ||
                        rightMap.contains(((ColorPlot *) plot())->getPos(col));
-            //debout << "Point: " << (((ColorPlot *) plot())->getPos(col)).x() << "," << (((ColorPlot *) plot())->getPos(col)).y() << endl;
-            //debout << "Map x=" << map.x() << ", y=" << map.y() << ", width=" << map.width() << ", height=" << map.height() << endl;
-            //contains = map.contains(((ColorPlot *) plot())->getPos(col));
         }else
         {
             contains = map.contains(((ColorPlot *) plot())->getPos(col));
         }
-        if (!isGrey && map.colored() && contains) //         QPoint point = ;
+        if (!isGrey && map.colored() && contains)
             return map.mapHeight();
         else if (isGrey && !map.colored() && contains)
             return map.mapHeight();
@@ -355,15 +235,12 @@ double RectPlotItem::map(const QColor &col) const //const TrackPerson &tp RectMa
 
 int RectPlotItem::addMap(double x, double y, double w, double h, bool colored, double height, QColor &fromCol, QColor &toCol, bool invHue)
 {
-//    debout << "x=" << x << ", y=" << y << ", w=" << w << ", h=" << h << ", colored=" << colored << ", fromCol=" << fromCol << ", toCol=" << toCol << ", invHue=" << invHue << endl;
     mMaps.append(RectMap(x, y, w, h, colored, height));
     mMaps.last().setFromColor(fromCol);
     mMaps.last().setToColor(toCol);
     mMaps.last().setInvHue(invHue);
-//    debout << "mActIndex: " << mActIndex << ", mMaps.size(): " << mMaps.size() << endl;
     if (mActIndex < 0)
         mActIndex = 0;
-//    debout << "mActIndex: " << mActIndex << ", mMaps.size(): " << mMaps.size() << endl;
     return mMaps.size()-1;
 }
 int RectPlotItem::addMap()
@@ -488,15 +365,7 @@ void RectPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap&
     int i;
     float rX,rW;
 
-    //         debout << "---" <<endl;
-    //         debout << re.x() << " " << re.y() << " " << re.width() << " " << re.height()<<endl;
-    //         debout << "x:" <<endl;
-    //         debout << mapX.p1() << " "<< mapX.p2() << " " << mapX.s1() << " "<< mapX.s2() << " "<<endl;
-    //         debout << "y:" <<endl;
-    //         debout << mapY.p1() << " "<< mapY.p2() << " " << mapY.s1() << " "<< mapY.s2() << " "<<endl;
-    //         debout << mModel << " "<< mX << " " << mY<<endl;
-
-    // ganu leicht verschiebung: eigentlich muessten noch andere werte wie diese einfliessen:
+    // TODO ganz leicht verschiebung: eigentlich muessten noch andere werte wie diese einfliessen:
     //         p->scale((mx.p2() - mx.p1())/(mx.s2() - mx.s1()), (my.p1() - my.p2())/(my.s2() - my.s1()));//
     //mx.p1()-mx.s1(), my.s2()+my.p2()-((ColorPlot *) plot())->yMax()
 
@@ -515,7 +384,7 @@ void RectPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap&
 
         if (mMaps[i].invHue())
         {
-            rect = mMaps[i]; //(QRectF) cast nicht noetig
+            rect = mMaps[i];
             rect.moveTop(yMax-rect.y()-rect.height()); // nicht setY!!!!!, da dann height angepast wird
             rX = rect.x();
             rW = rect.width();
@@ -528,7 +397,7 @@ void RectPlotItem::draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap&
         }
         else
         {
-            rect = mMaps[i]; //(QRectF) cast nicht noetig
+            rect = mMaps[i];
             rect.moveTop(yMax-rect.y()-rect.height()); // nicht setY!!!!!, da dann height angepast wird
             p->drawRect(rect);
         }
@@ -548,10 +417,6 @@ public:
     Zoomer(int xAxis, int yAxis, QWidget *canvas)
         : QwtPlotZoomer(xAxis, yAxis, canvas)
     {
-        ////// Macht Probleme mit Qwt 6
-        //////setSelectionFlags(QwtPicker::DragSelection | QwtPicker::CornerToCorner);
-        // default: setRubberBand(QwtPicker::NoRubberBand);
-
         // RightButton: zoom out by 1
         // Ctrl+RightButton: zoom out to full size
 
@@ -560,37 +425,19 @@ public:
         setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
 
         setRubberBand(QwtPicker::RectRubberBand);
-        //mZoomer->setRubberBandPen(QColor(Qt::green));
         setTrackerMode(QwtPicker::AlwaysOn); //ActiveOnly (only when the selection is active), AlwaysOff
-        //mZoomer->setTrackerPen(QColor(Qt::white));
     }
 
     // ueberschrieben, da so kommazahlen unterdrueckt werden, da intervall mindestens 5 umfasst
-// Qwt 5: QwtDoubleSize minZoomSize() const //QwtPlotZoomer::
     QSizeF minZoomSize() const override
     {
         return QwtDoubleSize(5., 5.);
     }
 
-// QwtPlot *plot()
-// {
-//     QObject *w = canvas();
-//     if ( w )
-//     {
-//         w = w->parent();
-//         if ( w && w->inherits("QwtPlot") )
-//             return (QwtPlot *)w;
-//     }
-
-//     return NULL;
-// }
-
-//widgetWheelEvent  	(   	QWheelEvent *   	 e  	 )
-
     /**
      * @brief Allows movement in the zoomed in color plot via dragging with a pressed down middle mouse button.
-     * @param e
-     */
+    * @param e
+    */
     void widgetMouseMoveEvent(QMouseEvent *e) override
     {
         static int lastX = -1;
@@ -601,7 +448,6 @@ public:
         lastX = e->x();
         lastY = e->y();
 
-        //if (e->button() == Qt::MidButton) fkt bei move nicht
         if (e->buttons() == Qt::MiddleButton)
         {
             plot()->setAutoReplot(false);
@@ -611,8 +457,8 @@ public:
                 {
                     const QwtScaleMap map = plot()->canvasMap(axis);
 
-                    const int i1 = map.transform(plot()->axisScaleDiv(axis).lowerBound()); // war in aelterer qwt version: axisScaleDiv(axis)->lBound()
-                    const int i2 = map.transform(plot()->axisScaleDiv(axis).upperBound()); // war in aelterer qwt version: axisScaleDiv(axis)->hBound()
+                    const int i1 = map.transform(plot()->axisScaleDiv(axis).lowerBound());
+                    const int i2 = map.transform(plot()->axisScaleDiv(axis).upperBound());
 
                     double d1, d2;
                     if ( axis == QwtPlot::xBottom || axis == QwtPlot::xTop )
@@ -626,8 +472,6 @@ public:
                         d2 = map.invTransform(i2 - dy);
                     }
 
-                    //debout << zoomBase().width() << " " << zoomBase().height() << endl;
-                    //debout << plot()->axisScaleDiv(axis)->lBound() << " " << plot()->axisScaleDiv(axis)->hBound() << endl;
                     if (d1 < 0)
                     {
                         d2 = d2-d1;
@@ -652,21 +496,7 @@ public:
         }
         QwtPlotZoomer::widgetMouseMoveEvent(e);
     }
-//     // damit bei pan nicht text angezeigt wird // wenn eingebauter pan benutzt wird!!!
-//     void widgetMousePressEvent(QMouseEvent *e)
-//     {
-//         if (e->button() == Qt::MidButton)
-//             setTrackerMode(QwtPicker::AlwaysOff);
 
-//         QwtPlotZoomer::widgetMousePressEvent(e);
-//     }
-//     void widgetMouseReleaseEvent(QMouseEvent *e)
-//     {
-//         if (e->button() == Qt::MidButton)
-//             setTrackerMode(QwtPicker::AlwaysOn);
-
-//         QwtPlotZoomer::widgetMouseReleaseEvent(e);
-//     }
 
     QwtText trackerText(const QPoint &pos) const override
     {
@@ -708,15 +538,8 @@ public:
         double sy = mapY.p1()/(mapY.s2() - mapY.s1());
         double yMax = ((ColorPlot *) plot())->yMax();
         double sS = ((ColorPlot *) plot())->symbolSize()*0.35355339;
-        //         debout << "---" <<endl;
-        //         debout << re.x() << " " << re.y() << " " << re.width() << " " << re.height()<<endl;
-        //         debout << "x:" <<endl;
-        //         debout << mapX.p1() << " "<< mapX.p2() << " " << mapX.s1() << " "<< mapX.s2() << " "<<endl;
-        //         debout << "y:" <<endl;
-        //         debout << mapY.p1() << " "<< mapY.p2() << " " << mapY.s1() << " "<< mapY.s2() << " "<<endl;
-        //         debout << mModel << " "<< mX << " " << mY<<endl;
 
-        // ganu leicht verschiebung: eigentlich muessten noch andere werte wie diese einfliessen:
+        // TODO ganz leicht verschiebung: eigentlich muessten noch andere werte wie diese einfliessen:
         //         p->scale((mx.p2() - mx.p1())/(mx.s2() - mx.s1()), (my.p1() - my.p2())/(my.s2() - my.s1()));//
         //mx.p1()-mx.s1(), my.s2()+my.p2()-((ColorPlot *) plot())->yMax()
 
@@ -729,8 +552,6 @@ public:
 
         QPointF p1, p2;
         QPointF point = mPoint;
-
-        //point.setY(yMax-mPoint.y());
 
         p1.setX(point.x()+sS/sx);
         p1.setY(point.y()+sS/sy);
@@ -770,41 +591,21 @@ ColorPlot::ColorPlot(QWidget *parent) // default= NULL
         : QwtPlot(parent)
 {
     mControlWidget = nullptr;
-//     mTracker = NULL;
     mGreyDiff = 50;
     mSymbolSize = 10.;
 
-    // fkt nicht:
-    //setFrameShape(Box); // damit rahmen gleich wie alle anderen group boxen
-    //setFrameShadow(Sunken);
 
     QwtText titleX("x");
     QwtText titleY("y");
 
     setAxisTitle(xBottom, titleX); //"x"
     setAxisTitle(yLeft, titleY); //"y"
-    //setAxisFont(xBottom, f);
-    //setAxisFont(yLeft, f);
     plotLayout()->setAlignCanvasToScales(true);
-    //axisScaleEngine(xBottom)->setAttribute(QwtScaleEngine::Floating, false);
-    //axisScaleEngine(yLeft)->setAttribute(QwtScaleEngine::Floating, false);
-    //canvas()->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    //canvas()->setFixedWidth(400); //geometry().width()-
-    //canvas()->setFixedHeight(400); //geometry().height()-
 
     mImageItem = new ImagePlotItem();
     mImageItem->attach(this);
 
     mZoomer = new Zoomer(xBottom, yLeft, canvas());
-
-    //(new QwtPlotPanner(canvas()))->setMouseButton(Qt::MidButton);
-
-//     mTpc = new QwtPlotCurve("color of tracking points");
-//     mTpc->attach(this);
-//     mTpc->setStyle(QwtPlotCurve::NoCurve);
-//     mTpc->setSymbol(QwtSymbol(QwtSymbol::XCross, QBrush(Qt::white), QPen(Qt::black), QSize(4, 4)));
-//     // Ellipse, Rect, Diamond, Triangle, DTriangle, UTriangle, LTriangle, RTriangle, Cross, XCross, HLine, VLine, Star1, Star2, Hexagon, StyleCnt 
-//     //    mTpc->setPen(...);
 
      mTrackerItem = new TrackerPlotItem();
      mTrackerItem->attach(this);
@@ -814,13 +615,6 @@ ColorPlot::ColorPlot(QWidget *parent) // default= NULL
 
      mViewColorItem = new ViewColorPlotItem();
      mViewColorItem->attach(this);
-
-//  test:    mRectItem->addMap(10, 10, 100, 100, true, 1.40);
-
-     //paintEngine()->hasFeature(QPaintEngine::Antialiasing);
-    //setAutoReplot(true);
-
-//      setMouseTracking(true); // mouse move events werden auch bei nichtdruecken einer moustaste ausgeloest
 }
 
 void ColorPlot::replot()
@@ -876,19 +670,10 @@ bool ColorPlot::isGrey(const QColor &col) const
     else
         return false;
 }
-// void ColorPlot::mouseMoveEvent(QMouseEvent *event) 
-// {
-//     QFrame::mouseMoveEvent(event);
-//     debout << "moveEvent" << endl;
-// }
 
 void ColorPlot::setCursor(const QColor &col)
 {
-    //QPoint pos = getPos(col);
-    //QMouseEvent event(QEvent::MouseMove, pos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
     mViewColorItem->setPoint(getPos(col));
-    //mZoomer->mouseMoveEvent(&event); //widgetM
-    //QFrame::mouseMoveEvent(&event);
 }
 
 
@@ -975,7 +760,6 @@ void ColorPlot::setControlWidget(Control *control)
 
 void ColorPlot::setTracker(Tracker *tracker)
 {
-//     mTracker = tracker;
     mTrackerItem->setTracker(tracker);
 }
 
@@ -986,14 +770,12 @@ void ColorPlot::setScale()
         int model = mControlWidget->recoColorModel->currentIndex();
         int x = mControlWidget->recoColorX->currentIndex();
         int y = mControlWidget->recoColorY->currentIndex();
-        
-//         mTrackerItem->setModel(model, x, y);
 
         QwtDoubleRect base(0., 0., 255., 255.);
         
         mXMax = 255.;
         mYMax = 255.;
-        if (model == 0) // HSV //mControlWidget->recoColorModel->currentIndex()
+        if (model == 0) // HSV
         {
             if (x==0)
                 mXMax = 359.;
@@ -1001,14 +783,8 @@ void ColorPlot::setScale()
                 mYMax = 359.;
         }
 
-//         setAutoReplot(false); // hiermit koennte temporaer das automatische skalieren auf werte von setaxisscale unterdrueckt werden
         setAxisScale(QwtPlot::xBottom, 0., mXMax);
         setAxisScale(QwtPlot::yLeft, 0., mYMax);
-//         setAutoReplot(true);
-//         replot();
-
-//         setAxisAutoScale(QwtPlot::xBottom);
-//         setAxisAutoScale(QwtPlot::yLeft);
 
         replot(); // why, see: file:///C:/Programme/qwt-5.0.1/doc/html/class_qwt_plot_zoomer.html#7a1711597f441223efdb7d9931fe19b9
 
@@ -1018,7 +794,7 @@ void ColorPlot::setScale()
     }
 }
 
-void ColorPlot::generateImage() // int model, int x, int y, int z
+void ColorPlot::generateImage()
 {
     if (mControlWidget)
     {
@@ -1038,7 +814,6 @@ void ColorPlot::generateImage() // int model, int x, int y, int z
         if (midValue < 130)
         {
             mZoomer->setTrackerPen(QColor(Qt::white));
-//             mTpc->setPen(QPen(Qt::white));
             mTrackerItem->setPen(QPen(Qt::white));
             mRectItem->setPen(QPen(Qt::white));
             mViewColorItem->setPen(QPen(Qt::white));
@@ -1046,76 +821,12 @@ void ColorPlot::generateImage() // int model, int x, int y, int z
         else
         {
             mZoomer->setTrackerPen(QColor(Qt::black));
-//             mTpc->setPen(QPen(Qt::black));
             mTrackerItem->setPen(QPen(Qt::black));
             mRectItem->setPen(QPen(Qt::black));
             mViewColorItem->setPen(QPen(Qt::black));
         }
     }
 }
-
-// void ColorPlot::updateTracker()
-// {
-//     if (mTracker)
-//     {
-//         int model = mControlWidget->recoColorModel->currentIndex();
-//         int x = mControlWidget->recoColorX->currentIndex();
-//         int y = mControlWidget->recoColorY->currentIndex();
-//         int i;
-
-// //         mTrackerItem->updateTracker(model, x, y);
-
-//         QwtArray<double> xData; // == QVector
-//         QwtArray<double> yData;
-
-//         // die for-schleife innerhalb der if und nicht anders herum aus performance gruenden
-//         if (model == 0) // HSV
-//         {
-//             if (x==0)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     xData.append((*mTracker)[i].color().hue());
-//             else if (x==1)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     xData.append((*mTracker)[i].color().saturation());
-//             else
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     xData.append((*mTracker)[i].color().value());
-//             if (y==0)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     yData.append((*mTracker)[i].color().hue());
-//             else if (y==1)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     yData.append((*mTracker)[i].color().saturation());
-//             else
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     yData.append((*mTracker)[i].color().value());
-//         }
-//         else // RGB
-//         {
-//             if (x==0)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     xData.append((*mTracker)[i].color().red());
-//             else if (x==1)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     xData.append((*mTracker)[i].color().green());
-//             else
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     xData.append((*mTracker)[i].color().blue());
-//             if (y==0)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     yData.append((*mTracker)[i].color().red());
-//             else if (y==1)
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     yData.append((*mTracker)[i].color().green());
-//             else
-//                 for (i = 0; i < mTracker->size(); ++i)
-//                     yData.append((*mTracker)[i].color().blue());
-//         }
-
-//         mTpc->setData(xData, yData);
-//         debout << "data " << xData.size() << " " << yData.size()<<endl;
-//     }    
-// }
 
 int ColorPlot::zValue() const
 {

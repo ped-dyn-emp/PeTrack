@@ -97,7 +97,6 @@ bool AutoCalib::openCalibFiles()
             mCalibFiles = calibFiles;
             return true;
         }
-        //cout << mCalibFiles.first().toStdString() << endl; //toAscii() .data() Local8Bit().constData() << endl;
     }
     return false;
 }
@@ -224,8 +223,7 @@ void AutoCalib::autoCalib()
         // run calibration
 
         bool ok = runCalibration( image_points, view.size(), board_size,
-            square_size, aspect_ratio, flags, camera_matrix, dist_coeffs, &reproj_errs);//, extr_params);//,
-//            &reproj_errs);//, &avg_reproj_err );
+            square_size, aspect_ratio, flags, camera_matrix, dist_coeffs, &reproj_errs);
         debout << (ok ? "Calibration succeeded." : "Calibration failed.") << std::endl; //  "Avgage reprojection error is "  << avg_reproj_err << endl;
         debout << "Intrinsic reprojection error is: " << reproj_errs << std::endl;
 
@@ -235,13 +233,11 @@ void AutoCalib::autoCalib()
         debout << "( " << camera_matrix.at<double>(0,0) << " " << camera_matrix.at<double>(0,1) << " " << camera_matrix.at<double>(0,2) << ")" << std::endl;
         debout << "( " << camera_matrix.at<double>(1,0) << " " << camera_matrix.at<double>(1,1) << " " << camera_matrix.at<double>(1,2) << ")" << std::endl;
         debout << "( " << camera_matrix.at<double>(2,0) << " " << camera_matrix.at<double>(2,1) << " " << camera_matrix.at<double>(2,2) << ")" << std::endl;
-        //        debout << camera_matrix << endl;
 
         debout << "Distortioncoefficients: " << std::endl;
         debout << "r2: " << dist_coeffs.at<double>(0,0) << " r4: " << dist_coeffs.at<double>(0,1) << " r6: " << dist_coeffs.at<double>(0,4) << std::endl;
         debout << "tx: " << dist_coeffs.at<double>(0,2) << " ty: " << dist_coeffs.at<double>(0,3) << std::endl;
         debout << "k4: " << dist_coeffs.at<double>(0,5) << " k5: " << dist_coeffs.at<double>(0,6) << " k6: " << dist_coeffs.at<double>(0,7) << std::endl;
-        //        debout << dist_coeffs << endl;
 
         // set calibration values
         mControlWidget->setCalibFxValue(camera_matrix.at<double>(0,0));
