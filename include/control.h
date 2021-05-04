@@ -24,6 +24,7 @@
 #include <QtWidgets>
 
 #include "ui_control.h"
+#include "recognition.h"
 
 class Petrack;
 //class Image;
@@ -219,10 +220,10 @@ public:
         return mMainWindow;
     }
 
-    // 0 == Kaserne, 1 == Hermes, 2 == Ohne, 3 == Color, 4 == Japan
-    inline int getRecoMethod()
+    inline reco::RecognitionMethod getRecoMethod() const
     {
-        return recoMethod->currentIndex();
+        auto method = recoMethod->itemData(recoMethod->currentIndex());
+        return method.value<reco::RecognitionMethod>();
     }
 
 private slots:

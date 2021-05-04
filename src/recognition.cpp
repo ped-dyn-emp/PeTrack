@@ -1063,11 +1063,11 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control 
     Petrack *mainWindow = controlWidget->getMainWindow();
 
     int bS = mainWindow->getImageBorderSize();
-    int recoMethod = controlWidget->getRecoMethod();
+    auto recoMethod = controlWidget->getRecoMethod();
 
     if (controlWidget->getCalibCoordDimension() == 0) // 3D
     {
-        if (recoMethod == 6)  // for usage of codemarker with CodeMarker-function (-> without MulticolorMarker)
+        if (recoMethod == RecognitionMethod::Code)  // for usage of codemarker with CodeMarker-function (-> without MulticolorMarker)
         {
             QRect rect(myRound(mainWindow->getRecoRoiItem()->rect().x()),//+controlWidget->getMainWindow()->getImageBorderSize()),
                        myRound(mainWindow->getRecoRoiItem()->rect().y()),//+controlWidget->getMainWindow()->getImageBorderSize()),
@@ -1087,7 +1087,7 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control 
             maxMarkerPerimeterRate = (codeMarkerWidget->maxMarkerPerimeter->value()*4./cmPerPixel_min)/std::max(rect.width(),rect.height());
         }
 
-        if (recoMethod == 5)   // for usage of codemarker with MulticolorMarker
+        if (recoMethod == RecognitionMethod::MultiColor)   // for usage of codemarker with MulticolorMarker
         {
             QRect rect(0,0, img.rows, img.cols);
 
@@ -1189,7 +1189,7 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control 
 //#endif
 }
 
-void findContourMarker(cv::Mat &img, QList<TrackPoint> *crossList, int markerBrightness, bool ignoreWithoutMarker, bool autoWB, int recoMethod, float headSize)
+void findContourMarker(cv::Mat &img, QList<TrackPoint> *crossList, int markerBrightness, bool ignoreWithoutMarker, bool autoWB, RecognitionMethod recoMethod, float headSize)
 {
     int threshold, plus, count;
     double angle;
@@ -1453,11 +1453,11 @@ cvWaitKey();
                     //debout << e.area() << " " << fabs(contourArea)<<  endl;
                     //debout << "MyEllipse" << endl;
                     MyEllipse e(box.center.x, box.center.y, box.size.width*0.5, box.size.height*0.5, angle);
-                    if (recoMethod == 0) // Casern
+                    if (recoMethod == RecognitionMethod::Casern) // Casern
                         added = markerCasernList.mayAddEllipse(grayFix, e, (contourArea > 0));
-                    else if (recoMethod == 1) // Hermes
+                    else if (recoMethod == RecognitionMethod::Hermes) // Hermes
                         added = markerHermesList.mayAddEllipse(grayFix, e, (contourArea > 0));
-                    else if (recoMethod == 4) // Japan
+                    else if (recoMethod == RecognitionMethod::Japan) // Japan
                         added = markerJapanList.mayAddEllipse(grayFix, e, (contourArea > 0));
 
                     if (added)
@@ -1576,17 +1576,17 @@ imShow("img2", tmpAusgabe2);
 #endif
 
     //cvReleaseMemStorage()
-    if (recoMethod == 0) // Casern
+    if (recoMethod == RecognitionMethod::Casern) // Casern
     {
         markerCasernList.organize(img, autoWB);
         markerCasernList.toCrossList(crossList, ignoreWithoutMarker);
     }
-    else if (recoMethod == 1) // Hermes
+    else if (recoMethod == RecognitionMethod::Hermes) // Hermes
     {
         markerHermesList.organize(img, autoWB);
         markerHermesList.toCrossList(crossList, ignoreWithoutMarker);
     }
-    else if (recoMethod == 4) // Japan
+    else if (recoMethod == RecognitionMethod::Japan) // Japan
     {
         markerJapanList.organize(img, autoWB);
         markerJapanList.toCrossList(crossList, ignoreWithoutMarker);
@@ -1627,13 +1627,13 @@ void getMarkerPos(cv::Mat &img, QRect &roi, QList<TrackPoint> *crossList, Contro
     int markerBrightness = controlWidget->markerBrightness->value();
     bool ignoreWithoutMarker = (controlWidget->markerIgnoreWithout->checkState() == Qt::Checked);
     bool autoWB = (controlWidget->recoAutoWB->checkState() == Qt::Checked);
-    int recoMethod = controlWidget->getRecoMethod();
+    auto recoMethod = controlWidget->getRecoMethod();
 
     cv::Mat tImg;
     cv::Rect rect;
     //debout << "recoMethod: " << recoMethod << endl;
 //    tImg = getRoi(img, roi, rect, !((recoMethod == 3)||(recoMethod == 5)||(recoMethod == 6)));
-    tImg = getRoi(img, roi, rect, !((recoMethod == 3) || (recoMethod == 5) || (recoMethod == 6)));
+    tImg = getRoi(img, roi, rect, !((recoMethod == RecognitionMethod::Color) || (recoMethod == RecognitionMethod::MultiColor) || (recoMethod == RecognitionMethod::Code)));
 
     if (tImg.empty())
         return;
@@ -1641,12 +1641,11 @@ void getMarkerPos(cv::Mat &img, QRect &roi, QList<TrackPoint> *crossList, Contro
     // offset of rect
     Vec2F v(rect.x-borderSize, rect.y-borderSize);
     //debout << "method: " << recoMethod << endl;
-    // 0 == Kaserne, 1 == Hermes, 2 == Ohne, 3 == Color, 4 == Japan, 5 == MultiColor, 6 == CodeMarker
-    if (recoMethod == 5)
+    if (recoMethod == RecognitionMethod::MultiColor)
         findMultiColorMarker(tImg, crossList, controlWidget, ignoreWithoutMarker, v);
-    else if (recoMethod == 3)
+    else if (recoMethod == RecognitionMethod::Color)
         findColorMarker(tImg, crossList, controlWidget);
-    else if (recoMethod == 6)
+    else if (recoMethod == RecognitionMethod::Code)
         findCodeMarker(tImg, crossList, controlWidget);
     else
         findContourMarker(tImg, crossList, markerBrightness, ignoreWithoutMarker, autoWB, recoMethod, controlWidget->getMainWindow()->getHeadSize());

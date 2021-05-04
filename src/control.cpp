@@ -156,15 +156,16 @@ Control::Control(QWidget *parent)
 
     mIndexChanging = true;
 
-    recoMethod->addItem("marker casern"); // 0
-    recoMethod->addItem("marker hermes"); // 1
-    recoMethod->addItem("without marker"); // 2
-    recoMethod->addItem("color marker"); // 3
-    recoMethod->addItem("marker Japan"); // 4
-    recoMethod->addItem("multicolor marker"); // 5
-    recoMethod->addItem("code marker"); // 6
+    recoMethod->addItem("marker casern", QVariant::fromValue(reco::RecognitionMethod::Casern));
+    recoMethod->addItem("marker hermes", QVariant::fromValue(reco::RecognitionMethod::Hermes));
+    recoMethod->addItem("stereo", QVariant::fromValue(reco::RecognitionMethod::Stereo));
+    recoMethod->addItem("color marker", QVariant::fromValue(reco::RecognitionMethod::Color));
+    recoMethod->addItem("marker Japan", QVariant::fromValue(reco::RecognitionMethod::Japan));
+    recoMethod->addItem("multicolor marker", QVariant::fromValue(reco::RecognitionMethod::MultiColor));
+    recoMethod->addItem("code marker", QVariant::fromValue(reco::RecognitionMethod::Code));
 
-    recoMethod->setCurrentIndex(5); // default multicolor marker (until 11/2016 hermes marker)
+    // default multicolor marker (until 11/2016 hermes marker)
+    recoMethod->setCurrentIndex(recoMethod->findData(QVariant::fromValue(reco::RecognitionMethod::MultiColor)));
 
     scrollArea->setMinimumWidth(
         scrollAreaWidgetContents->sizeHint().width() +
@@ -1364,14 +1365,23 @@ void Control::on_recoSymbolSize_valueChanged(int index)
 }
 void Control::on_recoStereoShow_clicked()
 {
-    if (recoMethod->currentIndex() == 5)
+    auto selectedRecognitionMethod = getRecoMethod();
+    if ( selectedRecognitionMethod == reco::RecognitionMethod::MultiColor)
+    {
         mMainWindow->getMultiColorMarkerWidget()->show();
-    else if (recoMethod->currentIndex() == 3)
+    }
+    else if (selectedRecognitionMethod == reco::RecognitionMethod::Color)
+    {
         mMainWindow->getColorMarkerWidget()->show();
-    else if (recoMethod->currentIndex() == 6)
+    }
+    else if (selectedRecognitionMethod == reco::RecognitionMethod::Code)
+    {
         mMainWindow->getCodeMarkerWidget()->show();
+    }
     else
+    {
         mMainWindow->getStereoWidget()->show();
+    }
 }
 
 void Control::on_mapColorRange_clicked()
@@ -2426,7 +2436,8 @@ void Control::setXml(QDomElement &elem)
 
         subSubElem = (elem.ownerDocument()).createElement("PERFORM");
         subSubElem.setAttribute("ENABLED", performRecognition->isChecked());
-        subSubElem.setAttribute("METHOD", recoMethod->currentIndex());
+        subSubElem.setAttribute("METHOD",
+                static_cast<int>(recoMethod->itemData(recoMethod->currentIndex()).value<reco::RecognitionMethod>()));
         subSubElem.setAttribute("STEP", recoStep->value());
         subElem.appendChild(subSubElem);
 
@@ -2953,7 +2964,15 @@ void Control::getXml(QDomElement &elem)
                     if (subSubElem.hasAttribute("ENABLED"))
                         performRecognition->setCheckState(subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     if (subSubElem.hasAttribute("METHOD"))
-                        recoMethod->setCurrentIndex(subSubElem.attribute("METHOD").toInt());
+                    {
+                        auto recognitionMethod = static_cast<reco::RecognitionMethod>(subSubElem.attribute("METHOD").toInt());
+                        auto foundIndex = recoMethod->findData(QVariant::fromValue(recognitionMethod));
+                        if (foundIndex == -1)
+                        {
+                            throw std::invalid_argument("Recognition Method could not be found, please check your input");
+                        }
+                        recoMethod->setCurrentIndex(foundIndex);
+                    }
                     if (subSubElem.hasAttribute("STEP"))
                         recoStep->setValue(subSubElem.attribute("STEP").toInt());
                 }

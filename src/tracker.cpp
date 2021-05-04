@@ -1135,7 +1135,7 @@ bool Tracker::addPoint(TrackPoint &p, int frame, const QSet<int>& onlyVisible, i
     // skalierungsfaktor fuer kopfgroesse
     // fuer multicolor marker groesser, da der schwarze punkt weit am rand liegen kann
     bool multiColorWithDot = false;
-    if (mMainWindow->getControlWidget()->getRecoMethod() == 5 && // multicolor marker
+    if (mMainWindow->getControlWidget()->getRecoMethod() == reco::RecognitionMethod::MultiColor && // multicolor marker
         mMainWindow->getMultiColorMarkerWidget()->useDot->isChecked() && // nutzung von black dot
         !mMainWindow->getMultiColorMarkerWidget()->ignoreWithoutDot->isChecked()) // muetzen ohne black dot werden auch akzeptiert
     {
@@ -1618,8 +1618,8 @@ int Tracker::track(cv::Mat &img, cv::Rect &rect, int frame, bool reTrack, int re
 
         // (bei schlechten, aber noch ertraeglichem fehler in der naehe dunkelsten punkt suchen)
         // dieser ansatz kann dazu fuehren, dass bei starken helligkeitsunterschieden auf pappe zum schatten gewandert wird!!!
-        int recoMethod = mMainWindow->getControlWidget()->getRecoMethod(); // 0 == Kaserne, 1 == Hermes, 2 == Ohne, 3 == Color, 4 == Japan
-        if (!mMainWindow->getStereoWidget()->stereoUseForReco->isChecked() && ((recoMethod == 0)|| (recoMethod == 1))) // nicht benutzen, wenn ueber disparity der kopf gesucht wird und somit kein marker vorhanden oder zumindest nicht am punkt lewigen muss
+        auto recoMethod = mMainWindow->getControlWidget()->getRecoMethod();
+        if (!mMainWindow->getStereoWidget()->stereoUseForReco->isChecked() && ((recoMethod == reco::RecognitionMethod::Casern)|| (recoMethod == reco::RecognitionMethod::Hermes))) // nicht benutzen, wenn ueber disparity der kopf gesucht wird und somit kein marker vorhanden oder zumindest nicht am punkt lewigen muss
         {
             refineViaNearDarkPoint();
         }

@@ -2084,8 +2084,9 @@ void Petrack::resetUI()
     mControlWidget->roiShow->setCheckState(Qt::Unchecked);
     getRecoRoiItem()->setRect(0,0,0,0);
 
-    // marker
-    mControlWidget->recoMethod->setCurrentIndex(5);
+    // marker, default multicolor marker (until 11/2016 hermes marker)
+    mControlWidget->recoMethod->setCurrentIndex(
+            mControlWidget->recoMethod->findData(QVariant::fromValue(reco::RecognitionMethod::MultiColor)));
     mControlWidget->markerBrightness->setValue(100);
     mControlWidget->markerIgnoreWithout->setCheckState(Qt::Checked);
 
@@ -2807,7 +2808,7 @@ void Petrack::testTracker()
 
 int Petrack::calculateRealTracker()
 {
-    bool autoCorrectOnlyExport = (mControlWidget->getRecoMethod() == 5) && // multicolor
+    bool autoCorrectOnlyExport = (mControlWidget->getRecoMethod() == reco::RecognitionMethod::MultiColor) && // multicolor
             mMultiColorMarkerWidget->autoCorrect->isChecked() &&
             mMultiColorMarkerWidget->autoCorrectOnlyExport->isChecked();
     //int anz = mTrackerReal->calculate(mTracker, mImageItem, mControlWidget->getColorPlot(), getImageBorderSize(), mControlWidget->anaMissingFrames->checkState());
@@ -3061,7 +3062,7 @@ void Petrack::exportTracker(QString dest) //default = ""
         if (!dest.isEmpty())
         {
             QList<int> pers, frame;
-            bool autoCorrectOnlyExport = (mControlWidget->getRecoMethod() == 5) && // multicolor
+            bool autoCorrectOnlyExport = (mControlWidget->getRecoMethod() == reco::RecognitionMethod::MultiColor) && // multicolor
                     mMultiColorMarkerWidget->autoCorrect->isChecked() &&
                     mMultiColorMarkerWidget->autoCorrectOnlyExport->isChecked();
 
@@ -3774,13 +3775,15 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                            myRound(mRecognitionRoiItem->rect().height()));
                 QList<TrackPoint> persList;
 //                bool markerLess = true;
-                int recoMethod = mControlWidget->getRecoMethod();
+                auto recoMethod = mControlWidget->getRecoMethod();
 #ifdef TIME_MEASUREMENT
                 //        "==========: "
                 debout << "vor   reco: " << getElapsedTime() <<endl;
 #endif
-                if ((recoMethod == 0) || (recoMethod == 1) || (recoMethod == 3) || (recoMethod == 4) || (recoMethod == 5) || (recoMethod == 6)) //else
-                { // 0 == Kaserne, 1 == Hermes, 2 == Ohne, 3 == Color, 4 == Japan, 5 == MultiColor, 6 == CodeMarker
+                if ((recoMethod == reco::RecognitionMethod::Casern) || (recoMethod == reco::RecognitionMethod::Hermes)
+                || (recoMethod == reco::RecognitionMethod::Color) || (recoMethod == reco::RecognitionMethod::Japan)
+                || (recoMethod == reco::RecognitionMethod::MultiColor) || (recoMethod == reco::RecognitionMethod::Code)) //else
+                {
                     // persList == crossList
                     //                    getMarkerPos(mIplImgFiltered, rect, &persList, mControlWidget->markerBrightness->value(),
                     //                                getImageBorderSize(), (mControlWidget->markerIgnoreWithout->checkState() == Qt::Checked),

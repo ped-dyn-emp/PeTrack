@@ -32,6 +32,22 @@ class Control;
 class ImageItem;
 
 namespace reco {
+    /**
+     * Different recognition methods used in PeTrack
+     *
+     * Note: be aware that changing the explicitly assigned integer values will break backwards compatibility!
+     */
+    enum class RecognitionMethod
+    {
+        Casern = 0,
+        Hermes = 1,
+        Stereo = 2,
+        Color = 3,
+        Japan = 4,
+        MultiColor = 5,
+        Code = 6,
+    };
+
     // berechnet pixelverschiebung aufgrund von schraegsicht bei einem farbmarker
     // Maik Dissertation Seite 138
     // boxImageCentre ohne Border
@@ -97,4 +113,6 @@ namespace reco {
         cv::Ptr<cv::aruco::Dictionary> getDictMip36h12();
     }
 }
+
+Q_DECLARE_METATYPE(reco::RecognitionMethod)
 #endif
