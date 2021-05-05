@@ -2528,7 +2528,7 @@ void Control::setXml(QDomElement &elem)
         subElem.appendChild(subSubElem);
 
         subSubElem = (elem.ownerDocument()).createElement("ONLY_VISIBLE");
-        subSubElem.setAttribute("ENABLED", trackOnlyVisible->isChecked());
+        subSubElem.setAttribute("ENABLED", trackOnlySelected->isChecked());
         subElem.appendChild(subSubElem);
 
         subSubElem = (elem.ownerDocument()).createElement("REGION_OF_INTEREST");
@@ -3148,7 +3148,7 @@ void Control::getXml(QDomElement &elem)
                 else if (subSubElem.tagName() == "ONLY_VISIBLE")
                 {
                     if (subSubElem.hasAttribute("ENABLED"))
-                        trackOnlyVisible->setCheckState(subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                        trackOnlySelected->setCheckState(subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                 }
                 else if (subSubElem.tagName() == "SEARCH_MISSING_FRAMES")
                 {
