@@ -919,8 +919,6 @@ bool Animation::openAnimationVideo(QString fileName)
     }
     else
     {
-        // Destroy anything that was before
-        free();
 #ifndef STEREO_DISABLED
         if (mCaptureStereo)
         {
