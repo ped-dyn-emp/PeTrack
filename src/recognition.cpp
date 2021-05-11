@@ -203,6 +203,19 @@ Vec2F autoCorrectColorMarker(Vec2F &boxImageCentre, Control *controlWidget)
     ColorParameters	param;
 
     setColorParameter(options.fromColor, options.toColor, options.invHue, param);
+    // Marker Color is set according to the color which is searched
+    // Calculating is only neccessary for casern-marker like markers
+    const QColor markerColor = [param](){
+        if (param.inversHue)
+        {
+        return QColor::fromHsv(2*((param.h_low+(param.h_high-param.h_low)/2+90)%180),
+                               (param.s_high + param.s_low)/2,
+                               (param.v_high + param.v_low)/2);
+        }
+        return QColor::fromHsv(2*(param.h_low+(param.h_high-param.h_low)/2),
+                               (param.s_high + param.s_low)/2,
+                               (param.v_high + param.v_low)/2);
+        }(); // Lambda so markerColor can be const
 
     cv::Mat img = options.img;
     cv::Mat binary = options.binary;
@@ -261,31 +274,13 @@ Vec2F autoCorrectColorMarker(Vec2F &boxImageCentre, Control *controlWidget)
             continue;
         }
 
-        int cx = static_cast<int>(std::lround(box.center.x));
-        int cy = static_cast<int>(std::lround(box.center.y));
-        int add = static_cast<int>(std::min(box.size.height,box.size.width)/4);
-
-        QColor col, col2;
-        // color for hat measured at 3 points
-        col.setRgb(getValue(img,cx,cy).rgb());
-        col2.setRgb(getValue(img,cx+add,cy).rgb());
-        if (col.value()<col2.value()) // take brighter color
-        {
-            col = col2;
-        }
-        col2.setRgb(getValue(img,cx-add,cy).rgb());
-        if (col.value()<col2.value()) // take brighter color
-        {
-            col = col2;
-        }
-
         // centre of rect in the coordinates of the whole image (instead of ROI)
         Vec2F boxImageCentre = options.offset;
         boxImageCentre.setX(boxImageCentre.x()+static_cast<double>(box.center.x));
         boxImageCentre.setY(boxImageCentre.y()+static_cast<double>(box.center.y));
 
         // TODO maybe use move constructor to increase perf for contour(then not const anymore)
-        colorBlobs.push_back({box, boxImageCentre, col, contour, static_cast<double>(maxExpansion)});
+        colorBlobs.push_back({box, boxImageCentre, markerColor, contour, static_cast<double>(maxExpansion)});
     }
     return colorBlobs;
 }

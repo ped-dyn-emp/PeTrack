@@ -151,7 +151,7 @@ class TestTrackerTxt:
                 min_diff = -1
                 for test_person in test_file:
                     diff = self.calc_diff(truth_person, test_person)
-                    if min_diff == -1:
+                    if min_diff == -1 and diff < self.MAX_DIFF:
                         min_diff = diff
                         match = test_person
                     elif diff < min_diff and diff < self.MAX_DIFF:
@@ -212,4 +212,4 @@ class TestTrackerTxt:
             return self.MAX_DIFF
 
 # tester = TestTrackerTxt()
-# tester.test_e2e_via_txt(("markerJapan_test", "markerJapan_truth"))
+# tester.test_e2e_via_txt(("./blackdotMarker_test", "./blackdotMarker_truth"))
