@@ -50,8 +50,10 @@ class GridItem;
 enum Camera {cameraLeft, cameraRight, cameraUnset};
 #endif
 
-#define HEAD_SIZE 21. // durchschnittliche Kopflaenge in cm (Kopf 21x14)
-#define AXIS_MARKERS_LENGTH 10
+// durchschnittliche Kopflaenge in cm (Kopf 21x14)
+inline constexpr double HEAD_SIZE = 21.;
+
+inline constexpr int AXIS_MARKERS_LENGTH = 10;
 
 class QAction;
 class QActionGroup;

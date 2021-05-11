@@ -28,12 +28,22 @@
 #include "vector.h"
 #include "petrack.h"
 
-#define EXTRAPOLATE_FACTOR 3. // war 1.5, aber bei bildauslassungen kann es ungewollt zuschlagen (bei 3 ist ein ausgelassener frame mgl, bei 2 wieder ein problem)
-#define MAX_COUNT 1500 // maximale anzahl an gleichzeitig getrackten personen
-#define MAX_STEP_TRACK 5 // maximale zahl an frames zwischen denen noch getrackt wird
-#define MAX_TRACK_ERROR 200 // maximaler fehler beim tracken, so das noch punkt hinzugefuegt wird
-                            // um am ende des tracking nicht am bildrand herumzukrakseln!
-#define MIN_HEIGHT -100000. // minimale Personengroesse zur Identifizierung, dass Hoehe nicht gesetz, war -1, was aber an Treppen schlecht war
+// war 1.5, aber bei bildauslassungen kann es ungewollt zuschlagen (bei 3 ist ein ausgelassener frame mgl, bei 2 wieder ein problem)
+inline constexpr double EXTRAPOLATE_FACTOR = 3.;
+
+// maximale anzahl an gleichzeitig getrackten personen
+inline constexpr int MAX_COUNT = 1500;
+
+// maximale zahl an frames zwischen denen noch getrackt wird
+inline constexpr int MAX_STEP_TRACK = 5;
+
+// maximaler fehler beim tracken, so das noch punkt hinzugefuegt wird
+// um am ende des tracking nicht am bildrand herumzukrakseln!
+inline constexpr float MAX_TRACK_ERROR = 200.F;
+
+// minimale Personengroesse zur Identifizierung, dass Hoehe nicht gesetz, war -1, was aber an Treppen schlecht war
+inline constexpr double MIN_HEIGHT = -100'000.;
+
 
 class TrackPoint : public Vec2F // Vec2F is pixel point in picture
 {

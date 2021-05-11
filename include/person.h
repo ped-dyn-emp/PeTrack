@@ -28,8 +28,8 @@
 #include "backgroundFilter.h"
 #include "tracker.h"
 
-#define STEP_SIZE 5 //10 // Hoehenschritte der Isolinien in cm
-#define DISP_GAP_SIZE_TO_FILL 15 // 15 pixel innerhalb einer Zeile werden linear in disp interpoliert
+inline constexpr int STEP_SIZE = 5; //10 // Hoehenschritte der Isolinien in cm
+inline constexpr int DISP_GAP_SIZE_TO_FILL = 15; // 15 pixel innerhalb einer Zeile werden linear in disp interpoliert
 
 class Person: public QList<MyEllipse> // List is approximated isoline
 {

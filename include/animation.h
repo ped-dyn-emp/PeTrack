@@ -38,7 +38,7 @@
 #include "stereoAviFile.h"
 #endif
 
-#define DEFAULT_FPS 25
+inline constexpr int DEFAULT_FPS = 25;
 
 class Petrack;
 
