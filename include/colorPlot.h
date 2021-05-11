@@ -27,7 +27,7 @@
 
 #include "helper.h"
 
-#define DEFAULT_HEIGHT 180.0
+inline constexpr double DEFAULT_HEIGHT = 180.0;
 
 class ImagePlotItem;
 class Tracker;

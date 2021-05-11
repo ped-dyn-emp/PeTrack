@@ -27,8 +27,8 @@
 
 // Byte Number (nicht alle Zahlen gehen?: 2*1280*960*32*20) enstehen avi mit einem bild
 // unter 2GB fuer reader und unter 4 GB fuer writer bleiben!!!
-#define AVI_FILE_SPLIT_SIZE ( ( 2*1280*960*32*20 ) )
 // 2*1280*960*32*20 = 1,5 GB = 40 Sekunden = 640 Bilder
+inline constexpr int AVI_FILE_SPLIT_SIZE = ( ( 2*1280*960*32*20 ) );
 
 /**
  * A simple wrapper for an .AVI file .

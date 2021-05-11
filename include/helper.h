@@ -63,9 +63,7 @@ inline std::ostream& operator<<(std::ostream& s, const QString& t)
 #define	MAX(a, b) ((a)>(b)?(a):(b))
 #endif
 
-#ifndef PI
-#define PI 3.141592654
-#endif
+inline constexpr double PI = 3.141592654;
 
 // SHARING MAY ALSO WORK:
 //    > IplImage* frame = cvQueryFrame(mCamera);

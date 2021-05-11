@@ -23,15 +23,14 @@
 
 #include <QGraphicsRectItem>
 
-#define DISTANCE_TO_BORDER 5
-#define MIN_SIZE 10
-
 class Petrack;
 class Control;
 
 
 class RecognitionRoiItem : public QGraphicsRectItem
 {
+    inline static constexpr int DISTANCE_TO_BORDER = 5;
+    inline static constexpr int MIN_SIZE = 10;
     enum pressLocation{inside, top, bottom, left, right, topLeft, topRight, bottomLeft, bottomRight};
 
 private:
