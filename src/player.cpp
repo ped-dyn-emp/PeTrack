@@ -27,6 +27,7 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QIntValidator>
+#include <QtConcurrent>
 
 #include "player.h"
 #include "animation.h"
@@ -256,7 +257,10 @@ bool Player::updateImage()
     double time1 = 0.0, tstart;
     tstart = clock();
 #endif
-    mMainWindow->updateImage(mImg);
+
+    QFuture<void> future = QtConcurrent::run([&]() {mMainWindow->updateImage(mImg); });
+    future.waitForFinished();
+
     if (mRec)
     {
         mAviFile.appendFrame((const unsigned char*) mImg.data, true);
@@ -271,7 +275,6 @@ bool Player::updateImage()
     mSlider->setValue(mAnimation->getCurrentFrameNum()); //(1000*mAnimation->getCurrentFrameNum())/mAnimation->getNumFrames());
     mFrameNum->setText(QString().number(mAnimation->getCurrentFrameNum()));
     mSliderSet = false; // reset setSlider here because if value doesnt change than it would not be reset by skiptoframe
-    qApp->processEvents(); // to allow event while playing
 
     return true;
 }
