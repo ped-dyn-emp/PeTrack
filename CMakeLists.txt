@@ -117,7 +117,7 @@ endif ()
 # Qt
 find_package(
   Qt5 5.14
-  COMPONENTS Widgets OpenGL Xml Core PrintSupport
+  COMPONENTS Widgets OpenGL Xml Core PrintSupport Concurrent
   REQUIRED)
 
 # OpenCV
@@ -169,6 +169,7 @@ target_link_libraries(petrack_core PUBLIC
   Qt5::Xml
   Qt5::Core
   Qt5::PrintSupport
+  Qt5::Concurrent
 )
 
 target_include_directories(petrack_core PRIVATE "${CMAKE_SOURCE_DIR}/ui")
