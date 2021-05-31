@@ -44,7 +44,6 @@
 #include "player.h"
 #include "calibFilter.h"
 #include "autoCalib.h"
-#include "recognition.h"
 #include "trackerItem.h"
 #include "backgroundItem.h"
 #include "tracker.h"
@@ -107,7 +106,7 @@ Petrack::Petrack()
     mCalibFilter = new CalibFilter; // schoener waere erst zu erzeugen, wenn video geladen wird, da sonst bei stereo erst normealer und dann stereo objekt erzeugt wird
     mCalibFilter->disable();        // aber control widget greift schon bei erzeugung auf alle objekte zur einstellung zurueck
 
-    mControlWidget = new Control(this);
+    mControlWidget = new Control(*this, mReco);
     cw =  mControlWidget; // muss spaeter geloescht werden
 
     mStereoWidget = new StereoWidget(this);
@@ -2512,7 +2511,7 @@ void Petrack::testTracker()
 
 int Petrack::calculateRealTracker()
 {
-    bool autoCorrectOnlyExport = (mControlWidget->getRecoMethod() == reco::RecognitionMethod::MultiColor) && // multicolor
+    bool autoCorrectOnlyExport = (mReco.getRecoMethod() == reco::RecognitionMethod::MultiColor) && // multicolor
             mMultiColorMarkerWidget->autoCorrect->isChecked() &&
             mMultiColorMarkerWidget->autoCorrectOnlyExport->isChecked();
     int anz = mTrackerReal->calculate(mTracker, mImageItem, mControlWidget->getColorPlot(), getImageBorderSize(),
@@ -2555,7 +2554,7 @@ void Petrack::exportTracker(QString dest) //default = ""
         if (!dest.isEmpty())
         {
             QList<int> pers, frame;
-            bool autoCorrectOnlyExport = (mControlWidget->getRecoMethod() == reco::RecognitionMethod::MultiColor) && // multicolor
+            bool autoCorrectOnlyExport = (mReco.getRecoMethod() == reco::RecognitionMethod::MultiColor) && // multicolor
                     mMultiColorMarkerWidget->autoCorrect->isChecked() &&
                     mMultiColorMarkerWidget->autoCorrectOnlyExport->isChecked();
 
@@ -3135,7 +3134,8 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             int anz = mTracker->track(mImgFiltered, rect, frameNum,
                                       mControlWidget->trackRepeat->isChecked(),
                                       mControlWidget->trackRepeatQual->value(), getImageBorderSize(),
-                                      mControlWidget->trackRegionLevels->value(), getOnlyVisible());
+                                      mReco.getRecoMethod(), mControlWidget->trackRegionLevels->value(),
+                                      getOnlyVisible());
 #ifdef TIME_MEASUREMENT
             debout << "nach track: " << getElapsedTime() <<endl;
 #endif
@@ -3166,7 +3166,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                            myRound(mRecognitionRoiItem->rect().width()),
                            myRound(mRecognitionRoiItem->rect().height()));
                 QList<TrackPoint> persList;
-                auto recoMethod = mControlWidget->getRecoMethod();
+                auto recoMethod = mReco.getRecoMethod();
 #ifdef TIME_MEASUREMENT
                 //        "==========: "
                 debout << "vor   reco: " << getElapsedTime() <<endl;
@@ -3175,20 +3175,20 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                 || (recoMethod == reco::RecognitionMethod::Color) || (recoMethod == reco::RecognitionMethod::Japan)
                 || (recoMethod == reco::RecognitionMethod::MultiColor) || (recoMethod == reco::RecognitionMethod::Code)) //else
                 {
-                    reco::getMarkerPos(mImgFiltered, rect, &persList, mControlWidget, getImageBorderSize(), getBackgroundFilter());
+                    persList = mReco.getMarkerPos(mImgFiltered, rect, mControlWidget, getImageBorderSize(), getBackgroundFilter());
                 }
 #ifndef STEREO_DISABLED
                 if (mStereoContext && mStereoWidget->stereoUseForReco->isChecked())
                 {
                     PersonList pl;
-                    pl.calcPersonPos(mImgFiltered, rect, persList, mStereoContext, getBackgroundFilter(), markerLess);
+                    pl.calcPersonPos(mImgFiltered, rect, &persList, mStereoContext, getBackgroundFilter(), markerLess);
                 }
 #endif
 #ifdef TIME_MEASUREMENT
                 //        "==========: "
                 debout << "nach  reco: " << getElapsedTime() <<endl;
 #endif
-                mTracker->addPoints(persList, frameNum);
+                mTracker->addPoints(persList, frameNum, mReco.getRecoMethod());
 
                 // folgendes lieber im Anschluss, ggf beim exportieren oder statt test direkt del:
                 if (mStereoContext && mStereoWidget->stereoUseForReco->isChecked())
@@ -3459,7 +3459,7 @@ int Petrack::addOrMoveManualTrackPoint(const QPointF& pos)
     int pers = -1;
     TrackPoint tP(Vec2F{pos}, 110); // 110 is higher than 100 (max. quality) and gets clamped to 100 after insertion
     // allows replacemet of every point (check for better quality always passes)
-    mTracker->addPoint(tP, mAnimation->getCurrentFrameNum(), getOnlyVisible(), &pers);
+    mTracker->addPoint(tP, mAnimation->getCurrentFrameNum(), getOnlyVisible(), mReco.getRecoMethod(), &pers);
     updateControlWidget();
     return pers;
 }

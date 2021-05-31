@@ -35,7 +35,7 @@ class Control: public QWidget, public Ui::Control
     Q_OBJECT
 
 public:
-    Control(QWidget *parent = nullptr);
+    Control(QWidget& parent, reco::Recognizer& recognizer);
 
     void setScene(QGraphicsScene *sc);
 
@@ -219,11 +219,9 @@ public:
         return mMainWindow;
     }
 
-    inline reco::RecognitionMethod getRecoMethod() const
-    {
-        auto method = recoMethod->itemData(recoMethod->currentIndex());
-        return method.value<reco::RecognitionMethod>();
-    }
+private:
+    reco::RecognitionMethod getRecoMethod() const;
+
 
 private slots:
     void on_anaCalculate_clicked();
@@ -308,6 +306,8 @@ private slots:
     void on_trackShowBefore_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
     void on_trackShowAfter_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
 
+    void on_recoMethod_currentIndexChanged(int index);
+    void onRecoMethodChanged(reco::RecognitionMethod method);
     void on_performRecognition_stateChanged(int i);
     void on_markerBrightness_valueChanged(int i);
     void on_markerIgnoreWithout_stateChanged(int i);
@@ -413,6 +413,9 @@ private slots:
     void on_trackRoiShow_stateChanged(int arg1);
 
     void on_trackRoiFix_stateChanged(int arg1);
+
+signals:
+    void userChangedRecoMethod(reco::RecognitionMethod method);
 
 private:
     Petrack *mMainWindow;

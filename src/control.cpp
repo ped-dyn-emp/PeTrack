@@ -44,11 +44,11 @@
 
 #define DEFAULT_HEIGHT 180.0
 
-Control::Control(QWidget *parent)
-    : QWidget(parent)
+Control::Control(QWidget& parent, reco::Recognizer& recognizer)
+    : QWidget(&parent)
 {
     setAccessibleName("Control");
-    mMainWindow = (class Petrack*) parent;
+    mMainWindow = (class Petrack*) &parent;
     mScene = nullptr;
     mLoading = false;
     //beim erzeugen von new colorplot absturz!!!!
@@ -164,8 +164,9 @@ Control::Control(QWidget *parent)
     recoMethod->addItem("multicolor marker", QVariant::fromValue(reco::RecognitionMethod::MultiColor));
     recoMethod->addItem("code marker", QVariant::fromValue(reco::RecognitionMethod::Code));
 
-    // default multicolor marker (until 11/2016 hermes marker)
-    recoMethod->setCurrentIndex(recoMethod->findData(QVariant::fromValue(reco::RecognitionMethod::MultiColor)));
+    connect(&recognizer, &reco::Recognizer::recoMethodChanged, this, &Control::onRecoMethodChanged);
+    connect(this, &Control::userChangedRecoMethod, &recognizer, &reco::Recognizer::userChangedRecoMethod);
+    recoMethod->setCurrentIndex(recoMethod->findData(QVariant::fromValue(recognizer.getRecoMethod())));
 
     scrollArea->setMinimumWidth(
         scrollAreaWidgetContents->sizeHint().width() +
@@ -1547,6 +1548,17 @@ void Control::on_performRecognition_stateChanged(int /*i*/)
     mMainWindow->setRecognitionChanged(true);// flag changes of recognition parameters
     if( !mMainWindow->isLoading() )
         mMainWindow->updateImage();
+}
+
+void Control::on_recoMethod_currentIndexChanged(int /*index*/)
+{
+    auto method = recoMethod->itemData(recoMethod->currentIndex());
+    emit userChangedRecoMethod(method.value<reco::RecognitionMethod>());
+}
+
+void Control::onRecoMethodChanged(reco::RecognitionMethod method)
+{
+    recoMethod->setCurrentIndex(recoMethod->findData(QVariant::fromValue(method)));
 }
 
 void Control::on_markerBrightness_valueChanged(int /*i*/)
@@ -3376,6 +3388,12 @@ void Control::getXml(QDomElement &elem)
     mMainWindow->updateCoord();
 }
 
+reco::RecognitionMethod Control::getRecoMethod() const
+{
+    auto method = recoMethod->itemData(recoMethod->currentIndex());
+    return method.value<reco::RecognitionMethod>();
+}
+
 void Control::on_colorPickerButton_clicked(bool checked)
 {
     //true wenn neu gechecked, false wenn wieder abgewählt
@@ -3651,3 +3669,4 @@ void Control::expandRange(QColor& fromColor, QColor& toColor, const QColor& clic
 }
 
 #include "moc_control.cpp"
+

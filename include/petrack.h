@@ -39,6 +39,7 @@
 #include "autoCalib.h"
 #include "coordItem.h"
 #include "extrCalibration.h"
+#include "recognition.h"
 
 class CalibFilter;
 class Animation;
@@ -224,6 +225,10 @@ public:
     inline Control* getControlWidget()
     {
         return mControlWidget;
+    }
+    inline reco::Recognizer& getRecognizer()
+    {
+        return mReco;
     }
     inline StereoWidget* getStereoWidget()
     {
@@ -566,6 +571,8 @@ private:
 
     bool mRecognitionChanged;
     bool mTrackChanged;
+
+    reco::Recognizer mReco;
 
     Tracker *mTracker;
     TrackerReal *mTrackerReal;
