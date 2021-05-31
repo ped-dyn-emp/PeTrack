@@ -949,7 +949,7 @@ int Tracker::calcPosition(int /*frame*/) {
  * @param[out] pers person the point was added to; undefined when new trajectory was created
  * @return true if new trajectory was created; false otherwise
  */
-bool Tracker::addPoint(TrackPoint &p, int frame, const QSet<int>& onlyVisible, int *pers)
+bool Tracker::addPoint(TrackPoint &p, int frame, const QSet<int>& onlyVisible, reco::RecognitionMethod method, int *pers)
 {
     bool found = false;
     int i, iNearest = 0.;
@@ -977,7 +977,7 @@ bool Tracker::addPoint(TrackPoint &p, int frame, const QSet<int>& onlyVisible, i
     // skalierungsfaktor fuer kopfgroesse
     // fuer multicolor marker groesser, da der schwarze punkt weit am rand liegen kann
     bool multiColorWithDot = false;
-    if (mMainWindow->getControlWidget()->getRecoMethod() == reco::RecognitionMethod::MultiColor && // multicolor marker
+    if (method == reco::RecognitionMethod::MultiColor && // multicolor marker
         mMainWindow->getMultiColorMarkerWidget()->useDot->isChecked() && // nutzung von black dot
         !mMainWindow->getMultiColorMarkerWidget()->ignoreWithoutDot->isChecked()) // muetzen ohne black dot werden auch akzeptiert
     {
@@ -1067,7 +1067,7 @@ bool Tracker::addPoint(TrackPoint &p, int frame, const QSet<int>& onlyVisible, i
 }
 
 // used from recognition
-void Tracker::addPoints(QList<TrackPoint> &pL, int frame)
+void Tracker::addPoints(QList<TrackPoint> &pL, int frame, reco::RecognitionMethod method)
 {
     int i;
 
@@ -1078,7 +1078,7 @@ void Tracker::addPoints(QList<TrackPoint> &pL, int frame)
     // ueberprufen ob identisch mit einem Punkt in liste
     for (i = 0; i < pL.size(); ++i) // ueber PointList
     {
-        addPoint(pL[i], frame, QSet<int>());
+        addPoint(pL[i], frame, QSet<int>(), method);
     }
 }
 
@@ -1377,7 +1377,7 @@ bool Tracker::tryMergeTrajectories(const TrackPoint& v, size_t i, int frame)
  * @param errorScaleExponent errorScale is 1.5^errorScaleExponent
  * @return Number of tracked points
  */
-int Tracker::track(cv::Mat &img, cv::Rect &rect, int frame, bool reTrack, int reQual, int borderSize, int level, QSet<int> onlyVisible, int errorScaleExponent)
+int Tracker::track(cv::Mat &img, cv::Rect &rect, int frame, bool reTrack, int reQual, int borderSize, reco::RecognitionMethod recoMethod, int level, QSet<int> onlyVisible, int errorScaleExponent)
 {
     QList<int> trjToDel;
     float errorScale = pow(1.5,errorScaleExponent); // 0 waere neutral
@@ -1436,7 +1436,6 @@ int Tracker::track(cv::Mat &img, cv::Rect &rect, int frame, bool reTrack, int re
 
         // (bei schlechten, aber noch ertraeglichem fehler in der naehe dunkelsten punkt suchen)
         // dieser ansatz kann dazu fuehren, dass bei starken helligkeitsunterschieden auf pappe zum schatten gewandert wird!!!
-        auto recoMethod = mMainWindow->getControlWidget()->getRecoMethod();
         if (!mMainWindow->getStereoWidget()->stereoUseForReco->isChecked() && ((recoMethod == reco::RecognitionMethod::Casern)|| (recoMethod == reco::RecognitionMethod::Hermes))) // nicht benutzen, wenn ueber disparity der kopf gesucht wird und somit kein marker vorhanden oder zumindest nicht am punkt lewigen muss
         {
             refineViaNearDarkPoint();

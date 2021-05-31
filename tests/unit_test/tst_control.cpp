@@ -240,5 +240,5 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
 SCENARIO("Open PeTrack check defaults", "[ui][config]")
 {
     Petrack pet {};
-    REQUIRE(pet.getControlWidget()->getRecoMethod() == reco::RecognitionMethod::MultiColor);
+    REQUIRE(pet.getRecognizer().getRecoMethod() == reco::RecognitionMethod::MultiColor);
 }

@@ -464,10 +464,10 @@ public:
     // true, if new traj is inserted with point p and initial frame frame
     // p in pixel coord
     // pers wird gesetzt, wenn existierender trackpoint einer person verschoben wird
-    bool addPoint(TrackPoint &p, int frame, const QSet<int>& onlyVisible, int *pers = nullptr);
+    bool addPoint(TrackPoint &p, int frame, const QSet<int>& onlyVisible, reco::RecognitionMethod method, int *pers = nullptr);
 
     // hier sollte direkt die farbe mit uebergeben werden
-    void addPoints(QList<TrackPoint> &pL, int frame);
+    void addPoints(QList<TrackPoint> &pL, int frame, reco::RecognitionMethod method);
 
     // calculate height of person
 
@@ -484,7 +484,7 @@ public:
     int insertFeaturePoints(int frame, size_t count, cv::Mat &img, int borderSize, float errorScale);
 
     // frame ist frame fuer naechsten prev frame
-    int track(cv::Mat &img,cv::Rect &rect, int frame, bool reTrack, int reQual, int borderSize, int level=3, QSet<int> onlyVisible = QSet<int>(), int errorScaleExponent=0);
+    int track(cv::Mat &img, cv::Rect &rect, int frame, bool reTrack, int reQual, int borderSize,  reco::RecognitionMethod recoMethod, int level=3, QSet<int> onlyVisible = QSet<int>(), int errorScaleExponent=0);
 
 
     void checkPlausibility(QList<int> &pers, QList<int> &frame,

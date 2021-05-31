@@ -579,7 +579,7 @@ void detail::refineWithAruco(std::vector<ColorBlob> &blobs, const cv::Mat& img, 
 
         if (subImg.empty())
             continue;
-        findCodeMarker(subImg, &crossList, controlWidget, offsetCropRect2Roi);
+        findCodeMarker(subImg, crossList, controlWidget, options.method, offsetCropRect2Roi);
 
         // The next three statements each:
         // - set the offset of subImg with regards to ROI //(ROI to original image is archieved later in the code for all methods)
@@ -647,7 +647,7 @@ void detail::refineWithAruco(std::vector<ColorBlob> &blobs, const cv::Mat& img, 
  * @param ignoreWithoutMarker (is ignored->overwritten by cmWidget->ignoreWithoutDot->isChecked())
  * @param offset
  */
-void findMultiColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, bool ignoreWithoutMarker, Vec2F &offset)
+void findMultiColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *controlWidget, bool ignoreWithoutMarker, Vec2F &offset, RecognitionMethod method)
 {
     Petrack *mainWindow = controlWidget->getMainWindow();
     MultiColorMarkerItem* cmItem = mainWindow->getMultiColorMarkerItem();
@@ -720,7 +720,7 @@ void findMultiColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *c
             options.imageItem = mainWindow->getImageItem();
 
             // adds to crosslist
-            refineWithBlackDot(blobs, img, *crossList, options);
+            refineWithBlackDot(blobs, img, crossList, options);
         }else if (useCodeMarker)
         {
             ArucoOptions options;
@@ -728,9 +728,10 @@ void findMultiColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *c
             options.autoCorrectOnlyExport = autoCorrectOnlyExport;
             options.ignoreWithoutMarker = ignoreWithoutMarker;
             options.controlWidget = controlWidget;
+            options.method = method;
 
             // adds to crosslist
-            refineWithAruco(blobs, img, *crossList, options);
+            refineWithAruco(blobs, img, crossList, options);
         }else
         {
             Vec2F moveDir;
@@ -740,11 +741,11 @@ void findMultiColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *c
                 {
                     moveDir = autoCorrectColorMarker(blob.imageCenter, controlWidget);
 
-                    crossList->append(TrackPoint(Vec2F(blob.box.center.x, blob.box.center.y)+moveDir, 100, Vec2F(blob.box.center.x, blob.box.center.y), blob.color)); // 100 beste qualitaet
+                    crossList.append(TrackPoint(Vec2F(blob.box.center.x, blob.box.center.y)+moveDir, 100, Vec2F(blob.box.center.x, blob.box.center.y), blob.color)); // 100 beste qualitaet
                 }
                 else
                 {
-                    crossList->append(TrackPoint(Vec2F(blob.box.center.x, blob.box.center.y), 100, Vec2F(blob.box.center.x, blob.box.center.y), blob.color)); // 100 beste qualitaet
+                    crossList.append(TrackPoint(Vec2F(blob.box.center.x, blob.box.center.y), 100, Vec2F(blob.box.center.x, blob.box.center.y), blob.color)); // 100 beste qualitaet
                 }
             }
         }
@@ -761,7 +762,7 @@ void findMultiColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *c
  * @param crossList
  * @param controlWidget
  */
-void findColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *controlWidget)
+void findColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *controlWidget)
 {
     ColorParameters	param;
     ColorMarkerItem*     cmItem = controlWidget->getMainWindow()->getColorMarkerItem();
@@ -840,7 +841,7 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *contro
         {
             // eine mittelung waere ggf sinnvoll, aber am rand aufpassen
             col.setRgb(getValue(img,myRound(box.center.x),myRound(box.center.y)).rgb());
-            crossList->append(TrackPoint(Vec2F(box.center.x, box.center.y), 100, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
+            crossList.append(TrackPoint(Vec2F(box.center.x, box.center.y), 100, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
         }
 
         // take the next contour
@@ -854,7 +855,7 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *contro
  * @param crossList[out] list of detected TrackPoints
  * @param controlWidget
  */
-void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control *controlWidget, Vec2F offsetCropRect2Roi /*=(0,0)*/)
+void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *controlWidget, RecognitionMethod recoMethod, Vec2F offsetCropRect2Roi /*=(0,0)*/)
 {
     CodeMarkerItem* codeMarkerItem = controlWidget->getMainWindow()->getCodeMarkerItem();
     CodeMarkerWidget* codeMarkerWidget = controlWidget->getMainWindow()->getCodeMarkerWidget();
@@ -873,7 +874,6 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control 
     Petrack *mainWindow = controlWidget->getMainWindow();
 
     int bS = mainWindow->getImageBorderSize();
-    auto recoMethod = controlWidget->getRecoMethod();
 
     if (controlWidget->getCalibCoordDimension() == 0) // 3D
     {
@@ -895,9 +895,7 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control 
 
             minMarkerPerimeterRate = (codeMarkerWidget->minMarkerPerimeter->value()*4./cmPerPixel_max)/std::max(rect.width(),rect.height());
             maxMarkerPerimeterRate = (codeMarkerWidget->maxMarkerPerimeter->value()*4./cmPerPixel_min)/std::max(rect.width(),rect.height());
-        }
-
-        if (recoMethod == RecognitionMethod::MultiColor)   // for usage of codemarker with MulticolorMarker
+        } else if (recoMethod == RecognitionMethod::MultiColor)   // for usage of codemarker with MulticolorMarker
         {
             QRect rect(0,0, img.rows, img.cols);
 
@@ -962,7 +960,7 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> *crossList, Control 
         double x = (corners.at(i).at(0).x+corners.at(i).at(1).x+corners.at(i).at(2).x+corners.at(i).at(3).x)*0.25;
         double y = (corners.at(i).at(0).y+corners.at(i).at(1).y+corners.at(i).at(2).y+corners.at(i).at(3).y)*0.25;
 
-        crossList->append(TrackPoint(Vec2F(x,y), 100, ids.at(i))); // 100 beste qualitaet
+        crossList.append(TrackPoint(Vec2F(x,y), 100, ids.at(i))); // 100 beste qualitaet
     }
 }
 
@@ -1076,35 +1074,47 @@ void findContourMarker(cv::Mat &img, QList<TrackPoint> *crossList, int markerBri
  *
  * @param img
  * @param roi Region of interest for recognition
- * @param crossList[out] detected TrackPoints
  * @param controlWidget
  * @param borderSize
  * @param bgFilter
+ *
+ * @return List of detected TrackPoints
  */
-void getMarkerPos(cv::Mat &img, QRect &roi, QList<TrackPoint> *crossList, Control *controlWidget, int borderSize, BackgroundFilter *bgFilter)
+QList<TrackPoint> Recognizer::getMarkerPos(cv::Mat &img, QRect &roi, Control *controlWidget, int borderSize, BackgroundFilter *bgFilter)
 {
     int markerBrightness = controlWidget->markerBrightness->value();
     bool ignoreWithoutMarker = (controlWidget->markerIgnoreWithout->checkState() == Qt::Checked);
     bool autoWB = (controlWidget->recoAutoWB->checkState() == Qt::Checked);
-    auto recoMethod = controlWidget->getRecoMethod();
 
     cv::Mat tImg;
     cv::Rect rect;
-    tImg = getRoi(img, roi, rect, !((recoMethod == RecognitionMethod::Color) || (recoMethod == RecognitionMethod::MultiColor) || (recoMethod == RecognitionMethod::Code)));
+    tImg = getRoi(img, roi, rect, !((mRecoMethod == RecognitionMethod::Color) || (mRecoMethod == RecognitionMethod::MultiColor) || (mRecoMethod == RecognitionMethod::Code)));
 
     if (tImg.empty())
-        return;
+        return QList<TrackPoint>{};
 
+    QList<TrackPoint> crossList;
     // offset of rect
     Vec2F v(rect.x-borderSize, rect.y-borderSize);
-    if (recoMethod == RecognitionMethod::MultiColor)
-        findMultiColorMarker(tImg, crossList, controlWidget, ignoreWithoutMarker, v);
-    else if (recoMethod == RecognitionMethod::Color)
-        findColorMarker(tImg, crossList, controlWidget);
-    else if (recoMethod == RecognitionMethod::Code)
-        findCodeMarker(tImg, crossList, controlWidget);
-    else
-        findContourMarker(tImg, crossList, markerBrightness, ignoreWithoutMarker, autoWB, recoMethod, controlWidget->getMainWindow()->getHeadSize());
+
+    switch (mRecoMethod) {
+        case RecognitionMethod::MultiColor:
+            findMultiColorMarker(tImg, crossList, controlWidget, ignoreWithoutMarker, v, mRecoMethod);
+            break;
+        case RecognitionMethod::Color:
+            findColorMarker(tImg, crossList, controlWidget);
+            break;
+        case RecognitionMethod::Code:
+            findCodeMarker(tImg, crossList, controlWidget, mRecoMethod);
+            break;
+        case RecognitionMethod::Casern: [[fallthrough]];
+        case RecognitionMethod::Hermes: [[fallthrough]];
+        case RecognitionMethod::Japan:
+            findContourMarker(tImg, &crossList, markerBrightness, ignoreWithoutMarker, autoWB, mRecoMethod, controlWidget->getMainWindow()->getHeadSize());
+            break;
+        case RecognitionMethod::Stereo:
+            throw std::invalid_argument("Stereo marker are not handled in getMarkerPos, but in PersonList::calcPersonPos");
+    }
 
     // must be set because else hovermoveevent of recognitionRec moves also the colorMaskItem
     controlWidget->getMainWindow()->getColorMarkerItem()->setRect(v);
@@ -1112,24 +1122,23 @@ void getMarkerPos(cv::Mat &img, QRect &roi, QList<TrackPoint> *crossList, Contro
     controlWidget->getMainWindow()->getMultiColorMarkerItem()->setRect(v);
     // must be set because else hovermoveevent of recognitionRec moves also the colorMaskItem
     controlWidget->getMainWindow()->getCodeMarkerItem()->setRect(v);
+
     // set cross position relative to original image size
-    for (int i=0; i < crossList->size(); ++i)
-    {
-         (*crossList)[i] += v;
-         (*crossList)[i].setColPoint((*crossList)[i].colPoint() + v);
+    for (auto& point : crossList){
+        point += v;
+        point.setColPoint(point.colPoint() + v);
     }
 
     if (bgFilter->getEnabled()) // nur fuer den fall von bgSubtraction durchfuehren
     {
-        for (int i=0; i < crossList->size(); ++i)
-        {
-            if (! bgFilter->isForeground(crossList->at(i).x(), crossList->at(i).y()))
-            {
-                crossList->removeAt(i);
-                --i;
-            }
-        }
+        crossList.erase(
+            std::remove_if(crossList.begin(), crossList.end(), [bgFilter](TrackPoint& tp){
+                return !bgFilter->isForeground(tp.x(), tp.y());
+            }),
+            crossList.end());
     }
+
+    return crossList;
 }
 
 
