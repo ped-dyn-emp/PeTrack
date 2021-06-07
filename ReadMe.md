@@ -4,7 +4,7 @@ Software for tracking pedestrians.
 
 
 ## Installation, Uninstallation:
-To obtain the installer of the latest stable version, follow the steps at https://www.fz-juelich.de/ias/ias-7/EN/Expertise/Software/PeTrack/petrackDownload.html.
+To obtain the installer of the latest stable Windows version, follow the steps at https://www.fz-juelich.de/ias/ias-7/EN/Expertise/Software/PeTrack/petrackDownload.html.
 Afterwards just execute `petrack-installer_<version>.exe` and follow the instructions.
 To uninstall PeTrack execute `Uninstall.exe` in the PeTrack application folder.
 
@@ -17,13 +17,14 @@ petrack -help
 
 Key bindings can be found in the help menu of the program.
 
-For more information see https://www.fz-juelich.de/ias/ias-7/EN/Expertise/Software/PeTrack/petrack.html.
+For more information see https://jugit.fz-juelich.de/ped-dyn-emp/petrack/-/wikis/home.
 
-Normal usage is interactive usage.
+For setting up an extraction process PeTrack is used interactively. 
+To perform the extraction for multiple experiments the command line functionality is useful.
 
 
 ## Example:
-To generate trajectories from a single image sequence starting with frame000.jpg to
+To generate trajectories from a single image sequence starting with frame000.jpg
 with settings stored in project.pet, export tracker file tracker_file and exit
 with saving the project to project.pet again:
 
