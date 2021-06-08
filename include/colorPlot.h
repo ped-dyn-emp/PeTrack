@@ -101,9 +101,9 @@ public:
     {
         return mMapHeight;
     }
-    inline void setMapHeight(double h)
+    inline void setMapHeight(double height)
     {
-        mMapHeight = h;
+        mMapHeight = height;
     }
     inline void setInvHue(bool b)
     {

@@ -3042,7 +3042,7 @@ void Control::getXml(QDomElement &elem)
                             recoColorModel->setCurrentIndex(subSubElem.attribute("MODEL").toInt());
                     }
 
-                    double x=0., y=0., width=0., height=0., mapHeight=DEFAULT_HEIGHT;
+                    double x=0., y=0., width=0., height=0., mapHeightValue=DEFAULT_HEIGHT;
                     bool colored=true, invHue=false;
                     QColor fromCol, toCol;
                     int h=-1, s=-1, v=-1;
@@ -3064,7 +3064,7 @@ void Control::getXml(QDomElement &elem)
                             if (subSubSubElem.hasAttribute("COLORED"))
                                 colored = subSubSubElem.attribute("COLORED").toInt();
                             if (subSubSubElem.hasAttribute("MAP_HEIGHT"))
-                                mapHeight = subSubSubElem.attribute("MAP_HEIGHT").toDouble();
+                                mapHeightValue = subSubSubElem.attribute("MAP_HEIGHT").toDouble();
 
                             if (subSubSubElem.hasAttribute("FROM_HUE"))
                                 h = subSubSubElem.attribute("FROM_HUE").toInt();
@@ -3085,7 +3085,7 @@ void Control::getXml(QDomElement &elem)
                             if (subSubSubElem.hasAttribute("INV_HUE"))
                                 invHue = subSubSubElem.attribute("INV_HUE").toInt();
 
-                            colorPlot->getMapItem()->addMap(x, y, width, height, colored, mapHeight, fromCol, toCol, invHue);
+                            colorPlot->getMapItem()->addMap(x, y, width, height, colored, mapHeightValue, fromCol, toCol, invHue);
 
                         }
 

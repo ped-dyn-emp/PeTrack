@@ -27,24 +27,24 @@ ColorRangeWidget::ColorRangeWidget(QWidget *parent)
     mMainWindow = (class Petrack*) parent;
     mColorPlot = mMainWindow->getControlWidget()->getColorPlot();
 
-    fromHue = 0;
-    fromSat = 0;
-    fromVal = 128;
-    toHue = 359;
-    toSat = 255;
-    toVal = 255;
+    mFromHue = 0;
+    mFromSat = 0;
+    mFromVal = 128;
+    mToHue = 359;
+    mToSat = 255;
+    mToVal = 255;
 
     setupUi(this);
 
-    QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(fromHue).arg(fromSat).arg(fromVal);
+    QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(mFromHue).arg(mFromSat).arg(mFromVal);
     fromColor->setStyleSheet(styleString);
-    styleString = QString("background-color: hsv(%1,%2,%3)").arg(toHue).arg(toSat).arg(toVal);
+    styleString = QString("background-color: hsv(%1,%2,%3)").arg(mToHue).arg(mToSat).arg(mToVal);
     toColor->setStyleSheet(styleString);
 
     QColor col;
-    col = QColor::fromHsv(fromHue, fromSat, fromVal);
+    col = QColor::fromHsv(mFromHue, mFromSat, mFromVal);
     fromTriangle->setColor(col);
-    col.setHsv(toHue, toSat, toVal);
+    col.setHsv(mToHue, mToSat, mToVal);
     toTriangle->setColor(col);
 }
 
@@ -96,12 +96,12 @@ void ColorRangeWidget::setControlWidget(int toHue, int fromHue, int toSat, int f
 
 void ColorRangeWidget::on_fromTriangle_colorChanged(const QColor &col)
 {
-    fromHue = col.hue(); fromSat = col.saturation(); fromVal = col.value();
-    QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(fromHue).arg(fromSat).arg(fromVal);
+    mFromHue = col.hue(); mFromSat = col.saturation(); mFromVal = col.value();
+    QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(mFromHue).arg(mFromSat).arg(mFromVal);
     fromColor->setStyleSheet(styleString);
 
     mColorPlot->getMapItem()->changeActMapFromColor(col);
-    setControlWidget(toHue, fromHue, toSat, fromSat);
+    setControlWidget(mToHue, mFromHue, mToSat, mFromSat);
 
     mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
     if( !mMainWindow->isLoading() )
@@ -109,12 +109,12 @@ void ColorRangeWidget::on_fromTriangle_colorChanged(const QColor &col)
 }
 void ColorRangeWidget::on_toTriangle_colorChanged(const QColor &col)
 {
-    toHue = col.hue(); toSat = col.saturation(); toVal = col.value();
-    QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(toHue).arg(toSat).arg(toVal);
+    mToHue = col.hue(); mToSat = col.saturation(); mToVal = col.value();
+    QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(mToHue).arg(mToSat).arg(mToVal);
     toColor->setStyleSheet(styleString);
 
     mColorPlot->getMapItem()->changeActMapToColor(col);
-    setControlWidget(toHue, fromHue, toSat, fromSat);
+    setControlWidget(mToHue, mFromHue, mToSat, mFromSat);
 
     mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
     if( !mMainWindow->isLoading() )
@@ -127,7 +127,7 @@ void ColorRangeWidget::on_fromColor_clicked()
     // ueber palette war der button ausser initial nicht zu aendern!!!
 
     QColor colBefore;
-    colBefore = QColor::fromHsv(fromHue, fromSat, fromVal);
+    colBefore = QColor::fromHsv(mFromHue, mFromSat, mFromVal);
     QColor col = (QColorDialog::getColor(colBefore, this, "Select color from which value a pixel belongs to marker")).convertTo(QColor::Hsv);
     if (col.isValid() && col != colBefore)
     {
@@ -141,7 +141,7 @@ void ColorRangeWidget::on_toColor_clicked()
     // QWindowsXpStyle uses native theming engine which causes some palette modifications not to have any effect.
     // ueber palette war der button ausser initial nicht zu aendern!!!
     QColor colBefore;
-    colBefore = QColor::fromHsv(toHue, toSat, toVal);
+    colBefore = QColor::fromHsv(mToHue, mToSat, mToVal);
     QColor col = (QColorDialog::getColor(colBefore, this, "Select color to which value a pixel belongs to marker")).convertTo(QColor::Hsv);
     if (col.isValid() && col != colBefore)
     {
@@ -159,8 +159,8 @@ void ColorRangeWidget::setFromColor(const QColor &col)
 {
     if (col.isValid())
     {
-        fromHue = col.hue(); fromSat = col.saturation(); fromVal = col.value();
-        QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(fromHue).arg(fromSat).arg(fromVal);
+        mFromHue = col.hue(); mFromSat = col.saturation(); mFromVal = col.value();
+        QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(mFromHue).arg(mFromSat).arg(mFromVal);
         fromColor->setStyleSheet(styleString);
         fromTriangle->setColor(col);
     }
@@ -170,8 +170,8 @@ void ColorRangeWidget::setToColor(const QColor &col)
 {
     if (col.isValid())
     {
-        toHue = col.hue(); toSat = col.saturation(); toVal = col.value();
-        QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(toHue).arg(toSat).arg(toVal);
+        mToHue = col.hue(); mToSat = col.saturation(); mToVal = col.value();
+        QString styleString = QString("background-color: hsv(%1,%2,%3)").arg(mToHue).arg(mToSat).arg(mToVal);
         toColor->setStyleSheet(styleString);
         toTriangle->setColor(col);
     }

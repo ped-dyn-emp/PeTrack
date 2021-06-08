@@ -58,7 +58,7 @@ void copyToQImage(QImage &qImg, cv::Mat &img) // war static functin in animatiol
     if (channels == 3)
     {
         // Needs Qt 5.14 for QImage::Format_BGR888 (saves the color transformation into RGB888)
-        qImg = QImage((const unsigned char*) (img.data),img.cols,img.rows, img.step, QImage::Format_BGR888).copy();
+        qImg = QImage((const unsigned char*) (img.data),img.cols,img.rows, static_cast<int>(img.step), QImage::Format_BGR888).copy();
     }
     else if (channels == 1)
     {

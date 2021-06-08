@@ -966,7 +966,8 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control 
 
 void findContourMarker(cv::Mat &img, QList<TrackPoint> *crossList, int markerBrightness, bool ignoreWithoutMarker, bool autoWB, RecognitionMethod recoMethod, float headSize)
 {
-    int threshold, plus, count;
+    int threshold, plus;
+    size_t count;
     double angle;
     MarkerHermesList markerHermesList;
     MarkerCasernList markerCasernList;

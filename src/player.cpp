@@ -570,7 +570,7 @@ bool Player::skipToFrame() // [0..mAnimation->getNumFrames()-1]
  */
 void Player::update()
 {
-    if (true || !mMainWindow->isLoading())
+    if constexpr (true || !mMainWindow->isLoading())
     {
 
         if( mFrameNum->text().toInt() < mFrameInNum->text().toInt() )

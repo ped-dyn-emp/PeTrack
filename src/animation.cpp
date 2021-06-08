@@ -174,7 +174,7 @@ bool Animation::openTimeFile(QString &timeFileName)
     QFile file(timeFileName);
     int fcycSec=-1, fcycCount=-1; // fuer erstes frame
     int lframe=-1 , lcycSec=-1, lcycCount=-1; // fuer vorangegangenen frame
-    int frame=-1 , cycSec, cycCount, cycOffset, sec, microSec, bufIndex, bufSeqNum, seqNum;
+    int frame=-1 , cycSec=-1, cycCount=-1, cycOffset=-1, sec=-1, microSec=-1, bufIndex=-1, bufSeqNum=-1, seqNum=-1;
     int dum, add=0;
     double fps, dif, difMin=1000., difMax=-1000.;
     int minFrame=-1, maxFrame=-1;
@@ -1058,7 +1058,7 @@ bool Animation::getInfoVideo(QString /*fileName*/)
     mSourceOutFrame = mMaxFrames-1;
 
     // Set videocapture to the last frame if CV_CAP_PROP_POS_FRAMES is supported by used video codec
-    if( mVideoCapture.set(cv::CAP_PROP_POS_FRAMES, mMaxFrames) > 0 )
+    if( mVideoCapture.set(cv::CAP_PROP_POS_FRAMES, mMaxFrames))
     {
         // Set videoCapture to the really correct last frame
         mVideoCapture.set(cv::CAP_PROP_POS_FRAMES, mVideoCapture.get(cv::CAP_PROP_POS_FRAMES)-1);

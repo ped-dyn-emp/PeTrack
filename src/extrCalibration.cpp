@@ -296,7 +296,7 @@ bool ExtrCalibration::fetch2DPoints()
         {
             points2D.clear();
 
-            for(size_t i = 0; i < sz_2d; i++)
+            for(int i = 0; i < static_cast<int>(sz_2d); i++)
             {
                 //debout << "[" << i << "]: (" << mMainWindow->getTracker()->at(i).at(0).x() << ", " << mMainWindow->getTracker()->at(i).at(0).y() << ")" << endl;
                 // Info: Tracker->TrackPerson->TrackPoint->Vec2F
@@ -694,15 +694,15 @@ cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d)
     if( debug )
     {
         std::cout << "\n-.- ESTIMATED ROTATION\n";
-        for ( size_t p=0; p<3; p++ )
+        for ( int p=0; p<3; p++ )
             printf("%20.18f, %20.18f, %20.18f\n",rot_mat.at<double>(p,0),rot_mat.at<double>(p,1),rot_mat.at<double>(p,2));
 
         std::cout << "\n-.- ESTIMATED ROTATION^-1\n";
-        for ( size_t p=0; p<3; p++ )
+        for ( int p=0; p<3; p++ )
             printf("%20.18f, %20.18f, %20.18f\n",rot_inv.at<double>(p,0),rot_inv.at<double>(p,1),rot_inv.at<double>(p,2));
 
         std::cout << "\n-.- ESTIMATED R^-1*R\n";
-        for ( size_t p=0; p<3; p++ )
+        for ( int p=0; p<3; p++ )
             printf("%20.18f, %20.18f, %20.18f\n",e.at<double>(p,0),e.at<double>(p,1),e.at<double>(p,2));
 
         std::cout << "\n-.- ESTIMATED TRANSLATION\n";
@@ -802,15 +802,15 @@ cv::Point3f ExtrCalibration::get3DPoint(cv::Point2f p2d, double h)
         if( debug )
         {
         debout << "\n-.- ESTIMATED ROTATION\n";
-        for ( size_t p=0; p<3; p++ )
+        for ( int p=0; p<3; p++ )
             printf("%20.18f, %20.18f, %20.18f\n",rot_mat.at<double>(p,0),rot_mat.at<double>(p,1),rot_mat.at<double>(p,2));
 
         debout << "\n-.- ESTIMATED ROTATION^-1\n";
-        for ( size_t p=0; p<3; p++ )
+        for ( int p=0; p<3; p++ )
             printf("%20.18f, %20.18f, %20.18f\n",rot_inv.at<double>(p,0),rot_inv.at<double>(p,1),rot_inv.at<double>(p,2));
 
         debout << "\n-.- ESTIMATED R^-1*R\n";
-        for ( size_t p=0; p<3; p++ )
+        for ( int p=0; p<3; p++ )
             printf("%20.18f, %20.18f, %20.18f\n",e.at<double>(p,0),e.at<double>(p,1),e.at<double>(p,2));
 
         debout << "\n-.- ESTIMATED TRANSLATION\n";

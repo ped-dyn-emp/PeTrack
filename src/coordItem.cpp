@@ -388,7 +388,7 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 
             QPointF points[4];
             cv::Point2f p[4];
-            char coordinaten[50];
+            QString coordinaten;
 
             /////////////////////////////////////////////////////
             // Draw a cube (Quader) near coord system          //
@@ -483,14 +483,14 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
                 painter->drawLine(QPointF(max_x, max_y), QPointF(max_x, min_y));
                 painter->drawLine(QPointF(max_x, min_y), QPointF(min_x, min_y));
 
-                sprintf (coordinaten, "(%d, %d)", min_x, min_y);
-                painter->drawText(QPoint(min_x-45, min_y-10), QString(coordinaten));
+                coordinaten = QString::asprintf("(%d, %d)", min_x, min_y);
+                painter->drawText(QPoint(min_x-45, min_y-10), coordinaten);
 
-                sprintf (coordinaten, "%d", max_y-min_y);
-                painter->drawText(QPoint(min_x+10,min_y+(max_y-min_y)/2.0), QString(coordinaten));
+                coordinaten = QString::asprintf("%d", max_y - min_y);
+                painter->drawText(QPoint(min_x+10,min_y+(max_y-min_y)/2.0), coordinaten);
 
-                sprintf (coordinaten, "%d", max_x-min_x);
-                painter->drawText(QPoint(min_x+(max_x-min_x)/2.0,min_y+30), QString(coordinaten));
+                coordinaten = QString::asprintf("%d", max_x - min_x);
+                painter->drawText(QPoint(min_x+(max_x-min_x)/2.0,min_y+30), coordinaten);
             }
 
 
@@ -524,7 +524,7 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
 
             if( debug ) debout << "Ursprungskoordinaten: " << ursprung.x << ", " << ursprung.y << std::endl;
             if( debug ) debout << "Bildsize: " << mMainWindow->getImage()->width() << "x" << mMainWindow->getImage()->height() << std::endl;
-            if( debug ) sprintf (coordinaten, "(%f  %f %f)", tX3D, tY3D, tZ3D);
+            if( debug ) coordinaten = QString::asprintf("(%f  %f %f)", tX3D, tY3D, tZ3D);
 
             //////////////////////////////
             // Drawing the tick-markers //
@@ -574,8 +574,8 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             painter->setBrush(Qt::green);
             painter->setFont(QFont("Arial", 20));
 
-            if( debug ) sprintf (coordinaten, "(%.2f, %.2f)", ursprung.x,ursprung.y);
-            if( debug ) painter->drawText(QPoint(ursprung.x-100,ursprung.y),QString(coordinaten));
+            if( debug ) coordinaten = QString::asprintf("(%.2f, %.2f)", ursprung.x,ursprung.y);
+            if( debug ) painter->drawText(QPoint(ursprung.x-100,ursprung.y),coordinaten);
 
             //////////////////////////////////////////////
             // Drawing the peaks at the end of the axis //
@@ -611,11 +611,11 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             painter->drawLine(points[0],points[2]);
             painter->drawLine(points[2],points[1]);
 
-            if( debug ) sprintf (coordinaten, "(%.2f, %.2f)", p[1].x,p[1].y);
-            if( debug ) painter->drawText(QPoint(p[3].x,p[3].y),QString(coordinaten));
+            if( debug ) coordinaten = QString::asprintf("(% .2f, % .2f)", p[1].x,p[1].y);
+            if( debug ) painter->drawText(QPoint(p[3].x,p[3].y),coordinaten);
 
-            if( debug ) sprintf(coordinaten, "X");
-            if( debug ) painter->drawText(QPoint(p[1].x,p[1].y),QString(coordinaten));
+            if( debug ) coordinaten = QString::fromLatin1("X");
+            if( debug ) painter->drawText(QPoint(p[1].x,p[1].y),coordinaten);
 
             ///////
             // Y //
@@ -645,11 +645,11 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             painter->drawLine(points[0],points[2]);
             painter->drawLine(points[2],points[1]);
 
-            if( debug ) sprintf (coordinaten, "(%.2f, %.2f)", p[1].x,p[1].y);
-            if( debug ) painter->drawText(QPoint(p[3].x,p[3].y),QString(coordinaten));
+            if( debug ) coordinaten = QString::asprintf("(%.2f, %.2f)", p[1].x,p[1].y);
+            if( debug ) painter->drawText(QPoint(p[3].x,p[3].y),coordinaten);
 
-            if( debug ) sprintf(coordinaten, "Y");
-            if( debug ) painter->drawText(QPoint(p[1].x,p[1].y),QString(coordinaten));
+            if( debug ) coordinaten = QString::fromLatin1("Y");
+            if( debug ) painter->drawText(QPoint(p[1].x,p[1].y),coordinaten);
 
             ///////
             // Z //
@@ -679,11 +679,11 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*optio
             painter->drawLine(points[0],points[2]);
             painter->drawLine(points[2],points[1]);
 
-            if( debug )  sprintf (coordinaten, "(%.2f, %.2f)", p[1].x,p[1].y);
-            if( debug ) painter->drawText(QPoint(p[3].x,p[3].y),QString(coordinaten));
+            if( debug ) coordinaten = QString::asprintf("(%.2f, %.2f)", p[1].x,p[1].y);
+            if( debug ) painter->drawText(QPoint(p[3].x,p[3].y),coordinaten);
 
-            if( debug ) sprintf(coordinaten, "Z");
-            if( debug ) painter->drawText(QPoint(p[1].x,p[1].y),QString(coordinaten));
+            if( debug ) coordinaten =  QString::fromLatin1("Z");
+            if( debug ) painter->drawText(QPoint(p[1].x,p[1].y),coordinaten);
 
             }
         }

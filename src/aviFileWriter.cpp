@@ -391,7 +391,7 @@ bool AviFileWriter::checkOpenCVVersion()
 
    //DWORD dwVer = ::VideoForWindowsVersion();
 
-   if( CV_MAJOR_VERSION < 3 )
+   if constexpr ( CV_MAJOR_VERSION < 3 )
    {
       assert( false );  // opencv version too old.
       return false;
