@@ -86,8 +86,8 @@ void TrackPersonReal::init(int firstFrame, double height, int markerID)
 
 void TrackPersonReal::addEnd(const QPointF& pos, int frame)
 {
-    Vec3F p(pos.x(), pos.y(), -1.);
-    addEnd(p, frame);
+    Vec3F point(pos.x(), pos.y(), -1.);
+    addEnd(point, frame);
 }
 void TrackPersonReal::addEnd(const Vec3F& pos, int frame)
 {
@@ -97,11 +97,11 @@ void TrackPersonReal::addEnd(const Vec3F& pos, int frame)
 
 void TrackPersonReal::addEnd(const QPointF& pos, int frame, const QPointF& dir)
 {
-    Vec3F p(pos.x(), pos.y(), -1.);
-    Vec2F d(dir.x(), dir.y());
+    Vec3F point(pos.x(), pos.y(), -1.);
+    Vec2F viewDirection(dir.x(), dir.y());
     ++mLastFrame;
-    d.normalize();
-    append(TrackPointReal(p, frame, d));
+    viewDirection.normalize();
+    append(TrackPointReal(point, frame, viewDirection));
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------
@@ -527,9 +527,9 @@ void TrackerReal::exportTxt(QTextStream &out, bool alternateHeight, bool useTrac
         out << Qt::endl;
 
     if (exportUseM)
-        scale = .01;
+        scale = .01f;
     else
-        scale = 1.;
+        scale = 1.f;
 
     QProgressDialog progress("Export TXT-File",nullptr,0,size(),mMainWindow->window());
     progress.setWindowTitle("Export .txt-File");

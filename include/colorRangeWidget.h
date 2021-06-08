@@ -34,12 +34,12 @@ class ColorRangeWidget: public QWidget, public Ui::ColorRange
 public:
     ColorRangeWidget(QWidget *parent = nullptr);
 
-    int fromHue;
-    int fromSat;
-    int fromVal;
-    int toHue;
-    int toSat;
-    int toVal;
+    int mFromHue;
+    int mFromSat;
+    int mFromVal;
+    int mToHue;
+    int mToSat;
+    int mToVal;
 
     void setInvHue(bool b);
     void setFromColor(const QColor &col);

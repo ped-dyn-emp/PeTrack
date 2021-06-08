@@ -246,9 +246,8 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
     int curFrame = mMainWindow->getAnimation()->getCurrentFrameNum();
     QPen ellipsePen;
     QRectF rect;
-    Vec2F n;
+    Vec2F normalVector;
     cv::Subdiv2D subdiv;
-    int i, j;
     QPen linePen;
     QPen numberPen;
     QPen groundPositionPen;
@@ -303,12 +302,12 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
         y_switch = rightBottom.y < leftTop.y ? abs(leftTop.y-rightBottom.y) : 0;
         debout << "x_offset: " << x_offset << ", y_offset: " << y_offset << ", x_switch: " << x_switch << ", y_switch: " << y_switch << std::endl;
 
-        cv::Rect rect(cv::Rect(leftTop.x+x_offset,leftTop.y+y_offset,x_switch>0 ? x_switch : (rightBottom.x-leftTop.x),y_switch>0 ? y_switch : (rightBottom.y-leftTop.y)));
-        debout << "Rect size: P(" << rect.x << ", " << rect.y << "), width: " << rect.width << ", height: " << rect.height << std::endl;
+        cv::Rect delaunyROI(cv::Rect(leftTop.x+x_offset,leftTop.y+y_offset,x_switch>0 ? x_switch : (rightBottom.x-leftTop.x),y_switch>0 ? y_switch : (rightBottom.y-leftTop.y)));
+        debout << "Rect size: P(" << delaunyROI.x << ", " << delaunyROI.y << "), width: " << delaunyROI.width << ", height: " << delaunyROI.height << std::endl;
 
-        subdiv.initDelaunay(rect);
+        subdiv.initDelaunay(delaunyROI);
     }
-    for (i = 0; i < mTracker->size(); ++i) // ueber TrackPerson
+    for (int i = 0; i < mTracker->size(); ++i) // ueber TrackPerson
     {
         // show current frame
         if ((!(mControlWidget->trackShowOnly->checkState() == Qt::Checked) && !(mControlWidget->trackShowOnlyList->checkState() == Qt::Checked)) ||
@@ -338,7 +337,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                     hS = mMainWindow->winSize(nullptr, i, curFrame);
                     if (hS < 2) 
                         hS = 2; // entspricht Vorgehen in tracker.cpp
-                    for (j = 0; j <= mControlWidget->trackRegionLevels->value(); ++j)
+                    for (int j = 0; j <= mControlWidget->trackRegionLevels->value(); ++j)
                     {
                         rect.setRect(tp.x()-hS/2., tp.y()-hS/2., hS, hS);
                         painter->drawRect(rect);
@@ -367,32 +366,32 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                 {
                     if (tp.color().isValid())
                     {
-                        n = (tp-tp.colPoint()).normal();
-                        n.normalize();
-                        if (n.length()<.001) // wenn to und colpoint aufeinander liegen z bei colorMarker!
-                            n.set(1., 0.);
+                        normalVector = (tp-tp.colPoint()).normal();
+                        normalVector.normalize();
+                        if (normalVector.length()<.001) // wenn to und colpoint aufeinander liegen z bei colorMarker!
+                            normalVector.set(1., 0.);
                     }
                     else
                     {
                         // man koennte auch lastNormal von anderem trackpath nehmen statt 1, 0
-                        n.set(1., 0.);
+                        normalVector.set(1., 0.);
                         // den vorherigen trackpoint finden, wo reco farbe erzeugt hat und somit colpoint vorliegt
-                        for (j = curFrame-mTracker->at(i).firstFrame(); j > -1; --j)
+                        for (int j = curFrame-mTracker->at(i).firstFrame(); j > -1; --j)
                             if (mTracker->at(i).at(j).color().isValid())
                             {
-                                n = (mTracker->at(i).at(j)-mTracker->at(i).at(j).colPoint()).normal();
-                                n.normalize();
+                                normalVector = (mTracker->at(i).at(j)-mTracker->at(i).at(j).colPoint()).normal();
+                                normalVector.normalize();
                                 break;
                             }
                         // einen nachfolgenden trackpoint suchen, wenn vorher keiner mit farbe war
                         // zB wenn rueckwaerts abgespielt wird
-                        if ((n.x()==1.) && (n.y()==0.))
+                        if ((normalVector.x()==1.) && (normalVector.y()==0.))
                         {
-                            for (j = curFrame-mTracker->at(i).firstFrame()+1; j < mTracker->at(i).size(); ++j)
+                            for (int j = curFrame-mTracker->at(i).firstFrame()+1; j < mTracker->at(i).size(); ++j)
                                 if (mTracker->at(i).at(j).color().isValid())
                                 {
-                                    n = (mTracker->at(i).at(j)-mTracker->at(i).at(j).colPoint()).normal();
-                                    n.normalize();
+                                    normalVector = (mTracker->at(i).at(j)-mTracker->at(i).at(j).colPoint()).normal();
+                                    normalVector.normalize();
                                     break;
                                 }
                         }
@@ -419,7 +418,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                 {
                     painter->setPen(Qt::NoPen);
                     painter->setBrush(QBrush(mTracker->at(i).color()));
-                    rect.setRect(tp.x()+(pSP+pSC)*0.6*n.x()-pSC/2., tp.y()+(pSP+pSC)*0.6*n.y()-pSC/2., pSC, pSC); // 11
+                    rect.setRect(tp.x()+(pSP+pSC)*0.6*normalVector.x()-pSC/2., tp.y()+(pSP+pSC)*0.6*normalVector.y()-pSC/2., pSC, pSC); // 11
                     painter->drawEllipse(rect);
                 }
                 else if ((mControlWidget->trackShowColColor->checkState() == Qt::Checked) &&
@@ -430,7 +429,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                     {
                         painter->setPen(numberPen);
                         painter->setBrush(Qt::NoBrush);
-                        rect.setRect(tp.x()+(pSP+pSC)*0.6*n.x()-pSC/2., tp.y()+(pSP+pSC)*0.6*n.y()-pSC/2., 3*pSC, 2.5*pSC); // 11
+                        rect.setRect(tp.x()+(pSP+pSC)*0.6*normalVector.x()-pSC/2., tp.y()+(pSP+pSC)*0.6*normalVector.y()-pSC/2., 3*pSC, 2.5*pSC); // 11
                         if (height < MIN_HEIGHT+1)
                         {
                             if (mControlWidget->getCalibCoordDimension() == 0) // 3D
@@ -450,7 +449,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                     {
                         painter->setPen(numberPen);
                         painter->setBrush(Qt::NoBrush);
-                        rect.setRect(tp.x()+(pSP+pSC)*0.6*n.x()-pSC/2., tp.y()+(pSP+pSC)*0.6*n.y()-pSC/2., 3*pSC, 2*pSC); // 11
+                        rect.setRect(tp.x()+(pSP+pSC)*0.6*normalVector.x()-pSC/2., tp.y()+(pSP+pSC)*0.6*normalVector.y()-pSC/2., 3*pSC, 2*pSC); // 11
                         painter->drawText(rect, Qt::AlignHCenter, QString("%1").arg(height, 6, 'f', 1));
                     }
                     painter->setFont(font);
@@ -460,7 +459,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                     // listennummer
                     painter->setPen(numberPen);
                     painter->setBrush(Qt::NoBrush);
-                    rect.setRect(tp.x()-(pSP+pSN)*0.6*n.x()-pSN, tp.y()-(pSP+pSN)*0.6*n.y()-pSN/2., 2.*pSN, pSN); // 11
+                    rect.setRect(tp.x()-(pSP+pSN)*0.6*normalVector.x()-pSN, tp.y()-(pSP+pSN)*0.6*normalVector.y()-pSN/2., 2.*pSN, pSN); // 11
                     painter->drawText(rect, Qt::AlignHCenter, QString("%1").arg(i+1));
                 }
                 if (mControlWidget->trackShowGroundPosition->checkState() == Qt::Checked)
@@ -540,7 +539,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                     if (to > mTracker->at(i).size())
                         to = mTracker->at(i).size();
                 }
-                for (j = from; j < to; ++j) // ueber TrackPoint
+                for (int j = from; j < to; ++j) // ueber TrackPoint
                 {
                     // path
                     if (mControlWidget->trackShowPath->checkState() == Qt::Checked)
@@ -666,7 +665,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
                 debout << "facets3D.at(" << i << ").at(" << j << ").x = " << facets3D.at(i).at(j).x << ", .y = " << facets3D.at(i).at(j).y << std::endl;
                 debout << "point2D.x = " << point2D.x << " , .y = " << point2D.y << std::endl;
 
-                if ( false && sqrt(pow((facets3D.at(i).at(j).x - centers3D.at(i).x),2) +
+                if constexpr ( false && sqrt(pow((facets3D.at(i).at(j).x - centers3D.at(i).x),2) +
                                    pow((facets3D.at(i).at(j).y - centers3D.at(i).y),2)) > r )
                 {
                     if (circleStarted)

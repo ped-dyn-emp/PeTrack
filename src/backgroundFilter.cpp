@@ -232,7 +232,7 @@ bool BackgroundFilter::load(QString dest) //default = ""
             memmove(&min, bgImg.data, sizeof(float));
             memmove(&max, bgImg.data+sizeof(float), sizeof(float));
 
-            if (sizeof(float) != 4)
+            if constexpr (sizeof(float) != 4)
                 debout << "Warning: the height range coded inside the background picture is not portable!" << std::endl;
 
             // uebetragen der z-werte in 8-bit-bild ---------------------------------------------------------

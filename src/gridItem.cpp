@@ -76,8 +76,8 @@ void GridItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 cv::Point3f p3d_last = extCalib->get3DPoint(cv::Point2f(mouse_x/*event->lastScenePos().x()*/,
                                                                 mouse_y/*event->lastScenePos().y()*/),
                                                         mControlWidget->getCalibGrid3DTransZ());
-                mControlWidget->setCalibGrid3DTransX(gridTrans_x+(mControlWidget->getCalibCoord3DSwapX() > 0 ? -1 : 1)*round(p3d.x-p3d_last.x));
-                mControlWidget->setCalibGrid3DTransY(gridTrans_y+(mControlWidget->getCalibCoord3DSwapY() > 0 ? -1 : 1)*round(p3d.y-p3d_last.y));
+                mControlWidget->setCalibGrid3DTransX(gridTrans_x+(mControlWidget->getCalibCoord3DSwapX() ? -1 : 1)*round(p3d.x-p3d_last.x));
+                mControlWidget->setCalibGrid3DTransY(gridTrans_y+(mControlWidget->getCalibCoord3DSwapY() ? -1 : 1)*round(p3d.y-p3d_last.y));
 
             }else
             {
@@ -479,7 +479,7 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option
 
                 painter->setPen(Qt::red);
 
-                if( false && vanishPointIsInsideImage )
+                if constexpr ( false && vanishPointIsInsideImage )
                 {
                     bool simpleMethod = true;
                     if( simpleMethod ){
