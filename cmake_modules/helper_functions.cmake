@@ -22,10 +22,10 @@ function(get_git_info)
     # VCS info
     ################################################################################
     find_package(Git QUIET)
-    find_program(GIT_SCM git DOC "Git version control")
-    mark_as_advanced(GIT_SCM)
-    find_file(GITDIR NAMES .git PATHS ${CMAKE_SOURCE_DIR} NO_DEFAULT_PATH)
-    if (GIT_SCM AND GITDIR)
+
+    # Returns 0 if the given directory is a git repo
+    execute_process(COMMAND "${GIT_EXECUTABLE}" -C "${CMAKE_SOURCE_DIR}" rev-parse RESULT_VARIABLE in_git_repo)
+    if (in_git_repo EQUAL "0")
         # the commit's SHA1, and whether the building workspace was dirty or not
         # describe --match=NeVeRmAtCh --always --tags --abbrev=40 --dirty
         execute_process(COMMAND
