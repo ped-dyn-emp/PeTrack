@@ -157,7 +157,7 @@ public:
     bool fetch2DPoints();
     void calibExtrParams();
     bool calcReprojectionError();
-    cv::Point2f getImagePoint(cv::Point3f p3d);
+    virtual cv::Point2f getImagePoint(cv::Point3f p3d);
     cv::Point3f get3DPoint(cv::Point2f p2d, double h);
     cv::Point3f transformRT(cv::Point3f p);
     bool isOutsideImage(cv::Point2f p2d);

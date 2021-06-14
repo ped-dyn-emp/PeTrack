@@ -39,6 +39,10 @@
 #include "autoCalib.h"
 #include "coordItem.h"
 #include "extrCalibration.h"
+#include "openMoCapDialog.h"
+#include "moCapPerson.h"
+#include "moCapController.h"
+
 #include "recognition.h"
 
 class CalibFilter;
@@ -86,6 +90,9 @@ class MultiColorMarkerItem;
 class BackgroundItem;
 class Tracker;
 class TrackerReal;
+class MoCapStorage;
+class MoCapItem;
+
 
 class Petrack : public QMainWindow
 {
@@ -128,6 +135,7 @@ public slots:
     void writeXmlElement(QXmlStreamWriter& xmlStream, QDomElement element);
     void openSequence(QString fileName = "");
     void openCameraLiveStream(int camID = -1);
+    void openMoCapFile();
     void saveSequence(bool saveVideo, bool saveView = false, QString dest = "");
     void saveView(QString dest = "");
     void saveImage(QString dest = "");
@@ -197,6 +205,15 @@ public:
     {
         return mProFileName;
     }
+private:
+    inline void setProFileName(const QString& fileName)
+    {
+        // NOTE: Use only the global variant in future?
+        // global one in helper.h because it is needed to use getFileList and shouldn't depend on Petrack
+        proFileName = fileName;
+        mProFileName = fileName;
+    }
+public:
     inline QString getTrackFileName()
     {
         return mTrcFileName;
@@ -301,6 +318,10 @@ public:
     inline BackgroundItem* getBackgroundItem()
     {
         return mBackgroundItem;
+    }
+    inline MoCapItem* getMoCapItem()
+    {
+        return mMoCapItem;
     }
     inline RecognitionRoiItem* getRecoRoiItem()
     {
@@ -410,6 +431,10 @@ public:
     {
         return mShowFPS;
     }
+    inline MoCapController& getMoCapController()
+    {
+        return mMoCapController;
+    }
 
 
     void updateWindowTitle();
@@ -471,6 +496,7 @@ private:
 
     QAction *mOpenSeqAct;
     QAction *mOpenCameraAct;
+    QAction *mOpenMoCapAct;
     QAction *mSaveSeqVidAct;
     QAction *mSaveSeqVidViewAct;
     QAction *mSaveSeqImgAct;
@@ -549,6 +575,7 @@ private:
     CodeMarkerItem *mCodeMarkerItem;
     MultiColorMarkerItem *mMultiColorMarkerItem;
     BackgroundItem *mBackgroundItem;
+    MoCapItem *mMoCapItem;
 
     QDoubleSpinBox *mStatusPosRealHeight;
     QLabel *mStatusLabelStereo;
@@ -586,6 +613,9 @@ private:
     bool mAutoBackTrack;
     bool mAutoTrackOptimizeColor;
     bool mLoading;
+
+    MoCapStorage mStorage;
+    MoCapController mMoCapController {mStorage, mExtrCalibration};
 
 
     QString mPetrackVersion{"Unknown"}; ///< Version of PeTrack used to compile

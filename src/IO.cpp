@@ -18,10 +18,17 @@
  * along with this program.  If not, see <https://cdwww.gnu.org/licenses/>.
  */
 
-#include "IO.h"
 #include <QFile>
 #include <QRegularExpression>
 #include <QTextStream>
+#include <opencv2/opencv.hpp>
+
+#include "IO.h"
+#include "moCapPerson.h"
+#include "skeletonTree.h"
+#include "skeletonTreeFactory.h"
+#include "pMessageBox.h"
+
 
 /**
  * @brief Reads individual heights for markerIDs from file.
@@ -118,6 +125,141 @@ std::variant<std::unordered_map<int, float>, std::string> IO::readHeightFile(con
                + " maybe because of wrong file extension. Needs to be .txt.";
     }
     return "No file provided.";
+}
+
+/**
+ * @brief Delegates the input c3d to the correct method for given system.
+ *
+ * This method calls the correct IO method for the MoCap system.
+ * Currently only XSENS is supported.
+ *
+ * @param storage mMoCapStorage of petrack
+ * @param metadata new MoCapPersonMetadata
+ */
+void IO::readMoCapC3D(MoCapStorage &storage, const MoCapPersonMetadata &metadata)
+{
+    MoCapPerson person;
+    const std::string& filename = metadata.getFilepath();
+    MoCapSystem fp = metadata.getSystem();
+    person.setMetadata(metadata);
+
+    ezc3d::c3d c3d;
+    try
+    {
+        c3d = ezc3d::c3d{filename};
+    }
+    catch(const std::invalid_argument& e)
+    {
+
+        std::stringstream ss;
+        ss << "Error while reading C3D File " << filename << ": " << e.what() << '\n';
+        PCritical(nullptr, "Error: Cannot load C3D File", ss.str().c_str());
+        return;
+    }
+
+    size_t firstFrame = c3d.header().firstFrame();
+    person.setTimeOffset(person.getMetadata().getOffset() - firstFrame / person.getMetadata().getSamplerate());
+
+    // getImagePoint takes points in cm -> cm as target unit
+    const std::string unit = c3d.parameters().group("POINT").parameter("UNITS").valuesAsString()[0];
+    double conversionFactor = 1e-1; // default, since XSens uses this
+    if(unit == "mm")
+    {
+        conversionFactor = 1e-1;
+    }else if(unit == "cm")
+    {
+        conversionFactor = 1.0;
+    }else if(unit == "m")
+    {
+        conversionFactor = 100.0;
+    }
+
+    const auto c3dToPoint3f = [conversionFactor](const ezc3d::DataNS::Points3dNS::Point& point){
+        return cv::Point3f{static_cast<float>(point.x()),
+                           static_cast<float>(point.y()),
+                           static_cast<float>(point.z())} * conversionFactor;
+    };
+
+    switch (fp) {
+        case XSensC3D:
+            readSkeletonC3D_XSENS(c3d, person, c3dToPoint3f);
+            break;
+        case END: break; // So clang doesn't say it isn't handled
+    }
+
+    storage.addPerson(person);
+}
+
+/**
+ * @brief Reads a XSens c3d and extracts the skeletons
+ *
+ * See the official MVN_User_Manual and/or the definition of XSensStruct for details
+ * on which points are which.
+ *
+ * @param c3d[in] c3d-oject corresponding to the XSens c3d-File
+ * @param person[out] the person which the skeletons are added to
+ * @param c3dToPoint3f[in] function which converts a c3d point to a cv::Point3f in cm
+ */
+void IO::readSkeletonC3D_XSENS(
+    const ezc3d::c3d &c3d,
+    MoCapPerson &person,
+    const std::function<cv::Point3f(const ezc3d::DataNS::Points3dNS::Point&)>& c3dToPoint3f
+    )
+{
+    /*
+     * Points from XSens
+     * 1 based so everything minus 1
+     * hip/Sacrum: 8
+     * C7: 16
+     * right shoulder: 21
+     * left shoulder: 22
+     * right elbow: 29
+     * left elbow: 32
+     * right wrist: 28
+     * left wrist: 31
+     * right top of hand: 33
+     * left top of hand: 36
+     * top of head: 17
+     * right ischial tub: 6
+     * left ischial tub: 7
+     * right kneecap: 42
+     * left kneecap: 46
+     * right heel: 53
+     * left heel: 59
+     * right toe: 58
+     * left toe: 64
+    */
+
+    const auto& frames = c3d.data().frames();
+
+    for(const auto& frame : frames)
+    {
+        const auto& points = frame.points().points();
+        XSenseStruct skeletonStruct;
+        skeletonStruct.mHipR    = c3dToPoint3f(points[5]);
+        skeletonStruct.mHipL    = c3dToPoint3f(points[6]);
+        skeletonStruct.mRoot    = c3dToPoint3f(points[7]);
+        skeletonStruct.mNeck    = c3dToPoint3f(points[15]);
+        skeletonStruct.mHeadTop = c3dToPoint3f(points[16]);
+        skeletonStruct.mEarR    = c3dToPoint3f(points[17]);
+        skeletonStruct.mEarL    = c3dToPoint3f(points[18]);
+        skeletonStruct.mShldrR  = c3dToPoint3f(points[20]);
+        skeletonStruct.mShldrL  = c3dToPoint3f(points[21]);
+        skeletonStruct.mWristR  = c3dToPoint3f(points[27]);
+        skeletonStruct.mElbowR  = c3dToPoint3f(points[28]);
+        skeletonStruct.mWristL  = c3dToPoint3f(points[30]);
+        skeletonStruct.mElbowL  = c3dToPoint3f(points[31]);
+        skeletonStruct.mHandR   = c3dToPoint3f(points[32]);
+        skeletonStruct.mHandL   = c3dToPoint3f(points[35]);
+        skeletonStruct.mKneeR   = c3dToPoint3f(points[41]);
+        skeletonStruct.mKneeL   = c3dToPoint3f(points[45]);
+        skeletonStruct.mHeelR   = c3dToPoint3f(points[52]);
+        skeletonStruct.mToeR    = c3dToPoint3f(points[57]);
+        skeletonStruct.mHeelL   = c3dToPoint3f(points[58]);
+        skeletonStruct.mToeL    = c3dToPoint3f(points[63]);
+
+        person.addSkeleton(SkeletonTreeFactory::generateTree(skeletonStruct));
+    }
 }
 
 /**

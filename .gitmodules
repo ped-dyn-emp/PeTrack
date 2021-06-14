@@ -2,3 +2,6 @@
 	path = 3rdparty
 	url = ../petrack-3rdparty.git
 	shallow = true
+[submodule "ezc3d"]
+	path = ezc3d
+	url = https://github.com/pyomeca/ezc3d.git

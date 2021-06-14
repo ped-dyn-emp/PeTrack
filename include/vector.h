@@ -55,7 +55,12 @@ protected:
 public:
     Vec3F();
     Vec3F(double x, double y, double z);
+    ~Vec3F() = default;
+
     Vec3F(const Vec3F& v) = default;
+    Vec3F(Vec3F&& v) = default;
+
+    Vec3F(const cv::Point3f& v);
 
     double x() const;
     double y() const;
@@ -65,22 +70,27 @@ public:
     void setZ(double z);
     void set(double x, double y, double z);
 
+    Vec3F& operator=(const Vec3F& v) = default;
+    Vec3F& operator=(Vec3F&& v) = default;
+
+    Vec3F& operator=(const cv::Point3f& v);
+
     Vec3F operator+(const Vec3F& v) const;
     Vec3F operator-(const Vec3F& v) const;
-    const Vec3F operator+=(const Vec3F& v);
-    const Vec3F operator-=(const Vec3F& v);
+    Vec3F& operator+=(const Vec3F& v);
+    Vec3F& operator-=(const Vec3F& v);
     Vec3F operator-() const;
-	
-	Vec3F operator*(double n) const; // scalar product
-	Vec3F operator/(double n) const; // scalar divide
 
-	double operator*(const Vec3F& v) const; // dot product
+    Vec3F operator*(double n) const; // multiply with a scalar value
+    Vec3F operator/(double n) const; // divide by a scalar value
 
-	bool operator==(const Vec3F& v) const;
-	bool operator!=(const Vec3F& v) const;
+    double operator*(const Vec3F& v) const; // dot product 
 
-	double length() const;
-	Vec3F unit() const;
+    bool operator==(const Vec3F& v) const;
+    bool operator!=(const Vec3F& v) const;
+
+    double length() const;
+    Vec3F unit() const;
 	void normalize();
 
     double distanceToPoint(const Vec3F& p) const;
@@ -127,34 +137,38 @@ public:
     void setY(double y);
     void set(double x, double y);
 
-    Vec2F operator=(const CvPoint *v);
+    Vec2F& operator=(const CvPoint *v);
 
-    const Vec2F& operator+=(const Vec2F& v);
-    const Vec2F operator+(const Vec2F& v) const;
-    const Vec2F operator-=(const Vec2F& v);
-    const Vec2F operator-(const Vec2F& v) const;
+    Vec2F& operator+=(const Vec2F& v);
+    Vec2F operator+(const Vec2F& v) const;
+    Vec2F& operator-=(const Vec2F& v);
+    Vec2F operator-(const Vec2F& v) const;
     Vec2F operator-() const;
-	
-	Vec2F operator*(double n) const; // scalar product
-	Vec2F operator/(double n) const; // scalar divide
 
-	double operator*(const Vec2F& v) const; // dot product
+    Vec2F operator*(double n) const; // multiply with a scalar value
+    Vec2F operator/(double n) const; // divide by a scalar value
 
-	bool operator==(const Vec2F& v) const;
-	bool operator!=(const Vec2F& v) const;
+    double operator*(const Vec2F& v) const; // dot product
 
-	double length() const;
-	double angle() const;
-	Vec2F unit() const;
-	Vec2F normal() const;
-	void normalize();
+    bool operator==(const Vec2F& v) const;
+    bool operator!=(const Vec2F& v) const;
+
+    double length() const;
+
+    double angle() const;
+
+    Vec2F unit() const;
+
+    Vec2F normal() const;
+
+    void normalize();
 
     double distanceToPoint(const Vec2F& p) const;
     // return distance from vec to line between p1 and p2
     double distanceToLine(const Vec2F& p1, const Vec2F& p2) const;
     double angleBetweenVec(const Vec2F& v) const;
 
-	static Vec2F fromAngle(double angle);
+    static Vec2F fromAngle(double angle);
 };
 
 
@@ -178,18 +192,18 @@ inline QTextStream& operator<< (QTextStream& s, const Vec2F& v)
 inline std::istream& operator>> (std::istream& s, Vec2F& v)
 {
     double d;
-    s >> d; 
+    s >> d;
     v.setX(d);
-    s >> d; 
+    s >> d;
     v.setY(d);
     return s;
 }
 inline QTextStream& operator>> (QTextStream& s, Vec2F& v)
 {
     double d;
-    s >> d; 
+    s >> d;
     v.setX(d);
-    s >> d; 
+    s >> d;
     v.setY(d);
     return s;
 }
