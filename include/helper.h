@@ -26,6 +26,7 @@
 #include <QString>
 
 extern QString commandLineOptionsString;
+extern QString proFileName; ///< Path to the project (.pet) file; defined in helper.cpp
 
 constexpr const char* file_name(const char* path) {
     const char* file = path;
@@ -204,7 +205,7 @@ inline QTextStream& operator>>(QTextStream& s, QColor& col)
  * @param relToFileName
  * @return first file to exist
  */
-inline QString getExistingFile(const QString &fileList, const QString &relToFileName)
+inline QString getExistingFile(const QString &fileList, const QString &relToFileName = proFileName)
 {
     QStringList list;
     list = fileList.split(";", Qt::SkipEmptyParts);
@@ -222,7 +223,7 @@ inline QString getExistingFile(const QString &fileList, const QString &relToFile
 
 #include <QFileInfo>
 #include <QDir>
-inline QString getFileList(const QString &fileName, const QString &relToFileName)
+inline QString getFileList(const QString &fileName, const QString &relToFileName = proFileName)
 {
     QString seqAbs      = QFileInfo(fileName).absoluteFilePath();
     QString seqRelToPro = QDir(QFileInfo(relToFileName).absolutePath()).relativeFilePath(seqAbs);

@@ -642,7 +642,7 @@ bool ExtrCalibration::calcReprojectionError()
  * composed out of rotation and translation aquired in ExtrCalibration::calibExtrParams().
  * After that, the internal camera matrix is applied.
  *
- * @param p3d 3D point to transform
+ * @param p3d 3D point to transform in cm
  * @return calculated 2D projection of p3d
  */
 cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d)
@@ -747,8 +747,8 @@ cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d)
  * @brief Tranforms a 2D point into a 3D point with given height.
  *
  * @param p2d 2D pixel point (without border)
- * @param h height i.e. distance to xy-plane
- * @return calculated 3D point
+ * @param h height i.e. distance to xy-plane in cm
+ * @return calculated 3D point in cm
  */
 cv::Point3f ExtrCalibration::get3DPoint(cv::Point2f p2d, double h)
 {

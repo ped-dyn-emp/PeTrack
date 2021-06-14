@@ -27,6 +27,7 @@
 #include "trackerItem.h"
 #include "imageItem.h"
 #include "backgroundItem.h"
+#include "moCapItem.h"
 #include "colorPlot.h"
 #include "analysePlot.h"
 #include "player.h"
@@ -43,16 +44,27 @@
 #include "recognitionRoiItem.h"
 
 #define DEFAULT_HEIGHT 180.0
-
-Control::Control(QWidget& parent, reco::Recognizer& recognizer)
+    
+Control::Control(QWidget& parent, QGraphicsScene &scene, reco::Recognizer& recognizer)
     : QWidget(&parent)
 {
     setAccessibleName("Control");
     mMainWindow = (class Petrack*) &parent;
-    mScene = nullptr;
+    mScene = &scene;
     mLoading = false;
     //beim erzeugen von new colorplot absturz!!!!
     setupUi(this);
+
+    // Observers for moCapShow, moCapSize and moCapColor in moCapController;
+    // updates UI value when changed.
+    QObject::connect(&mMainWindow->getMoCapController(), &MoCapController::showMoCapChanged,
+                     this, &Control::setMoCapShow);
+    QObject::connect(&mMainWindow->getMoCapController(), &MoCapController::thicknessChanged,
+                     this, &Control::setMoCapSize);
+    QObject::connect(&mMainWindow->getMoCapController(), &MoCapController::colorChanged,
+                     this, &Control::setMoCapColor);
+    // Pulls all observable attributes
+    mMainWindow->getMoCapController().notifyAllObserver();
 
     // Weitere Verzerrungsparameter werden vllt. spaeter mal gebraucht bisher von OpenCV nicht beruecksichtig. Muessen dann noch in die Oberflaeche eingebaut werden
     // Deniz: OpenCV kann Sie mittlerweile benutzen, wenn man calibrateCamera die Flag CALIB_RATIONAL_MODEL übergibt; Ergibt eine genauere Kalibration
@@ -246,6 +258,49 @@ void Control::setTrackGroundPathColor(QColor col)
     trackGroundPathColorButton->setPalette(pal);
     //trackPathColorButton->setAutoFillBackground(true);
     //trackPathColorButton->update();
+}
+/**
+ * @brief Getter for MoCapColor selection
+ * @return the current selected color
+ * */
+QColor Control::getMoCapColor()
+{
+    return moCapColorButton->palette().color(QPalette::Button);
+}
+/**
+ * @brief Setter for MoCapShow
+ *
+ * Sets the visibility of the moCap visualization
+ * */
+void Control::setMoCapShow(bool visibility)
+{
+    if(showMoCap->isChecked() != visibility) {
+        showMoCap->toggle();
+    }
+}
+/**
+ * @brief Setter for MoCapColor palette and button
+ *
+ * Sets the button color and the palette selection
+ * */
+void Control::setMoCapColor(QColor col)
+{
+    if(getMoCapColor() != col) {
+        QPalette pal = moCapColorButton->palette();
+        pal.setColor(QPalette::Button, col);
+        moCapColorButton->setPalette(pal);
+    }
+}
+/**
+ * @brief Setter for MoCapSize
+ *
+ * Sets the moCap line thickness
+ * */
+void Control::setMoCapSize(int size)
+{
+    if(moCapSize->value() != size) {
+        moCapSize->setValue(size);
+    }
 }
 
 //---------------------------------------
@@ -1055,6 +1110,19 @@ void Control::on_trackGroundPathColorButton_clicked()
         mMainWindow->updateImage();
 }
 
+void Control::on_moCapColorButton_clicked()
+{
+    QColor col = QColorDialog::getColor(getMoCapColor(), this);
+    if(col.isValid())
+    {
+        mMainWindow->getMoCapController().setColor(col);
+    }
+    mScene->update();
+    if(!mMainWindow->isLoading()) {
+        mMainWindow->updateImage();
+    }
+}
+
 void Control::on_trackRegionScale_valueChanged(int /*i*/)
 { 
     mMainWindow->setTrackChanged(true); 
@@ -1239,6 +1307,17 @@ void Control::on_trackHeadSized_stateChanged(int i)
     }
     mScene->update(); 
 }
+
+void Control::on_showMoCap_stateChanged(int i) {
+    mMainWindow->getMoCapController().setShowMoCap(i == Qt::Checked);
+    mScene->update();
+}
+
+void Control::on_moCapSize_valueChanged(int i) {
+    mMainWindow->getMoCapController().setThickness(i);
+    mScene->update();
+}
+
 
 //------------------- recognition
 
@@ -3309,7 +3388,6 @@ void Control::getXml(QDomElement &elem)
                         trackShowGroundPosition->setCheckState(subSubElem.attribute("SHOW_GROUND_POSITION").toInt() ? Qt::Checked : Qt::Unchecked);
                     if (subSubElem.hasAttribute("SHOW_GROUND_PATH"))
                         trackShowGroundPath->setCheckState(subSubElem.attribute("SHOW_GROUND_PATH").toInt() ? Qt::Checked : Qt::Unchecked);
-
                     if (subSubElem.hasAttribute("TRACK_PATH_COLOR"))
                     {
                         QColor color(subSubElem.attribute("TRACK_PATH_COLOR"));
@@ -3338,7 +3416,6 @@ void Control::getXml(QDomElement &elem)
                         trackGroundPositionSize->setValue(subSubElem.attribute("GROUND_POSITION_SIZE").toInt());
                     if (subSubElem.hasAttribute("GROUND_PATH_SIZE"))
                         trackGroundPathSize->setValue(subSubElem.attribute("GROUND_PATH_SIZE").toInt());
-
                     if (subSubElem.hasAttribute("POINTS_COLORED"))
                         trackShowPointsColored->setCheckState(subSubElem.attribute("POINTS_COLORED").toInt() ? Qt::Checked : Qt::Unchecked);
                     if (subSubElem.hasAttribute("NUMBER_BOLD"))

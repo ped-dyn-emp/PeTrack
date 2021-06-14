@@ -28,6 +28,7 @@ if (WIN32)
     install(DIRECTORY "${Qt5Core_DIR}/../../../../../Licenses" DESTINATION "Licenses/Qt_Licenses")
     install(DIRECTORY "${OpenCV_DIR}/etc/licenses" DESTINATION "Licenses/OpenCV_Licenses")
     install(FILES "${OpenCV_DIR}/LICENSE/" DESTINATION "Licenses/OpenCV_Licenses")
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/ezc3d/LICENSE" DESTINATION "Licenses/ezc3d_license/")
 endif()
 
 install(FILES "${CMAKE_SOURCE_DIR}/ReadMe.md" "${CMAKE_SOURCE_DIR}/LICENSE" DESTINATION ".")

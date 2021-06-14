@@ -22,7 +22,7 @@
 #define CONTROL_H
 
 #include <QtWidgets>
-
+#include <Qt>
 #include "ui_control.h"
 #include "recognition.h"
 
@@ -35,7 +35,7 @@ class Control: public QWidget, public Ui::Control
     Q_OBJECT
 
 public:
-    Control(QWidget& parent, reco::Recognizer& recognizer);
+    Control(QWidget& parent, QGraphicsScene &scene, reco::Recognizer& recognizer);
 
     void setScene(QGraphicsScene *sc);
 
@@ -47,6 +47,7 @@ public:
     void setTrackPathColor(QColor col);
     QColor getTrackGroundPathColor();
     void setTrackGroundPathColor(QColor col);
+    QColor getMoCapColor();
 
     bool getRecoRoiShow();
     void setRecoRoiShow(bool b);
@@ -294,6 +295,7 @@ private slots:
     void on_trackShowGroundPath_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
     void on_trackShowHeightIndividual_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
     void on_trackNumberBold_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_showMoCap_stateChanged(int i);
 
     void on_trackCurrentPointSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
     void on_trackPointSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
@@ -305,6 +307,7 @@ private slots:
     void on_trackGroundPathSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
     void on_trackShowBefore_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
     void on_trackShowAfter_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_moCapSize_valueChanged(int i);
 
     void on_recoMethod_currentIndexChanged(int index);
     void onRecoMethodChanged(reco::RecognitionMethod method);
@@ -399,6 +402,7 @@ private slots:
 
     void on_trackPathColorButton_clicked();
     void on_trackGroundPathColorButton_clicked();
+    void on_moCapColorButton_clicked();
 
     void on_showVoronoiCells_stateChanged(int arg1);
 
@@ -414,6 +418,9 @@ private slots:
 
     void on_trackRoiFix_stateChanged(int arg1);
 
+    void setMoCapShow(bool visibility);
+    void setMoCapColor(QColor col);
+    void setMoCapSize(int size);
 signals:
     void userChangedRecoMethod(reco::RecognitionMethod method);
 

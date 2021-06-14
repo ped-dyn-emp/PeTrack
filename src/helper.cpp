@@ -22,6 +22,7 @@
 
 #include <opencv2/opencv.hpp>
 
+QString proFileName; ///< Path to the project (.pet) file; used for saving relative paths via getFileList and getExistingFile
 QString commandLineOptionsString = QObject::tr(
 "<p><code>petrack [-help|-?] [[-project] project.pet] </code><br>"
 "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>[-sequence imageSequenceOrVideo]</code><br>"

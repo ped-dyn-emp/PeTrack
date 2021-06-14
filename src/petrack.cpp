@@ -46,6 +46,7 @@
 #include "autoCalib.h"
 #include "trackerItem.h"
 #include "backgroundItem.h"
+#include "moCapItem.h"
 #include "tracker.h"
 #include "trackerReal.h"
 #include "pMessageBox.h"
@@ -106,7 +107,9 @@ Petrack::Petrack()
     mCalibFilter = new CalibFilter; // schoener waere erst zu erzeugen, wenn video geladen wird, da sonst bei stereo erst normealer und dann stereo objekt erzeugt wird
     mCalibFilter->disable();        // aber control widget greift schon bei erzeugung auf alle objekte zur einstellung zurueck
 
-    mControlWidget = new Control(*this, mReco);
+    mScene = new QGraphicsScene(this);
+
+    mControlWidget = new Control(*this, *mScene, mReco);
     cw =  mControlWidget; // muss spaeter geloescht werden
 
     mStereoWidget = new StereoWidget(this);
@@ -130,10 +133,8 @@ Petrack::Petrack()
     mMultiColorMarkerWidget->setWindowFlags(Qt::Window);
     mMultiColorMarkerWidget->setWindowTitle("MultiColor marker parameter");
 
-    mScene = new QGraphicsScene(this);
-
     mImageItem = new ImageItem(this); // durch uebergabe von scene wird indirekt ein scene->addItem() aufgerufen
-    mControlWidget->setScene(mScene);
+
 
     mAnimation = new Animation(this);
 
@@ -214,6 +215,11 @@ Petrack::Petrack()
     mBackgroundItem->setZValue(2.2); // um so groesser um so hoeher um so eher zu sehen
     mBackgroundItem->setVisible(false);
 
+    //---------------------------
+
+    mMoCapItem = new MoCapItem(*this, *mAnimation, mMoCapController);
+    mMoCapItem->setZValue(3); // um so groesser um so hoeher um so eher zu sehen
+
     /// Add Items
     mScene->addItem(mImageItem);
     mScene->addItem(mLogoItem);
@@ -227,6 +233,7 @@ Petrack::Petrack()
     mScene->addItem(mCodeMarkerItem);
     mScene->addItem(mMultiColorMarkerItem);
     mScene->addItem(mBackgroundItem);
+    mScene->addItem(mMoCapItem);
 
     //---------------------------
 
@@ -396,6 +403,10 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
         {
             mMultiColorMarkerWidget->getXml(elem);
         }
+        else if (elem.tagName() == "MOCAP")
+        {
+            mMoCapController.getXml(elem);
+        }
         else if (elem.tagName() == "CONTROL")
         {
             mControlWidget->getXml(elem);
@@ -562,7 +573,7 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
 
         debout << "open " << fileName << std::endl;
         file.close();
-        mProFileName = fileName;
+        setProFileName(fileName);
 
         QDomElement root = doc.firstChildElement("PETRACK");
         if (root.hasAttribute("VERSION"))
@@ -625,6 +636,11 @@ void Petrack::saveXml(QDomDocument &doc)
     mMultiColorMarkerWidget->setXml(elem);
     root.appendChild(elem);
 
+    // settings for MoCap-Visualization
+    elem = doc.createElement("MOCAP");
+    mMoCapController.setXml(elem);
+    root.appendChild(elem);
+
     // player settings (which frame, frame range)
     elem = doc.createElement("PLAYER");
     elem.setAttribute("FRAME", mPlayerWidget->getPos()); // == mAnimation->getCurrentFrameNum()
@@ -674,6 +690,7 @@ bool Petrack::saveProject(QString fileName) // default fileName=""
 
     if (!fileName.isEmpty())
     {
+        setProFileName(fileName);
         QDomDocument doc("PETRACK"); // eigentlich Pfad zu Beschreibungsdatei fuer Dateiaufbau
         saveXml(doc);
 
@@ -704,7 +721,6 @@ bool Petrack::saveProject(QString fileName) // default fileName=""
         statusBar()->showMessage(tr("Saved project to %1.").arg(fileName), 5000);
         debout << "save project to " << fileName << std::endl;
 
-        mProFileName = fileName;
         updateWindowTitle();
         return true;
     }
@@ -829,6 +845,11 @@ void Petrack::openSequence(QString fileName) // default fileName = ""
             mLogoItem->fadeOut(50);
         updateCoord();
     }
+}
+
+void Petrack::openMoCapFile(){
+    OpenMoCapDialog dialog(this, mMoCapController);
+    dialog.exec();
 }
 
 void Petrack::updateWindowTitle()
@@ -1426,6 +1447,9 @@ void Petrack::createActions()
     //mOpenCameraAct->setShortcut(tr("Ctrl+C")); // because of some reason it is sometimes fired with Ctrl+LeftMouseButton ==> so disabled (it's also not really needed)
     connect(mOpenCameraAct, SIGNAL(triggered()), this, SLOT(openCameraLiveStream()));
 
+    mOpenMoCapAct = new QAction(tr("Open MoCap File"), this);
+    connect(mOpenMoCapAct, &QAction::triggered, this, &Petrack::openMoCapFile);
+
     mSaveSeqVidAct = new QAction(tr("Save Video"), this);
     //mSaveSeqVidAct->setShortcut(tr("Ctrl+E"));
     mSaveSeqVidAct->setEnabled(false);
@@ -1603,6 +1627,7 @@ void Petrack::createMenus()
     mFileMenu->addSeparator();
     mFileMenu->addAction(mOpenSeqAct);
     mFileMenu->addAction(mOpenCameraAct);
+    mFileMenu->addAction(mOpenMoCapAct);
     mFileMenu->addAction(mSaveSeqVidAct);
     mFileMenu->addAction(mSaveSeqVidViewAct);
     mFileMenu->addAction(mSaveImageAct);
@@ -2107,7 +2132,7 @@ void Petrack::readSettings()
     mAntialiasAct->setChecked(settings.value("antialias", false).toBool());
     mOpenGLAct->setChecked(settings.value("opengl", false).toBool());
     mSeqFileName = settings.value("seqFileName", QDir::currentPath()).toString();
-    mProFileName = settings.value("proFilePath", QDir::currentPath()).toString();
+    setProFileName(settings.value("proFilePath", QDir::currentPath()).toString());
     // nicht ganz sauber, da so immer schon zu anfang in calib file list etwas drin steht und somit auto ausgefuehrt werden kann
     // wird aber beim ersten openCalib... ueberschrieben
     mAutoCalib.addCalibFile(settings.value("calibFile", QDir::currentPath()).toString());

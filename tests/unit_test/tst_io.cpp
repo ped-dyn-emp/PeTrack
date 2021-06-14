@@ -23,6 +23,7 @@
 #include <ostream>
 
 #include "IO.h"
+#include "moCapPerson.h"
 
 TEST_CASE("src/IO", "[tracking][io]")
 {
@@ -465,5 +466,65 @@ TEST_CASE("src/IO", "[tracking][io]")
             std::remove(markerFileName.c_str());
         }
     }
+}
+
+SCENARIO("I want to read a XSens c3d file", "[io]")
+{
+    ezc3d::c3d c3d;
+
+    GIVEN("A c3d object with 10 frames and a samplerate of 60hz")
+    {
+        ezc3d::ParametersNS::GroupNS::Parameter pointRate("RATE");
+        pointRate.set(std::vector<double>{60.0}, {1});
+        c3d.parameter("POINT", pointRate);
+
+        ezc3d::ParametersNS::GroupNS::Parameter unit("UNITS");
+        unit.set("cm");
+        c3d.parameter("POINT", unit);
+
+        for(int i = 0; i < 64; ++i){
+            c3d.point("marker_" + std::to_string(i+1));
+        }
+
+        ezc3d::DataNS::Frame f;
+        int nPoints(c3d.parameters().group("POINT").parameter("USED").valuesAsInt()[0]);
+        ezc3d::DataNS::Points3dNS::Points pts;
+        for (size_t i=0; i<static_cast<size_t>(nPoints); ++i){
+            ezc3d::DataNS::Points3dNS::Point pt;
+            // See i-value via x/y/z value
+            pt.x(i);
+            pt.y(i);
+            pt.z(i);
+            pts.point(pt);
+        }
+        f.add(pts);
+        for(int i = 0; i < 10; ++i){
+            c3d.frame(f);
+        }
+
+        AND_GIVEN("I read that c3d-file into a MoCapPerson")
+        {
+            MoCapPerson person;
+            auto c3dToPoint3f = [](ezc3d::DataNS::Points3dNS::Point point){
+                return cv::Point3f{static_cast<float>(point.x()),
+                                   static_cast<float>(point.y()),
+                                   static_cast<float>(point.z())} * 1;
+            };
+            IO::readSkeletonC3D_XSENS(c3d, person, c3dToPoint3f);
+
+
+            THEN("The MoCapPerson is properly initialized")
+            {
+                auto skeleton = person.getSkeleton(0);
+                auto root = skeleton.getRoot();
+                // NOTE checking everything should be part of a test for the SkeletonFactory
+
+                REQUIRE(root.getPos() == cv::Point3f{7,7,7}); // pSacrum point[7]
+                REQUIRE(root.getChildById(1).getPos() == cv::Point3f(15,15,15)); // pC7SpinalProcess point[15]
+            }
+        }
+    }
 
 }
+
+    

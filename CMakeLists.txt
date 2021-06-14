@@ -202,6 +202,15 @@ endif()
 
 target_sources(petrack_core PRIVATE src/analysePlot.cpp)
 
+#*****************************************************************
+# Linking ezc3d                                                  *
+#*****************************************************************
+set(DUMMY ${BUILD_SHARED_LIBS})
+set(BUILD_SHARED_LIBS FALSE CACHE BOOL "Choose if build should be a dynamic or static library")
+add_subdirectory(ezc3d/ EXCLUDE_FROM_ALL)
+target_link_libraries(petrack_core PUBLIC ezc3d)
+set(BUILD_SHARED_LIBS ${DUMMY})
+
 #*************************************************************
 # Handling of Options                                        *
 #*************************************************************
@@ -308,6 +317,13 @@ target_sources(petrack_core PRIVATE
     include/trackingRoiItem.h
     include/analysePlot.h
     include/IO.h
+    include/skeletonTree.h
+    include/skeletonTreeFactory.h
+    include/moCapPerson.h
+    include/moCapItem.h
+    include/moCapController.h
+    include/openMoCapDialog.h
+    include/moCapPersonMetadata.h
     include/pMessageBox.h
     )
 
@@ -358,6 +374,13 @@ target_sources(petrack_core PRIVATE
     src/extrCalibration.cpp
     src/trackingRoiItem.cpp
     src/IO.cpp
+    src/skeletonTree.cpp
+    src/skeletonTreeFactory.cpp
+    src/moCapPerson.cpp
+    src/moCapItem.cpp
+    src/moCapController.cpp
+    src/openMoCapDialog.cpp
+    src/moCapPersonMetadata.cpp
     src/pMessageBox.cpp
     ui/codeMarker.ui
     ui/colorMarker.ui
@@ -365,6 +388,7 @@ target_sources(petrack_core PRIVATE
     ui/multiColorMarker.ui
     ui/stereo.ui
     ui/control.ui
+    ui/openMoCapDialog.ui
 )
 
 target_sources(petrack PRIVATE

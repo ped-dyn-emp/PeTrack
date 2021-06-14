@@ -25,14 +25,26 @@
 #include <unordered_map>
 #include <string>
 #include <QString>
+#include <ezc3d_all.h>
+#include <opencv2/opencv.hpp>
+class MoCapStorage;
+class MoCapPerson;
+class MoCapPersonMetadata;
+
 
 namespace IO
 {
     std::variant<std::unordered_map<int, float>, std::string>
     readHeightFile(const QString& heightFileName);
 
+    void readMoCapC3D(MoCapStorage &storage, const MoCapPersonMetadata &metadata);
+    void readSkeletonC3D_XSENS(
+        const ezc3d::c3d &c3d,
+        MoCapPerson &person,
+        const std::function<cv::Point3f(const ezc3d::DataNS::Points3dNS::Point&)>& c3dToPoint3f
+        );
+
     std::variant<std::unordered_map<int, int>, std::string>
     readMarkerIDFile(const QString& markerFileName);
 }
-
-#endif
+#endif //IO_H
