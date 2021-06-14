@@ -145,13 +145,30 @@ cv::Mat Animation::getCurrentFrame()
 }
 
 /**
- * @brief Skips (grabs) the given number of frames (default 1)
+ * @brief Skips the given number of frames
+ *
+ * This functions skips the given number of frames.
+ * For image sequences, it actually skips them. For
+ * videos, it only grabs them (without decoding)
+ * instead of skipping them completely since
+ * video codecs do not allow for random access.
  *
  * @param num Number of frames to skip.
  */
 void Animation::skipFrame(int num)
 {
-    if(mVideoCapture.isOpened())
+    if(isImageSequence()){
+        int lastFrameNum = getSourceOutFrameNum();
+        if(mCurrentFrame + num > lastFrameNum){
+            mCurrentFrame = lastFrameNum;
+        }else{
+            mCurrentFrame += num;
+        }
+        for(int i = 0; i < num; ++i)
+        {
+            mMainWindow->updateShowFPS(true);
+        }
+    }else if(mVideoCapture.isOpened())
     {
         int lastFrameNum = getSourceOutFrameNum();
         for(int i = 0; i < num && mCurrentFrame < lastFrameNum; ++i)
