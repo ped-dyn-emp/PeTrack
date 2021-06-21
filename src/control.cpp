@@ -1539,6 +1539,15 @@ void Control::on_mapHeight_valueChanged(double /*d*/)
                                        mapColor->isChecked(), mapHeight->value());
     //colorPlot->replot(); Anzeige aendert sich nichts
 }
+
+void Control::on_mapHeight_editingFinished()
+{
+    if(mapHeight->value() < 100)
+    {
+        PInformation(this, "Height is in cm, not m!","You put in a low value for height.\n Gentle reminder that height is in cm, not m.");
+    }
+}
+
 void Control::on_mapAdd_clicked()
 {
     mapNr->setMaximum(mapNr->maximum()+1);

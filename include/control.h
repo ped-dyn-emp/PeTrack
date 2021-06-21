@@ -254,6 +254,7 @@ private slots:
     void on_mapH_valueChanged(int i);
     void on_mapColor_stateChanged(int i);
     void on_mapHeight_valueChanged(double d);
+    void on_mapHeight_editingFinished();
     void on_mapAdd_clicked();
     void on_mapDel_clicked();
     void on_mapDistribution_clicked();
