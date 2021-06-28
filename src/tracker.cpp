@@ -1157,24 +1157,53 @@ size_t Tracker::calcPrevFeaturePoints(int prevFrame, cv::Rect &rect, int frame, 
     {
         for (int i = 0; i < size(); ++i)
         {
-            if (((onlyVisible.empty()) || (onlyVisible.contains(i))) &&
-                at(i).trackPointExist(prevFrame) &&
-                ((reTrack && at(i).trackPointExist(frame) && at(i).trackPointAt(frame).qual() < reQual) ||
-                 !at(i).trackPointExist(frame)))
-            {
-                cv::Point2f p2f(at(i).at(prevFrame-at(i).firstFrame()).x()+borderSize,
-                            at(i).at(prevFrame-at(i).firstFrame()).y()+borderSize);
-                if(rect.contains(p2f))
-                {
-                    mPrevFeaturePoints.push_back(p2f);
-                    ++j;
+            if(!((onlyVisible.empty()) || (onlyVisible.contains(i)))){
+                continue;
+            }
+            if(!at(i).trackPointExist(prevFrame)){
+                continue;
+            }
 
-                    mPrevFeaturePointsIdx.push_back(i);
+            /*
+             * For retracking to occur, every point in the path from the last
+             * recognized point to this point should have been tracked with higher qual.
+             * This should eliminate cases in which wrong points are tracked confidently
+             * and replace better ones, under the assumption we only get to a wrong point
+             * due to a low-quality tracking earlier.
+             */
+            bool applyReTrack = reTrack;
+            if(reTrack)
+            {
+                int dir = (frame - prevFrame); // direction of tracking - forward/backwards
+                dir /= std::abs(dir); // theoretically possible to omit MAX_STEP_TRACK frames
+                constexpr int minQualReco = 90;
+                for(int j = 0;
+                    at(i).trackPointExist(frame + j*dir) && at(i).trackPointAt(frame + j*dir).qual() < minQualReco;
+                    ++j){
+                    if(at(i).trackPointAt(frame + j*dir).qual() < reQual){
+                        applyReTrack = false;
+                        break;
+                    }
+                }
+            }
+            if( at(i).trackPointExist(frame) && !applyReTrack ){
+                continue;
+            }
+
+
+            Vec2F prevPoint = at(i).at(prevFrame-at(i).firstFrame());
+            prevPoint += Vec2F(borderSize, borderSize);
+            cv::Point2f p2f = prevPoint.toPoint2f();
+            if(rect.contains(p2f))
+            {
+                mPrevFeaturePoints.push_back(p2f);
+                ++j;
+
+                mPrevFeaturePointsIdx.push_back(i);
                 if (j > MAX_COUNT-2)
                 {
                     debout << "Warning: reached maximal number of tracking point: " << MAX_COUNT << std::endl;
                     break; // for loop
-                }
                 }
             }
         }

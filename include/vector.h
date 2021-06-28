@@ -130,6 +130,7 @@ public:
     CvPoint2D32f toCvPoint2D32f() const;
     QPoint toQPoint() const;
     QPointF toQPointF() const;
+    cv::Point2f toPoint2f() const;
 
     double x() const;
     double y() const;
