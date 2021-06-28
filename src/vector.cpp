@@ -251,6 +251,11 @@ QPointF Vec2F::toQPointF() const
     return QPointF(mX, mY);
 }
 
+cv::Point2f Vec2F::toPoint2f() const
+{
+    return cv::Point2f(static_cast<float>(mX), static_cast<float>(mY));
+}
+
 double Vec2F::x() const
 {
     return mX;
