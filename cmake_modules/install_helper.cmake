@@ -32,6 +32,7 @@ if (WIN32)
 endif()
 
 install(FILES "${CMAKE_SOURCE_DIR}/ReadMe.md" "${CMAKE_SOURCE_DIR}/LICENSE" DESTINATION ".")
+install(FILES "${CMAKE_SOURCE_DIR}/.zenodo.json" DESTINATION "bin")
 
 ##################################################################
 #                         PACKAGE                                #

@@ -1,0 +1,55 @@
+{
+  "title" : "PeTrack",
+  "description": "Software for extracting pedestrian trajectories from videos.",
+  "license": "GPLv3",
+  "upload_type": "software",
+  "creators": [
+    {
+      "affiliation": "Forschungszentrum Jülich GmbH",
+      "name": "Boltes, Maik",
+      "orcid": "0000-0001-7240-896X"
+    },
+    {
+      "affiliation": "Forschungszentrum Jülich GmbH",
+      "name": "Adrian, Juliane",
+      "orcid": "0000-0002-6023-5173"
+    },
+    {
+      "name": "Brualla, Ricardo Martin"
+    },
+    {
+      "affiliation": "Forschungszentrum Jülich GmbH",
+      "name": "Graf, Arne"
+    },
+    {
+      "affiliation": "Forschungszentrum Jülich GmbH",
+      "name": "Häger, Paul"
+    },
+    {
+      "affiliation": "Forschungszentrum Jülich GmbH",
+      "name": "Hillebrand, Daniel"
+    },
+    {
+      "affiliation": "Forschungszentrum Jülich GmbH",
+      "name": "Kilic, Deniz"
+    },
+    {
+      "affiliation": "Forschungszentrum Jülich GmbH",
+      "name": "Lieberenz, Paul"
+    },
+    {
+      "affiliation": "Forschungszentrum Jülich GmbH",
+      "name": "Salden, Daniel"
+    },
+    {
+      "affiliation": "Forschungszentrum Jülich GmbH",
+      "name": "Schrödter, Tobias",
+      "orcid": "0000-0002-1071-060X"
+    },
+    {
+      "affiliation": "Forschungszentrum Jülich GmbH",
+      "name": "Seemann, Ann Katrin",
+      "orcid": "0000-0003-3738-2869"
+    }
+  ]
+}

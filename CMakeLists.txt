@@ -269,6 +269,7 @@ endif(BUILD_UNIT_TESTS)
 # Aus bequemlichkeit dann einfach alle aus der alten .pro rüberkopiert
 target_include_directories(petrack_core PUBLIC "./include")
 target_sources(petrack_core PRIVATE
+    include/aboutDialog.h
     include/petrack.h
     include/helper.h
     include/control.h
@@ -328,6 +329,7 @@ target_sources(petrack_core PRIVATE
     )
 
 target_sources(petrack_core PRIVATE
+    src/aboutDialog.cpp
     src/helper.cpp
     src/control.cpp
     src/petrack.cpp
@@ -382,6 +384,7 @@ target_sources(petrack_core PRIVATE
     src/openMoCapDialog.cpp
     src/moCapPersonMetadata.cpp
     src/pMessageBox.cpp
+    ui/about.ui
     ui/codeMarker.ui
     ui/colorMarker.ui
     ui/colorRange.ui
@@ -419,6 +422,8 @@ endif(${STEREO})
 # # fuer pgrAviFile win32:LIBS += -lavifil32 win32:LIBS += -lmsvfw32 win64:LIBS
 # += -lavifil32 win64:LIBS += -lmsvfw32
 
+# Copy author file to build directory
+configure_file("${CMAKE_SOURCE_DIR}/.zenodo.json" "${CMAKE_CURRENT_BINARY_DIR}/.zenodo.json" COPYONLY)
 
 #####################################################
 # Installer                                         #

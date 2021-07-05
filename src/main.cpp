@@ -92,9 +92,9 @@ int main(int argc, char *argv[])
             QMessageBox::about(nullptr, QObject::tr("Command line options"), commandLineOptionsString);
             return 0; // 0 means exit success // 1?
         }
-        else if (arg.at(i) == "-project") 
+        else if (arg.at(i) == "-project")
             project = arg.at(++i);
-        else if (arg.at(i) == "-sequence") 
+        else if (arg.at(i) == "-sequence")
             sequence = arg.at(++i);
         else if ((arg.at(i) == "-autoSave") || (arg.at(i) == "-autosave"))
         {
