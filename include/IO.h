@@ -46,5 +46,7 @@ namespace IO
 
     std::variant<std::unordered_map<int, int>, std::string>
     readMarkerIDFile(const QString& markerFileName);
+
+    std::vector<std::string> readAuthors(const QString & authorsFile);
 }
 #endif //IO_H

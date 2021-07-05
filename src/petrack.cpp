@@ -52,6 +52,7 @@
 #include "pMessageBox.h"
 #include "trackingRoiItem.h"
 #include "recognitionRoiItem.h"
+#include "aboutDialog.h"
 
 #ifdef AVI
 #include "aviFile.h"
@@ -65,7 +66,7 @@
 #include <cmath>
 
 #include <opencv2/opencv.hpp>
-
+#include "IO.h"
 
 //temp muss spaeter herausgenommen werden,
 // dient dazu, in anderen dateien um schnell ueber cw->temp1->value() an einstellbare daten zu kommen
@@ -74,7 +75,7 @@ Control *cw;
 int Petrack::trcVersion = 0;
 
 // Reihenfolge des anlegens der objekte ist sehr wichtig
-Petrack::Petrack()
+Petrack::Petrack() : mAuthors(IO::readAuthors(QCoreApplication::applicationDirPath()+ "/.zenodo.json"))
 {
     QIcon icon;
     icon.addFile(":/icon"); // about
@@ -1297,19 +1298,12 @@ void Petrack::resetSettings()
 
 void Petrack::about()
 {
-    QString message =
-        "<p><b>PeTrack</b> - Pedestrian tracking<br>"
-        "Version: " + mPetrackVersion + "<br>"
-        "Commit hash: " + mGitCommitID + "<br>"
-        "Commit date: " + mGitCommitDate + "<br>"
-        "Commit branch: " + mGitCommitBranch + "<br>"
-        "Compiler: " + mCompilerID + " (" + mCompilerVersion + ")<br>"
-        "Compile date: " + mCompileDate + "</p>"
-        "&copy; Forschungszentrum Juelich GmbH</p>";
 
-    //People/Pedestrian/Person tracking
-    QMessageBox::about(this, tr("About PeTrack"),
-                       message);
+
+  auto about = new AboutDialog(this, mPetrackVersion, mGitCommitID,
+                               mGitCommitDate, mGitCommitBranch,
+                               mCompilerID, mCompilerVersion, mCompileDate, mAuthors);
+  about->show();
 }
 
 
@@ -1710,7 +1704,7 @@ void Petrack::createStatusBar()
     mStatusLabelTime->setFont(f);
     mStatusLabelTime->setMinimumWidth(200);
     mStatusLabelFPS->setFont(f);
-    mStatusLabelFPS->setMinimumWidth(80);    
+    mStatusLabelFPS->setMinimumWidth(80);
     mStatusLabelFPS->setAutoFillBackground(true);
     mStatusLabelFPS->setToolTip("Click to adapt play rate to fps rate");
     mStatusPosRealHeight->setRange(-999.9, 9999.9); // in cm
@@ -2216,7 +2210,7 @@ void Petrack::setMousePosOnImage(QPointF pos)
         // pixel coordinate
         QPoint pos1((int)(pos.x())+1, (int)(pos.y())+1);
         setStatusPos(pos1);
-        
+
         // pixel color
         setStatusColor();
     }
@@ -2694,7 +2688,7 @@ void Petrack::exportTracker(QString dest) //default = ""
 
                 time1 = 0.0;
                 tstart = clock();
-#endif                  
+#endif
                 mTrackerReal->calculate(mTracker, mImageItem, mControlWidget->getColorPlot(), getImageBorderSize(),
                                         mControlWidget->trackMissingFrames->checkState(),
                                         mStereoWidget->stereoUseForExport->isChecked(),
@@ -3537,7 +3531,7 @@ void Petrack::deleteTrackPointInsideROI()
 void Petrack::updateSourceInOutFrames()
 {
     mPlayerWidget->setFrameInNum(mAnimation->getSourceInFrameNum());
-    mPlayerWidget->setFrameOutNum(mAnimation->getSourceOutFrameNum());    
+    mPlayerWidget->setFrameOutNum(mAnimation->getSourceOutFrameNum());
 }
 
 // delta gibt menge an Umdrehungen und richtung an

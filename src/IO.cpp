@@ -19,16 +19,18 @@
  */
 
 #include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QRegularExpression>
 #include <QTextStream>
 #include <opencv2/opencv.hpp>
 
 #include "IO.h"
 #include "moCapPerson.h"
+#include "pMessageBox.h"
 #include "skeletonTree.h"
 #include "skeletonTreeFactory.h"
-#include "pMessageBox.h"
-
 
 /**
  * @brief Reads individual heights for markerIDs from file.
@@ -344,3 +346,39 @@ std::variant<std::unordered_map<int, int>, std::string> IO::readMarkerIDFile(con
     }
     return "No file provided.";
 }
+
+/**
+ * Opens the list of authors in zenodo metadata format (see
+ * https://developers.zenodo.org/#representation) for more details.
+ *
+ * @param authorsFile zenodo metadata file containing the author information
+ * @return list of authors
+ */
+std::vector<std::string> IO::readAuthors(const QString & authorsFile)
+{
+    QFile file(authorsFile);
+    file.open(QIODevice::ReadOnly);
+
+    QJsonParseError parseError{};
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(file.readAll(), &parseError);
+
+    std::vector<std::string> authors;
+
+    if (parseError.error == QJsonParseError::NoError)
+    {
+        QJsonObject root = jsonDocument.object();
+        auto creators = root["creators"].toArray();
+        for (auto author : creators)
+        {
+            QJsonObject node = author.toObject();
+            authors.push_back(node["name"].toString().toStdString());
+        }
+    }
+    else
+    {
+        debout << "Error while parsing author file: " << parseError.errorString() << "\n";
+    }
+
+    return authors;
+}
+

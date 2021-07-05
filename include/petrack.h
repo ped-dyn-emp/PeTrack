@@ -626,6 +626,8 @@ private:
     QString mCompileDate{"Unknown"}; ///< Compile date
     QString mCompilerID{"Unknown"}; ///< Used compiler
     QString mCompilerVersion{"Unknown"}; ///< Used compiler version
+
+    std::vector<std::string> mAuthors;
 };
 
 #endif
