@@ -326,6 +326,7 @@ target_sources(petrack_core PRIVATE
     include/openMoCapDialog.h
     include/moCapPersonMetadata.h
     include/pMessageBox.h
+    include/moCapSelectionWidget.h
     )
 
 target_sources(petrack_core PRIVATE
@@ -384,6 +385,7 @@ target_sources(petrack_core PRIVATE
     src/openMoCapDialog.cpp
     src/moCapPersonMetadata.cpp
     src/pMessageBox.cpp
+    src/moCapSelectionWidget.cpp
     ui/about.ui
     ui/codeMarker.ui
     ui/colorMarker.ui
@@ -392,6 +394,7 @@ target_sources(petrack_core PRIVATE
     ui/stereo.ui
     ui/control.ui
     ui/openMoCapDialog.ui
+    ui/moCapSelectionWidget.ui
 )
 
 target_sources(petrack PRIVATE

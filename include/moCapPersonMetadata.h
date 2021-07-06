@@ -46,12 +46,12 @@ public:
     MoCapPersonMetadata& operator=(const MoCapPersonMetadata&) = default;
     MoCapPersonMetadata& operator=(MoCapPersonMetadata&&) = default;
     ~MoCapPersonMetadata() = default;
-    MoCapPersonMetadata(std::string filepath, MoCapSystem system, int samplerate, double offset);
+    MoCapPersonMetadata(std::string filepath, MoCapSystem system, double samplerate, double offset);
 
     void setFilepath(const std::string &filepath, MoCapSystem system);
     void setSamplerate(double samplerate);
     void setOffset(double offset);
-    void setMetadata(const std::string &filepath, MoCapSystem, int samplerate, double offset);
+    void setMetadata(const std::string &filepath, MoCapSystem, double samplerate, double offset);
     MoCapSystem getSystem() const;
     double getSamplerate() const;
     double getOffset() const;

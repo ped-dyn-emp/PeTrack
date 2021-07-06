@@ -24,52 +24,32 @@
 #include "ui_openMoCapDialog.h"
 #include "moCapPersonMetadata.h"
 
+#include "moCapSelectionWidget.h"
+
 OpenMoCapDialog::OpenMoCapDialog(QWidget *parent, MoCapController &controller) :
         QDialog(parent),
         mUi(new Ui::OpenMoCapDialog),
         mController(controller),
         mParent(parent)
 {
-    constexpr int defaultSampleRate = 60;
-    constexpr double offsetRange = 5;
-
     mUi->setupUi(this);
+
+
+
     mMoCapSystems = QMap<QString, MoCapSystem>();
     setWindowFlags(windowFlags().setFlag(Qt::WindowContextHelpButtonHint, false));
     mMoCapSystems.insert("XSensC3D", MoCapSystem::XSensC3D);
-    mUi->cbInputSystem->addItems(QStringList(mMoCapSystems.keys()));
-    mUi->cbInputSystem->setCurrentIndex(0);
-    mUi->sampleRateSpinBox->setRange(1, 300);
-    mUi->sampleRateSpinBox->setValue(defaultSampleRate);
-    mUi->offSetSpinBox->setRange(-offsetRange, offsetRange);
-    mUi->offSetSpinBox->setSingleStep(0.01);
-    mUi->filePathLineEdit->setReadOnly(true);
-    mUi->pushButtonOK->setDisabled(true);
+
+    const auto loadedMetadata = mController.getAllMoCapPersonMetadata();
+    for(const auto& metadata : loadedMetadata){
+        mUi->moCapSelections->layout()->addWidget(new MoCapSelectionWidget(this, mMoCapSystems, metadata));
+    }
+
     connect(mUi->pushButtonOK, &QPushButton::clicked, this, &OpenMoCapDialog::clickedOk);
     connect(mUi->pushButtonCancel, &QPushButton::clicked, this, &OpenMoCapDialog::close);
-    connect(mUi->browseFileButton, &QPushButton::clicked, this, &OpenMoCapDialog::setFileName);
 }
 
-/**
- * @brief Opens QFileDialog and enables ok-Button if the selected filename isn't empty.
- *
- * This method is called by a Signal('browse File'-Button).
- * The selected Filename is shown(read-only) in the LineEdit-Field.
- */
 
-void OpenMoCapDialog::setFileName(){
-    std::stringstream extensionsString;
-    extensionsString << "All MoCap File Types (";
-    for(const auto &extension: moCapFileExtensions){
-        extensionsString << " *." << extension.second;
-    }
-    extensionsString << ")";
-    QString filename = QFileDialog::getOpenFileName(this, tr("Open C3D File"), QDir::currentPath(),
-                                                                 QString::fromStdString(extensionsString.str()));
-    mUi->filePathLineEdit->clear();
-    mUi->filePathLineEdit->insert(filename);
-    mUi->pushButtonOK->setDisabled(filename.isEmpty());
-}
 
 /**
  * @brief Sets FileAttributes of MoCapController and calls readMoCapFile
@@ -77,20 +57,39 @@ void OpenMoCapDialog::setFileName(){
  * This method is called by a Signal(Ok-Button) and closes the window if no errors occur.
  */
 void OpenMoCapDialog::clickedOk() {
-    QString filePath = mUi->filePathLineEdit->text();
-    int samplerate = mUi->sampleRateSpinBox->value();
-    double offset = mUi->offSetSpinBox->value();
-    MoCapSystem system = mMoCapSystems.value(mUi->cbInputSystem->currentText());
-    std::stringstream errormsg;
-    try{
-        std::vector<MoCapPersonMetadata> metadata;
-        MoCapPersonMetadata currentMetadata(filePath.toStdString(), system, samplerate, offset);
-        metadata.push_back(currentMetadata);
-        mController.readMoCapFiles(metadata);
-        this->close();
-    }catch(std::exception &e){
-        errormsg << e.what() << "\n";
-        QMessageBox::critical(mParent, "PeTrack", QString::fromStdString(errormsg.str()));
+    bool allDataIsValid = true;
+    std::vector<MoCapPersonMetadata> metadata;
+
+    for(int i = 0; i < mUi->moCapSelections->layout()->count(); ++i)
+    {
+        auto selectionWidget = dynamic_cast<const MoCapSelectionWidget*>(mUi->moCapSelections->layout()->itemAt(i)->widget());
+        if(selectionWidget == nullptr || !selectionWidget->isFilledOut())
+        {
+            continue;
+        }
+
+        try{
+            MoCapPersonMetadata currentMetadata = selectionWidget->getMetadata();
+            metadata.push_back(currentMetadata);
+        }catch(std::exception &e){
+            allDataIsValid = false;
+            std::stringstream errormsg;
+            errormsg << e.what() << "\n";
+            QMessageBox::critical(mParent, "PeTrack", QString::fromStdString(errormsg.str()));
+        }
+    }
+
+
+    if(allDataIsValid)
+    {
+        try {
+            mController.readMoCapFiles(metadata);
+            this->close();
+        }  catch (std::exception &e) {
+            std::stringstream errormsg;
+            errormsg << e.what() << "\n";
+            QMessageBox::critical(mParent, "PeTrack", QString::fromStdString(errormsg.str()));
+        }
     }
 }
 
@@ -99,3 +98,9 @@ OpenMoCapDialog::~OpenMoCapDialog()
 {
     delete mUi;
 }
+
+void OpenMoCapDialog::on_btnAddSelection_clicked()
+{
+    mUi->moCapSelections->layout()->addWidget(new MoCapSelectionWidget(this, mMoCapSystems));
+}
+

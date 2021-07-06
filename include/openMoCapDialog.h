@@ -52,8 +52,10 @@ public:
     OpenMoCapDialog& operator=(OpenMoCapDialog&&) = delete;
     ~OpenMoCapDialog() override;
 
-    void setFileName();
     void clickedOk();
+
+private slots:
+    void on_btnAddSelection_clicked();
 
 private:
     Ui::OpenMoCapDialog *mUi;
