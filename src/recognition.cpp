@@ -559,6 +559,7 @@ void detail::refineWithAruco(std::vector<ColorBlob> &blobs, const cv::Mat& img, 
     bool autoCorrect = options.autoCorrect;
     bool autoCorrectOnlyExport = options.autoCorrectOnlyExport;
 
+    CodeMarkerOptions& codeOpt = options.codeOpt;
     for(ColorBlob& blob : blobs)
     {
         // cropRect has coordinates of rechtangele around color blob with respect to lower left corner (as in the beginning of useBlackDot)
@@ -579,7 +580,10 @@ void detail::refineWithAruco(std::vector<ColorBlob> &blobs, const cv::Mat& img, 
 
         if (subImg.empty())
             continue;
-        findCodeMarker(subImg, crossList, controlWidget, options.method, offsetCropRect2Roi);
+        // TODO: Use Reference to actual codeMarkerOptions in MulticolorMarkerOptions
+        // NOTE: For now, add as parameter of findMulticolorMarker
+        codeOpt.offsetCropRect2Roi = offsetCropRect2Roi;
+        findCodeMarker(subImg, crossList, options.method, codeOpt);
 
         // The next three statements each:
         // - set the offset of subImg with regards to ROI //(ROI to original image is archieved later in the code for all methods)
@@ -632,6 +636,7 @@ void detail::refineWithAruco(std::vector<ColorBlob> &blobs, const cv::Mat& img, 
             crossList.back() = crossList.back() + (Vec2F(cropRect.x, cropRect.y) + moveDir);
         }
     }
+    codeOpt.offsetCropRect2Roi = Vec2F{0,0};
 }
 
 /**
@@ -647,7 +652,7 @@ void detail::refineWithAruco(std::vector<ColorBlob> &blobs, const cv::Mat& img, 
  * @param ignoreWithoutMarker (is ignored->overwritten by cmWidget->ignoreWithoutDot->isChecked())
  * @param offset
  */
-void findMultiColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *controlWidget, bool ignoreWithoutMarker, Vec2F &offset, RecognitionMethod method)
+void findMultiColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *controlWidget, bool ignoreWithoutMarker, Vec2F &offset, RecognitionMethod method, CodeMarkerOptions& codeOpt)
 {
     Petrack *mainWindow = controlWidget->getMainWindow();
     MultiColorMarkerItem* cmItem = mainWindow->getMultiColorMarkerItem();
@@ -723,12 +728,14 @@ void findMultiColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *c
             refineWithBlackDot(blobs, img, crossList, options);
         }else if (useCodeMarker)
         {
-            ArucoOptions options;
-            options.autoCorrect = autoCorrect;
-            options.autoCorrectOnlyExport = autoCorrectOnlyExport;
-            options.ignoreWithoutMarker = ignoreWithoutMarker;
-            options.controlWidget = controlWidget;
-            options.method = method;
+            ArucoOptions options{
+                controlWidget,
+                ignoreWithoutMarker,
+                autoCorrect,
+                autoCorrectOnlyExport,
+                method,
+                codeOpt
+            };
 
             // adds to crosslist
             refineWithAruco(blobs, img, crossList, options);
@@ -855,14 +862,14 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *contro
  * @param crossList[out] list of detected TrackPoints
  * @param controlWidget
  */
-void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *controlWidget, RecognitionMethod recoMethod, Vec2F offsetCropRect2Roi /*=(0,0)*/)
+void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, RecognitionMethod recoMethod, const CodeMarkerOptions& opt)
 {
-    CodeMarkerItem* codeMarkerItem = controlWidget->getMainWindow()->getCodeMarkerItem();
-    CodeMarkerWidget* codeMarkerWidget = controlWidget->getMainWindow()->getCodeMarkerWidget();
+    CodeMarkerItem *codeMarkerItem = opt.codeMarkerItem;
+    const auto& par = opt.detectorParams;
 
-    cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::PREDEFINED_DICTIONARY_NAME(codeMarkerWidget->dictList->currentIndex()));
+    cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::PREDEFINED_DICTIONARY_NAME(opt.indexOfMarkerDict));
 
-    if (codeMarkerWidget->dictList->currentIndex() == 17) //for usage of DICT_mip_36h12 as it is not predifined in opencv
+    if (opt.indexOfMarkerDict == 17) //for usage of DICT_mip_36h12 as it is not predifined in opencv
     {
         dictionary = detail::getDictMip36h12();
     }
@@ -871,11 +878,11 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control 
 
     double minMarkerPerimeterRate = 0.03, maxMarkerPerimeterRate = 4, minCornerDistanceRate = 0.05, minMarkerDistanceRate = 0.05;
 
-    Petrack *mainWindow = controlWidget->getMainWindow();
+    Petrack *mainWindow = opt.controlWidget->getMainWindow();
 
     int bS = mainWindow->getImageBorderSize();
 
-    if (controlWidget->getCalibCoordDimension() == 0) // 3D
+    if (opt.controlWidget->getCalibCoordDimension() == 0) // 3D
     {
         if (recoMethod == RecognitionMethod::Code)  // for usage of codemarker with CodeMarker-function (-> without MulticolorMarker)
         {
@@ -883,18 +890,18 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control 
                        myRound(mainWindow->getRecoRoiItem()->rect().y()),
                        myRound(mainWindow->getRecoRoiItem()->rect().width()),
                        myRound(mainWindow->getRecoRoiItem()->rect().height()));
-            QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y(),controlWidget->mapDefaultHeight->value()),
-                    p2 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y(),controlWidget->mapDefaultHeight->value()),
-                    p3 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value()),
-                    p4 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value());
+            QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y(),opt.controlWidget->mapDefaultHeight->value()),
+                    p2 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y(),opt.controlWidget->mapDefaultHeight->value()),
+                    p3 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y()+rect.height(),opt.controlWidget->mapDefaultHeight->value()),
+                    p4 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y()+rect.height(),opt.controlWidget->mapDefaultHeight->value());
 
             double cmPerPixel_min = std::min(std::min(std::min(p1.x(), p1.y()), std::min(p2.x(), p2.y())),
                                              std::min(std::min(p3.x(), p3.y()), std::min(p4.x(), p4.y())));
             double cmPerPixel_max = std::max(std::max(std::max(p1.x(), p1.y()), std::max(p2.x(), p2.y())),
                                              std::max(std::max(p3.x(), p3.y()), std::max(p4.x(), p4.y())));
 
-            minMarkerPerimeterRate = (codeMarkerWidget->minMarkerPerimeter->value()*4./cmPerPixel_max)/std::max(rect.width(),rect.height());
-            maxMarkerPerimeterRate = (codeMarkerWidget->maxMarkerPerimeter->value()*4./cmPerPixel_min)/std::max(rect.width(),rect.height());
+            minMarkerPerimeterRate = (par.minMarkerPerimeter*4./cmPerPixel_max)/std::max(rect.width(),rect.height());
+            maxMarkerPerimeterRate = (par.maxMarkerPerimeter*4./cmPerPixel_min)/std::max(rect.width(),rect.height());
         } else if (recoMethod == RecognitionMethod::MultiColor)   // for usage of codemarker with MulticolorMarker
         {
             QRect rect(0,0, img.rows, img.cols);
@@ -904,44 +911,44 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control 
             maxMarkerPerimeterRate = 4.;
         }
 
-        minCornerDistanceRate = codeMarkerWidget->minCornerDistance->value();
-        minMarkerDistanceRate = codeMarkerWidget->minMarkerDistance->value();
+        minCornerDistanceRate = par.minCornerDistance;
+        minMarkerDistanceRate = par.minMarkerDistance;
 
     }
     else // 2D
     {
         double cmPerPixel = mainWindow->getImageItem()->getCmPerPixel();
-        minMarkerPerimeterRate = (codeMarkerWidget->minMarkerPerimeter->value()*4/cmPerPixel)/std::max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
-        maxMarkerPerimeterRate = (codeMarkerWidget->maxMarkerPerimeter->value()*4/cmPerPixel)/std::max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
+        minMarkerPerimeterRate = (par.minMarkerPerimeter*4/cmPerPixel)/std::max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
+        maxMarkerPerimeterRate = (par.maxMarkerPerimeter*4/cmPerPixel)/std::max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
 
-        minCornerDistanceRate = codeMarkerWidget->minCornerDistance->value();
-        minMarkerDistanceRate = codeMarkerWidget->minMarkerDistance->value();
+        minCornerDistanceRate = par.minCornerDistance;
+        minMarkerDistanceRate = par.minMarkerDistance;
     }
 
-    detectorParams->adaptiveThreshWinSizeMin              = codeMarkerWidget->adaptiveThreshWinSizeMin->value();
-    detectorParams->adaptiveThreshWinSizeMax              = codeMarkerWidget->adaptiveThreshWinSizeMax->value();
-    detectorParams->adaptiveThreshWinSizeStep             = codeMarkerWidget->adaptiveThreshWinSizeStep->value();
-    detectorParams->adaptiveThreshConstant                = codeMarkerWidget->adaptiveThreshConstant->value();
+    detectorParams->adaptiveThreshWinSizeMin              = par.adaptiveThreshWinSizeMin;
+    detectorParams->adaptiveThreshWinSizeMax              = par.adaptiveThreshWinSizeMax;
+    detectorParams->adaptiveThreshWinSizeStep             = par.adaptiveThreshWinSizeStep;
+    detectorParams->adaptiveThreshConstant                = par.adaptiveThreshConstant;
     detectorParams->minMarkerPerimeterRate                = minMarkerPerimeterRate;
     detectorParams->maxMarkerPerimeterRate                = maxMarkerPerimeterRate;
-    detectorParams->polygonalApproxAccuracyRate           = codeMarkerWidget->polygonalApproxAccuracyRate->value();
+    detectorParams->polygonalApproxAccuracyRate           = par.polygonalApproxAccuracyRate;
     detectorParams->minCornerDistanceRate                 = minCornerDistanceRate;
-    detectorParams->minDistanceToBorder                   = codeMarkerWidget->minDistanceToBorder->value();
+    detectorParams->minDistanceToBorder                   = par.minDistanceToBorder;
     detectorParams->minMarkerDistanceRate                 = minMarkerDistanceRate;
     // No refinement is default value
     // TODO Check if this is the best MEthod for our usecase
-    if(codeMarkerWidget->doCornerRefinement->isChecked()){
+    if(par.doCornerRefinement){
         detectorParams->cornerRefinementMethod            = cv::aruco::CornerRefineMethod::CORNER_REFINE_SUBPIX;
     }
-    detectorParams->cornerRefinementWinSize               = codeMarkerWidget->cornerRefinementWinSize->value();
-    detectorParams->cornerRefinementMaxIterations         = codeMarkerWidget->cornerRefinementMaxIterations->value();
-    detectorParams->cornerRefinementMinAccuracy           = codeMarkerWidget->cornerRefinementMinAccuracy->value();
-    detectorParams->markerBorderBits                      = codeMarkerWidget->markerBorderBits->value();
-    detectorParams->perspectiveRemovePixelPerCell         = codeMarkerWidget->perspectiveRemovePixelPerCell->value();
-    detectorParams->perspectiveRemoveIgnoredMarginPerCell = codeMarkerWidget->perspectiveRemoveIgnoredMarginPerCell->value();
-    detectorParams->maxErroneousBitsInBorderRate          = codeMarkerWidget->maxErroneousBitsInBorderRate->value();
-    detectorParams->minOtsuStdDev                         = codeMarkerWidget->minOtsuStdDev->value();
-    detectorParams->errorCorrectionRate                   = codeMarkerWidget->errorCorrectionRate->value();
+    detectorParams->cornerRefinementWinSize               = par.cornerRefinementWinSize;
+    detectorParams->cornerRefinementMaxIterations         = par.cornerRefinementMaxIterations;
+    detectorParams->cornerRefinementMinAccuracy           = par.cornerRefinementMinAccuracy;
+    detectorParams->markerBorderBits                      = par.markerBorderBits;
+    detectorParams->perspectiveRemovePixelPerCell         = par.perspectiveRemovePixelPerCell;
+    detectorParams->perspectiveRemoveIgnoredMarginPerCell = par.perspectiveRemoveIgnoredMarginPerCell;
+    detectorParams->maxErroneousBitsInBorderRate          = par.maxErroneousBitsInBorderRate;
+    detectorParams->minOtsuStdDev                         = par.minOtsuStdDev;
+    detectorParams->errorCorrectionRate                   = par.errorCorrectionRate;
 
     std::vector<int> ids;
     std::vector<std::vector<cv::Point2f> > corners, rejected;
@@ -951,8 +958,8 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control 
 
     cv::aruco::detectMarkers(img, dictionary, corners, ids, detectorParams, rejected);
 
-    codeMarkerItem->addDetectedMarkers(corners,ids, offsetCropRect2Roi);
-    codeMarkerItem->addRejectedMarkers(rejected, offsetCropRect2Roi);
+    codeMarkerItem->addDetectedMarkers(corners,ids, opt.offsetCropRect2Roi);
+    codeMarkerItem->addRejectedMarkers(rejected, opt.offsetCropRect2Roi);
 
     // detected code markers
     for(size_t i = 0; i<ids.size(); i++)
@@ -1100,13 +1107,13 @@ QList<TrackPoint> Recognizer::getMarkerPos(cv::Mat &img, QRect &roi, Control *co
 
     switch (mRecoMethod) {
         case RecognitionMethod::MultiColor:
-            findMultiColorMarker(tImg, crossList, controlWidget, ignoreWithoutMarker, v, mRecoMethod);
+            findMultiColorMarker(tImg, crossList, controlWidget, ignoreWithoutMarker, v, mRecoMethod, mCodeMarkerOptions);
             break;
         case RecognitionMethod::Color:
             findColorMarker(tImg, crossList, controlWidget);
             break;
         case RecognitionMethod::Code:
-            findCodeMarker(tImg, crossList, controlWidget, mRecoMethod);
+            findCodeMarker(tImg, crossList, mRecoMethod, mCodeMarkerOptions);
             break;
         case RecognitionMethod::Casern: [[fallthrough]];
         case RecognitionMethod::Hermes: [[fallthrough]];
@@ -1142,6 +1149,21 @@ QList<TrackPoint> Recognizer::getMarkerPos(cv::Mat &img, QRect &roi, Control *co
     return crossList;
 }
 
+void CodeMarkerOptions::userChangedDetectorParams(ArucoCodeParams params)
+{
+    if(params != detectorParams){
+        detectorParams = params;
+        emit detectorParamsChanged();
+    }
+}
+
+void CodeMarkerOptions::userChangedIndexOfMarkerDict(int idx)
+{
+    if(idx != indexOfMarkerDict){
+        indexOfMarkerDict = idx;
+        emit indexOfMarkerDictChanged();
+    }
+}
 
 /**
  * @brief getMip36h12Dict() overrides current dictionary with dictionary from 'aruco_mip_36h12_dict'

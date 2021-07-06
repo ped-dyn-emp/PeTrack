@@ -32,6 +32,7 @@ class QRect;
 class BackgroundFilter;
 class Control;
 class ImageItem;
+class CodeMarkerItem;
 
 namespace reco {
     /**
@@ -50,12 +51,71 @@ namespace reco {
         Code = 6,
     };
 
+    struct ArucoCodeParams {
+        double minMarkerPerimeter = 5;
+        double maxMarkerPerimeter = 15;
+        double minCornerDistance = 0.05;
+        double minMarkerDistance = 0.05;
+        int adaptiveThreshWinSizeMin = 3;
+        int adaptiveThreshWinSizeMax = 27;
+        int adaptiveThreshWinSizeStep = 10;
+        int adaptiveThreshConstant = 7;
+        double polygonalApproxAccuracyRate = 0.03;
+        int minDistanceToBorder = 3;
+        bool doCornerRefinement = false;
+        int cornerRefinementWinSize = 5;
+        int cornerRefinementMaxIterations = 30;
+        double cornerRefinementMinAccuracy = 0.1;
+        int markerBorderBits = 1;
+        int perspectiveRemovePixelPerCell = 4;
+        double perspectiveRemoveIgnoredMarginPerCell = 0.13;
+        double maxErroneousBitsInBorderRate = 0.35;
+        double minOtsuStdDev = 5;
+        double errorCorrectionRate = 0.6;
+
+        friend inline constexpr bool operator==(const ArucoCodeParams & lhs, const ArucoCodeParams & rhs) noexcept
+        {
+            return (lhs.minMarkerPerimeter == rhs.minMarkerPerimeter) && ((lhs.maxMarkerPerimeter == rhs.maxMarkerPerimeter) && ((lhs.minCornerDistance == rhs.minCornerDistance) && ((lhs.minMarkerDistance == rhs.minMarkerDistance) && ((lhs.adaptiveThreshWinSizeMin == rhs.adaptiveThreshWinSizeMin) && ((lhs.adaptiveThreshWinSizeMax == rhs.adaptiveThreshWinSizeMax) && ((lhs.adaptiveThreshWinSizeStep == rhs.adaptiveThreshWinSizeStep) && ((lhs.adaptiveThreshConstant == rhs.adaptiveThreshConstant) && ((lhs.polygonalApproxAccuracyRate == rhs.polygonalApproxAccuracyRate) && ((lhs.minDistanceToBorder == rhs.minDistanceToBorder) && ((static_cast<int>(lhs.doCornerRefinement) == static_cast<int>(rhs.doCornerRefinement)) && ((lhs.cornerRefinementWinSize == rhs.cornerRefinementWinSize) && ((lhs.cornerRefinementMaxIterations == rhs.cornerRefinementMaxIterations) && ((lhs.cornerRefinementMinAccuracy == rhs.cornerRefinementMinAccuracy) && ((lhs.markerBorderBits == rhs.markerBorderBits) && ((lhs.perspectiveRemovePixelPerCell == rhs.perspectiveRemovePixelPerCell) && ((lhs.perspectiveRemoveIgnoredMarginPerCell == rhs.perspectiveRemoveIgnoredMarginPerCell) && ((lhs.maxErroneousBitsInBorderRate == rhs.maxErroneousBitsInBorderRate) && ((lhs.minOtsuStdDev == rhs.minOtsuStdDev) && (lhs.errorCorrectionRate == rhs.errorCorrectionRate)))))))))))))))))));
+        }
+        friend inline constexpr bool operator!=(const ArucoCodeParams& lhs, const ArucoCodeParams& rhs)
+        {
+            return !(lhs == rhs);
+        }
+    };
+
+
+    struct CodeMarkerOptions : public QObject{
+        Q_OBJECT
+
+    public:
+        CodeMarkerItem *codeMarkerItem;
+        int indexOfMarkerDict = 16;
+
+        ArucoCodeParams detectorParams;
+
+        Control *controlWidget;
+        Vec2F offsetCropRect2Roi = Vec2F{0,0};
+
+    public:
+        ArucoCodeParams getDetectorParams() const {return detectorParams;}
+        int getIndexOfMarkerDict() const {return indexOfMarkerDict;}
+
+    public:
+        void userChangedDetectorParams(ArucoCodeParams params);
+        void userChangedIndexOfMarkerDict(int idx);
+
+    signals:
+        void detectorParamsChanged();
+        void indexOfMarkerDictChanged();
+    };
+
     class Recognizer : public QObject
     {
         Q_OBJECT
 
     private:
         // TODO add options for each marker type
+        CodeMarkerOptions mCodeMarkerOptions;
 
         // default multicolor marker (until 11/2016 hermes marker)
         RecognitionMethod mRecoMethod = RecognitionMethod::MultiColor;
@@ -63,6 +123,7 @@ namespace reco {
         QList<TrackPoint> getMarkerPos(cv::Mat &img, QRect &roi, Control *controlWidget, int borderSize, BackgroundFilter *bgFilter);
 
         RecognitionMethod getRecoMethod() const {return mRecoMethod;}
+        CodeMarkerOptions& getCodeMarkerOptions() {return mCodeMarkerOptions;}
 
     public slots:
         void userChangedRecoMethod(RecognitionMethod method)
@@ -130,6 +191,7 @@ namespace reco {
             bool     autoCorrect         = false;   ///< should perspective correction be performed
             bool autoCorrectOnlyExport   = false;   ///< should perspective correction only be performed when exporting trajectories
             RecognitionMethod method = RecognitionMethod::Code; ///< Used recognition method; could be called from findMulticolorMarker
+            CodeMarkerOptions& codeOpt;
         };
 
         std::vector<ColorBlob> findColorBlob(const ColorBlobDetectionParams &options);
@@ -138,7 +200,7 @@ namespace reco {
         void refineWithBlackDot(std::vector<ColorBlob>& blobs, const cv::Mat& img, QList<TrackPoint>& crossList, const BlackDotOptions& options);
         void refineWithAruco(std::vector<ColorBlob> &blobs, const cv::Mat& img, QList<TrackPoint> &crossList, ArucoOptions& options);
 
-        void findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *controlWidget, RecognitionMethod recoMethod, Vec2F offsetCropRect2Roi=Vec2F{0,0});
+        void findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, RecognitionMethod recoMethod, const CodeMarkerOptions &opt);
         cv::Ptr<cv::aruco::Dictionary> getDictMip36h12();
     }
 }
