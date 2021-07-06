@@ -20,12 +20,12 @@
 #include <QFileInfo>
 #include "moCapPersonMetadata.h"
 
-MoCapPersonMetadata::MoCapPersonMetadata(std::string filepath, MoCapSystem system, int samplerate, double offset){
+MoCapPersonMetadata::MoCapPersonMetadata(std::string filepath, MoCapSystem system, double samplerate, double offset){
     setMetadata(filepath, system, samplerate, offset);
 }
 
 
-void MoCapPersonMetadata::setMetadata(const std::string &filepath, MoCapSystem system, int samplerate, double offset){
+void MoCapPersonMetadata::setMetadata(const std::string &filepath, MoCapSystem system, double samplerate, double offset){
     setSamplerate(samplerate);
     setOffset(offset);
     setFilepath(filepath, system);
@@ -86,8 +86,8 @@ double MoCapPersonMetadata::getOffset() const {
 
 bool operator==(const MoCapPersonMetadata &lhs, const MoCapPersonMetadata &rhs){
     return (lhs.getFilepath().compare(rhs.getFilepath()) == 0
-            && lhs.getOffset() == rhs.getOffset()
-            && lhs.getSamplerate() == rhs.getSamplerate()
+            && std::abs(lhs.getOffset() - rhs.getOffset()) < 1e-4
+            && std::abs(lhs.getSamplerate() - rhs.getSamplerate()) < 1e-4
             && lhs.getSystem() == rhs.getSystem());
 }
 

@@ -39,7 +39,6 @@
 #include "autoCalib.h"
 #include "coordItem.h"
 #include "extrCalibration.h"
-#include "openMoCapDialog.h"
 #include "moCapPerson.h"
 #include "moCapController.h"
 

@@ -52,6 +52,8 @@
 #include "pMessageBox.h"
 #include "trackingRoiItem.h"
 #include "recognitionRoiItem.h"
+#include "openMoCapDialog.h"
+
 #include "aboutDialog.h"
 
 #ifdef AVI
@@ -1445,7 +1447,7 @@ void Petrack::createActions()
     //mOpenCameraAct->setShortcut(tr("Ctrl+C")); // because of some reason it is sometimes fired with Ctrl+LeftMouseButton ==> so disabled (it's also not really needed)
     connect(mOpenCameraAct, SIGNAL(triggered()), this, SLOT(openCameraLiveStream()));
 
-    mOpenMoCapAct = new QAction(tr("Open MoCap File"), this);
+    mOpenMoCapAct = new QAction(tr("Manage MoCap Files"), this);
     connect(mOpenMoCapAct, &QAction::triggered, this, &Petrack::openMoCapFile);
 
     mSaveSeqVidAct = new QAction(tr("Save Video"), this);
