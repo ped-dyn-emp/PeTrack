@@ -125,7 +125,7 @@ Petrack::Petrack() : mAuthors(IO::readAuthors(QCoreApplication::applicationDirPa
     mColorMarkerWidget->setWindowFlags(Qt::Window);
     mColorMarkerWidget->setWindowTitle("Color marker parameter");
 
-    mCodeMarkerWidget = new CodeMarkerWidget(this);
+    mCodeMarkerWidget = new CodeMarkerWidget(this, mReco.getCodeMarkerOptions());
     mCodeMarkerWidget->setWindowFlags(Qt::Window);
     mCodeMarkerWidget->setWindowTitle("Code marker parameter");
 
@@ -267,6 +267,10 @@ Petrack::Petrack() : mAuthors(IO::readAuthors(QCoreApplication::applicationDirPa
     createActions();
     createMenus();
     createStatusBar();
+
+    // TODO delete once we get Options to be value only (i.e. no Pointer/Ref anymore)
+    mReco.getCodeMarkerOptions().controlWidget = mControlWidget;
+    mReco.getCodeMarkerOptions().codeMarkerItem = mCodeMarkerItem;
 
     mSeqFileName = QDir::currentPath(); //fuer allerersten Aufruf des Programms
     readSettings();

@@ -18,10 +18,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "codeMarkerWidget.h"
+#include <opencv2/core/version.hpp>
 
-CodeMarkerWidget::CodeMarkerWidget(QWidget *parent)
-    : QWidget(parent)
+#include "codeMarkerWidget.h"
+#include "recognition.h"
+
+CodeMarkerWidget::CodeMarkerWidget(QWidget *parent, reco::CodeMarkerOptions& codeMarkerOpt)
+    : QWidget(parent), mCodeMarkerOpt(codeMarkerOpt)
 {
     mMainWindow = (class Petrack*) parent;
 
@@ -50,8 +53,45 @@ CodeMarkerWidget::CodeMarkerWidget(QWidget *parent)
     dictList->addItem("DICT_ARUCO_ORGINAL"); // 16
     dictList->addItem("DICT_mip_36h12");//17
 
-    dictList->setCurrentIndex(16);
+    connect(&mCodeMarkerOpt, &reco::CodeMarkerOptions::detectorParamsChanged, this, &CodeMarkerWidget::readDetectorParams);
+    connect(&mCodeMarkerOpt, &reco::CodeMarkerOptions::indexOfMarkerDictChanged, this, &CodeMarkerWidget::readDictListIndex);
 
+    // get default values from Options
+    readDetectorParams();
+    readDictListIndex();
+
+
+    // NOTE: No parameter validation done here
+    // Can result in crash, when invalid params are chosen (e.g. min larger than max)
+    auto changedParams = [&](){
+        sendDetectorParams(packDetectorParams());
+        notifyChanged();
+    };
+
+    connect(minMarkerPerimeter, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
+    connect(maxMarkerPerimeter, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
+
+    connect(adaptiveThreshWinSizeMin, QOverload<int>::of(&QSpinBox::valueChanged), changedParams);
+    connect(adaptiveThreshWinSizeMax, QOverload<int>::of(&QSpinBox::valueChanged), changedParams);
+    connect(adaptiveThreshWinSizeStep, QOverload<int>::of(&QSpinBox::valueChanged), changedParams);
+    connect(adaptiveThreshConstant, QOverload<int>::of(&QSpinBox::valueChanged), changedParams);
+
+    connect(polygonalApproxAccuracyRate, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
+    connect(minCornerDistance, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
+    connect(minDistanceToBorder, QOverload<int>::of(&QSpinBox::valueChanged), changedParams);
+    connect(minMarkerDistance, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
+
+    connect(doCornerRefinement, &QGroupBox::clicked, changedParams);
+    connect(cornerRefinementWinSize, QOverload<int>::of(&QSpinBox::valueChanged), changedParams);
+    connect(cornerRefinementMaxIterations, QOverload<int>::of(&QSpinBox::valueChanged), changedParams);
+    connect(cornerRefinementMinAccuracy, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
+
+    connect(markerBorderBits, QOverload<int>::of(&QSpinBox::valueChanged), changedParams);
+    connect(perspectiveRemovePixelPerCell, QOverload<int>::of(&QSpinBox::valueChanged), changedParams);
+    connect(perspectiveRemoveIgnoredMarginPerCell, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
+    connect(maxErroneousBitsInBorderRate, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
+    connect(errorCorrectionRate, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
+    connect(minOtsuStdDev, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
 }
 
 //<COLOR_MARKER>
@@ -155,10 +195,94 @@ void CodeMarkerWidget::getXml(QDomElement &elem)
                 errorCorrectionRate->setValue(subElem.attribute("ERROR_CORRECTION_RATE").toDouble());
             if (subElem.hasAttribute("SHOW_DETECTED_CANDIDATES"))
                 showDetectedCandidates->setCheckState(subElem.attribute("SHOW_DETECTED_CANDIDATES").toInt() ? Qt::Checked : Qt::Unchecked);
-
-
         }
     }
+}
+
+reco::ArucoCodeParams CodeMarkerWidget::packDetectorParams()
+{
+    reco::ArucoCodeParams params;
+    params.adaptiveThreshConstant = adaptiveThreshConstant->value();
+    params.adaptiveThreshWinSizeMax = adaptiveThreshWinSizeMax->value();
+    params.adaptiveThreshWinSizeMin = adaptiveThreshWinSizeMin->value();
+    params.adaptiveThreshWinSizeStep = adaptiveThreshWinSizeStep->value();
+    params.cornerRefinementMaxIterations = cornerRefinementMaxIterations->value();
+    params.cornerRefinementMinAccuracy = cornerRefinementMinAccuracy->value();
+    params.cornerRefinementWinSize = cornerRefinementWinSize->value();
+    params.doCornerRefinement = doCornerRefinement->isChecked();
+    params.errorCorrectionRate = errorCorrectionRate->value();
+    params.markerBorderBits = markerBorderBits->value();
+    params.maxErroneousBitsInBorderRate = maxErroneousBitsInBorderRate->value();
+    params.minDistanceToBorder = minDistanceToBorder->value();
+    params.minMarkerDistance = minMarkerDistance->value();
+    params.minMarkerPerimeter = minMarkerPerimeter->value();
+    params.minOtsuStdDev = minOtsuStdDev->value();
+    params.perspectiveRemoveIgnoredMarginPerCell = perspectiveRemoveIgnoredMarginPerCell->value();
+    params.perspectiveRemovePixelPerCell = perspectiveRemovePixelPerCell->value();
+    params.polygonalApproxAccuracyRate = polygonalApproxAccuracyRate->value();
+
+    return params;
+}
+
+void CodeMarkerWidget::on_showDetectedCandidates_stateChanged(int i)
+{
+    mMainWindow->getCodeMarkerItem()->setVisible(i);
+    if( !mMainWindow->isLoading() )
+        mMainWindow->getScene()->update();
+}
+
+void CodeMarkerWidget::on_moreInfosButton_clicked()
+{
+#define CV_NUMERIC_VERSION CVAUX_STR(CV_VERSION_MAJOR) "." CVAUX_STR(CV_VERSION_MINOR) "." CVAUX_STR(CV_VERSION_REVISION)
+    QDesktopServices::openUrl(QUrl("http://docs.opencv.org/" CV_NUMERIC_VERSION "/d1/dcd/structcv_1_1aruco_1_1DetectorParameters.html#details", QUrl::TolerantMode));
+    QDesktopServices::openUrl(QUrl("http://docs.opencv.org/" CV_NUMERIC_VERSION "/d5/dae/tutorial_aruco_detection.html", QUrl::TolerantMode));
+}
+
+void CodeMarkerWidget::on_dictList_currentIndexChanged(int i)
+{
+    mCodeMarkerOpt.userChangedIndexOfMarkerDict(i);
+    notifyChanged();
+}
+
+
+void CodeMarkerWidget::notifyChanged()
+{
+    mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
+    if( !mMainWindow->isLoading() )
+        mMainWindow->updateImage();
+}
+
+void CodeMarkerWidget::readDetectorParams()
+{
+    auto params = mCodeMarkerOpt.getDetectorParams();
+    adaptiveThreshConstant->setValue(params.adaptiveThreshConstant);
+    adaptiveThreshWinSizeMax->setValue(params.adaptiveThreshWinSizeMax);
+    adaptiveThreshWinSizeMin->setValue(params.adaptiveThreshWinSizeMin);
+    adaptiveThreshWinSizeStep->setValue(params.adaptiveThreshWinSizeStep);
+    cornerRefinementMaxIterations->setValue(params.cornerRefinementMaxIterations);
+    cornerRefinementMinAccuracy->setValue(params.cornerRefinementMinAccuracy);
+    cornerRefinementWinSize->setValue(params.cornerRefinementWinSize);
+    doCornerRefinement->setChecked(params.doCornerRefinement);
+    errorCorrectionRate->setValue(params.errorCorrectionRate);
+    markerBorderBits->setValue(params.markerBorderBits);
+    maxErroneousBitsInBorderRate->setValue(params.maxErroneousBitsInBorderRate);
+    minDistanceToBorder->setValue(params.minDistanceToBorder);
+    minMarkerDistance->setValue(params.minMarkerDistance);
+    minMarkerPerimeter->setValue(params.minMarkerPerimeter);
+    minOtsuStdDev->setValue(params.minOtsuStdDev);
+    perspectiveRemoveIgnoredMarginPerCell->setValue(params.perspectiveRemoveIgnoredMarginPerCell);
+    perspectiveRemovePixelPerCell->setValue(params.perspectiveRemovePixelPerCell);
+    polygonalApproxAccuracyRate->setValue(params.polygonalApproxAccuracyRate);
+}
+
+void CodeMarkerWidget::readDictListIndex()
+{
+    dictList->setCurrentIndex(mCodeMarkerOpt.getIndexOfMarkerDict());
+}
+
+void CodeMarkerWidget::sendDetectorParams(reco::ArucoCodeParams params)
+{
+    mCodeMarkerOpt.userChangedDetectorParams(params);
 }
 
 #include "moc_codeMarkerWidget.cpp"
