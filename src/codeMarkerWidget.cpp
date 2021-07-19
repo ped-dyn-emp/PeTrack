@@ -153,13 +153,13 @@ void CodeMarkerWidget::getXml(QDomElement &elem)
 
         if (subElem.tagName() == "PARAM")
         {
-            if (subElem.hasAttribute("ADAPTIVE_TRHESH_WIN_SIZE_MIN"))
+            if (subElem.hasAttribute("ADAPTIVE_THRESH_WIN_SIZE_MIN"))
                 adaptiveThreshWinSizeMin->setValue(subElem.attribute("ADAPTIVE_THRESH_WIN_SIZE_MIN").toInt());
-            if (subElem.hasAttribute("ADAPTIVE_TRHESH_WIN_SIZE_MAX"))
+            if (subElem.hasAttribute("ADAPTIVE_THRESH_WIN_SIZE_MAX"))
                 adaptiveThreshWinSizeMax->setValue(subElem.attribute("ADAPTIVE_THRESH_WIN_SIZE_MAX").toInt());
-            if (subElem.hasAttribute("ADAPTIVE_TRHESH_WIN_SIZE_STEP"))
+            if (subElem.hasAttribute("ADAPTIVE_THRESH_WIN_SIZE_STEP"))
                 adaptiveThreshWinSizeStep->setValue(subElem.attribute("ADAPTIVE_THRESH_WIN_SIZE_STEP").toInt());
-            if (subElem.hasAttribute("ADAPTIVE_TRHESH_CONSTANT"))
+            if (subElem.hasAttribute("ADAPTIVE_THRESH_CONSTANT"))
                 adaptiveThreshConstant->setValue(subElem.attribute("ADAPTIVE_THRESH_CONSTANT").toInt());
             if (subElem.hasAttribute("MIN_MARKER_PERIMETER"))
                 minMarkerPerimeter->setValue(subElem.attribute("MIN_MARKER_PERIMETER").toDouble());
