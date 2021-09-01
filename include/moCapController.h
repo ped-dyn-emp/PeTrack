@@ -28,7 +28,7 @@
 #include "extrCalibration.h"
 #include "moCapPersonMetadata.h"
 
-class SkeletonLine;
+struct SkeletonLine;
 class QDomElement;
 
 struct SegmentRenderData
@@ -43,7 +43,7 @@ public:
 bool operator==(const SegmentRenderData& lhs, const SegmentRenderData& rhs);
 
 /**
- * @brief The MoCapController class controlls the visualisation of MoCap data.
+ * @brief The MoCapController class controls the visualisation of MoCap data.
  *
  * This class coordinates the visualization of motion capturing data. It saves the
  * different parameters of the visualization and transforms the data in MoCapStorage

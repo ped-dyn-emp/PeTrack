@@ -59,7 +59,6 @@ public:
     void setXml(QDomElement &elem) const;
 
 private:
-    int mId;
     std::vector<SkeletonTree> mSkeletons;
     MoCapPersonMetadata mMetadata;
 };
