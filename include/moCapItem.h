@@ -25,7 +25,7 @@
 class MoCapController;
 class Animation;
 class Petrack;
-class SegmentRenderData;
+struct SegmentRenderData;
 
 /**
  * @brief The MoCapItem class draws stick figures to visalize the MoCap data.
