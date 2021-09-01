@@ -15,6 +15,11 @@
       "orcid": "0000-0002-6023-5173"
     },
     {
+      "affiliation": "Forschungszentrum Jülich GmbH",
+      "name": "Boomers, Ann Katrin",
+      "orcid": "0000-0003-3738-2869"
+    },
+    {
       "name": "Brualla, Ricardo Martin"
     },
     {
@@ -45,11 +50,6 @@
       "affiliation": "Forschungszentrum Jülich GmbH",
       "name": "Schrödter, Tobias",
       "orcid": "0000-0002-1071-060X"
-    },
-    {
-      "affiliation": "Forschungszentrum Jülich GmbH",
-      "name": "Seemann, Ann Katrin",
-      "orcid": "0000-0003-3738-2869"
     }
   ]
 }
