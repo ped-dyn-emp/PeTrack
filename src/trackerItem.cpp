@@ -65,7 +65,7 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         int i, iNearest = -1;
         float dist, minDist = 1000000.;
 
-        QSet<int> onlyVisible = mMainWindow->getOnlyVisible();
+        QSet<int> onlyVisible = mMainWindow->getPedestrianUserSelection();
         int frame = mMainWindow->getAnimation()->getCurrentFrameNum();
 
         for (i = 0; i < mTracker->size(); ++i) // !found &&  // ueber TrackPerson
@@ -307,13 +307,13 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*opt
 
         subdiv.initDelaunay(delaunyROI);
     }
+
+    auto pedestrianToPaint = mMainWindow->getPedestrianUserSelection();
     for (int i = 0; i < mTracker->size(); ++i) // ueber TrackPerson
     {
         // show current frame
-        if ((!(mControlWidget->trackShowOnly->checkState() == Qt::Checked) && !(mControlWidget->trackShowOnlyList->checkState() == Qt::Checked)) ||
-            (((mControlWidget->trackShowOnly->checkState() == Qt::Checked) || (mControlWidget->trackShowOnlyList->checkState() == Qt::Checked)) &&
-                mMainWindow->getOnlyVisible().contains((i))))
-        {
+          if (pedestrianToPaint.contains(i) || pedestrianToPaint.empty())
+          {
             if (mTracker->at(i).trackPointExist(curFrame))
             {
                 if (mControlWidget->trackHeadSized->checkState() == Qt::Checked)
