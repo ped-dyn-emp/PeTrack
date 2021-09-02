@@ -945,7 +945,7 @@ int Tracker::calcPosition(int /*frame*/) {
  *
  * @param[in] point TrackPoint to add
  * @param[in] frame current frame (frame in which point was detected)
- * @param[in] onlyVisible set of selected persons, see Petrack::getOnlyVisible()
+ * @param[in] onlyVisible set of selected persons, see Petrack::getPedestriansToTrack()
  * @param[out] pers person the point was added to; undefined when new trajectory was created
  * @return true if new trajectory was created; false otherwise
  */
@@ -1402,7 +1402,7 @@ bool Tracker::tryMergeTrajectories(const TrackPoint& v, size_t i, int frame)
  * @param reQual threshold for low quality in case of reTrack = true
  * @param borderSize
  * @param level level of Gauss-Pyramid that is used with Lucas-Kanade
- * @param onlyVisible Set of trajectories which should be evaluated; @see Petrack::getOnlyVisible
+ * @param onlyVisible Set of trajectories which should be evaluated; @see Petrack::getPedestriansToTrack
  * @param errorScaleExponent errorScale is 1.5^errorScaleExponent
  * @return Number of tracked points
  */

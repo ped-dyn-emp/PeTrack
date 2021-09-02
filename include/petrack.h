@@ -180,7 +180,8 @@ public:
     void updateImage(bool imageChanged = false);
     void updateImage(const cv::Mat &img);
     void updateSequence();
-    QSet<int> getOnlyVisible();
+    QSet<int> getPedestrianUserSelection();
+    QSet<int> getPedestriansToTrack();
     double getCmPerPixel() const;
     void setHeadSize(double hS=-1);
     double getHeadSize(QPointF *pos=nullptr, int pers=-1, int frame=-1);

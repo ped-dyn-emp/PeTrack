@@ -1178,7 +1178,7 @@ void Control::on_trackGotoNr_clicked()
     if (mMainWindow->getTracker()->size() >= trackShowOnlyNr->value())
     {
 //        int firstMin = mMainWindow->getAnimation()->getMaxFrames(), lastMax = 0;
-//        foreach(int onlyVisible, mMainWindow->getOnlyVisible() )
+//        foreach(int onlyVisible, mMainWindow->getPedestriansToTrack() )
 //        {
 //            if(mMainWindow->getTracker()->at(onlyVisible).firstFrame() < firstMin)
 //                firstMin = mMainWindow->getTracker()->at(onlyVisible).firstFrame();
@@ -1196,7 +1196,7 @@ void Control::on_trackGotoStartNr_clicked()
     if (mMainWindow->getTracker()->size() >= trackShowOnlyNr->value())
     {
 //        int start = mMainWindow->getAnimation()->getMaxFrames();
-//        foreach(int onlyVisible, mMainWindow->getOnlyVisible() )
+//        foreach(int onlyVisible, mMainWindow->getPedestriansToTrack() )
 //        {
 //            if(mMainWindow->getTracker()->at(onlyVisible).firstFrame() < start)
 //                start = mMainWindow->getTracker()->at(onlyVisible).firstFrame();
@@ -1210,7 +1210,7 @@ void Control::on_trackGotoEndNr_clicked()
     if (mMainWindow->getTracker()->size() >= trackShowOnlyNr->value())
     {
 //        int end = 0;
-//        foreach(int onlyVisible, mMainWindow->getOnlyVisible() )
+//        foreach(int onlyVisible, mMainWindow->getPedestriansToTrack() )
 //        {
 //            if(mMainWindow->getTracker()->at(onlyVisible).lastFrame() > end)
 //                end = mMainWindow->getTracker()->at(onlyVisible).lastFrame();
@@ -1237,7 +1237,8 @@ void Control::on_trackShowOnlyListButton_clicked()
         {
             /// ToDo: parse from lineEdit
             checkBox.push_back(new QCheckBox(QString::number(i+1)));
-            checkBox.at(i)->setChecked(mMainWindow->getOnlyVisible().contains(i));
+            checkBox.at(i)->setChecked(
+                mMainWindow->getPedestriansToTrack().contains(i));
 //            layout->addWidget(checkBox.at(i));
             layout->addWidget(checkBox.at(i),3+i/5,i%5,1,1);
         }

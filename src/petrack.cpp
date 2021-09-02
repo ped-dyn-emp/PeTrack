@@ -3160,7 +3160,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                                       mControlWidget->trackRepeat->isChecked(),
                                       mControlWidget->trackRepeatQual->value(), getImageBorderSize(),
                                       mReco.getRecoMethod(), mControlWidget->trackRegionLevels->value(),
-                                      getOnlyVisible());
+                                getPedestriansToTrack());
 #ifdef TIME_MEASUREMENT
             debout << "nach track: " << getElapsedTime() <<endl;
 #endif
@@ -3389,61 +3389,82 @@ double Petrack::getHeadSize(QPointF *pos, int pers, int frame)
 }
 
 /**
- * @brief Petrack::getOnlyVisible Returns trajectories which should be evaluated
+ * @brief Return the user's selection of pedestrians/trajectories
  *
- * If "only for visible people" is checked, then only people visible via
- * "show only people" (single person) or "show only people list"(multiple persons)
- * are going to be evaluated. If "only for visible people" is not checked,
- * everyone gets evaluated, not only the ones selected for visibility.
+ * Only people selected via "show only people" (single person) or "show only
+ * people list"(multiple persons) are going to be selected.
+ *
+ * @return All user selected pedestrian (empty for all pedestrians)
+ */
+QSet<int> Petrack::getPedestrianUserSelection()
+{
+    if (mControlWidget->trackShowOnly->checkState() == Qt::Checked) {
+        QSet<int> onlyVisible;
+        onlyVisible.insert(mControlWidget->trackShowOnlyNr->value() - 1);
+        return onlyVisible;
+    }
+    if (mControlWidget->trackShowOnlyList->checkState() == Qt::Checked) {
+        QStringList list = mControlWidget->trackShowOnlyNrList->text().split(
+            ",", Qt::SkipEmptyParts);
+        QSet<int> onlyVisible;
+        foreach (QString s, list)
+        {
+            bool ok = false;
+            int nr = s.toInt(&ok);
+            if (ok /* && nr <= maxPed && nr > 0*/) // einzelne ID
+            {
+                onlyVisible.insert(nr - 1);
+            }
+            else // error or IDs range (e.g. 1-3, 6-10, etc.)
+            {
+                QStringList range = s.split("-", Qt::SkipEmptyParts);
+                int last, first = range[0].toInt(&ok);
+
+                if (ok /* && first <= maxPed && nr > 0*/)
+                {
+                    last = range[1].toInt(&ok);
+                    if (ok /* && last <= maxPed && nr > 0*/)
+                    {
+                      if (first > last)
+                      {
+                        std::swap(first, last);
+                      }
+
+                      for (int i = first; i <= last; i++)
+                      {
+                        onlyVisible.insert(i - 1);
+                      }
+                    }
+                }
+            }
+            if (!ok)
+            {
+              debout << "Warning: error while reading showOnlyVisible list from input line!"
+                     << std::endl;
+            }
+        }
+        return onlyVisible; // in anzeige wird ab 1 gezaehlt, in datenstruktur ab 0
+    }
+    return QSet<int>();
+}
+
+/**
+ * @brief Checks which pedestrians/trajectories are selected for evaluation.
+ *
+ * If "only for selected" is checked, then only selected people (@see
+ * Petrack::getPedestrianUserSelection()) are going to be tracked, all people
+ * otherwise.
  *
  * @return all trajectories which should be evaluated; empty when all should be evaluated
  */
-QSet<int> Petrack::getOnlyVisible()
+QSet<int> Petrack::getPedestriansToTrack()
 {
-    if  ((mControlWidget->trackOnlySelected->checkState() == Qt::Checked) && (mControlWidget->trackShowOnly->checkState() == Qt::Checked || mControlWidget->trackShowOnlyList->checkState() == Qt::Checked))
+    if (mControlWidget->trackOnlySelected->checkState() == Qt::Checked)
     {
-        if( mControlWidget->trackShowOnlyList->checkState() == Qt::Checked)
-        {
-            QStringList list = mControlWidget->trackShowOnlyNrList->text().split(",", Qt::SkipEmptyParts);
-            QSet<int> onlyVisible;
-            foreach(QString s, list)
-            {
-                bool ok = false;
-                int nr = s.toInt(&ok);
-                if(ok/* && nr <= maxPed && nr > 0*/) // einzelne ID
-                    onlyVisible.insert(nr-1);
-                else // error or IDs range (e.g. 1-3, 6-10, etc.)
-                {
-                    QStringList range = s.split("-", Qt::SkipEmptyParts);
-                    int last,first = range[0].toInt(&ok);
+      return getPedestrianUserSelection();
+    }
 
-                    if(ok/* && first <= maxPed && nr > 0*/)
-                    {
-                        last = range[1].toInt(&ok);
-                        if(ok/* && last <= maxPed && nr > 0*/)
-                        {
-                            if(first>last)
-                                std::swap(first,last);
-
-                            for(int i=first;i<=last;i++)
-                                onlyVisible.insert(i-1);
-                        }
-                    }
-
-                }
-                if(!ok)
-                    debout << "Warning: error while reading showOnlyVisible list from input line!" << std::endl;
-            }
-            return onlyVisible; //in anzeige wird ab 1 gezaehlt, in datenstruktur ab 0
-
-        }else
-        {
-            QSet<int> onlyVisible;
-            onlyVisible.insert(mControlWidget->trackShowOnlyNr->value()-1);
-            return onlyVisible;
-        }
-    }else
-        return QSet<int>();
+    return QSet<int>();
 }
 
 void Petrack::addManualTrackPointOnlyVisible(const QPointF& pos)
@@ -3465,7 +3486,8 @@ void Petrack::updateControlWidget()
 
 void Petrack::splitTrackPerson(QPointF pos)
 {
-    mTracker->splitPersonAt((Vec2F) pos, mAnimation->getCurrentFrameNum(), getOnlyVisible());
+    mTracker->splitPersonAt((Vec2F) pos, mAnimation->getCurrentFrameNum(),
+                            getPedestrianUserSelection());
     updateControlWidget();
 }
 
@@ -3484,7 +3506,8 @@ int Petrack::addOrMoveManualTrackPoint(const QPointF& pos)
     int pers = -1;
     TrackPoint tP(Vec2F{pos}, 110); // 110 is higher than 100 (max. quality) and gets clamped to 100 after insertion
     // allows replacemet of every point (check for better quality always passes)
-    mTracker->addPoint(tP, mAnimation->getCurrentFrameNum(), getOnlyVisible(), mReco.getRecoMethod(), &pers);
+    mTracker->addPoint(tP, mAnimation->getCurrentFrameNum(),
+                       getPedestrianUserSelection(), mReco.getRecoMethod(), &pers);
     updateControlWidget();
     return pers;
 }
@@ -3493,23 +3516,27 @@ int Petrack::addOrMoveManualTrackPoint(const QPointF& pos)
 // loeschen von Trackpoints einer Trajektorie
 void Petrack::deleteTrackPoint(QPointF pos, int direction) //const QPoint &pos
 {
-    mTracker->delPoint((Vec2F) pos, direction, mAnimation->getCurrentFrameNum(), getOnlyVisible());
+    mTracker->delPoint((Vec2F) pos, direction, mAnimation->getCurrentFrameNum(),
+                       getPedestrianUserSelection());
     updateControlWidget();
 }
 void Petrack::editTrackPersonComment(QPointF pos)
 {
 
-    mTracker->editTrackPersonComment((Vec2F) pos, mAnimation->getCurrentFrameNum(), getOnlyVisible());
+    mTracker->editTrackPersonComment((Vec2F) pos, mAnimation->getCurrentFrameNum(),
+                                     getPedestrianUserSelection());
     updateControlWidget();
 }
 void Petrack::setTrackPersonHeight(QPointF pos)
 {
-    mTracker->setTrackPersonHeight((Vec2F) pos, mAnimation->getCurrentFrameNum(), getOnlyVisible());
+    mTracker->setTrackPersonHeight((Vec2F) pos, mAnimation->getCurrentFrameNum(),
+                                   getPedestrianUserSelection());
     updateControlWidget();
 }
 void Petrack::resetTrackPersonHeight(QPointF pos)
 {
-    mTracker->resetTrackPersonHeight((Vec2F) pos, mAnimation->getCurrentFrameNum(), getOnlyVisible());
+    mTracker->resetTrackPersonHeight((Vec2F) pos, mAnimation->getCurrentFrameNum(),
+                                     getPedestrianUserSelection());
     updateControlWidget();
 }
 
