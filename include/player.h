@@ -74,7 +74,6 @@ public slots:
     void recStream();
     void pause();
     void togglePlayPause();
-    bool skipTo(int proMil);
     bool skipToFrame(int f);
     bool skipToFrame();
     void update();
@@ -105,7 +104,6 @@ private:
     bool mPlayerSpeedLimited;
     bool mPlayerSpeedFixed = false;
     bool mLooping = false;
-    bool mSliderSet;
     bool mRec;
 
 
