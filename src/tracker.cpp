@@ -1426,6 +1426,12 @@ int Tracker::track(cv::Mat &img, cv::Rect &rect, int frame, bool reTrack, int re
     if ((mPrevFrame != -1) && (abs(frame - mPrevFrame) > MAX_STEP_TRACK))
         reset();
 
+    if (abs(frame - mPrevFrame) == 0)
+    {
+        debout << "ERROR: Frame has not changed. There is nothing to track!" << std::endl;
+        return -1;
+    }
+
     if (img.channels() == 3)
     {
         cv::cvtColor(img,mGrey,cv::COLOR_BGR2GRAY);

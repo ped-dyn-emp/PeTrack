@@ -217,7 +217,6 @@ void Player::setAnim(Animation *anim)
     if (anim)
     {
         pause();
-        mSliderSet = false;
         mAnimation = anim;
         int max = anim->getNumFrames()>1 ? anim->getNumFrames()-1 : 0;
         setSliderMax(max);
@@ -270,11 +269,8 @@ bool Player::updateImage()
     time1 = time1/CLOCKS_PER_SEC;
     cout << "  time(update image) = " << time1 << " sec." << endl;
 #endif
-    // mSliderSet is needed because setValue will call skiptoframe because of connect slot
-    mSliderSet = true;
     mSlider->setValue(mAnimation->getCurrentFrameNum()); //(1000*mAnimation->getCurrentFrameNum())/mAnimation->getNumFrames());
     mFrameNum->setText(QString().number(mAnimation->getCurrentFrameNum()));
-    mSliderSet = false; // reset setSlider here because if value doesnt change than it would not be reset by skiptoframe
 
     return true;
 }
@@ -533,20 +529,9 @@ void Player::recStream()
     }
 }
 
-bool Player::skipTo(int proMil) // proMil = [0..1000]
-{
-    if (mSliderSet)
-    {
-        return false;
-    }
-    pause();
-    mImg = mAnimation->getFrameAtPos(proMil/1000.0); // value between 0..1
-    return updateImage();
-}
-
 bool Player::skipToFrame(int f) // [0..mAnimation->getNumFrames()-1]
 {
-    if (mSliderSet)
+    if (f == mAnimation->getCurrentFrameNum())
     {
         return false;
     }
