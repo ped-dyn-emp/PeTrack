@@ -885,31 +885,28 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, Recognit
 
     if (controlWidget->getCalibCoordDimension() == 0) // 3D
     {
+        QRect rect(myRound(mainWindow->getRecoRoiItem()->rect().x()),
+                   myRound(mainWindow->getRecoRoiItem()->rect().y()),
+                   myRound(mainWindow->getRecoRoiItem()->rect().width()),
+                   myRound(mainWindow->getRecoRoiItem()->rect().height()));
+        QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y(),controlWidget->mapDefaultHeight->value()),
+            p2 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y(),controlWidget->mapDefaultHeight->value()),
+            p3 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value()),
+            p4 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value());
+
+        double cmPerPixel_min = std::min(std::min(std::min(p1.x(), p1.y()), std::min(p2.x(), p2.y())),
+                                         std::min(std::min(p3.x(), p3.y()), std::min(p4.x(), p4.y())));
+        double cmPerPixel_max = std::max(std::max(std::max(p1.x(), p1.y()), std::max(p2.x(), p2.y())),
+                                         std::max(std::max(p3.x(), p3.y()), std::max(p4.x(), p4.y())));
+
         if (recoMethod == RecognitionMethod::Code)  // for usage of codemarker with CodeMarker-function (-> without MulticolorMarker)
         {
-            QRect rect(myRound(mainWindow->getRecoRoiItem()->rect().x()),
-                       myRound(mainWindow->getRecoRoiItem()->rect().y()),
-                       myRound(mainWindow->getRecoRoiItem()->rect().width()),
-                       myRound(mainWindow->getRecoRoiItem()->rect().height()));
-            QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y(),controlWidget->mapDefaultHeight->value()),
-                    p2 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y(),controlWidget->mapDefaultHeight->value()),
-                    p3 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value()),
-                    p4 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value());
-
-            double cmPerPixel_min = std::min(std::min(std::min(p1.x(), p1.y()), std::min(p2.x(), p2.y())),
-                                             std::min(std::min(p3.x(), p3.y()), std::min(p4.x(), p4.y())));
-            double cmPerPixel_max = std::max(std::max(std::max(p1.x(), p1.y()), std::max(p2.x(), p2.y())),
-                                             std::max(std::max(p3.x(), p3.y()), std::max(p4.x(), p4.y())));
-
             minMarkerPerimeterRate = (par.getMinMarkerPerimeter()*4./cmPerPixel_max)/std::max(rect.width(),rect.height());
             maxMarkerPerimeterRate = (par.getMaxMarkerPerimeter()*4./cmPerPixel_min)/std::max(rect.width(),rect.height());
         } else if (recoMethod == RecognitionMethod::MultiColor)   // for usage of codemarker with MulticolorMarker
         {
-            QRect rect(0,0, img.rows, img.cols);
-
-            // from Aruco Documentation values 0 + 4 all info is considered (low performance issues expected due to small image size)
-            minMarkerPerimeterRate = 0.02;
-            maxMarkerPerimeterRate = 4.;
+            minMarkerPerimeterRate = (par.getMinMarkerPerimeter()*4./cmPerPixel_max)/std::max(img.cols,img.rows);
+            maxMarkerPerimeterRate = (par.getMaxMarkerPerimeter()*4./cmPerPixel_min)/std::max(img.cols,img.rows);
         }
 
         minCornerDistanceRate = par.getMinCornerDistance();
