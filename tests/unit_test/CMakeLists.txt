@@ -8,6 +8,7 @@ target_sources(petrack_tests PRIVATE
     tst_SkeletonTree.cpp
     tst_moCapController.cpp
     tst_recognition.cpp
+    tst_codeMarkerWidget.cpp
 )
 
 

@@ -24,18 +24,23 @@
 #include <QtWidgets>
 #include <opencv2/aruco.hpp>
 
-#include "ui_codeMarker.h"
+
 
 #include "petrack.h"
 #include "codeMarkerItem.h"
 #include "recognition.h"
+namespace Ui{
+    class CodeMarker;
+}
 
-class CodeMarkerWidget: public QWidget, public Ui::CodeMarker
+
+
+class CodeMarkerWidget: public QWidget
 {
     Q_OBJECT
 
 public:
-    CodeMarkerWidget(QWidget *parent, reco::CodeMarkerOptions& opt);
+    CodeMarkerWidget(QWidget *parent, reco::CodeMarkerOptions& opt, Ui::CodeMarker *mUi);
 
     // store data in xml node
     void setXml(QDomElement &elem);
@@ -43,8 +48,7 @@ public:
     // read data from xml node
     void getXml(QDomElement &elem);
 
-    reco::ArucoCodeParams packDetectorParams();
-
+    bool showDetectedCandidates();
 
 private slots:
 
@@ -62,8 +66,12 @@ private slots:
     void readDictListIndex();
 
 private:
+    Ui::CodeMarker *mUi;
+
     Petrack *mMainWindow;
     reco::CodeMarkerOptions &mCodeMarkerOpt;
 };
+
+reco::ArucoCodeParams packDetectorParams(const Ui::CodeMarker *ui);
 
 #endif

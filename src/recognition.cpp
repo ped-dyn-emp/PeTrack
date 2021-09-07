@@ -582,7 +582,7 @@ void detail::refineWithAruco(std::vector<ColorBlob> &blobs, const cv::Mat& img, 
             continue;
         // TODO: Use Reference to actual codeMarkerOptions in MulticolorMarkerOptions
         // NOTE: For now, add as parameter of findMulticolorMarker
-        codeOpt.offsetCropRect2Roi = offsetCropRect2Roi;
+        codeOpt.setOffsetCropRect2Roi(offsetCropRect2Roi);
         findCodeMarker(subImg, crossList, options.method, codeOpt);
 
         // The next three statements each:
@@ -636,7 +636,7 @@ void detail::refineWithAruco(std::vector<ColorBlob> &blobs, const cv::Mat& img, 
             crossList.back() = crossList.back() + (Vec2F(cropRect.x, cropRect.y) + moveDir);
         }
     }
-    codeOpt.offsetCropRect2Roi = Vec2F{0,0};
+    codeOpt.setOffsetCropRect2Roi(Vec2F{0,0});
 }
 
 /**
@@ -864,12 +864,13 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *contro
  */
 void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, RecognitionMethod recoMethod, const CodeMarkerOptions& opt)
 {
-    CodeMarkerItem *codeMarkerItem = opt.codeMarkerItem;
-    const auto& par = opt.detectorParams;
+    CodeMarkerItem *codeMarkerItem = opt.getCodeMarkerItem();
+    Control *controlWidget = opt.getControlWidget();
+    const auto& par = opt.getDetectorParams();
 
-    cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::PREDEFINED_DICTIONARY_NAME(opt.indexOfMarkerDict));
+    cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::PREDEFINED_DICTIONARY_NAME(opt.getIndexOfMarkerDict()));
 
-    if (opt.indexOfMarkerDict == 17) //for usage of DICT_mip_36h12 as it is not predifined in opencv
+    if (opt.getIndexOfMarkerDict() == 17) //for usage of DICT_mip_36h12 as it is not predifined in opencv
     {
         dictionary = detail::getDictMip36h12();
     }
@@ -878,11 +879,11 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, Recognit
 
     double minMarkerPerimeterRate = 0.03, maxMarkerPerimeterRate = 4, minCornerDistanceRate = 0.05, minMarkerDistanceRate = 0.05;
 
-    Petrack *mainWindow = opt.controlWidget->getMainWindow();
+    Petrack *mainWindow = controlWidget->getMainWindow();
 
     int bS = mainWindow->getImageBorderSize();
 
-    if (opt.controlWidget->getCalibCoordDimension() == 0) // 3D
+    if (controlWidget->getCalibCoordDimension() == 0) // 3D
     {
         if (recoMethod == RecognitionMethod::Code)  // for usage of codemarker with CodeMarker-function (-> without MulticolorMarker)
         {
@@ -890,18 +891,18 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, Recognit
                        myRound(mainWindow->getRecoRoiItem()->rect().y()),
                        myRound(mainWindow->getRecoRoiItem()->rect().width()),
                        myRound(mainWindow->getRecoRoiItem()->rect().height()));
-            QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y(),opt.controlWidget->mapDefaultHeight->value()),
-                    p2 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y(),opt.controlWidget->mapDefaultHeight->value()),
-                    p3 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y()+rect.height(),opt.controlWidget->mapDefaultHeight->value()),
-                    p4 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y()+rect.height(),opt.controlWidget->mapDefaultHeight->value());
+            QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y(),controlWidget->mapDefaultHeight->value()),
+                    p2 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y(),controlWidget->mapDefaultHeight->value()),
+                    p3 = mainWindow->getImageItem()->getCmPerPixel(rect.x(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value()),
+                    p4 = mainWindow->getImageItem()->getCmPerPixel(rect.x()+rect.width(),rect.y()+rect.height(),controlWidget->mapDefaultHeight->value());
 
             double cmPerPixel_min = std::min(std::min(std::min(p1.x(), p1.y()), std::min(p2.x(), p2.y())),
                                              std::min(std::min(p3.x(), p3.y()), std::min(p4.x(), p4.y())));
             double cmPerPixel_max = std::max(std::max(std::max(p1.x(), p1.y()), std::max(p2.x(), p2.y())),
                                              std::max(std::max(p3.x(), p3.y()), std::max(p4.x(), p4.y())));
 
-            minMarkerPerimeterRate = (par.minMarkerPerimeter*4./cmPerPixel_max)/std::max(rect.width(),rect.height());
-            maxMarkerPerimeterRate = (par.maxMarkerPerimeter*4./cmPerPixel_min)/std::max(rect.width(),rect.height());
+            minMarkerPerimeterRate = (par.getMinMarkerPerimeter()*4./cmPerPixel_max)/std::max(rect.width(),rect.height());
+            maxMarkerPerimeterRate = (par.getMaxMarkerPerimeter()*4./cmPerPixel_min)/std::max(rect.width(),rect.height());
         } else if (recoMethod == RecognitionMethod::MultiColor)   // for usage of codemarker with MulticolorMarker
         {
             QRect rect(0,0, img.rows, img.cols);
@@ -911,44 +912,44 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, Recognit
             maxMarkerPerimeterRate = 4.;
         }
 
-        minCornerDistanceRate = par.minCornerDistance;
-        minMarkerDistanceRate = par.minMarkerDistance;
+        minCornerDistanceRate = par.getMinCornerDistance();
+        minMarkerDistanceRate = par.getMinMarkerDistance();
 
     }
     else // 2D
     {
         double cmPerPixel = mainWindow->getImageItem()->getCmPerPixel();
-        minMarkerPerimeterRate = (par.minMarkerPerimeter*4/cmPerPixel)/std::max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
-        maxMarkerPerimeterRate = (par.maxMarkerPerimeter*4/cmPerPixel)/std::max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
+        minMarkerPerimeterRate = (par.getMinMarkerPerimeter()*4/cmPerPixel)/std::max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
+        maxMarkerPerimeterRate = (par.getMaxMarkerPerimeter()*4/cmPerPixel)/std::max(mainWindow->getImage()->width()-bS,mainWindow->getImage()->height()-bS);
 
-        minCornerDistanceRate = par.minCornerDistance;
-        minMarkerDistanceRate = par.minMarkerDistance;
+        minCornerDistanceRate = par.getMinCornerDistance();
+        minMarkerDistanceRate = par.getMinMarkerDistance();
     }
 
-    detectorParams->adaptiveThreshWinSizeMin              = par.adaptiveThreshWinSizeMin;
-    detectorParams->adaptiveThreshWinSizeMax              = par.adaptiveThreshWinSizeMax;
-    detectorParams->adaptiveThreshWinSizeStep             = par.adaptiveThreshWinSizeStep;
-    detectorParams->adaptiveThreshConstant                = par.adaptiveThreshConstant;
+    detectorParams->adaptiveThreshWinSizeMin              = par.getAdaptiveThreshWinSizeMin();
+    detectorParams->adaptiveThreshWinSizeMax              = par.getAdaptiveThreshWinSizeMax();
+    detectorParams->adaptiveThreshWinSizeStep             = par.getAdaptiveThreshWinSizeStep();
+    detectorParams->adaptiveThreshConstant                = par.getAdaptiveThreshConstant();
     detectorParams->minMarkerPerimeterRate                = minMarkerPerimeterRate;
     detectorParams->maxMarkerPerimeterRate                = maxMarkerPerimeterRate;
-    detectorParams->polygonalApproxAccuracyRate           = par.polygonalApproxAccuracyRate;
+    detectorParams->polygonalApproxAccuracyRate           = par.getPolygonalApproxAccuracyRate();
     detectorParams->minCornerDistanceRate                 = minCornerDistanceRate;
-    detectorParams->minDistanceToBorder                   = par.minDistanceToBorder;
+    detectorParams->minDistanceToBorder                   = par.getMinDistanceToBorder();
     detectorParams->minMarkerDistanceRate                 = minMarkerDistanceRate;
     // No refinement is default value
     // TODO Check if this is the best MEthod for our usecase
-    if(par.doCornerRefinement){
+    if(par.getDoCornerRefinement()){
         detectorParams->cornerRefinementMethod            = cv::aruco::CornerRefineMethod::CORNER_REFINE_SUBPIX;
     }
-    detectorParams->cornerRefinementWinSize               = par.cornerRefinementWinSize;
-    detectorParams->cornerRefinementMaxIterations         = par.cornerRefinementMaxIterations;
-    detectorParams->cornerRefinementMinAccuracy           = par.cornerRefinementMinAccuracy;
-    detectorParams->markerBorderBits                      = par.markerBorderBits;
-    detectorParams->perspectiveRemovePixelPerCell         = par.perspectiveRemovePixelPerCell;
-    detectorParams->perspectiveRemoveIgnoredMarginPerCell = par.perspectiveRemoveIgnoredMarginPerCell;
-    detectorParams->maxErroneousBitsInBorderRate          = par.maxErroneousBitsInBorderRate;
-    detectorParams->minOtsuStdDev                         = par.minOtsuStdDev;
-    detectorParams->errorCorrectionRate                   = par.errorCorrectionRate;
+    detectorParams->cornerRefinementWinSize               = par.getCornerRefinementWinSize();
+    detectorParams->cornerRefinementMaxIterations         = par.getCornerRefinementMaxIterations();
+    detectorParams->cornerRefinementMinAccuracy           = par.getCornerRefinementMinAccuracy();
+    detectorParams->markerBorderBits                      = par.getMarkerBorderBits();
+    detectorParams->perspectiveRemovePixelPerCell         = par.getPerspectiveRemovePixelPerCell();
+    detectorParams->perspectiveRemoveIgnoredMarginPerCell = par.getPerspectiveRemoveIgnoredMarginPerCell();
+    detectorParams->maxErroneousBitsInBorderRate          = par.getMaxErroneousBitsInBorderRate();
+    detectorParams->minOtsuStdDev                         = par.getMinOtsuStdDev();
+    detectorParams->errorCorrectionRate                   = par.getErrorCorrectionRate();
 
     std::vector<int> ids;
     std::vector<std::vector<cv::Point2f> > corners, rejected;
@@ -958,8 +959,8 @@ void detail::findCodeMarker(cv::Mat &img, QList<TrackPoint> &crossList, Recognit
 
     cv::aruco::detectMarkers(img, dictionary, corners, ids, detectorParams, rejected);
 
-    codeMarkerItem->addDetectedMarkers(corners,ids, opt.offsetCropRect2Roi);
-    codeMarkerItem->addRejectedMarkers(rejected, opt.offsetCropRect2Roi);
+    codeMarkerItem->addDetectedMarkers(corners,ids, opt.getOffsetCropRect2Roi());
+    codeMarkerItem->addRejectedMarkers(rejected, opt.getOffsetCropRect2Roi());
 
     // detected code markers
     for(size_t i = 0; i<ids.size(); i++)
@@ -1149,7 +1150,17 @@ QList<TrackPoint> Recognizer::getMarkerPos(cv::Mat &img, QRect &roi, Control *co
     return crossList;
 }
 
-void CodeMarkerOptions::userChangedDetectorParams(ArucoCodeParams params)
+const Vec2F &CodeMarkerOptions::getOffsetCropRect2Roi() const
+{
+    return offsetCropRect2Roi;
+}
+
+void CodeMarkerOptions::setOffsetCropRect2Roi(const Vec2F &newOffsetCropRect2Roi)
+{
+    offsetCropRect2Roi = newOffsetCropRect2Roi;
+}
+
+void CodeMarkerOptions::setDetectorParams(ArucoCodeParams params)
 {
     if(params != detectorParams){
         detectorParams = params;
@@ -1157,7 +1168,7 @@ void CodeMarkerOptions::userChangedDetectorParams(ArucoCodeParams params)
     }
 }
 
-void CodeMarkerOptions::userChangedIndexOfMarkerDict(int idx)
+void CodeMarkerOptions::setIndexOfMarkerDict(int idx)
 {
     if(idx != indexOfMarkerDict){
         indexOfMarkerDict = idx;
@@ -1198,4 +1209,250 @@ cv::Ptr<cv::aruco::Dictionary> detail::getDictMip36h12()
 
     return dictionary;
 }
+
+double ArucoCodeParams::getMaxMarkerPerimeter() const
+{
+    return maxMarkerPerimeter;
+}
+
+void ArucoCodeParams::setMaxMarkerPerimeter(double newMaxMarkerPerimeter)
+{
+    if(newMaxMarkerPerimeter < minMarkerPerimeter){
+        throw std::invalid_argument("Max perimeter length needs to be at least as big as min perimiter length");
+    }
+    maxMarkerPerimeter = newMaxMarkerPerimeter;
+}
+
+double ArucoCodeParams::getMinCornerDistance() const
+{
+    return minCornerDistance;
+}
+
+void ArucoCodeParams::setMinCornerDistance(double newMinCornerDistance)
+{
+    if(newMinCornerDistance < 0){
+        throw std::invalid_argument("Min corner distance cannot be negative");
+    }
+    minCornerDistance = newMinCornerDistance;
+}
+
+double ArucoCodeParams::getMinMarkerDistance() const
+{
+    return minMarkerDistance;
+}
+
+void ArucoCodeParams::setMinMarkerDistance(double newMinMarkerDistance)
+{
+    minMarkerDistance = newMinMarkerDistance;
+}
+
+int ArucoCodeParams::getAdaptiveThreshWinSizeMin() const
+{
+    return adaptiveThreshWinSizeMin;
+}
+
+void ArucoCodeParams::setAdaptiveThreshWinSizeMin(int newAdaptiveThreshWinSizeMin)
+{
+    if(newAdaptiveThreshWinSizeMin > adaptiveThreshWinSizeMax){
+        throw std::invalid_argument("Min adaptiveTreshWinSize needs to be at most as large as max");
+    }
+    if(newAdaptiveThreshWinSizeMin < 3){
+        throw std::invalid_argument("Min winsize must be at least 3");
+    }
+    adaptiveThreshWinSizeMin = newAdaptiveThreshWinSizeMin;
+}
+
+int ArucoCodeParams::getAdaptiveThreshWinSizeMax() const
+{
+    return adaptiveThreshWinSizeMax;
+}
+
+void ArucoCodeParams::setAdaptiveThreshWinSizeMax(int newAdaptiveThreshWinSizeMax)
+{
+    if(newAdaptiveThreshWinSizeMax < adaptiveThreshWinSizeMin){
+        throw std::invalid_argument("Max adaptiveThreshWinSize needs to be at least as large as the minimum");
+    }
+    if(newAdaptiveThreshWinSizeMax < 3){
+        throw std::invalid_argument("Max adaptive winsize needs to be at lest 3");
+    }
+    adaptiveThreshWinSizeMax = newAdaptiveThreshWinSizeMax;
+}
+
+int ArucoCodeParams::getAdaptiveThreshWinSizeStep() const
+{
+    return adaptiveThreshWinSizeStep;
+}
+
+void ArucoCodeParams::setAdaptiveThreshWinSizeStep(int newAdaptiveThreshWinSizeStep)
+{
+    if(newAdaptiveThreshWinSizeStep <= 0){
+        throw std::invalid_argument("Winsize step needs to be larger than 0");
+    }
+    adaptiveThreshWinSizeStep = newAdaptiveThreshWinSizeStep;
+}
+
+int ArucoCodeParams::getAdaptiveThreshConstant() const
+{
+    return adaptiveThreshConstant;
+}
+
+void ArucoCodeParams::setAdaptiveThreshConstant(int newAdaptiveThreshConstant)
+{
+    adaptiveThreshConstant = newAdaptiveThreshConstant;
+}
+
+double ArucoCodeParams::getPolygonalApproxAccuracyRate() const
+{
+    return polygonalApproxAccuracyRate;
+}
+
+void ArucoCodeParams::setPolygonalApproxAccuracyRate(double newPolygonalApproxAccuracyRate)
+{
+    polygonalApproxAccuracyRate = newPolygonalApproxAccuracyRate;
+}
+
+int ArucoCodeParams::getMinDistanceToBorder() const
+{
+    return minDistanceToBorder;
+}
+
+void ArucoCodeParams::setMinDistanceToBorder(int newMinDistanceToBorder)
+{
+    if(newMinDistanceToBorder < 0){
+        throw std::invalid_argument("Min distance to border cannot be negative");
+    }
+    minDistanceToBorder = newMinDistanceToBorder;
+}
+
+bool ArucoCodeParams::getDoCornerRefinement() const
+{
+    return doCornerRefinement;
+}
+
+void ArucoCodeParams::setDoCornerRefinement(bool newDoCornerRefinement)
+{
+    doCornerRefinement = newDoCornerRefinement;
+}
+
+int ArucoCodeParams::getCornerRefinementWinSize() const
+{
+    return cornerRefinementWinSize;
+}
+
+void ArucoCodeParams::setCornerRefinementWinSize(int newCornerRefinementWinSize)
+{
+    if(newCornerRefinementWinSize < 1){
+        throw std::invalid_argument("Winsize needs to be at least 1");
+    }
+    cornerRefinementWinSize = newCornerRefinementWinSize;
+}
+
+int ArucoCodeParams::getCornerRefinementMaxIterations() const
+{
+    return cornerRefinementMaxIterations;
+}
+
+void ArucoCodeParams::setCornerRefinementMaxIterations(int newCornerRefinementMaxIterations)
+{
+    if(newCornerRefinementMaxIterations < 1){
+        throw std::invalid_argument("Max iterations needs to be at least 1");
+    }
+    cornerRefinementMaxIterations = newCornerRefinementMaxIterations;
+}
+
+double ArucoCodeParams::getCornerRefinementMinAccuracy() const
+{
+    return cornerRefinementMinAccuracy;
+}
+
+void ArucoCodeParams::setCornerRefinementMinAccuracy(double newCornerRefinementMinAccuracy)
+{
+    if(newCornerRefinementMinAccuracy <= 0){
+        throw std::invalid_argument("Min accuracy needs to be larger than 0");
+    }
+    cornerRefinementMinAccuracy = newCornerRefinementMinAccuracy;
+}
+
+int ArucoCodeParams::getMarkerBorderBits() const
+{
+    return markerBorderBits;
+}
+
+void ArucoCodeParams::setMarkerBorderBits(int newMarkerBorderBits)
+{
+    if(newMarkerBorderBits < 1){
+        throw std::invalid_argument("Marker Borderbits needs to be at least 1");
+    }
+    markerBorderBits = newMarkerBorderBits;
+}
+
+int ArucoCodeParams::getPerspectiveRemovePixelPerCell() const
+{
+    return perspectiveRemovePixelPerCell;
+}
+
+void ArucoCodeParams::setPerspectiveRemovePixelPerCell(int newPerspectiveRemovePixelPerCell)
+{
+    perspectiveRemovePixelPerCell = newPerspectiveRemovePixelPerCell;
+}
+
+double ArucoCodeParams::getPerspectiveRemoveIgnoredMarginPerCell() const
+{
+    return perspectiveRemoveIgnoredMarginPerCell;
+}
+
+void ArucoCodeParams::setPerspectiveRemoveIgnoredMarginPerCell(double newPerspectiveRemoveIgnoredMarginPerCell)
+{
+    perspectiveRemoveIgnoredMarginPerCell = newPerspectiveRemoveIgnoredMarginPerCell;
+}
+
+double ArucoCodeParams::getMaxErroneousBitsInBorderRate() const
+{
+    return maxErroneousBitsInBorderRate;
+}
+
+void ArucoCodeParams::setMaxErroneousBitsInBorderRate(double newMaxErroneousBitsInBorderRate)
+{
+    maxErroneousBitsInBorderRate = newMaxErroneousBitsInBorderRate;
+}
+
+double ArucoCodeParams::getMinOtsuStdDev() const
+{
+    return minOtsuStdDev;
+}
+
+void ArucoCodeParams::setMinOtsuStdDev(double newMinOtsuStdDev)
+{
+    if(newMinOtsuStdDev <= 0){
+        throw std::invalid_argument("Min Otsu stddev needs to be larger than 0");
+    }
+    minOtsuStdDev = newMinOtsuStdDev;
+}
+
+double ArucoCodeParams::getErrorCorrectionRate() const
+{
+    return errorCorrectionRate;
+}
+
+void ArucoCodeParams::setErrorCorrectionRate(double newErrorCorrectionRate)
+{
+    errorCorrectionRate = newErrorCorrectionRate;
+}
+
+double ArucoCodeParams::getMinMarkerPerimeter() const
+{
+    return minMarkerPerimeter;
+}
+
+void ArucoCodeParams::setMinMarkerPerimeter(double newMinMarkerPerimeter)
+{
+    if(newMinMarkerPerimeter > maxMarkerPerimeter){
+        throw std::invalid_argument("Min marker perimeter needs to be at most as large as the max perimeter.");
+    }
+    if(newMinMarkerPerimeter <= 0){
+        throw std::invalid_argument("Min marker perimeter must be larger than 0");
+    }
+    minMarkerPerimeter = newMinMarkerPerimeter;
+}
+
 } // namespace reco
