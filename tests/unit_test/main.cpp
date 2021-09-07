@@ -23,13 +23,35 @@
 
 #include <QApplication>
 #include <QtTest>
+#include <vector>
 
 int main( int argc, char* argv[] )
 {
-    QApplication a(argc, argv);
+    // always start unit tests as offscreen, so PMessageBox-es only log
+    bool platformAlreadyGiven = false;
+    for(int i = 0; i < argc; ++i){
+        if(qstrcmp("-platform", argv[i]) == 0){
+            platformAlreadyGiven = true;
+        }
+    }
+    int argc2;
+    char **argv2;
+    auto args = std::vector<const char*>(argv, argv+argc);
+    if(!platformAlreadyGiven)
+    {
+        args.push_back("-platform");
+        args.push_back("offscreen");
+        argc2 = argc+2;
+        argv2 = const_cast<char **>(args.data());
+    }else{
+        argc2 = argc;
+        argv2 = argv;
+    }
+
+    QApplication a(argc2, argv2);
 
     QTEST_SET_MAIN_SOURCE_PATH
-    const int result = Catch::Session().run( argc, argv );
+    const int result = Catch::Session().run( argc2, argv2 );
 
     return ( result < 0xff ? result : 0xff );
 }

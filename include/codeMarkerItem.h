@@ -28,6 +28,10 @@
 class Petrack;
 class Control;
 class Tracker;
+namespace reco {
+    class CodeMarkerOptions;
+}
+
 
 struct OffsetMarker {
     std::vector<cv::Point2f> corners;
@@ -40,6 +44,7 @@ class CodeMarkerItem : public QGraphicsItem
 {
 private:
     Petrack *mMainWindow;
+    const reco::CodeMarkerOptions &mArucoOptions;
     const QColor mRejectedColor = QColor(255,0,0); // red
     const QColor mCornerColor = QColor(0,0,255); // blue
     const QColor mAcceptedColor = QColor(0,255,0); // green
@@ -49,7 +54,7 @@ private:
     Vec2F mUlc;  // upper left corner to draw
 
 public:
-    CodeMarkerItem(QWidget *wParent, QGraphicsItem * parent = nullptr);
+    CodeMarkerItem(QWidget *wParent, const reco::CodeMarkerOptions &options, QGraphicsItem * parent = nullptr);
     QRectF boundingRect() const override;
     void setRect(Vec2F& v);
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

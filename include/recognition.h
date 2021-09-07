@@ -51,7 +51,7 @@ namespace reco {
         Code = 6,
     };
 
-    struct ArucoCodeParams {
+    class ArucoCodeParams {
         double minMarkerPerimeter = 5;
         double maxMarkerPerimeter = 15;
         double minCornerDistance = 0.05;
@@ -73,6 +73,8 @@ namespace reco {
         double minOtsuStdDev = 5;
         double errorCorrectionRate = 0.6;
 
+    public:
+
         friend inline constexpr bool operator==(const ArucoCodeParams & lhs, const ArucoCodeParams & rhs) noexcept
         {
             return (lhs.minMarkerPerimeter == rhs.minMarkerPerimeter) && ((lhs.maxMarkerPerimeter == rhs.maxMarkerPerimeter) && ((lhs.minCornerDistance == rhs.minCornerDistance) && ((lhs.minMarkerDistance == rhs.minMarkerDistance) && ((lhs.adaptiveThreshWinSizeMin == rhs.adaptiveThreshWinSizeMin) && ((lhs.adaptiveThreshWinSizeMax == rhs.adaptiveThreshWinSizeMax) && ((lhs.adaptiveThreshWinSizeStep == rhs.adaptiveThreshWinSizeStep) && ((lhs.adaptiveThreshConstant == rhs.adaptiveThreshConstant) && ((lhs.polygonalApproxAccuracyRate == rhs.polygonalApproxAccuracyRate) && ((lhs.minDistanceToBorder == rhs.minDistanceToBorder) && ((static_cast<int>(lhs.doCornerRefinement) == static_cast<int>(rhs.doCornerRefinement)) && ((lhs.cornerRefinementWinSize == rhs.cornerRefinementWinSize) && ((lhs.cornerRefinementMaxIterations == rhs.cornerRefinementMaxIterations) && ((lhs.cornerRefinementMinAccuracy == rhs.cornerRefinementMinAccuracy) && ((lhs.markerBorderBits == rhs.markerBorderBits) && ((lhs.perspectiveRemovePixelPerCell == rhs.perspectiveRemovePixelPerCell) && ((lhs.perspectiveRemoveIgnoredMarginPerCell == rhs.perspectiveRemoveIgnoredMarginPerCell) && ((lhs.maxErroneousBitsInBorderRate == rhs.maxErroneousBitsInBorderRate) && ((lhs.minOtsuStdDev == rhs.minOtsuStdDev) && (lhs.errorCorrectionRate == rhs.errorCorrectionRate)))))))))))))))))));
@@ -81,13 +83,53 @@ namespace reco {
         {
             return !(lhs == rhs);
         }
+        double getMinMarkerPerimeter() const;
+        void setMinMarkerPerimeter(double newMinMarkerPerimeter);
+        double getMaxMarkerPerimeter() const;
+        void setMaxMarkerPerimeter(double newMaxMarkerPerimeter);
+        double getMinCornerDistance() const;
+        void setMinCornerDistance(double newMinCornerDistance);
+        double getMinMarkerDistance() const;
+        void setMinMarkerDistance(double newMinMarkerDistance);
+        int getAdaptiveThreshWinSizeMin() const;
+        void setAdaptiveThreshWinSizeMin(int newAdaptiveThreshWinSizeMin);
+        int getAdaptiveThreshWinSizeMax() const;
+        void setAdaptiveThreshWinSizeMax(int newAdaptiveThreshWinSizeMax);
+        int getAdaptiveThreshWinSizeStep() const;
+        void setAdaptiveThreshWinSizeStep(int newAdaptiveThreshWinSizeStep);
+        int getAdaptiveThreshConstant() const;
+        void setAdaptiveThreshConstant(int newAdaptiveThreshConstant);
+        double getPolygonalApproxAccuracyRate() const;
+        void setPolygonalApproxAccuracyRate(double newPolygonalApproxAccuracyRate);
+        int getMinDistanceToBorder() const;
+        void setMinDistanceToBorder(int newMinDistanceToBorder);
+        bool getDoCornerRefinement() const;
+        void setDoCornerRefinement(bool newDoCornerRefinement);
+        int getCornerRefinementWinSize() const;
+        void setCornerRefinementWinSize(int newCornerRefinementWinSize);
+        int getCornerRefinementMaxIterations() const;
+        void setCornerRefinementMaxIterations(int newCornerRefinementMaxIterations);
+        double getCornerRefinementMinAccuracy() const;
+        void setCornerRefinementMinAccuracy(double newCornerRefinementMinAccuracy);
+        int getMarkerBorderBits() const;
+        void setMarkerBorderBits(int newMarkerBorderBits);
+        int getPerspectiveRemovePixelPerCell() const;
+        void setPerspectiveRemovePixelPerCell(int newPerspectiveRemovePixelPerCell);
+        double getPerspectiveRemoveIgnoredMarginPerCell() const;
+        void setPerspectiveRemoveIgnoredMarginPerCell(double newPerspectiveRemoveIgnoredMarginPerCell);
+        double getMaxErroneousBitsInBorderRate() const;
+        void setMaxErroneousBitsInBorderRate(double newMaxErroneousBitsInBorderRate);
+        double getMinOtsuStdDev() const;
+        void setMinOtsuStdDev(double newMinOtsuStdDev);
+        double getErrorCorrectionRate() const;
+        void setErrorCorrectionRate(double newErrorCorrectionRate);
     };
 
 
-    struct CodeMarkerOptions : public QObject{
+    class CodeMarkerOptions : public QObject{
         Q_OBJECT
 
-    public:
+    private:
         CodeMarkerItem *codeMarkerItem;
         int indexOfMarkerDict = 16;
 
@@ -97,12 +139,22 @@ namespace reco {
         Vec2F offsetCropRect2Roi = Vec2F{0,0};
 
     public:
+        // TODO: Remove getter and setter for pointers;
+        // cannot properly set these in constructor because of
+        // bidirectional dependecies
+        CodeMarkerItem *getCodeMarkerItem() const {return codeMarkerItem;}
+        Control *getControlWidget() const {return controlWidget;}
         ArucoCodeParams getDetectorParams() const {return detectorParams;}
         int getIndexOfMarkerDict() const {return indexOfMarkerDict;}
 
     public:
-        void userChangedDetectorParams(ArucoCodeParams params);
-        void userChangedIndexOfMarkerDict(int idx);
+        void setCodeMarkerItem(CodeMarkerItem *item) {codeMarkerItem = item;}
+        void setControlWidget(Control *control) {controlWidget = control;}
+        void setDetectorParams(ArucoCodeParams params);
+        void setIndexOfMarkerDict(int idx);
+
+        const Vec2F &getOffsetCropRect2Roi() const;
+        void setOffsetCropRect2Roi(const Vec2F &newOffsetCropRect2Roi);
 
     signals:
         void detectorParamsChanged();

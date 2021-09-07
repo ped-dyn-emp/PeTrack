@@ -29,9 +29,9 @@
 
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,
-// so dass pixel quadratisch 
-CodeMarkerItem::CodeMarkerItem(QWidget *wParent, QGraphicsItem * parent)
-    : QGraphicsItem(parent)
+// so dass pixel quadratisch
+CodeMarkerItem::CodeMarkerItem(QWidget *wParent, const reco::CodeMarkerOptions &options, QGraphicsItem * parent)
+    : QGraphicsItem(parent), mArucoOptions(options)
 {
     mMainWindow = (class Petrack*) wParent;
 }
@@ -73,7 +73,7 @@ void CodeMarkerItem::setRect(Vec2F& v)
 void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
 {
 
-    if (mMainWindow->getCodeMarkerWidget()->showDetectedCandidates->isChecked())
+    if (mMainWindow->getCodeMarkerWidget()->showDetectedCandidates())
     {
         int nMarkers = static_cast<int>(mCorners.size());
         int nRejected = static_cast<int>(mRejected.size());
@@ -91,8 +91,8 @@ void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*
 
     if (false) // Show min/max marker size
     {
-        int minPerimeter = mMainWindow->getCodeMarkerWidget()->minMarkerPerimeter->value();
-        int maxPerimeter = mMainWindow->getCodeMarkerWidget()->maxMarkerPerimeter->value();
+        int minPerimeter = mArucoOptions.getDetectorParams().getMinMarkerPerimeter();
+        int maxPerimeter = mArucoOptions.getDetectorParams().getMaxMarkerPerimeter();
         double height = mMainWindow->getStatusPosRealHeight();
 
         cv::Point2f p0,p1,p2,p3;
