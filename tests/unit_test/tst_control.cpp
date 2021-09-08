@@ -18,29 +18,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <catch2/catch.hpp>
-
-#include <iostream>
 #include "control.h"
+#include "imageItem.h"
+#include "view.h"
 
+#include <QGraphicsScene>
 #include <QSignalSpy>
 #include <QTestEventList>
-#include <QGraphicsScene>
-#include "imageItem.h"
-
-#include "view.h"
+#include <catch2/catch.hpp>
+#include <iostream>
 
 
 // TODO Connect und Disconnect vom Event (lässt sich an und abschalten)
 // TODO Weitere Testcases überlegen
 
-void checkSelectedColor(Control* con, bool invHue, int toHue, int fromHue,
-                        int toSat, int fromSat, int toVal, int fromVal,
-                        int mapX, int mapW, int mapY, int mapH){
-
+void checkSelectedColor(
+    Control *con,
+    bool     invHue,
+    int      toHue,
+    int      fromHue,
+    int      toSat,
+    int      fromSat,
+    int      toVal,
+    int      fromVal,
+    int      mapX,
+    int      mapW,
+    int      mapY,
+    int      mapH)
+{
     REQUIRE(con->getColorPlot()->getMapItem()->getActMapInvHue() == invHue);
 
-    QColor toColor = con->getColorPlot()->getMapItem()->getActMapToColor();
+    QColor toColor   = con->getColorPlot()->getMapItem()->getActMapToColor();
     QColor fromColor = con->getColorPlot()->getMapItem()->getActMapFromColor();
 
     // Hue
@@ -65,8 +73,8 @@ void checkSelectedColor(Control* con, bool invHue, int toHue, int fromHue,
 
 SCENARIO("I open PeTrack with a red image", "[ui][config]")
 {
-    Petrack pet {};
-    cv::Mat redTestImage {cv::Size(50, 50), CV_8UC3, cv::Scalar(179,255,200)};
+    Petrack pet{};
+    cv::Mat redTestImage{cv::Size(50, 50), CV_8UC3, cv::Scalar(179, 255, 200)};
     cv::cvtColor(redTestImage, redTestImage, cv::COLOR_HSV2BGR);
     // NOTE Gibt es eine bessere Methode, als das Bild erst zu speichern?
     cv::imwrite("TESTBILD_DELETE_ME.png", redTestImage);
@@ -75,17 +83,17 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
 
     QPointer<Control> con = pet.getControlWidget();
 
-    GIVEN("I click the colorPickerButton") {
+    GIVEN("I click the colorPickerButton")
+    {
         QTestEventList eventList;
-        QPushButton* colorPickerButton = con->findChild<QPushButton*>("colorPickerButton");
+        QPushButton *  colorPickerButton = con->findChild<QPushButton *>("colorPickerButton");
         eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier);
         eventList.simulate(colorPickerButton);
 
-        THEN("The Button is checked") {
-            REQUIRE(colorPickerButton->isChecked());
-        }
+        THEN("The Button is checked") { REQUIRE(colorPickerButton->isChecked()); }
 
-        AND_GIVEN("I shift+click on one point of the (red) image"){
+        AND_GIVEN("I shift+click on one point of the (red) image")
+        {
             eventList.clear();
             eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::ShiftModifier, viewCenter);
             eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::ShiftModifier, viewCenter);
@@ -96,7 +104,8 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
             eventList.simulate(pet.getView()->viewport());
             REQUIRE(setColorSpy.count() == 2);
 
-            THEN("This pixel and its sourroundings get selected as new color"){
+            THEN("This pixel and its sourroundings get selected as new color")
+            {
                 // Red, so we need Inverse Hue
                 bool invHue = true;
 
@@ -118,7 +127,7 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
                 // x = 2 * 3 = 6
                 int mapX = 6;
                 // w = |toHue - fromHue| = 350
-                int mapW= 350;
+                int mapW = 350;
                 // y = 2 * fromSaturation = 500
                 int mapY = 500;
                 // h = toSaturation - fromSaturation = 5
@@ -126,8 +135,9 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
 
                 checkSelectedColor(con, invHue, toHue, fromHue, toSat, fromSat, toVal, fromVal, mapX, mapW, mapY, mapH);
 
-                AND_GIVEN("Afterwards I left-click on a slightly different red pixel"){
-                    cv::Mat differentRedTestImage {cv::Size(50, 50), CV_8UC3, cv::Scalar(170,235,220)};
+                AND_GIVEN("Afterwards I left-click on a slightly different red pixel")
+                {
+                    cv::Mat differentRedTestImage{cv::Size(50, 50), CV_8UC3, cv::Scalar(170, 235, 220)};
                     cv::cvtColor(differentRedTestImage, differentRedTestImage, cv::COLOR_HSV2BGR);
                     pet.updateImage(differentRedTestImage);
 
@@ -135,7 +145,8 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
                     eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier, viewCenter);
                     eventList.simulate(pet.getView()->viewport());
 
-                    THEN("The selected color is expanded accordingly"){
+                    THEN("The selected color is expanded accordingly")
+                    {
                         // new lower bound on Hue is 340 - 10 -> 330
                         fromHue = 330;
                         // 330 (fromHue) - 3 (toHue) = 327
@@ -149,14 +160,16 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
                         // new upper bound on Value is 220 + 10 -> 230
                         toVal = 230;
 
-                        checkSelectedColor(con, invHue, toHue, fromHue, toSat, fromSat, toVal, fromVal, mapX, mapW, mapY, mapH);
+                        checkSelectedColor(
+                            con, invHue, toHue, fromHue, toSat, fromSat, toVal, fromVal, mapX, mapW, mapY, mapH);
                     }
                 }
             }
         }
 
-        AND_GIVEN("I shift+click on a red-isch/magenta pixel (Hue=340)"){
-            cv::Mat magentaTestImage {cv::Size(50, 50), CV_8UC3, cv::Scalar(170,235,220)};
+        AND_GIVEN("I shift+click on a red-isch/magenta pixel (Hue=340)")
+        {
+            cv::Mat magentaTestImage{cv::Size(50, 50), CV_8UC3, cv::Scalar(170, 235, 220)};
             cv::cvtColor(magentaTestImage, magentaTestImage, cv::COLOR_HSV2BGR);
             pet.updateImage(magentaTestImage);
 
@@ -167,8 +180,9 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
 
             REQUIRE(!con->getColorPlot()->getMapItem()->getActMapInvHue());
 
-            AND_GIVEN("Afterwards I click on an red image (Hue=10)"){
-                cv::Mat otherSideRedImage {cv::Size(50, 50), CV_8UC3, cv::Scalar(5,235,220)};
+            AND_GIVEN("Afterwards I click on an red image (Hue=10)")
+            {
+                cv::Mat otherSideRedImage{cv::Size(50, 50), CV_8UC3, cv::Scalar(5, 235, 220)};
                 cv::cvtColor(otherSideRedImage, otherSideRedImage, cv::COLOR_HSV2BGR);
                 pet.updateImage(otherSideRedImage);
 
@@ -176,13 +190,14 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
                 eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier, viewCenter);
                 eventList.simulate(pet.getView()->viewport());
 
-                THEN("Inverse hue gets checked"){ /*Lieber color changed accordingly und dementsprechend weiterarbeiten?*/
+                THEN("Inverse hue gets checked")
+                { /*Lieber color changed accordingly und dementsprechend weiterarbeiten?*/
                     REQUIRE(con->getColorPlot()->getMapItem()->getActMapInvHue());
-
                 }
             }
-            AND_GIVEN("Afterwards I click on an pink Image (Hue=320)"){
-                cv::Mat pinkTestImage {cv::Size(50, 50), CV_8UC3, cv::Scalar(160,235,220)};
+            AND_GIVEN("Afterwards I click on an pink Image (Hue=320)")
+            {
+                cv::Mat pinkTestImage{cv::Size(50, 50), CV_8UC3, cv::Scalar(160, 235, 220)};
                 cv::cvtColor(pinkTestImage, pinkTestImage, cv::COLOR_HSV2BGR);
                 pet.updateImage(pinkTestImage);
 
@@ -191,30 +206,31 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
                 eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier, viewCenter);
                 eventList.simulate(pet.getView()->viewport());
 
-                THEN("I still do not use inverse Hue"){
+                THEN("I still do not use inverse Hue")
+                {
                     REQUIRE(!con->getColorPlot()->getMapItem()->getActMapInvHue());
                 }
             }
         }
-        AND_GIVEN("I shift+click on one specific pixel"){
-            cv::Mat newTestImage {cv::Size(50, 50), CV_8UC3, cv::Scalar(50,235,220)};
+        AND_GIVEN("I shift+click on one specific pixel")
+        {
+            cv::Mat newTestImage{cv::Size(50, 50), CV_8UC3, cv::Scalar(50, 235, 220)};
             // set middle Pixel (clicked pixel) to other Value
-            newTestImage.at<cv::Vec3b>(cv::Point(25,25)) = cv::Vec3b(100,255,255);
+            newTestImage.at<cv::Vec3b>(cv::Point(25, 25)) = cv::Vec3b(100, 255, 255);
             cv::cvtColor(newTestImage, newTestImage, cv::COLOR_HSV2BGR);
             pet.updateImage(newTestImage);
-            QMouseEvent event {QEvent::HoverMove, QPoint(25, 25), Qt::NoButton, Qt::NoButton, Qt::NoModifier};
+            QMouseEvent event{QEvent::HoverMove, QPoint(25, 25), Qt::NoButton, Qt::NoButton, Qt::NoModifier};
 
-            QPointF pointOnScene = pet.getImageItem()->mapToScene(QPoint(25, 25));
-            QPoint pointOnViewport = pet.getView()->mapFromScene(pointOnScene);
+            QPointF pointOnScene    = pet.getImageItem()->mapToScene(QPoint(25, 25));
+            QPoint  pointOnViewport = pet.getView()->mapFromScene(pointOnScene);
 
             // Only after a click the hover event setting mMousePosOnImage gets fired. Focus?
-            eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::ShiftModifier,
-                                    pointOnViewport);
-            eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::ShiftModifier,
-                                    pointOnViewport);
+            eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::ShiftModifier, pointOnViewport);
+            eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::ShiftModifier, pointOnViewport);
             eventList.simulate(pet.getView()->viewport());
 
-            THEN("I get a color selection fitting this single pixel"){
+            THEN("I get a color selection fitting this single pixel")
+            {
                 bool invHue = false;
                 // Upper Bound Hue 200 + 5 -> 205 Lower Bound: 200 - 5 -> 195
                 int fromHue = 195, toHue = 205;
@@ -239,6 +255,6 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
 
 SCENARIO("Open PeTrack check defaults", "[ui][config]")
 {
-    Petrack pet {};
+    Petrack pet{};
     REQUIRE(pet.getRecognizer().getRecoMethod() == reco::RecognitionMethod::MultiColor);
 }

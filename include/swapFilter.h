@@ -28,7 +28,7 @@ class SwapFilter : public Filter
 {
 private:
     Parameter mSwapHorizontally; // 0.0 false; 1.0 true
-    Parameter mSwapVertically; // 0.0 false; 1.0 true
+    Parameter mSwapVertically;   // 0.0 false; 1.0 true
 
 public:
     SwapFilter();

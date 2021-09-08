@@ -21,39 +21,35 @@
 #ifndef ANALYSEPLOT_H
 #define ANALYSEPLOT_H
 
-#include <QPen>
-
-#include <qwt_plot.h>
-#include <qwt_plot_zoomer.h>
-#include <qwt_plot_item.h>
-
 #include "helper.h"
 #include "tracker.h"
 #include "trackerReal.h"
 
+#include <QPen>
+#include <qwt_plot.h>
+#include <qwt_plot_item.h>
+#include <qwt_plot_zoomer.h>
+
 class Control;
 
-//-----------------------------------------------------------------
-
-class TrackerRealPlotItem: public QwtPlotItem
+class TrackerRealPlotItem : public QwtPlotItem
 {
 public:
     TrackerRealPlotItem();
 
-    void draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& re) const;
+    void draw(QPainter *p, const QwtScaleMap &mapX, const QwtScaleMap &mapY, const QRectF &re) const;
 
     void setPen(const QPen &pen);
 
-    void setTrackerReal(TrackerReal* trackerReal);
+    void setTrackerReal(TrackerReal *trackerReal);
 
 private:
     TrackerReal *mTrackerReal;
-    QPen mPen;
+    QPen         mPen;
 };
 
-//-----------------------------------------------------------------------------------------
 
-class AnalysePlot: public QwtPlot
+class AnalysePlot : public QwtPlot
 {
     Q_OBJECT
 
@@ -62,55 +58,28 @@ public:
 
     QPoint getPos(const QColor &col) const;
 
-    inline void setControlWidget(Control *control)
-    {
-        mControlWidget = control;
-    }
-    inline Control * getControlWidget() const
-    {
-        return mControlWidget;
-    }
-    inline void setActFrame(int f)
-    {
-        mActFrame = f;
-    }
-    inline int getActFrame() const
-    {
-        return mActFrame;
-    }
-    void setTrackerReal(TrackerReal* TR);
-    void setScale();
+    inline void     setControlWidget(Control *control) { mControlWidget = control; }
+    inline Control *getControlWidget() const { return mControlWidget; }
+    inline void     setActFrame(int f) { mActFrame = f; }
+    inline int      getActFrame() const { return mActFrame; }
+    void            setTrackerReal(TrackerReal *TR);
+    void            setScale();
 
-    inline double symbolSize() const
-    {
-        return mSymbolSize;
-    }
-    inline void setSymbolSize(double s)
-    {
-        mSymbolSize = s;
-    }
-    QwtPlotZoomer * getZoomer()
-    {
-        return mZoomer;
-    }
+    inline double  symbolSize() const { return mSymbolSize; }
+    inline void    setSymbolSize(double s) { mSymbolSize = s; }
+    QwtPlotZoomer *getZoomer() { return mZoomer; }
 
-    inline double xMax() const
-    {
-        return mXMax;
-    }
-    inline double yMax() const
-    {
-        return mYMax;
-    }
+    inline double xMax() const { return mXMax; }
+    inline double yMax() const { return mYMax; }
 
 private:
-    double mSymbolSize;
-    double mXMin, mXMax, mYMin, mYMax;
-    Control *mControlWidget;
-    TrackerReal *mTrackerReal;
+    double               mSymbolSize;
+    double               mXMin, mXMax, mYMin, mYMax;
+    Control *            mControlWidget;
+    TrackerReal *        mTrackerReal;
     TrackerRealPlotItem *mTrackerRealItem;
-    QwtPlotZoomer *mZoomer;
-    int mActFrame;
+    QwtPlotZoomer *      mZoomer;
+    int                  mActFrame;
 };
 
 #endif

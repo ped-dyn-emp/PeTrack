@@ -20,21 +20,17 @@
 
 #include "calibStereoFilter.h"
 
-CalibStereoFilter::CalibStereoFilter()
-    :Filter()
+CalibStereoFilter::CalibStereoFilter() : Filter()
 {
     setOnCopy(false); // da in stereoContext der Speicherplatz fuer res liegt
 }
 
-
-
-cv::Mat CalibStereoFilter::act(cv::Mat &/*img*/, cv::Mat &/*res*/)
+cv::Mat CalibStereoFilter::act(cv::Mat & /*img*/, cv::Mat & /*res*/)
 {
     return cv::Mat();
-
 }
-void CalibStereoFilter::setStereoContext(pet::StereoContext* stereoContext)
+
+void CalibStereoFilter::setStereoContext(pet::StereoContext *stereoContext)
 {
     mStereoContext = stereoContext;
 }
-

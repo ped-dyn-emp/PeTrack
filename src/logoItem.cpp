@@ -18,14 +18,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QGraphicsScene>
-#include <QPainter>
-#include <QApplication>
-#include <QTimer>
-
 #include "logoItem.h"
+
 #include "petrack.h"
 
+#include <QApplication>
+#include <QGraphicsScene>
+#include <QPainter>
+#include <QTimer>
 #include <ctime>
 
 // minimale Zeit zwischen zwei Blendenstufen in Millisekunden
@@ -36,15 +36,15 @@ Fader::Fader()
     mTimer = nullptr;
 }
 
-void Fader::fadeOut(LogoItem* lI, int frames)
+void Fader::fadeOut(LogoItem *lI, int frames)
 {
     mLogoItem = lI;
-    if (frames < 1)
+    if(frames < 1)
         mFrames = 1;
     else
         mFrames = frames;
-    mStep = 1./mFrames;
-    if (mTimer) // wenn fadeOut schon mal aufgerufen wurde; so wird nur ein QTimer maximal angelegt
+    mStep = 1. / mFrames;
+    if(mTimer) // wenn fadeOut schon mal aufgerufen wurde; so wird nur ein QTimer maximal angelegt
         delete mTimer;
     mTimer = new QTimer(this);
     connect(mTimer, SIGNAL(timeout()), this, SLOT(fadeOutStep()));
@@ -55,13 +55,14 @@ void Fader::fadeOutStep()
 {
     static clock_t lastTime = clock();
 
-    if (((double)(clock()-lastTime))/CLOCKS_PER_SEC > FRAME_INTERVAL*.001) // beschleunigen, wenn zu langsam ausgeblendet wird
-        mStep*=2;
+    if(((double) (clock() - lastTime)) / CLOCKS_PER_SEC >
+       FRAME_INTERVAL * .001) // beschleunigen, wenn zu langsam ausgeblendet wird
+        mStep *= 2;
     lastTime = clock();
 
-    if (mLogoItem->getOpacity()>0.)
+    if(mLogoItem->getOpacity() > 0.)
     {
-        mLogoItem->setOpacity(mLogoItem->getOpacity()-mStep);
+        mLogoItem->setOpacity(mLogoItem->getOpacity() - mStep);
         mLogoItem->scene()->update(); // ein neuzeichnen wird erwuenscht und irgendwann bei processEvents gemacht
         qApp->processEvents();
     }
@@ -72,13 +73,11 @@ void Fader::fadeOutStep()
     }
 }
 
-LogoItem::LogoItem(QWidget *wParent, QGraphicsItem * parent)
-    : QGraphicsItem(parent)
+LogoItem::LogoItem(QWidget *wParent, QGraphicsItem *parent) : QGraphicsItem(parent)
 {
-    mOpacity = 1.0;
-    mMainWindow = (class Petrack*) wParent;
-    mImage = new QImage(":/logo"); // in icons.qrc definiert
-
+    mOpacity    = 1.0;
+    mMainWindow = (class Petrack *) wParent;
+    mImage      = new QImage(":/logo"); // in icons.qrc definiert
 }
 
 QRectF LogoItem::boundingRect() const
@@ -90,18 +89,18 @@ void LogoItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
 {
     int w;
     int h;
-    if (mMainWindow->getImage())
+    if(mMainWindow->getImage())
     {
-        w = (mMainWindow->getImage()->width())/2 - (mImage->width())/2 - mMainWindow->getImageBorderSize();
-        h = (mMainWindow->getImage()->height())/2 - (mImage->height())/2 - mMainWindow->getImageBorderSize();
+        w = (mMainWindow->getImage()->width()) / 2 - (mImage->width()) / 2 - mMainWindow->getImageBorderSize();
+        h = (mMainWindow->getImage()->height()) / 2 - (mImage->height()) / 2 - mMainWindow->getImageBorderSize();
     }
     else
     {
-        w = 0; 
+        w = 0;
         h = 0;
     }
     painter->setOpacity(mOpacity);
-    painter->drawImage(w,h,*mImage);
+    painter->drawImage(w, h, *mImage);
 }
 
 // logo wird langsam ausgeblendet

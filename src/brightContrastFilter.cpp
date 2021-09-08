@@ -21,8 +21,7 @@
 #include "brightContrastFilter.h"
 
 
-BrightContrastFilter::BrightContrastFilter()
-    :Filter()
+BrightContrastFilter::BrightContrastFilter() : Filter()
 {
     mB.setMinimum(-100.);
     mB.setMaximum(100.);
@@ -37,35 +36,34 @@ BrightContrastFilter::BrightContrastFilter()
 
 cv::Mat BrightContrastFilter::act(cv::Mat &img, cv::Mat &res)
 {
-
     double delta, a, b;
     /*
      * The algorithm is by Werner D. Streidt
      * (http://visca.com/ffactory/archives/5-99/msg00021.html)
      */
-    if (mC.getValue() > 0)
+    if(mC.getValue() > 0)
     {
-        delta = 127.*mC.getValue()/100.;
-        a = 255./(255. - delta*2.);
-        b = a*(mB.getValue() - delta);
+        delta = 127. * mC.getValue() / 100.;
+        a     = 255. / (255. - delta * 2.);
+        b     = a * (mB.getValue() - delta);
     }
     else
     {
-        delta = -128.*mC.getValue()/100.;
-        a = (256.-delta*2.)/255.;
-        b = a*mB.getValue() + delta;
+        delta = -128. * mC.getValue() / 100.;
+        a     = (256. - delta * 2.) / 255.;
+        b     = a * mB.getValue() + delta;
     }
 
-    img.convertTo(res,-1,a,b);
+    img.convertTo(res, -1, a, b);
     return res;
 }
 
-Parameter* BrightContrastFilter::getBrightness()
+Parameter *BrightContrastFilter::getBrightness()
 {
     return &mB;
 }
 
-Parameter* BrightContrastFilter::getContrast()
+Parameter *BrightContrastFilter::getContrast()
 {
     return &mC;
 }

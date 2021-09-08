@@ -18,6 +18,13 @@
  * along with this program.  If not, see <https://cdwww.gnu.org/licenses/>.
  */
 
+#include "IO.h"
+
+#include "moCapPerson.h"
+#include "pMessageBox.h"
+#include "skeletonTree.h"
+#include "skeletonTreeFactory.h"
+
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -25,12 +32,6 @@
 #include <QRegularExpression>
 #include <QTextStream>
 #include <opencv2/opencv.hpp>
-
-#include "IO.h"
-#include "moCapPerson.h"
-#include "pMessageBox.h"
-#include "skeletonTree.h"
-#include "skeletonTreeFactory.h"
 
 /**
  * @brief Reads individual heights for markerIDs from file.
@@ -50,15 +51,15 @@
  * @param heightFileName name of the file containing the height information
  * @return map of markerID to height if parsing was successful, error message otherwise
  */
-std::variant<std::unordered_map<int, float>, std::string> IO::readHeightFile(const QString& heightFileName)
+std::variant<std::unordered_map<int, float>, std::string> IO::readHeightFile(const QString &heightFileName)
 {
-    if (!heightFileName.isEmpty())
+    if(!heightFileName.isEmpty())
     {
         // Import heights from txt-file
-        if (heightFileName.right(4) == ".txt")
+        if(heightFileName.right(4) == ".txt")
         {
             QFile heightFile(heightFileName);
-            if (!heightFile.open(QIODevice::ReadOnly | QIODevice::Text))
+            if(!heightFile.open(QIODevice::ReadOnly | QIODevice::Text))
             {
                 return "Could not open " + heightFileName.toStdString();
             }
@@ -66,23 +67,23 @@ std::variant<std::unordered_map<int, float>, std::string> IO::readHeightFile(con
             std::unordered_map<int, float> markerHeights;
 
             QTextStream in(&heightFile);
-            bool readHeader = false;
-            float conversionFactorToCM = 1.0F;
+            bool        readHeader           = false;
+            float       conversionFactorToCM = 1.0F;
 
-            while (!in.atEnd())
+            while(!in.atEnd())
             {
                 QString line = in.readLine();
                 // Process header/comment line
-                if( line.startsWith("#",Qt::CaseInsensitive))
+                if(line.startsWith("#", Qt::CaseInsensitive))
                 {
-                    if (!readHeader)
+                    if(!readHeader)
                     {
-                        const QString& headerline = line;
-                        if (headerline.contains("z/cm"))
+                        const QString &headerline = line;
+                        if(headerline.contains("z/cm"))
                         {
                             conversionFactorToCM = 1.0F;
                         }
-                        else if (headerline.contains("z/m"))
+                        else if(headerline.contains("z/m"))
                         {
                             conversionFactorToCM = 100.0F;
                         }
@@ -92,39 +93,39 @@ std::variant<std::unordered_map<int, float>, std::string> IO::readHeightFile(con
                 }
 
                 // read line with format: [id height]
-                if (auto splitLine = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts); splitLine.size() == 2)
+                if(auto splitLine = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts); splitLine.size() == 2)
                 {
                     bool markerConverted = true;
-                    int markerID = splitLine[0].toInt(&markerConverted);
-                    if (!markerConverted)
+                    int  markerID        = splitLine[0].toInt(&markerConverted);
+                    if(!markerConverted)
                     {
                         return "Marker needs to be an integer value, but is " + splitLine[0].toStdString();
                     }
-                    bool heightConverted = true;
-                    float height = splitLine[1].toFloat(&heightConverted) * conversionFactorToCM;
+                    bool  heightConverted = true;
+                    float height          = splitLine[1].toFloat(&heightConverted) * conversionFactorToCM;
 
-                    if (!heightConverted || height <= 0)
+                    if(!heightConverted || height <= 0)
                     {
                         return "Height needs to be a positive numerical value, but is " + splitLine[1].toStdString();
                     }
 
-                    if (auto inserted = markerHeights.insert(std::make_pair(markerID, height)); !inserted.second)
+                    if(auto inserted = markerHeights.insert(std::make_pair(markerID, height)); !inserted.second)
                     {
                         return "Duplicate entry for markerID = " + std::to_string(markerID) + ".";
                     }
                 }
                 else
                 {
-                    return "Line should contain exactly 2 values: id height. But it contains "
-                            + std::to_string(splitLine.size()) + " entries.";
+                    return "Line should contain exactly 2 values: id height. But it contains " +
+                           std::to_string(splitLine.size()) + " entries.";
                 }
             }
             heightFile.close();
             return markerHeights;
         }
 
-        return "Cannot load " + heightFileName.toStdString()
-               + " maybe because of wrong file extension. Needs to be .txt.";
+        return "Cannot load " + heightFileName.toStdString() +
+               " maybe because of wrong file extension. Needs to be .txt.";
     }
     return "No file provided.";
 }
@@ -140,9 +141,9 @@ std::variant<std::unordered_map<int, float>, std::string> IO::readHeightFile(con
  */
 void IO::readMoCapC3D(MoCapStorage &storage, const MoCapPersonMetadata &metadata)
 {
-    MoCapPerson person;
-    const std::string& filename = metadata.getFilepath();
-    MoCapSystem fp = metadata.getSystem();
+    MoCapPerson        person;
+    const std::string &filename = metadata.getFilepath();
+    MoCapSystem        fp       = metadata.getSystem();
     person.setMetadata(metadata);
 
     ezc3d::c3d c3d;
@@ -150,9 +151,8 @@ void IO::readMoCapC3D(MoCapStorage &storage, const MoCapPersonMetadata &metadata
     {
         c3d = ezc3d::c3d{filename};
     }
-    catch(const std::invalid_argument& e)
+    catch(const std::invalid_argument &e)
     {
-
         std::stringstream ss;
         ss << "Error while reading C3D File " << filename << ": " << e.what() << '\n';
         PCritical(nullptr, "Error: Cannot load C3D File", ss.str().c_str());
@@ -163,30 +163,35 @@ void IO::readMoCapC3D(MoCapStorage &storage, const MoCapPersonMetadata &metadata
     person.setTimeOffset(person.getMetadata().getOffset() - firstFrame / person.getMetadata().getSamplerate());
 
     // getImagePoint takes points in cm -> cm as target unit
-    const std::string unit = c3d.parameters().group("POINT").parameter("UNITS").valuesAsString()[0];
-    double conversionFactor = 1e-1; // default, since XSens uses this
+    const std::string unit             = c3d.parameters().group("POINT").parameter("UNITS").valuesAsString()[0];
+    double            conversionFactor = 1e-1; // default, since XSens uses this
     if(unit == "mm")
     {
         conversionFactor = 1e-1;
-    }else if(unit == "cm")
+    }
+    else if(unit == "cm")
     {
         conversionFactor = 1.0;
-    }else if(unit == "m")
+    }
+    else if(unit == "m")
     {
         conversionFactor = 100.0;
     }
 
-    const auto c3dToPoint3f = [conversionFactor](const ezc3d::DataNS::Points3dNS::Point& point){
-        return cv::Point3f{static_cast<float>(point.x()),
-                           static_cast<float>(point.y()),
-                           static_cast<float>(point.z())} * conversionFactor;
+    const auto c3dToPoint3f = [conversionFactor](const ezc3d::DataNS::Points3dNS::Point &point)
+    {
+        return cv::Point3f{
+                   static_cast<float>(point.x()), static_cast<float>(point.y()), static_cast<float>(point.z())} *
+               conversionFactor;
     };
 
-    switch (fp) {
+    switch(fp)
+    {
         case XSensC3D:
             readSkeletonC3D_XSENS(c3d, person, c3dToPoint3f);
             break;
-        case END: break; // So clang doesn't say it isn't handled
+        case END:
+            break; // So clang doesn't say it isn't handled
     }
 
     storage.addPerson(person);
@@ -203,10 +208,9 @@ void IO::readMoCapC3D(MoCapStorage &storage, const MoCapPersonMetadata &metadata
  * @param c3dToPoint3f[in] function which converts a c3d point to a cv::Point3f in cm
  */
 void IO::readSkeletonC3D_XSENS(
-    const ezc3d::c3d &c3d,
-    MoCapPerson &person,
-    const std::function<cv::Point3f(const ezc3d::DataNS::Points3dNS::Point&)>& c3dToPoint3f
-    )
+    const ezc3d::c3d &                                                          c3d,
+    MoCapPerson &                                                               person,
+    const std::function<cv::Point3f(const ezc3d::DataNS::Points3dNS::Point &)> &c3dToPoint3f)
 {
     /*
      * Points from XSens
@@ -230,13 +234,13 @@ void IO::readSkeletonC3D_XSENS(
      * left heel: 59
      * right toe: 58
      * left toe: 64
-    */
+     */
 
-    const auto& frames = c3d.data().frames();
+    const auto &frames = c3d.data().frames();
 
-    for(const auto& frame : frames)
+    for(const auto &frame : frames)
     {
-        const auto& points = frame.points().points();
+        const auto & points = frame.points().points();
         XSenseStruct skeletonStruct;
         skeletonStruct.mHipR    = c3dToPoint3f(points[5]);
         skeletonStruct.mHipL    = c3dToPoint3f(points[6]);
@@ -284,13 +288,13 @@ void IO::readSkeletonC3D_XSENS(
  */
 std::variant<std::unordered_map<int, int>, std::string> IO::readMarkerIDFile(const QString &markerFileName)
 {
-    if (!markerFileName.isEmpty())
+    if(!markerFileName.isEmpty())
     {
         // Import heights from txt-file
-        if (markerFileName.right(4) == ".txt")
+        if(markerFileName.right(4) == ".txt")
         {
             QFile markerFile(markerFileName);
-            if (!markerFile.open(QIODevice::ReadOnly | QIODevice::Text))
+            if(!markerFile.open(QIODevice::ReadOnly | QIODevice::Text))
             {
                 return "Could not open " + markerFileName.toStdString();
             }
@@ -299,50 +303,50 @@ std::variant<std::unordered_map<int, int>, std::string> IO::readMarkerIDFile(con
 
             QTextStream in(&markerFile);
 
-            while (!in.atEnd())
+            while(!in.atEnd())
             {
                 QString line = in.readLine();
 
                 // Skip header/comment line
-                if( line.startsWith("#",Qt::CaseInsensitive))
+                if(line.startsWith("#", Qt::CaseInsensitive))
                 {
                     continue;
                 }
 
                 // read line with format: [personID markerID]
-                if (auto splitLine = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts); splitLine.size() == 2)
+                if(auto splitLine = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts); splitLine.size() == 2)
                 {
                     bool personIDConverted = true;
-                    int personID = splitLine[0].toInt(&personIDConverted);
-                    if (!personIDConverted)
+                    int  personID          = splitLine[0].toInt(&personIDConverted);
+                    if(!personIDConverted)
                     {
                         return "PersonID needs to be an integer value, but is " + splitLine[0].toStdString();
                     }
                     bool markerIDConverted = true;
-                    int markerID = splitLine[1].toInt(&markerIDConverted);
+                    int  markerID          = splitLine[1].toInt(&markerIDConverted);
 
-                    if (!markerIDConverted )
+                    if(!markerIDConverted)
                     {
                         return "MarkerID needs to be an integer value, but is " + splitLine[1].toStdString();
                     }
 
-                    if (auto inserted = markerIDs.insert(std::make_pair(personID, markerID)); !inserted.second)
+                    if(auto inserted = markerIDs.insert(std::make_pair(personID, markerID)); !inserted.second)
                     {
                         return "Duplicate entry for personID = " + std::to_string(personID) + ".";
                     }
                 }
                 else
                 {
-                    return "Line should contain exactly 2 values: personID markerID. But it contains "
-                           + std::to_string(splitLine.size()) + " entries.";
+                    return "Line should contain exactly 2 values: personID markerID. But it contains " +
+                           std::to_string(splitLine.size()) + " entries.";
                 }
             }
             markerFile.close();
             return markerIDs;
         }
 
-        return "Cannot load " + markerFileName.toStdString()
-               + " maybe because of wrong file extension. Needs to be .txt.";
+        return "Cannot load " + markerFileName.toStdString() +
+               " maybe because of wrong file extension. Needs to be .txt.";
     }
     return "No file provided.";
 }
@@ -354,21 +358,21 @@ std::variant<std::unordered_map<int, int>, std::string> IO::readMarkerIDFile(con
  * @param authorsFile zenodo metadata file containing the author information
  * @return list of authors
  */
-std::vector<std::string> IO::readAuthors(const QString & authorsFile)
+std::vector<std::string> IO::readAuthors(const QString &authorsFile)
 {
     QFile file(authorsFile);
     file.open(QIODevice::ReadOnly);
 
     QJsonParseError parseError{};
-    QJsonDocument jsonDocument = QJsonDocument::fromJson(file.readAll(), &parseError);
+    QJsonDocument   jsonDocument = QJsonDocument::fromJson(file.readAll(), &parseError);
 
     std::vector<std::string> authors;
 
-    if (parseError.error == QJsonParseError::NoError)
+    if(parseError.error == QJsonParseError::NoError)
     {
-        QJsonObject root = jsonDocument.object();
-        auto creators = root["creators"].toArray();
-        for (auto author : creators)
+        QJsonObject root     = jsonDocument.object();
+        auto        creators = root["creators"].toArray();
+        for(auto author : creators)
         {
             QJsonObject node = author.toObject();
             authors.push_back(node["name"].toString().toStdString());
@@ -381,4 +385,3 @@ std::vector<std::string> IO::readAuthors(const QString & authorsFile)
 
     return authors;
 }
-

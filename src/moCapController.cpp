@@ -18,21 +18,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QDomElement>
-#include <QMessageBox>
-
-#include <opencv2/opencv.hpp>
-
-#include "moCapPerson.h"
 #include "moCapController.h"
+
 #include "IO.h"
 #include "helper.h"
+#include "moCapPerson.h"
+
+#include <QDomElement>
+#include <QMessageBox>
+#include <opencv2/opencv.hpp>
 
 
-bool operator==(const SegmentRenderData& lhs, const SegmentRenderData& rhs){
-    return lhs.mColor == rhs.mColor &&
-           lhs.mDirected == rhs.mDirected &&
-           lhs.mLine == rhs.mLine &&
+bool operator==(const SegmentRenderData &lhs, const SegmentRenderData &rhs)
+{
+    return lhs.mColor == rhs.mColor && lhs.mDirected == rhs.mDirected && lhs.mLine == rhs.mLine &&
            lhs.mThickness == rhs.mThickness;
 }
 
@@ -51,32 +50,38 @@ bool operator==(const SegmentRenderData& lhs, const SegmentRenderData& rhs){
  * @param [in]currentFrame current frame of the video
  * @param [out]renderData array of SegmentRenderData, to which to append the result
  */
-void MoCapController::transformPersonSkeleton(const MoCapPerson &person, double framerate, int currentFrame, std::vector<SegmentRenderData> &renderData) const
+void MoCapController::transformPersonSkeleton(
+    const MoCapPerson &             person,
+    double                          framerate,
+    int                             currentFrame,
+    std::vector<SegmentRenderData> &renderData) const
 {
-    double currentTime = currentFrame/framerate;
+    double currentTime = currentFrame / framerate;
     double sampleIndex = person.getSampleIndex(currentTime);
-    bool hasPre = person.hasSample(std::floor(sampleIndex));
-    bool hasPost = person.hasSample(std::ceil(sampleIndex));
+    bool   hasPre      = person.hasSample(std::floor(sampleIndex));
+    bool   hasPost     = person.hasSample(std::ceil(sampleIndex));
 
     if(!hasPre && !hasPost)
     {
         return;
-    }else if(!hasPre)
+    }
+    else if(!hasPre)
     {
         debout << "Start of XSens recording reached for file '" << person.getFilename() << "'" << std::endl;
         return;
-    }else if(!hasPost)
+    }
+    else if(!hasPost)
     {
         debout << "End of XSens recording reached for file '" << person.getFilename() << "'" << std::endl;
         return;
     }
 
-    const SkeletonTree& preSample = person.getSample(std::floor(sampleIndex));
-    const SkeletonTree& postSample = person.getSample(std::ceil(sampleIndex));
-    double intpart = 0.0;
-    double weight = modf(sampleIndex, &intpart);
+    const SkeletonTree &preSample  = person.getSample(std::floor(sampleIndex));
+    const SkeletonTree &postSample = person.getSample(std::ceil(sampleIndex));
+    double              intpart    = 0.0;
+    double              weight     = modf(sampleIndex, &intpart);
 
-    const auto prePairs = preSample.getLines();
+    const auto prePairs  = preSample.getLines();
     const auto postPairs = postSample.getLines();
 
     const std::vector<SkeletonLine> interpolatedPairs = interpolate(prePairs, postPairs, weight);
@@ -85,80 +90,72 @@ void MoCapController::transformPersonSkeleton(const MoCapPerson &person, double 
     projectedPairs.reserve(prePairs.size());
 
     SkeletonLine neckToHead;
-    Vec3F neckToHead3D;
+    Vec3F        neckToHead3D;
 
-    for(const auto& pair : interpolatedPairs)
+    for(const auto &pair : interpolatedPairs)
     {
-        projectedPairs.emplace_back(
-            mExtrCalib.getImagePoint(pair.start),
-            mExtrCalib.getImagePoint(pair.end)
-        );
+        projectedPairs.emplace_back(mExtrCalib.getImagePoint(pair.start), mExtrCalib.getImagePoint(pair.end));
         if(pair.start_id == 1 && pair.end_id == 2)
         {
-            neckToHead = pair;
+            neckToHead   = pair;
             neckToHead3D = Vec3F(pair.end - pair.start);
         }
     }
 
-    for(const auto& pair : projectedPairs)
+    for(const auto &pair : projectedPairs)
     {
-        renderData.push_back({
-            /*.mLine =*/ QLine(pair.first.x, pair.first.y,
-                        pair.second.x, pair.second.y),
-            /*.mColor =*/ mColor,
-            /*.mThickness =*/ mThickness,
-            /*.mDirected =*/ false
-        });
+        renderData.push_back(
+            {/*.mLine =*/QLine(pair.first.x, pair.first.y, pair.second.x, pair.second.y),
+             /*.mColor =*/mColor,
+             /*.mThickness =*/mThickness,
+             /*.mDirected =*/false});
     }
 
     // Head Direction Arrow
-    Vec3F headDir_v = preSample.getHeadDir() * (1-weight) + postSample.getHeadDir() * weight;
+    Vec3F headDir_v = preSample.getHeadDir() * (1 - weight) + postSample.getHeadDir() * weight;
     headDir_v.normalize();
     cv::Point3f headDir = cv::Point3f(headDir_v.x(), headDir_v.y(), headDir_v.z());
     headDir *= neckToHead3D.length();
 
     // Start arrow at 75% the way from C7 to top of head
-    auto arrowBase = neckToHead.start + (neckToHead.end - neckToHead.start) * 0.75;
-    cv::Point2f arrowHead = mExtrCalib.getImagePoint(arrowBase + headDir);
-    auto arrowBase2D = mExtrCalib.getImagePoint(arrowBase);
+    auto        arrowBase   = neckToHead.start + (neckToHead.end - neckToHead.start) * 0.75;
+    cv::Point2f arrowHead   = mExtrCalib.getImagePoint(arrowBase + headDir);
+    auto        arrowBase2D = mExtrCalib.getImagePoint(arrowBase);
 
-    renderData.push_back({
-        /*.mLine =*/      QLine(arrowBase2D.x, arrowBase2D.y,
-                          arrowHead.x, arrowHead.y),
-        /*.mColor =*/     mColor,
-        /*.mThickness =*/ mThickness,
-        /*.mDirected =*/  true
-    });
+    renderData.push_back(
+        {/*.mLine =*/QLine(arrowBase2D.x, arrowBase2D.y, arrowHead.x, arrowHead.y),
+         /*.mColor =*/mColor,
+         /*.mThickness =*/mThickness,
+         /*.mDirected =*/true});
 }
 
 std::vector<SegmentRenderData> MoCapController::getRenderData(int currentFrame, double framerate) const
 {
     std::vector<SegmentRenderData> renderData;
-    for(const auto& person : mStorage.getPersons()){
+    for(const auto &person : mStorage.getPersons())
+    {
         transformPersonSkeleton(person, framerate, currentFrame, renderData);
     }
     return renderData;
 }
 
-std::vector<SkeletonLine>
-MoCapController::interpolate(
-    const std::vector<SkeletonLine>& prePairs,
-    const std::vector<SkeletonLine>& postPairs,
-    double weight
-    )
+std::vector<SkeletonLine> MoCapController::interpolate(
+    const std::vector<SkeletonLine> &prePairs,
+    const std::vector<SkeletonLine> &postPairs,
+    double                           weight)
 {
     // Needs: prePairs.size() == postPairs.size()
     // Needs: prePair and postPair be EXACTLY one sample away from each other
     std::vector<SkeletonLine> interpolatedPairs;
     interpolatedPairs.reserve(prePairs.size());
 
-    for(size_t i = 0; i < prePairs.size(); ++i){
-        interpolatedPairs.push_back({
-            /*.start =*/ prePairs[i].start * (1-weight) + postPairs[i].start * weight,
-            /*.start_id =*/ prePairs[i].start_id,
-            /*.end =*/ prePairs[i].end * (1-weight) + postPairs[i].end * weight,
-            /*.end_id =*/ prePairs[i].end_id
-        });
+    for(size_t i = 0; i < prePairs.size(); ++i)
+    {
+        interpolatedPairs.push_back(
+            {/*.start =*/prePairs[i].start * (1 - weight) + postPairs[i].start * weight,
+             /*.start_id =*/prePairs[i].start_id,
+             /*.end =*/prePairs[i].end * (1 - weight) + postPairs[i].end * weight,
+             /*.end_id =*/prePairs[i].end_id});
     }
     return interpolatedPairs;
 }
@@ -169,8 +166,10 @@ MoCapController::interpolate(
  * @param visibility must be a bool
  * @emit showMoCapChanged event when visibility is different from mShowMoCap
  * */
-void MoCapController::setShowMoCap(bool visibility) {
-    if(mShowMoCap != visibility) {
+void MoCapController::setShowMoCap(bool visibility)
+{
+    if(mShowMoCap != visibility)
+    {
         mShowMoCap = visibility;
         emit showMoCapChanged(visibility);
     }
@@ -185,10 +184,12 @@ void MoCapController::setShowMoCap(bool visibility) {
  * */
 void MoCapController::setColor(const QColor &color)
 {
-    if(!color.isValid()){
+    if(!color.isValid())
+    {
         throw std::invalid_argument("Selected color is invalid!");
     }
-    if(mColor != color) {
+    if(mColor != color)
+    {
         mColor = color;
         emit colorChanged(color);
     }
@@ -203,10 +204,12 @@ void MoCapController::setColor(const QColor &color)
  * */
 void MoCapController::setThickness(int thickness)
 {
-    if(thickness <= 0){
+    if(thickness <= 0)
+    {
         throw std::invalid_argument("Thickness must be greater than 0!");
     }
-    if(mThickness != thickness) {
+    if(mThickness != thickness)
+    {
         mThickness = thickness;
         emit thicknessChanged(thickness);
     }
@@ -218,7 +221,8 @@ void MoCapController::setThickness(int thickness)
  * @emit showMoCapChanged, colorChanged, thicknessChanged
  * Notifies every observer manually to update the attributes
  * */
-void MoCapController::notifyAllObserver() {
+void MoCapController::notifyAllObserver()
+{
     emit showMoCapChanged(mShowMoCap);
     emit colorChanged(mColor);
     emit thicknessChanged(mThickness);
@@ -227,9 +231,11 @@ void MoCapController::notifyAllObserver() {
 /**
  * @return vector of MoCapPersonMetadata from the persons in mStorage
  */
-std::vector<MoCapPersonMetadata> MoCapController::getAllMoCapPersonMetadata() const{
+std::vector<MoCapPersonMetadata> MoCapController::getAllMoCapPersonMetadata() const
+{
     std::vector<MoCapPersonMetadata> metadata;
-    for(const MoCapPerson &person : mStorage.getPersons()){
+    for(const MoCapPerson &person : mStorage.getPersons())
+    {
         metadata.push_back(person.getMetadata());
     }
     return metadata;
@@ -242,19 +248,18 @@ std::vector<MoCapPersonMetadata> MoCapController::getAllMoCapPersonMetadata() co
  * This method deletes every person from the storage whose metadata does not occur in the newMetadata and calls
  * the IO::readMoCapC3D-method for every new Metadata.
  */
-void MoCapController::readMoCapFiles(const std::vector<MoCapPersonMetadata> &newMetadata){
-    std::vector<MoCapPerson> &persons = mStorage.getPersons();
-    auto unselected = [&](auto person){
-        return std::find(newMetadata.cbegin(), newMetadata.cend(), person.getMetadata()) == newMetadata.cend();
-    };
-    persons.erase(
-        std::remove_if(persons.begin(), persons.end(), unselected),
-        persons.end()
-        );
+void MoCapController::readMoCapFiles(const std::vector<MoCapPersonMetadata> &newMetadata)
+{
+    std::vector<MoCapPerson> &persons    = mStorage.getPersons();
+    auto                      unselected = [&](auto person)
+    { return std::find(newMetadata.cbegin(), newMetadata.cend(), person.getMetadata()) == newMetadata.cend(); };
+    persons.erase(std::remove_if(persons.begin(), persons.end(), unselected), persons.end());
     std::vector<MoCapPersonMetadata> currentMetadata = getAllMoCapPersonMetadata();
-    for(const MoCapPersonMetadata& md: newMetadata){
+    for(const MoCapPersonMetadata &md : newMetadata)
+    {
         bool isNewMd = std::find(currentMetadata.cbegin(), currentMetadata.cend(), md) == currentMetadata.cend();
-        if(isNewMd){
+        if(isNewMd)
+        {
             IO::readMoCapC3D(mStorage, md);
         }
     }
@@ -281,8 +286,8 @@ void MoCapController::setXml(QDomElement &elem)
     elem.setAttribute("SIZE", mThickness);
     elem.setAttribute("COLOR", mColor.name());
 
-    const auto& persons = mStorage.getPersons();
-    for(const auto& person : persons)
+    const auto &persons = mStorage.getPersons();
+    for(const auto &person : persons)
     {
         person.setXml(elem);
     }
@@ -301,17 +306,17 @@ void MoCapController::setXml(QDomElement &elem)
 void MoCapController::getXml(const QDomElement &elem)
 {
     // NOTE: Maybe only load the c3d-files once show is activated
-    if (elem.hasAttribute("SHOW"))
+    if(elem.hasAttribute("SHOW"))
     {
         bool isVisible = elem.attribute("SHOW").toInt();
         setShowMoCap(isVisible);
     }
-    if (elem.hasAttribute("COLOR"))
+    if(elem.hasAttribute("COLOR"))
     {
         QColor color(elem.attribute("COLOR"));
         setColor(color);
     }
-    if (elem.hasAttribute("SIZE"))
+    if(elem.hasAttribute("SIZE"))
     {
         setThickness(elem.attribute("SIZE").toInt());
     }
@@ -321,18 +326,19 @@ void MoCapController::getXml(const QDomElement &elem)
     {
         for(QDomElement subElem = elem.firstChildElement(); !subElem.isNull(); subElem = subElem.nextSiblingElement())
         {
-            if (subElem.tagName() == "PERSON")
+            if(subElem.tagName() == "PERSON")
             {
                 MoCapPersonMetadata metadata;
-                bool ok;
-                QString path;
-                if (subElem.hasAttribute("FILE") && subElem.hasAttribute("SYSTEM"))
+                bool                ok;
+                QString             path;
+                if(subElem.hasAttribute("FILE") && subElem.hasAttribute("SYSTEM"))
                 {
-                    path = subElem.attribute("FILE");
+                    path               = subElem.attribute("FILE");
                     const QString file = getExistingFile(path);
-                    path = path.split(";").size() == 2 ? path.split(";").at(1) : "Saved path is invalid"
-                                                                                 "";
-                    int system = subElem.attribute("SYSTEM").toInt(&ok);
+                    path               = path.split(";").size() == 2 ? path.split(";").at(1) :
+                                                                       "Saved path is invalid"
+                                                         "";
+                    int system         = subElem.attribute("SYSTEM").toInt(&ok);
 
                     if(!ok)
                     {
@@ -343,35 +349,38 @@ void MoCapController::getXml(const QDomElement &elem)
                     if(system < 0 || system >= MoCapSystem::END)
                     {
                         std::stringstream ss;
-                        ss << "System index " << system << " of file " << path << " is not associated with an implemented MoCap system.";
+                        ss << "System index " << system << " of file " << path
+                           << " is not associated with an implemented MoCap system.";
                         throw std::invalid_argument(ss.str());
                     }
 
-                    metadata.setFilepath(file.toStdString(),
-                                         static_cast<MoCapSystem>(system));
+                    metadata.setFilepath(file.toStdString(), static_cast<MoCapSystem>(system));
                 }
-                if (subElem.hasAttribute("TIME_OFFSET"))
+                if(subElem.hasAttribute("TIME_OFFSET"))
                 {
                     metadata.setOffset(subElem.attribute("TIME_OFFSET").toDouble(&ok));
                     std::stringstream ss;
                     ss << "Element TIME_OFFSET of file " << path << " does not contain a valid floating-point number!";
-                    if(!ok) throw std::invalid_argument(ss.str());
+                    if(!ok)
+                        throw std::invalid_argument(ss.str());
                 }
-                if (subElem.hasAttribute("SAMPLE_RATE"))
+                if(subElem.hasAttribute("SAMPLE_RATE"))
                 {
                     metadata.setSamplerate(subElem.attribute("SAMPLE_RATE").toInt(&ok));
                     std::stringstream ss;
                     ss << "Element SAMPLE_RATE of file " << path << " does not contain a valid integer!";
-                    if(!ok) throw std::invalid_argument(ss.str());
+                    if(!ok)
+                        throw std::invalid_argument(ss.str());
                 }
                 savedMetadata.push_back(metadata);
             }
         }
         readMoCapFiles(savedMetadata);
-    }catch(const std::exception& e)
+    }
+    catch(const std::exception &e)
     {
         std::stringstream ss;
-        ss <<"Problem reading the C3D-file(s): " << e.what();
+        ss << "Problem reading the C3D-file(s): " << e.what();
         debout << ss.str() << std::endl;
         QMessageBox::critical(nullptr, tr("Error"), QString::fromStdString(ss.str()));
     }

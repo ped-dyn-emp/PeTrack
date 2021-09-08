@@ -20,15 +20,15 @@
 
 #include "pMessageBox.h"
 
+#include "helper.h"
+
+#include <QApplication>
+#include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QLabel>
-#include <QStyle>
-#include <QDialogButtonBox>
 #include <QPushButton>
-#include <QApplication>
+#include <QStyle>
 #include <QTextDocument>
-
-#include "helper.h"
 
 /**
  * @brief Constructs a PMessageBox
@@ -41,12 +41,22 @@
  * @param buttons buttons for the user to click default: only Ok)
  * @param defaultButton button used when pressing enter
  */
-PMessageBox::PMessageBox(QWidget *parent, const QString& title, const QString& msg, const QIcon& icon, const QString& informativeText, StandardButtons buttons, StandardButton defaultButton) : QDialog(parent, Qt::MSWindowsFixedSizeDialogHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
+PMessageBox::PMessageBox(
+    QWidget *       parent,
+    const QString & title,
+    const QString & msg,
+    const QIcon &   icon,
+    const QString & informativeText,
+    StandardButtons buttons,
+    StandardButton  defaultButton) :
+    QDialog(
+        parent,
+        Qt::MSWindowsFixedSizeDialogHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
 {
-    QGridLayout* layout = new QGridLayout();
+    QGridLayout *layout = new QGridLayout();
     setLayout(layout);
 
-    QFont f = QApplication::font("QMessageBox");
+    QFont                    f = QApplication::font("QMessageBox");
     Qt::TextInteractionFlags flags(style()->styleHint(QStyle::SH_MessageBox_TextInteractionFlags, nullptr, this));
 
     QLabel *detailedText = new QLabel(this);
@@ -59,41 +69,52 @@ PMessageBox::PMessageBox(QWidget *parent, const QString& title, const QString& m
         layout->addWidget(detailedText, 1, 1);
     }
 
-    QLabel* text = new QLabel(this);
+    QLabel *text = new QLabel(this);
     text->setWordWrap(true);
     text->setTextInteractionFlags(flags);
     text->setFont(f);
     text->setText(msg);
-    layout->addWidget(text, 0,1);
+    layout->addWidget(text, 0, 1);
 
     setWindowTitle(title);
-    QLabel* infoIcon = new QLabel(this);
-    int iconSize = style()->pixelMetric(QStyle::PM_MessageBoxIconSize, nullptr, this);
+    QLabel *infoIcon = new QLabel(this);
+    int     iconSize = style()->pixelMetric(QStyle::PM_MessageBoxIconSize, nullptr, this);
     infoIcon->setPixmap(icon.pixmap(iconSize, iconSize));
     layout->addWidget(infoIcon, 0, 0);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(buttons, this);
     layout->addWidget(buttonBox, 2, 1);
-    if(defaultButton != StandardButton::NoButton){
+    if(defaultButton != StandardButton::NoButton)
+    {
         QPushButton *def = buttonBox->button(defaultButton);
-        if(def){
+        if(def)
+        {
             def->setAutoDefault(false);
             def->setDefault(true);
-        }else{
+        }
+        else
+        {
             debout << "Warning: Given default button does is non-specified button" << std::endl;
         }
-
     }
 
     // return the clicked button; -1 if none was clicked
-    connect(buttonBox, &QDialogButtonBox::clicked, this, [=](QAbstractButton *button){
-        int ret = buttonBox->standardButton(button);
-        if(ret == StandardButton::NoButton){
-            this->done(-1);
-        }else{
-            this->done(ret);
-        }
-    });
+    connect(
+        buttonBox,
+        &QDialogButtonBox::clicked,
+        this,
+        [=](QAbstractButton *button)
+        {
+            int ret = buttonBox->standardButton(button);
+            if(ret == StandardButton::NoButton)
+            {
+                this->done(-1);
+            }
+            else
+            {
+                this->done(ret);
+            }
+        });
 
     layout->setSpacing(20);
 
@@ -118,13 +139,15 @@ PMessageBox::PMessageBox(QWidget *parent, const QString& title, const QString& m
  * @param defaultButton button to press, when pressing enter
  * @return clicked button
  */
-int PMessageBox::information(const char*file,
-                             const char*func,
-                             int line, QWidget *parent,
-                             const QString &title,
-                             const QString &text,
-                             PMessageBox::StandardButtons buttons,
-                             PMessageBox::StandardButton defaultButton)
+int PMessageBox::information(
+    const char *                 file,
+    const char *                 func,
+    int                          line,
+    QWidget *                    parent,
+    const QString &              title,
+    const QString &              text,
+    PMessageBox::StandardButtons buttons,
+    PMessageBox::StandardButton  defaultButton)
 {
     std::cout << func << " in " << file_name(file) << " line " << line << ": Info: " << text << std::endl;
 
@@ -135,16 +158,14 @@ int PMessageBox::information(const char*file,
         if(buttons & (~StandardButton::Ok))
         {
             throw std::runtime_error(
-                QString("user-interaction demanded during offscreen mode with message\n%1")
-                    .arg(text).toStdString()
-            );
+                QString("user-interaction demanded during offscreen mode with message\n%1").arg(text).toStdString());
         }
 
         return StandardButton::NoButton;
     }
 
-    QIcon icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation);
-    PMessageBox msg = PMessageBox(parent, title, text, icon, QString(), buttons, defaultButton);
+    QIcon       icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation);
+    PMessageBox msg  = PMessageBox(parent, title, text, icon, QString(), buttons, defaultButton);
     return msg.exec();
 }
 
@@ -163,14 +184,15 @@ int PMessageBox::information(const char*file,
  * @param defaultButton button to press, when pressing enter
  * @return clicked button
  */
-int PMessageBox::warning(const char* file,
-                         const char* func,
-                         int line,
-                         QWidget *parent,
-                         const QString &title,
-                         const QString &text,
-                         PMessageBox::StandardButtons buttons,
-                         PMessageBox::StandardButton defaultButton)
+int PMessageBox::warning(
+    const char *                 file,
+    const char *                 func,
+    int                          line,
+    QWidget *                    parent,
+    const QString &              title,
+    const QString &              text,
+    PMessageBox::StandardButtons buttons,
+    PMessageBox::StandardButton  defaultButton)
 {
     std::cout << func << " in " << file_name(file) << " line " << line << ": Warning: " << text << std::endl;
 
@@ -181,16 +203,14 @@ int PMessageBox::warning(const char* file,
         if(buttons & (~StandardButton::Ok))
         {
             throw std::runtime_error(
-                QString("user-interaction demanded during offscreen mode with message\n%1")
-                    .arg(text).toStdString()
-            );
+                QString("user-interaction demanded during offscreen mode with message\n%1").arg(text).toStdString());
         }
 
         return StandardButton::NoButton;
     }
 
-    QIcon icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning);
-    PMessageBox msg = PMessageBox(parent, title, text, icon, QString(), buttons, defaultButton);
+    QIcon       icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning);
+    PMessageBox msg  = PMessageBox(parent, title, text, icon, QString(), buttons, defaultButton);
     return msg.exec();
 }
 
@@ -209,14 +229,15 @@ int PMessageBox::warning(const char* file,
  * @param defaultButton button to press, when pressing enter
  * @return clicked button
  */
-int PMessageBox::critical(const char*file,
-                          const char*func,
-                          int line,
-                          QWidget *parent,
-                          const QString &title,
-                          const QString &text,
-                          PMessageBox::StandardButtons buttons,
-                          PMessageBox::StandardButton defaultButton)
+int PMessageBox::critical(
+    const char *                 file,
+    const char *                 func,
+    int                          line,
+    QWidget *                    parent,
+    const QString &              title,
+    const QString &              text,
+    PMessageBox::StandardButtons buttons,
+    PMessageBox::StandardButton  defaultButton)
 {
     std::cout << func << " in " << file_name(file) << " line " << line << ": Critical: " << text << std::endl;
 
@@ -227,16 +248,14 @@ int PMessageBox::critical(const char*file,
         if(buttons & (~StandardButton::Ok))
         {
             throw std::runtime_error(
-                QString("user-interaction demanded during offscreen mode with message\n%1")
-                    .arg(text).toStdString()
-            );
+                QString("user-interaction demanded during offscreen mode with message\n%1").arg(text).toStdString());
         }
 
         return StandardButton::NoButton;
     }
 
-    QIcon icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxCritical);
-    PMessageBox msg = PMessageBox(parent, title, text, icon, QString(), buttons, defaultButton);
+    QIcon       icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxCritical);
+    PMessageBox msg  = PMessageBox(parent, title, text, icon, QString(), buttons, defaultButton);
     return msg.exec();
 }
 
@@ -255,25 +274,24 @@ int PMessageBox::critical(const char*file,
  * @param defaultButton button to press, when pressing enter
  * @return clicked button
  */
-int PMessageBox::question(const char* /*file*/,
-                          const char* /*func*/,
-                          int /*line*/,
-                          QWidget *parent,
-                          const QString &title,
-                          const QString &text,
-                          PMessageBox::StandardButtons buttons,
-                          PMessageBox::StandardButton defaultButton)
+int PMessageBox::question(
+    const char * /*file*/,
+    const char * /*func*/,
+    int /*line*/,
+    QWidget *                    parent,
+    const QString &              title,
+    const QString &              text,
+    PMessageBox::StandardButtons buttons,
+    PMessageBox::StandardButton  defaultButton)
 {
-    QIcon icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxQuestion);
-    PMessageBox msg = PMessageBox(parent, title, text, icon, QString(), buttons, defaultButton);
+    QIcon       icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxQuestion);
+    PMessageBox msg  = PMessageBox(parent, title, text, icon, QString(), buttons, defaultButton);
 
     // no debout, since question **demands** user interaction; also no support for scripting to come
     if(QGuiApplication::platformName() == "offscreen")
     {
         throw std::runtime_error(
-            QString("user-interaction demanded during offscreen mode with message\n%1")
-                .arg(text).toStdString()
-        );
+            QString("user-interaction demanded during offscreen mode with message\n%1").arg(text).toStdString());
     }
 
     return msg.exec();
@@ -282,13 +300,16 @@ int PMessageBox::question(const char* /*file*/,
 void PMessageBox::setMinimumWidth(QLabel *textLabel)
 {
     QTextDocument doc;
-    if(Qt::mightBeRichText(textLabel->text())){
+    if(Qt::mightBeRichText(textLabel->text()))
+    {
         doc.setHtml(textLabel->text());
-    }else{
+    }
+    else
+    {
         doc.setPlainText(textLabel->text());
     }
     doc.setDefaultFont(textLabel->font());
-    doc.setTextWidth(textLabel->fontMetrics().averageCharWidth()*120);
+    doc.setTextWidth(textLabel->fontMetrics().averageCharWidth() * 120);
 
     textLabel->setMinimumWidth(static_cast<int>(doc.idealWidth()));
 }

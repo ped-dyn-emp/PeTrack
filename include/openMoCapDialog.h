@@ -20,15 +20,16 @@
 #ifndef OPENMOCAPDIALOG_H
 #define OPENMOCAPDIALOG_H
 
-#include <QDialog>
-#include <QMap>
-
 #include "IO.h"
 #include "moCapController.h"
 #include "moCapPersonMetadata.h"
 
-namespace Ui {
-    class OpenMoCapDialog;
+#include <QDialog>
+#include <QMap>
+
+namespace Ui
+{
+class OpenMoCapDialog;
 }
 
 /**
@@ -45,11 +46,11 @@ class OpenMoCapDialog : public QDialog
 
 public:
     explicit OpenMoCapDialog(QWidget *parent, MoCapController &controller);
-    OpenMoCapDialog() = delete;
-    OpenMoCapDialog(const OpenMoCapDialog&) = delete;
-    OpenMoCapDialog(OpenMoCapDialog&&) = delete;
-    OpenMoCapDialog& operator=(const OpenMoCapDialog&) = delete;
-    OpenMoCapDialog& operator=(OpenMoCapDialog&&) = delete;
+    OpenMoCapDialog()                        = delete;
+    OpenMoCapDialog(const OpenMoCapDialog &) = delete;
+    OpenMoCapDialog(OpenMoCapDialog &&)      = delete;
+    OpenMoCapDialog &operator=(const OpenMoCapDialog &) = delete;
+    OpenMoCapDialog &operator=(OpenMoCapDialog &&) = delete;
     ~OpenMoCapDialog() override;
 
     void clickedOk();
@@ -58,10 +59,10 @@ private slots:
     void on_btnAddSelection_clicked();
 
 private:
-    Ui::OpenMoCapDialog *mUi;
+    Ui::OpenMoCapDialog *      mUi;
     QMap<QString, MoCapSystem> mMoCapSystems;
-    MoCapController &mController;
-    QWidget *mParent;
+    MoCapController &          mController;
+    QWidget *                  mParent;
 };
 
 #endif // OPENMOCAPDIALOG_H

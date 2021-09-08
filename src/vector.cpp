@@ -18,32 +18,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <opencv2/opencv.hpp>
-
-#include <QPointF>
-#include <QPoint>
-#include <limits>
-
 #include "vector.h"
+
 #include "helper.h"
 
-Vec3F::Vec3F()
-    : mX(0),
-      mY(0),
-      mZ(0)
-{
-}
-Vec3F::Vec3F(double x, double y, double z)
-    : mX(x),
-      mY(y),
-      mZ(z)
-{
-}
+#include <QPoint>
+#include <QPointF>
+#include <limits>
+#include <opencv2/opencv.hpp>
 
-Vec3F::Vec3F(const cv::Point3f& v)
-    : mX(v.x), mY(v.y), mZ(v.z)
-{
-}
+Vec3F::Vec3F() : mX(0), mY(0), mZ(0) {}
+Vec3F::Vec3F(double x, double y, double z) : mX(x), mY(y), mZ(z) {}
+
+Vec3F::Vec3F(const cv::Point3f &v) : mX(v.x), mY(v.y), mZ(v.z) {}
 
 double Vec3F::x() const
 {
@@ -79,7 +66,7 @@ void Vec3F::set(double x, double y, double z)
 }
 
 
-Vec3F& Vec3F::operator=(const cv::Point3f& v)
+Vec3F &Vec3F::operator=(const cv::Point3f &v)
 {
     mX = v.x;
     mY = v.y;
@@ -87,17 +74,17 @@ Vec3F& Vec3F::operator=(const cv::Point3f& v)
     return *this;
 }
 
-Vec3F Vec3F::operator+(const Vec3F& v) const
+Vec3F Vec3F::operator+(const Vec3F &v) const
 {
     return Vec3F(*this) += v;
 }
 
-Vec3F Vec3F::operator-(const Vec3F& v) const
+Vec3F Vec3F::operator-(const Vec3F &v) const
 {
     return Vec3F(*this) -= v;
 }
 
-Vec3F& Vec3F::operator+=(const Vec3F& v)
+Vec3F &Vec3F::operator+=(const Vec3F &v)
 {
     mX += v.mX;
     mY += v.mY;
@@ -105,7 +92,7 @@ Vec3F& Vec3F::operator+=(const Vec3F& v)
     return *this;
 }
 
-Vec3F& Vec3F::operator-=(const Vec3F& v)
+Vec3F &Vec3F::operator-=(const Vec3F &v)
 {
     mX -= v.mX;
     mY -= v.mY;
@@ -132,31 +119,31 @@ Vec3F Vec3F::operator/(double n) const
  * @brief Calculates the dot product.
  * @return The dot product.
  */
-double Vec3F::operator*(const Vec3F& v) const
+double Vec3F::operator*(const Vec3F &v) const
 {
     return mX * v.mX + mY * v.mY;
 }
 
-bool Vec3F::operator==(const Vec3F& v) const
+bool Vec3F::operator==(const Vec3F &v) const
 {
     return mX == v.mX && mY == v.mY && mZ == v.mZ;
 }
 
-bool Vec3F::operator!=(const Vec3F& v) const
+bool Vec3F::operator!=(const Vec3F &v) const
 {
     return !(*this == v);
 }
 
 double Vec3F::length() const
 {
-    return sqrt(mX*mX+mY*mY+mZ*mZ);
+    return sqrt(mX * mX + mY * mY + mZ * mZ);
 }
 
 /**
-* @brief Gets this vector in normalized form.
-*
-* @return A copy of this vector normalized to unit length.
-*/
+ * @brief Gets this vector in normalized form.
+ *
+ * @return A copy of this vector normalized to unit length.
+ */
 Vec3F Vec3F::unit() const
 {
     Vec3F tmp(*this);
@@ -173,20 +160,22 @@ Vec3F Vec3F::unit() const
 void Vec3F::normalize()
 {
     double len = length();
-    if (fabs(len) > std::numeric_limits<double>::epsilon())
+    if(fabs(len) > std::numeric_limits<double>::epsilon())
     {
-        mX/=len;
-        mY/=len;
-        mZ/=len;
-    }else{
-        //vector assumed to be 0 or very close to 0
+        mX /= len;
+        mY /= len;
+        mZ /= len;
+    }
+    else
+    {
+        // vector assumed to be 0 or very close to 0
         mX = 0.;
         mY = 0.;
         mZ = 0.;
     }
 }
 
-double Vec3F::distanceToPoint(const Vec3F& p) const
+double Vec3F::distanceToPoint(const Vec3F &p) const
 {
     return (*this - p).length();
 }
@@ -194,38 +183,14 @@ double Vec3F::distanceToPoint(const Vec3F& p) const
 
 //---------------------------------------------------------------------------
 
-Vec2F::Vec2F()
-    : mX(0),
-      mY(0)
-{
-}
-Vec2F::Vec2F(double x, double y)
-    : mX(x),
-      mY(y)
-{
-}
-Vec2F::Vec2F(const QPointF& v)
-    : mX(v.x()),
-      mY(v.y())
-{
-}
+Vec2F::Vec2F() : mX(0), mY(0) {}
+Vec2F::Vec2F(double x, double y) : mX(x), mY(y) {}
+Vec2F::Vec2F(const QPointF &v) : mX(v.x()), mY(v.y()) {}
 
-Vec2F::Vec2F(const cv::Point2f &p)
-    : mX(p.x),
-      mY(p.y)
-{
-}
+Vec2F::Vec2F(const cv::Point2f &p) : mX(p.x), mY(p.y) {}
 
-Vec2F::Vec2F(const CvPoint* v)
-    : mX(v->x),
-      mY(v->y)
-{
-}
-Vec2F::Vec2F(const CvPoint2D32f* v)
-    : mX(v->x),
-      mY(v->y)
-{
-}
+Vec2F::Vec2F(const CvPoint *v) : mX(v->x), mY(v->y) {}
+Vec2F::Vec2F(const CvPoint2D32f *v) : mX(v->x), mY(v->y) {}
 
 CvPoint Vec2F::toCvPoint() const
 {
@@ -279,24 +244,24 @@ void Vec2F::set(double x, double y)
     mY = y;
 }
 
-Vec2F& Vec2F::operator+=(const Vec2F& v)
+Vec2F &Vec2F::operator+=(const Vec2F &v)
 {
     mX += v.mX;
     mY += v.mY;
     return *this;
 }
-Vec2F Vec2F::operator+(const Vec2F& v) const
+Vec2F Vec2F::operator+(const Vec2F &v) const
 {
     return Vec2F(*this) += v;
 }
 
-Vec2F& Vec2F::operator-=(const Vec2F& v)
+Vec2F &Vec2F::operator-=(const Vec2F &v)
 {
     mX -= v.mX;
     mY -= v.mY;
     return *this;
 }
-Vec2F Vec2F::operator-(const Vec2F& v) const
+Vec2F Vec2F::operator-(const Vec2F &v) const
 {
     return Vec2F(*this) -= v;
 }
@@ -321,17 +286,17 @@ Vec2F Vec2F::operator/(double n) const
  *
  * @return The dot product.
  */
-double Vec2F::operator*(const Vec2F& v) const
+double Vec2F::operator*(const Vec2F &v) const
 {
     return mX * v.mX + mY * v.mY;
 }
 
-bool Vec2F::operator==(const Vec2F& v) const
+bool Vec2F::operator==(const Vec2F &v) const
 {
     return mX == v.mX && mY == v.mY;
 }
 
-bool Vec2F::operator!=(const Vec2F& v) const
+bool Vec2F::operator!=(const Vec2F &v) const
 {
     return !(*this == v);
 }
@@ -359,7 +324,7 @@ double Vec2F::angle() const
     return atan2(mY, mX);
 }
 
- /**
+/**
  * @brief Gets this vector in normalized form.
  *
  * @return A copy of this vector normalized to unit length.
@@ -385,31 +350,33 @@ Vec2F Vec2F::normal() const
 void Vec2F::normalize()
 {
     double len = length();
-    if (len > std::numeric_limits<double>::epsilon())
+    if(len > std::numeric_limits<double>::epsilon())
     {
-        mX/=len;
-        mY/=len;
-    }else{
+        mX /= len;
+        mY /= len;
+    }
+    else
+    {
         mX = 0.;
         mY = 0.;
     }
 }
 
-double Vec2F::distanceToPoint(const Vec2F& p) const
+double Vec2F::distanceToPoint(const Vec2F &p) const
 {
     return (*this - p).length();
 }
 
-double Vec2F::distanceToLine(const Vec2F& p1, const Vec2F& p2) const
+double Vec2F::distanceToLine(const Vec2F &p1, const Vec2F &p2) const
 {
-    Vec2F n = (p2-p1).normal(); // normal vector
-    n.normalize(); // normalized normal vector
-    return fabs(*this * n - p1*n);
+    Vec2F n = (p2 - p1).normal(); // normal vector
+    n.normalize();                // normalized normal vector
+    return fabs(*this * n - p1 * n);
 }
 
-double Vec2F::angleBetweenVec(const Vec2F& v) const
+double Vec2F::angleBetweenVec(const Vec2F &v) const
 {
-    return acos((*this * v)/(length()*v.length()));
+    return acos((*this * v) / (length() * v.length()));
 }
 
 Vec2F Vec2F::fromAngle(double angle)

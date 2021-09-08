@@ -32,7 +32,8 @@ std::string versionString(int major, int minor, int patch)
 
 // Taken from:
 // https://sourceforge.net/p/predef/wiki/Compilers/
-constexpr const char * COMPILER_ID{
+constexpr const char *COMPILER_ID
+{
 #ifdef __clang__
     "clang++"
 #elif defined(__GNUC__)
@@ -53,8 +54,8 @@ const std::string COMPILER_VERSION =
     versionString(__clang_major__, __clang_minor__, __clang_patchlevel__);
 #elif defined(__GNUC__)
 #if defined(__MINGW32__)
-    versionString(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__)
-    + "(" +versionString(__MINGW32__, __MINGW32_MAJOR_VERSION, __MINGW32_MINOR_VERSION) + ")";
+    versionString(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__) + "(" +
+    versionString(__MINGW32__, __MINGW32_MAJOR_VERSION, __MINGW32_MINOR_VERSION) + ")";
 #else
     versionString(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 #endif
@@ -66,4 +67,4 @@ const std::string COMPILER_VERSION =
 
 const std::string COMPILE_TIMESTAMP = __TIMESTAMP__;
 
-#endif //COMPILERINFORMATION_H
+#endif // COMPILERINFORMATION_H

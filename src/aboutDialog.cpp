@@ -23,17 +23,18 @@
 
 #include "ui_about.h"
 
-AboutDialog::AboutDialog(QWidget *parent,
-                         const QString& version,
-                         const QString & commitHash,
-                         const QString& commitDate,
-                         const QString & commitBranch,
-                         const QString & compiler,
-                         const QString & compilerVersion,
-                         const QString & compileDate,
-                         const std::vector<std::string> & authors)
-    : QDialog(parent), mUi(new Ui::About) {
-
+AboutDialog::AboutDialog(
+    QWidget *                       parent,
+    const QString &                 version,
+    const QString &                 commitHash,
+    const QString &                 commitDate,
+    const QString &                 commitBranch,
+    const QString &                 compiler,
+    const QString &                 compilerVersion,
+    const QString &                 compileDate,
+    const std::vector<std::string> &authors) :
+    QDialog(parent), mUi(new Ui::About)
+{
     mUi->setupUi(this);
 
     // perform additional setup here ...
@@ -45,9 +46,10 @@ AboutDialog::AboutDialog(QWidget *parent,
     mUi->lblCompilerVersionValue->setText(compilerVersion);
     mUi->lblCompileDateValue->setText(compileDate);
 
-    for (std::size_t i = 0; i < authors.size(); ++i) {
-        int row = i/2ul;
-        int col = i%2ul;
+    for(std::size_t i = 0; i < authors.size(); ++i)
+    {
+        int   row   = i / 2ul;
+        int   col   = i % 2ul;
         auto *label = new QLabel();
         label->setText(QString::fromStdString(authors[i]));
         mUi->lytAuthors->addWidget(label, row, col, 1, 1);

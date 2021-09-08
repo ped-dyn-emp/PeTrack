@@ -18,14 +18,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <cmath>
+#include "ellipse.h"
+
+#include "helper.h"
+#include "vector.h"
 
 #include <QPointF>
 #include <QSizeF>
-
-#include "ellipse.h"
-#include "vector.h"
-#include "helper.h"
+#include <cmath>
 
 // Name musste MyEllipse genommen werden, da anscheinend Ellipse schon vergeben ist
 
@@ -35,22 +35,13 @@
 // QGraphicsEllipseItem ist sehr umfangreich fuer die repraesentation
 // kann auch schief stehen, hat aber keine abfragen, ob punkt innerhalb
 
-MyEllipse::MyEllipse()
-    :
-    mR1(0),
-    mR2(0),
-    mAngle(0)
-{
-}
-MyEllipse::MyEllipse(double x, double y, double r1, double r2, double angle)
-    : mC(x, y), 
-      mR1(r1 > r2 ? r1 : r2),
-      mR2(r1 > r2 ? r2 : r1),
-      mAngle(angle)
+MyEllipse::MyEllipse() : mR1(0), mR2(0), mAngle(0) {}
+MyEllipse::MyEllipse(double x, double y, double r1, double r2, double angle) :
+    mC(x, y), mR1(r1 > r2 ? r1 : r2), mR2(r1 > r2 ? r2 : r1), mAngle(angle)
 {
     double dist = sqrt(mR1 * mR1 - mR2 * mR2); // distance of focal points from centre
-    mF1 = mC + Vec2F::fromAngle(angle) * dist;
-    mF2 = mC - Vec2F::fromAngle(angle) * dist;
+    mF1         = mC + Vec2F::fromAngle(angle) * dist;
+    mF2         = mC - Vec2F::fromAngle(angle) * dist;
 }
 MyEllipse::MyEllipse(QPointF center, QSizeF size, double angle)
 {
@@ -68,21 +59,22 @@ QSizeF MyEllipse::size() const
 
 double MyEllipse::area() const
 {
-    return PI*mR1*mR2;
+    return PI * mR1 * mR2;
 }
 
 /// only estimation, because of complex elliptical integral
 double MyEllipse::outline() const
 {
-    return PI*(1.5*(mR1+mR2) - sqrt(mR1*mR2));
+    return PI * (1.5 * (mR1 + mR2) - sqrt(mR1 * mR2));
     // weitere Moeglichkeiten, siehe http://de.wikipedia.org/wiki/Ellipse#Formelsammlung_Fl.C3.A4cheninhalt_und_Umfang
-    //return PI*(mR1+mR2)*(1+(3*((mR1-mR2)/(mR1+mR2))*((mR1-mR2)/(mR1+mR2)))/(10+sqrt(4-(3*((mR1-mR2)/(mR1+mR2))*((mR1-mR2)/(mR1+mR2))))));
-    //return PI*sqrt(2.*(mR1*mR1+mR2*mR2));
-    //return PI*(mR1+mR2);
+    // return
+    // PI*(mR1+mR2)*(1+(3*((mR1-mR2)/(mR1+mR2))*((mR1-mR2)/(mR1+mR2)))/(10+sqrt(4-(3*((mR1-mR2)/(mR1+mR2))*((mR1-mR2)/(mR1+mR2))))));
+    // return PI*sqrt(2.*(mR1*mR1+mR2*mR2));
+    // return PI*(mR1+mR2);
 }
 
 /// is point p inside or on the ellipse
-bool MyEllipse::isInside(const Vec2F& p) const
+bool MyEllipse::isInside(const Vec2F &p) const
 {
     // for a point to be inside the ellipse the sum of the
     // distances from both focal points must be <= 2 * mR1
@@ -94,18 +86,15 @@ bool MyEllipse::isInside(double x, double y) const
 }
 bool MyEllipse::isNearlyCircle() const
 {
-    return ratio()<1.3;
+    return ratio() < 1.3;
 }
 
 void MyEllipse::draw(cv::Mat &img, int r, int g, int b) const
 {
     cv::Size size;
-    size.width = myRound(mR1);
-    size.height = myRound(mR2);
-    Vec2F centerVec = center();
+    size.width          = myRound(mR1);
+    size.height         = myRound(mR2);
+    Vec2F     centerVec = center();
     cv::Point centerPoint(centerVec.x(), centerVec.y());
-    cv::ellipse(img, centerPoint, size, 180*mAngle/PI, 0, 360, cv::Scalar(r,g,b), 1, cv::LINE_AA, 0);
+    cv::ellipse(img, centerPoint, size, 180 * mAngle / PI, 0, 360, cv::Scalar(r, g, b), 1, cv::LINE_AA, 0);
 }
-
-
-

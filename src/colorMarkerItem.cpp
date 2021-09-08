@@ -18,24 +18,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QtWidgets>
-
-#include "petrack.h"
-#include "view.h"
 #include "colorMarkerItem.h"
-#include "colorMarkerWidget.h"
-#include "tracker.h"
+
 #include "animation.h"
+#include "colorMarkerWidget.h"
+#include "petrack.h"
+#include "tracker.h"
+#include "view.h"
+
+#include <QtWidgets>
 
 
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,
-// so dass pixel quadratisch 
-ColorMarkerItem::ColorMarkerItem(QWidget *wParent, QGraphicsItem * parent)
-    : QGraphicsItem(parent)
+// so dass pixel quadratisch
+ColorMarkerItem::ColorMarkerItem(QWidget *wParent, QGraphicsItem *parent) : QGraphicsItem(parent)
 {
-    mMainWindow = (class Petrack*) wParent;
-    mImage = nullptr;
+    mMainWindow = (class Petrack *) wParent;
+    mImage      = nullptr;
 }
 
 /**
@@ -48,13 +48,17 @@ ColorMarkerItem::ColorMarkerItem(QWidget *wParent, QGraphicsItem * parent)
  */
 QRectF ColorMarkerItem::boundingRect() const
 {
-    if (mMainWindow->getImage())
-        return QRectF(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize(), mMainWindow->getImage()->width(), mMainWindow->getImage()->height());
+    if(mMainWindow->getImage())
+        return QRectF(
+            -mMainWindow->getImageBorderSize(),
+            -mMainWindow->getImageBorderSize(),
+            mMainWindow->getImage()->width(),
+            mMainWindow->getImage()->height());
     else
         return QRectF(0, 0, 0, 0);
 }
 
-void ColorMarkerItem::setRect(Vec2F& v)
+void ColorMarkerItem::setRect(Vec2F &v)
 {
     mUlc = v; // upper left corner to draw
 }
@@ -68,41 +72,40 @@ void ColorMarkerItem::setRect(Vec2F& v)
  *
  * @param painter
  */
-void ColorMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+void ColorMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    if (!mMask.empty())
+    if(!mMask.empty())
     {
-        if ((mImage != nullptr) && ((mImage->width() != mMask.cols) || (mImage->height() != mMask.rows)))
+        if((mImage != nullptr) && ((mImage->width() != mMask.cols) || (mImage->height() != mMask.rows)))
         {
-            delete mImage; // delete null pointer is ok
+            delete mImage;    // delete null pointer is ok
             mImage = nullptr; // is not been done by delete
         }
-        if (mImage == nullptr) // zu Beginn oder wenn sich die Groesse aendert
+        if(mImage == nullptr) // zu Beginn oder wenn sich die Groesse aendert
             mImage = new QImage(mMask.cols, mMask.rows, QImage::Format_ARGB32);
 
-        int x,y;
-        auto* data = mMask.data;//->imageData);
-        auto* yData = data;
-        int notMaskMask = ((int) !mMainWindow->getColorMarkerWidget()->maskMask->isChecked())*255; // 255 oder 0
+        int   x, y;
+        auto *data        = mMask.data; //->imageData);
+        auto *yData       = data;
+        int   notMaskMask = ((int) !mMainWindow->getColorMarkerWidget()->maskMask->isChecked()) * 255; // 255 oder 0
 
-        for (y = 0; y < mMask.rows; y++)
+        for(y = 0; y < mMask.rows; y++)
         {
             // Pointer to the data information in the QImage for just one column
             // set pointer to value before, because ++p is faster than p++
-            auto * p = mImage->scanLine(y)-1;
-            for (x = 0; x < mMask.cols; x++)
+            auto *p = mImage->scanLine(y) - 1;
+            for(x = 0; x < mMask.cols; x++)
             {
-                *(++p) = *data; // color.blue();
-                *(++p) = *data; // color.green();
-                *(++p) = *data; // color.red();
+                *(++p) = *data;                     // color.blue();
+                *(++p) = *data;                     // color.green();
+                *(++p) = *data;                     // color.red();
                 *(++p) = *data ? notMaskMask : 255; // color.alpha(); // 255;
                 ++data;
             }
-            data = (yData += mMask.cols/sizeof(char)); // because sometimes widthStep != width
+            data = (yData += mMask.cols / sizeof(char)); // because sometimes widthStep != width
         }
-        painter->setOpacity(mMainWindow->getColorMarkerWidget()->opacity->value()/100.);
-        painter->drawImage(mUlc.x(),mUlc.y(), *mImage);
-
+        painter->setOpacity(mMainWindow->getColorMarkerWidget()->opacity->value() / 100.);
+        painter->drawImage(mUlc.x(), mUlc.y(), *mImage);
     }
 }
 
@@ -115,9 +118,9 @@ void ColorMarkerItem::setMask(cv::Mat &mask)
 /// original width w and height h must be given
 cv::Mat ColorMarkerItem::createMask(int w, int h)
 {
-    if (w>0 && h>0 && (mMask.empty() || (!mMask.empty() && (w != mMask.cols || h != mMask.rows))))
+    if(w > 0 && h > 0 && (mMask.empty() || (!mMask.empty() && (w != mMask.cols || h != mMask.rows))))
     {
-        mMask.create(h,w,CV_8UC1);
+        mMask.create(h, w, CV_8UC1);
     }
     return mMask;
 }

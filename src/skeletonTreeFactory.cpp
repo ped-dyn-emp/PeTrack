@@ -17,9 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <opencv2/core/matx.hpp>
-#include "vector.h"
 #include "skeletonTreeFactory.h"
+
+#include "vector.h"
+
+#include <opencv2/core/matx.hpp>
 
 /**
  * @brief Static method to construct a SkeletonTree.
@@ -31,48 +33,46 @@
  * @return The constructed Skeleton.
  *
  */
-SkeletonTree SkeletonTreeFactory::generateTree(const XSenseStruct&  points)
+SkeletonTree SkeletonTreeFactory::generateTree(const XSenseStruct &points)
 {
+    // Start from the root
+    SkeletonNode  root(0, points.mRoot);
+    SkeletonNode &neck = root.addChild(SkeletonNode(1, points.mNeck));
 
-    //Start from the root
-    SkeletonNode root(0, points.mRoot);
-    SkeletonNode& neck = root.addChild(SkeletonNode(1, points.mNeck));
-
-    //continue with the neck
+    // continue with the neck
     neck.addChild(SkeletonNode(2, points.mHeadTop));
-    SkeletonNode& lShoulder = neck.addChild(SkeletonNode(3, points.mShldrL));
+    SkeletonNode &lShoulder = neck.addChild(SkeletonNode(3, points.mShldrL));
 
-    //add the left arm
-    SkeletonNode& lElbow = lShoulder.addChild(SkeletonNode(4, points.mElbowL));
-    SkeletonNode& lWrist = lElbow.addChild(SkeletonNode(5, points.mWristL));
+    // add the left arm
+    SkeletonNode &lElbow = lShoulder.addChild(SkeletonNode(4, points.mElbowL));
+    SkeletonNode &lWrist = lElbow.addChild(SkeletonNode(5, points.mWristL));
     lWrist.addChild(SkeletonNode(6, points.mHandL));
 
-    //add the right arm
-    SkeletonNode& rShoulder = neck.addChild(SkeletonNode(7, points.mShldrR));
-    SkeletonNode& rElbow = rShoulder.addChild(SkeletonNode(8, points.mElbowR));
-    SkeletonNode& rWrist = rElbow.addChild(SkeletonNode(9, points.mWristR));
+    // add the right arm
+    SkeletonNode &rShoulder = neck.addChild(SkeletonNode(7, points.mShldrR));
+    SkeletonNode &rElbow    = rShoulder.addChild(SkeletonNode(8, points.mElbowR));
+    SkeletonNode &rWrist    = rElbow.addChild(SkeletonNode(9, points.mWristR));
     rWrist.addChild(SkeletonNode(10, points.mHandR));
 
-    //add the left leg
-    SkeletonNode& lHip = root.addChild(SkeletonNode(11, points.mHipL));
-    SkeletonNode& lKnee = lHip.addChild(SkeletonNode(12, points.mKneeL));
-    SkeletonNode& lHeel = lKnee.addChild(SkeletonNode(13, points.mHeelL));
+    // add the left leg
+    SkeletonNode &lHip  = root.addChild(SkeletonNode(11, points.mHipL));
+    SkeletonNode &lKnee = lHip.addChild(SkeletonNode(12, points.mKneeL));
+    SkeletonNode &lHeel = lKnee.addChild(SkeletonNode(13, points.mHeelL));
     lHeel.addChild(SkeletonNode(14, points.mToeL));
 
-    SkeletonNode& rHip = root.addChild(SkeletonNode(15, points.mHipR));
-    SkeletonNode& rKnee = rHip.addChild(SkeletonNode(16, points.mKneeR));
-    SkeletonNode& rHeel = rKnee.addChild(SkeletonNode(17, points.mHeelR));
+    SkeletonNode &rHip  = root.addChild(SkeletonNode(15, points.mHipR));
+    SkeletonNode &rKnee = rHip.addChild(SkeletonNode(16, points.mKneeR));
+    SkeletonNode &rHeel = rKnee.addChild(SkeletonNode(17, points.mHeelR));
     rHeel.addChild(SkeletonNode(18, points.mToeR));
 
 
-    //calculate view direction of the head
-    cv::Point3f headUp = points.mHeadTop - points.mNeck;
+    // calculate view direction of the head
+    cv::Point3f headUp      = points.mHeadTop - points.mNeck;
     cv::Point3f rightVector = points.mEarR - points.mEarL;
-    //the direction is calculated using the cross product
+    // the direction is calculated using the cross product
     cv::Point3f dir = headUp.cross(rightVector);
 
     SkeletonTree skeleton(std::move(root), Vec3F(dir));
 
     return skeleton;
 }
-

@@ -34,9 +34,8 @@ public:
 
     cv::Mat act(cv::Mat &img, cv::Mat &res);
 
-    void setStereoContext(pet::StereoContext* stereoContext);
+    void setStereoContext(pet::StereoContext *stereoContext);
 };
-
 
 
 #endif

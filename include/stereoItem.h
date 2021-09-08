@@ -21,27 +21,27 @@
 #ifndef STEREOITEM_H
 #define STEREOITEM_H
 
-#include <QGraphicsItem>
-
 #include "petrack.h"
+
+#include <QGraphicsItem>
 
 class StereoItem : public QGraphicsItem
 {
 private:
     Petrack *mMainWindow;
-    QImage *mImage;
-    bool mDispNew; // indicates that a new disparity has been generated after the last drawing
+    QImage * mImage;
+    bool     mDispNew; // indicates that a new disparity has been generated after the last drawing
 
 public:
-    StereoItem(QWidget *wParent, QGraphicsItem * parent = nullptr);
+    StereoItem(QWidget *wParent, QGraphicsItem *parent = nullptr);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
 #ifndef STEREO_DISABLED
     void updateData(IplImage *disp);
 #endif
     QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-    void setDispNew(bool d = true);
+    void   paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void   setDispNew(bool d = true);
 };
 
 #endif

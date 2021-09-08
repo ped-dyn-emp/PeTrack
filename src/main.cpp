@@ -18,27 +18,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "IO.h"
+#include "compilerInformation.h"
+#include "helper.h"
+#include "petrack.h"
+#include "tracker.h"
+
 #include <QApplication>
-#include <QtWidgets>
 #include <QMessageBox>
 #include <QStyleFactory>
+#include <QtWidgets>
 #include <csignal>
 #include <cstdio>
 #include <sstream>
 #include <string>
 
-#include "petrack.h"
-#include "helper.h"
-#include "tracker.h"
-#include "IO.h"
-#include "compilerInformation.h"
-
 // Aufrufbeispiel:
 // release/petrack.exe -sequence ../../einzelbilder/wert0001.png -autoSave dir|ttt.avi
 
 
-static QApplication * gApp = nullptr;
-void quit(int sig_number)
+static QApplication *gApp = nullptr;
+void                 quit(int sig_number)
 {
     gApp->quit();
     return;
@@ -46,18 +46,18 @@ void quit(int sig_number)
 
 int main(int argc, char *argv[])
 {
-
     Q_INIT_RESOURCE(icons);
 
     QApplication app(argc, argv);
 
-// Reihenfolge beim Beenden von Petrack (signal abouttoquit() von qapplication nicht hinbekommen):
-// - petrack:closeevent()
-// - app.exec() am ende dieser Programmzeilen wird beendet
-// - Funktion, die mit qAddPostRoutine an Qt uebergeben wird
-// - SIGTERM kann nicht von QT abgefangen werden, sondern muss mit signal behandelt werden
+    // Reihenfolge beim Beenden von Petrack (signal abouttoquit() von qapplication nicht hinbekommen):
+    // - petrack:closeevent()
+    // - app.exec() am ende dieser Programmzeilen wird beendet
+    // - Funktion, die mit qAddPostRoutine an Qt uebergeben wird
+    // - SIGTERM kann nicht von QT abgefangen werden, sondern muss mit signal behandelt werden
     gApp = &app;
-    signal(SIGINT, quit); // used to catch ctrl-C and get rid of error "QObject::killTimers: timers cannot be stopped from another thread"
+    signal(SIGINT, quit); // used to catch ctrl-C and get rid of error "QObject::killTimers: timers cannot be stopped
+                          // from another thread"
 
     app.setStyle(QStyleFactory::create("Fusion")); // added for Qt5
 
@@ -66,25 +66,25 @@ int main(int argc, char *argv[])
     //   -sequence *.png:  um animation zu laden (ueberschreibt projekt)
     //   -autoSave file oder ordner: um automatisches herausschreiben von sequenz in ordner zu machen
     QStringList arg = app.arguments();
-    QString sequence;
-    QString project;
-    QString autoSaveDest;
-    bool autoSave = false;
-    QString autoTrackDest;
-    QString autoPlayDest;
-    bool autoTrack = false;
-    bool autoPlay = false;
+    QString     sequence;
+    QString     project;
+    QString     autoSaveDest;
+    bool        autoSave = false;
+    QString     autoTrackDest;
+    QString     autoPlayDest;
+    bool        autoTrack = false;
+    bool        autoPlay  = false;
 
     QString autoReadHeightFile;
-    bool autoReadHeight = false;
+    bool    autoReadHeight = false;
     QString autoReadMarkerFile;
-    bool autoReadMarkerID = false;
+    bool    autoReadMarkerID = false;
     QString autoSaveTrackerFile;
-    bool autoSaveTracker = false;
+    bool    autoSaveTracker = false;
 
-    for (int i = 1; i < arg.size(); ++i) // i=0 ist Programmname
+    for(int i = 1; i < arg.size(); ++i) // i=0 ist Programmname
     {
-        if (arg.at(i) == "-help" || arg.at(i) == "-?")
+        if(arg.at(i) == "-help" || arg.at(i) == "-?")
         {
             QTextDocument doc;
             doc.setHtml(commandLineOptionsString);
@@ -92,52 +92,54 @@ int main(int argc, char *argv[])
             QMessageBox::about(nullptr, QObject::tr("Command line options"), commandLineOptionsString);
             return 0; // 0 means exit success // 1?
         }
-        else if (arg.at(i) == "-project")
+        else if(arg.at(i) == "-project")
             project = arg.at(++i);
-        else if (arg.at(i) == "-sequence")
+        else if(arg.at(i) == "-sequence")
             sequence = arg.at(++i);
-        else if ((arg.at(i) == "-autoSave") || (arg.at(i) == "-autosave"))
+        else if((arg.at(i) == "-autoSave") || (arg.at(i) == "-autosave"))
         {
-            autoSave = true;
+            autoSave     = true;
             autoSaveDest = arg.at(++i);
         }
-        else if ((arg.at(i) == "-autoTrack") || (arg.at(i) == "-autotrack"))
+        else if((arg.at(i) == "-autoTrack") || (arg.at(i) == "-autotrack"))
         {
             autoTrack = true;
             // hat tracker_file bestimmte Dateiendung txt oder trc, dann wird nur genau diese exportiert, sonst beide
             autoTrackDest = arg.at(++i);
         }
-        else if ((arg.at(i) == "-autoPlay") || (arg.at(i) == "-autoplay"))
-        { // nur abspielen und keine aenderungen an control track and reco, um zB groessenbestimmung nachtraeglich vorzunehmen, nachdem haendisch kontrolliert
+        else if((arg.at(i) == "-autoPlay") || (arg.at(i) == "-autoplay"))
+        { // nur abspielen und keine aenderungen an control track and reco, um zB groessenbestimmung nachtraeglich
+          // vorzunehmen, nachdem haendisch kontrolliert
             autoPlay = true;
             // hat tracker_file bestimmte Dateiendung txt oder trc, dann wird nur genau diese exportiert, sonst beide
             autoPlayDest = arg.at(++i);
         }
-        else if (arg.at(i).right(4) == ".pet")
+        else if(arg.at(i).right(4) == ".pet")
         {
             // -project option ueberschreibt *.pet uebergabe ohne option!!
-            if (project.isEmpty())
+            if(project.isEmpty())
                 project = arg.at(i);
         }
-        else if ((arg.at(i) == "-autoReadMarkerID") || (arg.at(i) == "-autoreadmarkerid"))
+        else if((arg.at(i) == "-autoReadMarkerID") || (arg.at(i) == "-autoreadmarkerid"))
         {
-          // -autoreadmarkerid followed by txt-file including personIDs and markerIDs
-          // reads the txt-file and applies the markerIds to persons with corresponding personIDs
-          autoReadMarkerID = true;
-          autoReadMarkerFile = arg.at(++i);
+            // -autoreadmarkerid followed by txt-file including personIDs and markerIDs
+            // reads the txt-file and applies the markerIds to persons with corresponding personIDs
+            autoReadMarkerID   = true;
+            autoReadMarkerFile = arg.at(++i);
         }
-        else if ((arg.at(i) == "-autoReadHeight") || (arg.at(i) == "-autoreadheight"))
+        else if((arg.at(i) == "-autoReadHeight") || (arg.at(i) == "-autoreadheight"))
         {
             // -autoreadheight followed by txt-file including markerIDs and individual heights
             // reads the txt-file and applies the heights to persons with corresponding markerIDs
-            autoReadHeight = true;
+            autoReadHeight     = true;
             autoReadHeightFile = arg.at(++i);
         }
-        else if ((arg.at(i) == "-autoSaveTracker") || (arg.at(i) == "-autosavetracker"))
+        else if((arg.at(i) == "-autoSaveTracker") || (arg.at(i) == "-autosavetracker"))
         {
-              // -autoSaveTracker followed by Trackerfile which can either have the ending *.txt or *.trc. If no ending is given, both files will be created
-              autoSaveTracker = true;
-              autoSaveTrackerFile = arg.at(++i);
+            // -autoSaveTracker followed by Trackerfile which can either have the ending *.txt or *.trc. If no ending is
+            // given, both files will be created
+            autoSaveTracker     = true;
+            autoSaveTrackerFile = arg.at(++i);
         }
         else
         {
@@ -163,53 +165,55 @@ int main(int argc, char *argv[])
     petrack.show(); // damit bei reiner Hilfe nicht angezeigt wird, erst hier der aufruf
 
     // erst nachher ausfuehren, damit reihenfolge der command line argumente keine rolle spielt
-    if (!project.isEmpty())
+    if(!project.isEmpty())
     {
-        if (sequence.isEmpty())
+        if(sequence.isEmpty())
             petrack.openProject(project);
         else
             petrack.openProject(project, false);
     }
-    if (!sequence.isEmpty()) // nach project so dass dies datei in project ueberschreibt
+    if(!sequence.isEmpty()) // nach project so dass dies datei in project ueberschreibt
         petrack.openSequence(sequence);
-    if (autoSave && (autoSaveDest.right(4) != ".pet"))
+    if(autoSave && (autoSaveDest.right(4) != ".pet"))
     {
-        if ((autoSaveDest.right(4) == ".txt")||(autoSaveDest.right(5) == ".trav")||(autoSaveDest.right(4) == ".dat"))
-            petrack.exportTracker(autoSaveDest); // projekt wird geladen und nur Trajektoprien herausgeschrieben (zB wenn sich .pet (altitude) oder .trc aendert (delrec))
+        if((autoSaveDest.right(4) == ".txt") || (autoSaveDest.right(5) == ".trav") || (autoSaveDest.right(4) == ".dat"))
+            petrack.exportTracker(autoSaveDest); // projekt wird geladen und nur Trajektoprien herausgeschrieben (zB
+                                                 // wenn sich .pet (altitude) oder .trc aendert (delrec))
         else
-            petrack.saveSequence(true, false, autoSaveDest); // true spielt keine rolle, sondern wird durch dateiendung bestimmt
-        return EXIT_SUCCESS;  // 0 means exit success// Programm beenden nach speichern! // 1?
+            petrack.saveSequence(
+                true, false, autoSaveDest); // true spielt keine rolle, sondern wird durch dateiendung bestimmt
+        return EXIT_SUCCESS;                // 0 means exit success// Programm beenden nach speichern! // 1?
     }
     // hat tracker_file bestimmte Dateiendung txt oder trc, dann wird nur genau diese exportiert, sonst beide
-    if (autoTrack)
+    if(autoTrack)
     {
         petrack.trackAll();
 
-        if (autoReadMarkerID)
+        if(autoReadMarkerID)
         {
             auto markerIDs = IO::readMarkerIDFile(autoReadMarkerFile);
-            if (std::holds_alternative<std::unordered_map<int, int>>(markerIDs)) // heights contains the height map
+            if(std::holds_alternative<std::unordered_map<int, int>>(markerIDs)) // heights contains the height map
             {
                 petrack.getTracker()->setMarkerIDs(std::get<std::unordered_map<int, int>>(markerIDs));
                 petrack.setMarkerIDFileName(autoReadHeightFile);
             }
-            else //markerIDs contains an error string
+            else // markerIDs contains an error string
             {
-              debout << "Error: " << std::get<std::string>(markerIDs) << "\n";
-              return EXIT_FAILURE;
+                debout << "Error: " << std::get<std::string>(markerIDs) << "\n";
+                return EXIT_FAILURE;
             }
         }
 
-        if (autoReadHeight)
+        if(autoReadHeight)
         {
             auto markerHeights = IO::readHeightFile(autoReadHeightFile);
-            if (std::holds_alternative<std::unordered_map<int, float>>(markerHeights)) // heights contains the height map
+            if(std::holds_alternative<std::unordered_map<int, float>>(markerHeights)) // heights contains the height map
             {
                 petrack.getTracker()->resetHeight();
                 petrack.getTracker()->setMarkerHeights(std::get<std::unordered_map<int, float>>(markerHeights));
                 petrack.setHeightFileName(autoReadHeightFile);
             }
-            else //markerHeights contains an error string
+            else // markerHeights contains an error string
             {
                 debout << "Error: " << std::get<std::string>(markerHeights) << "\n";
                 return EXIT_FAILURE;
@@ -217,61 +221,61 @@ int main(int argc, char *argv[])
         }
 
         petrack.exportTracker(autoTrackDest);
-        if (autoSave && (autoSaveDest.right(4) == ".pet"))
+        if(autoSave && (autoSaveDest.right(4) == ".pet"))
         {
             petrack.saveProject(autoSaveDest);
         }
 
-        return EXIT_SUCCESS;  // Programm beenden nach speichern! // 1?
+        return EXIT_SUCCESS; // Programm beenden nach speichern! // 1?
     }
 
-    if (autoPlay)
+    if(autoPlay)
     {
         petrack.playAll();
         petrack.exportTracker(autoPlayDest);
-        if (autoSave && (autoSaveDest.right(4) == ".pet"))
+        if(autoSave && (autoSaveDest.right(4) == ".pet"))
         {
             petrack.saveProject(autoSaveDest);
         }
-        return EXIT_SUCCESS;  // Programm beenden nach speichern! // 1?
+        return EXIT_SUCCESS; // Programm beenden nach speichern! // 1?
     }
 
-    if (!autoTrack && autoReadMarkerID) // TODO autoTrack is always false here, as otherwise already returned
+    if(!autoTrack && autoReadMarkerID) // TODO autoTrack is always false here, as otherwise already returned
     {
         auto markerIDs = IO::readMarkerIDFile(autoReadMarkerFile);
-        if (std::holds_alternative<std::unordered_map<int, int>>(markerIDs)) // heights contains the height map
+        if(std::holds_alternative<std::unordered_map<int, int>>(markerIDs)) // heights contains the height map
         {
             petrack.getTracker()->setMarkerIDs(std::get<std::unordered_map<int, int>>(markerIDs));
             petrack.setMarkerIDFileName(autoReadHeightFile);
         }
-        else //heights contains an error string
+        else // heights contains an error string
         {
             debout << "Error: " << std::get<std::string>(markerIDs) << "\n";
             return EXIT_FAILURE;
         }
     }
 
-    if (!autoTrack && autoReadHeight) // TODO autoTrack is always false here, as otherwise already returned
+    if(!autoTrack && autoReadHeight) // TODO autoTrack is always false here, as otherwise already returned
     {
         auto markerHeights = IO::readHeightFile(autoReadHeightFile);
-        if (std::holds_alternative<std::unordered_map<int, float>>(markerHeights)) // heights contains the height map
+        if(std::holds_alternative<std::unordered_map<int, float>>(markerHeights)) // heights contains the height map
         {
             petrack.getTracker()->resetHeight();
             petrack.getTracker()->setMarkerHeights(std::get<std::unordered_map<int, float>>(markerHeights));
             petrack.setHeightFileName(autoReadHeightFile);
         }
-        else //heights contains an error string
+        else // heights contains an error string
         {
             debout << "Error: " << std::get<std::string>(markerHeights) << "\n";
             return EXIT_FAILURE;
         }
     }
 
-    if (autoSaveTracker)
+    if(autoSaveTracker)
     {
         petrack.exportTracker(autoSaveTrackerFile);
     }
-    if (autoSave && (autoSaveDest.right(4) == ".pet"))
+    if(autoSave && (autoSaveDest.right(4) == ".pet"))
     {
         petrack.saveProject(autoSaveDest);
         return EXIT_SUCCESS;

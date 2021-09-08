@@ -4,12 +4,18 @@ FROM ubuntu:20.10
 RUN apt-get update && apt-get install -y software-properties-common
 
 # Install the needed tools
-RUN apt-get update && apt-get install -y wget \
-                       git \
-                       g++ \
-                       make \
-                       ninja-build \
-                       cmake
+RUN echo "deb [trusted=yes] http://apt.llvm.org/groovy/ llvm-toolchain-groovy-12 main" | tee /etc/apt/sources.list.d/clang.list && \
+    apt-get update && \
+    apt-get install -y \
+        wget \
+        git \
+        g++ \
+        make \
+        ninja-build \
+        cmake \
+        parallel \
+        catch2 \
+        clang-format-12
 
 # Install the needed libraries
 RUN apt-get update && apt-get install -y \

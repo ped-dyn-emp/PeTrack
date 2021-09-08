@@ -36,16 +36,16 @@ private:
     Parameter mFy;
     Parameter mCx;
     Parameter mCy;
-    Parameter mR2;//mK1
-    Parameter mR4;//mK2
+    Parameter mR2; // mK1
+    Parameter mR4; // mK2
     Parameter mTx;
     Parameter mTy;
-    Parameter mR6;//mK3
+    Parameter mR6; // mK3
     Parameter mK4;
     Parameter mK5;
     Parameter mK6;
-    cv::Mat map1;
-    cv::Mat map2;
+    cv::Mat   map1;
+    cv::Mat   map2;
 
 public:
     CalibFilter();

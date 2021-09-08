@@ -21,13 +21,13 @@
 #ifndef COLORRANGEWIDGET_H
 #define COLORRANGEWIDGET_H
 
-#include <QtWidgets>
+#include "colorPlot.h"
+#include "petrack.h"
 #include "ui_colorRange.h"
 
-#include "petrack.h"
-#include "colorPlot.h"
+#include <QtWidgets>
 
-class ColorRangeWidget: public QWidget, public Ui::ColorRange
+class ColorRangeWidget : public QWidget, public Ui::ColorRange
 {
     Q_OBJECT
 
@@ -57,7 +57,7 @@ private slots:
     void on_toColor_clicked();
 
 private:
-    Petrack *mMainWindow;
+    Petrack *  mMainWindow;
     ColorPlot *mColorPlot;
 };
 

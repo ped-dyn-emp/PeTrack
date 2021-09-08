@@ -21,10 +21,10 @@
 #ifndef MARKERCASERN_H
 #define MARKERCASERN_H
 
-#include <QList>
-#include <QColor>
-
 #include "ellipse.h"
+
+#include <QColor>
+#include <QList>
 
 
 class TrackPoint;
@@ -32,53 +32,38 @@ class TrackPoint;
 class MarkerCasern
 {
 private:
-    MyEllipse mHead;
-    bool mHasHead;
-    Vec2F mQuadrangle[4];
-    bool mHasQuadrangle;
+    MyEllipse        mHead;
+    bool             mHasHead;
+    Vec2F            mQuadrangle[4];
+    bool             mHasQuadrangle;
     QList<MyEllipse> mSpots;
-    QList<int> mSpotCount;
-    QColor mCol;
-    int mCenterIndex; // index in mSpots list from cross marker
-    int mColorIndex; // index in mSpots list from color marker
-    int mOtherIndex; // index in mSpots list from round marker
+    QList<int>       mSpotCount;
+    QColor           mCol;
+    int              mCenterIndex; // index in mSpots list from cross marker
+    int              mColorIndex;  // index in mSpots list from color marker
+    int              mOtherIndex;  // index in mSpots list from round marker
 public:
     MarkerCasern(MyEllipse head);
     MarkerCasern();
     ~MarkerCasern();
-    
-    inline const MyEllipse& head() const
-    {
-        return mHead;
-    }
-    inline const Vec2F* quadrangle() const
-    {
-        return mQuadrangle;
-    }
-    inline const QList<MyEllipse>& spots() const // reference to be faster
+
+    inline const MyEllipse &       head() const { return mHead; }
+    inline const Vec2F *           quadrangle() const { return mQuadrangle; }
+    inline const QList<MyEllipse> &spots() const // reference to be faster
     {
         return mSpots;
     }
-    inline const QColor& color() const
-    {
-        return mCol;
-    }
+    inline const QColor &color() const { return mCol; }
 
-    inline bool hasHead() const
-    {
-        return mHasHead;
-    }
-    inline bool hasQuadrangle() const
-    {
-        return mHasQuadrangle;
-    }
+    inline bool hasHead() const { return mHasHead; }
+    inline bool hasQuadrangle() const { return mHasQuadrangle; }
 
-    bool isOverlappingHead(const MyEllipse& e) const;
-    bool isInsideHead(const Vec2F& p) const;
+    bool isOverlappingHead(const MyEllipse &e) const;
+    bool isInsideHead(const Vec2F &p) const;
 
     // returns spot number in spots list when inside, otherwise returns -1
-    int isOverlappingSpots(const MyEllipse& e) const;
-    int isInsideSpots(const Vec2F& p) const;
+    int isOverlappingSpots(const MyEllipse &e) const;
+    int isInsideSpots(const Vec2F &p) const;
 
     void modifyHead(const MyEllipse &head);
 
@@ -101,13 +86,12 @@ public:
 class MarkerCasernList : public QList<MarkerCasern>
 {
 public:
-    bool mayAddEllipse(const cv::Mat &img, const MyEllipse& e, bool blackInside);
+    bool mayAddEllipse(const cv::Mat &img, const MyEllipse &e, bool blackInside);
     bool mayAddQuadrangle(const Vec2F v[4]);
 
     // organize every marker and delete marker without head
     void organize(const cv::Mat &img, bool autoWB);
 
-    //draw ... Qt
     void draw(cv::Mat &img) const;
 
     void toCrossList(QList<TrackPoint> *crossList, bool ignoreWithoutMarker) const;

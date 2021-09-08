@@ -38,15 +38,20 @@ struct SegmentRenderData;
 class MoCapItem : public QGraphicsItem
 {
 public:
-    MoCapItem(QWidget &wParent, Animation &animation, MoCapController &moCapController, QGraphicsItem *parent = nullptr);
+    MoCapItem(
+        QWidget &        wParent,
+        Animation &      animation,
+        MoCapController &moCapController,
+        QGraphicsItem *  parent = nullptr);
     QRectF boundingRect() const override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    void   paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
 private:
-    Petrack &mMainWindow;
-    Animation &mAnimation;
+    Petrack &        mMainWindow;
+    Animation &      mAnimation;
     MoCapController &mController;
-    static void drawLine(QPainter *painter, SegmentRenderData &renderData) ;
-    static void drawArrowHead(QPainter *painter, SegmentRenderData &renderData) ;
+    static void      drawLine(QPainter *painter, SegmentRenderData &renderData);
+    static void      drawArrowHead(QPainter *painter, SegmentRenderData &renderData);
 };
 
 #endif // MOCAPITEM_H

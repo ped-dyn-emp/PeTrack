@@ -1,18 +1,17 @@
+#include "moCapSelectionWidget.h"
+
+#include "openMoCapDialog.h"
+#include "ui_moCapSelectionWidget.h"
+
 #include <QFileDialog>
 
-#include "moCapSelectionWidget.h"
-#include "ui_moCapSelectionWidget.h"
-#include "openMoCapDialog.h"
-
-MoCapSelectionWidget::MoCapSelectionWidget(QWidget *parent, const QMap<QString, MoCapSystem>& moCapSystems) :
-    QWidget(parent),
-    mUi(new Ui::MoCapSelectionWidget),
-    mMoCapSystems(moCapSystems)
+MoCapSelectionWidget::MoCapSelectionWidget(QWidget *parent, const QMap<QString, MoCapSystem> &moCapSystems) :
+    QWidget(parent), mUi(new Ui::MoCapSelectionWidget), mMoCapSystems(moCapSystems)
 {
     mUi->setupUi(this);
 
-    constexpr int defaultSampleRate = 60;
-    constexpr double offsetRange = 5;
+    constexpr int    defaultSampleRate = 60;
+    constexpr double offsetRange       = 5;
 
     mUi->btnDelete->setIcon(QApplication::style()->standardIcon(QStyle::SP_TrashIcon));
     mUi->cbInputSystem->addItems(QStringList(moCapSystems.keys()));
@@ -32,11 +31,15 @@ MoCapSelectionWidget::MoCapSelectionWidget(QWidget *parent, const QMap<QString, 
  * @param moCapSystems Map from QString in Combobox to MoCapSystem-Enum
  * @param metadata Metadata which should be represented by this widget
  */
-MoCapSelectionWidget::MoCapSelectionWidget(QWidget *parent, const QMap<QString, MoCapSystem> &moCapSystems, const MoCapPersonMetadata &metadata) :
+MoCapSelectionWidget::MoCapSelectionWidget(
+    QWidget *                         parent,
+    const QMap<QString, MoCapSystem> &moCapSystems,
+    const MoCapPersonMetadata &       metadata) :
     MoCapSelectionWidget(parent, moCapSystems)
 {
     auto usedMoCapSystem = std::find(moCapSystems.begin(), moCapSystems.end(), metadata.getSystem());
-    if(usedMoCapSystem != moCapSystems.end()){
+    if(usedMoCapSystem != moCapSystems.end())
+    {
         mUi->cbInputSystem->setCurrentText(usedMoCapSystem.key());
     }
     mUi->sampleRateSpinBox->setValue(metadata.getSamplerate());
@@ -55,15 +58,17 @@ MoCapSelectionWidget::MoCapSelectionWidget(QWidget *parent, const QMap<QString, 
  *
  * This method is called by a Signal('browse File'-Button).
  */
-void MoCapSelectionWidget::setFileName(){
+void MoCapSelectionWidget::setFileName()
+{
     std::stringstream extensionsString;
     extensionsString << "All MoCap File Types (";
-    for(const auto &extension: moCapFileExtensions){
+    for(const auto &extension : moCapFileExtensions)
+    {
         extensionsString << " *." << extension.second;
     }
     extensionsString << ")";
-    QString filename = QFileDialog::getOpenFileName(this, tr("Open C3D File"), QDir::currentPath(),
-                                                    QString::fromStdString(extensionsString.str()));
+    QString filename = QFileDialog::getOpenFileName(
+        this, tr("Open C3D File"), QDir::currentPath(), QString::fromStdString(extensionsString.str()));
     mUi->filePathLabel->clear();
     mUi->filePathLabel->setText(filename);
     mFilledOut = !filename.isEmpty();
@@ -78,10 +83,11 @@ void MoCapSelectionWidget::setFileName(){
  */
 MoCapPersonMetadata MoCapSelectionWidget::getMetadata() const
 {
-        return MoCapPersonMetadata(mUi->filePathLabel->text().toStdString(),
-                                   mMoCapSystems[mUi->cbInputSystem->currentText()],
-                                   mUi->sampleRateSpinBox->value(),
-                               mUi->offSetSpinBox->value());
+    return MoCapPersonMetadata(
+        mUi->filePathLabel->text().toStdString(),
+        mMoCapSystems[mUi->cbInputSystem->currentText()],
+        mUi->sampleRateSpinBox->value(),
+        mUi->offSetSpinBox->value());
 }
 
 bool MoCapSelectionWidget::isFilledOut() const

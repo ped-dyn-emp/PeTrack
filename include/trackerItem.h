@@ -35,10 +35,10 @@ private:
     Tracker *mTracker;
 
 public:
-    TrackerItem(QWidget *wParent, Tracker *tracker, QGraphicsItem * parent = nullptr);
-    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    TrackerItem(QWidget *wParent, Tracker *tracker, QGraphicsItem *parent = nullptr);
+    void   contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void   paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };
 
 #endif

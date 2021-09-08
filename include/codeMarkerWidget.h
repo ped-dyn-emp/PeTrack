@@ -21,26 +21,24 @@
 #ifndef CODEMARKERWIDGET_H
 #define CODEMARKERWIDGET_H
 
+#include "codeMarkerItem.h"
+#include "petrack.h"
+#include "recognition.h"
+
 #include <QtWidgets>
 #include <opencv2/aruco.hpp>
-
-
-
-#include "petrack.h"
-#include "codeMarkerItem.h"
-#include "recognition.h"
-namespace Ui{
-    class CodeMarker;
+namespace Ui
+{
+class CodeMarker;
 }
 
 
-
-class CodeMarkerWidget: public QWidget
+class CodeMarkerWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    CodeMarkerWidget(QWidget *parent, reco::CodeMarkerOptions& opt, Ui::CodeMarker *mUi);
+    CodeMarkerWidget(QWidget *parent, reco::CodeMarkerOptions &opt, Ui::CodeMarker *mUi);
 
     // store data in xml node
     void setXml(QDomElement &elem);
@@ -68,7 +66,7 @@ private slots:
 private:
     Ui::CodeMarker *mUi;
 
-    Petrack *mMainWindow;
+    Petrack *                mMainWindow;
     reco::CodeMarkerOptions &mCodeMarkerOpt;
 };
 

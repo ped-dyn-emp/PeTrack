@@ -20,10 +20,10 @@
 #ifndef MOCAPPERSON_H
 #define MOCAPPERSON_H
 
-#include <vector>
-#include "skeletonTree.h"
 #include "moCapPersonMetadata.h"
+#include "skeletonTree.h"
 
+#include <vector>
 
 
 class QDomElement;
@@ -39,20 +39,16 @@ class QDomElement;
 class MoCapPerson
 {
 public:
-    double getSampleIndex(double time) const;
-    inline bool hasSample(size_t index) const{
-        return index < mSkeletons.size();
-    };
-    inline const SkeletonTree& getSample(size_t sample) const{
-        return mSkeletons.at(sample);
-    }
+    double                     getSampleIndex(double time) const;
+    inline bool                hasSample(size_t index) const { return index < mSkeletons.size(); };
+    inline const SkeletonTree &getSample(size_t sample) const { return mSkeletons.at(sample); }
 
-    void setSamplerate(double samplerate);
-    void setTimeOffset(double timeOffset);
-    void setMetadata(const MoCapPersonMetadata& metadata);
-    void addSkeleton(const SkeletonTree& skeleton);
-    const SkeletonTree& getSkeleton(size_t samples) const;
-    const std::string& getFilename() const;
+    void                       setSamplerate(double samplerate);
+    void                       setTimeOffset(double timeOffset);
+    void                       setMetadata(const MoCapPersonMetadata &metadata);
+    void                       addSkeleton(const SkeletonTree &skeleton);
+    const SkeletonTree &       getSkeleton(size_t samples) const;
+    const std::string &        getFilename() const;
     const MoCapPersonMetadata &getMetadata() const;
 
 
@@ -60,22 +56,19 @@ public:
 
 private:
     std::vector<SkeletonTree> mSkeletons;
-    MoCapPersonMetadata mMetadata;
+    MoCapPersonMetadata       mMetadata;
 };
 
 class MoCapStorage
 {
 private:
     std::vector<MoCapPerson> mPersons;
+
 public:
-    void addPerson(const MoCapPerson &person);
-    void addPerson(MoCapPerson&& person);
-    std::vector<MoCapPerson>& getPersons(){
-        return mPersons;
-    }
-    const std::vector<MoCapPerson>& getPersons() const{
-        return mPersons;
-    }
+    void                            addPerson(const MoCapPerson &person);
+    void                            addPerson(MoCapPerson &&person);
+    std::vector<MoCapPerson> &      getPersons() { return mPersons; }
+    const std::vector<MoCapPerson> &getPersons() const { return mPersons; }
 };
 
 #endif // MOCAPPERSON_H

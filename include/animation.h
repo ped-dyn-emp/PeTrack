@@ -21,15 +21,14 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#include <QWidget>
+#include <QFileInfo>
+#include <QImage>
 #include <QPair>
 #include <QPixmap>
 #include <QSize>
-#include <QImage>
 #include <QStringList>
 #include <QTime>
-#include <QFileInfo>
-
+#include <QWidget>
 #include <opencv2/opencv.hpp>
 
 #ifdef STEREO
@@ -51,23 +50,22 @@ class Petrack;
  * (FPS, resolution, etc.) and to the sequene itself is managed by
  * this class.
  */
-class Animation{
-
+class Animation
+{
 public:
-
     // Constructor & Destructor
     Animation(QWidget *wParent);
     ~Animation();
- 
+
     // Returns the next frame of the animation
     cv::Mat getNextFrame();
- 
+
     // Returns the previous frame of the animation
     cv::Mat getPreviousFrame();
- 
+
     // Returns the frame at the index index
     cv::Mat getFrameAtIndex(int index);
- 
+
     // Returns the frame at the position position
     // positions is a double between 0 and 1 that indicates the position in the animation
     cv::Mat getFrameAtPos(double position);
@@ -91,40 +89,40 @@ public:
     // Opens a live stream of the camera with id ID
     bool openCameraStream(int camID);
 
-    // Returns the number of frames in the current animation  
-    int getNumFrames(); 
+    // Returns the number of frames in the current animation
+    int getNumFrames();
 
     // Returns the maximum number of frames in the source file
     int getMaxFrames() const;
- 
-    // Returns the index of the current frame  
+
+    // Returns the index of the current frame
     int getCurrentFrameNum() const;
 
     // Sets the sourceIn/Out frame numbers
-    void updateSourceInFrameNum(int in=-1);
-    void updateSourceOutFrameNum(int out=-1);
+    void updateSourceInFrameNum(int in = -1);
+    void updateSourceOutFrameNum(int out = -1);
 
     // Returns the sourceIn/Out frame numbers
     int getSourceInFrameNum() const;
     int getSourceOutFrameNum() const;
- 
-    // Returns the filename of the current frame  
+
+    // Returns the filename of the current frame
     QString getCurrentFileName();
- 
+
     // Returns the FPS of the current animation if it is a video
     double getFPS();
     double getOriginalFPS() const;
 
     void setFPS(double fps);
- 
+
     // Returns the size of the original frames (could made bigger after filtering)
     QSize getSize();
- 
+
     // free's all the data in animation
     void free();
 
     void reset();
- 
+
     bool isVideo() const;
     bool isStereoVideo() const;
     bool isImageSequence() const;
@@ -132,12 +130,12 @@ public:
 
 #ifndef STEREO_DISABLED
     enum Camera getCamera();
-    void setCamera(enum Camera);
+    void        setCamera(enum Camera);
 #endif
     int getFirstFrameSec() const;
     int getFirstFrameMicroSec() const;
 
-    QString getFileBase();
+    QString   getFileBase();
     QFileInfo getFileInfo();
 
 #ifndef STEREO_DISABLED
@@ -150,11 +148,10 @@ public:
 #endif
 
 private:
-
     Petrack *mMainWindow;
     // name, info of the video or sequence
-    QString mFileBase;
-    QString mFileSuffix;
+    QString   mFileBase;
+    QString   mFileSuffix;
     QFileInfo mFileInfo;
 
     // Indicate if the current animation is a video or a photo or a stereo video
@@ -163,26 +160,27 @@ private:
 #ifndef STEREO_DISABLED
     // indicates which camera is used for stereo video
     enum Camera mCamera;
- #endif
+#endif
 
     // Image that will be used by the animation and that will be returned in the public functions
     cv::Mat mImage;
- 
-    // Size of the frame 
+
+    // Size of the frame
     QSize mSize;
- 
-    // Number of frames in the whole animation 
+
+    // Number of frames in the whole animation
     int mMaxFrames;
- 
+
     // Number of frames per second in video
     double mFps;
     double mOriginalFps;
 
-    // the time (seconds since 1.1.1970 0 uhr, microseconds (.000001s)) when the first frame was recorded (bumblebee .time file)
+    // the time (seconds since 1.1.1970 0 uhr, microseconds (.000001s)) when the first frame was recorded (bumblebee
+    // .time file)
     int mFirstSec;
     int mFirstMicroSec;
 
-    // Index of the current opened frame 
+    // Index of the current opened frame
     int mCurrentFrame;
 
     // Index of sourceIn/Out frame
@@ -195,16 +193,16 @@ private:
     // indicates, if time file is loaded inside the open sequence
     bool mTimeFileLoaded;
 
-    /******************************************/ 
+    /******************************************/
     /***  Sequence of photos implementation ***/
     /******************************************/
 
     // Methods
 
     // Implementation of the openAnimation function for photo series
-    // Opens an animation made of photos 
+    // Opens an animation made of photos
     bool openAnimationPhoto(QString fileName);
- 
+
     // Implementation of getFrameAtIndex for photo series
     // Returns the frame at index index in the serie
     cv::Mat getFramePhoto(int index);
@@ -217,15 +215,15 @@ private:
     void freePhoto();
 
     // Sets the sourceIn/Out frame numbers
-    void setSourceInFrameNum(int in=-1);
-    void setSourceOutFrameNum(int out=-1);
+    void setSourceInFrameNum(int in = -1);
+    void setSourceOutFrameNum(int out = -1);
 
-    // Variables 
+    // Variables
 
     // A list with all the filenames of the series
     QStringList mImgFilesList;
- 
-    /******************************************/ 
+
+    /******************************************/
     /***  Video implementation              ***/
     /******************************************/
 
@@ -234,7 +232,7 @@ private:
     // fileNumber indicates the number of the successive files splited while writing
     // nur bei einer ganz neuen sequenz ist stereoImgBuffer != 0
 #ifndef STEREO_DISABLED
-    bool openAnimationStereoVideo(int fileNumber, IplImage* stereoImgLeft, IplImage* stereoImgRight);
+    bool openAnimationStereoVideo(int fileNumber, IplImage *stereoImgLeft, IplImage *stereoImgRight);
 #endif
     bool openAnimationStereoVideo(int fileNumber, cv::Mat &stereoImgLeft, cv::Mat &stereoImgRight);
 
@@ -242,20 +240,20 @@ private:
     bool openAnimationStereoVideo(QString fileName);
 
     // Implementation of the openAnimation function for videos
-    // Opens an animation from a video file 
+    // Opens an animation from a video file
     bool openAnimationVideo(QString fileName);
- 
+
     // Implementation of getFrameAtIndex for videos
     // Returns the frame at index index in the video
     cv::Mat getFrameVideo(int index);
- 
+
     // Gets Size and Frame number information of the recently open animation
     // It is thought to be called once just at the opening of an animation
     bool getInfoVideo(QString fileName);
 
     bool getCameraInfo();
- 
-    // Free's the video data 
+
+    // Free's the video data
     void freeVideo();
 
 
@@ -276,7 +274,7 @@ private:
 
     // A list with all the filenames of the stereo video series
     QStringList mStereoVideoFilesList;
- #endif
+#endif
 };
 
 #endif

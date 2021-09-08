@@ -22,32 +22,35 @@
 #ifndef ABOUTDIALOG_H
 #define ABOUTDIALOG_H
 
-namespace Ui {
-    class About;
+namespace Ui
+{
+class About;
 }
 
-class AboutDialog : public QDialog {
-  Q_OBJECT
+class AboutDialog : public QDialog
+{
+    Q_OBJECT
 
 public:
-    AboutDialog(QWidget *parent,
-                const QString & version,
-                const QString & commitHash,
-                const QString & commitDate,
-                const QString & commitBranch,
-                const QString & compiler,
-                const QString & compilerVersion,
-                const QString & compileDate,
-                const std::vector<std::string> & authors);
+    AboutDialog(
+        QWidget *                       parent,
+        const QString &                 version,
+        const QString &                 commitHash,
+        const QString &                 commitDate,
+        const QString &                 commitBranch,
+        const QString &                 compiler,
+        const QString &                 compilerVersion,
+        const QString &                 compileDate,
+        const std::vector<std::string> &authors);
 
     AboutDialog(const AboutDialog &) = delete;
-    AboutDialog & operator=(AboutDialog) = delete;
-    AboutDialog(const AboutDialog &&) = delete;
-    AboutDialog & operator=(AboutDialog &&) = delete;
+    AboutDialog &operator=(AboutDialog) = delete;
+    AboutDialog(const AboutDialog &&)   = delete;
+    AboutDialog &operator=(AboutDialog &&) = delete;
 
     ~AboutDialog() override;
 
 private:
-    Ui::About * mUi;
+    Ui::About *mUi;
 };
 #endif // ABOUTDIALOG_H

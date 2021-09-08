@@ -21,13 +21,13 @@
 #ifndef STEREOWIDGET_H
 #define STEREOWIDGET_H
 
-#include <QtWidgets>
-#include "ui_stereo.h"
-
 #include "petrack.h"
 #include "stereoItem.h"
+#include "ui_stereo.h"
 
-class StereoWidget: public QWidget, public Ui::Stereo
+#include <QtWidgets>
+
+class StereoWidget : public QWidget, public Ui::Stereo
 {
     Q_OBJECT
 
@@ -44,12 +44,12 @@ private slots:
 #ifndef STEREO_DISABLED
     void on_stereoUseForHeight_stateChanged(int i)
     {
-        if (stereoUseForHeightEver->isChecked() && stereoUseForHeight->isChecked())  
+        if(stereoUseForHeightEver->isChecked() && stereoUseForHeight->isChecked())
             mMainWindow->updateImage();
     }
     void on_stereoUseForHeightEver_stateChanged(int i)
     {
-        if (stereoUseForHeightEver->isChecked() && stereoUseForHeight->isChecked())
+        if(stereoUseForHeightEver->isChecked() && stereoUseForHeight->isChecked())
             mMainWindow->updateImage();
     }
 
@@ -60,12 +60,12 @@ private slots:
     }
     void on_stereoColor_currentIndexChanged(int i)
     {
-        if (mMainWindow && (mMainWindow->getScene()))
+        if(mMainWindow && (mMainWindow->getScene()))
             mMainWindow->getScene()->update();
     }
     void on_stereoDispAlgo_currentIndexChanged(int i)
     {
-        if (mMainWindow && (mMainWindow->getScene()) && mMainWindow->getStereoContext())
+        if(mMainWindow && (mMainWindow->getScene()) && mMainWindow->getStereoContext())
         {
             mMainWindow->getStereoContext()->indicateNewValues();
             mMainWindow->getScene()->update();
@@ -73,38 +73,35 @@ private slots:
     }
     void on_hideWrong_stateChanged(int i)
     {
-        if (mMainWindow && (mMainWindow->getScene()) && mMainWindow->getStereoContext())
+        if(mMainWindow && (mMainWindow->getScene()) && mMainWindow->getStereoContext())
         {
             mMainWindow->getStereoContext()->indicateNewValues();
             mMainWindow->getScene()->update();
         }
-        //mMainWindow->getScene()->update();
+        // mMainWindow->getScene()->update();
     }
     void on_stereoMaskSize_valueChanged(int i)
     {
-        if (i%2 == 0)
+        if(i % 2 == 0)
         {
-            stereoMaskSize->setValue(i-1);
+            stereoMaskSize->setValue(i - 1);
             return;
         }
-        if (mMainWindow->getStereoContext())
+        if(mMainWindow->getStereoContext())
         {
             mMainWindow->getStereoContext()->indicateNewValues();
             mMainWindow->getScene()->update();
         }
     }
-    void on_opacity_valueChanged(int i)
-    {
-        mMainWindow->getScene()->update();
-    }
+    void on_opacity_valueChanged(int i) { mMainWindow->getScene()->update(); }
     void on_edgeMaskSize_valueChanged(int i)
     {
-        if (i%2 == 0)
+        if(i % 2 == 0)
         {
-            edgeMaskSize->setValue(i-1);
+            edgeMaskSize->setValue(i - 1);
             return;
         }
-        if (mMainWindow->getStereoContext())
+        if(mMainWindow->getStereoContext())
         {
             mMainWindow->getStereoContext()->preprocess();
             mMainWindow->getStereoContext()->indicateNewValues();
@@ -115,7 +112,7 @@ private slots:
     // zuerst das ergebniss des zuletzt berechneten frames mit edge angezeigt wird!!!!!!!!!
     void on_useEdge_stateChanged(int i)
     {
-        if (mMainWindow->getStereoContext())
+        if(mMainWindow->getStereoContext())
         {
             mMainWindow->getStereoContext()->preprocess();
             mMainWindow->getStereoContext()->indicateNewValues();
@@ -124,7 +121,7 @@ private slots:
     }
     void on_maxDisparity_valueChanged(int i)
     {
-        if (mMainWindow->getStereoContext())
+        if(mMainWindow->getStereoContext())
         {
             mMainWindow->getStereoContext()->indicateNewValues();
             mMainWindow->getScene()->update();
@@ -132,17 +129,14 @@ private slots:
     }
     void on_minDisparity_valueChanged(int i)
     {
-        if (mMainWindow->getStereoContext())
+        if(mMainWindow->getStereoContext())
         {
             mMainWindow->getStereoContext()->indicateNewValues();
             mMainWindow->getScene()->update();
         }
     }
 
-    void on_stereoExport_clicked()
-    {
-        mMainWindow->getStereoContext()->exportPointCloud();
-    }
+    void on_stereoExport_clicked() { mMainWindow->getStereoContext()->exportPointCloud(); }
 #endif
 
 private:

@@ -21,21 +21,22 @@
 #ifndef ELLIPSE_H
 #define ELLIPSE_H
 
-#include <opencv2/opencv.hpp>
-
 #include "vector.h"
+
+#include <opencv2/opencv.hpp>
 
 class QPointF;
 class QSizeF;
 
-class MyEllipse {
+class MyEllipse
+{
 private:
-    Vec2F mC; // center 
-    double mR1; // radii
-    double mR2; // guarantees that mR1 >= mR2
+    Vec2F  mC;     // center
+    double mR1;    // radii
+    double mR2;    // guarantees that mR1 >= mR2
     double mAngle; // 0..PI arc between pos x axis and ellipse axis with size mR1 (>mR2)
-    Vec2F mF1; // focal points
-    Vec2F mF2;
+    Vec2F  mF1;    // focal points
+    Vec2F  mF2;
 
 public:
     MyEllipse();
@@ -43,40 +44,24 @@ public:
     MyEllipse(QPointF center, QSizeF size, double angle);
     MyEllipse(const MyEllipse &ellipse) = default;
 
-    Vec2F center() const;
+    Vec2F  center() const;
     QSizeF size() const;
 
-    // inline fkt muessen im header definiert werden!!!
-    inline double x() const
-    {
-        return mC.x();
-    }
-    inline double y() const
-    {
-        return mC.y();
-    }
-    inline double r1() const
-    {
-        return mR1;
-    }
-    inline double r2() const
-    {
-        return mR2;
-    }
-    inline double angle() const
-    {
-        return mAngle;
-    }
+    inline double x() const { return mC.x(); }
+    inline double y() const { return mC.y(); }
+    inline double r1() const { return mR1; }
+    inline double r2() const { return mR2; }
+    inline double angle() const { return mAngle; }
 
     inline double ratio() const // >=1
     {
-        return mR1/mR2;
+        return mR1 / mR2;
     }
     double area() const;
     // only estimation, because of complex elliptical integral
     double outline() const;
     // is point p inside or on the ellipse
-    bool isInside(const Vec2F& p) const;
+    bool isInside(const Vec2F &p) const;
     bool isInside(double x, double y) const;
     bool isNearlyCircle() const;
 

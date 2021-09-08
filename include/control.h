@@ -21,32 +21,33 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#include <QtWidgets>
-#include <Qt>
-#include "ui_control.h"
 #include "recognition.h"
+#include "ui_control.h"
+
+#include <Qt>
+#include <QtWidgets>
 
 class Petrack;
 class QGraphicsScene;
 class QDomElement;
 
-class Control: public QWidget, public Ui::Control
+class Control : public QWidget, public Ui::Control
 {
     Q_OBJECT
 
 public:
-    Control(QWidget& parent, QGraphicsScene &scene, reco::Recognizer& recognizer);
+    Control(QWidget &parent, QGraphicsScene &scene, reco::Recognizer &recognizer);
 
     void setScene(QGraphicsScene *sc);
 
-    bool getTrackShow();
-    void setTrackShow(bool b);
-    bool getTrackFix();
-    void setTrackFix(bool b);
+    bool   getTrackShow();
+    void   setTrackShow(bool b);
+    bool   getTrackFix();
+    void   setTrackFix(bool b);
     QColor getTrackPathColor();
-    void setTrackPathColor(QColor col);
+    void   setTrackPathColor(QColor col);
     QColor getTrackGroundPathColor();
-    void setTrackGroundPathColor(QColor col);
+    void   setTrackGroundPathColor(QColor col);
     QColor getMoCapColor();
 
     bool getRecoRoiShow();
@@ -64,103 +65,103 @@ public:
     int getFilterBorderSize();
 
     double getCalibFxValue();
-    void setCalibFxValue(double d);
-    void setCalibFxMin(double d);
-    void setCalibFxMax(double d);
+    void   setCalibFxValue(double d);
+    void   setCalibFxMin(double d);
+    void   setCalibFxMax(double d);
     double getCalibFyValue();
-    void setCalibFyValue(double d);
-    void setCalibFyMin(double d);
-    void setCalibFyMax(double d);
+    void   setCalibFyValue(double d);
+    void   setCalibFyMin(double d);
+    void   setCalibFyMax(double d);
     double getCalibCxValue();
-    void setCalibCxValue(double d);
-    void setCalibCxMin(double d);
-    void setCalibCxMax(double d);
+    void   setCalibCxValue(double d);
+    void   setCalibCxMin(double d);
+    void   setCalibCxMax(double d);
     double getCalibCyValue();
-    void setCalibCyValue(double d);
-    void setCalibCyMin(double d);
-    void setCalibCyMax(double d);
+    void   setCalibCyValue(double d);
+    void   setCalibCyMin(double d);
+    void   setCalibCyMax(double d);
     double getCalibR2Value();
-    void setCalibR2Value(double d);
-    void setCalibR2Min(double d);
-    void setCalibR2Max(double d);
+    void   setCalibR2Value(double d);
+    void   setCalibR2Min(double d);
+    void   setCalibR2Max(double d);
     double getCalibR4Value();
-    void setCalibR4Value(double d);
-    void setCalibR4Min(double d);
-    void setCalibR4Max(double d);
+    void   setCalibR4Value(double d);
+    void   setCalibR4Min(double d);
+    void   setCalibR4Max(double d);
     double getCalibTxValue();
-    void setCalibTxValue(double d);
-    void setCalibTxMin(double d);
-    void setCalibTxMax(double d);
+    void   setCalibTxValue(double d);
+    void   setCalibTxMin(double d);
+    void   setCalibTxMax(double d);
     double getCalibTyValue();
-    void setCalibTyValue(double d);
-    void setCalibTyMin(double d);
-    void setCalibTyMax(double d);
+    void   setCalibTyValue(double d);
+    void   setCalibTyMin(double d);
+    void   setCalibTyMax(double d);
     double getCalibR6Value();
-    void setCalibR6Value(double d);
-    void setCalibR6Min(double d);
-    void setCalibR6Max(double d);
+    void   setCalibR6Value(double d);
+    void   setCalibR6Min(double d);
+    void   setCalibR6Max(double d);
     double getCalibK4Value();
-    void setCalibK4Value(double d);
-    void setCalibK4Min(double d);
-    void setCalibK4Max(double d);
+    void   setCalibK4Value(double d);
+    void   setCalibK4Min(double d);
+    void   setCalibK4Max(double d);
     double getCalibK5Value();
-    void setCalibK5Value(double d);
-    void setCalibK5Min(double d);
-    void setCalibK5Max(double d);
+    void   setCalibK5Value(double d);
+    void   setCalibK5Min(double d);
+    void   setCalibK5Max(double d);
     double getCalibK6Value();
-    void setCalibK6Value(double d);
-    void setCalibK6Min(double d);
-    void setCalibK6Max(double d);
+    void   setCalibK6Value(double d);
+    void   setCalibK6Min(double d);
+    void   setCalibK6Max(double d);
 
     double getCalibExtrRot1();
-    void setCalibExtrRot1(double d);
+    void   setCalibExtrRot1(double d);
     double getCalibExtrRot2();
-    void setCalibExtrRot2(double d);
+    void   setCalibExtrRot2(double d);
     double getCalibExtrRot3();
-    void setCalibExtrRot3(double d);
+    void   setCalibExtrRot3(double d);
     double getCalibExtrTrans1();
-    void setCalibExtrTrans1(double d);
+    void   setCalibExtrTrans1(double d);
     double getCalibExtrTrans2();
-    void setCalibExtrTrans2(double d);
+    void   setCalibExtrTrans2(double d);
     double getCalibExtrTrans3();
-    void setCalibExtrTrans3(double d);
-    void setEnabledExtrParams(bool enable);
+    void   setCalibExtrTrans3(double d);
+    void   setEnabledExtrParams(bool enable);
 
-    int /*Petrack::Dimension*/ getCalibCoordDimension();
-    bool getCalibExtrCalibPointsShow();
-    bool getCalibExtrVanishPointsShow();
-    bool getCalibCoordShow();
-    void setCalibCoordShow(bool b);
-    bool getCalibCoordFix();
-    void setCalibCoordFix(bool b);
-    bool getIs3DView();
-    void setIs3DView(bool b);
-    int getCalibCoordRotate();
-    void setCalibCoordRotate(int i);
-    int getCalibCoordTransX();
-    void setCalibCoordTransX(int i);
-    int getCalibCoordTransXMax();
-    void setCalibCoordTransXMax(int i);
-    int getCalibCoordTransXMin();
-    void setCalibCoordTransXMin(int i);
-    int getCalibCoordTransY();
-    void setCalibCoordTransY(int i);
-    int getCalibCoordTransYMax();
-    void setCalibCoordTransYMax(int i);
-    int getCalibCoordTransYMin();
-    void setCalibCoordTransYMin(int i);
-    int getCalibCoordScale();
-    void setCalibCoordScale(int i);
+    int    getCalibCoordDimension();
+    bool   getCalibExtrCalibPointsShow();
+    bool   getCalibExtrVanishPointsShow();
+    bool   getCalibCoordShow();
+    void   setCalibCoordShow(bool b);
+    bool   getCalibCoordFix();
+    void   setCalibCoordFix(bool b);
+    bool   getIs3DView();
+    void   setIs3DView(bool b);
+    int    getCalibCoordRotate();
+    void   setCalibCoordRotate(int i);
+    int    getCalibCoordTransX();
+    void   setCalibCoordTransX(int i);
+    int    getCalibCoordTransXMax();
+    void   setCalibCoordTransXMax(int i);
+    int    getCalibCoordTransXMin();
+    void   setCalibCoordTransXMin(int i);
+    int    getCalibCoordTransY();
+    void   setCalibCoordTransY(int i);
+    int    getCalibCoordTransYMax();
+    void   setCalibCoordTransYMax(int i);
+    int    getCalibCoordTransYMin();
+    void   setCalibCoordTransYMin(int i);
+    int    getCalibCoordScale();
+    void   setCalibCoordScale(int i);
     double getCalibCoordUnit();
-    void setCalibCoordUnit(double d);
+    void   setCalibCoordUnit(double d);
 
-    int getCalibCoord3DTransX();
+    int  getCalibCoord3DTransX();
     void setCalibCoord3DTransX(int i);
-    int getCalibCoord3DTransY();
+    int  getCalibCoord3DTransY();
     void setCalibCoord3DTransY(int i);
-    int getCalibCoord3DTransZ();
+    int  getCalibCoord3DTransZ();
     void setCalibCoord3DTransZ(int i);
-    int getCalibCoord3DAxeLen();
+    int  getCalibCoord3DAxeLen();
     void setCalibCoord3DAxeLen(int i);
     bool getCalibCoord3DSwapX();
     void setCalibCoord3DSwapX(bool b);
@@ -169,56 +170,44 @@ public:
     bool getCalibCoord3DSwapZ();
     void setCalibCoord3DSwapZ(bool b);
 
-    int /*Petrack::Dimension*/ getCalibGridDimension();
+    int  getCalibGridDimension();
     bool getCalibGridShow();
     void setCalibGridShow(bool b);
     bool getCalibGridFix();
     void setCalibGridFix(bool b);
-    int getCalibGridRotate();
+    int  getCalibGridRotate();
     void setCalibGridRotate(int i);
-    int getCalibGridTransX();
+    int  getCalibGridTransX();
     void setCalibGridTransX(int i);
-    int getCalibGridTransY();
+    int  getCalibGridTransY();
     void setCalibGridTransY(int i);
-    int getCalibGridScale();
+    int  getCalibGridScale();
     void setCalibGridScale(int i);
 
-    int getCalibGrid3DTransX();
+    int  getCalibGrid3DTransX();
     void setCalibGrid3DTransX(int i);
-    int getCalibGrid3DTransY();
+    int  getCalibGrid3DTransY();
     void setCalibGrid3DTransY(int i);
-    int getCalibGrid3DTransZ();
+    int  getCalibGrid3DTransZ();
     void setCalibGrid3DTransZ(int i);
     void setGridMinMaxTranslation(int minx, int maxx, int miny, int maxy);
-    int getCalibGrid3DResolution();
+    int  getCalibGrid3DResolution();
     void setCalibGrid3DResolution(int i);
 
-    void expandRange(QColor& fromColor, QColor& toColor, const QColor& clickedColor) const;
-    void saveChange(const QColor& fromColor, const QColor& toColor, RectPlotItem* map);
-    bool getColors(QColor& clickedColor, QColor& toColor, QColor& fromColor, RectPlotItem*& map);
+    void expandRange(QColor &fromColor, QColor &toColor, const QColor &clickedColor) const;
+    void saveChange(const QColor &fromColor, const QColor &toColor, RectPlotItem *map);
+    bool getColors(QColor &clickedColor, QColor &toColor, QColor &fromColor, RectPlotItem *&map);
 
-    void setXml(QDomElement &elem);
-    void getXml(QDomElement &elem);
-    bool isLoading()
-    {
-        return mMainWindow->isLoading();
-    }
-    inline ColorPlot *getColorPlot() const
-    {
-        return colorPlot;
-    }
+    void              setXml(QDomElement &elem);
+    void              getXml(QDomElement &elem);
+    bool              isLoading() { return mMainWindow->isLoading(); }
+    inline ColorPlot *getColorPlot() const { return colorPlot; }
 
 #ifdef QWT
-    inline AnalysePlot *getAnalysePlot() const
-    {
-        return analysePlot;
-    }
+    inline AnalysePlot *getAnalysePlot() const { return analysePlot; }
 #endif
 
-    inline Petrack *getMainWindow() const
-    {
-        return mMainWindow;
-    }
+    inline Petrack *getMainWindow() const { return mMainWindow; }
 
 private:
     reco::RecognitionMethod getRecoMethod() const;
@@ -278,36 +267,120 @@ private slots:
     void on_trackRegionLevels_valueChanged(int i);
     void on_trackShowSearchSize_stateChanged(int i);
 
-    void on_trackShowOnlyVisible_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackShowCurrentPoint_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackShowOnlyVisible_stateChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackShowCurrentPoint_stateChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
     void on_trackGotoNr_clicked();
     void on_trackGotoStartNr_clicked();
     void on_trackGotoEndNr_clicked();
 
     void on_trackHeadSized_stateChanged(int i);
 
-    void on_trackShowPoints_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackShowPointsColored_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackShowPath_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackShowColColor_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackShowColorMarker_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackShowNumber_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackShowGroundPosition_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackShowGroundPath_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackShowHeightIndividual_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackNumberBold_stateChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackShowPoints_stateChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackShowPointsColored_stateChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackShowPath_stateChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackShowColColor_stateChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackShowColorMarker_stateChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackShowNumber_stateChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackShowGroundPosition_stateChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackShowGroundPath_stateChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackShowHeightIndividual_stateChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackNumberBold_stateChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
     void on_showMoCap_stateChanged(int i);
 
-    void on_trackCurrentPointSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackPointSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackPathWidth_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackColColorSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackCurrentPointSize_valueChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackPointSize_valueChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackPathWidth_valueChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackColColorSize_valueChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
     void on_trackColorMarkerSize_valueChanged(int /*i*/) { mScene->update(); }
-    void on_trackNumberSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackGroundPositionSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackGroundPathSize_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackShowBefore_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
-    void on_trackShowAfter_valueChanged(int /*i*/) { if (!isLoading()) mScene->update(); }
+    void on_trackNumberSize_valueChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackGroundPositionSize_valueChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackGroundPathSize_valueChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackShowBefore_valueChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
+    void on_trackShowAfter_valueChanged(int /*i*/)
+    {
+        if(!isLoading())
+            mScene->update();
+    }
     void on_moCapSize_valueChanged(int i);
 
     void on_recoMethod_currentIndexChanged(int index);
@@ -426,12 +499,13 @@ signals:
     void userChangedRecoMethod(reco::RecognitionMethod method);
 
 private:
-    Petrack *mMainWindow;
+    Petrack *       mMainWindow;
     QGraphicsScene *mScene;
-    bool mColorChanging;
-    bool mIndexChanging; // shows, if the index of the color model is really changing; nor while constructor (initialer durchlauf) and may be while loading xml file
-    bool mLoading; // shows, if new project is just loading
-    QDoubleSpinBox *k4,*k5,*k6; // Muss noch in die Oberflaeche eingebaut werden
-    };
+    bool            mColorChanging;
+    bool mIndexChanging; // shows, if the index of the color model is really changing; nor while constructor (initialer
+                         // durchlauf) and may be while loading xml file
+    bool            mLoading;     // shows, if new project is just loading
+    QDoubleSpinBox *k4, *k5, *k6; // Muss noch in die Oberflaeche eingebaut werden
+};
 
 #endif

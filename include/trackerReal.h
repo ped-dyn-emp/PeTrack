@@ -21,56 +21,36 @@
 #ifndef TRACKERREAL_H
 #define TRACKERREAL_H
 
-#include <QList>
-
-#include "vector.h"
-#include "tracker.h"
-#include "imageItem.h"
 #include "colorPlot.h"
+#include "imageItem.h"
+#include "tracker.h"
+#include "vector.h"
+
+#include <QList>
 
 // point in x/y in cm
 class TrackPointReal : public Vec3F
 {
 private:
-    int mFrameNum; // frame number in animation sequence possibly with missing frames
+    int   mFrameNum; // frame number in animation sequence possibly with missing frames
     Vec2F mViewDir;
     float mAngleOfView; // angle of view of camera to point
-    int mMarkerID;
+    int   mMarkerID;
+
 public:
     TrackPointReal(const Vec3F &p, int frameNum);
     TrackPointReal(const Vec3F &p, int frameNum, const Vec2F &d);
 
-    inline int frameNum() const
-    {
-        return mFrameNum;
-    }
-    inline void setFrameNum(int frameNum)
-    {
-        mFrameNum = frameNum;
-    }
-    inline Vec2F viewDir() const
-    {
-        return mViewDir;
-    }
-    inline float angleOfView() const
-    {
-        return mAngleOfView;
-    }
-    inline void setAngleOfView(float a)
-    {
-        mAngleOfView = a;
-    }
-    inline int getMarkerID() const
-    {
-        return mMarkerID;
-    }
-    inline void setMarkerID(int markerID)
-    {
-        mMarkerID = markerID;
-    }
+    inline int   frameNum() const { return mFrameNum; }
+    inline void  setFrameNum(int frameNum) { mFrameNum = frameNum; }
+    inline Vec2F viewDir() const { return mViewDir; }
+    inline float angleOfView() const { return mAngleOfView; }
+    inline void  setAngleOfView(float a) { mAngleOfView = a; }
+    inline int   getMarkerID() const { return mMarkerID; }
+    inline void  setMarkerID(int markerID) { mMarkerID = markerID; }
 };
 
-inline QTextStream& operator<<(QTextStream& s, const TrackPointReal& tp)
+inline QTextStream &operator<<(QTextStream &s, const TrackPointReal &tp)
 {
     s << tp.x() << " " << tp.y(); // nur x, y wird ausgegeben, z wird nur bei Bedarf mit ausgegeben!!!
     return s;
@@ -83,63 +63,39 @@ inline QTextStream& operator<<(QTextStream& s, const TrackPointReal& tp)
 class TrackPersonReal : public QList<TrackPointReal>
 {
 private:
-    double mHeight; // height of the person
-    int mFirstFrame; // 0.. frame where the person was tracked the first time
-    int mLastFrame; // 0..
-    int mMarkerID = -1; //set to -1 as -1 does not naturally occur as a ArucoMarkerNumber-value
+    double mHeight;        // height of the person
+    int    mFirstFrame;    // 0.. frame where the person was tracked the first time
+    int    mLastFrame;     // 0..
+    int    mMarkerID = -1; // set to -1 as -1 does not naturally occur as a ArucoMarkerNumber-value
 
 public:
     TrackPersonReal();
     TrackPersonReal(int frame, const TrackPointReal &p);
 
-    inline double height() const
-    {
-        return mHeight;
-    }
-    inline void setHeight(double h)
-    {
-        mHeight = h;
-    }
-    inline int firstFrame() const
-    {
-        return mFirstFrame;
-    }
-    inline void setFirstFrame(int f)
-    {
-        mFirstFrame = f;
-    }
-    inline int lastFrame() const
-    {
-        return mLastFrame;
-    }
-    inline void setLastFrame(int f)
-    {
-        mLastFrame = f;
-    }
-    inline int getMarkerID() const
-    {
-        return mMarkerID;
-    }
-    inline void setMarkerID(int markerID)
-    {
-        mMarkerID = markerID;
-    }
-    bool trackPointExist(int frame) const;
-    const TrackPointReal& trackPointAt(int frame) const; // & macht bei else probleme, sonst mit [] zugreifbar
+    inline double         height() const { return mHeight; }
+    inline void           setHeight(double h) { mHeight = h; }
+    inline int            firstFrame() const { return mFirstFrame; }
+    inline void           setFirstFrame(int f) { mFirstFrame = f; }
+    inline int            lastFrame() const { return mLastFrame; }
+    inline void           setLastFrame(int f) { mLastFrame = f; }
+    inline int            getMarkerID() const { return mMarkerID; }
+    inline void           setMarkerID(int markerID) { mMarkerID = markerID; }
+    bool                  trackPointExist(int frame) const;
+    const TrackPointReal &trackPointAt(int frame) const; // & macht bei else probleme, sonst mit [] zugreifbar
     // gibt -1 zurueck, wenn frame oder naechster frame nicht existiert
     // entfernung ist absolut
     double distanceToNextFrame(int frame) const;
-    void init(int firstFrame, double height, int markerID);
-    void addEnd(const QPointF& pos, int frame);
-    void addEnd(const Vec3F& pos, int frame);
-    void addEnd(const QPointF& pos, int frame, const QPointF &dir);
+    void   init(int firstFrame, double height, int markerID);
+    void   addEnd(const QPointF &pos, int frame);
+    void   addEnd(const Vec3F &pos, int frame);
+    void   addEnd(const QPointF &pos, int frame, const QPointF &dir);
 };
 
-inline QTextStream& operator<<(QTextStream& s, const TrackPersonReal& tp)
+inline QTextStream &operator<<(QTextStream &s, const TrackPersonReal &tp)
 {
     int firstFrame = tp.firstFrame();
-    for (int i = 0; i < tp.size(); ++i)
-        s << firstFrame+i << tp.at(i) << tp.height() << Qt::endl;
+    for(int i = 0; i < tp.size(); ++i)
+        s << firstFrame + i << tp.at(i) << tp.height() << Qt::endl;
     return s;
 }
 
@@ -157,26 +113,14 @@ inline QTextStream& operator<<(QTextStream& s, const TrackPersonReal& tp)
 class TrackerReal : public QList<TrackPersonReal>
 {
 private:
-    double mXMin, mXMax, mYMin, mYMax;
+    double   mXMin, mXMax, mYMin, mYMax;
     Petrack *mMainWindow;
 
 public:
-    inline double xMin() const
-    {
-        return mXMin;
-    }
-    inline double xMax() const
-    {
-        return mXMax;
-    }
-    inline double yMin() const
-    {
-        return mYMin;
-    }
-    inline double yMax() const
-    {
-        return mYMax;
-    }
+    inline double xMin() const { return mXMin; }
+    inline double xMax() const { return mXMax; }
+    inline double yMin() const { return mYMin; }
+    inline double yMax() const { return mYMax; }
 
     TrackerReal(QWidget *wParent);
 
@@ -189,20 +133,40 @@ public:
     // petrack...getImageBorderSize()
     // mControlWidget->getColorPlot()
     // petrack...mImageItem
-    int calculate(Tracker *tracker, ImageItem *imageItem, ColorPlot *colorPlot, int imageBorderSize = 0, bool missingFramesInserted = true, bool useTrackpoints = false,
-                  bool alternateHeight = false, double altitude = 0, bool useCalibrationCenter = true,
-                  bool exportElimTp = false, bool exportElimTrj = false, bool exportSmooth = true,
-                  bool exportViewingDirection = false, bool exportAngleOfView = false, bool exportMarkerID = false, bool exportAutoCorrect = false);
+    int calculate(
+        Tracker *  tracker,
+        ImageItem *imageItem,
+        ColorPlot *colorPlot,
+        int        imageBorderSize        = 0,
+        bool       missingFramesInserted  = true,
+        bool       useTrackpoints         = false,
+        bool       alternateHeight        = false,
+        double     altitude               = 0,
+        bool       useCalibrationCenter   = true,
+        bool       exportElimTp           = false,
+        bool       exportElimTrj          = false,
+        bool       exportSmooth           = true,
+        bool       exportViewingDirection = false,
+        bool       exportAngleOfView      = false,
+        bool       exportMarkerID         = false,
+        bool       exportAutoCorrect      = false);
 
     void calcMinMax();
-    int largestFirstFrame();
-    int largestLastFrame();
-    int smallestFirstFrame();
-    int smallestLastFrame();
+    int  largestFirstFrame();
+    int  largestLastFrame();
+    int  smallestFirstFrame();
+    int  smallestLastFrame();
 
     // alternateHeight true, wenn keine eindeutige personengroesse ausgegeben wird, sondern fuer jeden pounkt andere
-    void exportTxt(QTextStream &out,    bool alternateHeight, bool useTrackpoints, bool exportViewingDirection, bool exportAngleOfView, bool exportUseM, bool exportMarkerID);
-    void exportDat(QTextStream &out,    bool alternateHeight, bool useTrackpoints); // fuer gnuplot
+    void exportTxt(
+        QTextStream &out,
+        bool         alternateHeight,
+        bool         useTrackpoints,
+        bool         exportViewingDirection,
+        bool         exportAngleOfView,
+        bool         exportUseM,
+        bool         exportMarkerID);
+    void exportDat(QTextStream &out, bool alternateHeight, bool useTrackpoints); // fuer gnuplot
     void exportXml(QTextStream &outXml, bool alternateHeight, bool useTrackpoints);
 };
 

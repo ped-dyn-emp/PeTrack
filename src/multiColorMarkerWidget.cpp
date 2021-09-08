@@ -20,10 +20,9 @@
 
 #include "multiColorMarkerWidget.h"
 
-MultiColorMarkerWidget::MultiColorMarkerWidget(QWidget *parent)
-    : QWidget(parent)
+MultiColorMarkerWidget::MultiColorMarkerWidget(QWidget *parent) : QWidget(parent)
 {
-    mMainWindow = (class Petrack*) parent;
+    mMainWindow = (class Petrack *) parent;
     setupUi(this);
     mOldMinArea = minArea->value();
     mOldMaxArea = maxArea->value();
@@ -73,63 +72,67 @@ void MultiColorMarkerWidget::setXml(QDomElement &elem)
 void MultiColorMarkerWidget::getXml(QDomElement &elem)
 {
     QDomElement subElem;
-    QString styleString;
+    QString     styleString;
 
     for(subElem = elem.firstChildElement(); !subElem.isNull(); subElem = subElem.nextSiblingElement())
     {
-        if (subElem.tagName() == "MASK")
+        if(subElem.tagName() == "MASK")
         {
-            if (subElem.hasAttribute("SHOW"))
+            if(subElem.hasAttribute("SHOW"))
                 showMask->setCheckState(subElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
-            if (subElem.hasAttribute("OPACITY"))
+            if(subElem.hasAttribute("OPACITY"))
                 opacity->setValue(subElem.attribute("OPACITY").toInt());
-            if (subElem.hasAttribute("MASK"))
+            if(subElem.hasAttribute("MASK"))
                 maskMask->setCheckState(subElem.attribute("MASK").toInt() ? Qt::Checked : Qt::Unchecked);
         }
-        if (subElem.tagName() == "BLACK_DOT")
+        if(subElem.tagName() == "BLACK_DOT")
         {
-            if (subElem.hasAttribute("USE"))
+            if(subElem.hasAttribute("USE"))
                 useDot->setCheckState(subElem.attribute("USE").toInt() ? Qt::Checked : Qt::Unchecked);
-            if (subElem.hasAttribute("SIZE"))
+            if(subElem.hasAttribute("SIZE"))
                 dotSize->setValue(subElem.attribute("SIZE").toDouble());
-            if (subElem.hasAttribute("IGNORE_WITHOUT"))
-                ignoreWithoutDot->setCheckState(subElem.attribute("IGNORE_WITHOUT").toInt() ? Qt::Checked : Qt::Unchecked);
-            if (subElem.hasAttribute("USE_COLOR"))
+            if(subElem.hasAttribute("IGNORE_WITHOUT"))
+                ignoreWithoutDot->setCheckState(
+                    subElem.attribute("IGNORE_WITHOUT").toInt() ? Qt::Checked : Qt::Unchecked);
+            if(subElem.hasAttribute("USE_COLOR"))
                 useColor->setCheckState(subElem.attribute("USE_COLOR").toInt() ? Qt::Checked : Qt::Unchecked);
-            if (subElem.hasAttribute("RESTRICT_POSITION"))
-                restrictPosition->setCheckState(subElem.attribute("RESTRICT_POSITION").toInt() ? Qt::Checked : Qt::Unchecked);
+            if(subElem.hasAttribute("RESTRICT_POSITION"))
+                restrictPosition->setCheckState(
+                    subElem.attribute("RESTRICT_POSITION").toInt() ? Qt::Checked : Qt::Unchecked);
         }
-        if (subElem.tagName() == "CODE_MARKER")
+        if(subElem.tagName() == "CODE_MARKER")
         {
-            if (subElem.hasAttribute("USE"))
+            if(subElem.hasAttribute("USE"))
                 useCodeMarker->setCheckState(subElem.attribute("USE").toInt() ? Qt::Checked : Qt::Unchecked);
-            if (subElem.hasAttribute("IGNORE_WITHOUT"))
-                ignoreWithoutDot->setCheckState(subElem.attribute("IGNORE_WITHOUT").toInt() ? Qt::Checked : Qt::Unchecked);
+            if(subElem.hasAttribute("IGNORE_WITHOUT"))
+                ignoreWithoutDot->setCheckState(
+                    subElem.attribute("IGNORE_WITHOUT").toInt() ? Qt::Checked : Qt::Unchecked);
         }
-        if (subElem.tagName() == "AUTO_CORRECT")
+        if(subElem.tagName() == "AUTO_CORRECT")
         {
-            if (subElem.hasAttribute("USE"))
+            if(subElem.hasAttribute("USE"))
                 autoCorrect->setCheckState(subElem.attribute("USE").toInt() ? Qt::Checked : Qt::Unchecked);
-            if (subElem.hasAttribute("ONLY_EXPORT"))
-                autoCorrectOnlyExport->setCheckState(subElem.attribute("ONLY_EXPORT").toInt() ? Qt::Checked : Qt::Unchecked);
+            if(subElem.hasAttribute("ONLY_EXPORT"))
+                autoCorrectOnlyExport->setCheckState(
+                    subElem.attribute("ONLY_EXPORT").toInt() ? Qt::Checked : Qt::Unchecked);
         }
-        if (subElem.tagName() == "PARAM")
+        if(subElem.tagName() == "PARAM")
         {
-            if (subElem.hasAttribute("CLOSE_RADIUS"))
+            if(subElem.hasAttribute("CLOSE_RADIUS"))
                 closeRadius->setValue(subElem.attribute("CLOSE_RADIUS").toInt());
-            if (subElem.hasAttribute("CLOSE_USED"))
+            if(subElem.hasAttribute("CLOSE_USED"))
                 useClose->setCheckState(subElem.attribute("CLOSE_USED").toInt() ? Qt::Checked : Qt::Unchecked);
-            if (subElem.hasAttribute("OPEN_RADIUS"))
+            if(subElem.hasAttribute("OPEN_RADIUS"))
                 openRadius->setValue(subElem.attribute("OPEN_RADIUS").toInt());
-            if (subElem.hasAttribute("OPEN_USED"))
+            if(subElem.hasAttribute("OPEN_USED"))
                 useOpen->setCheckState(subElem.attribute("OPEN_USED").toInt() ? Qt::Checked : Qt::Unchecked);
-            if (subElem.hasAttribute("MIN_AREA"))
+            if(subElem.hasAttribute("MIN_AREA"))
                 minArea->setValue(subElem.attribute("MIN_AREA").toInt());
-            if (subElem.hasAttribute("MAX_AREA"))
+            if(subElem.hasAttribute("MAX_AREA"))
                 maxArea->setValue(subElem.attribute("MAX_AREA").toInt());
-            if (subElem.hasAttribute("USE_HEAD_SIZE"))
+            if(subElem.hasAttribute("USE_HEAD_SIZE"))
                 useHeadSize->setCheckState(subElem.attribute("USE_HEAD_SIZE").toInt() ? Qt::Checked : Qt::Unchecked);
-            if (subElem.hasAttribute("MAX_RATIO"))
+            if(subElem.hasAttribute("MAX_RATIO"))
                 maxRatio->setValue(subElem.attribute("MAX_RATIO").toDouble());
         }
     }

@@ -21,22 +21,21 @@
 #ifndef EXTRCALIBRATION_H
 #define EXTRCALIBRATION_H
 
-#include <iostream>
-#include <vector>
-#include <array>
-
-#include <QString>
 #include <QDomElement>
-
+#include <QString>
+#include <array>
+#include <iostream>
 #include <opencv2/opencv.hpp>
+#include <vector>
 
 class Petrack;
 class Control;
 
 
-class ReprojectionError{
+class ReprojectionError
+{
 private:
-    bool mValid = false;
+    bool   mValid = false;
     double mPointHeightAvg;
     double mPointHeightStdDev;
     double mPointHeightVariance;
@@ -53,30 +52,44 @@ private:
     double mPixelMax;
 
     double mUsedDefaultHeight;
+
 public:
     ReprojectionError() = default;
 
-    ReprojectionError(double pointHeightAvg, double pointHeightStdDev,
-                      double pointHeightVariance, double pointHeightMax,
-                      double defaultHeightAvg, double defaultHeightStdDev,
-                      double defaultHeightVariance, double defaultHeightMax,
-                      double pixelAvg, double pixelStdDev,
-                      double pixelVariance, double pixelMax,
-                      double defaultHeight):
-        mPointHeightAvg(pointHeightAvg), mPointHeightStdDev(pointHeightStdDev),
-        mPointHeightVariance(pointHeightVariance), mPointHeightMax(pointHeightMax),
-        mDefaultHeightAvg(defaultHeightAvg), mDefaultHeightStdDev(defaultHeightStdDev),
-        mDefaultHeightVariance(defaultHeightVariance), mDefaultHeightMax(defaultHeightMax),
-        mPixelAvg(pixelAvg), mPixelStdDev(pixelStdDev),
-        mPixelVariance(pixelVariance), mPixelMax(pixelMax),
+    ReprojectionError(
+        double pointHeightAvg,
+        double pointHeightStdDev,
+        double pointHeightVariance,
+        double pointHeightMax,
+        double defaultHeightAvg,
+        double defaultHeightStdDev,
+        double defaultHeightVariance,
+        double defaultHeightMax,
+        double pixelAvg,
+        double pixelStdDev,
+        double pixelVariance,
+        double pixelMax,
+        double defaultHeight) :
+        mPointHeightAvg(pointHeightAvg),
+        mPointHeightStdDev(pointHeightStdDev),
+        mPointHeightVariance(pointHeightVariance),
+        mPointHeightMax(pointHeightMax),
+        mDefaultHeightAvg(defaultHeightAvg),
+        mDefaultHeightStdDev(defaultHeightStdDev),
+        mDefaultHeightVariance(defaultHeightVariance),
+        mDefaultHeightMax(defaultHeightMax),
+        mPixelAvg(pixelAvg),
+        mPixelStdDev(pixelStdDev),
+        mPixelVariance(pixelVariance),
+        mPixelMax(pixelMax),
         mUsedDefaultHeight(defaultHeight)
     {
         auto data = getData();
-        mValid = !std::any_of(data.begin(), data.end(), [](double a){return !std::isfinite(a) || a < 0;});
+        mValid    = !std::any_of(data.begin(), data.end(), [](double a) { return !std::isfinite(a) || a < 0; });
     }
 
-    void getXml(QDomElement& elem);
-    void setXml(QDomElement& elem) const;
+    void getXml(QDomElement &elem);
+    void setXml(QDomElement &elem) const;
 
     double pointHeightAvg() const;
     double pointHeightStdDev() const;
@@ -95,16 +108,25 @@ public:
 
     double usedDefaultHeight() const;
 
-    std::array<double, 13> getData() const {
-        return {mPointHeightAvg, mPointHeightStdDev, mPointHeightVariance, mPointHeightMax,
-         mDefaultHeightAvg, mDefaultHeightStdDev, mDefaultHeightVariance, mDefaultHeightMax,
-         mPixelAvg, mPixelStdDev, mPixelVariance, mPixelMax,
-         mUsedDefaultHeight};
+    std::array<double, 13> getData() const
+    {
+        return {
+            mPointHeightAvg,
+            mPointHeightStdDev,
+            mPointHeightVariance,
+            mPointHeightMax,
+            mDefaultHeightAvg,
+            mDefaultHeightStdDev,
+            mDefaultHeightVariance,
+            mDefaultHeightMax,
+            mPixelAvg,
+            mPixelStdDev,
+            mPixelVariance,
+            mPixelMax,
+            mUsedDefaultHeight};
     }
 
-    bool isValid() const{
-        return mValid;
-    }
+    bool isValid() const { return mValid; }
 };
 
 
@@ -121,7 +143,6 @@ public:
  */
 class ExtrCalibration
 {
-
 private:
     Petrack *mMainWindow;
     Control *mControlWidget;
@@ -135,61 +156,39 @@ private:
 
     double *camValues;
     double *distValues;
-    bool isExtCalib;
-    float camHeight;
+    bool    isExtCalib;
+    float   camHeight;
 
     ReprojectionError reprojectionError;
-    QString mExtrCalibFile;
-    void init();
+    QString           mExtrCalibFile;
+    void              init();
 
 public:
-
     ExtrCalibration();
     ~ExtrCalibration();
-    void setMainWindow(Petrack *mw);
-    bool isEmptyExtrCalibFile();
-    bool isSetExtrCalib();
-    void setExtrCalibFile(const QString &f);
-    QString getExtrCalibFile();
-    bool openExtrCalibFile();
-    bool loadExtrCalibFile();
-    bool saveExtrCalibPoints();
-    bool fetch2DPoints();
-    void calibExtrParams();
-    bool calcReprojectionError();
-    virtual cv::Point2f getImagePoint(cv::Point3f p3d);
-    cv::Point3f get3DPoint(cv::Point2f p2d, double h);
-    cv::Point3f transformRT(cv::Point3f p);
-    bool isOutsideImage(cv::Point2f p2d);
-    inline bool isOutsideImage(cv::Point3f p3d)
-    {
-        return isOutsideImage(getImagePoint(p3d));
-    }
-    inline std::vector<cv::Point3f> get3DList()
-    {
-        return points3D;
-    }
-    inline void set3DList(std::vector<cv::Point3f> list3D)
-    {
-        this->points3D = list3D;
-    }
-    inline std::vector<cv::Point2f> get2DList()
-    {
-        return points2D;
-    }
-    inline void set2DList(std::vector<cv::Point2f> list2D)
-    {
-        this->points2D = list2D;
-    }
-    inline float getCamHeight() const
-    {
-        return camHeight;
-    }
-    inline void setCamHeight(float cHeight)
-    {
-        this->camHeight = cHeight;
-    }
-    inline ReprojectionError getReprojectionError()
+    void                            setMainWindow(Petrack *mw);
+    bool                            isEmptyExtrCalibFile();
+    bool                            isSetExtrCalib();
+    void                            setExtrCalibFile(const QString &f);
+    QString                         getExtrCalibFile();
+    bool                            openExtrCalibFile();
+    bool                            loadExtrCalibFile();
+    bool                            saveExtrCalibPoints();
+    bool                            fetch2DPoints();
+    void                            calibExtrParams();
+    bool                            calcReprojectionError();
+    virtual cv::Point2f             getImagePoint(cv::Point3f p3d);
+    cv::Point3f                     get3DPoint(cv::Point2f p2d, double h);
+    cv::Point3f                     transformRT(cv::Point3f p);
+    bool                            isOutsideImage(cv::Point2f p2d);
+    inline bool                     isOutsideImage(cv::Point3f p3d) { return isOutsideImage(getImagePoint(p3d)); }
+    inline std::vector<cv::Point3f> get3DList() { return points3D; }
+    inline void                     set3DList(std::vector<cv::Point3f> list3D) { this->points3D = list3D; }
+    inline std::vector<cv::Point2f> get2DList() { return points2D; }
+    inline void                     set2DList(std::vector<cv::Point2f> list2D) { this->points2D = list2D; }
+    inline float                    getCamHeight() const { return camHeight; }
+    inline void                     setCamHeight(float cHeight) { this->camHeight = cHeight; }
+    inline ReprojectionError        getReprojectionError()
     {
         if(!reprojectionError.isValid())
             calcReprojectionError();

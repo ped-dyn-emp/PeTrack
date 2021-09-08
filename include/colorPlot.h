@@ -21,11 +21,10 @@
 #ifndef COLORPLOT_H
 #define COLORPLOT_H
 
-#include <QPen>
-
-#include <qwt_plot.h>
-
 #include "helper.h"
+
+#include <QPen>
+#include <qwt_plot.h>
 
 inline constexpr double DEFAULT_HEIGHT = 180.0;
 
@@ -37,148 +36,115 @@ class Zoomer;
 class RectPlotItem;
 class ViewColorPlotItem;
 
-//-----------------------------------------------------------------
 
-class TrackerPlotItem: public QwtPlotItem
+class TrackerPlotItem : public QwtPlotItem
 {
 public:
     TrackerPlotItem();
 
-    void draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& re) const;
+    void draw(QPainter *p, const QwtScaleMap &mapX, const QwtScaleMap &mapY, const QRectF &re) const;
 
     void setPen(const QPen &pen);
 
     void setModel(int model, int x, int y);
 
-    void setTracker(Tracker *tracker);
-    Tracker * getTracker();
+    void     setTracker(Tracker *tracker);
+    Tracker *getTracker();
 
 private:
     Tracker *mTracker;
-    QPen mPen;
+    QPen     mPen;
 };
 
-//-----------------------------------------------------------------
 
-class RectMap: public QRectF
+class RectMap : public QRectF
 {
 public:
-    RectMap()
-        : mColored(true), mMapHeight(DEFAULT_HEIGHT), mInversHue(false)
+    RectMap() : mColored(true), mMapHeight(DEFAULT_HEIGHT), mInversHue(false)
     {
         setRect(0., 0., 0., 0.);
-        mFromCol = QColor::fromHsv(0,0,0);
-        mToCol = QColor::fromHsv(359,255,255);
+        mFromCol = QColor::fromHsv(0, 0, 0);
+        mToCol   = QColor::fromHsv(359, 255, 255);
     }
-    RectMap(QRectF r)
-        : QRectF(r), mInversHue(false)
+    RectMap(QRectF r) : QRectF(r), mInversHue(false)
     {
         setRect(0., 0., 0., 0.);
-        mFromCol = QColor::fromHsv(0,0,0);
-        mToCol = QColor::fromHsv(359,255,255);
+        mFromCol = QColor::fromHsv(0, 0, 0);
+        mToCol   = QColor::fromHsv(359, 255, 255);
     }
-    RectMap(double x, double y, double w, double h, bool colored, double mapHeight)
-        : QRectF(x, y, w, h), mColored(colored), mMapHeight(mapHeight), mInversHue(false)
+    RectMap(double x, double y, double w, double h, bool colored, double mapHeight) :
+        QRectF(x, y, w, h), mColored(colored), mMapHeight(mapHeight), mInversHue(false)
     {
-        mFromCol = QColor::fromHsv(0,0,0);
-        mToCol = QColor::fromHsv(359,255,255);
+        mFromCol = QColor::fromHsv(0, 0, 0);
+        mToCol   = QColor::fromHsv(359, 255, 255);
     }
-    RectMap(QRectF r, bool colored, double mapHeight)
-        : QRectF(r), mColored(colored), mMapHeight(mapHeight), mInversHue(false)
+    RectMap(QRectF r, bool colored, double mapHeight) :
+        QRectF(r), mColored(colored), mMapHeight(mapHeight), mInversHue(false)
     {
-        mFromCol = QColor::fromHsv(0,0,0);
-        mToCol = QColor::fromHsv(359,255,255);
+        mFromCol = QColor::fromHsv(0, 0, 0);
+        mToCol   = QColor::fromHsv(359, 255, 255);
     }
-    inline bool colored() const
-    {
-        return mColored;
-    }
-    inline void setColored(bool b)
-    {
-        mColored = b;
-    }
-    inline double mapHeight() const
-    {
-        return mMapHeight;
-    }
-    inline void setMapHeight(double height)
-    {
-        mMapHeight = height;
-    }
-    inline void setInvHue(bool b)
-    {
-        mInversHue = b;
-    }
-    inline void setFromColor(const QColor &fromCol)
-    {
-        mFromCol = fromCol;
-    }
-    inline void setToColor(const QColor &toCol)
-    {
-        mToCol = toCol;
-    }
-    inline bool invHue() const
-    {
-        return mInversHue;
-    }
-    inline QColor & toColor()
-    {
-        return mToCol;
-    }
-    inline QColor & fromColor()
-    {
-        return mFromCol;
-    }
+    inline bool    colored() const { return mColored; }
+    inline void    setColored(bool b) { mColored = b; }
+    inline double  mapHeight() const { return mMapHeight; }
+    inline void    setMapHeight(double height) { mMapHeight = height; }
+    inline void    setInvHue(bool b) { mInversHue = b; }
+    inline void    setFromColor(const QColor &fromCol) { mFromCol = fromCol; }
+    inline void    setToColor(const QColor &toCol) { mToCol = toCol; }
+    inline bool    invHue() const { return mInversHue; }
+    inline QColor &toColor() { return mToCol; }
+    inline QColor &fromColor() { return mFromCol; }
 
-    bool mColored;
+    bool   mColored;
     double mMapHeight;
     QColor mFromCol;
     QColor mToCol;
-    bool mInversHue;
+    bool   mInversHue;
 };
 
-//-----------------------------------------------------------------------------------------
 
-class RectPlotItem: public QwtPlotItem
+class RectPlotItem : public QwtPlotItem
 {
 public:
     RectPlotItem();
 
-    double map(const QColor &col) const; //TrackPerson &tp RectMap ... double x, double y
+    double map(const QColor &col) const; // TrackPerson &tp RectMap ... double x, double y
 
-    int addMap(double x, double y, double w, double h, bool colored, double height, QColor &fromCol, QColor &toCol, bool invHue);
-    int addMap();
-    void changeMap(int index, double x, double y, double w, double h, bool colored, double mapHeight);
-    void changeActMapInvHue(bool b);
-    void changeActMapFromColor(const QColor &fromCol);
-    void changeActMapToColor(const QColor &toCol);
-    bool getActMapInvHue();
-    QColor getActMapToColor();
-    QColor getActMapFromColor();
-    RectMap getMap(int index) const;
-    void delMap(int index);
-    inline void delMaps()
-    {
-        mMaps.clear();
-    }
-    inline int mapNum() const
-    {
-        return mMaps.size();
-    }
+    int addMap(
+        double  x,
+        double  y,
+        double  w,
+        double  h,
+        bool    colored,
+        double  height,
+        QColor &fromCol,
+        QColor &toCol,
+        bool    invHue);
+    int         addMap();
+    void        changeMap(int index, double x, double y, double w, double h, bool colored, double mapHeight);
+    void        changeActMapInvHue(bool b);
+    void        changeActMapFromColor(const QColor &fromCol);
+    void        changeActMapToColor(const QColor &toCol);
+    bool        getActMapInvHue();
+    QColor      getActMapToColor();
+    QColor      getActMapFromColor();
+    RectMap     getMap(int index) const;
+    void        delMap(int index);
+    inline void delMaps() { mMaps.clear(); }
+    inline int  mapNum() const { return mMaps.size(); }
 
-    void draw(QPainter* p, const QwtScaleMap& mapX, const QwtScaleMap& mapY, const QRectF& re) const;
+    void draw(QPainter *p, const QwtScaleMap &mapX, const QwtScaleMap &mapY, const QRectF &re) const;
 
     void setPen(const QPen &pen);
 
 private:
     QList<RectMap> mMaps;
-    QPen mPen;
-    int mActIndex;
+    QPen           mPen;
+    int            mActIndex;
 };
 
-//-----------------------------------------------------------------
 
-class ColorPlot: public QwtPlot
+class ColorPlot : public QwtPlot
 {
     Q_OBJECT
 
@@ -189,65 +155,41 @@ public:
 
     void setCursor(const QColor &col);
 
-    QPoint getPos(const QColor &col, int *z=nullptr) const;
+    QPoint getPos(const QColor &col, int *z = nullptr) const;
 
     bool isGrey(const QColor &col) const;
 
     double map(const QColor &col) const;
-    bool printDistribution() const;
+    bool   printDistribution() const;
 
     void setControlWidget(Control *control);
     void setTracker(Tracker *tracker);
     void setScale();
     void generateImage();
 
-    inline double symbolSize() const
-    {
-        return mSymbolSize;
-    }
-    inline void setSymbolSize(double s)
-    {
-        mSymbolSize = s;
-    }
+    inline double symbolSize() const { return mSymbolSize; }
+    inline void   setSymbolSize(double s) { mSymbolSize = s; }
 
-    inline int greyDiff() const
-    {
-        return mGreyDiff;
-    }
-    inline void setGreyDiff(int s)
-    {
-        mGreyDiff = s;
-    }
-    inline double xMax() const
-    {
-        return mXMax;
-    }
-    inline double yMax() const
-    {
-        return mYMax;
-    }
-    int zValue() const;
+    inline int    greyDiff() const { return mGreyDiff; }
+    inline void   setGreyDiff(int s) { mGreyDiff = s; }
+    inline double xMax() const { return mXMax; }
+    inline double yMax() const { return mYMax; }
+    int           zValue() const;
 
-    inline TrackerPlotItem *getTrackerItem() const
-    {
-        return mTrackerItem;
-    }
-    inline RectPlotItem *getMapItem() const
-    {
-        return mRectItem;
-    }
+    inline TrackerPlotItem *getTrackerItem() const { return mTrackerItem; }
+    inline RectPlotItem *   getMapItem() const { return mRectItem; }
 
 private:
-    double mSymbolSize;
-    double mXMax;
-    double mYMax;
-    Control *mControlWidget;
-    ImagePlotItem *mImageItem;
-    TrackerPlotItem *mTrackerItem;
-    RectPlotItem *mRectItem;
+    double             mSymbolSize;
+    double             mXMax;
+    double             mYMax;
+    Control *          mControlWidget;
+    ImagePlotItem *    mImageItem;
+    TrackerPlotItem *  mTrackerItem;
+    RectPlotItem *     mRectItem;
     ViewColorPlotItem *mViewColorItem;
-    Zoomer *mZoomer;
-    int mGreyDiff;
+    Zoomer *           mZoomer;
+    int                mGreyDiff;
 };
 
 #endif
