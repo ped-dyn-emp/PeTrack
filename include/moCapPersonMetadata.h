@@ -22,12 +22,14 @@
 
 #include "IO.h"
 
-enum MoCapSystem{
+enum MoCapSystem
+{
     XSensC3D = 0,
     END ///< Used for checks before casting an int to MoCapSystem, must always stay at the end!
 };
+
 /** This map maps different MoCapSystems to an appropriate file extension. It is used for validating a given filepath.
-     * in the OpenMoCapDialog and MoCapPersonMetadata and should be expanded with every new MoCapSystem.*/
+ * in the OpenMoCapDialog and MoCapPersonMetadata and should be expanded with every new MoCapSystem.*/
 const std::map<MoCapSystem, std::string> moCapFileExtensions = {{MoCapSystem::XSensC3D, "c3d"}};
 
 
@@ -38,30 +40,31 @@ const std::map<MoCapSystem, std::string> moCapFileExtensions = {{MoCapSystem::XS
  * MoCap-Recording. This class identifies a single recording and
  * includes all data needed by PeTrack to (re)load a MoCap-Recording.
  */
-class MoCapPersonMetadata{
+class MoCapPersonMetadata
+{
 public:
-    MoCapPersonMetadata() = default;
-    MoCapPersonMetadata(const MoCapPersonMetadata&) = default;
-    MoCapPersonMetadata(MoCapPersonMetadata&&) = default;
-    MoCapPersonMetadata& operator=(const MoCapPersonMetadata&) = default;
-    MoCapPersonMetadata& operator=(MoCapPersonMetadata&&) = default;
-    ~MoCapPersonMetadata() = default;
+    MoCapPersonMetadata()                            = default;
+    MoCapPersonMetadata(const MoCapPersonMetadata &) = default;
+    MoCapPersonMetadata(MoCapPersonMetadata &&)      = default;
+    MoCapPersonMetadata &operator=(const MoCapPersonMetadata &) = default;
+    MoCapPersonMetadata &operator=(MoCapPersonMetadata &&) = default;
+    ~MoCapPersonMetadata()                                 = default;
     MoCapPersonMetadata(std::string filepath, MoCapSystem system, double samplerate, double offset);
 
-    void setFilepath(const std::string &filepath, MoCapSystem system);
-    void setSamplerate(double samplerate);
-    void setOffset(double offset);
-    void setMetadata(const std::string &filepath, MoCapSystem, double samplerate, double offset);
-    MoCapSystem getSystem() const;
-    double getSamplerate() const;
-    double getOffset() const;
+    void               setFilepath(const std::string &filepath, MoCapSystem system);
+    void               setSamplerate(double samplerate);
+    void               setOffset(double offset);
+    void               setMetadata(const std::string &filepath, MoCapSystem, double samplerate, double offset);
+    MoCapSystem        getSystem() const;
+    double             getSamplerate() const;
+    double             getOffset() const;
     const std::string &getFilepath() const;
 
 private:
-    std::string mFilepath = "";
-    MoCapSystem mSystem = XSensC3D;
-    double mSamplerate = 60;
-    double mOffset = 0; ///< time offset from MoCap to video in seconds
+    std::string mFilepath   = "";
+    MoCapSystem mSystem     = XSensC3D;
+    double      mSamplerate = 60;
+    double      mOffset     = 0; ///< time offset from MoCap to video in seconds
 };
 
 bool operator==(const MoCapPersonMetadata &lhs, const MoCapPersonMetadata &rhs);

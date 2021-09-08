@@ -19,10 +19,10 @@
  */
 
 #include "swapFilter.h"
+
 #include "helper.h"
 
-SwapFilter::SwapFilter()
-    :Filter()
+SwapFilter::SwapFilter() : Filter()
 {
     mSwapVertically.setMinimum(0.);
     mSwapVertically.setMaximum(1.);
@@ -42,24 +42,24 @@ cv::Mat SwapFilter::act(cv::Mat &img, cv::Mat &res)
     bool sV = (bool) mSwapVertically.getValue();
     bool sH = (bool) mSwapHorizontally.getValue();
 
-        if (sV && sH)
-            cv::flip(img, res, -1); // both
-        else if (sV)
-            cv::flip(img, res,  0); // vertical
-        else if (sH)
-            cv::flip(img, res,  1); // horizontal
-        else
-            res = img;          // nothing to do
+    if(sV && sH)
+        cv::flip(img, res, -1); // both
+    else if(sV)
+        cv::flip(img, res, 0); // vertical
+    else if(sH)
+        cv::flip(img, res, 1); // horizontal
+    else
+        res = img; // nothing to do
 
 
     return res;
 }
 
-Parameter* SwapFilter::getSwapHorizontally()
+Parameter *SwapFilter::getSwapHorizontally()
 {
     return &mSwapHorizontally;
 }
-Parameter* SwapFilter::getSwapVertically()
+Parameter *SwapFilter::getSwapVertically()
 {
     return &mSwapVertically;
 }

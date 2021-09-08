@@ -25,15 +25,15 @@
 Parameter::Parameter()
 {
     mValue = mMinimum = mMaximum = 0;
-    mChg = false;
-    mFilter = nullptr;
+    mChg                         = false;
+    mFilter                      = nullptr;
 }
 
 void Parameter::setFilter(Filter *filter)
 {
     mFilter = filter;
 }
-Filter * Parameter::getFilter()
+Filter *Parameter::getFilter()
 {
     return mFilter;
 }
@@ -48,7 +48,7 @@ double Parameter::getValue() const
 }
 void Parameter::setValue(double d)
 {
-    if (d != mValue)
+    if(d != mValue)
     {
         mValue = d;
         setChanged(true);
@@ -83,7 +83,7 @@ bool Parameter::getChanged() const
 void Parameter::setChanged(bool b)
 {
     mChg = b;
-    if (mFilter)
+    if(mFilter)
         mFilter->setChanged(true);
 }
 
@@ -93,7 +93,7 @@ Filter::Filter()
 {
     mEnable = true;
     mOnCopy = true;
-    mChg = false;
+    mChg    = false;
 }
 
 /**
@@ -117,7 +117,7 @@ bool Filter::getChanged()
 }
 void Filter::setChanged(bool b)
 {
-    mChg=b;
+    mChg = b;
 }
 
 /**
@@ -134,24 +134,25 @@ void Filter::setChanged(bool b)
  */
 cv::Mat Filter::apply(cv::Mat &img)
 {
-    if (getEnabled())
+    if(getEnabled())
     {
-        if (getOnCopy())
+        if(getOnCopy())
         {
-            cv::Mat res(cv::Size(img.cols,img.rows),CV_8UC(img.channels()));
-            mRes = act(img,res);
-            mChg = false;
-            return mRes;
-        }else
-        {
-            mRes = act(img,img);
+            cv::Mat res(cv::Size(img.cols, img.rows), CV_8UC(img.channels()));
+            mRes = act(img, res);
             mChg = false;
             return mRes;
         }
-
-    }else
+        else
+        {
+            mRes = act(img, img);
+            mChg = false;
+            return mRes;
+        }
+    }
+    else
     {
-        mChg = false;
+        mChg        = false;
         return mRes = img;
     }
 }
@@ -163,22 +164,22 @@ cv::Mat Filter::getLastResult()
 
 void Filter::freeLastResult()
 {
-  //free oder delete? - beides falsch
+    // free oder delete? - beides falsch
 }
 
 void Filter::enable()
 {
-    mChg = true;
+    mChg    = true;
     mEnable = true;
 }
 void Filter::disable()
 {
-    mChg = true;
+    mChg    = true;
     mEnable = false;
 }
 void Filter::setEnabled(bool b)
 {
-    mChg = true;
+    mChg    = true;
     mEnable = b;
 }
 bool Filter::getEnabled() const
@@ -188,7 +189,7 @@ bool Filter::getEnabled() const
 
 void Filter::setOnCopy(bool b)
 {
-    mChg = true;
+    mChg    = true;
     mOnCopy = b;
 }
 bool Filter::getOnCopy() const

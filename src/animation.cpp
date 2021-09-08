@@ -27,29 +27,27 @@ Edited by: Ricardo Martin Brualla, 01.02.2007
 This class will hold an animation in form of a video or a sequence of images.
 In case of a video, you can only get the next frame. If it is a sequence of images,
 you can select the frame you want to get.
-Appart from that, there is a static function that converts IplImages to QImage, so 
+Appart from that, there is a static function that converts IplImages to QImage, so
 they can be represented in QT.
 
 */
 #include "animation.h"
 
-#include <QWidget>
-#include <QSize>
-#include <QStringList>
-#include <QRegExp>
-#include <QFileInfo>
-#include <QDir>
-#include <QTime>
-
-#include <sstream>
-#include <iomanip>
-
-#include <opencv2/opencv.hpp>
-
-#include "pMessageBox.h"
 #include "filter.h"
 #include "helper.h"
+#include "pMessageBox.h"
 #include "petrack.h"
+
+#include <QDir>
+#include <QFileInfo>
+#include <QRegExp>
+#include <QSize>
+#include <QStringList>
+#include <QTime>
+#include <QWidget>
+#include <iomanip>
+#include <opencv2/opencv.hpp>
+#include <sstream>
 
 /**********************************************************************/
 /* Constructors & Destructors                                        **/
@@ -57,19 +55,18 @@ they can be represented in QT.
 
 Animation::Animation(QWidget *wParent)
 {
-    mMainWindow = (class Petrack*) wParent;
-    mVideo = false;
-    mStereo = false;
-    mImgSeq = false;
+    mMainWindow       = (class Petrack *) wParent;
+    mVideo            = false;
+    mStereo           = false;
+    mImgSeq           = false;
     mCameraLiveStream = false;
-    mCurrentFrame = -1;
-    mMaxFrames = -1;
-    mSourceInFrame = -1;
-    mSourceOutFrame = -1;
-    mFps = -1;
-    mFirstSec = -1;
-    mFirstMicroSec = -1;
-    ////mCapture = NULL;
+    mCurrentFrame     = -1;
+    mMaxFrames        = -1;
+    mSourceInFrame    = -1;
+    mSourceOutFrame   = -1;
+    mFps              = -1;
+    mFirstSec         = -1;
+    mFirstMicroSec    = -1;
 #ifndef STEREO_DISABLED
     mCaptureStereo = nullptr;
 #endif
@@ -81,12 +78,12 @@ Animation::Animation(QWidget *wParent)
 
 Animation::~Animation()
 {
-    if (mImgSeq)
+    if(mImgSeq)
         freePhoto();
-    if (mVideo || mCameraLiveStream)
+    if(mVideo || mCameraLiveStream)
         freeVideo();
 
-    mSourceInFrame = -1;
+    mSourceInFrame  = -1;
     mSourceOutFrame = -1;
 }
 
@@ -97,32 +94,34 @@ Animation::~Animation()
 /// Returns the next frame of the animation
 cv::Mat Animation::getNextFrame()
 {
-    return getFrameAtIndex(mCurrentFrame+1);
+    return getFrameAtIndex(mCurrentFrame + 1);
 }
 
 /// Returns the previous frame of the animation
 cv::Mat Animation::getPreviousFrame()
 {
-    return getFrameAtIndex(mCurrentFrame-1);
+    return getFrameAtIndex(mCurrentFrame - 1);
 }
 
 /// Returns the frame at the index index
 cv::Mat Animation::getFrameAtIndex(int index)
 {
-    if (mCameraLiveStream)
+    if(mCameraLiveStream)
         return getFrameVideo(index);
     // geaendert: We make sure first the index is valid.
     //            If not, it will be set the first or the last index
-    if (index<getSourceInFrameNum()){
+    if(index < getSourceInFrameNum())
+    {
         return cv::Mat();
     }
-    if (index>getSourceOutFrameNum()){
+    if(index > getSourceOutFrameNum())
+    {
         return cv::Mat();
     }
     // Call the own methods to get it done
-    if (mVideo)
+    if(mVideo)
         return getFrameVideo(index);
-    if (mImgSeq)
+    if(mImgSeq)
         return getFramePhoto(index);
     return cv::Mat();
 }
@@ -135,7 +134,7 @@ cv::Mat Animation::getFrameAtIndex(int index)
  */
 cv::Mat Animation::getFrameAtPos(double position)
 {
-    return getFrameAtIndex((int) (getSourceInFrameNum()+(position*(getNumFrames()-1))));
+    return getFrameAtIndex((int) (getSourceInFrameNum() + (position * (getNumFrames() - 1))));
 }
 
 /// Returns the current frame
@@ -157,18 +156,23 @@ cv::Mat Animation::getCurrentFrame()
  */
 void Animation::skipFrame(int num)
 {
-    if(isImageSequence()){
+    if(isImageSequence())
+    {
         int lastFrameNum = getSourceOutFrameNum();
-        if(mCurrentFrame + num > lastFrameNum){
+        if(mCurrentFrame + num > lastFrameNum)
+        {
             mCurrentFrame = lastFrameNum;
-        }else{
+        }
+        else
+        {
             mCurrentFrame += num;
         }
         for(int i = 0; i < num; ++i)
         {
             mMainWindow->updateShowFPS(true);
         }
-    }else if(mVideoCapture.isOpened())
+    }
+    else if(mVideoCapture.isOpened())
     {
         int lastFrameNum = getSourceOutFrameNum();
         for(int i = 0; i < num && mCurrentFrame < lastFrameNum; ++i)
@@ -189,70 +193,80 @@ void Animation::skipFrame(int num)
 bool Animation::openTimeFile(QString &timeFileName)
 {
     QFile file(timeFileName);
-    int fcycSec=-1, fcycCount=-1; // fuer erstes frame
-    int lframe=-1 , lcycSec=-1, lcycCount=-1; // fuer vorangegangenen frame
-    int frame=-1 , cycSec=-1, cycCount=-1, cycOffset=-1, sec=-1, microSec=-1, bufIndex=-1, bufSeqNum=-1, seqNum=-1;
-    int dum, add=0;
-    double fps, dif, difMin=1000., difMax=-1000.;
-    int minFrame=-1, maxFrame=-1;
+    int   fcycSec = -1, fcycCount = -1;              // fuer erstes frame
+    int   lframe = -1, lcycSec = -1, lcycCount = -1; // fuer vorangegangenen frame
+    int frame = -1, cycSec = -1, cycCount = -1, cycOffset = -1, sec = -1, microSec = -1, bufIndex = -1, bufSeqNum = -1,
+        seqNum = -1;
+    int    dum, add = 0;
+    double fps, dif, difMin = 1000., difMax = -1000.;
+    int    minFrame = -1, maxFrame = -1;
 
     debout << "Found corresponding time file " << timeFileName << std::endl;
 
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        debout << "  Error: Cannot open existing time file " << timeFileName << ":" << std::endl << "  " << file.errorString() << std::endl;
+        debout << "  Error: Cannot open existing time file " << timeFileName << ":" << std::endl
+               << "  " << file.errorString() << std::endl;
         return false;
     }
     else
     {
         QTextStream in(&file);
-        QDateTime dt;
+        QDateTime   dt;
         in >> dum; // einlesen des ersten Wertes eines Zeile, um leerzeilen trotz nicht-Dateiende zu erkennen!
-        while (!in.atEnd())
+        while(!in.atEnd())
         {
             frame = dum;
             in >> cycSec >> cycCount >> cycOffset >> sec >> microSec >> bufIndex >> bufSeqNum >> seqNum;
-            if (frame == 0)
+            if(frame == 0)
             {
-                fcycSec=cycSec; fcycCount=cycCount;
+                fcycSec   = cycSec;
+                fcycCount = cycCount;
                 dt.setTime_t(sec);
                 debout << "  Recording starts at " << dt.toString("dd.MM.yyyy hh:mm:ss.");
                 std::cout << std::setw(6) << std::setfill('0') << microSec << std::endl;
-                mFirstSec = sec;
+                mFirstSec      = sec;
                 mFirstMicroSec = microSec;
             }
             else
             {
                 // minimale maximale Zeitabstaende zwischen frames bestimmen - cyc... sind genauere zeiten vom bus
-                if (lcycSec > cycSec) // wrap around after 128s
+                if(lcycSec > cycSec) // wrap around after 128s
                 {
-                    dif = (cycSec-lcycSec+128)+(cycCount-lcycCount)/8000.;
+                    dif = (cycSec - lcycSec + 128) + (cycCount - lcycCount) / 8000.;
                     add += 128;
                 }
                 else
-                    dif = (cycSec-lcycSec)+(cycCount-lcycCount)/8000.;
-                if (dif > difMax)
+                    dif = (cycSec - lcycSec) + (cycCount - lcycCount) / 8000.;
+                if(dif > difMax)
                 {
-                    difMax = dif;
+                    difMax   = dif;
                     maxFrame = lframe;
                 }
-                if (dif < difMin)
+                if(dif < difMin)
                 {
-                    difMin = dif;
+                    difMin   = dif;
                     minFrame = lframe;
                 }
             }
-            lframe=frame; lcycSec=cycSec; lcycCount=cycCount;
+            lframe    = frame;
+            lcycSec   = cycSec;
+            lcycCount = cycCount;
             in >> dum;
         }
         dt.setTime_t(sec);
-        fps = frame/((cycSec-fcycSec+add)+(cycCount-fcycCount)/8000.);
-        debout << "  Recording ends   at " << dt.toString("dd.MM.yyyy hh:mm:ss."); // entspricht nicht der in statusbar angezeigten zeit des letzten frames, da in statusbar fps und frameanzahl herangezogen wird (genauer)!!!
+        fps = frame / ((cycSec - fcycSec + add) + (cycCount - fcycCount) / 8000.);
+        debout << "  Recording ends   at "
+               << dt.toString(
+                      "dd.MM.yyyy hh:mm:ss."); // entspricht nicht der in statusbar angezeigten zeit des letzten frames,
+                                               // da in statusbar fps und frameanzahl herangezogen wird (genauer)!!!
         std::cout << std::setw(6) << std::setfill('0') << microSec << std::endl;
-        debout << "  Fps with "<< frame+1 <<" frames: " << fps << " (min "<<1./difMax<<" at frame "<<maxFrame<<" to "<<maxFrame+1<<", max "<<1./difMin<<" at frame "<<minFrame<<" to "<<minFrame+1<<")" << std::endl;
+        debout << "  Fps with " << frame + 1 << " frames: " << fps << " (min " << 1. / difMax << " at frame "
+               << maxFrame << " to " << maxFrame + 1 << ", max " << 1. / difMin << " at frame " << minFrame << " to "
+               << minFrame + 1 << ")" << std::endl;
         setFPS(fps);
-        mStereo = true;
-        mSourceOutFrame = frame; //mNumFrames = frame+1;
+        mStereo         = true;
+        mSourceOutFrame = frame; // mNumFrames = frame+1;
 
         file.close();
         return true;
@@ -277,22 +291,22 @@ int Animation::getFirstFrameMicroSec() const
  */
 QString Animation::getTimeString(int frame)
 {
-    if (frame == -1)
+    if(frame == -1)
         frame = getCurrentFrameNum();
 
-    if (mFirstSec != -1) // stereo video from arena with 16 fps
+    if(mFirstSec != -1) // stereo video from arena with 16 fps
     {
         QDateTime dt;
-        int deziMilliSec = frame%16*625 + mFirstMicroSec/100; // 625 = 10000/16
-        dt.setTime_t(mFirstSec + frame/16 + deziMilliSec/10000);
-        return (dt.toString("dd.MM.yyyy hh:mm:ss")+".%1").arg(deziMilliSec%10000, 4, 10, QChar('0'));
+        int       deziMilliSec = frame % 16 * 625 + mFirstMicroSec / 100; // 625 = 10000/16
+        dt.setTime_t(mFirstSec + frame / 16 + deziMilliSec / 10000);
+        return (dt.toString("dd.MM.yyyy hh:mm:ss") + ".%1").arg(deziMilliSec % 10000, 4, 10, QChar('0'));
     }
     else
     {
-        int sec = (int) (frame/mFps);
-        QTime t(0,0,0);
+        int   sec = (int) (frame / mFps);
+        QTime t(0, 0, 0);
         t = t.addSecs(sec);
-        return (t.toString("hh:mm:ss")+".%1").arg(myRound(((frame/mFps)-sec)*10000), 4, 10, QChar('0'));
+        return (t.toString("hh:mm:ss") + ".%1").arg(myRound(((frame / mFps) - sec) * 10000), 4, 10, QChar('0'));
     }
 }
 
@@ -303,78 +317,70 @@ QString Animation::getTimeString(int frame)
  */
 bool Animation::openAnimation(QString fileName)
 {
-
     QFileInfo fileInfo(fileName);
     // First of all : does the file exist?
-    if (fileInfo.exists())
+    if(fileInfo.exists())
     {
-        bool openRet = false;
-        QString timeFileName = fileName.left(fileName.lastIndexOf("cam")+4)+".time";
+        bool      openRet      = false;
+        QString   timeFileName = fileName.left(fileName.lastIndexOf("cam") + 4) + ".time";
         QFileInfo fileTimeInfo(timeFileName);
-        if (fileTimeInfo.exists())
+        if(fileTimeInfo.exists())
         {
             mTimeFileLoaded = openTimeFile(timeFileName);
         }
-        // Modify it to open other video extensions!
-        //if ((fileName.right(4).toLower() == ".avi") ||
-        //    (fileName.right(4).toLower() == ".mov") ||
-        //    (fileName.right(4).toLower() == ".mts") ||
-        //    (fileName.right(5).toLower() == ".m2ts") ||
-        //    (fileName.right(4).toLower() == ".wmv") ||
-        //    (fileName.right(4).toLower() == ".mp4") )
-        //{
         // now all videos will be try to open with OpenCV
         openRet = openAnimationPhoto(fileName);
-        //}
+
         // If it is not a video, then is a photo :-)
-        //else
-        if (openRet == false) // es konnte keine Bildsequenz geladen werden
+        if(openRet == false) // es konnte keine Bildsequenz geladen werden
             openRet = openAnimationVideo(fileName);
-        if (mTimeFileLoaded && !openRet)
-            debout << "Warning: New loaded time file do not correspond to untouched sequence, because new sequence was not loadable!" << std::endl;
+        if(mTimeFileLoaded && !openRet)
+            debout << "Warning: New loaded time file do not correspond to untouched sequence, because new sequence was "
+                      "not loadable!"
+                   << std::endl;
         mTimeFileLoaded = false; // reset for new open stereo video sequence
         return openRet;
     }
-    else 
+    else
         return false;
 }
 
 /// Opens a camera livestream
 bool Animation::openCameraStream(int camID)
 {
-   if( !mVideoCapture.open(camID) )
-   {
-            return false;
-   }else
-   {
+    if(!mVideoCapture.open(camID))
+    {
+        return false;
+    }
+    else
+    {
         // Destroy anything that was before
         free();
         // Set new video & photo labels
-        mStereo = false;
-        mVideo = true;
-        mImgSeq = false;
+        mStereo           = false;
+        mVideo            = true;
+        mImgSeq           = false;
         mCameraLiveStream = true;
 
         mCurrentFrame = -1;
         // Get the information of the animation
-        if (!getCameraInfo())
-             return false;
-
-   }
-   return true;
+        if(!getCameraInfo())
+            return false;
+    }
+    return true;
 }
 
 /// Returns the number of frames in the current animation
 int Animation::getNumFrames()
 {
-    if (mVideo || mImgSeq || mStereo)
-        return getSourceOutFrameNum()-getSourceInFrameNum()+1;//return mNumFrames;
+    if(mVideo || mImgSeq || mStereo)
+        return getSourceOutFrameNum() - getSourceInFrameNum() + 1; // return mNumFrames;
     return 0;
 }
 
 int Animation::getMaxFrames() const
 {
-    if (mVideo || mImgSeq)
+    if(mVideo || mImgSeq)
         return mMaxFrames;
     return 0;
 }
@@ -418,10 +424,10 @@ int Animation::getSourceOutFrameNum() const
 /// Returns the filename of the current frame
 QString Animation::getCurrentFileName()
 {
-    if (mCameraLiveStream)
+    if(mCameraLiveStream)
         return QString("camera live stream");
 
-    if (!mImgFilesList.isEmpty() && mImgSeq)
+    if(!mImgFilesList.isEmpty() && mImgSeq)
     {
         if(mCurrentFrame < getSourceInFrameNum() || mCurrentFrame > getSourceOutFrameNum())
             return QFileInfo(mImgFilesList.at(getSourceInFrameNum())).fileName();
@@ -435,16 +441,16 @@ QString Animation::getCurrentFileName()
 /// Returns the FPS of the current animation
 double Animation::getFPS()
 {
-    if (mCameraLiveStream)
+    if(mCameraLiveStream)
     {
-        if (mVideoCapture.get(cv::CAP_PROP_FPS))
+        if(mVideoCapture.get(cv::CAP_PROP_FPS))
             setFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
     }
-    if (mVideo)
+    if(mVideo)
         return mFps;
-    else if (mImgSeq)
+    else if(mImgSeq)
     {
-        if (mFps == -1)
+        if(mFps == -1)
             return DEFAULT_FPS; // we assume images from pal video (germany)
         else
             return mFps; // if we found a corresponding .time file for the bumblebee xb3
@@ -467,7 +473,7 @@ void Animation::setFPS(double fps)
 /// Returns the size of the original frames (could made bigger after filtering)
 QSize Animation::getSize()
 {
-    if (mVideo || mImgSeq)
+    if(mVideo || mImgSeq)
         return mSize;
     else
     {
@@ -480,12 +486,12 @@ QSize Animation::getSize()
 /// free's all the data in animation
 void Animation::free()
 {
-    if (mImgSeq)
+    if(mImgSeq)
         freePhoto();
-    if (mVideo || mCameraLiveStream)
+    if(mVideo || mCameraLiveStream)
         freeVideo();
 
-    mSourceInFrame = -1;
+    mSourceInFrame  = -1;
     mSourceOutFrame = -1;
 }
 
@@ -493,17 +499,17 @@ void Animation::reset()
 {
     free();
 
-    mVideo = false;
-    mStereo = false;
-    mImgSeq = false;
+    mVideo            = false;
+    mStereo           = false;
+    mImgSeq           = false;
     mCameraLiveStream = false;
-    mCurrentFrame = -1;
-    mMaxFrames = -1;
-    mSourceInFrame = -1;
-    mSourceOutFrame = -1;
-    mFps = -1;
-    mFirstSec = -1;
-    mFirstMicroSec = -1;
+    mCurrentFrame     = -1;
+    mMaxFrames        = -1;
+    mSourceInFrame    = -1;
+    mSourceOutFrame   = -1;
+    mFps              = -1;
+    mFirstSec         = -1;
+    mFirstMicroSec    = -1;
 #ifndef STEREO_DISABLED
     mCaptureStereo = nullptr;
 #endif
@@ -549,7 +555,7 @@ bool Animation::isCameraLiveStream() const
 #ifndef STEREO_DISABLED
 enum Camera Animation::getCamera()
 {
-    if (mCaptureStereo != nullptr)
+    if(mCaptureStereo != nullptr)
         return mCaptureStereo->getCamera();
     else
         return cameraUnset;
@@ -557,9 +563,10 @@ enum Camera Animation::getCamera()
 
 void Animation::setCamera(enum Camera c)
 {
-    if (mCaptureStereo != nullptr)
+    if(mCaptureStereo != nullptr)
         return mCaptureStereo->setCamera(c);
-    //else   //keine Warnung, damit bei Projekt ohne direkt geladenem Video aber setzen von Stereo-Einstellungen keine Warnung ausgegeben wird
+    // else   //keine Warnung, damit bei Projekt ohne direkt geladenem Video aber setzen von Stereo-Einstellungen keine
+    // Warnung ausgegeben wird
     //    debout << "Warning: Setting camera is only allowed for loaded stereo videos!" << endl;
 }
 #endif
@@ -572,56 +579,57 @@ bool Animation::openAnimationPhoto(QString fileName)
     // check, if cv can open one animation file
 
     cv::Mat tempMat;
-    tempMat = cv::imread(fileName.toStdString(),cv::IMREAD_UNCHANGED);//, IMREAD_UNCHANGED);//CV_LOAD_IMAGE_UNCHANGED);
+    tempMat =
+        cv::imread(fileName.toStdString(), cv::IMREAD_UNCHANGED); //, IMREAD_UNCHANGED);//CV_LOAD_IMAGE_UNCHANGED);
 
     // Check for invalid input
-    if(! tempMat.data )
+    if(!tempMat.data)
     {
         return false;
     }
-    if( tempMat.channels() == 4 ){
+    if(tempMat.channels() == 4)
+    {
         std::cout << "Warning: PNG-Alpha channel will be ignored." << std::endl;
-        tempMat = cv::imread(fileName.toStdString(),cv::IMREAD_COLOR);
+        tempMat = cv::imread(fileName.toStdString(), cv::IMREAD_COLOR);
     }
 
-   // Destroy anything that was before
+    // Destroy anything that was before
     free();
     // Set new video & photo labels
-    mVideo = false;
-    mStereo = false;
-    mImgSeq = true;
+    mVideo            = false;
+    mStereo           = false;
+    mImgSeq           = true;
     mCameraLiveStream = false;
 
     // Accessing to file information and directory information
     mFileInfo = QFileInfo(fileName);
-    QDir dir = mFileInfo.dir();
+    QDir dir  = mFileInfo.dir();
     // Get all files in the same directory
-    QList<QFileInfo> fileList = dir.entryInfoList(QDir::Files,QDir::Name);
+    QList<QFileInfo> fileList = dir.entryInfoList(QDir::Files, QDir::Name);
 
     // series1_0002-left => split into series1_|0002|-left
     // regexp is greedy - from left to right try to get the most characters
     QRegExp regExp("(?:[0-9]*)([^0-9]*)$"); //(?: ) zum ignorieren
     QString front, back;
-    int frontLen, frontLenList;
-    if ((frontLen = regExp.indexIn(mFileInfo.completeBaseName())) > -1)
+    int     frontLen, frontLenList;
+    if((frontLen = regExp.indexIn(mFileInfo.completeBaseName())) > -1)
     {
         front = mFileInfo.completeBaseName().left(frontLen);
-        back = regExp.cap(1);
+        back  = regExp.cap(1);
     }
     else // does not match regExp at all
         return false;
     mFileBase = front + back; // completeBaseName to cut suffix and sequence number
 
-    // Create a new image files list 
+    // Create a new image files list
     mImgFilesList.clear();
-    for (int i = 0; i < fileList.size(); i++)
+    for(int i = 0; i < fileList.size(); i++)
     {
-        if ((frontLenList = regExp.indexIn(fileList.at(i).completeBaseName())) > -1)
+        if((frontLenList = regExp.indexIn(fileList.at(i).completeBaseName())) > -1)
         {
             // Is the file in the series?
-            if ((fileList.at(i).completeBaseName().left(frontLenList) == front) &&
-                (regExp.cap(1) == back) &&
-                (fileList.at(i).suffix() == mFileInfo.suffix()))
+            if((fileList.at(i).completeBaseName().left(frontLenList) == front) && (regExp.cap(1) == back) &&
+               (fileList.at(i).suffix() == mFileInfo.suffix()))
             {
                 mImgFilesList << fileList.at(i).filePath();
             }
@@ -629,7 +637,7 @@ bool Animation::openAnimationPhoto(QString fileName)
     }
 
     // Get the information of the animation
-    if (!getInfoPhoto())
+    if(!getInfoPhoto())
         return false;
     // Set the current frame to  -1 (shows, that no frame is already loaded)
     mCurrentFrame = -1;
@@ -644,36 +652,43 @@ bool Animation::openAnimationPhoto(QString fileName)
  */
 cv::Mat Animation::getFramePhoto(int index)
 {
-    if ((index != mCurrentFrame) || mImage.empty())
+    if((index != mCurrentFrame) || mImage.empty())
     {
         // Check if the index is valid
         if(index < getSourceInFrameNum() || index > getSourceOutFrameNum())
             return cv::Mat();
 
-        mImage = cv::imread(mImgFilesList.at(index).toStdString(),cv::IMREAD_UNCHANGED);//CV_LOAD_IMAGE_UNCHANGED);
+        mImage = cv::imread(mImgFilesList.at(index).toStdString(), cv::IMREAD_UNCHANGED); // CV_LOAD_IMAGE_UNCHANGED);
 
         // Check for invalid input
-        if( mImage.empty() )                              // Check for invalid input
+        if(mImage.empty()) // Check for invalid input
         {
-            debout <<  "Could not open or find the image" << std::endl ;
+            debout << "Could not open or find the image" << std::endl;
             return cv::Mat();
         }
 
-        if( mImage.channels() == 4 )
+        if(mImage.channels() == 4)
         {
-            mImage = imread(mImgFilesList.at(index).toStdString(),cv::IMREAD_COLOR);
+            mImage = imread(mImgFilesList.at(index).toStdString(), cv::IMREAD_COLOR);
         }
         // Check image size of each frame
-        if( (mSize.width() > 0 && mSize.height() > 0) && (mImage.cols != mSize.width() || mImage.rows != mSize.height()) )
+        if((mSize.width() > 0 && mSize.height() > 0) && (mImage.cols != mSize.width() || mImage.rows != mSize.height()))
         {
             debout << "Could not load image: image size differs in image sequence" << std::endl;
             debout << "Please ensure to have images of the same size!" << std::endl;
 
-            PCritical(nullptr,"An error has occurred!",
-                                  QString("The size of the images in the selected image sequence does not agree."
-                                          "<br /><br />[0]:  %1  (%2x%3 pixel)<br />[%4]:   %5  (%6x%7 pixel)")
-                                  .arg(mImgFilesList.at(0)).arg(mSize.width()).arg(mSize.height()).arg(index)
-                                  .arg(mImgFilesList.at(index)).arg(mImage.cols).arg(mImage.rows));
+            PCritical(
+                nullptr,
+                "An error has occurred!",
+                QString("The size of the images in the selected image sequence does not agree."
+                        "<br /><br />[0]:  %1  (%2x%3 pixel)<br />[%4]:   %5  (%6x%7 pixel)")
+                    .arg(mImgFilesList.at(0))
+                    .arg(mSize.width())
+                    .arg(mSize.height())
+                    .arg(index)
+                    .arg(mImgFilesList.at(index))
+                    .arg(mImage.cols)
+                    .arg(mImage.rows));
 
             return cv::Mat();
         }
@@ -695,21 +710,22 @@ cv::Mat Animation::getFramePhoto(int index)
  */
 bool Animation::getInfoPhoto()
 {
-    bool rc = false;
+    bool    rc = false;
     cv::Mat tempImg;
     // Set the number of frames
     mMaxFrames = mImgFilesList.size();
     setSourceInFrameNum(0);
-    setSourceOutFrameNum(mMaxFrames-1);
+    setSourceOutFrameNum(mMaxFrames - 1);
     // Set the size of the frames
     // For that we need to retrieve a frame!
     tempImg = getFramePhoto(getSourceInFrameNum());
-    if (!tempImg.empty()) // if frame is loadable
+    if(!tempImg.empty()) // if frame is loadable
     {
         // 1 or 3 channel and 8 bit per pixel
-        if (!(((tempImg.channels() == 1) || (tempImg.channels() == 3)) && (tempImg.depth() == CV_8U)))
+        if(!(((tempImg.channels() == 1) || (tempImg.channels() == 3)) && (tempImg.depth() == CV_8U)))
         {
-            debout << "Error: Only 1 or 3 channels (you are using "<< tempImg.channels() <<") and 8 bpp (you are using "<< tempImg.depth() <<") are supported!" << std::endl;
+            debout << "Error: Only 1 or 3 channels (you are using " << tempImg.channels()
+                   << ") and 8 bpp (you are using " << tempImg.depth() << ") are supported!" << std::endl;
         }
         else
         {
@@ -725,7 +741,7 @@ bool Animation::getInfoPhoto()
 void Animation::freePhoto()
 {
     // Release the image pointer
-    if (!mImage.empty())
+    if(!mImage.empty())
     {
         mImage = cv::Mat();
     }
@@ -766,24 +782,27 @@ bool Animation::openAnimationStereoVideo(int fileNumber, IplImage *stereoImgLeft
     StereoAviFile *captureStereo = new StereoAviFile;
 #endif
 
-    if ((fileNumber < mStereoVideoFilesList.length()) &&
-        (captureStereo->open(mStereoVideoFilesList[fileNumber].toStdString().c_str(), stereoImgLeft, stereoImgRight)))
+    if((fileNumber < mStereoVideoFilesList.length()) &&
+       (captureStereo->open(mStereoVideoFilesList[fileNumber].toStdString().c_str(), stereoImgLeft, stereoImgRight)))
     {
-        // wird nun schon vorher abgefragt: vor mTimeFileLoaded war mFps == 16 because time file must be loaded before ; && (myRound(mFps) == 16)
-        if (!((captureStereo->m_iRows == 960) && (captureStereo->m_iCols == 1280) && (captureStereo->m_iBPP == 16)))
+        // wird nun schon vorher abgefragt: vor mTimeFileLoaded war mFps == 16 because time file must be loaded before ;
+        // && (myRound(mFps) == 16)
+        if(!((captureStereo->m_iRows == 960) && (captureStereo->m_iCols == 1280) && (captureStereo->m_iBPP == 16)))
         {
-            debout << "Error: Only stereo videos from Hermes experiments with 1280x960 pixel, 16 bits per pixel anf 16 frames per second are supported!" << endl;
+            debout << "Error: Only stereo videos from Hermes experiments with 1280x960 pixel, 16 bits per pixel anf 16 "
+                      "frames per second are supported!"
+                   << endl;
             delete captureStereo;
             return false;
         }
-        if (mCaptureStereo)
+        if(mCaptureStereo)
         {
             captureStereo->setCamera(mCaptureStereo->getCamera());
             mCaptureStereo->close();
             delete mCaptureStereo;
         }
         mCurrentStereoFileNumber = fileNumber;
-        mCaptureStereo = captureStereo;
+        mCaptureStereo           = captureStereo;
         return true;
     }
     else
@@ -795,22 +814,23 @@ bool Animation::openAnimationStereoVideo(int fileNumber, IplImage *stereoImgLeft
 bool Animation::openAnimationStereoVideo(int fileNumber, Mat &stereoImgLeft, Mat &stereoImgRight)
 {
     IplImage *tempStereoImgLeft, *tempStereoImgRight;
-    Size size;
-    size.width = stereoImgLeft.cols;
+    Size      size;
+    size.width  = stereoImgLeft.cols;
     size.height = stereoImgRight.rows;
-    tempStereoImgLeft  = cvCreateImage(size, 8, 1); // new unsigned char[2*1280*960]; // only stereo from bumblebee xb3 supported!
-    tempStereoImgRight = cvCreateImage(size, 8, 1); // new unsigned char[2*1280*960]; // only stereo from bumblebee xb3 supported!
-//        tempStereoImgLeft.create(size,CV_8UC1);
-//        tempStereoImgRight.create(size,CV_8UC1);
+    tempStereoImgLeft =
+        cvCreateImage(size, 8, 1); // new unsigned char[2*1280*960]; // only stereo from bumblebee xb3 supported!
+    tempStereoImgRight =
+        cvCreateImage(size, 8, 1); // new unsigned char[2*1280*960]; // only stereo from bumblebee xb3 supported!
+                                   //        tempStereoImgLeft.create(size,CV_8UC1);
+                                   //        tempStereoImgRight.create(size,CV_8UC1);
     bool ret = openAnimationStereoVideo(fileNumber, tempStereoImgLeft, tempStereoImgRight);
 
     if(ret)
     {
-
         mStereoImgLeft  = cvarrToMat(tempStereoImgLeft);
         mStereoImgRight = cvarrToMat(tempStereoImgRight);
-
-    }else
+    }
+    else
     {
         cvReleaseImage(&tempStereoImgLeft);
         cvReleaseImage(&tempStereoImgRight);
@@ -825,56 +845,58 @@ bool Animation::openAnimationStereoVideo(int fileNumber, Mat &stereoImgLeft, Mat
 bool Animation::openAnimationStereoVideo(QString fileName)
 {
     bool ret = false;
-//    IplImage *tempStereoImgLeft, *tempStereoImgRight;
-//    Mat tempStereoImgLeft,tempStereoImgRight;
+    //    IplImage *tempStereoImgLeft, *tempStereoImgRight;
+    //    Mat tempStereoImgLeft,tempStereoImgRight;
     // Accessing to file information and directory information
-    QFileInfo fileInfo(fileName);
-    QDir dir = fileInfo.dir();
+    QFileInfo   fileInfo(fileName);
+    QDir        dir = fileInfo.dir();
     QStringList filters;
-    //QString firstFileName = (fileName.left(fileName.lastIndexOf("cam")+5) + "%1.avi").arg(fileNumber, 4, 10, QChar('0'));
-    filters << (fileInfo.fileName()).left((fileInfo.fileName()).lastIndexOf("cam")+5) + "????.avi"; //"*.cpp" << "*.cxx" << "*.cc";
-    //dir.setNameFilters(filters);
-    QStringList tmpList = mStereoVideoFilesList;
+    // QString firstFileName = (fileName.left(fileName.lastIndexOf("cam")+5) + "%1.avi").arg(fileNumber, 4, 10,
+    // QChar('0'));
+    filters << (fileInfo.fileName()).left((fileInfo.fileName()).lastIndexOf("cam") + 5) +
+                   "????.avi"; //"*.cpp" << "*.cxx" << "*.cc";
+    // dir.setNameFilters(filters);
+    QStringList tmpList   = mStereoVideoFilesList;
     mStereoVideoFilesList = dir.entryList(filters);
-    for (int i = 0; i < mStereoVideoFilesList.size(); i++)
+    for(int i = 0; i < mStereoVideoFilesList.size(); i++)
         mStereoVideoFilesList[i] = fileInfo.path() + "/" + mStereoVideoFilesList[i];
 
-    //debout << "getNumFrames: " << getNumFrames() << " mStereoVideoFilesList.len: " << mStereoVideoFilesList.length() << endl;
-    if (((getNumFrames()-1/*mNumFrames-1*/) / 640) == (mStereoVideoFilesList.length()-1))
+    // debout << "getNumFrames: " << getNumFrames() << " mStereoVideoFilesList.len: " << mStereoVideoFilesList.length()
+    // << endl;
+    if(((getNumFrames() - 1 /*mNumFrames-1*/) / 640) == (mStereoVideoFilesList.length() - 1))
     {
         Size size;
-        size.width = 1280;
+        size.width  = 1280;
         size.height = 960;
-        mStereoImgLeft.create(size,CV_8UC1);
-        mStereoImgRight.create(size,CV_8UC1);
-//        tempStereoImgLeft  = cvCreateImage(size, 8, 1); // new unsigned char[2*1280*960]; // only stereo from bumblebee xb3 supported!
-//        tempStereoImgRight = cvCreateImage(size, 8, 1); // new unsigned char[2*1280*960]; // only stereo from bumblebee xb3 supported!
-//        tempStereoImgLeft.create(size,CV_8UC1);
-//        tempStereoImgRight.create(size,CV_8UC1);
+        mStereoImgLeft.create(size, CV_8UC1);
+        mStereoImgRight.create(size, CV_8UC1);
+        //        tempStereoImgLeft  = cvCreateImage(size, 8, 1); // new unsigned char[2*1280*960]; // only stereo from
+        //        bumblebee xb3 supported! tempStereoImgRight = cvCreateImage(size, 8, 1); // new unsigned
+        //        char[2*1280*960]; // only stereo from bumblebee xb3 supported! tempStereoImgLeft.create(size,CV_8UC1);
+        //        tempStereoImgRight.create(size,CV_8UC1);
         ret = openAnimationStereoVideo(0, mStereoImgLeft, mStereoImgRight);
     }
-    //debout << " ret: " << ret << endl;
-    if (ret)
+    // debout << " ret: " << ret << endl;
+    if(ret)
     {
-//        if (mStereoImgLeft)
-//        {
-//            cvReleaseImage(&mStereoImgLeft);
-//            mStereoImgLeft = NULL;
-//        }
-//        if (mStereoImgRight)
-//        {
-//            cvReleaseImage(&mStereoImgRight);
-//            mStereoImgRight = NULL;
-//        }
-//        mStereoImgLeft  = cvarrToMat(tempStereoImgLeft);
-//        mStereoImgRight = cvarrToMat(tempStereoImgRight);
-
+        //        if (mStereoImgLeft)
+        //        {
+        //            cvReleaseImage(&mStereoImgLeft);
+        //            mStereoImgLeft = NULL;
+        //        }
+        //        if (mStereoImgRight)
+        //        {
+        //            cvReleaseImage(&mStereoImgRight);
+        //            mStereoImgRight = NULL;
+        //        }
+        //        mStereoImgLeft  = cvarrToMat(tempStereoImgLeft);
+        //        mStereoImgRight = cvarrToMat(tempStereoImgRight);
     }
     else
     {
         mStereoVideoFilesList = tmpList;
-//        tempStereoImgLeft = NULL;
-//        tempStereoImgRight = NULL;
+        //        tempStereoImgLeft = NULL;
+        //        tempStereoImgRight = NULL;
     }
 
     return ret;
@@ -885,7 +907,7 @@ bool Animation::openAnimationStereoVideo(QString fileName)
 /// Opens an animation from a video file
 bool Animation::openAnimationVideo(QString fileName)
 {
-    if( !mVideoCapture.open(fileName.toStdString().c_str()) )
+    if(!mVideoCapture.open(fileName.toStdString().c_str()))
         return false;
 
     if(mVideoCapture.isOpened())
@@ -893,7 +915,7 @@ bool Animation::openAnimationVideo(QString fileName)
         int width  = (int) mVideoCapture.get(cv::CAP_PROP_FRAME_WIDTH);
         int height = (int) mVideoCapture.get(cv::CAP_PROP_FRAME_HEIGHT);
         int fps    = (int) mVideoCapture.get(cv::CAP_PROP_FPS);
-        if ((width == 1280) && (height == 960) && (fps == 16)) // dann gehe ich von einem stereo video der BBX3 aus!!!
+        if((width == 1280) && (height == 960) && (fps == 16)) // dann gehe ich von einem stereo video der BBX3 aus!!!
         {
             mVideoCapture.release();
             mStereo = true;
@@ -902,24 +924,24 @@ bool Animation::openAnimationVideo(QString fileName)
     // Check if it was created succesfully
     if(!mVideoCapture.isOpened())
     {
-#if  STEREO && not STEREO_DISABLED
+#if STEREO && not STEREO_DISABLED
 
 
-         // untersuchen, ob Stereodaten von Arena/Messe-Versuchen
-        if (mTimeFileLoaded && openAnimationStereoVideo(fileName))
+        // untersuchen, ob Stereodaten von Arena/Messe-Versuchen
+        if(mTimeFileLoaded && openAnimationStereoVideo(fileName))
         {
             // Destroy anything that was before
-            //free();
+            // free();
 
             // Set new video & photo labels
 
-            mVideo = true;
-            mImgSeq = false;
+            mVideo            = true;
+            mImgSeq           = false;
             mCameraLiveStream = false;
-            //mCurrentFrame = -1;
+            // mCurrentFrame = -1;
             // Get the information of the animation
-//            if (!getInfoVideo(fileName))
-//                return false;
+            //            if (!getInfoVideo(fileName))
+            //                return false;
 
             // Set the size in the QSize structure
             mSize.setHeight(mCaptureStereo->m_iRows);
@@ -937,28 +959,28 @@ bool Animation::openAnimationVideo(QString fileName)
     else
     {
 #ifndef STEREO_DISABLED
-        if (mCaptureStereo)
+        if(mCaptureStereo)
         {
             mCaptureStereo->close();
             delete mCaptureStereo;
         }
 #endif
         // Set new video & photo labels
-        mStereo = false;
-        mVideo = true;
-        mImgSeq = false;
+        mStereo           = false;
+        mVideo            = true;
+        mImgSeq           = false;
         mCameraLiveStream = false;
 
         mCurrentFrame = -1;
         // Get the information of the animation
-        if (!getInfoVideo(fileName))
+        if(!getInfoVideo(fileName))
             return false;
         // Set the current frame to -1 (shows, that no frame is already loaded)
     }
 
-    mFileInfo = QFileInfo(fileName);
-    mFileBase = mFileInfo.completeBaseName();
-    mFileSuffix = mFileInfo.suffix();
+    mFileInfo     = QFileInfo(fileName);
+    mFileBase     = mFileInfo.completeBaseName();
+    mFileSuffix   = mFileInfo.suffix();
     mCurrentFrame = -1; // Set the current frame to -1 (shows, that no frame is already loaded)
 
     return true;
@@ -968,12 +990,11 @@ bool Animation::openAnimationVideo(QString fileName)
 /// Returns the frame at given index in the video
 cv::Mat Animation::getFrameVideo(int index)
 {
-
-    if (mCameraLiveStream)
+    if(mCameraLiveStream)
     {
-        if (mVideoCapture.read(mImage/*tempMat*/) )
+        if(mVideoCapture.read(mImage /*tempMat*/))
         {
-            if (mImage.empty())//tempImg == NULL)
+            if(mImage.empty()) // tempImg == NULL)
                 return cv::Mat();
 
             mCurrentFrame++;
@@ -981,46 +1002,48 @@ cv::Mat Animation::getFrameVideo(int index)
         return mImage;
     }
 
-    if ((index != mCurrentFrame) || mImage.empty())
+    if((index != mCurrentFrame) || mImage.empty())
     {
         // Check if we have a valid index
-        if (index < getSourceInFrameNum() || (index > getSourceOutFrameNum() && getSourceOutFrameNum() != -1) )
+        if(index < getSourceInFrameNum() || (index > getSourceOutFrameNum() && getSourceOutFrameNum() != -1))
             return cv::Mat();
-        if (mVideo && !mStereo)
+        if(mVideo && !mStereo)
         {
             // Check if we have a valid capture device
-            if (!mVideoCapture.isOpened())
+            if(!mVideoCapture.isOpened())
                 return cv::Mat();
             // Now we need to see if it is necessary to seek for the frame or if we can use
             // directly the cvQueryFrame function
             // This is tested since the seek function takes a lot of time!
-            if (index == getSourceInFrameNum() || mCurrentFrame+1 != index)
+            if(index == getSourceInFrameNum() || mCurrentFrame + 1 != index)
             {
-                if( !mVideoCapture.set(cv::CAP_PROP_POS_FRAMES, index) )
+                if(!mVideoCapture.set(cv::CAP_PROP_POS_FRAMES, index))
                 {
                     debout << "Error: video file does not support skipping." << std::endl;
                     return cv::Mat();
                 }
             }
             // Query the frame
-            if( mVideoCapture.read(mImage))
+            if(mVideoCapture.read(mImage))
             {
-                if (mImage.empty())//tempImg == NULL)
+                if(mImage.empty()) // tempImg == NULL)
                     return cv::Mat();
-            }else
+            }
+            else
             {
-                debout << "Warning: number of frames in the video seems to be incorrect. Frame[" << index << "] is not loadable! Set number of Frames to " << index << "." << std::endl;
-                mSourceOutFrame = index-1;
+                debout << "Warning: number of frames in the video seems to be incorrect. Frame[" << index
+                       << "] is not loadable! Set number of Frames to " << index << "." << std::endl;
+                mSourceOutFrame = index - 1;
                 setSourceOutFrameNum(mSourceOutFrame);
                 return cv::Mat();
             }
         }
 #ifndef STEREO_DISABLED
-        else if (mStereo && mCaptureStereo)// stereo video
+        else if(mStereo && mCaptureStereo) // stereo video
         {
-            if (index/640 != mCurrentStereoFileNumber) // 640 stereo frames in one file
+            if(index / 640 != mCurrentStereoFileNumber) // 640 stereo frames in one file
             {
-                openAnimationStereoVideo(index/640, mStereoImgLeft, mStereoImgRight);
+                openAnimationStereoVideo(index / 640, mStereoImgLeft, mStereoImgRight);
             }
             mImage = cvarrToMat(mCaptureStereo->readFrame(index - mCurrentStereoFileNumber * 640));
         }
@@ -1029,7 +1052,7 @@ cv::Mat Animation::getFrameVideo(int index)
         mCurrentFrame = index;
     }
 #ifndef STEREO_DISABLED
-    else if (mStereo && (index == mCurrentFrame)) // da mgl anderes Bild rechte/links angefordert wird
+    else if(mStereo && (index == mCurrentFrame)) // da mgl anderes Bild rechte/links angefordert wird
         mImage = cvarrToMat(mCaptureStereo->readFrame(index - mCurrentStereoFileNumber * 640));
 #endif
     // Return the pointer to the IplImage :-)
@@ -1044,15 +1067,16 @@ bool Animation::getInfoVideo(QString /*fileName*/)
     // We will grab the information from a frame of the animation
     setSourceInFrameNum(0);
     cv::Mat tempImg = getFrameVideo(getSourceInFrameNum());
-    if (tempImg.empty())
+    if(tempImg.empty())
     {
         debout << "Error: No frame could be retrieved from the capture during getInfoVideo." << std::endl;
         return false;
     }
     // 1 or 3 channel and 8 bit per pixel
-    if (!(((tempImg.channels() == 1) || (tempImg.channels() == 3)) && (tempImg.depth() == CV_8U)))
+    if(!(((tempImg.channels() == 1) || (tempImg.channels() == 3)) && (tempImg.depth() == CV_8U)))
     {
-        debout << "Warning: Only 1 or 3 channels (you are using "<< tempImg.channels() <<") and 8 bpp (you are using "<< tempImg.depth() <<") are supported!" << std::endl;
+        debout << "Warning: Only 1 or 3 channels (you are using " << tempImg.channels() << ") and 8 bpp (you are using "
+               << tempImg.depth() << ") are supported!" << std::endl;
     }
     // Set the size in the QSize structure
     mSize.setHeight(tempImg.rows);
@@ -1060,44 +1084,51 @@ bool Animation::getInfoVideo(QString /*fileName*/)
     // Release the temporary frame
     // We get the FPS number with the cvGetCaptureProperty function
     // Note that this doesn't work if no frame has already retrieved!!
-    if (mVideoCapture.get(cv::CAP_PROP_FPS)){
+    if(mVideoCapture.get(cv::CAP_PROP_FPS))
+    {
         setFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
         mOriginalFps = mVideoCapture.get(cv::CAP_PROP_FPS);
     }
     // detect the used video codec
-    int fourCC = static_cast<int>( mVideoCapture.get(cv::CAP_PROP_FOURCC) );
-    char FOURCC[] = {(char)( fourCC & 0XFF) ,
-                     (char)((fourCC & 0XFF00) >> 8),
-                     (char)((fourCC & 0XFF0000) >> 16),
-                     (char)((fourCC & 0XFF000000) >> 24),
-                                                        0};
-    mMaxFrames = (int) mVideoCapture.get(cv::CAP_PROP_FRAME_COUNT); //mNumFrame
-    mSourceOutFrame = mMaxFrames-1;
+    int  fourCC   = static_cast<int>(mVideoCapture.get(cv::CAP_PROP_FOURCC));
+    char FOURCC[] = {
+        (char) (fourCC & 0XFF),
+        (char) ((fourCC & 0XFF00) >> 8),
+        (char) ((fourCC & 0XFF0000) >> 16),
+        (char) ((fourCC & 0XFF000000) >> 24),
+        0};
+    mMaxFrames      = (int) mVideoCapture.get(cv::CAP_PROP_FRAME_COUNT); // mNumFrame
+    mSourceOutFrame = mMaxFrames - 1;
 
     // Set videocapture to the last frame if CV_CAP_PROP_POS_FRAMES is supported by used video codec
-    if( mVideoCapture.set(cv::CAP_PROP_POS_FRAMES, mMaxFrames))
+    if(mVideoCapture.set(cv::CAP_PROP_POS_FRAMES, mMaxFrames))
     {
         // Set videoCapture to the really correct last frame
-        mVideoCapture.set(cv::CAP_PROP_POS_FRAMES, mVideoCapture.get(cv::CAP_PROP_POS_FRAMES)-1);
+        mVideoCapture.set(cv::CAP_PROP_POS_FRAMES, mVideoCapture.get(cv::CAP_PROP_POS_FRAMES) - 1);
 
 
         // Check if mNumFrames agrees with last readable frame
-        if( mMaxFrames != (mVideoCapture.get(cv::CAP_PROP_POS_FRAMES)+1) )
+        if(mMaxFrames != (mVideoCapture.get(cv::CAP_PROP_POS_FRAMES) + 1))
         {
-            debout << "Warning: number of frames detected by OpenCV library (" << mMaxFrames << ") seems to be incorrect! (set to estimated value: "<< (mVideoCapture.get(cv::CAP_PROP_POS_FRAMES)+1) << ") [video codec: " << FOURCC << "]" << std::endl;
-            mMaxFrames = mVideoCapture.get(cv::CAP_PROP_POS_FRAMES)+1;
-            mSourceOutFrame = mMaxFrames-1;
+            debout << "Warning: number of frames detected by OpenCV library (" << mMaxFrames
+                   << ") seems to be incorrect! (set to estimated value: "
+                   << (mVideoCapture.get(cv::CAP_PROP_POS_FRAMES) + 1) << ") [video codec: " << FOURCC << "]"
+                   << std::endl;
+            mMaxFrames      = mVideoCapture.get(cv::CAP_PROP_POS_FRAMES) + 1;
+            mSourceOutFrame = mMaxFrames - 1;
         }
 
         // Check if the last frame of the video is readable/OK?
         cv::Mat frame;
-        while( !mVideoCapture.read(frame) ){
-            mVideoCapture.set(cv::CAP_PROP_POS_FRAMES,mVideoCapture.get(cv::CAP_PROP_POS_FRAMES)-2);
-            mMaxFrames = mVideoCapture.get(cv::CAP_PROP_POS_FRAMES)+1;
-            if( mVideoCapture.get(cv::CAP_PROP_POS_FRAMES) < 0 ){
+        while(!mVideoCapture.read(frame))
+        {
+            mVideoCapture.set(cv::CAP_PROP_POS_FRAMES, mVideoCapture.get(cv::CAP_PROP_POS_FRAMES) - 2);
+            mMaxFrames = mVideoCapture.get(cv::CAP_PROP_POS_FRAMES) + 1;
+            if(mVideoCapture.get(cv::CAP_PROP_POS_FRAMES) < 0)
+            {
                 std::cerr << "Warning: video file seems to be broken!" << std::endl;
-                mMaxFrames = -1;
-                mSourceOutFrame = mMaxFrames-1;
+                mMaxFrames      = -1;
+                mSourceOutFrame = mMaxFrames - 1;
                 return false;
             }
         }
@@ -1105,16 +1136,18 @@ bool Animation::getInfoVideo(QString /*fileName*/)
 
     // Since we don't trust OpenCV, another check is never enough :-)
     int defaultFrames = 10000;
-    int maxFrames = 9999999; // > 111 h @ 25fps
-    if (getNumFrames() <= 0)
+    int maxFrames     = 9999999; // > 111 h @ 25fps
+    if(getNumFrames() <= 0)
     {
-        debout << "Error: Incorrect number ("<<getNumFrames()<<") of frames. Setting it to "<<defaultFrames<<"." << std::endl;
-        mSourceOutFrame = getSourceInFrameNum()+defaultFrames;
+        debout << "Error: Incorrect number (" << getNumFrames() << ") of frames. Setting it to " << defaultFrames << "."
+               << std::endl;
+        mSourceOutFrame = getSourceInFrameNum() + defaultFrames;
     }
-    if (getNumFrames() > maxFrames)// = 6h * 60mins * 60 secs * 25 frames
+    if(getNumFrames() > maxFrames) // = 6h * 60mins * 60 secs * 25 frames
     {
-        debout << "Warning: Number of frames ("<<getNumFrames()<<") seems to be incorrect. Setting it to "<<defaultFrames<<"." << std::endl;
-        mSourceOutFrame = getSourceInFrameNum()+defaultFrames;
+        debout << "Warning: Number of frames (" << getNumFrames() << ") seems to be incorrect. Setting it to "
+               << defaultFrames << "." << std::endl;
+        mSourceOutFrame = getSourceInFrameNum() + defaultFrames;
     }
     setSourceOutFrameNum(mSourceOutFrame);
     return true;
@@ -1123,15 +1156,16 @@ bool Animation::getInfoVideo(QString /*fileName*/)
 bool Animation::getCameraInfo()
 {
     cv::Mat tempImg = getFrameVideo(0);
-    if (tempImg.empty())
+    if(tempImg.empty())
     {
         debout << "Error: No frame could be retrieved from the capture during getInfoVideo." << std::endl;
         return false;
     }
     // 1 or 3 channel and 8 bit per pixel
-    if (!(((tempImg.channels() == 1) || (tempImg.channels() == 3)) && (tempImg.depth() == CV_8U)))
+    if(!(((tempImg.channels() == 1) || (tempImg.channels() == 3)) && (tempImg.depth() == CV_8U)))
     {
-        debout << "Warning: Only 1 or 3 channels (you are using "<< tempImg.channels() <<") and 8 bpp (you are using "<< tempImg.depth() <<") are supported!" << std::endl;
+        debout << "Warning: Only 1 or 3 channels (you are using " << tempImg.channels() << ") and 8 bpp (you are using "
+               << tempImg.depth() << ") are supported!" << std::endl;
     }
     // Set the size in the QSize structure
     mSize.setHeight(tempImg.rows);
@@ -1139,11 +1173,11 @@ bool Animation::getCameraInfo()
     // Release the temporary frame
     // We get the FPS number with the cvGetCaptureProperty function
     // Note that this doesn't work if no frame has already retrieved!!
-    if (mVideoCapture.get(cv::CAP_PROP_FPS)){
+    if(mVideoCapture.get(cv::CAP_PROP_FPS))
+    {
         setFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
         mOriginalFps = mVideoCapture.get(cv::CAP_PROP_FPS);
     }
-
 
 
     return true;
@@ -1153,14 +1187,13 @@ bool Animation::getCameraInfo()
 void Animation::freeVideo()
 {
     // Release the capture device
-    if (mVideoCapture.isOpened())
+    if(mVideoCapture.isOpened())
     {
         mVideoCapture.release();
     }
     // Release the image pointer
-    if (!mImage.empty())
+    if(!mImage.empty())
     {
         mImage = cv::Mat();
     }
-
 }

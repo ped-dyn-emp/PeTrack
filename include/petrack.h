@@ -21,28 +21,26 @@
 #ifndef PETRACK_H
 #define PETRACK_H
 
-#include <QMainWindow>
 #include <QDomDocument>
 #include <QKeyEvent>
+#include <QMainWindow>
 #include <QMouseEvent>
-
 #include <opencv2/opencv.hpp>
 
 #ifdef STEREO
-#include "stereoContext.h"
 #include "calibStereoFilter.h"
+#include "stereoContext.h"
 #endif
-#include "brightContrastFilter.h"
-#include "borderFilter.h"
-#include "swapFilter.h"
-#include "backgroundFilter.h"
 #include "autoCalib.h"
+#include "backgroundFilter.h"
+#include "borderFilter.h"
+#include "brightContrastFilter.h"
 #include "coordItem.h"
 #include "extrCalibration.h"
-#include "moCapPerson.h"
 #include "moCapController.h"
-
+#include "moCapPerson.h"
 #include "recognition.h"
+#include "swapFilter.h"
 
 class CalibFilter;
 class Animation;
@@ -51,7 +49,12 @@ class RecognitionRoiItem;
 class GridItem;
 
 #ifdef STEREO_DISABLED
-enum Camera {cameraLeft, cameraRight, cameraUnset};
+enum Camera
+{
+    cameraLeft,
+    cameraRight,
+    cameraUnset
+};
 #endif
 
 // durchschnittliche Kopflaenge in cm (Kopf 21x14)
@@ -131,7 +134,7 @@ public slots:
     void saveXml(QDomDocument &doc);
     bool saveSameProject();
     bool saveProject(QString fileName = "");
-    void writeXmlElement(QXmlStreamWriter& xmlStream, QDomElement element);
+    void writeXmlElement(QXmlStreamWriter &xmlStream, QDomElement element);
     void openSequence(QString fileName = "");
     void openCameraLiveStream(int camID = -1);
     void openMoCapFile();
@@ -139,9 +142,9 @@ public slots:
     void saveView(QString dest = "");
     void saveImage(QString dest = "");
     void setStatusPosReal();
-    void addManualTrackPointOnlyVisible(const QPointF& pos);
+    void addManualTrackPointOnlyVisible(const QPointF &pos);
     void splitTrackPerson(QPointF pos);
-    int  addOrMoveManualTrackPoint(const QPointF& pos);
+    int  addOrMoveManualTrackPoint(const QPointF &pos);
     void editTrackPersonComment(QPointF pos);
     void setTrackPersonHeight(QPointF pos);
     void resetTrackPersonHeight(QPointF pos);
@@ -149,292 +152,135 @@ public slots:
     void deleteTrackPointAll(int direction);
     void deleteTrackPointROI();
     void deleteTrackPointInsideROI();
-//    void showContextMenu(QPointF pos);
+    //    void showContextMenu(QPointF pos);
     void updateSourceInOutFrames();
     void skipToFrameWheel(int delta);
 
 public:
-    void updateControlWidget();
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dropEvent(QDropEvent *event);
-    void updateSceneRect();
-    double getStatusPosRealHeight();
-    void setStatusStereo(float x, float y, float z);
-    void setStatusTime();
-    void setStatusFPS();
-    void setShowFPS(double fps);
-    void updateShowFPS(bool skipped = false);
-    void setStatusPosReal(const QPointF &pos);
-    void setStatusPos(const QPoint &pos);
-    void setStatusColor(const QRgb &col);
-    void setStatusColor();
-    void setMousePosOnImage(QPointF pos);
-    void updateControlImage(cv::Mat &img);
-    int calculateRealTracker();
-    void exportTracker(QString dest = "");
-    void importTracker(QString dest = "");
-    void testTracker();
-    void trackAll();
-    void playAll();
-    int winSize(QPointF *pos=nullptr, int pers=-1, int frame=-1, int level=-1);
-    void updateImage(bool imageChanged = false);
-    void updateImage(const cv::Mat &img);
-    void updateSequence();
+    void      updateControlWidget();
+    void      dragEnterEvent(QDragEnterEvent *event);
+    void      dropEvent(QDropEvent *event);
+    void      updateSceneRect();
+    double    getStatusPosRealHeight();
+    void      setStatusStereo(float x, float y, float z);
+    void      setStatusTime();
+    void      setStatusFPS();
+    void      setShowFPS(double fps);
+    void      updateShowFPS(bool skipped = false);
+    void      setStatusPosReal(const QPointF &pos);
+    void      setStatusPos(const QPoint &pos);
+    void      setStatusColor(const QRgb &col);
+    void      setStatusColor();
+    void      setMousePosOnImage(QPointF pos);
+    void      updateControlImage(cv::Mat &img);
+    int       calculateRealTracker();
+    void      exportTracker(QString dest = "");
+    void      importTracker(QString dest = "");
+    void      testTracker();
+    void      trackAll();
+    void      playAll();
+    int       winSize(QPointF *pos = nullptr, int pers = -1, int frame = -1, int level = -1);
+    void      updateImage(bool imageChanged = false);
+    void      updateImage(const cv::Mat &img);
+    void      updateSequence();
     QSet<int> getPedestrianUserSelection();
     QSet<int> getPedestriansToTrack();
-    double getCmPerPixel() const;
-    void setHeadSize(double hS=-1);
-    double getHeadSize(QPointF *pos=nullptr, int pers=-1, int frame=-1);
+    double    getCmPerPixel() const;
+    void      setHeadSize(double hS = -1);
+    double    getHeadSize(QPointF *pos = nullptr, int pers = -1, int frame = -1);
 
     //------------------------------
     // inline function
-    bool isLoading() const
-    {
-        return mLoading;
-    }
-    void setLoading(bool b)
-    {
-        mLoading = b;
-    }
+    bool isLoading() const { return mLoading; }
+    void setLoading(bool b) { mLoading = b; }
 
-    inline pet::StereoContext* getStereoContext()
-    {
-        return mStereoContext;
-    }
-    inline QString getProFileName()
-    {
-        return mProFileName;
-    }
+    inline pet::StereoContext *getStereoContext() { return mStereoContext; }
+    inline QString             getProFileName() { return mProFileName; }
+
 private:
-    inline void setProFileName(const QString& fileName)
+    inline void setProFileName(const QString &fileName)
     {
         // NOTE: Use only the global variant in future?
         // global one in helper.h because it is needed to use getFileList and shouldn't depend on Petrack
-        proFileName = fileName;
+        proFileName  = fileName;
         mProFileName = fileName;
     }
+
 public:
-    inline QString getTrackFileName()
-    {
-        return mTrcFileName;
-    }
-    inline void setTrackFileName(const QString &fn)
-    {
-        mTrcFileName = fn;
-    }
-    inline QString getHeightFileName()
-    {
-        return mHeightFileName;
-    }
-    inline void setHeightFileName(const QString &fn)
-    {
-        mHeightFileName = fn;
-    }
-    inline QString getMarkerIDFileName()
-    {
-        return mMarkerIDFileName;
-    }
-    inline void setMarkerIDFileName(const QString &fn)
-    {
-        mMarkerIDFileName = fn;
-    }
+    inline QString getTrackFileName() { return mTrcFileName; }
+    inline void    setTrackFileName(const QString &fn) { mTrcFileName = fn; }
+    inline QString getHeightFileName() { return mHeightFileName; }
+    inline void    setHeightFileName(const QString &fn) { mHeightFileName = fn; }
+    inline QString getMarkerIDFileName() { return mMarkerIDFileName; }
+    inline void    setMarkerIDFileName(const QString &fn) { mMarkerIDFileName = fn; }
 
-    inline Control* getControlWidget()
-    {
-        return mControlWidget;
-    }
-    inline reco::Recognizer& getRecognizer()
-    {
-        return mReco;
-    }
-    inline StereoWidget* getStereoWidget()
-    {
-        return mStereoWidget;
-    }
-    inline ColorRangeWidget* getColorRangeWidget()
-    {
-        return mColorRangeWidget;
-    }
-    inline ColorMarkerWidget* getColorMarkerWidget()
-    {
-        return mColorMarkerWidget;
-    }
-    inline CodeMarkerWidget* getCodeMarkerWidget()
-    {
-        return mCodeMarkerWidget;
-    }
-    inline MultiColorMarkerWidget* getMultiColorMarkerWidget()
-    {
-        return mMultiColorMarkerWidget;
-    }
-    inline GraphicsView* getView()
-    {
-        return mView;
-    }
-    inline QGraphicsScene* getScene()
-    {
-        return mScene;
-    }
-    inline QImage* getImage()
-    {
-        return mImage;
-    }
-    inline cv::Mat getImg()
-    {
-        return mImg;
-    }
-    inline cv::Mat getImageFiltered()
-    {
-        return mImgFiltered;
-    }
-    inline Tracker* getTracker()
-    {
-        return mTracker;
-    }
-    inline TrackerReal* getTrackerReal()
-    {
-        return mTrackerReal;
-    }
-    inline ImageItem* getImageItem()
-    {
-        return mImageItem;
-    }
-    inline StereoItem* getStereoItem()
-    {
-        return mStereoItem;
-    }
-    inline ColorMarkerItem* getColorMarkerItem()
-    {
-        return mColorMarkerItem;
-    }
-    inline CodeMarkerItem* getCodeMarkerItem()
-    {
-        return mCodeMarkerItem;
-    }
-    inline MultiColorMarkerItem* getMultiColorMarkerItem()
-    {
-        return mMultiColorMarkerItem;
-    }
-    inline BackgroundItem* getBackgroundItem()
-    {
-        return mBackgroundItem;
-    }
-    inline MoCapItem* getMoCapItem()
-    {
-        return mMoCapItem;
-    }
-    inline RecognitionRoiItem* getRecoRoiItem()
-    {
-        return mRecognitionRoiItem;
-    }
-    inline TrackingRoiItem* getTrackRoiItem()
-    {
-        return mTrackingRoiItem;
-    }
+    inline Control *               getControlWidget() { return mControlWidget; }
+    inline reco::Recognizer &      getRecognizer() { return mReco; }
+    inline StereoWidget *          getStereoWidget() { return mStereoWidget; }
+    inline ColorRangeWidget *      getColorRangeWidget() { return mColorRangeWidget; }
+    inline ColorMarkerWidget *     getColorMarkerWidget() { return mColorMarkerWidget; }
+    inline CodeMarkerWidget *      getCodeMarkerWidget() { return mCodeMarkerWidget; }
+    inline MultiColorMarkerWidget *getMultiColorMarkerWidget() { return mMultiColorMarkerWidget; }
+    inline GraphicsView *          getView() { return mView; }
+    inline QGraphicsScene *        getScene() { return mScene; }
+    inline QImage *                getImage() { return mImage; }
+    inline cv::Mat                 getImg() { return mImg; }
+    inline cv::Mat                 getImageFiltered() { return mImgFiltered; }
+    inline Tracker *               getTracker() { return mTracker; }
+    inline TrackerReal *           getTrackerReal() { return mTrackerReal; }
+    inline ImageItem *             getImageItem() { return mImageItem; }
+    inline StereoItem *            getStereoItem() { return mStereoItem; }
+    inline ColorMarkerItem *       getColorMarkerItem() { return mColorMarkerItem; }
+    inline CodeMarkerItem *        getCodeMarkerItem() { return mCodeMarkerItem; }
+    inline MultiColorMarkerItem *  getMultiColorMarkerItem() { return mMultiColorMarkerItem; }
+    inline BackgroundItem *        getBackgroundItem() { return mBackgroundItem; }
+    inline MoCapItem *             getMoCapItem() { return mMoCapItem; }
+    inline RecognitionRoiItem *    getRecoRoiItem() { return mRecognitionRoiItem; }
+    inline TrackingRoiItem *       getTrackRoiItem() { return mTrackingRoiItem; }
 
-    inline TrackerItem* getTrackerItem()
-    {
-        return mTrackerItem;
-    }
-    inline Animation* getAnimation()
-    {
-        return mAnimation;
-    }
-    inline Player* getPlayer()
-    {
-        return mPlayerWidget;
-    }
+    inline TrackerItem *getTrackerItem() { return mTrackerItem; }
+    inline Animation *  getAnimation() { return mAnimation; }
+    inline Player *     getPlayer() { return mPlayerWidget; }
 
     inline void updateCoord()
     {
-        if (mCoordItem)
+        if(mCoordItem)
             mCoordItem->updateData();
     }
 
-    inline QPointF getMousePosOnImage()
-    {
-        return mMousePosOnImage;
-    }
+    inline QPointF getMousePosOnImage() { return mMousePosOnImage; }
 
-    inline void setRecognitionChanged(bool b)
-    {
-        mRecognitionChanged = b;
-    }
-    inline bool recognitionChanged() const
-    {
-        return mRecognitionChanged;
-    }
+    inline void setRecognitionChanged(bool b) { mRecognitionChanged = b; }
+    inline bool recognitionChanged() const { return mRecognitionChanged; }
 
-    inline void setTrackChanged(bool b)
-    {
-        mTrackChanged = b;
-    }
-    inline bool trackChanged() const
-    {
-        return mTrackChanged;
-    }
-    inline QAction* getHideControlActor()
-    {
-        return mHideControlsAct;
-    }
+    inline void     setTrackChanged(bool b) { mTrackChanged = b; }
+    inline bool     trackChanged() const { return mTrackChanged; }
+    inline QAction *getHideControlActor() { return mHideControlsAct; }
 
     // Attention: not type save, be care that animation is not stereo
-    inline CalibFilter* getCalibFilter()
-    {
-        return (CalibFilter*) mCalibFilter;
-    }
+    inline CalibFilter *getCalibFilter() { return (CalibFilter *) mCalibFilter; }
 #ifdef STEREO
     // Attention: not type save, be care that animation is stereo
-    inline CalibStereoFilter* getCalibStereoFilter()
-    {
-        return (CalibStereoFilter*) mCalibFilter;
-    }
+    inline CalibStereoFilter *getCalibStereoFilter() { return (CalibStereoFilter *) mCalibFilter; }
 #endif
-    inline BrightContrastFilter* getBrightContrastFilter()
-    {
-        return &mBrightContrastFilter;
-    }
-    inline BorderFilter* getBorderFilter()
-    {
-        return &mBorderFilter;
-    }
-    inline SwapFilter* getSwapFilter()
-    {
-        return &mSwapFilter;
-    }
-    inline BackgroundFilter* getBackgroundFilter()
-    {
-        return &mBackgroundFilter;
-    }
+    inline BrightContrastFilter *getBrightContrastFilter() { return &mBrightContrastFilter; }
+    inline BorderFilter *        getBorderFilter() { return &mBorderFilter; }
+    inline SwapFilter *          getSwapFilter() { return &mSwapFilter; }
+    inline BackgroundFilter *    getBackgroundFilter() { return &mBackgroundFilter; }
 
     inline int getImageBorderSize()
     {
-        if (getBorderFilter()->getEnabled())
+        if(getBorderFilter()->getEnabled())
             return (int) getBorderFilter()->getBorderSize()->getValue();
         else
             return 0;
     }
-    inline void setImageBorderSize(int sz)
-    {
-        getBorderFilter()->getBorderSize()->setValue(sz);
-    }
+    inline void setImageBorderSize(int sz) { getBorderFilter()->getBorderSize()->setValue(sz); }
 
-    inline AutoCalib* getAutoCalib()
-    {
-        return &mAutoCalib;
-    }
-    inline ExtrCalibration* getExtrCalibration()
-    {
-        return &mExtrCalibration;
-    }
-    inline double getStatusFPS() const
-    {
-        return mShowFPS;
-    }
-    inline MoCapController& getMoCapController()
-    {
-        return mMoCapController;
-    }
+    inline AutoCalib *      getAutoCalib() { return &mAutoCalib; }
+    inline ExtrCalibration *getExtrCalibration() { return &mExtrCalibration; }
+    inline double           getStatusFPS() const { return mShowFPS; }
+    inline MoCapController &getMoCapController() { return mMoCapController; }
 
 
     void updateWindowTitle();
@@ -443,7 +289,7 @@ public:
      * @brief Sets the information about the compiled PeTrack version.
      * @param petrackVersion current PeTrack version
      */
-    void setPeTrackVersion(const std::string& petrackVersion);
+    void setPeTrackVersion(const std::string &petrackVersion);
 
     /**
      * @brief Sets the information about the compiled git commit hash, commit date,
@@ -453,9 +299,9 @@ public:
      * @param gitCommitBranch commit branch of current version
      */
     void setGitInformation(
-                           const std::string& gitCommitID,
-                           const std::string& gitCommitDate,
-                           const std::string& gitCommitBranch);
+        const std::string &gitCommitID,
+        const std::string &gitCommitDate,
+        const std::string &gitCommitBranch);
 
     /**
      * @brief Sets the information about the used compiler and time stamp
@@ -463,9 +309,10 @@ public:
      * @param compilerID name of the used compiler
      * @param compilerVersion version of the used compiler
      */
-    void setCompileInformation(const std::string &compileTimeStamp,
-                               const std::string &compilerID,
-                               const std::string &compilerVersion);
+    void setCompileInformation(
+        const std::string &compileTimeStamp,
+        const std::string &compilerID,
+        const std::string &compilerVersion);
 
 private:
     void createActions();
@@ -478,68 +325,68 @@ private:
     bool maybeSave();
 
 
-    void keyPressEvent(QKeyEvent * event);
+    void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
 
     //------------------------------
 
     QHBoxLayout *mCentralLayout;
 
-    QFrame *mCentralWidget;
-    Control *mControlWidget;
-    QSplitter *mSplitter;
-    StereoWidget *mStereoWidget;
-    ColorRangeWidget *mColorRangeWidget;
-    ColorMarkerWidget *mColorMarkerWidget;
-    CodeMarkerWidget *mCodeMarkerWidget;
+    QFrame *                mCentralWidget;
+    Control *               mControlWidget;
+    QSplitter *             mSplitter;
+    StereoWidget *          mStereoWidget;
+    ColorRangeWidget *      mColorRangeWidget;
+    ColorMarkerWidget *     mColorMarkerWidget;
+    CodeMarkerWidget *      mCodeMarkerWidget;
     MultiColorMarkerWidget *mMultiColorMarkerWidget;
 
-    QAction *mOpenSeqAct;
-    QAction *mOpenCameraAct;
-    QAction *mOpenMoCapAct;
-    QAction *mSaveSeqVidAct;
-    QAction *mSaveSeqVidViewAct;
-    QAction *mSaveSeqImgAct;
-    QAction *mSaveSeqViewAct;
-    QAction *mOpenPrAct;
-    QAction *mSaveAct;
-    QAction *mSavePrAct;
-    QAction *mSaveImageAct;
-    QAction *mSaveViewAct;
-    QAction *mPrintAct;
-    QAction *mResetSettingsAct;
-    QAction *mExitAct;
-    QAction *mFontAct;
-    QAction *mHideControlsAct;
-    QAction *mAntialiasAct;
-    QAction *mCropZoomViewAct;
-    QAction *mOpenGLAct;
-    QAction *mResetAct;
-    QAction *mFitViewAct;
-    QAction *mFitROIAct;
-    QAction *mCameraLeftViewAct;
-    QAction *mCameraRightViewAct;
-    QAction *mLimitPlaybackSpeed;
-    QAction *mFixPlaybackSpeed;
-    QAction *mSetToRealtime;
-    QAction *mSetTo0p75;
-    QAction *mSetTo0p50;
-    QAction *mSetTo0p25;
-    QAction *mSetTo1p25;
-    QAction *mSetTo1p50;
-    QAction *mSetTo1p75;
-    QAction *mSetTo2p00;
-    QAction *mPlayerLooping;
-    QAction *mDelPastAct;
-    QAction *mDelFutureAct;
-    QAction *mDelAllRoiAct;
-    QAction *mDelPartRoiAct;
-    QAction *mCommandAct;
-    QAction *mKeyAct;
-    QAction *mAboutAct;
-    QAction *mOnlineHelpAct;
+    QAction *     mOpenSeqAct;
+    QAction *     mOpenCameraAct;
+    QAction *     mOpenMoCapAct;
+    QAction *     mSaveSeqVidAct;
+    QAction *     mSaveSeqVidViewAct;
+    QAction *     mSaveSeqImgAct;
+    QAction *     mSaveSeqViewAct;
+    QAction *     mOpenPrAct;
+    QAction *     mSaveAct;
+    QAction *     mSavePrAct;
+    QAction *     mSaveImageAct;
+    QAction *     mSaveViewAct;
+    QAction *     mPrintAct;
+    QAction *     mResetSettingsAct;
+    QAction *     mExitAct;
+    QAction *     mFontAct;
+    QAction *     mHideControlsAct;
+    QAction *     mAntialiasAct;
+    QAction *     mCropZoomViewAct;
+    QAction *     mOpenGLAct;
+    QAction *     mResetAct;
+    QAction *     mFitViewAct;
+    QAction *     mFitROIAct;
+    QAction *     mCameraLeftViewAct;
+    QAction *     mCameraRightViewAct;
+    QAction *     mLimitPlaybackSpeed;
+    QAction *     mFixPlaybackSpeed;
+    QAction *     mSetToRealtime;
+    QAction *     mSetTo0p75;
+    QAction *     mSetTo0p50;
+    QAction *     mSetTo0p25;
+    QAction *     mSetTo1p25;
+    QAction *     mSetTo1p50;
+    QAction *     mSetTo1p75;
+    QAction *     mSetTo2p00;
+    QAction *     mPlayerLooping;
+    QAction *     mDelPastAct;
+    QAction *     mDelFutureAct;
+    QAction *     mDelAllRoiAct;
+    QAction *     mDelPartRoiAct;
+    QAction *     mCommandAct;
+    QAction *     mKeyAct;
+    QAction *     mAboutAct;
+    QAction *     mOnlineHelpAct;
     QActionGroup *mCameraGroupView;
-    QMenu *mPlaybackSpeedMenu;
+    QMenu *       mPlaybackSpeedMenu;
 
     QMenu *mFileMenu;
     QMenu *mViewMenu;
@@ -553,47 +400,47 @@ private:
     QString mHeightFileName;
     QString mMarkerIDFileName;
 
-    cv::Mat mImg;
-    cv::Mat mImgFiltered;
-    QImage *mImage;
-    Animation *mAnimation;
+    cv::Mat             mImg;
+    cv::Mat             mImgFiltered;
+    QImage *            mImage;
+    Animation *         mAnimation;
     pet::StereoContext *mStereoContext;
-    Player *mPlayerWidget;
+    Player *            mPlayerWidget;
 
-    ViewWidget *mViewWidget;
-    GraphicsView *mView;
-    QGraphicsScene *mScene;
-    ImageItem *mImageItem;
-    LogoItem *mLogoItem;
-    CoordItem *mCoordItem;
-    GridItem *mGridItem;
-    RecognitionRoiItem *mRecognitionRoiItem;
-    TrackingRoiItem *mTrackingRoiItem;
-    TrackerItem *mTrackerItem;
-    StereoItem *mStereoItem;
-    ColorMarkerItem *mColorMarkerItem;
-    CodeMarkerItem *mCodeMarkerItem;
+    ViewWidget *          mViewWidget;
+    GraphicsView *        mView;
+    QGraphicsScene *      mScene;
+    ImageItem *           mImageItem;
+    LogoItem *            mLogoItem;
+    CoordItem *           mCoordItem;
+    GridItem *            mGridItem;
+    RecognitionRoiItem *  mRecognitionRoiItem;
+    TrackingRoiItem *     mTrackingRoiItem;
+    TrackerItem *         mTrackerItem;
+    StereoItem *          mStereoItem;
+    ColorMarkerItem *     mColorMarkerItem;
+    CodeMarkerItem *      mCodeMarkerItem;
     MultiColorMarkerItem *mMultiColorMarkerItem;
-    BackgroundItem *mBackgroundItem;
-    MoCapItem *mMoCapItem;
+    BackgroundItem *      mBackgroundItem;
+    MoCapItem *           mMoCapItem;
 
     QDoubleSpinBox *mStatusPosRealHeight;
-    QLabel *mStatusLabelStereo;
-    QLabel *mStatusLabelTime;
-    QLabel *mStatusLabelFPS;
-    QLabel *mStatusLabelPosReal;
-    QLabel *mStatusLabelPos;
-    QLabel *mStatusLabelColor;
+    QLabel *        mStatusLabelStereo;
+    QLabel *        mStatusLabelTime;
+    QLabel *        mStatusLabelFPS;
+    QLabel *        mStatusLabelPosReal;
+    QLabel *        mStatusLabelPos;
+    QLabel *        mStatusLabelColor;
 
     QPointF mMousePosOnImage;
 
-    Filter *mCalibFilter;
+    Filter *             mCalibFilter;
     BrightContrastFilter mBrightContrastFilter;
-    BorderFilter mBorderFilter;
-    SwapFilter mSwapFilter;
-    BackgroundFilter mBackgroundFilter;
+    BorderFilter         mBorderFilter;
+    SwapFilter           mSwapFilter;
+    BackgroundFilter     mBackgroundFilter;
 
-    AutoCalib mAutoCalib;
+    AutoCalib       mAutoCalib;
     ExtrCalibration mExtrCalibration;
 
     bool mRecognitionChanged;
@@ -601,10 +448,10 @@ private:
 
     reco::Recognizer mReco;
 
-    Tracker *mTracker;
+    Tracker *    mTracker;
     TrackerReal *mTrackerReal;
-    double mHeadSize;
-    double mCmPerPixel;
+    double       mHeadSize;
+    double       mCmPerPixel;
 
     QDomDocument mDefaultSettings;
 
@@ -614,17 +461,17 @@ private:
     bool mAutoTrackOptimizeColor;
     bool mLoading;
 
-    MoCapStorage mStorage;
-    MoCapController mMoCapController {mStorage, mExtrCalibration};
+    MoCapStorage    mStorage;
+    MoCapController mMoCapController{mStorage, mExtrCalibration};
 
 
-    QString mPetrackVersion{"Unknown"}; ///< Version of PeTrack used to compile
-    QString mGitCommitID{"Unknown"}; ///< Commit hash used to compile
-    QString mGitCommitDate{"Unknown"}; ///< Commit date used to compile
+    QString mPetrackVersion{"Unknown"};  ///< Version of PeTrack used to compile
+    QString mGitCommitID{"Unknown"};     ///< Commit hash used to compile
+    QString mGitCommitDate{"Unknown"};   ///< Commit date used to compile
     QString mGitCommitBranch{"Unknown"}; ///< Branch used to compile
 
-    QString mCompileDate{"Unknown"}; ///< Compile date
-    QString mCompilerID{"Unknown"}; ///< Used compiler
+    QString mCompileDate{"Unknown"};     ///< Compile date
+    QString mCompilerID{"Unknown"};      ///< Used compiler
     QString mCompilerVersion{"Unknown"}; ///< Used compiler version
 
     std::vector<std::string> mAuthors;

@@ -18,79 +18,80 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QtWidgets>
+#include "view.h"
 
+#include "control.h"
+#include "petrack.h"
+#include "vector.h"
+
+#include <QtWidgets>
 #include <cmath>
 
-#include "view.h"
-#include "vector.h"
-#include "petrack.h"
-#include "control.h"
-
-GraphicsView::GraphicsView(ViewWidget *viewWidget)
-    : QGraphicsView()
+GraphicsView::GraphicsView(ViewWidget *viewWidget) : QGraphicsView()
 {
     mViewWidget = viewWidget;
 
     setTransformationAnchor(AnchorUnderMouse); // for wheel
-    setResizeAnchor(AnchorUnderMouse); // for scroll?
+    setResizeAnchor(AnchorUnderMouse);         // for scroll?
 }
 
 
-void GraphicsView::wheelEvent(QWheelEvent * event)
+void GraphicsView::wheelEvent(QWheelEvent *event)
 {
     QPoint numDegrees = event->angleDelta() / 8;
 
-    if (event->modifiers() == Qt::ShiftModifier) // nur shift zugelassen ...
+    if(event->modifiers() == Qt::ShiftModifier) // nur shift zugelassen ...
     {
         // Check if horizontal scroll
-        if (event->angleDelta().x() != 0) // warum orienttion?
-            emit mouseShiftWheel(numDegrees.x()/15);
+        if(event->angleDelta().x() != 0) // warum orienttion?
+            emit mouseShiftWheel(numDegrees.x() / 15);
         else
-            emit mouseShiftWheel(-numDegrees.y()/15);
+            emit mouseShiftWheel(-numDegrees.y() / 15);
     }
     else
     {
         // Check if horizontal scroll
-        if (event->angleDelta().x() != 0) // warum orienttion?
-            mViewWidget->zoomIn(numDegrees.x()/2);
+        if(event->angleDelta().x() != 0) // warum orienttion?
+            mViewWidget->zoomIn(numDegrees.x() / 2);
         else
-            mViewWidget->zoomOut(numDegrees.y()/2);
+            mViewWidget->zoomOut(numDegrees.y() / 2);
     }
 }
 
 void GraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton)
+    if(event->button() == Qt::LeftButton)
     {
-        if (event->modifiers() & Qt::ShiftModifier) // mit & genuegt, dass unter anderem shift gedrueckt wird (zb mit conrol)
+        if(event->modifiers() &
+           Qt::ShiftModifier) // mit & genuegt, dass unter anderem shift gedrueckt wird (zb mit conrol)
         {
-            if (event->modifiers() & Qt::ControlModifier) // mindestens shift und control gedrueckt
+            if(event->modifiers() & Qt::ControlModifier) // mindestens shift und control gedrueckt
                 emit mouseShiftControlDoubleClick(mapToScene(event->pos()));
             else
-                emit mouseShiftDoubleClick(mapToScene(event->pos())); //const QPoint & //const QPointF &pos
+                emit mouseShiftDoubleClick(mapToScene(event->pos())); // const QPoint & //const QPointF &pos
         }
-        else if (event->modifiers() & Qt::ControlModifier) // mit & genuegt, dass unter anderem control gedrueckt wird (zb mit shift)
-            emit mouseControlDoubleClick(mapToScene(event->pos())); //const QPoint & //const QPointF &pos
+        else if(event->modifiers() & Qt::ControlModifier) // mit & genuegt, dass unter anderem control gedrueckt wird
+                                                          // (zb mit shift)
+            emit mouseControlDoubleClick(mapToScene(event->pos())); // const QPoint & //const QPointF &pos
         else
             emit mouseDoubleClick();
     }
-    else if (event->button() == Qt::RightButton)
+    else if(event->button() == Qt::RightButton)
     {
-        if (event->modifiers() == Qt::ShiftModifier) // nur shift zugelassen ...
+        if(event->modifiers() == Qt::ShiftModifier) // nur shift zugelassen ...
             emit mouseRightDoubleClick(mapToScene(event->pos()), -1);
-        else if (event->modifiers() == Qt::ControlModifier)
+        else if(event->modifiers() == Qt::ControlModifier)
             emit mouseRightDoubleClick(mapToScene(event->pos()), 0);
-        else if (event->modifiers() == Qt::AltModifier)
+        else if(event->modifiers() == Qt::AltModifier)
             emit mouseRightDoubleClick(mapToScene(event->pos()), 1);
     }
-    else if (event->button() == Qt::MiddleButton)
+    else if(event->button() == Qt::MiddleButton)
     {
-        if (event->modifiers() == Qt::ShiftModifier) // nur shift zugelassen ...
+        if(event->modifiers() == Qt::ShiftModifier) // nur shift zugelassen ...
             emit mouseMiddleDoubleClick(-1);
-        else if (event->modifiers() == Qt::ControlModifier)
+        else if(event->modifiers() == Qt::ControlModifier)
             emit mouseMiddleDoubleClick(0);
-        else if (event->modifiers() == Qt::AltModifier)
+        else if(event->modifiers() == Qt::AltModifier)
             emit mouseMiddleDoubleClick(1);
     }
 
@@ -104,29 +105,31 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
     // forward the arrow keys for handling in petrack player
     switch(event->key())
     {
-    case Qt::Key_Up:
-        mViewWidget->parent()->event(event);
-        break;
-    case Qt::Key_Down:
-        mViewWidget->parent()->event(event);
-        break;
-    case Qt::Key_Left:
-        mViewWidget->parent()->event(event);
-        break;
-    case Qt::Key_Right:
-        mViewWidget->parent()->event(event);
-        break;
-    default:
-        QGraphicsView::keyPressEvent(event);
+        case Qt::Key_Up:
+            mViewWidget->parent()->event(event);
+            break;
+        case Qt::Key_Down:
+            mViewWidget->parent()->event(event);
+            break;
+        case Qt::Key_Left:
+            mViewWidget->parent()->event(event);
+            break;
+        case Qt::Key_Right:
+            mViewWidget->parent()->event(event);
+            break;
+        default:
+            QGraphicsView::keyPressEvent(event);
     }
 }
 
 void GraphicsView::mousePressEvent(QMouseEvent *event)
 {
-
-    if(event->modifiers() & Qt::ShiftModifier){
+    if(event->modifiers() & Qt::ShiftModifier)
+    {
         emit setColorEvent();
-    }else{
+    }
+    else
+    {
         emit colorSelected();
     }
     QGraphicsView::mousePressEvent(event);
@@ -135,16 +138,15 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
 //---------------------------------------------------------------------
 
 
-ViewWidget::ViewWidget(QWidget *parent)
-    : QFrame(parent)
+ViewWidget::ViewWidget(QWidget *parent) : QFrame(parent)
 {
-    mMainWindow = (class Petrack*) parent;
+    mMainWindow = (class Petrack *) parent;
     setContentsMargins(0, 0, 0, 0);
     mGraphicsView = new GraphicsView(this);
     mGraphicsView->setRenderHint(QPainter::Antialiasing, false);
-    mGraphicsView->setDragMode(QGraphicsView::ScrollHandDrag); //RubberBandDrag
+    mGraphicsView->setDragMode(QGraphicsView::ScrollHandDrag); // RubberBandDrag
 
-    int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
+    int   size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
     QSize iconSize(size, size);
 
     // Hide|Show Button
@@ -170,7 +172,7 @@ ViewWidget::ViewWidget(QWidget *parent)
     rotateRightIcon->setIconSize(iconSize);
     mRotateSlider = new QSlider;
     mRotateSlider->setMinimum(-180); //-360
-    mRotateSlider->setMaximum(180); // 360
+    mRotateSlider->setMaximum(180);  // 360
     mRotateSlider->setValue(0);
     mRotateSlider->setTickPosition(QSlider::TicksBelow);
 
@@ -236,24 +238,29 @@ void ViewWidget::resetView()
 
 void ViewWidget::fitInView()
 {
-    mGraphicsView->fitInView(mGraphicsView->sceneRect(), Qt::KeepAspectRatio); // Qt::KeepAspectRatioByExpanding wuerde nur in eine dimension passend machen
-    // doesnt work: mGraphicsView->fitInView(mGraphicsView->sceneRect(), Qt::KeepAspectRatio); // two times, while in the first run possibly the scrollbars have been there for calculation
+    mGraphicsView->fitInView(
+        mGraphicsView->sceneRect(),
+        Qt::KeepAspectRatio); // Qt::KeepAspectRatioByExpanding wuerde nur in eine dimension passend machen
+    // doesnt work: mGraphicsView->fitInView(mGraphicsView->sceneRect(), Qt::KeepAspectRatio); // two times, while in
+    // the first run possibly the scrollbars have been there for calculation
     QTransform matrix = mGraphicsView->transform();
     // calculates the sclaing of matrix
     // see http://www.robertblum.com/articles/2005/02/14/decomposing-matrices for rotation out of matrix
     double scale = Vec2F(matrix.m11(), matrix.m21()).length();
-    mZoomSlider->setValue((int) (250.+50.*log(scale)/log(2.)));
+    mZoomSlider->setValue((int) (250. + 50. * log(scale) / log(2.)));
 }
 
 void ViewWidget::fitInROI(QRectF rect)
 {
-    mGraphicsView->fitInView(rect, Qt::KeepAspectRatio); // Qt::KeepAspectRatioByExpanding wuerde nur in eine dimension passend machen
-    // doesnt work: mGraphicsView->fitInView(mGraphicsView->sceneRect(), Qt::KeepAspectRatio); // two times, while in the first run possibly the scrollbars have been there for calculation
+    mGraphicsView->fitInView(
+        rect, Qt::KeepAspectRatio); // Qt::KeepAspectRatioByExpanding wuerde nur in eine dimension passend machen
+    // doesnt work: mGraphicsView->fitInView(mGraphicsView->sceneRect(), Qt::KeepAspectRatio); // two times, while in
+    // the first run possibly the scrollbars have been there for calculation
     QTransform matrix = mGraphicsView->transform();
     // calculates the sclaing of matrix
     // see http://www.robertblum.com/articles/2005/02/14/decomposing-matrices for rotation out of matrix
     double scale = Vec2F(matrix.m11(), matrix.m21()).length();
-    mZoomSlider->setValue((int) (250.+50.*log(scale)/log(2.)));
+    mZoomSlider->setValue((int) (250. + 50. * log(scale) / log(2.)));
 }
 
 void ViewWidget::setupMatrix()
@@ -267,12 +274,12 @@ void ViewWidget::setupMatrix()
     mGraphicsView->setTransform(matrix);
 }
 
-void ViewWidget::zoomIn(int i) //default i = 1
+void ViewWidget::zoomIn(int i) // default i = 1
 {
     mZoomSlider->setValue(mZoomSlider->value() + i);
 }
 
-void ViewWidget::zoomOut(int i) //default i = 1
+void ViewWidget::zoomOut(int i) // default i = 1
 {
     mZoomSlider->setValue(mZoomSlider->value() - i);
 }
@@ -289,11 +296,12 @@ void ViewWidget::rotateRight()
 
 void ViewWidget::hideControls(bool hide)
 {
-    if ( hide )
+    if(hide)
     {
         mMainWindow->getControlWidget()->setVisible(false);
         hideShowControlsButton->setIcon(QPixmap(":/arrowLeft"));
-    }else
+    }
+    else
     {
         mMainWindow->getControlWidget()->setVisible(true);
         hideShowControlsButton->setIcon(QPixmap(":/arrowRight"));

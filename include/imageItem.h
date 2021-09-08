@@ -26,29 +26,30 @@
 class Petrack;
 class Control;
 
-class ImageItem: public QGraphicsItem
+class ImageItem : public QGraphicsItem
 {
 private:
-    Petrack *mMainWindow;
-    Control *mControlWidget;
-    QImage *mImage;
+    Petrack *      mMainWindow;
+    Control *      mControlWidget;
+    QImage *       mImage;
     QGraphicsItem *mCoordItem;
+
 public:
-    ImageItem(QWidget *wParent, QGraphicsItem * parent = nullptr);
+    ImageItem(QWidget *wParent, QGraphicsItem *parent = nullptr);
 
-    QRectF boundingRect() const; 
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QRectF boundingRect() const;
+    void   paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    void setImage(QImage *img);
-    void setCoordItem(QGraphicsItem *ci);
-    double getCmPerPixel();
+    void    setImage(QImage *img);
+    void    setCoordItem(QGraphicsItem *ci);
+    double  getCmPerPixel();
     QPointF getCmPerPixel(float px, float py, float h = 0.);
-    double getAngleToGround(float px, float py, float h = 0);
+    double  getAngleToGround(float px, float py, float h = 0);
     QPointF getPosImage(QPointF pos, float height = 0.);
     QPointF getPosReal(QPointF pos, double height = 0.);
 
-    void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
-    void hoverMoveEvent(QGraphicsSceneHoverEvent * event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
 };
 
 #endif

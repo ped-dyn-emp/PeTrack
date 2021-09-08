@@ -18,12 +18,12 @@
  * along with this program.  If not, see <https://cdwww.gnu.org/licenses/>.
  */
 
+#include "IO.h"
+#include "moCapPerson.h"
+
 #include <catch2/catch.hpp>
 #include <fstream>
 #include <ostream>
-
-#include "IO.h"
-#include "moCapPerson.h"
 
 TEST_CASE("src/IO", "[tracking][io]")
 {
@@ -44,7 +44,9 @@ TEST_CASE("src/IO", "[tracking][io]")
                 auto errorMessage = IO::readHeightFile("wrong.extension");
                 REQUIRE(std::holds_alternative<std::string>(errorMessage));
                 std::string errorAsString = std::get<std::string>(errorMessage);
-                REQUIRE_THAT(errorAsString, Catch::Matchers::Equals(
+                REQUIRE_THAT(
+                    errorAsString,
+                    Catch::Matchers::Equals(
                         "Cannot load wrong.extension maybe because of wrong file extension. Needs to be .txt."));
             }
 
@@ -56,7 +58,7 @@ TEST_CASE("src/IO", "[tracking][io]")
                 REQUIRE_THAT(errorAsString, Catch::Matchers::Equals("No file provided."));
             }
 
-            std::string heigtFileName{"heights.txt"};
+            std::string   heigtFileName{"heights.txt"};
             std::ofstream heightFile(heigtFileName);
             heightFile << "# id z/cm" << std::endl;
 
@@ -84,8 +86,9 @@ TEST_CASE("src/IO", "[tracking][io]")
                         auto errorMessage = IO::readHeightFile(QString::fromStdString(heigtFileName));
                         REQUIRE(std::holds_alternative<std::string>(errorMessage));
                         std::string errorAsString = std::get<std::string>(errorMessage);
-                        REQUIRE_THAT(errorAsString,
-                                     Catch::Matchers::Equals("Marker needs to be an integer value, but is 234.234"));
+                        REQUIRE_THAT(
+                            errorAsString,
+                            Catch::Matchers::Equals("Marker needs to be an integer value, but is 234.234"));
                     }
 
                     SECTION("arbitrary string")
@@ -96,8 +99,9 @@ TEST_CASE("src/IO", "[tracking][io]")
                         auto errorMessage = IO::readHeightFile(QString::fromStdString(heigtFileName));
                         REQUIRE(std::holds_alternative<std::string>(errorMessage));
                         std::string errorAsString = std::get<std::string>(errorMessage);
-                        REQUIRE_THAT(errorAsString,
-                                     Catch::Matchers::Equals("Marker needs to be an integer value, but is WRONG"));
+                        REQUIRE_THAT(
+                            errorAsString,
+                            Catch::Matchers::Equals("Marker needs to be an integer value, but is WRONG"));
                     }
                 }
 
@@ -111,8 +115,9 @@ TEST_CASE("src/IO", "[tracking][io]")
                         auto errorMessage = IO::readHeightFile(QString::fromStdString(heigtFileName));
                         REQUIRE(std::holds_alternative<std::string>(errorMessage));
                         std::string errorAsString = std::get<std::string>(errorMessage);
-                        REQUIRE_THAT(errorAsString, Catch::Matchers::Equals(
-                                "Height needs to be a positive numerical value, but is WRONG"));
+                        REQUIRE_THAT(
+                            errorAsString,
+                            Catch::Matchers::Equals("Height needs to be a positive numerical value, but is WRONG"));
                     }
 
                     SECTION("not positive")
@@ -123,8 +128,9 @@ TEST_CASE("src/IO", "[tracking][io]")
                         auto errorMessage = IO::readHeightFile(QString::fromStdString(heigtFileName));
                         REQUIRE(std::holds_alternative<std::string>(errorMessage));
                         std::string errorAsString = std::get<std::string>(errorMessage);
-                        REQUIRE_THAT(errorAsString, Catch::Matchers::Equals(
-                                "Height needs to be a positive numerical value, but is 0"));
+                        REQUIRE_THAT(
+                            errorAsString,
+                            Catch::Matchers::Equals("Height needs to be a positive numerical value, but is 0"));
                     }
                 }
 
@@ -136,7 +142,9 @@ TEST_CASE("src/IO", "[tracking][io]")
                     auto errorMessage = IO::readHeightFile(QString::fromStdString(heigtFileName));
                     REQUIRE(std::holds_alternative<std::string>(errorMessage));
                     std::string errorAsString = std::get<std::string>(errorMessage);
-                    REQUIRE_THAT(errorAsString, Catch::Matchers::Equals(
+                    REQUIRE_THAT(
+                        errorAsString,
+                        Catch::Matchers::Equals(
                             "Line should contain exactly 2 values: id height. But it contains 4 entries."));
                 }
 
@@ -148,7 +156,9 @@ TEST_CASE("src/IO", "[tracking][io]")
                     auto errorMessage = IO::readHeightFile(QString::fromStdString(heigtFileName));
                     REQUIRE(std::holds_alternative<std::string>(errorMessage));
                     std::string errorAsString = std::get<std::string>(errorMessage);
-                    REQUIRE_THAT(errorAsString, Catch::Matchers::Equals(
+                    REQUIRE_THAT(
+                        errorAsString,
+                        Catch::Matchers::Equals(
                             "Line should contain exactly 2 values: id height. But it contains 1 entries."));
                 }
             }
@@ -159,7 +169,7 @@ TEST_CASE("src/IO", "[tracking][io]")
 
         SECTION("correct input")
         {
-            std::string heigtFileName{"heights.txt"};
+            std::string   heigtFileName{"heights.txt"};
             std::ofstream heightFile(heigtFileName);
 
             SECTION("file empty")
@@ -172,35 +182,35 @@ TEST_CASE("src/IO", "[tracking][io]")
             }
 
             std::unordered_map<int, float> referenceValuesMap{
-                    {987, 184},   //NOLINT
-                    {988, 179},   //NOLINT
-                    {989, 177.5}, //NOLINT
-                    {990, 154.5}, //NOLINT
-                    {991, 177},   //NOLINT
-                    {992, 177},   //NOLINT
-                    {993, 175.5}, //NOLINT
-                    {994, 194},   //NOLINT
-                    {995, 177},   //NOLINT
-                    {996, 167},   //NOLINT
-                    {997, 174},   //NOLINT
-                    {998, 190},   //NOLINT
-                    {999, 174}    //NOLINT
+                {987, 184},   // NOLINT
+                {988, 179},   // NOLINT
+                {989, 177.5}, // NOLINT
+                {990, 154.5}, // NOLINT
+                {991, 177},   // NOLINT
+                {992, 177},   // NOLINT
+                {993, 175.5}, // NOLINT
+                {994, 194},   // NOLINT
+                {995, 177},   // NOLINT
+                {996, 167},   // NOLINT
+                {997, 174},   // NOLINT
+                {998, 190},   // NOLINT
+                {999, 174}    // NOLINT
             };
             std::vector<std::pair<int, float>> referenceValuesVec;
             referenceValuesVec.assign(std::begin(referenceValuesMap), std::end(referenceValuesMap));
 
             SECTION("no comments")
             {
-                std::for_each(std::begin(referenceValuesMap), std::end(referenceValuesMap),
-                              [&heightFile](const std::pair<int, float> & element)
-                              {
-                                heightFile << element.first << " " << element.second << std::endl;
-                              });
+                std::for_each(
+                    std::begin(referenceValuesMap),
+                    std::end(referenceValuesMap),
+                    [&heightFile](const std::pair<int, float> &element)
+                    { heightFile << element.first << " " << element.second << std::endl; });
                 heightFile.close();
 
                 auto ret = IO::readHeightFile(QString::fromStdString(heigtFileName));
                 REQUIRE(std::holds_alternative<std::unordered_map<int, float>>(ret));
-                std::unordered_map<int, float> markerHeights = std::get<std::unordered_map<int, float>>(ret);
+                std::unordered_map<int, float>     markerHeights = std::get<std::unordered_map<int, float>>(ret);
                 std::vector<std::pair<int, float>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerHeights), std::end(markerHeights));
                 CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
@@ -210,16 +220,16 @@ TEST_CASE("src/IO", "[tracking][io]")
             SECTION("z-coordinate in cm")
             {
                 heightFile << "# id z/cm" << std::endl;
-                std::for_each(std::begin(referenceValuesMap), std::end(referenceValuesMap),
-                              [&heightFile](const std::pair<int, float> & element)
-                              {
-                                  heightFile << element.first << " " << element.second << std::endl;
-                              });
+                std::for_each(
+                    std::begin(referenceValuesMap),
+                    std::end(referenceValuesMap),
+                    [&heightFile](const std::pair<int, float> &element)
+                    { heightFile << element.first << " " << element.second << std::endl; });
                 heightFile.close();
 
                 auto ret = IO::readHeightFile(QString::fromStdString(heigtFileName));
                 REQUIRE(std::holds_alternative<std::unordered_map<int, float>>(ret));
-                std::unordered_map<int, float> markerHeights = std::get<std::unordered_map<int, float>>(ret);
+                std::unordered_map<int, float>     markerHeights = std::get<std::unordered_map<int, float>>(ret);
                 std::vector<std::pair<int, float>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerHeights), std::end(markerHeights));
                 CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
@@ -228,16 +238,16 @@ TEST_CASE("src/IO", "[tracking][io]")
             SECTION("z-coordinate in m")
             {
                 heightFile << "# id z/m" << std::endl;
-                std::for_each(std::begin(referenceValuesMap), std::end(referenceValuesMap),
-                              [&heightFile](const std::pair<int, float> & element)
-                              {
-                                  heightFile << element.first << " " << element.second/100.F << std::endl;
-                              });
+                std::for_each(
+                    std::begin(referenceValuesMap),
+                    std::end(referenceValuesMap),
+                    [&heightFile](const std::pair<int, float> &element)
+                    { heightFile << element.first << " " << element.second / 100.F << std::endl; });
                 heightFile.close();
 
                 auto ret = IO::readHeightFile(QString::fromStdString(heigtFileName));
                 REQUIRE(std::holds_alternative<std::unordered_map<int, float>>(ret));
-                std::unordered_map<int, float> markerHeights = std::get<std::unordered_map<int, float>>(ret);
+                std::unordered_map<int, float>     markerHeights = std::get<std::unordered_map<int, float>>(ret);
                 std::vector<std::pair<int, float>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerHeights), std::end(markerHeights));
 
@@ -247,23 +257,22 @@ TEST_CASE("src/IO", "[tracking][io]")
             SECTION("z-coordinate unit not specified")
             {
                 heightFile << "# id z/not_specifies" << std::endl;
-                std::for_each(std::begin(referenceValuesMap), std::end(referenceValuesMap),
-                              [&heightFile](const std::pair<int, float> & element)
-                              {
-                                  heightFile << element.first << " " << element.second << std::endl;
-                              });
+                std::for_each(
+                    std::begin(referenceValuesMap),
+                    std::end(referenceValuesMap),
+                    [&heightFile](const std::pair<int, float> &element)
+                    { heightFile << element.first << " " << element.second << std::endl; });
                 heightFile.close();
 
                 auto ret = IO::readHeightFile(QString::fromStdString(heigtFileName));
                 REQUIRE(std::holds_alternative<std::unordered_map<int, float>>(ret));
-                std::unordered_map<int, float> markerHeights = std::get<std::unordered_map<int, float>>(ret);
+                std::unordered_map<int, float>     markerHeights = std::get<std::unordered_map<int, float>>(ret);
                 std::vector<std::pair<int, float>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerHeights), std::end(markerHeights));
                 CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
             }
 
             std::remove(heigtFileName.c_str());
-
         }
     }
 
@@ -284,7 +293,9 @@ TEST_CASE("src/IO", "[tracking][io]")
                 auto errorMessage = IO::readMarkerIDFile("wrong.extension");
                 REQUIRE(std::holds_alternative<std::string>(errorMessage));
                 std::string errorAsString = std::get<std::string>(errorMessage);
-                REQUIRE_THAT(errorAsString, Catch::Matchers::Equals(
+                REQUIRE_THAT(
+                    errorAsString,
+                    Catch::Matchers::Equals(
                         "Cannot load wrong.extension maybe because of wrong file extension. Needs to be .txt."));
             }
 
@@ -296,7 +307,7 @@ TEST_CASE("src/IO", "[tracking][io]")
                 REQUIRE_THAT(errorAsString, Catch::Matchers::Equals("No file provided."));
             }
 
-            std::string markerFileName{"marker.txt"};
+            std::string   markerFileName{"marker.txt"};
             std::ofstream markerFile(markerFileName);
             markerFile << "# id markerID" << std::endl;
 
@@ -324,8 +335,9 @@ TEST_CASE("src/IO", "[tracking][io]")
                         auto errorMessage = IO::readMarkerIDFile(QString::fromStdString(markerFileName));
                         REQUIRE(std::holds_alternative<std::string>(errorMessage));
                         std::string errorAsString = std::get<std::string>(errorMessage);
-                        REQUIRE_THAT(errorAsString,
-                                     Catch::Matchers::Equals("PersonID needs to be an integer value, but is 234.234"));
+                        REQUIRE_THAT(
+                            errorAsString,
+                            Catch::Matchers::Equals("PersonID needs to be an integer value, but is 234.234"));
                     }
 
                     SECTION("arbitrary string")
@@ -336,8 +348,9 @@ TEST_CASE("src/IO", "[tracking][io]")
                         auto errorMessage = IO::readMarkerIDFile(QString::fromStdString(markerFileName));
                         REQUIRE(std::holds_alternative<std::string>(errorMessage));
                         std::string errorAsString = std::get<std::string>(errorMessage);
-                        REQUIRE_THAT(errorAsString,
-                                     Catch::Matchers::Equals("PersonID needs to be an integer value, but is WRONG"));
+                        REQUIRE_THAT(
+                            errorAsString,
+                            Catch::Matchers::Equals("PersonID needs to be an integer value, but is WRONG"));
                     }
                 }
 
@@ -351,8 +364,9 @@ TEST_CASE("src/IO", "[tracking][io]")
                         auto errorMessage = IO::readMarkerIDFile(QString::fromStdString(markerFileName));
                         REQUIRE(std::holds_alternative<std::string>(errorMessage));
                         std::string errorAsString = std::get<std::string>(errorMessage);
-                        REQUIRE_THAT(errorAsString,
-                                     Catch::Matchers::Equals("MarkerID needs to be an integer value, but is 43.56"));
+                        REQUIRE_THAT(
+                            errorAsString,
+                            Catch::Matchers::Equals("MarkerID needs to be an integer value, but is 43.56"));
                     }
 
                     SECTION("arbitrary string")
@@ -363,8 +377,9 @@ TEST_CASE("src/IO", "[tracking][io]")
                         auto errorMessage = IO::readMarkerIDFile(QString::fromStdString(markerFileName));
                         REQUIRE(std::holds_alternative<std::string>(errorMessage));
                         std::string errorAsString = std::get<std::string>(errorMessage);
-                        REQUIRE_THAT(errorAsString,
-                                     Catch::Matchers::Equals("MarkerID needs to be an integer value, but is WRONG"));
+                        REQUIRE_THAT(
+                            errorAsString,
+                            Catch::Matchers::Equals("MarkerID needs to be an integer value, but is WRONG"));
                     }
                 }
 
@@ -376,7 +391,9 @@ TEST_CASE("src/IO", "[tracking][io]")
                     auto errorMessage = IO::readMarkerIDFile(QString::fromStdString(markerFileName));
                     REQUIRE(std::holds_alternative<std::string>(errorMessage));
                     std::string errorAsString = std::get<std::string>(errorMessage);
-                    REQUIRE_THAT(errorAsString, Catch::Matchers::Equals(
+                    REQUIRE_THAT(
+                        errorAsString,
+                        Catch::Matchers::Equals(
                             "Line should contain exactly 2 values: personID markerID. But it contains 4 entries."));
                 }
 
@@ -388,7 +405,9 @@ TEST_CASE("src/IO", "[tracking][io]")
                     auto errorMessage = IO::readMarkerIDFile(QString::fromStdString(markerFileName));
                     REQUIRE(std::holds_alternative<std::string>(errorMessage));
                     std::string errorAsString = std::get<std::string>(errorMessage);
-                    REQUIRE_THAT(errorAsString, Catch::Matchers::Equals(
+                    REQUIRE_THAT(
+                        errorAsString,
+                        Catch::Matchers::Equals(
                             "Line should contain exactly 2 values: personID markerID. But it contains 1 entries."));
                 }
             }
@@ -398,7 +417,7 @@ TEST_CASE("src/IO", "[tracking][io]")
 
         SECTION("correct input")
         {
-            std::string markerFileName{"marker.txt"};
+            std::string   markerFileName{"marker.txt"};
             std::ofstream markerFile(markerFileName);
 
             SECTION("file empty")
@@ -411,26 +430,26 @@ TEST_CASE("src/IO", "[tracking][io]")
             }
 
             std::unordered_map<int, int> referenceValuesMap{
-                    {1, 987},   //NOLINT
-                    {2, 988},   //NOLINT
-                    {3, 989},   //NOLINT
-                    {4, 990},   //NOLINT
-                    {5, 991},   //NOLINT
-                    {6, 992},   //NOLINT
-                    {7, 993},   //NOLINT
-                    {8, 994},   //NOLINT
-                    {9, 995},   //NOLINT
-                    {10, 996},  //NOLINT
-                    {11, 997},  //NOLINT
-                    {12, 998},  //NOLINT
-                    {14, 999}   //NOLINT
+                {1, 987},  // NOLINT
+                {2, 988},  // NOLINT
+                {3, 989},  // NOLINT
+                {4, 990},  // NOLINT
+                {5, 991},  // NOLINT
+                {6, 992},  // NOLINT
+                {7, 993},  // NOLINT
+                {8, 994},  // NOLINT
+                {9, 995},  // NOLINT
+                {10, 996}, // NOLINT
+                {11, 997}, // NOLINT
+                {12, 998}, // NOLINT
+                {14, 999}  // NOLINT
             };
             std::vector<std::pair<int, int>> referenceValuesVec;
             referenceValuesVec.assign(std::begin(referenceValuesMap), std::end(referenceValuesMap));
 
             SECTION("no comments")
             {
-                for (const auto & [personID, markerID] : referenceValuesMap)
+                for(const auto &[personID, markerID] : referenceValuesMap)
                 {
                     markerFile << personID << " " << markerID << std::endl;
                 }
@@ -438,7 +457,7 @@ TEST_CASE("src/IO", "[tracking][io]")
 
                 auto ret = IO::readMarkerIDFile(QString::fromStdString(markerFileName));
                 REQUIRE(std::holds_alternative<std::unordered_map<int, int>>(ret));
-                auto markerIDs = std::get<std::unordered_map<int, int>>(ret);
+                auto                             markerIDs = std::get<std::unordered_map<int, int>>(ret);
                 std::vector<std::pair<int, int>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerIDs), std::end(markerIDs));
                 CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
@@ -447,7 +466,7 @@ TEST_CASE("src/IO", "[tracking][io]")
             SECTION("with comments")
             {
                 markerFile << "# this is a comment at the beginning" << std::endl;
-                for (const auto & [personID, markerID] : referenceValuesMap)
+                for(const auto &[personID, markerID] : referenceValuesMap)
                 {
                     markerFile << personID << " " << markerID << std::endl;
                     markerFile << "# this is a comment in the middle" << std::endl;
@@ -457,7 +476,7 @@ TEST_CASE("src/IO", "[tracking][io]")
 
                 auto ret = IO::readMarkerIDFile(QString::fromStdString(markerFileName));
                 REQUIRE(std::holds_alternative<std::unordered_map<int, int>>(ret));
-                auto markerIDs = std::get<std::unordered_map<int, int>>(ret);
+                auto                             markerIDs = std::get<std::unordered_map<int, int>>(ret);
                 std::vector<std::pair<int, int>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerIDs), std::end(markerIDs));
                 CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
@@ -482,14 +501,16 @@ SCENARIO("I want to read a XSens c3d file", "[io]")
         unit.set("cm");
         c3d.parameter("POINT", unit);
 
-        for(int i = 0; i < 64; ++i){
-            c3d.point("marker_" + std::to_string(i+1));
+        for(int i = 0; i < 64; ++i)
+        {
+            c3d.point("marker_" + std::to_string(i + 1));
         }
 
-        ezc3d::DataNS::Frame f;
-        int nPoints(c3d.parameters().group("POINT").parameter("USED").valuesAsInt()[0]);
+        ezc3d::DataNS::Frame              f;
+        int                               nPoints(c3d.parameters().group("POINT").parameter("USED").valuesAsInt()[0]);
         ezc3d::DataNS::Points3dNS::Points pts;
-        for (size_t i=0; i<static_cast<size_t>(nPoints); ++i){
+        for(size_t i = 0; i < static_cast<size_t>(nPoints); ++i)
+        {
             ezc3d::DataNS::Points3dNS::Point pt;
             // See i-value via x/y/z value
             pt.x(i);
@@ -498,17 +519,21 @@ SCENARIO("I want to read a XSens c3d file", "[io]")
             pts.point(pt);
         }
         f.add(pts);
-        for(int i = 0; i < 10; ++i){
+        for(int i = 0; i < 10; ++i)
+        {
             c3d.frame(f);
         }
 
         AND_GIVEN("I read that c3d-file into a MoCapPerson")
         {
             MoCapPerson person;
-            auto c3dToPoint3f = [](ezc3d::DataNS::Points3dNS::Point point){
-                return cv::Point3f{static_cast<float>(point.x()),
-                                   static_cast<float>(point.y()),
-                                   static_cast<float>(point.z())} * 1;
+            auto        c3dToPoint3f = [](ezc3d::DataNS::Points3dNS::Point point)
+            {
+                return cv::Point3f{
+                           static_cast<float>(point.x()),
+                           static_cast<float>(point.y()),
+                           static_cast<float>(point.z())} *
+                       1;
             };
             IO::readSkeletonC3D_XSENS(c3d, person, c3dToPoint3f);
 
@@ -516,15 +541,12 @@ SCENARIO("I want to read a XSens c3d file", "[io]")
             THEN("The MoCapPerson is properly initialized")
             {
                 auto skeleton = person.getSkeleton(0);
-                auto root = skeleton.getRoot();
+                auto root     = skeleton.getRoot();
                 // NOTE checking everything should be part of a test for the SkeletonFactory
 
-                REQUIRE(root.getPos() == cv::Point3f{7,7,7}); // pSacrum point[7]
-                REQUIRE(root.getChildById(1).getPos() == cv::Point3f(15,15,15)); // pC7SpinalProcess point[15]
+                REQUIRE(root.getPos() == cv::Point3f{7, 7, 7});                    // pSacrum point[7]
+                REQUIRE(root.getChildById(1).getPos() == cv::Point3f(15, 15, 15)); // pC7SpinalProcess point[15]
             }
         }
     }
-
 }
-
-    

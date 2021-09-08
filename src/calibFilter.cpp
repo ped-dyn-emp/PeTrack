@@ -19,11 +19,11 @@
  */
 
 #include "calibFilter.h"
+
 #include "helper.h"
 
 
-CalibFilter::CalibFilter()
-    :Filter()
+CalibFilter::CalibFilter() : Filter()
 {
     getFx()->setMinimum(500.);
     getFx()->setMaximum(5000.);
@@ -100,70 +100,79 @@ cv::Mat CalibFilter::act(cv::Mat &img, cv::Mat &res)
 {
     if(this->changed() || map1.size() != img.size())
     {
-        cv::Mat camera = (cv::Mat_<float>(3,3) << getFx()->getValue(), 0,                   getCx()->getValue(),
-                                          0,                   getFy()->getValue(), getCy()->getValue(),
-                                          0,                   0,                   1                   );
-        cv::Mat dist = (cv::Mat_<float>(1,8) << getR2()->getValue(), getR4()->getValue(),
-                                        getTx()->getValue(), getTy()->getValue(),
-                                        getR6()->getValue(),
-                                        getK4()->getValue(), getK5()->getValue(), getK6()->getValue());
+        cv::Mat camera =
+            (cv::Mat_<float>(3, 3) << getFx()->getValue(),
+             0,
+             getCx()->getValue(),
+             0,
+             getFy()->getValue(),
+             getCy()->getValue(),
+             0,
+             0,
+             1);
+        cv::Mat dist =
+            (cv::Mat_<float>(1, 8) << getR2()->getValue(),
+             getR4()->getValue(),
+             getTx()->getValue(),
+             getTy()->getValue(),
+             getR6()->getValue(),
+             getK4()->getValue(),
+             getK5()->getValue(),
+             getK6()->getValue());
 
 
-        initUndistortRectifyMap(camera, dist, cv::Mat_<double>::eye(3,3),
-                                camera,
-                                img.size(), CV_16SC2, map1, map2);
+        initUndistortRectifyMap(camera, dist, cv::Mat_<double>::eye(3, 3), camera, img.size(), CV_16SC2, map1, map2);
     }
 
     cv::remap(img, res, map1, map2, cv::INTER_LINEAR, cv::BORDER_CONSTANT);
     return res;
 }
 
-Parameter* CalibFilter::getFx()
+Parameter *CalibFilter::getFx()
 {
     return &mFx;
 }
-Parameter* CalibFilter::getFy()
+Parameter *CalibFilter::getFy()
 {
     return &mFy;
 }
-Parameter* CalibFilter::getCx()
+Parameter *CalibFilter::getCx()
 {
     return &mCx;
 }
-Parameter* CalibFilter::getCy()
+Parameter *CalibFilter::getCy()
 {
     return &mCy;
 }
-Parameter* CalibFilter::getR2()
+Parameter *CalibFilter::getR2()
 {
     return &mR2;
 }
-Parameter* CalibFilter::getR4()
+Parameter *CalibFilter::getR4()
 {
     return &mR4;
 }
-Parameter* CalibFilter::getTx()
+Parameter *CalibFilter::getTx()
 {
     return &mTx;
 }
-Parameter* CalibFilter::getTy()
+Parameter *CalibFilter::getTy()
 {
     return &mTy;
 }
-Parameter* CalibFilter::getR6()
+Parameter *CalibFilter::getR6()
 {
     return &mR6;
 }
-Parameter* CalibFilter::getK4()
+Parameter *CalibFilter::getK4()
 {
     return &mK4;
 }
-Parameter* CalibFilter::getK5()
+Parameter *CalibFilter::getK5()
 {
     return &mK5;
 }
-Parameter* CalibFilter::getK6()
+Parameter *CalibFilter::getK6()
 {
     return &mK6;
 }
-

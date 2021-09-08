@@ -21,13 +21,13 @@
 #ifndef COLORMARKERWIDGET_H
 #define COLORMARKERWIDGET_H
 
-#include <QtWidgets>
+#include "colorMarkerItem.h"
+#include "petrack.h"
 #include "ui_colorMarker.h"
 
-#include "petrack.h"
-#include "colorMarkerItem.h"
+#include <QtWidgets>
 
-class ColorMarkerWidget: public QWidget, public Ui::ColorMarker
+class ColorMarkerWidget : public QWidget, public Ui::ColorMarker
 {
     Q_OBJECT
 
@@ -55,63 +55,64 @@ private slots:
         mMainWindow->getColorMarkerItem()->setVisible(i);
         mMainWindow->getScene()->update();
     }
-    void on_maskMask_stateChanged(int /*i*/)
-    {
-        mMainWindow->getScene()->update();
-    }
-    void on_opacity_valueChanged(int /*i*/)
-    {
-        mMainWindow->getScene()->update();
-    }
+
+    void on_maskMask_stateChanged(int /*i*/) { mMainWindow->getScene()->update(); }
+    void on_opacity_valueChanged(int /*i*/) { mMainWindow->getScene()->update(); }
 
     // functions which force a new recognition
     void on_inversHue_stateChanged(int /*i*/)
     {
-        mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
-        if( !mMainWindow->isLoading() )
+        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+        if(!mMainWindow->isLoading())
             mMainWindow->updateImage();
     }
+
     void on_useOpen_stateChanged(int /*i*/)
     {
-        mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
-        if( !mMainWindow->isLoading() )
+        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+        if(!mMainWindow->isLoading())
             mMainWindow->updateImage();
     }
+
     void on_useClose_stateChanged(int /*i*/)
     {
-        mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
-        if( !mMainWindow->isLoading() )
+        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+        if(!mMainWindow->isLoading())
             mMainWindow->updateImage();
     }
 
     void on_closeRadius_valueChanged(int /*i*/)
     {
-        mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
-        if( !mMainWindow->isLoading() )
+        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+        if(!mMainWindow->isLoading())
             mMainWindow->updateImage();
     }
+
     void on_openRadius_valueChanged(int /*i*/)
     {
-        mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
-        if( !mMainWindow->isLoading() )
+        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+        if(!mMainWindow->isLoading())
             mMainWindow->updateImage();
     }
+
     void on_minArea_valueChanged(int /*i*/)
     {
-        mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
-        if( !mMainWindow->isLoading() )
+        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+        if(!mMainWindow->isLoading())
             mMainWindow->updateImage();
     }
+
     void on_maxArea_valueChanged(int /*i*/)
     {
-        mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
-        if( !mMainWindow->isLoading() )
+        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+        if(!mMainWindow->isLoading())
             mMainWindow->updateImage();
     }
+
     void on_maxRatio_valueChanged(double /*d*/)
     {
-        mMainWindow->setRecognitionChanged(true);// flag indicates that changes of recognition parameters happens
-        if( !mMainWindow->isLoading() )
+        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+        if(!mMainWindow->isLoading())
             mMainWindow->updateImage();
     }
 

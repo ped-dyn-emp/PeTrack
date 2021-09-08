@@ -18,22 +18,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QtWidgets>
-
-#include "petrack.h"
-#include "view.h"
 #include "codeMarkerItem.h"
+
 #include "codeMarkerWidget.h"
-#include "tracker.h"
 #include "control.h"
+#include "petrack.h"
+#include "tracker.h"
+#include "view.h"
+
+#include <QtWidgets>
 
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,
 // so dass pixel quadratisch
-CodeMarkerItem::CodeMarkerItem(QWidget *wParent, const reco::CodeMarkerOptions &options, QGraphicsItem * parent)
-    : QGraphicsItem(parent), mArucoOptions(options)
+CodeMarkerItem::CodeMarkerItem(QWidget *wParent, const reco::CodeMarkerOptions &options, QGraphicsItem *parent) :
+    QGraphicsItem(parent), mArucoOptions(options)
 {
-    mMainWindow = (class Petrack*) wParent;
+    mMainWindow = (class Petrack *) wParent;
 }
 
 
@@ -47,13 +48,17 @@ CodeMarkerItem::CodeMarkerItem(QWidget *wParent, const reco::CodeMarkerOptions &
  */
 QRectF CodeMarkerItem::boundingRect() const
 {
-    if (mMainWindow->getImage())
-        return QRectF(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize(), mMainWindow->getImage()->width(), mMainWindow->getImage()->height());
+    if(mMainWindow->getImage())
+        return QRectF(
+            -mMainWindow->getImageBorderSize(),
+            -mMainWindow->getImageBorderSize(),
+            mMainWindow->getImage()->width(),
+            mMainWindow->getImage()->height());
     else
         return QRectF(0, 0, 0, 0);
 }
 
-void CodeMarkerItem::setRect(Vec2F& v)
+void CodeMarkerItem::setRect(Vec2F &v)
 {
     mUlc = v; // upper left corner to draw
 }
@@ -62,20 +67,19 @@ void CodeMarkerItem::setRect(Vec2F& v)
  * @brief draws colored shapes at heads in image to indicate detection status
  *
  * different calculations of position depending on whether function is called out of findCodeMarker() Function
- * only (== recoMethod 6) or if findCodeMarker() Function is called out of findMulticolorMarker() Function (== recoMethod 5).
- * In the first case the offset is added automatically via 'offset' and 'v'.
- * In the second case the offset from cropRect to ROI has to be added manually.
+ * only (== recoMethod 6) or if findCodeMarker() Function is called out of findMulticolorMarker() Function (==
+ * recoMethod 5). In the first case the offset is added automatically via 'offset' and 'v'. In the second case the
+ * offset from cropRect to ROI has to be added manually.
  *
  * @param painter
  * @param option
  * @param widget
  */
-void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/)
+void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-
-    if (mMainWindow->getCodeMarkerWidget()->showDetectedCandidates())
+    if(mMainWindow->getCodeMarkerWidget()->showDetectedCandidates())
     {
-        int nMarkers = static_cast<int>(mCorners.size());
+        int nMarkers  = static_cast<int>(mCorners.size());
         int nRejected = static_cast<int>(mRejected.size());
 
         cv::Point2f p0, p1;
@@ -89,39 +93,37 @@ void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*
         }
     }
 
-    if (false) // Show min/max marker size
+    if(false) // Show min/max marker size
     {
-        int minPerimeter = mArucoOptions.getDetectorParams().getMinMarkerPerimeter();
-        int maxPerimeter = mArucoOptions.getDetectorParams().getMaxMarkerPerimeter();
-        double height = mMainWindow->getStatusPosRealHeight();
+        int    minPerimeter = mArucoOptions.getDetectorParams().getMinMarkerPerimeter();
+        int    maxPerimeter = mArucoOptions.getDetectorParams().getMaxMarkerPerimeter();
+        double height       = mMainWindow->getStatusPosRealHeight();
 
-        cv::Point2f p0,p1,p2,p3;
+        cv::Point2f p0, p1, p2, p3;
 
-        p0 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(0,0,height));
-        p1 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(maxPerimeter,0,height));
-        p2 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(maxPerimeter,maxPerimeter,height));
-        p3 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(0,maxPerimeter,height));
+        p0 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(0, 0, height));
+        p1 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(maxPerimeter, 0, height));
+        p2 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(maxPerimeter, maxPerimeter, height));
+        p3 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(0, maxPerimeter, height));
 
-        painter->setPen(qRgb(0,0,0));
-        painter->drawLine(p0.x,+p0.y,p1.x,p1.y);
-        painter->drawLine(p1.x,+p1.y,p2.x,p2.y);
-        painter->drawLine(p2.x,+p2.y,p3.x,p3.y);
-        painter->drawLine(p3.x,p3.y,p0.x,p0.y);
+        painter->setPen(qRgb(0, 0, 0));
+        painter->drawLine(p0.x, +p0.y, p1.x, p1.y);
+        painter->drawLine(p1.x, +p1.y, p2.x, p2.y);
+        painter->drawLine(p2.x, +p2.y, p3.x, p3.y);
+        painter->drawLine(p3.x, p3.y, p0.x, p0.y);
 
 
-        p0 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(0,0,height));
-        p1 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(minPerimeter,0,height));
-        p2 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(minPerimeter,minPerimeter,height));
-        p3 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(0,minPerimeter,height));
+        p0 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(0, 0, height));
+        p1 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(minPerimeter, 0, height));
+        p2 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(minPerimeter, minPerimeter, height));
+        p3 = mMainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(0, minPerimeter, height));
 
-        painter->setPen(qRgb(255,255,255));
-        painter->drawLine(p0.x,p0.y,p1.x,p1.y);
-        painter->drawLine(p1.x,p1.y,p2.x,p2.y);
-        painter->drawLine(p2.x,p2.y,p3.x,p3.y);
-        painter->drawLine(p3.x,p3.y,p0.x,p0.y);
-
+        painter->setPen(qRgb(255, 255, 255));
+        painter->drawLine(p0.x, p0.y, p1.x, p1.y);
+        painter->drawLine(p1.x, p1.y, p2.x, p2.y);
+        painter->drawLine(p2.x, p2.y, p3.x, p3.y);
+        painter->drawLine(p3.x, p3.y, p0.x, p0.y);
     }
-
 }
 
 /**
@@ -134,22 +136,24 @@ void CodeMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem */*
  * @param borderColor color of the rect drawn
  * @param painter painter with which to draw
  */
-void CodeMarkerItem::drawMarker(const OffsetMarker& currentMarker, int id, const QColor& borderColor, QPainter *painter)
+void CodeMarkerItem::drawMarker(const OffsetMarker &currentMarker, int id, const QColor &borderColor, QPainter *painter)
 {
     Vec2F offset = currentMarker.offset;
     // draw marker sides
-    for(int j = 0; j < numCorners; j++) {
+    for(int j = 0; j < numCorners; j++)
+    {
         Vec2F p0 = currentMarker.corners.at(j);
         Vec2F p1 = currentMarker.corners.at((j + 1) % numCorners);
         painter->setPen(borderColor);
         painter->drawLine((mUlc + p0 + offset).toQPointF(), (mUlc + p1 + offset).toQPointF());
     }
-    Vec2F topLeftCorner {currentMarker.corners.at(0)};
+    Vec2F topLeftCorner{currentMarker.corners.at(0)};
     painter->setPen(mCornerColor);
-    if(id != -1) {
-        painter->drawText((mUlc + topLeftCorner + offset + Vec2F(10,10)).toQPointF(), QString::number(id));
+    if(id != -1)
+    {
+        painter->drawText((mUlc + topLeftCorner + offset + Vec2F(10, 10)).toQPointF(), QString::number(id));
     }
-    painter->drawRect(QRectF((mUlc + topLeftCorner + offset - Vec2F(3,3)).toQPointF(), QSize(6.0,6.0)));
+    painter->drawRect(QRectF((mUlc + topLeftCorner + offset - Vec2F(3, 3)).toQPointF(), QSize(6.0, 6.0)));
 }
 
 /**
@@ -161,7 +165,10 @@ void CodeMarkerItem::drawMarker(const OffsetMarker& currentMarker, int id, const
  * @param ids ids of the detected markers
  * @param offset offset from marker-coords to recognition ROI
  */
-void CodeMarkerItem::addDetectedMarkers(std::vector<std::vector<cv::Point2f> > corners, std::vector<int> ids, Vec2F offset /* = (0,0)*/)
+void CodeMarkerItem::addDetectedMarkers(
+    std::vector<std::vector<cv::Point2f>> corners,
+    std::vector<int>                      ids,
+    Vec2F                                 offset /* = (0,0)*/)
 {
     for(std::vector<cv::Point2f> singleMarkerCorners : corners)
     {
@@ -176,7 +183,7 @@ void CodeMarkerItem::addDetectedMarkers(std::vector<std::vector<cv::Point2f> > c
  * @param rejected corners of the rejected markers
  * @param offset offset from marker-coords to recognition ROI
  */
-void CodeMarkerItem::addRejectedMarkers(std::vector<std::vector<cv::Point2f> > rejected, Vec2F offset /* = (0,0)*/)
+void CodeMarkerItem::addRejectedMarkers(std::vector<std::vector<cv::Point2f>> rejected, Vec2F offset /* = (0,0)*/)
 {
     for(std::vector<cv::Point2f> singleMarkerCorners : rejected)
     {

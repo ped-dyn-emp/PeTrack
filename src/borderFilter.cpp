@@ -21,8 +21,7 @@
 #include "borderFilter.h"
 
 
-BorderFilter::BorderFilter()
-    :Filter()
+BorderFilter::BorderFilter() : Filter()
 {
     mS.setMinimum(0.);
     mS.setMaximum(200.);
@@ -50,29 +49,30 @@ BorderFilter::BorderFilter()
 cv::Mat BorderFilter::act(cv::Mat &img, cv::Mat &res)
 {
     // border size
-    int s = (int) mS.getValue(); // schon beim zuweisen auf param gemacht (2*, da undistord filter anscheinend sonst probleme hat)
+    int s = (int) mS.getValue(); // schon beim zuweisen auf param gemacht (2*, da undistord filter anscheinend sonst
+                                 // probleme hat)
     int r = (int) mR.getValue();
     int g = (int) mG.getValue();
     int b = (int) mB.getValue();
 
-    cv::copyMakeBorder(img,res, s, s, s, s,cv::BORDER_CONSTANT,cv::Scalar(b,g,r));
+    cv::copyMakeBorder(img, res, s, s, s, s, cv::BORDER_CONSTANT, cv::Scalar(b, g, r));
 
     return res;
 }
 
-Parameter* BorderFilter::getBorderSize()
+Parameter *BorderFilter::getBorderSize()
 {
     return &mS;
 }
-Parameter* BorderFilter::getBorderColR()
+Parameter *BorderFilter::getBorderColR()
 {
     return &mR;
 }
-Parameter* BorderFilter::getBorderColG()
+Parameter *BorderFilter::getBorderColG()
 {
     return &mG;
 }
-Parameter* BorderFilter::getBorderColB()
+Parameter *BorderFilter::getBorderColB()
 {
     return &mB;
 }

@@ -37,26 +37,26 @@ class Filter;
 class Parameter
 {
 private:
-    double mValue;
-    double mMinimum;
-    double mMaximum;
-    bool mChg;
+    double  mValue;
+    double  mMinimum;
+    double  mMaximum;
+    bool    mChg;
     Filter *mFilter; // Filter where parameter is for
 
 public:
     Parameter();
 
-    void setFilter(Filter *filter);
-    Filter * getFilter();
+    void    setFilter(Filter *filter);
+    Filter *getFilter();
 
     double value() const;
     double getValue() const;
-    void setValue(double d);
+    void   setValue(double d);
 
     double getMinimum() const;
-    void setMinimum(double d);
+    void   setMinimum(double d);
     double getMaximum() const;
-    void setMaximum(double d);
+    void   setMaximum(double d);
 
     bool changed() const;
     bool getChanged() const;
@@ -75,20 +75,21 @@ public:
  * activation/deactivation as well as automated detection
  * of changed parameters.
  */
-class Filter {
+class Filter
+{
 private:
-    bool mChg;       // if filter paramater were changed
-    bool mEnable;    // if filter is actice
-    bool mOnCopy;    // if filter works on a copy 
+    bool    mChg;    // if filter paramater were changed
+    bool    mEnable; // if filter is actice
+    bool    mOnCopy; // if filter works on a copy
     cv::Mat mRes;
-    
+
     // pure virtual function, where to implement the filter conversion
     // returns the result over pointer res and as result
-    virtual cv::Mat act(cv::Mat &img, cv::Mat &res)=0;
+    virtual cv::Mat act(cv::Mat &img, cv::Mat &res) = 0;
 
 public:
     Filter();
-    virtual ~Filter() {};
+    virtual ~Filter(){};
 
     bool changed() const;
     bool getChanged();
@@ -99,7 +100,7 @@ public:
     cv::Mat apply(cv::Mat &img);
 
     cv::Mat getLastResult();
-    void freeLastResult();
+    void    freeLastResult();
 
     void enable();
     void disable();

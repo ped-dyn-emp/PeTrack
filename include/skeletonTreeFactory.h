@@ -21,8 +21,9 @@
 #ifndef SKELETONTREE_FACTORY_H
 #define SKELETONTREE_FACTORY_H
 
-#include <opencv2/core/types.hpp>
 #include "skeletonTree.h"
+
+#include <opencv2/core/types.hpp>
 
 /**
  * @brief This struct defines all the points needed to construct a skeleton from a person.
@@ -33,7 +34,8 @@
  * @see SkeletonTreeFactory
  * @see SkeletonTree
  **/
-struct XSenseStruct{
+struct XSenseStruct
+{
     cv::Point3f mRoot; /***< pSacrum used as sacrum and root. Id is 0. */
 
     cv::Point3f mNeck; /**< pC7SpinalProcess used as atlas bone. Id is 1. */
@@ -46,14 +48,14 @@ struct XSenseStruct{
     cv::Point3f mElbowR; /**< pRightOlecranon used as right elbow. Id is 8. */
     cv::Point3f mElbowL; /**< pLeftOlecranon used as left elbow. Id is 4. */
 
-    cv::Point3f mWristR;  /**< pRightStyloid used as right wrist. Id is 9. */
-    cv::Point3f mWristL;  /**< pLeftStyloid used as left wrist. Id is 5. */
+    cv::Point3f mWristR; /**< pRightStyloid used as right wrist. Id is 9. */
+    cv::Point3f mWristL; /**< pLeftStyloid used as left wrist. Id is 5. */
 
     cv::Point3f mHandR; /**< pRightTopOfHand used as the right hand. Id is 10. */
     cv::Point3f mHandL; /**< pLeftTopOfHand used as the left hand. Id is 6.*/
 
-    cv::Point3f mHipR;  /**< pRightIschialTub used as the right hip. Id is 15. */
-    cv::Point3f mHipL;  /**< pLeftIschialTub used as the left hip. Id is 11. */
+    cv::Point3f mHipR; /**< pRightIschialTub used as the right hip. Id is 15. */
+    cv::Point3f mHipL; /**< pLeftIschialTub used as the left hip. Id is 11. */
 
     cv::Point3f mKneeR; /**< pRightPatella used as the right knee. Id is 16. */
     cv::Point3f mKneeL; /**< pLeftPatella used as the left knee. Id is 12. */
@@ -75,9 +77,10 @@ struct XSenseStruct{
  *  Using that struct as a parameter the generateTree can be overloaded.
  *  @see SkeletonTree
  **/
-class SkeletonTreeFactory{
+class SkeletonTreeFactory
+{
 public:
-    static SkeletonTree generateTree(const XSenseStruct&  points);
+    static SkeletonTree generateTree(const XSenseStruct &points);
 };
 
 #endif

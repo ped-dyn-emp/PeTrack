@@ -17,23 +17,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <QFileDialog>
+#include "openMoCapDialog.h"
 
 #include "analysePlot.h"
-#include "openMoCapDialog.h"
-#include "ui_openMoCapDialog.h"
 #include "moCapPersonMetadata.h"
-
 #include "moCapSelectionWidget.h"
+#include "ui_openMoCapDialog.h"
+
+#include <QFileDialog>
 
 OpenMoCapDialog::OpenMoCapDialog(QWidget *parent, MoCapController &controller) :
-        QDialog(parent),
-        mUi(new Ui::OpenMoCapDialog),
-        mController(controller),
-        mParent(parent)
+    QDialog(parent), mUi(new Ui::OpenMoCapDialog), mController(controller), mParent(parent)
 {
     mUi->setupUi(this);
-
 
 
     mMoCapSystems = QMap<QString, MoCapSystem>();
@@ -41,7 +37,8 @@ OpenMoCapDialog::OpenMoCapDialog(QWidget *parent, MoCapController &controller) :
     mMoCapSystems.insert("XSensC3D", MoCapSystem::XSensC3D);
 
     const auto loadedMetadata = mController.getAllMoCapPersonMetadata();
-    for(const auto& metadata : loadedMetadata){
+    for(const auto &metadata : loadedMetadata)
+    {
         mUi->moCapSelections->layout()->addWidget(new MoCapSelectionWidget(this, mMoCapSystems, metadata));
     }
 
@@ -50,28 +47,32 @@ OpenMoCapDialog::OpenMoCapDialog(QWidget *parent, MoCapController &controller) :
 }
 
 
-
 /**
  * @brief Sets FileAttributes of MoCapController and calls readMoCapFile
  *
  * This method is called by a Signal(Ok-Button) and closes the window if no errors occur.
  */
-void OpenMoCapDialog::clickedOk() {
-    bool allDataIsValid = true;
+void OpenMoCapDialog::clickedOk()
+{
+    bool                             allDataIsValid = true;
     std::vector<MoCapPersonMetadata> metadata;
 
     for(int i = 0; i < mUi->moCapSelections->layout()->count(); ++i)
     {
-        auto selectionWidget = dynamic_cast<const MoCapSelectionWidget*>(mUi->moCapSelections->layout()->itemAt(i)->widget());
+        auto selectionWidget =
+            dynamic_cast<const MoCapSelectionWidget *>(mUi->moCapSelections->layout()->itemAt(i)->widget());
         if(selectionWidget == nullptr || !selectionWidget->isFilledOut())
         {
             continue;
         }
 
-        try{
+        try
+        {
             MoCapPersonMetadata currentMetadata = selectionWidget->getMetadata();
             metadata.push_back(currentMetadata);
-        }catch(std::exception &e){
+        }
+        catch(std::exception &e)
+        {
             allDataIsValid = false;
             std::stringstream errormsg;
             errormsg << e.what() << "\n";
@@ -82,10 +83,13 @@ void OpenMoCapDialog::clickedOk() {
 
     if(allDataIsValid)
     {
-        try {
+        try
+        {
             mController.readMoCapFiles(metadata);
             this->close();
-        }  catch (std::exception &e) {
+        }
+        catch(std::exception &e)
+        {
             std::stringstream errormsg;
             errormsg << e.what() << "\n";
             QMessageBox::critical(mParent, "PeTrack", QString::fromStdString(errormsg.str()));
@@ -103,4 +107,3 @@ void OpenMoCapDialog::on_btnAddSelection_clicked()
 {
     mUi->moCapSelections->layout()->addWidget(new MoCapSelectionWidget(this, mMoCapSystems));
 }
-

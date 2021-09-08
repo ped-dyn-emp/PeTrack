@@ -18,82 +18,83 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "player.h"
+
+#include "animation.h"
+#include "control.h"
+#include "pMessageBox.h"
+#include "petrack.h"
+
 #include <QApplication>
-#include <QToolButton>
-#include <QVBoxLayout>
+#include <QIntValidator>
+#include <QLabel>
+#include <QLineEdit>
 #include <QPixmap>
 #include <QSlider>
 #include <QStyle>
-#include <QLineEdit>
-#include <QLabel>
-#include <QIntValidator>
+#include <QToolButton>
+#include <QVBoxLayout>
 #include <QtConcurrent>
-
-#include "player.h"
-#include "animation.h"
-#include "petrack.h"
-#include "control.h"
-#include "pMessageBox.h"
 
 
 Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
 {
-    int size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
+    int   size = style()->pixelMetric(QStyle::PM_ToolBarIconSize);
     QSize iconSize(size, size);
 
-    //play forward Button
+    // play forward Button
     mPlayForwardButton = new QToolButton;
     mPlayForwardButton->setIcon(QPixmap(":/playF"));
     mPlayForwardButton->setIconSize(iconSize);
-    connect(mPlayForwardButton, &QToolButton::clicked,this, [&](){this->play(PlayerState::FORWARD);});
+    connect(mPlayForwardButton, &QToolButton::clicked, this, [&]() { this->play(PlayerState::FORWARD); });
 
-    //play backward Button
+    // play backward Button
     mPlayBackwardButton = new QToolButton;
     mPlayBackwardButton->setIcon(QPixmap(":/playB"));
     mPlayBackwardButton->setIconSize(iconSize);
-    connect(mPlayBackwardButton, &QToolButton::clicked, this, [&](){this->play(PlayerState::BACKWARD);});
+    connect(mPlayBackwardButton, &QToolButton::clicked, this, [&]() { this->play(PlayerState::BACKWARD); });
 
-    //frame forward Button
+    // frame forward Button
     mFrameForwardButton = new QToolButton;
     mFrameForwardButton->setAutoRepeat(true);
-    mFrameForwardButton->setAutoRepeatDelay(400);   // before repetition starts
-    mFrameForwardButton->setAutoRepeatInterval(1000./DEFAULT_FPS); // war: 40 // for 1000 ms / 25 fps
+    mFrameForwardButton->setAutoRepeatDelay(400);                    // before repetition starts
+    mFrameForwardButton->setAutoRepeatInterval(1000. / DEFAULT_FPS); // war: 40 // for 1000 ms / 25 fps
     mFrameForwardButton->setIcon(QPixmap(":/skipF"));
     mFrameForwardButton->setIconSize(iconSize);
-    connect(mFrameForwardButton,SIGNAL(clicked()),this,SLOT(frameForward()));
+    connect(mFrameForwardButton, SIGNAL(clicked()), this, SLOT(frameForward()));
 
-    //frame backward Button
+    // frame backward Button
     mFrameBackwardButton = new QToolButton;
     mFrameBackwardButton->setAutoRepeat(true);
-    mFrameBackwardButton->setAutoRepeatDelay(400);   // before repetition starts
-    mFrameBackwardButton->setAutoRepeatInterval(1000./DEFAULT_FPS); // war: 40 // for 1000 ms / 25 fps
+    mFrameBackwardButton->setAutoRepeatDelay(400);                    // before repetition starts
+    mFrameBackwardButton->setAutoRepeatInterval(1000. / DEFAULT_FPS); // war: 40 // for 1000 ms / 25 fps
     mFrameBackwardButton->setIcon(QPixmap(":/skipB"));
     mFrameBackwardButton->setIconSize(iconSize);
-    connect(mFrameBackwardButton,SIGNAL(clicked()),this,SLOT(frameBackward()));
+    connect(mFrameBackwardButton, SIGNAL(clicked()), this, SLOT(frameBackward()));
 
-    //pause button;
+    // pause button;
     mPauseButton = new QToolButton;
     mPauseButton->setIcon(QPixmap(":/pause"));
     mPauseButton->setIconSize(iconSize);
-    connect(mPauseButton,SIGNAL(clicked()),this,SLOT(pause()));
+    connect(mPauseButton, SIGNAL(clicked()), this, SLOT(pause()));
 
-    //rec button;
+    // rec button;
     mRecButton = new QToolButton;
     mRecButton->setIcon(QPixmap(":/record"));
     mRecButton->setIconSize(iconSize);
-    connect(mRecButton,SIGNAL(clicked()),this,SLOT(recStream()));
+    connect(mRecButton, SIGNAL(clicked()), this, SLOT(recStream()));
     mRec = false;
 
-    //slider
+    // slider
     mSlider = new QSlider(Qt::Horizontal);
     mSlider->setTickPosition(QSlider::TicksAbove);
     mSlider->setMinimumWidth(100);
-    connect(mSlider,SIGNAL(valueChanged(int)),this,SLOT(skipToFrame(int)));
+    connect(mSlider, SIGNAL(valueChanged(int)), this, SLOT(skipToFrame(int)));
 
-    //frame number
-    QFont f("Courier", 12, QFont::Bold); //Times Helvetica, Normal
-    mFrameNumValidator = new QIntValidator(0, 999999, this);
-    mFrameInNumValidator = new QIntValidator(0, 999999, this);
+    // frame number
+    QFont f("Courier", 12, QFont::Bold); // Times Helvetica, Normal
+    mFrameNumValidator    = new QIntValidator(0, 999999, this);
+    mFrameInNumValidator  = new QIntValidator(0, 999999, this);
     mFrameOutNumValidator = new QIntValidator(0, 999999, this);
 
     mFrameInNum = new QLineEdit("");
@@ -102,7 +103,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mFrameInNum->setAlignment(Qt::AlignRight);
     mFrameInNum->setValidator(mFrameInNumValidator);
     mFrameInNum->setFont(f);
-    connect(mFrameInNum,SIGNAL(editingFinished()),this,SLOT(update()));
+    connect(mFrameInNum, SIGNAL(editingFinished()), this, SLOT(update()));
 
     mFrameOutNum = new QLineEdit("");
     mFrameOutNum->setMaxLength(8);
@@ -110,27 +111,27 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mFrameOutNum->setAlignment(Qt::AlignRight);
     mFrameOutNum->setValidator(mFrameOutNumValidator);
     mFrameOutNum->setFont(f);
-    connect(mFrameOutNum,SIGNAL(editingFinished()),this,SLOT(update()));
+    connect(mFrameOutNum, SIGNAL(editingFinished()), this, SLOT(update()));
 
     mFrameNum = new QLineEdit("0");
-    mFrameNum->setMaxLength(8); // bedeutet maxminal 1,1 stunden
-    mFrameNum->setMaximumWidth(75); //5*sz.width() //62
+    mFrameNum->setMaxLength(8);     // bedeutet maxminal 1,1 stunden
+    mFrameNum->setMaximumWidth(75); // 5*sz.width() //62
     mFrameNum->setAlignment(Qt::AlignRight);
     mFrameNum->setValidator(mFrameNumValidator);
     mFrameNum->setFont(f);
-    connect(mFrameNum,SIGNAL(editingFinished()),this,SLOT(skipToFrame()));
+    connect(mFrameNum, SIGNAL(editingFinished()), this, SLOT(skipToFrame()));
 
-    //frame number
+    // frame number
     mFpsNum = new QLineEdit(QString::number(DEFAULT_FPS));
-    mFpsNum->setMaxLength(8); // bedeutet maxminal 999,99
-    mFpsNum->setMaximumWidth(62); //5*sz.width()
+    mFpsNum->setMaxLength(8);     // bedeutet maxminal 999,99
+    mFpsNum->setMaximumWidth(62); // 5*sz.width()
     mFpsNum->setAlignment(Qt::AlignRight);
     mFpsNumValidator = new QDoubleValidator(0.0, 999.99, 2, this);
     mFpsNum->setValidator(mFpsNumValidator);
     mFpsNum->setFont(f);
-    connect(mFpsNum,SIGNAL(editingFinished()),this,SLOT(setFPS()));
+    connect(mFpsNum, SIGNAL(editingFinished()), this, SLOT(setFPS()));
 
-    QFont f2("Courier", 12, QFont::Normal); //Times Helvetica, Normal
+    QFont f2("Courier", 12, QFont::Normal); // Times Helvetica, Normal
     mAtLabel = new QLabel("@");
     mAtLabel->setFont(f2);
 
@@ -145,7 +146,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     // default value
     mPlayerSpeedLimited = false;
 
-    //player layout
+    // player layout
     mPlayerLayout = new QHBoxLayout();
     mPlayerLayout->addWidget(mPlayBackwardButton);
     mPlayerLayout->addWidget(mFrameBackwardButton);
@@ -164,24 +165,22 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mPlayerLayout->addWidget(mFpsLabel);
     mPlayerLayout->setMargin(0);
 
-    mMainWindow = (class Petrack*) parent;
+    mMainWindow = (class Petrack *) parent;
 
     setLayout(mPlayerLayout);
 
     setAnim(anim);
-
 }
 
 void Player::setFPS(double fps) // default: double fps=-1.
 {
-    if (fps != -1)
+    if(fps != -1)
     {
         mFpsNum->setText(QString::number(fps));
-        mFrameForwardButton->setAutoRepeatInterval(1000./fps); // for 1000 ms / 25 fps
-        mFrameBackwardButton->setAutoRepeatInterval(1000./fps); // for 1000 ms / 25 fps
+        mFrameForwardButton->setAutoRepeatInterval(1000. / fps);  // for 1000 ms / 25 fps
+        mFrameBackwardButton->setAutoRepeatInterval(1000. / fps); // for 1000 ms / 25 fps
     }
     mAnimation->setFPS(mFpsNum->text().toDouble());
-
 }
 void Player::setPlayerSpeedLimited(bool fixed)
 {
@@ -209,16 +208,16 @@ void Player::setLooping(bool looping)
 
 void Player::setSpeedRelativeToRealtime(double factor)
 {
-    setFPS(mAnimation->getOriginalFPS()*factor);
+    setFPS(mAnimation->getOriginalFPS() * factor);
 }
 
 void Player::setAnim(Animation *anim)
 {
-    if (anim)
+    if(anim)
     {
         pause();
         mAnimation = anim;
-        int max = anim->getNumFrames()>1 ? anim->getNumFrames()-1 : 0;
+        int max    = anim->getNumFrames() > 1 ? anim->getNumFrames() - 1 : 0;
         setSliderMax(max);
         mFrameNumValidator->setTop(max);
         mFrameInNumValidator->setTop(anim->getSourceOutFrameNum());
@@ -246,7 +245,7 @@ void Player::setSliderMax(int max)
  */
 bool Player::updateImage()
 {
-    if (mImg.empty())
+    if(mImg.empty())
     {
         pause();
         return false;
@@ -254,22 +253,23 @@ bool Player::updateImage()
     qApp->processEvents();
 #ifdef TIME_MEASUREMENT
     double time1 = 0.0, tstart;
-    tstart = clock();
+    tstart       = clock();
 #endif
 
-    QFuture<void> future = QtConcurrent::run([&]() {mMainWindow->updateImage(mImg); });
+    QFuture<void> future = QtConcurrent::run([&]() { mMainWindow->updateImage(mImg); });
     future.waitForFinished();
 
-    if (mRec)
+    if(mRec)
     {
-        mAviFile.appendFrame((const unsigned char*) mImg.data, true);
+        mAviFile.appendFrame((const unsigned char *) mImg.data, true);
     }
 #ifdef TIME_MEASUREMENT
     time1 += clock() - tstart;
-    time1 = time1/CLOCKS_PER_SEC;
+    time1 = time1 / CLOCKS_PER_SEC;
     cout << "  time(update image) = " << time1 << " sec." << endl;
 #endif
-    mSlider->setValue(mAnimation->getCurrentFrameNum()); //(1000*mAnimation->getCurrentFrameNum())/mAnimation->getNumFrames());
+    mSlider->setValue(
+        mAnimation->getCurrentFrameNum()); //(1000*mAnimation->getCurrentFrameNum())/mAnimation->getNumFrames());
     mFrameNum->setText(QString().number(mAnimation->getCurrentFrameNum()));
 
     return true;
@@ -280,23 +280,23 @@ bool Player::forward()
     qApp->processEvents();
 #ifdef TIME_MEASUREMENT
     double time1 = 0.0, tstart;
-    tstart = clock();
+    tstart       = clock();
 #endif
 
     bool should_be_last_frame = mAnimation->getCurrentFrameNum() == mAnimation->getSourceOutFrameNum();
 
     mImg = mAnimation->getNextFrame();
     // check if animation is broken somewhere in the video
-    if (mImg.empty())
+    if(mImg.empty())
     {
-        if (!should_be_last_frame)
+        if(!should_be_last_frame)
         {
             debout << "Warning: video unexpected finished." << std::endl;
         }
     }
 #ifdef TIME_MEASUREMENT
     time1 += clock() - tstart;
-    time1 = time1/CLOCKS_PER_SEC;
+    time1 = time1 / CLOCKS_PER_SEC;
     cout << "  time(load frame) = " << time1 << " sec." << endl;
 #endif
     return updateImage();
@@ -307,12 +307,12 @@ bool Player::backward()
     qApp->processEvents();
 #ifdef TIME_MEASUREMENT
     double time1 = 0.0, tstart;
-    tstart = clock();
+    tstart       = clock();
 #endif
     mImg = mAnimation->getPreviousFrame();
 #ifdef TIME_MEASUREMENT
     time1 += clock() - tstart;
-    time1 = time1/CLOCKS_PER_SEC;
+    time1 = time1 / CLOCKS_PER_SEC;
     cout << "  time(load frame) = " << time1 << " sec." << endl;
 #endif
     return updateImage();
@@ -325,11 +325,15 @@ bool Player::backward()
  * @see PlayerState
  * @param state
  */
-void Player::play(PlayerState state){
-    if(mState == PlayerState::PAUSE){
+void Player::play(PlayerState state)
+{
+    if(mState == PlayerState::PAUSE)
+    {
         mState = state;
         playVideo();
-    }else{
+    }
+    else
+    {
         mState = state;
     }
 }
@@ -344,67 +348,88 @@ void Player::play(PlayerState state){
  * The method is left, when the video is paused and reentered, when playing
  * gets started again.
  */
-void Player::playVideo(){
+void Player::playVideo()
+{
     static QElapsedTimer timer;
-    int currentFrame = mAnimation->getCurrentFrameNum();
-    long long int overtime = 0;
+    int                  currentFrame = mAnimation->getCurrentFrameNum();
+    long long int        overtime     = 0;
 
-    while(mState != PlayerState::PAUSE){
+    while(mState != PlayerState::PAUSE)
+    {
         // slow down the player speed for extrem fast video sequences (Jiayue China or 16fps cam99 basigo grid video)
-        if (mPlayerSpeedLimited || mPlayerSpeedFixed)
+        if(mPlayerSpeedLimited || mPlayerSpeedFixed)
         {
-            auto supposedDiff = static_cast<long long int>(1'000/mAnimation->getFPS());
+            auto supposedDiff = static_cast<long long int>(1'000 / mAnimation->getFPS());
 
-            if(timer.isValid()){
-                if(mPlayerSpeedFixed && mState == PlayerState::FORWARD){
+            if(timer.isValid())
+            {
+                if(mPlayerSpeedFixed && mState == PlayerState::FORWARD)
+                {
                     overtime = std::max(0LL, overtime + (timer.elapsed() - supposedDiff));
-                    if(overtime >= supposedDiff){
+                    if(overtime >= supposedDiff)
+                    {
                         mAnimation->skipFrame(static_cast<int>(overtime / supposedDiff));
                         overtime = overtime % supposedDiff;
-                        currentFrame = std::min(mAnimation->getCurrentFrameNum() + 1, mAnimation->getSourceOutFrameNum());
+                        currentFrame =
+                            std::min(mAnimation->getCurrentFrameNum() + 1, mAnimation->getSourceOutFrameNum());
                     }
                 }
 
-                while(!timer.hasExpired(supposedDiff)){
+                while(!timer.hasExpired(supposedDiff))
+                {
                     qApp->processEvents();
                 }
             }
             timer.start();
-        }else{
+        }
+        else
+        {
             timer.invalidate();
         }
 
 
-        switch(mState){
-        case PlayerState::FORWARD:
-            mImg = mAnimation->getFrameAtIndex(currentFrame);
-            currentFrame++;
-            break;
-        case PlayerState::BACKWARD:
-            mImg = mAnimation->getFrameAtIndex(currentFrame);
-            currentFrame--;
-            break;
-        case PlayerState::PAUSE:
-            break;
+        switch(mState)
+        {
+            case PlayerState::FORWARD:
+                mImg = mAnimation->getFrameAtIndex(currentFrame);
+                currentFrame++;
+                break;
+            case PlayerState::BACKWARD:
+                mImg = mAnimation->getFrameAtIndex(currentFrame);
+                currentFrame--;
+                break;
+            case PlayerState::PAUSE:
+                break;
         }
 
-        if(!updateImage()){
+        if(!updateImage())
+        {
             mState = PlayerState::PAUSE;
-            if( mAnimation->getCurrentFrameNum() != 0 && mAnimation->getCurrentFrameNum() != mAnimation->getSourceOutFrameNum()){
+            if(mAnimation->getCurrentFrameNum() != 0 &&
+               mAnimation->getCurrentFrameNum() != mAnimation->getSourceOutFrameNum())
+            {
                 debout << "Warning: video unexpectedly finished." << std::endl;
             }
-        }else{
-            if( mLooping && mMainWindow->getControlWidget()->trackOnlineCalc->checkState() == Qt::Checked)
+        }
+        else
+        {
+            if(mLooping && mMainWindow->getControlWidget()->trackOnlineCalc->checkState() == Qt::Checked)
             {
-                PWarning(this, "Error: No tracking while looping", "Looping and tracking are incompatible. Please disable one first.");
+                PWarning(
+                    this,
+                    "Error: No tracking while looping",
+                    "Looping and tracking are incompatible. Please disable one first.");
                 mState = PlayerState::PAUSE;
                 break;
-            }else if(mLooping)
+            }
+            else if(mLooping)
             {
-                if(mState == PlayerState::FORWARD && mAnimation->getCurrentFrameNum() == mAnimation->getSourceOutFrameNum())
+                if(mState == PlayerState::FORWARD &&
+                   mAnimation->getCurrentFrameNum() == mAnimation->getSourceOutFrameNum())
                 {
                     currentFrame = 0;
-                }else if(mState == PlayerState::BACKWARD && mAnimation->getCurrentFrameNum() == 0)
+                }
+                else if(mState == PlayerState::BACKWARD && mAnimation->getCurrentFrameNum() == 0)
                 {
                     currentFrame = mAnimation->getSourceOutFrameNum();
                 }
@@ -439,7 +464,7 @@ void Player::togglePlayPause()
 {
     static PlayerState lastState;
 
-    if (mState != PlayerState::PAUSE)
+    if(mState != PlayerState::PAUSE)
     {
         lastState = mState;
         pause();
@@ -460,12 +485,13 @@ void Player::togglePlayPause()
  */
 void Player::recStream()
 {
-    if (mAnimation->isCameraLiveStream() || mAnimation->isVideo() || mAnimation->isImageSequence() || mAnimation->isStereoVideo())
+    if(mAnimation->isCameraLiveStream() || mAnimation->isVideo() || mAnimation->isImageSequence() ||
+       mAnimation->isStereoVideo())
     {
         // video temp path/file name
-        QString videoTmp = QDir::tempPath()+"/petrack-video-record.avi";
+        QString videoTmp = QDir::tempPath() + "/petrack-video-record.avi";
 
-        if (mRec) //stop recording and save recorded stream to disk
+        if(mRec) // stop recording and save recorded stream to disk
         {
             mRec = false;
             mRecButton->setIcon(QPixmap(":/record"));
@@ -474,24 +500,25 @@ void Player::recStream()
 
             QString dest;
 
-            QFileDialog fileDialog(this,
-                                   tr("Select file for saving video output"),
-                                   nullptr,
-                                   tr("Video (*.*);;AVI-File (*.avi);;All supported types (*.avi *.mp4);;All files (*.*)"));
+            QFileDialog fileDialog(
+                this,
+                tr("Select file for saving video output"),
+                nullptr,
+                tr("Video (*.*);;AVI-File (*.avi);;All supported types (*.avi *.mp4);;All files (*.*)"));
             fileDialog.setAcceptMode(QFileDialog::AcceptSave);
             fileDialog.setFileMode(QFileDialog::AnyFile);
             fileDialog.setDefaultSuffix("");
 
-            if( fileDialog.exec() )
+            if(fileDialog.exec())
                 dest = fileDialog.selectedFiles().at(0);
 
-            if (dest == nullptr)
+            if(dest == nullptr)
                 return;
 
-            if (QFile::exists(dest))
+            if(QFile::exists(dest))
                 QFile::remove(dest);
 
-            QProgressDialog progress("Save Video File",nullptr,0,2,mMainWindow);
+            QProgressDialog progress("Save Video File", nullptr, 0, 2, mMainWindow);
             progress.setWindowTitle("Save Video File");
             progress.setWindowModality(Qt::WindowModal);
             progress.setVisible(true);
@@ -502,26 +529,28 @@ void Player::recStream()
             qApp->processEvents();
             progress.setValue(1);
 
-            if (!QFile(videoTmp).copy(dest))
+            if(!QFile(videoTmp).copy(dest))
             {
-                PCritical(this, tr("PeTrack"),
-                                            tr("Error: Could not save video file!"));
-            }else
+                PCritical(this, tr("PeTrack"), tr("Error: Could not save video file!"));
+            }
+            else
             {
                 mMainWindow->statusBar()->showMessage(tr("Saved video file to %1.").arg(dest), 5000);
-                if (!QFile(videoTmp).remove())
-                debout << "Could not remove tmp-file: " << videoTmp << std::endl;
+                if(!QFile(videoTmp).remove())
+                    debout << "Could not remove tmp-file: " << videoTmp << std::endl;
 
                 progress.setValue(2);
             }
-
-        }else // open video writer
+        }
+        else // open video writer
         {
-            if (mAviFile.open(videoTmp.toStdString().c_str(), mImg.cols, mImg.rows, 8*mImg.channels(), mAnimation->getFPS()))
+            if(mAviFile.open(
+                   videoTmp.toStdString().c_str(), mImg.cols, mImg.rows, 8 * mImg.channels(), mAnimation->getFPS()))
             {
                 mRec = true;
                 mRecButton->setIcon(QPixmap(":/stop-record"));
-            }else
+            }
+            else
             {
                 debout << "error: could not open video output file!" << std::endl;
             }
@@ -531,7 +560,7 @@ void Player::recStream()
 
 bool Player::skipToFrame(int f) // [0..mAnimation->getNumFrames()-1]
 {
-    if (f == mAnimation->getCurrentFrameNum())
+    if(f == mAnimation->getCurrentFrameNum())
     {
         return false;
     }
@@ -542,10 +571,10 @@ bool Player::skipToFrame(int f) // [0..mAnimation->getNumFrames()-1]
 
 bool Player::skipToFrame() // [0..mAnimation->getNumFrames()-1]
 {
-       if (mFrameNum->text().toInt() < getFrameInNum())
-           mFrameNum->setText(QString::number(getFrameInNum()));
-       if (mFrameNum->text().toInt() > getFrameOutNum())
-           mFrameNum->setText(QString::number(getFrameOutNum()));
+    if(mFrameNum->text().toInt() < getFrameInNum())
+        mFrameNum->setText(QString::number(getFrameInNum()));
+    if(mFrameNum->text().toInt() > getFrameOutNum())
+        mFrameNum->setText(QString::number(getFrameOutNum()));
 
     return skipToFrame(mFrameNum->text().toInt());
 }
@@ -555,15 +584,14 @@ bool Player::skipToFrame() // [0..mAnimation->getNumFrames()-1]
  */
 void Player::update()
 {
-    if constexpr (true || !mMainWindow->isLoading())
+    if constexpr(true || !mMainWindow->isLoading())
     {
-
-        if( mFrameNum->text().toInt() < mFrameInNum->text().toInt() )
+        if(mFrameNum->text().toInt() < mFrameInNum->text().toInt())
         {
             mFrameNum->setText(mFrameInNum->text());
             skipToFrame(mFrameNum->text().toInt());
         }
-        if( mFrameNum->text().toInt() > mFrameOutNum->text().toInt() )
+        if(mFrameNum->text().toInt() > mFrameOutNum->text().toInt())
         {
             mFrameNum->setText(mFrameOutNum->text());
             skipToFrame(mFrameNum->text().toInt());
@@ -571,7 +599,7 @@ void Player::update()
         mSlider->setMinimum(getFrameInNum());
         mSlider->setMaximum(getFrameOutNum());
 
-        mFrameInNumValidator->setTop(getFrameOutNum()-1);
+        mFrameInNumValidator->setTop(getFrameOutNum() - 1);
         mFrameNumValidator->setBottom(getFrameInNum());
         mFrameNumValidator->setTop(getFrameOutNum());
 
@@ -584,38 +612,38 @@ void Player::update()
 
 int Player::getFrameInNum()
 {
-    if (mFrameInNum->text() == "")
+    if(mFrameInNum->text() == "")
         return -1;
     return mFrameInNum->text().toInt();
 }
 void Player::setFrameInNum(int in)
 {
-    if (in == -1)
+    if(in == -1)
         in = 0;
 
     mFrameInNum->setText(QString::number(in));
 
-    mFrameInNumValidator->setTop(getFrameOutNum()-1);
+    mFrameInNumValidator->setTop(getFrameOutNum() - 1);
     mFrameNumValidator->setBottom(getFrameInNum());
     mFrameNumValidator->setTop(getFrameOutNum());
 }
 int Player::getFrameOutNum()
 {
-    if (mFrameOutNum->text() == "")
+    if(mFrameOutNum->text() == "")
         return -1;
 
     return mFrameOutNum->text().toInt();
 }
 void Player::setFrameOutNum(int out)
 {
-    if (out == -1)
-        out = mAnimation->getMaxFrames()-1;
+    if(out == -1)
+        out = mAnimation->getMaxFrames() - 1;
 
     mFrameOutNum->setText(QString::number(out));
 
-    mFrameInNumValidator->setTop(/*out*/getFrameOutNum()-1);
+    mFrameInNumValidator->setTop(/*out*/ getFrameOutNum() - 1);
     mFrameNumValidator->setBottom(getFrameInNum());
-    mFrameNumValidator->setTop(/*out*/getFrameOutNum());
+    mFrameNumValidator->setTop(/*out*/ getFrameOutNum());
 }
 
 int Player::getPos()

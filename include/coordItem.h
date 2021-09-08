@@ -23,7 +23,7 @@
 
 #include <QGraphicsItem>
 #include <QtWidgets>
-#include <petrack.h>
+#include <opencv2/core/types.hpp>
 
 class Petrack;
 class Control;
@@ -32,28 +32,22 @@ class ExtrCalibration;
 class CoordItem : public QGraphicsItem
 {
 private:
-    Petrack *mMainWindow;
+    Petrack *        mMainWindow;
     ExtrCalibration *extCalib;
-    Control *mControlWidget;
-    cv::Point2f ursprung, x, y, z;
-    cv::Point2f calibPointsMin, calibPointsMax;
-    cv::Point3f x3D, y3D, z3D;
-    float mouse_x,mouse_y;
-    int coordTrans_x,coordTrans_y;
-    int coordDimension;
+    Control *        mControlWidget;
+    cv::Point2f      ursprung, x, y, z;
+    cv::Point2f      calibPointsMin, calibPointsMax;
+    cv::Point3f      x3D, y3D, z3D;
+    float            mouse_x, mouse_y;
+    int              coordTrans_x, coordTrans_y;
+    int              coordDimension;
 
 public:
-    inline void setCoordDimension(int dim)
-    {
-        this->coordDimension = dim;
-    }
-    inline int getCoordDimension() const
-    {
-        return this->coordDimension;
-    }
+    inline void setCoordDimension(int dim) { this->coordDimension = dim; }
+    inline int  getCoordDimension() const { return this->coordDimension; }
 
-    // Constructor
-    CoordItem(QWidget *wParent, QGraphicsItem * parent = nullptr);
+    CoordItem(QWidget *wParent, QGraphicsItem *parent = nullptr);
+
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 

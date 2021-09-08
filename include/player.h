@@ -21,8 +21,8 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <QWidget>
 #include <QTemporaryFile>
+#include <QWidget>
 
 #ifdef AVI
 #include "aviFile.h"
@@ -43,7 +43,8 @@ class QDoubleValidator;
 class Animation;
 class Petrack;
 
-enum class PlayerState{
+enum class PlayerState
+{
     FORWARD,
     BACKWARD,
     PAUSE
@@ -77,17 +78,17 @@ public slots:
     bool skipToFrame(int f);
     bool skipToFrame();
     void update();
-    void setFPS(double fps=-1.);
+    void setFPS(double fps = -1.);
     void togglePlayerSpeedLimited();
     void setPlayerSpeedLimited(bool fixed);
     bool getPlayerSpeedLimited() const;
     void setPlayerSpeedFixed(bool fixed);
     void setLooping(bool looping);
-    void setFrameInNum(int in=-1.);
-    void setFrameOutNum(int out=-1.);
-    int getFrameInNum();
-    int getFrameOutNum();
-    int getPos();
+    void setFrameInNum(int in = -1.);
+    void setFrameOutNum(int out = -1.);
+    int  getFrameInNum();
+    int  getFrameOutNum();
+    int  getPos();
     void play(PlayerState state);
 
 
@@ -98,13 +99,13 @@ private:
     bool backward();
     void playVideo();
 
-    Animation *mAnimation;    
+    Animation *    mAnimation;
     QTemporaryFile mTmpFile;
-    PlayerState mState = PlayerState::PAUSE;
-    bool mPlayerSpeedLimited;
-    bool mPlayerSpeedFixed = false;
-    bool mLooping = false;
-    bool mRec;
+    PlayerState    mState = PlayerState::PAUSE;
+    bool           mPlayerSpeedLimited;
+    bool           mPlayerSpeedFixed = false;
+    bool           mLooping          = false;
+    bool           mRec;
 
 
 #ifdef AVI
@@ -112,22 +113,22 @@ private:
 #else
     AviFileWriter mAviFile;
 #endif
- 
-    //GUI 
-    QToolButton *mFrameForwardButton, *mFrameBackwardButton, *mPlayForwardButton, *mPlayBackwardButton, *mPauseButton;
-    QToolButton *mRecButton;
-    cv::Mat mImg;
-    QHBoxLayout *mPlayerLayout;
-    Petrack *mMainWindow;
-    QSlider *mSlider;
-    QLineEdit *mFrameNum;
-    QLineEdit *mFrameInNum;
-    QLineEdit *mFrameOutNum;
-    QLineEdit *mFpsNum;
-    QLabel *mAtLabel;
-    QLabel *mSourceInLabel;
-    QLabel *mSourceOutLabel;
-    QLabel *mFpsLabel;
+
+    // GUI
+    QToolButton *  mFrameForwardButton, *mFrameBackwardButton, *mPlayForwardButton, *mPlayBackwardButton, *mPauseButton;
+    QToolButton *  mRecButton;
+    cv::Mat        mImg;
+    QHBoxLayout *  mPlayerLayout;
+    Petrack *      mMainWindow;
+    QSlider *      mSlider;
+    QLineEdit *    mFrameNum;
+    QLineEdit *    mFrameInNum;
+    QLineEdit *    mFrameOutNum;
+    QLineEdit *    mFpsNum;
+    QLabel *       mAtLabel;
+    QLabel *       mSourceInLabel;
+    QLabel *       mSourceOutLabel;
+    QLabel *       mFpsLabel;
     QIntValidator *mFrameNumValidator;
     QIntValidator *mFrameInNumValidator;
     QIntValidator *mFrameOutNumValidator;

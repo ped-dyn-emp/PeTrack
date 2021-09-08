@@ -26,31 +26,27 @@ class Control;
 
 #include "extrCalibration.h"
 
+#include <QGraphicsItem>
+
 class GridItem : public QGraphicsItem
 {
 private:
-    Petrack *mMainWindow;
+    Petrack *        mMainWindow;
     ExtrCalibration *extCalib;
-    Control *mControlWidget;
-    float mouse_x, mouse_y;
-    int gridTrans_x, gridTrans_y;
-    int gridDimension;
+    Control *        mControlWidget;
+    float            mouse_x, mouse_y;
+    int              gridTrans_x, gridTrans_y;
+    int              gridDimension;
 
 public:
-    inline void setGridDimension(int gDimension)
-    {
-        this->gridDimension = gDimension;
-    }
-    inline int getGridDimension() const
-    {
-        return this->gridDimension;
-    }
-    GridItem(QWidget *wParent, QGraphicsItem * parent = nullptr);
+    inline void setGridDimension(int gDimension) { this->gridDimension = gDimension; }
+    inline int  getGridDimension() const { return this->gridDimension; }
+    GridItem(QWidget *wParent, QGraphicsItem *parent = nullptr);
     QRectF boundingRect() const;
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    int drawLine(QPainter *painter, cv::Point2f *p, int y_offset);
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void   mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void   mousePressEvent(QGraphicsSceneMouseEvent *event);
+    int    drawLine(QPainter *painter, cv::Point2f *p, int y_offset);
+    void   paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };
 
 #endif

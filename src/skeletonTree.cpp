@@ -17,8 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <algorithm>
 #include "skeletonTree.h"
+
+#include <algorithm>
 
 //--SkeletonNode
 
@@ -28,10 +29,7 @@
  * @param[in] id  The identifier of this node.
  * @param[in] point  The position of this node.
  */
-SkeletonNode::SkeletonNode(const uint8_t& id, cv::Point3f point)
-    :mId(id), mPoint(std::move(point))
-{
-}
+SkeletonNode::SkeletonNode(const uint8_t &id, cv::Point3f point) : mId(id), mPoint(std::move(point)) {}
 
 /**
  * @brief Gets the Child with the specified id.
@@ -43,9 +41,11 @@ SkeletonNode::SkeletonNode(const uint8_t& id, cv::Point3f point)
  *
  * @return A const reference to the child with the specified id.
  * @throw std::out_of_range
-*/
-const SkeletonNode &SkeletonNode::getChildById(uint8_t id) const {
-    auto foundValue = std::find_if(mChildren.begin(), mChildren.end(), [id](const SkeletonNode& node){return node.getId() == id;});
+ */
+const SkeletonNode &SkeletonNode::getChildById(uint8_t id) const
+{
+    auto foundValue =
+        std::find_if(mChildren.begin(), mChildren.end(), [id](const SkeletonNode &node) { return node.getId() == id; });
     if(foundValue == mChildren.end())
     {
         throw std::out_of_range("Id" + std::to_string(id) + " in children not found");
@@ -64,16 +64,15 @@ const SkeletonNode &SkeletonNode::getChildById(uint8_t id) const {
  * @param[in, out] lines  The array to append the new lines.
  *
  */
-void SkeletonTree::recurseSkeleton(const SkeletonNode& node, std::vector<SkeletonLine>& lines)
+void SkeletonTree::recurseSkeleton(const SkeletonNode &node, std::vector<SkeletonLine> &lines)
 {
-    for(const SkeletonNode& child : node.getChildren()){
-        lines.push_back(
-                {/*Direct initialization of SkeletonLine struct*/
-                    /*.start =*/ node.getPos(),
-                    /*.start_id =*/ node.getId(),
-                    /*.end =*/ child.getPos(),
-                    /*.end_id =*/ child.getId()}
-        );
+    for(const SkeletonNode &child : node.getChildren())
+    {
+        lines.push_back({/*Direct initialization of SkeletonLine struct*/
+                         /*.start =*/node.getPos(),
+                         /*.start_id =*/node.getId(),
+                         /*.end =*/child.getPos(),
+                         /*.end_id =*/child.getId()});
         recurseSkeleton(child, lines);
     }
 }

@@ -22,27 +22,24 @@
 #define BACKGROUNDFILTER_H
 
 #include "filter.h"
+#include "stereoContext.h"
 
 #include <QString>
-
 #include <opencv2/opencv.hpp>
 #include <opencv2/video/background_segm.hpp>
-
-#include "stereoContext.h"
 
 
 class BackgroundFilter : public Filter
 {
 private:
-
     cv::Ptr<cv::BackgroundSubtractorMOG2> mBgModel;
 
-    bool mUpdate; // if 0, kein update des models, sonst schon
-    pet::StereoContext** mStereoContext; ///< zeiger auf den zeiger in petrack mit stereocontext
-    cv::Mat mBgPointCloud;
-    cv::Mat mForeground;
-    QString mLastFile;
-    double mDefaultHeight;
+    bool                 mUpdate;        // if 0, kein update des models, sonst schon
+    pet::StereoContext **mStereoContext; ///< zeiger auf den zeiger in petrack mit stereocontext
+    cv::Mat              mBgPointCloud;
+    cv::Mat              mForeground;
+    QString              mLastFile;
+    double               mDefaultHeight;
 
 public:
     BackgroundFilter();
@@ -54,16 +51,16 @@ public:
     bool update() const;
 
     QString getFilename();
-    void setFilename(const QString &fn);
+    void    setFilename(const QString &fn);
 
     bool load(QString dest = "");
     bool save(QString dest = "");
 
-    void setStereoContext(pet::StereoContext **sc);
-    pet::StereoContext** stereoContext();
+    void                 setStereoContext(pet::StereoContext **sc);
+    pet::StereoContext **stereoContext();
 
     cv::Mat getForeground(); ///< nutzen, wenn ueber ganzes bild foreground benutzt wird
-    bool isForeground(int i, int j);
+    bool    isForeground(int i, int j);
 
     void reset();
 

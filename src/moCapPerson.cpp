@@ -18,12 +18,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <QDomElement>
-
-#include <exception>
-
 #include "moCapPerson.h"
+
 #include "helper.h"
+
+#include <QDomElement>
+#include <exception>
 
 /**
  * @brief Gets index of sample at given time
@@ -46,7 +46,7 @@ void MoCapPerson::setTimeOffset(double timeOffset)
     mMetadata.setOffset(timeOffset);
 }
 
-void MoCapPerson::addSkeleton(const SkeletonTree& skeleton)
+void MoCapPerson::addSkeleton(const SkeletonTree &skeleton)
 {
     mSkeletons.push_back(skeleton);
 }
@@ -66,11 +66,10 @@ const MoCapPersonMetadata &MoCapPerson::getMetadata() const
     return mMetadata;
 }
 
-void MoCapPerson::setMetadata(const MoCapPersonMetadata& metadata)
+void MoCapPerson::setMetadata(const MoCapPersonMetadata &metadata)
 {
     mMetadata = metadata;
 }
-
 
 
 void MoCapPerson::setXml(QDomElement &elem) const

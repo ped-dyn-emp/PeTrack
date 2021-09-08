@@ -19,6 +19,7 @@
 ##
 stages:
   - build_environment
+  - pre-build-checks
   - build
   - test
   - build_installer
@@ -40,6 +41,12 @@ build_container:
   rules:
     - changes:
         - container/ubuntu/Dockerfile
+
+pre-build-checks:
+  image: $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_linux
+  stage: pre-build-checks
+  script:
+    - scripts/check-format-cpp.sh
 
 # Build petrack and petrack unit_tests
 build_linux:

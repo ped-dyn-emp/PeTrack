@@ -28,23 +28,34 @@ class Control;
 
 class TrackingRoiItem : public QGraphicsRectItem
 {
-  inline static constexpr int DISTANCE_TO_BORDER = 5;
-  inline static constexpr int MIN_SIZE = 10;
+    inline static constexpr int DISTANCE_TO_BORDER = 5;
+    inline static constexpr int MIN_SIZE           = 10;
 
-  enum pressLocation{inside, top, bottom, left, right, topLeft, topRight, bottomLeft, bottomRight};
+    enum pressLocation
+    {
+        inside,
+        top,
+        bottom,
+        left,
+        right,
+        topLeft,
+        topRight,
+        bottomLeft,
+        bottomRight
+    };
 
 private:
-    Petrack *mMainWindow;
-    Control *mControlWidget;
-    QRect mPressRect;
-    QPointF mPressPos;
+    Petrack *          mMainWindow;
+    Control *          mControlWidget;
+    QRect              mPressRect;
+    QPointF            mPressPos;
     enum pressLocation mPressLocation;
 
 public:
-    TrackingRoiItem(QWidget *wParent, QGraphicsItem * parent = nullptr);
-    void mousePressEvent(QGraphicsSceneMouseEvent * event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
+    TrackingRoiItem(QWidget *wParent, QGraphicsItem *parent = nullptr);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
     void checkRect();
 };

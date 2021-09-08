@@ -21,8 +21,9 @@
 #ifndef AUTOCALIB_H
 #define AUTOCALIB_H
 
-#include<QString>
-#include<QStringList>
+#include <QString>
+#include <QStringList>
+#include <opencv2/core/types.hpp>
 
 class Petrack;
 class Control;
@@ -47,13 +48,13 @@ public:
     AutoCalib();
     ~AutoCalib();
 
-    void setMainWindow(Petrack *mw);
-    bool isEmptyCalibFiles();
-    void addCalibFile(const QString &f);
-    QString getCalibFile(int i);
+    void        setMainWindow(Petrack *mw);
+    bool        isEmptyCalibFiles();
+    void        addCalibFile(const QString &f);
+    QString     getCalibFile(int i);
     QStringList getCalibFiles();
-    void setCalibFiles(const QStringList &fl);
-    bool openCalibFiles(); // return true if at least one file is selected
+    void        setCalibFiles(const QStringList &fl);
+    bool        openCalibFiles();    // return true if at least one file is selected
     inline void setBoardSizeX(int i) // 6
     {
         mBoardSizeX = i;
@@ -82,15 +83,22 @@ public:
     void autoCalib();
 
 private:
-    int runCalibration(std::vector<std::vector<cv::Point2f> > corners, cv::Size img_size, cv::Size board_size,
-        float square_size, float aspect_ratio, int flags,
-        cv::Mat &camera_matrix, cv::Mat &dist_coeffs, double *reproj_errs);
+    int runCalibration(
+        std::vector<std::vector<cv::Point2f>> corners,
+        cv::Size                              img_size,
+        cv::Size                              board_size,
+        float                                 square_size,
+        float                                 aspect_ratio,
+        int                                   flags,
+        cv::Mat &                             camera_matrix,
+        cv::Mat &                             dist_coeffs,
+        double *                              reproj_errs);
 
-    Petrack *mMainWindow;
-    Control *mControlWidget;
+    Petrack *   mMainWindow;
+    Control *   mControlWidget;
     QStringList mCalibFiles;
-    int mBoardSizeX, mBoardSizeY;
-    float mSquareSize;
+    int         mBoardSizeX, mBoardSizeY;
+    float       mSquareSize;
 };
 
 #endif
