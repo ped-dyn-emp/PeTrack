@@ -103,6 +103,12 @@ endif()
 ################################################################################
 # Dependencies
 ################################################################################
+# ezc3d
+set(DUMMY ${BUILD_SHARED_LIBS})
+set(BUILD_SHARED_LIBS FALSE CACHE BOOL "Choose if build should be a dynamic or static library")
+add_subdirectory(ezc3d/ EXCLUDE_FROM_ALL)
+set(BUILD_SHARED_LIBS ${DUMMY})
+
 # if win32 and mingw use in 3rd party
 if (USE_3RD_PARTY)
   # Setting path to OpenCV
@@ -116,9 +122,9 @@ endif ()
 
 # Qt
 find_package(
-        Qt5 5.14
-        COMPONENTS Widgets OpenGL Xml Core PrintSupport Concurrent
-        REQUIRED
+  Qt5 5.14
+  COMPONENTS Widgets OpenGL Xml Core PrintSupport Concurrent
+  REQUIRED
 )
 message("Building with Qt${QT_DEFAULT_MAJOR_VERSION} (${Qt5Core_VERSION_STRING})")
 
@@ -211,11 +217,7 @@ target_sources(petrack_core PRIVATE src/analysePlot.cpp)
 #*****************************************************************
 # Linking ezc3d                                                  *
 #*****************************************************************
-set(DUMMY ${BUILD_SHARED_LIBS})
-set(BUILD_SHARED_LIBS FALSE CACHE BOOL "Choose if build should be a dynamic or static library")
-add_subdirectory(ezc3d/ EXCLUDE_FROM_ALL)
 target_link_libraries(petrack_core PUBLIC ezc3d)
-set(BUILD_SHARED_LIBS ${DUMMY})
 
 #*************************************************************
 # Handling of Options                                        *
