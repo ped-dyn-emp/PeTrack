@@ -116,13 +116,19 @@ endif ()
 
 # Qt
 find_package(
-  Qt5 5.14
-  COMPONENTS Widgets OpenGL Xml Core PrintSupport Concurrent
-  REQUIRED)
+        Qt5 5.14
+        COMPONENTS Widgets OpenGL Xml Core PrintSupport Concurrent
+        REQUIRED
+)
+message("Building with Qt${QT_DEFAULT_MAJOR_VERSION} (${Qt5Core_VERSION_STRING})")
 
 # OpenCV
-find_package(OpenCV 4.2.0 EXACT REQUIRED )
-message("Building with OpenCV${OpenCV_VERSION_MAJOR}(${OpenCV_VERSION})")
+find_package(
+        OpenCV 4.2.0 EXACT
+        COMPONENTS core calib3d aruco video videoio highgui
+        REQUIRED
+)
+message("Building with OpenCV${OpenCV_VERSION_MAJOR} (${OpenCV_VERSION})")
 
 # QWT
 if(APPLE)
