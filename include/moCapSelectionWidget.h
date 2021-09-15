@@ -29,6 +29,7 @@ public:
     ~MoCapSelectionWidget() override;
 
     void                setFileName();
+    void                setFileName(QString filename);
     MoCapPersonMetadata getMetadata() const;
 
     bool isFilledOut() const;
