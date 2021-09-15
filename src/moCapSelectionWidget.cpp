@@ -21,7 +21,7 @@ MoCapSelectionWidget::MoCapSelectionWidget(QWidget *parent, const QMap<QString, 
     mUi->offSetSpinBox->setRange(-offsetRange, offsetRange);
     mUi->offSetSpinBox->setSingleStep(0.01);
 
-    connect(mUi->browseFileButton, &QPushButton::clicked, this, &MoCapSelectionWidget::setFileName);
+    connect(mUi->browseFileButton, &QPushButton::clicked, this, QOverload<>::of(&MoCapSelectionWidget::setFileName));
     connect(mUi->btnDelete, &QPushButton::clicked, this, &MoCapSelectionWidget::deleteLater);
 }
 
@@ -69,6 +69,20 @@ void MoCapSelectionWidget::setFileName()
     extensionsString << ")";
     QString filename = QFileDialog::getOpenFileName(
         this, tr("Open C3D File"), QDir::currentPath(), QString::fromStdString(extensionsString.str()));
+    setFileName(filename);
+}
+
+/**
+ * @brief Sets the filename to the given string
+ *
+ * Sets filePathLabel. Also sets mFilledOut to true if
+ * a file was selected, i.e. name != "" or false if
+ * name == ""
+ *
+ * @param filename name of MoCap-file
+ */
+void MoCapSelectionWidget::setFileName(QString filename)
+{
     mUi->filePathLabel->clear();
     mUi->filePathLabel->setText(filename);
     mFilledOut = !filename.isEmpty();
