@@ -290,6 +290,12 @@ namespace detail
         QList<TrackPoint> &     crossList,
         ArucoOptions &          options);
 
+    void resolveMoreThanOneCode(
+        const int          lengthini,
+        QList<TrackPoint> &crossList,
+        const ColorBlob &  blob,
+        const Vec2F        offset);
+
     void findCodeMarker(
         cv::Mat &                img,
         QList<TrackPoint> &      crossList,

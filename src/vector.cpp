@@ -192,19 +192,17 @@ Vec2F::Vec2F(const cv::Point2f &p) : mX(p.x), mY(p.y) {}
 Vec2F::Vec2F(const CvPoint *v) : mX(v->x), mY(v->y) {}
 Vec2F::Vec2F(const CvPoint2D32f *v) : mX(v->x), mY(v->y) {}
 
-CvPoint Vec2F::toCvPoint() const
-{
-    CvPoint p;
-    p.x = myRound(mX);
-    p.y = myRound(mY);
-    return p;
-}
 CvPoint2D32f Vec2F::toCvPoint2D32f() const
 {
     CvPoint2D32f p;
     p.x = mX;
     p.y = mY;
     return p;
+}
+
+cv::Point Vec2F::toCvPoint() const
+{
+    return cv::Point(myRound(mX), myRound(mY));
 }
 
 QPoint Vec2F::toQPoint() const
