@@ -41,9 +41,14 @@ void MoCapPerson::setSamplerate(double samplerate)
     mMetadata.setSamplerate(samplerate);
 }
 
-void MoCapPerson::setTimeOffset(double timeOffset)
+void MoCapPerson::setUserTimeOffset(double timeOffset)
 {
-    mMetadata.setOffset(timeOffset);
+    mMetadata.setUserTimeOffset(timeOffset);
+}
+
+void MoCapPerson::setFileTimeOffset(double timeOffset)
+{
+    mMetadata.setFileTimeOffset(timeOffset);
 }
 
 void MoCapPerson::addSkeleton(const SkeletonTree &skeleton)
@@ -78,7 +83,7 @@ void MoCapPerson::setXml(QDomElement &elem) const
     subElem = elem.ownerDocument().createElement("PERSON");
     elem.appendChild(subElem);
 
-    subElem.setAttribute("TIME_OFFSET", mMetadata.getOffset());
+    subElem.setAttribute("TIME_OFFSET", mMetadata.getUserTimeOffset());
     subElem.setAttribute("FILE", getFileList(QString::fromStdString(mMetadata.getFilepath())));
     subElem.setAttribute("SAMPLE_RATE", mMetadata.getSamplerate());
     subElem.setAttribute("SYSTEM", mMetadata.getSystem());

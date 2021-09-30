@@ -160,7 +160,7 @@ void IO::readMoCapC3D(MoCapStorage &storage, const MoCapPersonMetadata &metadata
     }
 
     size_t firstFrame = c3d.header().firstFrame();
-    person.setTimeOffset(person.getMetadata().getOffset() - firstFrame / person.getMetadata().getSamplerate());
+    person.setFileTimeOffset(-static_cast<double>(firstFrame) / person.getMetadata().getSamplerate());
 
     // getImagePoint takes points in cm -> cm as target unit
     const std::string unit             = c3d.parameters().group("POINT").parameter("UNITS").valuesAsString()[0];

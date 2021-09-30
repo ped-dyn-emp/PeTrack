@@ -11,7 +11,7 @@ MoCapSelectionWidget::MoCapSelectionWidget(QWidget *parent, const QMap<QString, 
     mUi->setupUi(this);
 
     constexpr int    defaultSampleRate = 60;
-    constexpr double offsetRange       = 5;
+    constexpr double offsetRange       = 999'999;
 
     mUi->btnDelete->setIcon(QApplication::style()->standardIcon(QStyle::SP_TrashIcon));
     mUi->cbInputSystem->addItems(QStringList(moCapSystems.keys()));
@@ -43,7 +43,7 @@ MoCapSelectionWidget::MoCapSelectionWidget(
         mUi->cbInputSystem->setCurrentText(usedMoCapSystem.key());
     }
     mUi->sampleRateSpinBox->setValue(metadata.getSamplerate());
-    mUi->offSetSpinBox->setValue(metadata.getOffset());
+    mUi->offSetSpinBox->setValue(metadata.getUserTimeOffset());
     mUi->filePathLabel->setText(QString::fromStdString(metadata.getFilepath()));
     mFilledOut = true;
 }
@@ -101,7 +101,8 @@ MoCapPersonMetadata MoCapSelectionWidget::getMetadata() const
         mUi->filePathLabel->text().toStdString(),
         mMoCapSystems[mUi->cbInputSystem->currentText()],
         mUi->sampleRateSpinBox->value(),
-        mUi->offSetSpinBox->value());
+        mUi->offSetSpinBox->value(),
+        0);
 }
 
 bool MoCapSelectionWidget::isFilledOut() const

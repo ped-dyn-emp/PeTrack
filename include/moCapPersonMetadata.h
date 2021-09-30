@@ -49,23 +49,38 @@ public:
     MoCapPersonMetadata &operator=(const MoCapPersonMetadata &) = default;
     MoCapPersonMetadata &operator=(MoCapPersonMetadata &&) = default;
     ~MoCapPersonMetadata()                                 = default;
-    MoCapPersonMetadata(std::string filepath, MoCapSystem system, double samplerate, double offset);
+    MoCapPersonMetadata(
+        std::string filepath,
+        MoCapSystem system,
+        double      samplerate,
+        double      userTimeOffset,
+        double      fileTimeOffset);
 
-    void               setFilepath(const std::string &filepath, MoCapSystem system);
-    void               setSamplerate(double samplerate);
-    void               setOffset(double offset);
-    void               setMetadata(const std::string &filepath, MoCapSystem, double samplerate, double offset);
+    void setFilepath(const std::string &filepath, MoCapSystem system);
+    void setSamplerate(double samplerate);
+    void setUserTimeOffset(double offset);
+    void setFileTimeOffset(double offset);
+    void setMetadata(
+        const std::string &filepath,
+        MoCapSystem,
+        double samplerate,
+        double userTimeOffset,
+        double fileTimeOffset);
     MoCapSystem        getSystem() const;
     double             getSamplerate() const;
     double             getOffset() const;
+    double             getUserTimeOffset() const;
     const std::string &getFilepath() const;
 
 private:
-    std::string mFilepath   = "";
-    MoCapSystem mSystem     = XSensC3D;
-    double      mSamplerate = 60;
-    double      mOffset     = 0; ///< time offset from MoCap to video in seconds
+    std::string mFilepath       = "";
+    MoCapSystem mSystem         = XSensC3D;
+    double      mSamplerate     = 60;
+    double      mUserTimeOffset = 0; ///< user chosen time offset from MoCap to video in seconds
+    double      mFileTimeOffset = 0; ///< time offset in seconds not from user but from MoCap-file
 };
+
+bool readsTheSame(const MoCapPersonMetadata &lhs, const MoCapPersonMetadata &rhs);
 
 bool operator==(const MoCapPersonMetadata &lhs, const MoCapPersonMetadata &rhs);
 bool operator!=(const MoCapPersonMetadata &lhs, const MoCapPersonMetadata &rhs);

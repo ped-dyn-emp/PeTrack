@@ -251,13 +251,21 @@ std::vector<MoCapPersonMetadata> MoCapController::getAllMoCapPersonMetadata() co
 void MoCapController::readMoCapFiles(const std::vector<MoCapPersonMetadata> &newMetadata)
 {
     std::vector<MoCapPerson> &persons    = mStorage.getPersons();
-    auto                      unselected = [&](auto person)
-    { return std::find(newMetadata.cbegin(), newMetadata.cend(), person.getMetadata()) == newMetadata.cend(); };
+    auto                      unselected = [&](MoCapPerson person)
+    {
+        return std::find_if(
+                   newMetadata.cbegin(),
+                   newMetadata.cend(),
+                   [&person](const MoCapPersonMetadata &other)
+                   { return readsTheSame(other, person.getMetadata()); }) == newMetadata.cend();
+    };
     persons.erase(std::remove_if(persons.begin(), persons.end(), unselected), persons.end());
     std::vector<MoCapPersonMetadata> currentMetadata = getAllMoCapPersonMetadata();
     for(const MoCapPersonMetadata &md : newMetadata)
     {
-        bool isNewMd = std::find(currentMetadata.cbegin(), currentMetadata.cend(), md) == currentMetadata.cend();
+        const auto isCurrentMD = [&md](const MoCapPersonMetadata &lhs) { return readsTheSame(lhs, md); };
+        bool       isNewMd =
+            std::find_if(currentMetadata.cbegin(), currentMetadata.cend(), isCurrentMD) == currentMetadata.cend();
         if(isNewMd)
         {
             IO::readMoCapC3D(mStorage, md);
@@ -358,7 +366,7 @@ void MoCapController::getXml(const QDomElement &elem)
                 }
                 if(subElem.hasAttribute("TIME_OFFSET"))
                 {
-                    metadata.setOffset(subElem.attribute("TIME_OFFSET").toDouble(&ok));
+                    metadata.setUserTimeOffset(subElem.attribute("TIME_OFFSET").toDouble(&ok));
                     std::stringstream ss;
                     ss << "Element TIME_OFFSET of file " << path << " does not contain a valid floating-point number!";
                     if(!ok)
