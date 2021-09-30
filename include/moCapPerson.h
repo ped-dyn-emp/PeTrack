@@ -44,7 +44,8 @@ public:
     inline const SkeletonTree &getSample(size_t sample) const { return mSkeletons.at(sample); }
 
     void                       setSamplerate(double samplerate);
-    void                       setTimeOffset(double timeOffset);
+    void                       setUserTimeOffset(double timeOffset);
+    void                       setFileTimeOffset(double timeOffset);
     void                       setMetadata(const MoCapPersonMetadata &metadata);
     void                       addSkeleton(const SkeletonTree &skeleton);
     const SkeletonTree &       getSkeleton(size_t samples) const;

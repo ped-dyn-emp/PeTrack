@@ -21,16 +21,27 @@
 
 #include <QFileInfo>
 
-MoCapPersonMetadata::MoCapPersonMetadata(std::string filepath, MoCapSystem system, double samplerate, double offset)
+MoCapPersonMetadata::MoCapPersonMetadata(
+    std::string filepath,
+    MoCapSystem system,
+    double      samplerate,
+    double      userTimeOffset,
+    double      fileTimeOffset)
 {
-    setMetadata(filepath, system, samplerate, offset);
+    setMetadata(filepath, system, samplerate, userTimeOffset, fileTimeOffset);
 }
 
 
-void MoCapPersonMetadata::setMetadata(const std::string &filepath, MoCapSystem system, double samplerate, double offset)
+void MoCapPersonMetadata::setMetadata(
+    const std::string &filepath,
+    MoCapSystem        system,
+    double             samplerate,
+    double             userTimeOffset,
+    double             fileTimeOffset)
 {
     setSamplerate(samplerate);
-    setOffset(offset);
+    setUserTimeOffset(userTimeOffset);
+    setFileTimeOffset(fileTimeOffset);
     setFilepath(filepath, system);
 }
 
@@ -71,9 +82,14 @@ void MoCapPersonMetadata::setSamplerate(double samplerate)
     mSamplerate = samplerate;
 }
 
-void MoCapPersonMetadata::setOffset(double offset)
+void MoCapPersonMetadata::setUserTimeOffset(double offset)
 {
-    mOffset = offset;
+    mUserTimeOffset = offset;
+}
+
+void MoCapPersonMetadata::setFileTimeOffset(double offset)
+{
+    mFileTimeOffset = offset;
 }
 
 const std::string &MoCapPersonMetadata::getFilepath() const
@@ -93,7 +109,12 @@ double MoCapPersonMetadata::getSamplerate() const
 
 double MoCapPersonMetadata::getOffset() const
 {
-    return mOffset;
+    return mUserTimeOffset + mFileTimeOffset;
+}
+
+double MoCapPersonMetadata::getUserTimeOffset() const
+{
+    return mUserTimeOffset;
 }
 
 bool operator==(const MoCapPersonMetadata &lhs, const MoCapPersonMetadata &rhs)
@@ -106,4 +127,24 @@ bool operator==(const MoCapPersonMetadata &lhs, const MoCapPersonMetadata &rhs)
 bool operator!=(const MoCapPersonMetadata &lhs, const MoCapPersonMetadata &rhs)
 {
     return !(lhs == rhs);
+}
+
+/**
+ * @brief Indicates if both metadata result in the same Person after reading
+ *
+ * This function indicated whether the two given metadata would result in the
+ * same person after calling IO::readMoCapC3D (or other) with them. That could be
+ * the case, if everything is the same except the file offset, which is newly set
+ * anyways.
+ *
+ * @param lhs first metadata
+ * @param rhs second metadata
+ * @return true if both result in same person after reading
+ */
+bool readsTheSame(const MoCapPersonMetadata &lhs, const MoCapPersonMetadata &rhs)
+{
+    return (
+        lhs.getFilepath().compare(rhs.getFilepath()) == 0 &&
+        std::abs(lhs.getUserTimeOffset() - rhs.getUserTimeOffset()) < 1e-4 &&
+        std::abs(lhs.getSamplerate() - rhs.getSamplerate()) < 1e-4 && lhs.getSystem() == rhs.getSystem());
 }

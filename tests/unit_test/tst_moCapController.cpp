@@ -54,7 +54,7 @@ SCENARIO("I want to get the render data with one person loaded", "[ui]")
 
     MoCapPerson person;
     person.setSamplerate(1);
-    person.setTimeOffset(0);
+    // default time offset 0
 
     ExtrCalibMock extrCalib;
 
