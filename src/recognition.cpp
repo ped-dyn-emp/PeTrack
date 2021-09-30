@@ -31,6 +31,7 @@
 #include "markerJapan.h"
 #include "multiColorMarkerItem.h"
 #include "multiColorMarkerWidget.h"
+#include "pMessageBox.h"
 #include "recognitionRoiItem.h"
 #include "tracker.h"
 
@@ -622,18 +623,27 @@ void detail::refineWithAruco(
     {
         // cropRect has coordinates of rechtangele around color blob with respect to lower left corner (as in the
         // beginning of useBlackDot)
-        cv::Rect               cropRect;
-        const cv::RotatedRect &box        = blob.box;
-        int                    extendRect = myRound(
+        const cv::RotatedRect &box      = blob.box;
+        cv::Rect               cropRect = box.boundingRect();
+
+
+        int extendRect = myRound(
             blob.maxExpansion *
-            .3); // scalar to increase area of cropRect for better detection of codemarkers when marker appears to stick
-                 // out of the colored head because of tilted heads; value of .3 chosen arbitrarily after discussion
-        cropRect.x     = std::max(1, myRound(box.center.x - box.size.width / 2. - border));
-        cropRect.y     = std::max(1, myRound(box.center.y - box.size.height / 2. - border));
-        cropRect.width = std::min(
-            img.cols - cropRect.x - extendRect - 1, 2 * border + ((myRound(blob.maxExpansion) + extendRect) & -2));
-        cropRect.height = std::min(
-            img.rows - cropRect.y - extendRect - 1, 2 * border + ((myRound(blob.maxExpansion) + extendRect) & -2));
+            2); // scalar to increase area of cropRect for better detection of codemarkers when marker appears to stick
+                // out of the colored head because of tilted heads; value of .3 chosen arbitrarily after discussion
+        const int sideLength = 2 * border + ((myRound(blob.maxExpansion) + extendRect) & -2);
+
+        const auto borderVec     = cv::Point(border, border);
+        const auto topLeftCorner = cropRect - borderVec;
+        cropRect.x               = std::max(1, topLeftCorner.x - sideLength / 2);
+        cropRect.y               = std::max(1, topLeftCorner.y - sideLength / 2);
+
+        // (x&-2) == std::floor(x - x%2) | Ensures it's divisible by 2
+        const int maxWidth  = img.cols - cropRect.x - 1;
+        cropRect.width      = std::min(maxWidth, sideLength);
+        const int maxHeight = img.rows - cropRect.y - 1;
+        cropRect.height     = std::min(maxHeight, sideLength);
+
         cv::Mat subImg = img(cropRect); // --> shallow copy (points to original data)
 
         int lengthini = crossList.size(); // initial length of crossList (before findCodeMarker() is called)
@@ -650,13 +660,16 @@ void detail::refineWithAruco(
         codeOpt.setOffsetCropRect2Roi(offsetCropRect2Roi);
         findCodeMarker(subImg, crossList, options.method, codeOpt);
 
+        resolveMoreThanOneCode(lengthini, crossList, blob, offsetCropRect2Roi);
+
         // The next three statements each:
         // - set the offset of subImg with regards to ROI //(ROI to original image is archieved later in the code for
         // all methods)
         // - add the functionality of autocorrection
         // - deal with functionality of ignore/not ignore heads without identified ArucoMarker
-        if(ignoreWithoutMarker && lengthini != crossList.size()) // if CodeMarker-Call returns crossList containing a
-                                                                 // new element (identified the ArucoMarker)
+        if(lengthini !=
+           crossList
+               .size()) // if CodeMarker-Call returns crossList containing a new element (identified the ArucoMarker)
         {
             Vec2F moveDir;
             if(autoCorrect && !autoCorrectOnlyExport)
@@ -671,8 +684,8 @@ void detail::refineWithAruco(
             crossList.back().setColPoint(Vec2F(box.center.x, box.center.y));
             crossList.back() = crossList.back() + (Vec2F(cropRect.x, cropRect.y) + moveDir);
         }
-        else if(!ignoreWithoutMarker && (lengthini == crossList.size())) // in case ignoreWithoutMarker is checked and
-                                                                         // CodeMarker-Call returns empty crossList
+        else if(!ignoreWithoutMarker && (lengthini == crossList.size())) // in case ignoreWithoutMarker isn't checked
+                                                                         // and CodeMarker-Call returns empty crossList
                                                                          // (could not identify a marker) the center of
                                                                          // the smallest rectangle around the colorblobb
                                                                          // is used as position
@@ -695,25 +708,54 @@ void detail::refineWithAruco(
                 Vec2F(box.center.x, box.center.y),
                 blob.color)); // 100 beste qualitaet
         }
-        else if(!ignoreWithoutMarker && (crossList.size() != lengthini)) // in case ignoreWithoutMarker is checked and
-                                                                         // CodeMarker-Call returns non-empty crossList
-                                                                         // (could identify a marker)
+    }
+}
+
+
+/**
+ * @brief Modifies CrossList to only contain codes inside the head-boundingbox
+ *
+ * This function deletes every new marker in crosslist, which is
+ * not inside the bounding rect of the blob. If multiple new
+ * codes are inside the bounding rect, only the first one
+ * encountered is not deleted.
+ *
+ * @param lengthini initial length of crosslist
+ * @param crossList list of detected markers
+ * @param blob (Color-)Blob of the detected person
+ * @param offset offset from CropRect to ROI
+ */
+void detail::resolveMoreThanOneCode(
+    const int          lengthini,
+    QList<TrackPoint> &crossList,
+    const ColorBlob &  blob,
+    const Vec2F        offset)
+{
+    if(lengthini + 1 < crossList.size())
+    {
+        int        correctIndex = -1;
+        const auto blobRect     = blob.box.boundingRect();
+        for(int i = lengthini; i < crossList.size(); ++i)
         {
-            Vec2F moveDir;
-            if(autoCorrect && !autoCorrectOnlyExport)
+            auto detectedTP = crossList[i];
+            if((detectedTP + offset).toCvPoint().inside(blobRect))
             {
-                moveDir = autoCorrectColorMarker(blob.imageCenter, controlWidget);
+                correctIndex = i;
+                break;
             }
-            else
-            {
-                moveDir = Vec2F(0, 0);
-            }
-            crossList.back().setCol(blob.color);
-            crossList.back().setColPoint(Vec2F(box.center.x, box.center.y));
-            crossList.back() = crossList.back() + (Vec2F(cropRect.x, cropRect.y) + moveDir);
+        }
+
+        if(correctIndex == -1)
+        {
+            // will be treated like no code was found to begin with
+            crossList.erase(crossList.begin() + lengthini, crossList.end());
+        }
+        else
+        {
+            crossList[lengthini] = crossList[correctIndex];
+            crossList.erase(crossList.begin() + lengthini + 1, crossList.end());
         }
     }
-    codeOpt.setOffsetCropRect2Roi(Vec2F{0, 0});
 }
 
 /**

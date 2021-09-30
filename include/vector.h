@@ -126,7 +126,7 @@ public:
     Vec2F(const CvPoint *v);
     Vec2F(const CvPoint2D32f *v);
 
-    CvPoint      toCvPoint() const;
+    cv::Point    toCvPoint() const;
     CvPoint2D32f toCvPoint2D32f() const;
     QPoint       toQPoint() const;
     QPointF      toQPointF() const;
