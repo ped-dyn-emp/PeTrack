@@ -132,29 +132,41 @@ inline QTextStream &operator>>(QTextStream &s, TrackPoint &tp)
 inline QTextStream &operator<<(QTextStream &s, const TrackPoint &tp)
 {
     if(Petrack::trcVersion > 2)
+    {
         s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " "
           << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color() << " "
           << tp.getMarkerID();
+    }
     else if(Petrack::trcVersion == 2)
+    {
         s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " "
           << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color();
+    }
     else
+    {
         s << tp.x() << " " << tp.y() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " "
           << tp.color();
+    }
     return s;
 }
 inline std::ostream &operator<<(std::ostream &s, const TrackPoint &tp)
 {
     if(Petrack::trcVersion > 2)
+    {
         s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " "
           << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color() << " "
           << tp.getMarkerID();
+    }
     else if(Petrack::trcVersion > 1)
+    {
         s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " "
           << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color();
+    }
     else
+    {
         s << tp.x() << " " << tp.y() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " "
           << tp.color();
+    }
     return s;
 }
 
@@ -304,7 +316,9 @@ inline QTextStream &operator<<(QTextStream &s, const TrackPerson &tp)
     s << " " << tp.size();
     s << Qt::endl << tp.serializeComment() << Qt::endl;
     for(int i = 0; i < tp.size(); ++i)
+    {
         s << tp.at(i) << Qt::endl;
+    }
     return s;
 }
 
@@ -319,7 +333,9 @@ inline std::ostream &operator<<(std::ostream &s, const TrackPerson &tp)
     s << " " << tp.size();
     s << std::endl << tp.serializeComment() << std::endl;
     for(int i = 0; i < tp.size(); ++i)
+    {
         s << tp.at(i) << std::endl;
+    }
     return s;
 }
 

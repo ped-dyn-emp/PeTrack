@@ -105,7 +105,9 @@ void RecognitionRoiItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     mMainWindow->setRecognitionChanged(true);
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 
     QGraphicsRectItem::mouseReleaseEvent(event);
 }
@@ -125,69 +127,105 @@ void RecognitionRoiItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                mPressLocation == bottomLeft)
             {
                 if(mPressRect.x() + diff.x() < -mMainWindow->getImageBorderSize())
+                {
                     diff.setX(-mPressRect.x() - mMainWindow->getImageBorderSize());
+                }
                 if(mPressLocation != inside && mPressRect.width() - diff.x() < MIN_SIZE)
+                {
                     diff.setX(mPressRect.width() - MIN_SIZE);
+                }
             }
             if(mPressLocation == inside || mPressLocation == topLeft || mPressLocation == top ||
                mPressLocation == topRight)
             {
                 if(mPressRect.y() + diff.y() < -mMainWindow->getImageBorderSize())
+                {
                     diff.setY(-mPressRect.y() - mMainWindow->getImageBorderSize());
+                }
                 if(mPressLocation != inside && mPressRect.height() - diff.y() < MIN_SIZE)
+                {
                     diff.setY(mPressRect.height() - MIN_SIZE);
+                }
             }
             if(mPressLocation == inside || mPressLocation == topRight || mPressLocation == right ||
                mPressLocation == bottomRight)
             {
                 if(mPressRect.x() + diff.x() + mPressRect.width() > img->width() - mMainWindow->getImageBorderSize())
+                {
                     diff.setX(img->width() - mPressRect.x() - mPressRect.width() - mMainWindow->getImageBorderSize());
+                }
                 if(mPressLocation != inside && mPressRect.width() + diff.x() < MIN_SIZE)
+                {
                     diff.setX(-mPressRect.width() + MIN_SIZE);
+                }
             }
             if(mPressLocation == inside || mPressLocation == bottomLeft || mPressLocation == bottom ||
                mPressLocation == bottomRight)
             {
                 if(mPressRect.y() + diff.y() + mPressRect.height() > img->height() - mMainWindow->getImageBorderSize())
+                {
                     diff.setY(img->height() - mPressRect.y() - mPressRect.height() - mMainWindow->getImageBorderSize());
+                }
                 if(mPressLocation != inside && mPressRect.height() + diff.y() < MIN_SIZE)
+                {
                     diff.setY(-mPressRect.height() + MIN_SIZE);
+                }
             }
         }
         if(mPressLocation == topLeft)
+        {
             setRect(
                 mPressRect.x() + diff.x(),
                 mPressRect.y() + diff.y(),
                 mPressRect.width() - diff.x(),
                 mPressRect.height() - diff.y());
+        }
         else if(mPressLocation == topRight)
+        {
             setRect(
                 mPressRect.x(),
                 mPressRect.y() + diff.y(),
                 mPressRect.width() + diff.x(),
                 mPressRect.height() - diff.y());
+        }
         else if(mPressLocation == bottomLeft)
+        {
             setRect(
                 mPressRect.x() + diff.x(),
                 mPressRect.y(),
                 mPressRect.width() - diff.x(),
                 mPressRect.height() + diff.y());
+        }
         else if(mPressLocation == bottomRight)
+        {
             setRect(mPressRect.x(), mPressRect.y(), mPressRect.width() + diff.x(), mPressRect.height() + diff.y());
+        }
         else if(mPressLocation == left)
+        {
             setRect(mPressRect.x() + diff.x(), mPressRect.y(), mPressRect.width() - diff.x(), mPressRect.height());
+        }
         else if(mPressLocation == right)
+        {
             setRect(mPressRect.x(), mPressRect.y(), mPressRect.width() + diff.x(), mPressRect.height());
+        }
         else if(mPressLocation == top)
+        {
             setRect(mPressRect.x(), mPressRect.y() + diff.y(), mPressRect.width(), mPressRect.height() - diff.y());
+        }
         else if(mPressLocation == bottom)
+        {
             setRect(mPressRect.x(), mPressRect.y(), mPressRect.width(), mPressRect.height() + diff.y());
+        }
         else // entspricht: if (mPressLocation == inside)
+        {
             setRect(mPressRect.x() + diff.x(), mPressRect.y() + diff.y(), mPressRect.width(), mPressRect.height());
+        }
         // nicht, da sonst koordinatensystem verschoben wird: QGraphicsRectItem::mouseMoveEvent(event); // drag
     }
     else // drag mach ich selber
+    {
         QGraphicsRectItem::mouseMoveEvent(event);
+    }
 }
 
 // event, of moving mouse
@@ -210,27 +248,43 @@ void RecognitionRoiItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
             if((event->pos()).x() < DISTANCE_TO_BORDER + r.x())
             {
                 if((event->pos()).y() < DISTANCE_TO_BORDER + r.y())
+                {
                     setCursor(Qt::SizeFDiagCursor);
+                }
                 else if((event->pos()).y() > r.height() + r.y() - DISTANCE_TO_BORDER)
+                {
                     setCursor(Qt::SizeBDiagCursor);
+                }
                 else
+                {
                     setCursor(Qt::SizeHorCursor);
+                }
             }
             else if((event->pos()).x() > r.width() + r.x() - DISTANCE_TO_BORDER)
             {
                 if((event->pos()).y() < DISTANCE_TO_BORDER + r.y())
+                {
                     setCursor(Qt::SizeBDiagCursor);
+                }
                 else if((event->pos()).y() > r.height() + r.y() - DISTANCE_TO_BORDER)
+                {
                     setCursor(Qt::SizeFDiagCursor);
+                }
                 else
+                {
                     setCursor(Qt::SizeHorCursor);
+                }
             }
             else if(
                 ((event->pos()).y() < DISTANCE_TO_BORDER + r.y()) ||
                 ((event->pos()).y() > r.height() + r.y() - DISTANCE_TO_BORDER))
+            {
                 setCursor(Qt::SizeVerCursor);
+            }
             else
+            {
                 setCursor(Qt::OpenHandCursor);
+            }
         }
         else // wird nur einmal durchaufen - ruecksetzen in control.cpp
         {
@@ -256,29 +310,39 @@ void RecognitionRoiItem::checkRect()
            r.y() > img.rows - mMainWindow->getImageBorderSize() - MIN_SIZE ||
            r.x() + r.width() < -mMainWindow->getImageBorderSize() + MIN_SIZE ||
            r.y() + r.height() < -mMainWindow->getImageBorderSize() + MIN_SIZE)
+        {
             setRect(-mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize(), img.cols, img.rows);
+        }
         else
         {
             if(r.x() < -mMainWindow->getImageBorderSize())
+            {
                 setRect(
                     -mMainWindow->getImageBorderSize(),
                     r.y(),
                     r.width() + (mMainWindow->getImageBorderSize() + r.x()),
                     r.height());
+            }
             if(r.y() < -mMainWindow->getImageBorderSize())
+            {
                 setRect(
                     r.x(),
                     -mMainWindow->getImageBorderSize(),
                     r.width(),
                     r.height() + (mMainWindow->getImageBorderSize() + r.y()));
+            }
             if(r.x() + mMainWindow->getImageBorderSize() + r.width() > img.cols)
             {
                 setRect(r.x(), r.y(), img.cols - r.x() - mMainWindow->getImageBorderSize(), r.height());
             }
             if(r.y() + mMainWindow->getImageBorderSize() + r.height() > img.rows)
+            {
                 setRect(r.x(), r.y(), r.width(), img.rows - r.y() - mMainWindow->getImageBorderSize());
+            }
         }
     }
     else
+    {
         setRect(0, 0, 0, 0);
+    }
 }

@@ -44,17 +44,25 @@ void GraphicsView::wheelEvent(QWheelEvent *event)
     {
         // Check if horizontal scroll
         if(event->angleDelta().x() != 0) // warum orienttion?
+        {
             emit mouseShiftWheel(numDegrees.x() / 15);
+        }
         else
+        {
             emit mouseShiftWheel(-numDegrees.y() / 15);
+        }
     }
     else
     {
         // Check if horizontal scroll
         if(event->angleDelta().x() != 0) // warum orienttion?
+        {
             mViewWidget->zoomIn(numDegrees.x() / 2);
+        }
         else
+        {
             mViewWidget->zoomOut(numDegrees.y() / 2);
+        }
     }
 }
 
@@ -66,33 +74,53 @@ void GraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
            Qt::ShiftModifier) // mit & genuegt, dass unter anderem shift gedrueckt wird (zb mit conrol)
         {
             if(event->modifiers() & Qt::ControlModifier) // mindestens shift und control gedrueckt
+            {
                 emit mouseShiftControlDoubleClick(mapToScene(event->pos()));
+            }
             else
+            {
                 emit mouseShiftDoubleClick(mapToScene(event->pos())); // const QPoint & //const QPointF &pos
+            }
         }
         else if(event->modifiers() & Qt::ControlModifier) // mit & genuegt, dass unter anderem control gedrueckt wird
                                                           // (zb mit shift)
+        {
             emit mouseControlDoubleClick(mapToScene(event->pos())); // const QPoint & //const QPointF &pos
+        }
         else
+        {
             emit mouseDoubleClick();
+        }
     }
     else if(event->button() == Qt::RightButton)
     {
         if(event->modifiers() == Qt::ShiftModifier) // nur shift zugelassen ...
+        {
             emit mouseRightDoubleClick(mapToScene(event->pos()), -1);
+        }
         else if(event->modifiers() == Qt::ControlModifier)
+        {
             emit mouseRightDoubleClick(mapToScene(event->pos()), 0);
+        }
         else if(event->modifiers() == Qt::AltModifier)
+        {
             emit mouseRightDoubleClick(mapToScene(event->pos()), 1);
+        }
     }
     else if(event->button() == Qt::MiddleButton)
     {
         if(event->modifiers() == Qt::ShiftModifier) // nur shift zugelassen ...
+        {
             emit mouseMiddleDoubleClick(-1);
+        }
         else if(event->modifiers() == Qt::ControlModifier)
+        {
             emit mouseMiddleDoubleClick(0);
+        }
         else if(event->modifiers() == Qt::AltModifier)
+        {
             emit mouseMiddleDoubleClick(1);
+        }
     }
 
     scene()->update(); // damit neu hinzugekommende trackpoint oder das loeschen von trackpoints sichtbar wird

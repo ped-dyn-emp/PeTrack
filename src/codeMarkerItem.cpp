@@ -49,13 +49,17 @@ CodeMarkerItem::CodeMarkerItem(QWidget *wParent, const reco::CodeMarkerOptions &
 QRectF CodeMarkerItem::boundingRect() const
 {
     if(mMainWindow->getImage())
+    {
         return QRectF(
             -mMainWindow->getImageBorderSize(),
             -mMainWindow->getImageBorderSize(),
             mMainWindow->getImage()->width(),
             mMainWindow->getImage()->height());
+    }
     else
+    {
         return QRectF(0, 0, 0, 0);
+    }
 }
 
 void CodeMarkerItem::setRect(Vec2F &v)

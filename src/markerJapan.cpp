@@ -48,32 +48,48 @@ MarkerJapan::~MarkerJapan()
 bool MarkerJapan::isOverlappingHead(const MyEllipse &e) const
 {
     if(hasHead())
+    {
         return mHead.isInside(e.center()) || e.isInside(mHead.center());
+    }
     else
+    {
         return false;
+    }
 }
 bool MarkerJapan::isInsideHead(const Vec2F &p) const
 {
     if(hasHead())
+    {
         return mHead.isInside(p);
+    }
     else
+    {
         return false;
+    }
 }
 
 // returns spot number in spots list when inside, otherwise returns -1
 int MarkerJapan::isOverlappingSpots(const MyEllipse &e) const
 {
     for(int i = 0; i < mSpots.size(); ++i)
+    {
         if((mSpots[i].isInside(e.center()) || e.isInside(mSpots[i].center())) && // Mittelpkte liegen ineinander
            ((e.center() - mSpots[i].center()).length() < 2))                     // kein zu grosser Abstand
+        {
             return i;
+        }
+    }
     return -1;
 }
 int MarkerJapan::isInsideSpots(const Vec2F &p) const
 {
     for(int i = 0; i < mSpots.size(); ++i)
+    {
         if(mSpots[i].isInside(p))
+        {
             return i;
+        }
+    }
     return -1;
 }
 
@@ -91,9 +107,13 @@ void MarkerJapan::modifyHead(const MyEllipse &head, float headSize)
     {
         if(mHead.outline() > outlineMin &&
            mHead.outline() < outlineMax) // bevorzugte groesse - nur initial koennte andere erzeugt werden
+        {
             if(fabs(mHead.ratio() - 1.43) >
                fabs(head.ratio() - 1.43)) // because white plate marker casern is 14x21cm -> 1.5 // for A4 -> 1.4285
+            {
                 mHead = head;
+            }
+        }
     }
     else
     {
@@ -110,7 +130,9 @@ void MarkerJapan::modifySpot(int i, const MyEllipse &spot)
         // - ob abstand zur mittellinie geringer
         // - ob form eher kreisfoermig
         if(spot.outline() > mSpots[i].outline())
+        {
             mSpots[i] = spot;
+        }
         ++mSpotCount[i];
     }
 }
@@ -137,14 +159,18 @@ void MarkerJapan::modifyQuadrangle(const Vec2F v[4])
             fabs((mQuadrangle[1] - mQuadrangle[0]).angleBetweenVec(mQuadrangle[2] - mQuadrangle[1]) - PI / 2.)))
         {
             for(int i = 0; i < 4; ++i)
+            {
                 mQuadrangle[i] = v[i];
+            }
         }
     }
     else
     {
         mHasQuadrangle = true;
         for(int i = 0; i < 4; ++i)
+        {
             mQuadrangle[i] = v[i];
+        }
     }
 }
 
@@ -156,11 +182,15 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
 
     // direkt herausspringen, da nichts zu tun ist
     if(mSpots.size() == 0)
+    {
         return;
+    }
 
     // durch mgl wachsen der spots muss ueberprueft werden, ob sich im nachhinnein Ueberlagerungen ergeben
     for(i = 0; i < mSpots.size(); ++i)
+    {
         for(j = i + 1; j < mSpots.size(); ++j)
+        {
             if(mSpots[i].isInside(mSpots[j].center()) || mSpots[j].isInside(mSpots[i].center()))
             {
                 modifySpot(i, mSpots[j]);
@@ -168,6 +198,8 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
                 j = i; // es muss von vorne begonnen werden, da i wachsen koennte und dann vorgaenger von j nun
                        // hineinpassen koennten // --j;
             }
+        }
+    }
 
     // nach groesse sortieren und loeschen koennte kreus angreifen zugunsten von zahl
 
@@ -181,15 +213,21 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
         ++anz;
         count = 0;
         for(i = 0; i < mSpotCount.size(); ++i)
+        {
             if(mSpotCount[i] > anz)
+            {
                 count++;
+            }
+        }
     }
     for(i = 0; i < mSpotCount.size(); ++i)
+    {
         if(mSpotCount[i] < anz)
         {
             deleteSpot(i);
             --i;
         }
+    }
 
     // 2 spots heraussuchen, bei denen um center in quadrat. bereich in ellipse der dunkelste Pkt (kleiner value in hsv)
     // gefunden wird
@@ -209,12 +247,16 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
             int minVal = 256; // groesser als komplett weiss (255)
             // bildrand muss nicht ueberprueft werden, da sie gar nicht erst hereingekommen waeren
             for(j = -r; j < r + 1; ++j)
+            {
                 for(k = -r; k < r + 1; ++k)
                 {
                     col.setRgb(getValue(img, cx + j, cy + k).rgb());
                     if(col.value() < minVal)
+                    {
                         minVal = col.value(); // Helligkeit
+                    }
                 }
+            }
             minValList.append(minVal);
         }
         // loeschen aller zu hellen spots
@@ -233,13 +275,16 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
 
     // bei 0 muss keine farbe mehr bestimmt werden
     if(mSpots.size() < 2)
+    {
         return;
+    }
 
     // farbe bestimmen (richtiger marker koennte auch durch form oder dem abstand des hellsten pkt in groesserer
     // umgebung vom mittelpkt bestimmt werden)
     bool   colSet = false;
     QColor colOther; // farbe des anderen spots
     for(i = 0; i < mSpots.size(); ++i)
+    {
         if(i != mCenterIndex)
         {
             cx = myRound(mSpots[i].x());
@@ -257,6 +302,7 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
             }
             // bildrand muss nicht ueberprueft werden, da sie gar nicht erst hereingekommen waeren
             for(j = -1; j < 2; ++j) // 3x3 feld wird ueberprueft
+            {
                 for(k = -1; k < 2; ++k)
                 {
                     col.setRgb(getValue(img, cx + j, cy + k).rgb());
@@ -273,7 +319,9 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
                         mColorIndex = i;
                     }
                 }
+            }
         }
+    }
 
     int  fromColor   = (SPOT_COLOR + 340) % 360;
     int  toColor     = (SPOT_COLOR + 20) % 360;
@@ -282,12 +330,16 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
     if(fromColor > toColor) // geht ueber farbrad 359 hinaus, alo 0..toColor + fromColor..359
     {
         if((hue <= toColor) || (hue >= fromColor))
+        {
             corectColor = true;
+        }
     }
     else
     {
         if((hue >= fromColor) && (hue <= toColor))
+        {
             corectColor = true;
+        }
     }
     if(!corectColor) // spots loeschen, wenn nicht die richtige farbe, dadurch wird marker spaeter aussortiert
     {
@@ -307,7 +359,9 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
         int    wcy = myRound(mSpots[mColorIndex].y() + 0.356 * (mSpots[mColorIndex].x() - mSpots[mOtherIndex].x()));
         QColor white(0, 0, 0);                              // hellster fleck
         int    avgWhiteR = 0, avgWhiteG = 0, avgWhiteB = 0; // durchschnittlichen weisswert
-        for(j = -1; j < 2; ++j)                             // 3x3 feld um ocx,ocy wird ueberprueft
+
+        for(j = -1; j < 2; ++j) // 3x3 feld um ocx,ocy wird ueberprueft
+        {
             for(k = -1; k < 2; ++k)
             {
                 QColor color = getValue(img, wcx + j, wcy + k);
@@ -316,11 +370,15 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
                 avgWhiteB += color.blue();
                 col.setRgb(getValue(img, wcx + j, wcy + k).rgb());
                 if(col.value() > white.value()) // wenn Helligkeit groesser
+                {
                     white = col;
+                }
             }
+        }
         wcx = myRound(mSpots[mColorIndex].x() - 0.356 * (mSpots[mColorIndex].y() - mSpots[mOtherIndex].y()));
         wcy = myRound(mSpots[mColorIndex].y() - 0.356 * (mSpots[mColorIndex].x() - mSpots[mOtherIndex].x()));
         for(j = -1; j < 2; ++j) // 3x3 feld um ocx,ocy wird ueberprueft
+        {
             for(k = -1; k < 2; ++k)
             {
                 QColor color = getValue(img, wcx + j, wcy + k);
@@ -329,8 +387,11 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
                 avgWhiteB += color.blue();
                 col.setRgb(getValue(img, wcx + j, wcy + k).rgb());
                 if(col.value() > white.value()) // wenn Helligkeit groesser
+                {
                     white = col;
+                }
             }
+        }
 
         avgWhiteR /= 18;
         avgWhiteG /= 18;
@@ -348,7 +409,9 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
                 (int) MIN(((255. / avgWhiteB) * colOther.blue()), 255.));
         }
         else
+        {
             debout << "Warning: white is to dark!" << std::endl;
+        }
 
         // eigentlich muesset saettigung ueber histogramm angepasst werden!!
     }
@@ -367,25 +430,37 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
 Vec2F MarkerJapan::getCenter() const
 {
     if(mColorIndex == -1 || mOtherIndex == -1 || mSpots.size() < 2)
+    {
         return mHead.center(); // good fallback ?
+    }
     else
+    {
         return (mSpots[0].center() + mSpots[1].center()) / 2.;
+    }
 }
 
 MyEllipse MarkerJapan::getCenterSpot() const
 {
     if(mCenterIndex == -1)
+    {
         return mHead; // good fallback ?
+    }
     else
+    {
         return mSpots[mCenterIndex];
+    }
 }
 
 MyEllipse MarkerJapan::getColorSpot() const
 {
     if(mColorIndex == -1)
+    {
         return mHead; // good fallback ?
+    }
     else
+    {
         return mSpots[mColorIndex];
+    }
 }
 
 void MarkerJapan::draw(cv::Mat &img) const
@@ -394,14 +469,20 @@ void MarkerJapan::draw(cv::Mat &img) const
 
     // head
     if(hasHead())
+    {
         head().draw(img, 255, 0, 255);
+    }
     // marker
     for(i = 0; i < mSpots.size(); ++i)
     {
         if(i == mCenterIndex)
+        {
             mSpots[i].draw(img, 255, 0, 0);
+        }
         else
+        {
             mSpots[i].draw(img, 0, 0, 255);
+        }
     }
     if(hasHead() && mSpots.size() == 0)
     {
@@ -414,7 +495,9 @@ void MarkerJapan::draw(cv::Mat &img) const
     {
         std::vector<cv::Point> pt;
         for(i = 0; i < 4; ++i)
+        {
             pt.push_back(cv::Point(mQuadrangle[i].x(), mQuadrangle[i].y()));
+        }
         // draw the square as a closed polyline
         cv::polylines(img, pt, true, CV_RGB(0, 255, 0), 1, cv::LINE_AA, 0);
     }
@@ -487,6 +570,7 @@ bool MarkerJapanList::mayAddEllipse(const cv::Mat &img, const MyEllipse &e, bool
             else if(!at(i).hasHead()) // marker hat noch keinen kopf
             {
                 for(j = 0; j < at(i).spots().size(); ++j)
+                {
                     if(e.isInside(at(i).spots()[j].center()))
                     {
                         if(!doesExist)
@@ -502,6 +586,7 @@ bool MarkerJapanList::mayAddEllipse(const cv::Mat &img, const MyEllipse &e, bool
                             --j;
                         }
                     }
+                }
             }
         }
 
@@ -566,7 +651,9 @@ void MarkerJapanList::organize(const cv::Mat &img, bool autoWB)
             }
             (*this)[i].organize(img, autoWB);
             if(!at(i).hasSpots()) // if after organization no spot is inside had
+            {
                 removeAt(i);
+            }
             else // hat mind. 2 spots
             {
                 // Abstand der Spots bestimmen (nur hier headsize bekannt)
@@ -574,13 +661,19 @@ void MarkerJapanList::organize(const cv::Mat &img, bool autoWB)
                 if(spotDistance >
                    0.8 * mHeadSize) // ein Hoechstabstand soll eingehalten werden, in Japan waren es hier 12 // kein
                                     // Minimalabstand da bei Schraegsicht abstand kleiner werden kann
+                {
                     removeAt(i);
+                }
                 else
+                {
                     i++;
+                }
             }
         }
         else
+        {
             removeAt(i);
+        }
     }
 }
 
@@ -589,7 +682,9 @@ void MarkerJapanList::organize(const cv::Mat &img, bool autoWB)
 void MarkerJapanList::draw(cv::Mat &img) const
 {
     for(int i = 0; i < size(); ++i)
+    {
         at(i).draw(img);
+    }
 }
 
 void MarkerJapanList::toCrossList(QList<TrackPoint> *crossList, bool ignoreWithoutMarker) const

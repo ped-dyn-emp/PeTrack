@@ -41,8 +41,10 @@ inline void printQVector3D(const QVector3D &p)
 inline void printQMatrix4x4(const QMatrix4x4 &m)
 {
     for(int i = 0; i < 4; ++i)
+    {
         debout << (m.data())[i * 4 + 0] << " " << (m.data())[i * 4 + 1] << " " << (m.data())[i * 4 + 2] << " "
                << (m.data())[i * 4 + 3] << std::endl;
+    }
 }
 
 class Vec3F

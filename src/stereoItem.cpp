@@ -51,13 +51,17 @@ StereoItem::StereoItem(QWidget *wParent, QGraphicsItem *parent) : QGraphicsItem(
 QRectF StereoItem::boundingRect() const
 {
     if(mMainWindow->getImage())
+    {
         return QRectF(
             -mMainWindow->getImageBorderSize(),
             -mMainWindow->getImageBorderSize(),
             mMainWindow->getImage()->width(),
             mMainWindow->getImage()->height());
+    }
     else
+    {
         return QRectF(0, 0, 0, 0);
+    }
 }
 
 // event, of moving mouse while button is pressed

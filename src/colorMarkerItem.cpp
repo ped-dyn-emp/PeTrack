@@ -49,13 +49,17 @@ ColorMarkerItem::ColorMarkerItem(QWidget *wParent, QGraphicsItem *parent) : QGra
 QRectF ColorMarkerItem::boundingRect() const
 {
     if(mMainWindow->getImage())
+    {
         return QRectF(
             -mMainWindow->getImageBorderSize(),
             -mMainWindow->getImageBorderSize(),
             mMainWindow->getImage()->width(),
             mMainWindow->getImage()->height());
+    }
     else
+    {
         return QRectF(0, 0, 0, 0);
+    }
 }
 
 void ColorMarkerItem::setRect(Vec2F &v)
@@ -82,7 +86,9 @@ void ColorMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * 
             mImage = nullptr; // is not been done by delete
         }
         if(mImage == nullptr) // zu Beginn oder wenn sich die Groesse aendert
+        {
             mImage = new QImage(mMask.cols, mMask.rows, QImage::Format_ARGB32);
+        }
 
         int   x, y;
         auto *data        = mMask.data; //->imageData);

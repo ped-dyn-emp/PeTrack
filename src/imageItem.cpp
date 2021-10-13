@@ -53,13 +53,17 @@ QRectF ImageItem::boundingRect() const
         return QRectF(0, 0, mImage->width(), mImage->height());
     }
     else
+    {
         return QRectF(0, 0, 0, 0);
+    }
 }
 
 void ImageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
     if(mImage)
+    {
         painter->drawImage(0, 0, *mImage);
+    }
 }
 
 void ImageItem::setImage(QImage *img)
@@ -105,7 +109,9 @@ double ImageItem::getCmPerPixel()
         // durch 100., da coordsys so gezeichnet, dass 1 bei 100 liegt
     }
     else
+    {
         return 0.;
+    }
 }
 // Liefert zum Pixelpunkt (px,py) die Anzahl der Zentimeter in x- und y-Richtung
 QPointF ImageItem::getCmPerPixel(float px, float py, float h)
@@ -126,25 +132,37 @@ QPointF ImageItem::getCmPerPixel(float px, float py, float h)
     cv::Point3f p3y2 = mMainWindow->getExtrCalibration()->get3DPoint(cv::Point2f(px, py + 0.5), h);
 
     if(debug)
+    {
         debout << "Punkte: " << p3x1.x << ", " << p3x1.y << ", " << p3x1.z << std::endl;
+    }
     if(debug)
+    {
         debout << "Punkte: " << p3x2.x << ", " << p3x2.y << ", " << p3x2.z << std::endl;
+    }
     if(debug)
+    {
         debout << "Punkte: " << p3y1.x << ", " << p3y1.y << ", " << p3y1.z << std::endl;
+    }
     if(debug)
+    {
         debout << "Punkte: " << p3y2.x << ", " << p3y2.y << ", " << p3y2.z << std::endl;
+    }
 
     double x_dir = norm(p3x1 - p3x2);
     double y_dir = norm(p3y1 - p3y2);
 
     if(debug)
+    {
         debout << "x_dir: " << x_dir << ", y_dir: " << y_dir << " Durchschnitt: " << (0.5 * (x_dir + y_dir))
                << std::endl;
+    }
 
     QPointF res(x_dir, y_dir);
 
     if(debug)
+    {
         debout << "CmPerPixel (x,y): " << res << std::endl;
+    }
 
     return res;
 }
@@ -167,16 +185,24 @@ double ImageItem::getAngleToGround(float px, float py, float height)
         cv::Point2f(px - mMainWindow->getImageBorderSize(), py - mMainWindow->getImageBorderSize()), height);
 
     if(debug)
+    {
         debout << "Camera:          " << cam.x << ", " << cam.y << ", " << cam.z << std::endl;
+    }
     if(debug)
+    {
         debout << "posInImage:      " << posInImage.x << ", " << posInImage.y << ", " << posInImage.z << std::endl;
+    }
 
     cv::Point3f a(cam.x - posInImage.x, cam.y - posInImage.y, cam.z - posInImage.z), b(0, 0, 1);
 
     if(debug)
+    {
         debout << "a: (" << a.x << ", " << a.y << ", " << a.z << ")" << std::endl;
+    }
     if(debug)
+    {
         debout << "b: (" << b.x << ", " << b.y << ", " << b.z << ")" << std::endl;
+    }
 
     return asin(
                (a.x * b.x + a.y * b.y + a.z * b.z) / (abs(sqrt(pow(a.x, 2) + pow(a.y, 2) + pow(a.z, 2))) *
@@ -205,12 +231,16 @@ QPointF ImageItem::getPosImage(QPointF pos, float height)
             //////////////
             // Old 2D mapping of Pixelpoints to RealPositions
             if(debug)
+            {
                 debout << "x: " << pos.x() << " y: " << pos.y() << std::endl;
+            }
             pos.setY(-pos.y());
             pos /= mControlWidget->getCalibCoordUnit() /
                    100.; // durch 100., da coordsys so gezeichnet, dass 1 bei 100 liegt
             if(debug)
+            {
                 debout << "x: " << pos.x() << " y: " << pos.y() << std::endl;
+            }
 
             pos = mapFromItem(mCoordItem, pos); // Einheit anpassen...
             if(mControlWidget->coordUseIntrinsic->checkState() == Qt::Checked)
@@ -224,11 +254,15 @@ QPointF ImageItem::getPosImage(QPointF pos, float height)
                 pos.ry() -= mImage->height() / 2. - .5; // Bildmitte
             }
             if(debug)
+            {
                 debout << "x: " << pos.x() << " y: " << pos.y() << std::endl;
+            }
             pos = (mControlWidget->coordAltitude->value() / (mControlWidget->coordAltitude->value() - height)) *
                   pos; //((a-height)/a)*pos;
             if(debug)
+            {
                 debout << "x: " << pos.x() << " y: " << pos.y() << std::endl;
+            }
             if(mControlWidget->coordUseIntrinsic->checkState() == Qt::Checked)
             {
                 pos.rx() += mControlWidget->getCalibCxValue();
@@ -240,7 +274,9 @@ QPointF ImageItem::getPosImage(QPointF pos, float height)
                 pos.ry() += mImage->height() / 2. - .5; // Bildmitte
             }
             if(debug)
+            {
                 debout << "x: " << pos.x() << " y: " << pos.y() << std::endl;
+            }
         }
     }
     return pos;
@@ -258,7 +294,9 @@ QPointF ImageItem::getPosReal(QPointF pos, double height)
         int  bS    = mMainWindow->getImageBorderSize();
 
         if(debug)
+        {
             debout << "Point pos.x: " << pos.x() << " pos.y: " << pos.y() << " height: " << height << std::endl;
+        }
 
         // Switch between 2D and 3D CameraCalibration/Position calculation
         if(mControlWidget->getCalibCoordDimension() == 0)
@@ -270,15 +308,25 @@ QPointF ImageItem::getPosReal(QPointF pos, double height)
             cv::Point2f p2d = debug ? mMainWindow->getExtrCalibration()->getImagePoint(p3d) : cv::Point2f(0, 0);
 
             if(debug)
+            {
                 debout << "########## INFO ###############" << std::endl;
+            }
             if(debug)
+            {
                 debout << "Org. 2D Point: (" << pos.x() << ", " << pos.y() << ") Hoehe: " << height << std::endl;
+            }
             if(debug)
+            {
                 debout << "Est. 3D Point: (" << p3d.x << ", " << p3d.y << ", " << p3d.z << ")" << std::endl;
+            }
             if(debug)
+            {
                 debout << "Est. 2D Point: (" << p2d.x << ", " << p2d.y << ")" << std::endl;
+            }
             if(debug)
+            {
                 debout << "######## END INFO #############" << std::endl;
+            }
 
             // ToDo: Getting the floor point of the Person! (Only the x/y-coordinates?)
             pos = QPointF(p3d.x, p3d.y);
@@ -286,9 +334,13 @@ QPointF ImageItem::getPosReal(QPointF pos, double height)
         else
         {
             if(debug)
+            {
                 debout << "########## INFO ###############" << std::endl;
+            }
             if(debug)
+            {
                 debout << "Org. 2D Point: (" << pos.x() << ", " << pos.y() << ") Hoehe: " << height << std::endl;
+            }
             // statt mControlWidget->getCalibFx() muesste spaeter wert stehen, der im verzerrten Bild fX=fY angibt
             // a = mControlWidget->getCalibFxValue()*getMeterPerPixel();
             // a = mControlWidget->coordAltitude->value();
@@ -304,13 +356,19 @@ QPointF ImageItem::getPosReal(QPointF pos, double height)
                 pos.ry() -= mImage->height() / 2. - .5; // Bildmitte
             }
             if(debug)
+            {
                 debout << "CoordAltitude: " << mControlWidget->coordAltitude->value() << std::endl;
+            }
             if(debug)
+            {
                 debout << "x: " << pos.x() << " y: " << pos.y() << std::endl;
+            }
             pos = ((mControlWidget->coordAltitude->value() - height) / mControlWidget->coordAltitude->value()) *
                   pos; //((a-height)/a)*pos;
             if(debug)
+            {
                 debout << "x: " << pos.x() << " y: " << pos.y() << std::endl;
+            }
             if(mControlWidget->coordUseIntrinsic->checkState() == Qt::Checked)
             {
                 pos.rx() += mControlWidget->getCalibCxValue();
@@ -323,19 +381,29 @@ QPointF ImageItem::getPosReal(QPointF pos, double height)
             }
             // Old 2D mapping of Pixelpoints to RealPositions
             if(debug)
+            {
                 debout << "x: " << pos.x() << " y: " << pos.y() << std::endl;
+            }
             pos = mapToItem(mCoordItem, pos); // Einheit anpassen...
             if(debug)
+            {
                 debout << "x: " << pos.x() << " y: " << pos.y() << std::endl;
+            }
             pos *= mControlWidget->getCalibCoordUnit() /
                    100.; // durch 100., da coordsys so gezeichnet, dass 1 bei 100 liegt
             if(debug)
+            {
                 debout << "x: " << pos.x() << " y: " << pos.y() << std::endl;
+            }
             pos.setY(-pos.y());
             if(debug)
+            {
                 debout << "Est. 3D Point: (" << pos.x() << ", " << pos.y() << ", " << height << ")" << std::endl;
+            }
             if(debug)
+            {
                 debout << "######## END INFO #############" << std::endl;
+            }
         }
     }
     return pos;

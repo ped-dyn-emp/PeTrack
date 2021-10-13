@@ -510,13 +510,19 @@ void Player::recStream()
             fileDialog.setDefaultSuffix("");
 
             if(fileDialog.exec())
+            {
                 dest = fileDialog.selectedFiles().at(0);
+            }
 
             if(dest == nullptr)
+            {
                 return;
+            }
 
             if(QFile::exists(dest))
+            {
                 QFile::remove(dest);
+            }
 
             QProgressDialog progress("Save Video File", nullptr, 0, 2, mMainWindow);
             progress.setWindowTitle("Save Video File");
@@ -537,7 +543,9 @@ void Player::recStream()
             {
                 mMainWindow->statusBar()->showMessage(tr("Saved video file to %1.").arg(dest), 5000);
                 if(!QFile(videoTmp).remove())
+                {
                     debout << "Could not remove tmp-file: " << videoTmp << std::endl;
+                }
 
                 progress.setValue(2);
             }
@@ -572,9 +580,13 @@ bool Player::skipToFrame(int f) // [0..mAnimation->getNumFrames()-1]
 bool Player::skipToFrame() // [0..mAnimation->getNumFrames()-1]
 {
     if(mFrameNum->text().toInt() < getFrameInNum())
+    {
         mFrameNum->setText(QString::number(getFrameInNum()));
+    }
     if(mFrameNum->text().toInt() > getFrameOutNum())
+    {
         mFrameNum->setText(QString::number(getFrameOutNum()));
+    }
 
     return skipToFrame(mFrameNum->text().toInt());
 }
@@ -613,13 +625,17 @@ void Player::update()
 int Player::getFrameInNum()
 {
     if(mFrameInNum->text() == "")
+    {
         return -1;
+    }
     return mFrameInNum->text().toInt();
 }
 void Player::setFrameInNum(int in)
 {
     if(in == -1)
+    {
         in = 0;
+    }
 
     mFrameInNum->setText(QString::number(in));
 
@@ -630,14 +646,18 @@ void Player::setFrameInNum(int in)
 int Player::getFrameOutNum()
 {
     if(mFrameOutNum->text() == "")
+    {
         return -1;
+    }
 
     return mFrameOutNum->text().toInt();
 }
 void Player::setFrameOutNum(int out)
 {
     if(out == -1)
+    {
         out = mAnimation->getMaxFrames() - 1;
+    }
 
     mFrameOutNum->setText(QString::number(out));
 
