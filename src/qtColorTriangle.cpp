@@ -161,7 +161,9 @@ void QtColorTriangle::polish()
 {
     outerRadius = (contentsRect().width() - 1) / 2;
     if((contentsRect().height() - 1) / 2 < outerRadius)
+    {
         outerRadius = (contentsRect().height() - 1) / 2;
+    }
 
     penWidth    = (int) floor(outerRadius / PENDIV); // 50.0); MB
     ellipseSize = (int) floor(outerRadius / ELLDIV); // 12.5); MB
@@ -274,7 +276,9 @@ void QtColorTriangle::genBackground()
 void QtColorTriangle::mouseMoveEvent(QMouseEvent *e)
 {
     if((e->buttons() & Qt::LeftButton) == 0)
+    {
         return;
+    }
 
     QPointF depos((double) e->pos().x(), (double) e->pos().y());
     bool    newColor = false;
@@ -288,13 +292,19 @@ void QtColorTriangle::mouseMoveEvent(QMouseEvent *e)
         b = a + TWOPI / 3.0;
         c = b + TWOPI / 3.0;
         if(b > TWOPI)
+        {
             b -= TWOPI;
+        }
         if(c > TWOPI)
+        {
             c -= TWOPI;
+        }
 
         double am = a - PI / 2;
         if(am < 0)
+        {
             am += TWOPI;
+        }
 
         curHue = 360 - (int) (((am) *360.0) / TWOPI);
         int h, s, v;
@@ -330,11 +340,17 @@ void QtColorTriangle::mouseMoveEvent(QMouseEvent *e)
         Vertex *p2 = &bb;
         Vertex *p3 = &cc;
         if(p1->point.y() > p2->point.y())
+        {
             swap(&p1, &p2);
+        }
         if(p1->point.y() > p3->point.y())
+        {
             swap(&p1, &p3);
+        }
         if(p2->point.y() > p3->point.y())
+        {
             swap(&p2, &p3);
+        }
 
         selectorPos = movePointToTriangle(depos.x(), depos.y(), aa, bb, cc);
         QColor col  = colorFromPoint(selectorPos);
@@ -350,7 +366,9 @@ void QtColorTriangle::mouseMoveEvent(QMouseEvent *e)
     }
 
     if(newColor)
+    {
         emit colorChanged(curColor);
+    }
 
     update();
 }
@@ -367,7 +385,9 @@ void QtColorTriangle::mousePressEvent(QMouseEvent *e)
 {
     // Only respond to the left mouse button.
     if(e->button() != Qt::LeftButton)
+    {
         return;
+    }
 
     QPointF depos((double) e->pos().x(), (double) e->pos().y());
     double  rad      = radiusAt(depos, contentsRect());
@@ -383,13 +403,19 @@ void QtColorTriangle::mousePressEvent(QMouseEvent *e)
         b = a + TWOPI / 3.0;
         c = b + TWOPI / 3.0;
         if(b > TWOPI)
+        {
             b -= TWOPI;
+        }
         if(c > TWOPI)
+        {
             c -= TWOPI;
+        }
 
         double am = a - PI / 2;
         if(am < 0)
+        {
             am += TWOPI;
+        }
 
         curHue = 360 - (int) ((am * 360.0) / TWOPI);
         int h, s, v;
@@ -428,11 +454,17 @@ void QtColorTriangle::mousePressEvent(QMouseEvent *e)
         Vertex *p2 = &bb;
         Vertex *p3 = &cc;
         if(p1->point.y() > p2->point.y())
+        {
             swap(&p1, &p2);
+        }
         if(p1->point.y() > p3->point.y())
+        {
             swap(&p1, &p3);
+        }
         if(p2->point.y() > p3->point.y())
+        {
             swap(&p2, &p3);
+        }
 
         selectorPos = movePointToTriangle(depos.x(), depos.y(), aa, bb, cc);
         QColor col  = colorFromPoint(selectorPos);
@@ -444,7 +476,9 @@ void QtColorTriangle::mousePressEvent(QMouseEvent *e)
     }
 
     if(newColor)
+    {
         emit colorChanged(curColor);
+    }
 
     update();
 }
@@ -457,7 +491,9 @@ void QtColorTriangle::mousePressEvent(QMouseEvent *e)
 void QtColorTriangle::mouseReleaseEvent(QMouseEvent *e)
 {
     if(e->button() == Qt::LeftButton)
+    {
         selMode = Idle;
+    }
 }
 
 /*!
@@ -471,7 +507,9 @@ void QtColorTriangle::keyPressEvent(QKeyEvent *e)
         {
             --curHue;
             if(curHue < 0)
+            {
                 curHue += 360;
+            }
             int h, s, v;
             curColor.getHsv(&h, &s, &v);
             QColor tmp;
@@ -483,7 +521,9 @@ void QtColorTriangle::keyPressEvent(QKeyEvent *e)
         {
             ++curHue;
             if(curHue > 359)
+            {
                 curHue -= 360;
+            }
             int h, s, v;
             curColor.getHsv(&h, &s, &v);
             QColor tmp;
@@ -499,16 +539,24 @@ void QtColorTriangle::keyPressEvent(QKeyEvent *e)
             if(e->modifiers() & Qt::ShiftModifier)
             {
                 if(s > 5)
+                {
                     s -= 5;
+                }
                 else
+                {
                     s = 0;
+                }
             }
             else
             {
                 if(v > 5)
+                {
                     v -= 5;
+                }
                 else
+                {
                     v = 0;
+                }
             }
             tmp.setHsv(curHue, s, v);
             setColor(tmp);
@@ -522,16 +570,24 @@ void QtColorTriangle::keyPressEvent(QKeyEvent *e)
             if(e->modifiers() & Qt::ShiftModifier)
             {
                 if(s < 250)
+                {
                     s += 5;
+                }
                 else
+                {
                     s = 255;
+                }
             }
             else
             {
                 if(v < 250)
+                {
                     v += 5;
+                }
                 else
+                {
                     v = 255;
+                }
             }
             tmp.setHsv(curHue, s, v);
             setColor(tmp);
@@ -549,7 +605,9 @@ void QtColorTriangle::resizeEvent(QResizeEvent *)
 {
     outerRadius = (contentsRect().width() - 1) / 2;
     if((contentsRect().height() - 1) / 2 < outerRadius)
+    {
         outerRadius = (contentsRect().height() - 1) / 2;
+    }
 
     penWidth    = (int) floor(outerRadius / PENDIV); // 50.0); MB
     ellipseSize = (int) floor(outerRadius / ELLDIV); // 12.5); MB
@@ -583,7 +641,9 @@ void QtColorTriangle::paintEvent(QPaintEvent *e)
 {
     QPainter p(this);
     if(e->rect().intersects(contentsRect()))
+    {
         p.setClipRegion(e->region().intersected(contentsRect()));
+    }
     if(mustGenerateBackground)
     {
         genBackground();
@@ -620,7 +680,9 @@ void QtColorTriangle::paintEvent(QPaintEvent *e)
     int ri, gi, bi;
     hueColor.getRgb(&ri, &gi, &bi);
     if((ri * 30) + (gi * 59) + (bi * 11) > 12800)
+    {
         painter.setPen(QPen(Qt::black, penWidth));
+    }
     else
     {
         painter.setPen(QPen(Qt::white, penWidth));
@@ -635,9 +697,13 @@ void QtColorTriangle::paintEvent(QPaintEvent *e)
     // Find a color for painting the selector based on the brightness
     // value of the color.
     if((ri * 30) + (gi * 59) + (bi * 11) > 12800)
+    {
         painter.setPen(QPen(Qt::black, penWidth));
+    }
     else
+    {
         painter.setPen(QPen(Qt::white, penWidth));
+    }
 
     // Draw the selector ellipse.
     painter.drawEllipse(QRectF(
@@ -681,11 +747,17 @@ void QtColorTriangle::drawTrigon(
     Vertex *p2 = &bb;
     Vertex *p3 = &cc;
     if(p1->point.y() > p2->point.y())
+    {
         swap(&p1, &p2);
+    }
     if(p1->point.y() > p3->point.y())
+    {
         swap(&p1, &p3);
+    }
     if(p2->point.y() > p3->point.y())
+    {
         swap(&p2, &p3);
+    }
 
     // All the three y deltas are >= 0
     double p1p2ydist = p2->point.y() - p1->point.y();
@@ -883,7 +955,9 @@ Sets the color of the triangle to \a col.
 void QtColorTriangle::setColor(const QColor &col)
 {
     if(col == curColor)
+    {
         return;
+    }
 
     curColor = col;
 
@@ -892,20 +966,28 @@ void QtColorTriangle::setColor(const QColor &col)
 
     // Never use an invalid hue to display colors
     if(h != -1)
+    {
         curHue = h;
+    }
 
     a = (((360 - curHue) * TWOPI) / 360.0);
     a += PI / 2.0;
     if(a > TWOPI)
+    {
         a -= TWOPI;
+    }
 
     b = a + TWOPI / 3;
     c = b + TWOPI / 3;
 
     if(b > TWOPI)
+    {
         b -= TWOPI;
+    }
     if(c > TWOPI)
+    {
         c -= TWOPI;
+    }
 
     double cx            = (double) contentsRect().center().x();
     double cy            = (double) contentsRect().center().y();
@@ -957,11 +1039,15 @@ double QtColorTriangle::angleAt(const QPointF &pos, const QRect &rect) const
     double mouseydist = pos.y() - (double) rect.center().y();
     double mouserad   = sqrt(mousexdist * mousexdist + mouseydist * mouseydist);
     if(mouserad == 0.0)
+    {
         return 0.0;
+    }
 
     double angle = acos(mousexdist / mouserad);
     if(mouseydist >= 0)
+    {
         angle = TWOPI - angle;
+    }
 
     return angle;
 }
@@ -1004,7 +1090,9 @@ bool angleBetweenAngles(double p, double a1, double a2)
     {
         a2 += TWOPI;
         if(p < PI)
+        {
             p += TWOPI;
+        }
     }
 
     return p >= a1 && p < a2;
@@ -1037,19 +1125,25 @@ static bool pointAbovePoint(double x, double y, double px, double py, double ax,
         {
             // line is draw upright-to-downleft
             if(floor(x) < floor(px) || floor(y) < floor(py))
+            {
                 result = true;
+            }
         }
         else if(floor(ay) > floor(by))
         {
             // line is draw downright-to-upleft
             if(floor(x) > floor(px) || floor(y) < floor(py))
+            {
                 result = true;
+            }
         }
         else
         {
             // line is flat horizontal
             if(y < ay)
+            {
                 result = true;
+            }
         }
     }
     else if(floor(ax) < floor(bx))
@@ -1058,19 +1152,25 @@ static bool pointAbovePoint(double x, double y, double px, double py, double ax,
         {
             // line is draw upleft-to-downright
             if(floor(x) < floor(px) || floor(y) > floor(py))
+            {
                 result = true;
+            }
         }
         else if(floor(ay) > floor(by))
         {
             // line is draw downleft-to-upright
             if(floor(x) > floor(px) || floor(y) > floor(py))
+            {
                 result = true;
+            }
         }
         else
         {
             // line is flat horizontal
             if(y > ay)
+            {
                 result = true;
+            }
         }
     }
     else
@@ -1079,17 +1179,23 @@ static bool pointAbovePoint(double x, double y, double px, double py, double ax,
         if(floor(ay) < floor(by))
         {
             if(x < ax)
+            {
                 result = true;
+            }
         }
         else if(floor(ay) > floor(by))
         {
             if(x > ax)
+            {
                 result = true;
+            }
         }
         else
         {
             if(!(x == ax && y == ay))
+            {
                 result = true;
+            }
         }
     }
 
@@ -1114,12 +1220,16 @@ static int pointInLine(double x, double y, double ax, double ay, double bx, doub
             // if (x,y) is in on or above the upper right point,
             // return -1.
             if(y <= ay && x >= ax)
+            {
                 return -1;
+            }
 
             // if (x,y) is in on or below the lower left point,
             // return 1.
             if(y >= by && x <= bx)
+            {
                 return 1;
+            }
         }
         else
         {
@@ -1132,21 +1242,29 @@ static int pointInLine(double x, double y, double ax, double ay, double bx, doub
                 // return -1. otherwise if x is to the left of the
                 // leftmost point, return 1.
                 if(x >= ax)
+                {
                     return -1;
+                }
                 else if(x <= bx)
+                {
                     return 1;
+                }
             }
             else
             {
                 // if (x,y) is on or below the lower right point,
                 // return -1.
                 if(y >= ay && x >= ax)
+                {
                     return -1;
+                }
 
                 // if (x,y) is on or above the upper left point,
                 // return 1.
                 if(y <= by && x <= bx)
+                {
                     return 1;
+                }
             }
         }
     }
@@ -1159,12 +1277,16 @@ static int pointInLine(double x, double y, double ax, double ay, double bx, doub
             // If (x,y) is on or above the upper left point, return
             // -1.
             if(y <= ay && x <= ax)
+            {
                 return -1;
+            }
 
             // If (x,y) is on or below the lower right point, return
             // 1.
             if(y >= by && x >= bx)
+            {
                 return 1;
+            }
         }
         else
         {
@@ -1174,21 +1296,29 @@ static int pointInLine(double x, double y, double ax, double ay, double bx, doub
             if(floor(ay) == floor(by))
             {
                 if(x <= ax)
+                {
                     return -1;
+                }
                 else if(x >= bx)
+                {
                     return 1;
+                }
             }
             else
             {
                 // If (x,y) is on or below the lower left point, return
                 // -1.
                 if(y >= ay && x <= ax)
+                {
                     return -1;
+                }
 
                 // If (x,y) is on or above the upper right point, return
                 // 1.
                 if(y <= by && x >= bx)
+                {
                     return 1;
+                }
             }
         }
     }
@@ -1276,9 +1406,13 @@ QtColorTriangle::movePointToTriangle(double x, double y, const Vertex &a, const 
             // outside b, return b. Otherwise return the projection.
             int n = pointInLine(p0x, p0y, a.point.x(), a.point.y(), b.point.x(), b.point.y());
             if(n < 0)
+            {
                 return a.point;
+            }
             else if(n > 0)
+            {
                 return b.point;
+            }
 
             return QPointF(p0x, p0y);
         }
@@ -1296,9 +1430,13 @@ QtColorTriangle::movePointToTriangle(double x, double y, const Vertex &a, const 
         {
             int n = pointInLine(p0x, p0y, b.point.x(), b.point.y(), c.point.x(), c.point.y());
             if(n < 0)
+            {
                 return b.point;
+            }
             else if(n > 0)
+            {
                 return c.point;
+            }
             return QPointF(p0x, p0y);
         }
     }
@@ -1315,9 +1453,13 @@ QtColorTriangle::movePointToTriangle(double x, double y, const Vertex &a, const 
         {
             int n = pointInLine(p0x, p0y, c.point.x(), c.point.y(), a.point.x(), a.point.y());
             if(n < 0)
+            {
                 return c.point;
+            }
             else if(n > 0)
+            {
                 return a.point;
+            }
             return QPointF(p0x, p0y);
         }
     }
@@ -1344,9 +1486,13 @@ QPointF QtColorTriangle::pointFromColor(const QColor &col) const
 {
     // Simplifications for the corner cases.
     if(col == Qt::black)
+    {
         return pb;
+    }
     else if(col == Qt::white)
+    {
         return pc;
+    }
 
     // Find the x and y slopes
     double ab_deltax = pb.x() - pa.x();
@@ -1408,7 +1554,9 @@ QColor QtColorTriangle::colorFromPoint(const QPointF &p) const
     // Find the outer radius of the hue gradient.
     int outerRadius = (contentsRect().width() - 1) / 2;
     if((contentsRect().height() - 1) / 2 < outerRadius)
+    {
         outerRadius = (contentsRect().height() - 1) / 2;
+    }
 
     // Find the center coordinates
     double cx = (double) contentsRect().center().x();
@@ -1426,7 +1574,9 @@ QColor QtColorTriangle::colorFromPoint(const QPointF &p) const
     // Find the hue value from the angle of the 'a' point.
     double angle = a - PI / 2.0;
     if(angle < 0)
+    {
         angle += TWOPI;
+    }
     double hue = (360.0 * angle) / TWOPI;
 
     // Create the color of the 'a' corner point. We know that b is
@@ -1445,11 +1595,17 @@ QColor QtColorTriangle::colorFromPoint(const QPointF &p) const
     Vertex *p2 = &bb;
     Vertex *p3 = &cc;
     if(p1->point.y() > p2->point.y())
+    {
         swap(&p1, &p2);
+    }
     if(p1->point.y() > p3->point.y())
+    {
         swap(&p1, &p3);
+    }
     if(p2->point.y() > p3->point.y())
+    {
         swap(&p2, &p3);
+    }
 
     // Find the slopes of all edges in the trigon. All the three y
     // deltas here are positive because of the above sorting.
@@ -1700,17 +1856,29 @@ QColor QtColorTriangle::colorFromPoint(const QPointF &p) const
     int gi = (int) floor(g);
     int bi = (int) floor(b);
     if(ri < 0)
+    {
         ri = 0;
+    }
     else if(ri > 255)
+    {
         ri = 255;
+    }
     if(gi < 0)
+    {
         gi = 0;
+    }
     else if(gi > 255)
+    {
         gi = 255;
+    }
     if(bi < 0)
+    {
         bi = 0;
+    }
     else if(bi > 255)
+    {
         bi = 255;
+    }
 
     // Voila, we have the color at the point of the selector.
     return QColor(ri, gi, bi);

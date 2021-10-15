@@ -54,7 +54,9 @@ void ColorRangeWidget::on_inversHue_stateChanged(int i)
     mColorPlot->getMapItem()->changeActMapInvHue(i == Qt::Checked);
     mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
     mColorPlot->replot();
 }
 
@@ -106,7 +108,9 @@ void ColorRangeWidget::on_fromTriangle_colorChanged(const QColor &col)
 
     mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 void ColorRangeWidget::on_toTriangle_colorChanged(const QColor &col)
 {
@@ -121,7 +125,9 @@ void ColorRangeWidget::on_toTriangle_colorChanged(const QColor &col)
 
     mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void ColorRangeWidget::on_fromColor_clicked()

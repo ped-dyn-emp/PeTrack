@@ -101,39 +101,51 @@ private slots:
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
     void on_useClose_stateChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
 
     void on_closeRadius_valueChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
     void on_openRadius_valueChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
 
     void on_minArea_valueChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
     void on_maxArea_valueChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
     void on_useHeadSize_stateChanged(int i)
     {
@@ -178,7 +190,9 @@ private slots:
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
 
 private:

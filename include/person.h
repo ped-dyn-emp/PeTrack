@@ -45,8 +45,10 @@ public:
     inline float     getDistTopEllipse() const { return mDistTopEllipse; }
     const MyEllipse *getHeadEllipse() const // muss pointer sein, da sonst nullptr nicht moeglich
     {
-        if(size() > (10 / STEP_SIZE)) // war 1 //
+        if(size() > (10 / STEP_SIZE)) // war 1
+        {
             return &at(10 / STEP_SIZE);
+        }
         return nullptr;
     }
 };

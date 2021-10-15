@@ -98,7 +98,9 @@ void copyToQImage(QImage &qImg, cv::Mat &img) // war static functin in animatiol
         }
     }
     else
+    {
         std::cout << "Error: " << channels << " channels are not supported!" << std::endl;
+    }
 }
 
 #ifndef STEREO_DISABLED
@@ -140,9 +142,13 @@ cv::Mat getRoi(cv::Mat &img, const QRect &roi, cv::Rect &rect, bool evenPixelNum
     {
         // roi.width and roi.height must be even
         if(rect.width % 2 > 0)
+        {
             --rect.width;
+        }
         if(rect.height % 2 > 0)
+        {
             --rect.height;
+        }
     }
     // roi.width and roi.height must be >=0
     if(rect.x < 0)

@@ -79,9 +79,13 @@ Animation::Animation(QWidget *wParent)
 Animation::~Animation()
 {
     if(mImgSeq)
+    {
         freePhoto();
+    }
     if(mVideo || mCameraLiveStream)
+    {
         freeVideo();
+    }
 
     mSourceInFrame  = -1;
     mSourceOutFrame = -1;
@@ -107,7 +111,9 @@ cv::Mat Animation::getPreviousFrame()
 cv::Mat Animation::getFrameAtIndex(int index)
 {
     if(mCameraLiveStream)
+    {
         return getFrameVideo(index);
+    }
     // geaendert: We make sure first the index is valid.
     //            If not, it will be set the first or the last index
     if(index < getSourceInFrameNum())
@@ -120,9 +126,13 @@ cv::Mat Animation::getFrameAtIndex(int index)
     }
     // Call the own methods to get it done
     if(mVideo)
+    {
         return getFrameVideo(index);
+    }
     if(mImgSeq)
+    {
         return getFramePhoto(index);
+    }
     return cv::Mat();
 }
 
@@ -237,7 +247,9 @@ bool Animation::openTimeFile(QString &timeFileName)
                     add += 128;
                 }
                 else
+                {
                     dif = (cycSec - lcycSec) + (cycCount - lcycCount) / 8000.;
+                }
                 if(dif > difMax)
                 {
                     difMax   = dif;
@@ -292,7 +304,9 @@ int Animation::getFirstFrameMicroSec() const
 QString Animation::getTimeString(int frame)
 {
     if(frame == -1)
+    {
         frame = getCurrentFrameNum();
+    }
 
     if(mFirstSec != -1) // stereo video from arena with 16 fps
     {
@@ -333,16 +347,22 @@ bool Animation::openAnimation(QString fileName)
 
         // If it is not a video, then is a photo :-)
         if(openRet == false) // es konnte keine Bildsequenz geladen werden
+        {
             openRet = openAnimationVideo(fileName);
+        }
         if(mTimeFileLoaded && !openRet)
+        {
             debout << "Warning: New loaded time file do not correspond to untouched sequence, because new sequence was "
                       "not loadable!"
                    << std::endl;
+        }
         mTimeFileLoaded = false; // reset for new open stereo video sequence
         return openRet;
     }
     else
+    {
         return false;
+    }
 }
 
 /// Opens a camera livestream
@@ -365,7 +385,9 @@ bool Animation::openCameraStream(int camID)
         mCurrentFrame = -1;
         // Get the information of the animation
         if(!getCameraInfo())
+        {
             return false;
+        }
     }
     return true;
 }
@@ -374,14 +396,18 @@ bool Animation::openCameraStream(int camID)
 int Animation::getNumFrames()
 {
     if(mVideo || mImgSeq || mStereo)
+    {
         return getSourceOutFrameNum() - getSourceInFrameNum() + 1; // return mNumFrames;
+    }
     return 0;
 }
 
 int Animation::getMaxFrames() const
 {
     if(mVideo || mImgSeq)
+    {
         return mMaxFrames;
+    }
     return 0;
 }
 
@@ -425,17 +451,25 @@ int Animation::getSourceOutFrameNum() const
 QString Animation::getCurrentFileName()
 {
     if(mCameraLiveStream)
+    {
         return QString("camera live stream");
+    }
 
     if(!mImgFilesList.isEmpty() && mImgSeq)
     {
         if(mCurrentFrame < getSourceInFrameNum() || mCurrentFrame > getSourceOutFrameNum())
+        {
             return QFileInfo(mImgFilesList.at(getSourceInFrameNum())).fileName();
+        }
         else
+        {
             return QFileInfo(mImgFilesList.at(mCurrentFrame)).fileName(); // to cut path
+        }
     }
     else
+    {
         return mFileBase + "." + mFileSuffix; //".avi"; //QString()
+    }
 }
 
 /// Returns the FPS of the current animation
@@ -444,19 +478,29 @@ double Animation::getFPS()
     if(mCameraLiveStream)
     {
         if(mVideoCapture.get(cv::CAP_PROP_FPS))
+        {
             setFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
+        }
     }
     if(mVideo)
+    {
         return mFps;
+    }
     else if(mImgSeq)
     {
         if(mFps == -1)
+        {
             return DEFAULT_FPS; // we assume images from pal video (germany)
+        }
         else
+        {
             return mFps; // if we found a corresponding .time file for the bumblebee xb3
+        }
     }
     else
+    {
         return -1;
+    }
 }
 
 double Animation::getOriginalFPS() const
@@ -474,7 +518,9 @@ void Animation::setFPS(double fps)
 QSize Animation::getSize()
 {
     if(mVideo || mImgSeq)
+    {
         return mSize;
+    }
     else
     {
         mSize.setHeight(0);
@@ -487,9 +533,13 @@ QSize Animation::getSize()
 void Animation::free()
 {
     if(mImgSeq)
+    {
         freePhoto();
+    }
     if(mVideo || mCameraLiveStream)
+    {
         freeVideo();
+    }
 
     mSourceInFrame  = -1;
     mSourceOutFrame = -1;
@@ -618,7 +668,9 @@ bool Animation::openAnimationPhoto(QString fileName)
         back  = regExp.cap(1);
     }
     else // does not match regExp at all
+    {
         return false;
+    }
     mFileBase = front + back; // completeBaseName to cut suffix and sequence number
 
     // Create a new image files list
@@ -638,7 +690,9 @@ bool Animation::openAnimationPhoto(QString fileName)
 
     // Get the information of the animation
     if(!getInfoPhoto())
+    {
         return false;
+    }
     // Set the current frame to  -1 (shows, that no frame is already loaded)
     mCurrentFrame = -1;
 
@@ -656,7 +710,9 @@ cv::Mat Animation::getFramePhoto(int index)
     {
         // Check if the index is valid
         if(index < getSourceInFrameNum() || index > getSourceOutFrameNum())
+        {
             return cv::Mat();
+        }
 
         mImage = cv::imread(mImgFilesList.at(index).toStdString(), cv::IMREAD_UNCHANGED); // CV_LOAD_IMAGE_UNCHANGED);
 
@@ -908,7 +964,9 @@ bool Animation::openAnimationStereoVideo(QString fileName)
 bool Animation::openAnimationVideo(QString fileName)
 {
     if(!mVideoCapture.open(fileName.toStdString().c_str()))
+    {
         return false;
+    }
 
     if(mVideoCapture.isOpened())
     {
@@ -974,7 +1032,9 @@ bool Animation::openAnimationVideo(QString fileName)
         mCurrentFrame = -1;
         // Get the information of the animation
         if(!getInfoVideo(fileName))
+        {
             return false;
+        }
         // Set the current frame to -1 (shows, that no frame is already loaded)
     }
 
@@ -995,7 +1055,9 @@ cv::Mat Animation::getFrameVideo(int index)
         if(mVideoCapture.read(mImage /*tempMat*/))
         {
             if(mImage.empty()) // tempImg == NULL)
+            {
                 return cv::Mat();
+            }
 
             mCurrentFrame++;
         }
@@ -1006,12 +1068,16 @@ cv::Mat Animation::getFrameVideo(int index)
     {
         // Check if we have a valid index
         if(index < getSourceInFrameNum() || (index > getSourceOutFrameNum() && getSourceOutFrameNum() != -1))
+        {
             return cv::Mat();
+        }
         if(mVideo && !mStereo)
         {
             // Check if we have a valid capture device
             if(!mVideoCapture.isOpened())
+            {
                 return cv::Mat();
+            }
             // Now we need to see if it is necessary to seek for the frame or if we can use
             // directly the cvQueryFrame function
             // This is tested since the seek function takes a lot of time!
@@ -1027,7 +1093,9 @@ cv::Mat Animation::getFrameVideo(int index)
             if(mVideoCapture.read(mImage))
             {
                 if(mImage.empty()) // tempImg == NULL)
+                {
                     return cv::Mat();
+                }
             }
             else
             {

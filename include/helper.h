@@ -94,20 +94,32 @@ inline double getMedianOf3(double a, double b, double c)
     if(a < b)
     {
         if(b < c)
+        {
             return b; // a b c
+        }
         else if(c < b && c < a)
+        {
             return a; // c a b
+        }
         else
+        {
             return c; // a c b
+        }
     }
     else // b<=a
     {
         if(a < c)
+        {
             return a; // b a c
+        }
         else if(c < a && c < b)
+        {
             return b; // c b a
+        }
         else
+        {
             return c; // b c a
+        }
     }
 }
 
@@ -163,17 +175,25 @@ inline QColor getValue(const cv::Mat &img, int x, int y)
 inline std::ostream &operator<<(std::ostream &s, const QColor &col)
 {
     if(col.isValid())
+    {
         s << col.red() << " " << col.green() << " " << col.blue();
+    }
     else
+    {
         s << -1 << " " << -1 << " " << -1;
+    }
     return s;
 }
 inline QTextStream &operator<<(QTextStream &s, const QColor &col)
 {
     if(col.isValid())
+    {
         s << col.red() << " " << col.green() << " " << col.blue();
+    }
     else
+    {
         s << -1 << " " << -1 << " " << -1;
+    }
     return s;
 }
 inline QTextStream &operator>>(QTextStream &s, QColor &col)
@@ -190,7 +210,9 @@ inline QTextStream &operator>>(QTextStream &s, QColor &col)
         col.setBlue(i);
     }
     else
+    {
         s >> i >> i;
+    }
     return s;
 }
 
@@ -214,11 +236,17 @@ inline QString getExistingFile(const QString &fileList, const QString &relToFile
     for(int i = 0; i < list.size(); ++i)
     {
         if(QFile(list.at(i)).exists())
+        {
             return list.at(i);
+        }
         if(QFile(list.at(i).trimmed()).exists())
+        {
             return list.at(i).trimmed();
+        }
         if(QFile(QFileInfo(relToFileName).absolutePath() + "/" + list.at(i).trimmed()).exists())
+        {
             return QFileInfo(relToFileName).absolutePath() + "/" + list.at(i).trimmed();
+        }
     }
     return ""; // wenn keine der Dateien existiert
 }
@@ -233,12 +261,18 @@ inline QString getFileList(const QString &fileName, const QString &relToFileName
     if(QFileInfo(fileName).isRelative())
     {
         if(fileName == seqRelToPro)
+        {
             return fileName + ";" + seqAbs;
+        }
         else
+        {
             return fileName + ";" + seqAbs + ";" + seqRelToPro;
+        }
     }
     else
+    {
         return fileName + ";" + seqRelToPro;
+    }
 }
 
 #include <ctime>

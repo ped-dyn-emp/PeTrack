@@ -972,19 +972,25 @@ void Control::on_anaCalculate_clicked()
     mMainWindow->calculateRealTracker();
     analysePlot->setScale();
     if(!isLoading())
+    {
         analysePlot->replot();
+    }
 }
 
 void Control::on_anaStep_valueChanged(int /*i*/)
 {
     if(!isLoading())
+    {
         analysePlot->replot();
+    }
 }
 
 void Control::on_anaMarkAct_stateChanged(int /*i*/)
 {
     if(!isLoading())
+    {
         analysePlot->replot();
+    }
 }
 
 void Control::on_anaConsiderX_stateChanged(int i)
@@ -1000,11 +1006,15 @@ void Control::on_anaConsiderX_stateChanged(int i)
         anaConsiderRev->setEnabled(true);
     }
     if((i == Qt::Unchecked) && (!anaConsiderY->isChecked()))
+    {
         anaConsiderX->setCheckState(Qt::Checked);
+    }
     else
     {
         if(!isLoading())
+        {
             analysePlot->replot();
+        }
     }
 }
 
@@ -1021,39 +1031,53 @@ void Control::on_anaConsiderY_stateChanged(int i)
         anaConsiderRev->setEnabled(true);
     }
     if((i == Qt::Unchecked) && (!anaConsiderX->isChecked()))
+    {
         anaConsiderY->setCheckState(Qt::Checked);
+    }
     else
     {
         if(!isLoading())
+        {
             analysePlot->replot();
+        }
     }
 }
 
 void Control::on_anaConsiderAbs_stateChanged(int /*i*/)
 {
     if(!isLoading())
+    {
         analysePlot->replot();
+    }
 }
 
 void Control::on_anaConsiderRev_stateChanged(int /*i*/)
 {
     if(!isLoading())
+    {
         analysePlot->replot();
+    }
 }
 
 void Control::on_showVoronoiCells_stateChanged(int /*arg1*/)
 {
     if(!isLoading())
+    {
         mMainWindow->getScene()->update();
+    }
 }
 
 //------------------- tracking
 void Control::on_trackShow_stateChanged(int i)
 {
     if(i == Qt::Checked)
+    {
         mMainWindow->getTrackerItem()->show();
+    }
     else if(i == Qt::Unchecked)
+    {
         mMainWindow->getTrackerItem()->hide();
+    }
 }
 
 void Control::on_trackFix_stateChanged(int /*i*/)
@@ -1068,7 +1092,9 @@ void Control::on_trackOnlineCalc_stateChanged(int i)
         mMainWindow->setTrackChanged(true); // flag changes of track parameters
         mMainWindow->getTracker()->reset();
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
 }
 
@@ -1088,7 +1114,9 @@ void Control::on_trackReset_clicked()
         mMainWindow->setRecognitionChanged(true); // flag changes of recognition parameters
         mMainWindow->getTracker()->init(size);
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
 }
 
@@ -1115,7 +1143,9 @@ void Control::on_trackPathColorButton_clicked()
         setTrackPathColor(col);
     }
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_trackGroundPathColorButton_clicked()
@@ -1126,7 +1156,9 @@ void Control::on_trackGroundPathColorButton_clicked()
         setTrackGroundPathColor(col);
     }
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_moCapColorButton_clicked()
@@ -1148,7 +1180,9 @@ void Control::on_trackRegionScale_valueChanged(int /*i*/)
     mMainWindow->setTrackChanged(true);
     mMainWindow->getTracker()->reset();
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_trackRegionLevels_valueChanged(int /*i*/)
@@ -1156,7 +1190,9 @@ void Control::on_trackRegionLevels_valueChanged(int /*i*/)
     mMainWindow->setTrackChanged(true);
     mMainWindow->getTracker()->reset();
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_trackShowSearchSize_stateChanged(int /*i*/)
@@ -1167,34 +1203,46 @@ void Control::on_trackShowSearchSize_stateChanged(int /*i*/)
 void Control::on_trackShowOnly_stateChanged(int i)
 {
     if(i > 0 && trackShowOnlyList->checkState() == Qt::Checked)
+    {
         trackShowOnlyList->setChecked(false);
+    }
 
     if(!isLoading())
+    {
         mScene->update();
+    }
 }
 
 void Control::on_trackShowOnlyList_stateChanged(int i)
 {
     if(i > 0 && trackShowOnly->checkState() == Qt::Checked)
+    {
         trackShowOnly->setChecked(false);
+    }
 
     trackShowOnlyListButton->setEnabled(i);
     trackShowOnlyNrList->setEnabled(i);
 
     if(!isLoading())
+    {
         mScene->update();
+    }
 }
 
 void Control::on_trackShowOnlyNr_valueChanged(int /*i*/)
 {
     if(!mMainWindow->isLoading())
+    {
         mScene->update();
+    }
 }
 
 void Control::on_trackShowOnlyNrList_textChanged(const QString & /*arg1*/)
 {
     if(!mMainWindow->isLoading())
+    {
         mScene->update();
+    }
 }
 
 void Control::on_trackGotoNr_clicked()
@@ -1262,7 +1310,9 @@ void Control::on_trackShowOnlyListButton_clicked()
             if(checkBox.at(i)->isChecked())
             {
                 if(first == -1)
+                {
                     first = i + 1;
+                }
             }
             else // not checked
             {
@@ -1270,9 +1320,13 @@ void Control::on_trackShowOnlyListButton_clicked()
                 {
                     last = i;
                     if(first == last)
+                    {
                         list.append(QString::number(first));
+                    }
                     else
+                    {
                         list.append(QString("%1-%2").arg(first).arg(last));
+                    }
                     last  = -1;
                     first = -1;
                 }
@@ -1317,7 +1371,9 @@ void Control::on_recoShowColor_stateChanged(int i)
 {
     colorPlot->getTrackerItem()->setVisible(i == Qt::Checked);
     if(!isLoading())
+    {
         colorPlot->replot();
+    }
 }
 
 void Control::on_recoOptimizeColor_clicked()
@@ -1379,7 +1435,9 @@ void Control::on_recoColorModel_currentIndexChanged(int index)
         colorPlot->setScale();
         colorPlot->generateImage();
         if(!isLoading())
+        {
             colorPlot->replot();
+        }
     }
 }
 
@@ -1390,7 +1448,9 @@ void Control::on_recoColorX_currentIndexChanged(int /*index*/)
         colorPlot->setScale();
         colorPlot->generateImage();
         if(!isLoading())
+        {
             colorPlot->replot();
+        }
     }
     // TODO schoen waere hier das gegenstueck bei y zu disablen, aber combobox bietet dies nicht auf einfachem weg
 }
@@ -1402,7 +1462,9 @@ void Control::on_recoColorY_currentIndexChanged(int /*index*/)
         colorPlot->setScale();
         colorPlot->generateImage();
         if(!isLoading())
+        {
             colorPlot->replot();
+        }
     }
 }
 
@@ -1412,7 +1474,9 @@ void Control::on_recoColorZ_valueChanged(int /*index*/)
     {
         colorPlot->generateImage();
         if(!isLoading())
+        {
             colorPlot->replot();
+        }
     }
 }
 
@@ -1420,14 +1484,18 @@ void Control::on_recoGreyLevel_valueChanged(int index)
 {
     colorPlot->setGreyDiff(index);
     if(!isLoading())
+    {
         colorPlot->replot();
+    }
 }
 
 void Control::on_recoSymbolSize_valueChanged(int index)
 {
     colorPlot->setSymbolSize(index);
     if(!isLoading())
+    {
         colorPlot->replot();
+    }
 }
 void Control::on_recoStereoShow_clicked()
 {
@@ -1495,7 +1563,9 @@ void Control::on_mapX_valueChanged(int /*i*/)
         mapColor->isChecked(),
         mapHeight->value());
     if(!isLoading())
+    {
         colorPlot->replot();
+    }
 }
 void Control::on_mapY_valueChanged(int /*i*/)
 {
@@ -1508,7 +1578,9 @@ void Control::on_mapY_valueChanged(int /*i*/)
         mapColor->isChecked(),
         mapHeight->value());
     if(!isLoading())
+    {
         colorPlot->replot();
+    }
 }
 void Control::on_mapW_valueChanged(int /*i*/)
 {
@@ -1521,7 +1593,9 @@ void Control::on_mapW_valueChanged(int /*i*/)
         mapColor->isChecked(),
         mapHeight->value());
     if(!isLoading())
+    {
         colorPlot->replot();
+    }
 }
 void Control::on_mapH_valueChanged(int /*i*/)
 {
@@ -1534,7 +1608,9 @@ void Control::on_mapH_valueChanged(int /*i*/)
         mapColor->isChecked(),
         mapHeight->value());
     if(!isLoading())
+    {
         colorPlot->replot();
+    }
 }
 void Control::on_mapColor_stateChanged(int /*i*/)
 {
@@ -1547,7 +1623,9 @@ void Control::on_mapColor_stateChanged(int /*i*/)
         mapColor->isChecked(),
         mapHeight->value());
     if(!isLoading())
+    {
         colorPlot->replot();
+    }
 }
 void Control::on_mapHeight_valueChanged(double /*d*/)
 {
@@ -1582,17 +1660,23 @@ void Control::on_mapDel_clicked()
 {
     colorPlot->getMapItem()->delMap(mapNr->value());
     if(mapNr->value() == mapNr->maximum())
+    {
         mapNr->setValue(mapNr->value() > 0 ? mapNr->maximum() - 1 : 0);
+    }
 
     mapNr->setMaximum(mapNr->maximum() > 0 ? mapNr->maximum() - 1 : 0);
 
     if(!isLoading())
+    {
         colorPlot->replot();
+    }
 }
 void Control::on_mapDistribution_clicked()
 {
     if(!colorPlot->printDistribution())
+    {
         mMainWindow->getTracker()->printHeightDistribution();
+    }
 }
 void Control::on_mapResetHeight_clicked()
 {
@@ -1664,7 +1748,9 @@ void Control::on_performRecognition_stateChanged(int /*i*/)
 {
     mMainWindow->setRecognitionChanged(true); // flag changes of recognition parameters
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_recoMethod_currentIndexChanged(int /*index*/)
@@ -1682,21 +1768,29 @@ void Control::on_markerBrightness_valueChanged(int /*i*/)
 {
     mMainWindow->setRecognitionChanged(true); // flag changes of recognition parameters
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 void Control::on_markerIgnoreWithout_stateChanged(int /*i*/)
 {
     mMainWindow->setRecognitionChanged(true); // flag changes of recognition parameters
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_roiShow_stateChanged(int i)
 {
     if(i == Qt::Checked)
+    {
         mMainWindow->getRecoRoiItem()->show(); // setVisible
+    }
     else if(i == Qt::Unchecked)
+    {
         mMainWindow->getRecoRoiItem()->hide(); // setVisible
+    }
 }
 void Control::on_roiFix_stateChanged(int i)
 {
@@ -1714,9 +1808,13 @@ void Control::on_roiFix_stateChanged(int i)
 void Control::on_trackRoiShow_stateChanged(int i)
 {
     if(i == Qt::Checked)
+    {
         mMainWindow->getTrackRoiItem()->show(); // setVisible
+    }
     else if(i == Qt::Unchecked)
+    {
         mMainWindow->getTrackRoiItem()->hide(); // setVisible
+    }
 }
 
 void Control::on_trackRoiFix_stateChanged(int i)
@@ -1736,42 +1834,60 @@ void Control::on_trackRoiFix_stateChanged(int i)
 void Control::on_filterBrightContrast_stateChanged(int i)
 {
     if(i == Qt::Checked)
+    {
         mMainWindow->getBrightContrastFilter()->enable();
+    }
     else if(i == Qt::Unchecked)
+    {
         mMainWindow->getBrightContrastFilter()->disable();
+    }
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_filterContrastParam_valueChanged(int i)
 {
     mMainWindow->getBrightContrastFilter()->getContrast()->setValue(i);
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_filterBrightParam_valueChanged(int i)
 {
     mMainWindow->getBrightContrastFilter()->getBrightness()->setValue(i);
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_filterBorder_stateChanged(int i)
 {
     if(i == Qt::Checked)
+    {
         mMainWindow->getBorderFilter()->enable();
+    }
     else if(i == Qt::Unchecked)
+    {
         mMainWindow->getBorderFilter()->disable();
+    }
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_filterBorderParamSize_valueChanged(int i)
 {
     mMainWindow->setImageBorderSize(2 * i); // 2* because undistored has problem with sizes not dividable  of 4
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_filterBorderParamCol_clicked()
@@ -1787,37 +1903,57 @@ void Control::on_filterBorderParamCol_clicked()
     bf->getBorderColG()->setValue(color.green());
     bf->getBorderColB()->setValue(color.blue());
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_filterSwap_stateChanged(int i)
 {
     if(i == Qt::Checked)
+    {
         mMainWindow->getSwapFilter()->enable();
+    }
     else if(i == Qt::Unchecked)
+    {
         mMainWindow->getSwapFilter()->disable();
+    }
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_filterSwapH_stateChanged(int i)
 {
     if(i == Qt::Checked)
+    {
         mMainWindow->getSwapFilter()->getSwapHorizontally()->setValue(1);
+    }
     else if(i == Qt::Unchecked)
+    {
         mMainWindow->getSwapFilter()->getSwapHorizontally()->setValue(0);
+    }
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_filterSwapV_stateChanged(int i)
 {
     if(i == Qt::Checked)
+    {
         mMainWindow->getSwapFilter()->getSwapVertically()->setValue(1);
+    }
     else if(i == Qt::Unchecked)
+    {
         mMainWindow->getSwapFilter()->getSwapVertically()->setValue(0);
+    }
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_filterBg_stateChanged(int i)
@@ -1832,7 +1968,9 @@ void Control::on_filterBg_stateChanged(int i)
         filterBgSave->setEnabled(true);
         filterBgLoad->setEnabled(true);
         if(showCheckState == Qt::Checked)
+        {
             filterBgShow->setCheckState(Qt::Checked);
+        }
         filterBgDeleteNumber->setEnabled(true);
         filterBgDeleteTrj->setEnabled(true);
         mMainWindow->getBackgroundFilter()->enable();
@@ -1851,23 +1989,31 @@ void Control::on_filterBg_stateChanged(int i)
         mMainWindow->getBackgroundFilter()->disable();
     }
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage(
             true); // true, da auch bei stehendem bild neue berechnungen durchgefuehrt werden sollen
+    }
 }
 
 void Control::on_filterBgUpdate_stateChanged(int i)
 {
     if(i == Qt::Checked)
+    {
         mMainWindow->getBackgroundFilter()->setUpdate(true); //  enable();
+    }
     else if(i == Qt::Unchecked)
+    {
         mMainWindow->getBackgroundFilter()->setUpdate(false); //->disable();
+    }
 }
 
 void Control::on_filterBgReset_clicked()
 {
     mMainWindow->getBackgroundFilter()->reset();
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_filterBgShow_stateChanged(int i)
@@ -1885,26 +2031,38 @@ void Control::on_filterBgLoad_clicked()
 {
     mMainWindow->getBackgroundFilter()->load();
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_apply_stateChanged(int i)
 {
     if(i == Qt::Checked)
+    {
         mMainWindow->getCalibFilter()->enable();
+    }
     else if(i == Qt::Unchecked)
+    {
         mMainWindow->getCalibFilter()->disable();
+    }
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_fx_valueChanged(double d)
 {
     mMainWindow->getCalibFilter()->getFx()->setValue(d);
     if(quadAspectRatio->isChecked())
+    {
         fy->setValue(d);
+    }
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
     setMeasuredAltitude();
 }
 
@@ -1912,7 +2070,9 @@ void Control::on_fy_valueChanged(double d)
 {
     mMainWindow->getCalibFilter()->getFy()->setValue(d);
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
     setMeasuredAltitude();
 }
 
@@ -1940,35 +2100,45 @@ void Control::on_r2_valueChanged(double d)
 {
     mMainWindow->getCalibFilter()->getR2()->setValue(d);
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_r4_valueChanged(double d)
 {
     mMainWindow->getCalibFilter()->getR4()->setValue(d);
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_r6_valueChanged(double d)
 {
     mMainWindow->getCalibFilter()->getR6()->setValue(d);
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_tx_valueChanged(double d)
 {
     mMainWindow->getCalibFilter()->getTx()->setValue(d);
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_ty_valueChanged(double d)
 {
     mMainWindow->getCalibFilter()->getTy()->setValue(d);
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void Control::on_quadAspectRatio_stateChanged(int i)
@@ -2044,50 +2214,66 @@ void Control::on_autoCalib_clicked()
 void Control::on_calibFiles_clicked()
 {
     if(mMainWindow->getAutoCalib()->openCalibFiles())
+    {
         autoCalib->setEnabled(true);
+    }
 }
 
 //---------------------------------------
 void Control::on_rot1_valueChanged(double /*arg1*/)
 {
     if(!isLoading())
+    {
         mMainWindow->updateCoord();
+    }
 }
 
 void Control::on_rot2_valueChanged(double /*arg1*/)
 {
     if(!isLoading())
+    {
         mMainWindow->updateCoord();
+    }
 }
 
 void Control::on_rot3_valueChanged(double /*arg1*/)
 {
     if(!isLoading())
+    {
         mMainWindow->updateCoord();
+    }
 }
 
 void Control::on_trans1_valueChanged(double /*arg1*/)
 {
     if(!isLoading())
+    {
         mMainWindow->updateCoord();
+    }
 }
 
 void Control::on_trans2_valueChanged(double /*arg1*/)
 {
     if(!isLoading())
+    {
         mMainWindow->updateCoord();
+    }
 }
 
 void Control::on_trans3_valueChanged(double /*arg1*/)
 {
     if(!isLoading())
+    {
         mMainWindow->updateCoord();
+    }
 }
 
 void Control::on_extCalibPointsShow_stateChanged(int /*arg1*/)
 {
     if(!isLoading())
+    {
         mScene->update();
+    }
 }
 
 void Control::on_extrCalibShowError_clicked()
@@ -2153,7 +2339,9 @@ void Control::on_extrCalibShowError_clicked()
 void Control::on_extVanishPointsShow_stateChanged(int /*arg1*/)
 {
     if(!isLoading())
+    {
         mScene->update();
+    }
 }
 void Control::on_coordLoad3DCalibPoints_clicked()
 {
@@ -2262,25 +2450,33 @@ void Control::on_gridScale_valueChanged(int /*i*/)
 void Control::on_grid3DTransX_valueChanged(int /*value*/)
 {
     if(!isLoading())
+    {
         mScene->update();
+    }
 }
 
 void Control::on_grid3DTransY_valueChanged(int /*value*/)
 {
     if(!isLoading())
+    {
         mScene->update();
+    }
 }
 
 void Control::on_grid3DTransZ_valueChanged(int /*value*/)
 {
     if(!isLoading())
+    {
         mScene->update();
+    }
 }
 
 void Control::on_grid3DResolution_valueChanged(int /*value*/)
 {
     if(!isLoading())
+    {
         mScene->update();
+    }
 }
 
 //---------------------------------------
@@ -2434,6 +2630,7 @@ void Control::on_coord3DSwapZ_stateChanged(int /*arg1*/)
 void Control::setMeasuredAltitude()
 {
     if(mMainWindow->getImageItem())
+    {
         coordAltitudeMeasured->setText(
             QString("(measured: %1)")
                 .arg(
@@ -2441,6 +2638,7 @@ void Control::setMeasuredAltitude()
                     6,
                     'f',
                     1));
+    }
 }
 
 //---------------------------------------
@@ -2493,7 +2691,9 @@ void Control::setXml(QDomElement &elem)
     subSubElem.setAttribute("SHOW", filterBgShow->isChecked());
     fn = mMainWindow->getBackgroundFilter()->getFilename();
     if(fn != "")
+    {
         fn = getFileList(fn, mMainWindow->getProFileName());
+    }
     subSubElem.setAttribute("FILE", fn);
     subSubElem.setAttribute("DELETE", filterBgDeleteTrj->isChecked());
     subSubElem.setAttribute("DELETE_NUMBER", filterBgDeleteNumber->value());
@@ -2526,8 +2726,12 @@ void Control::setXml(QDomElement &elem)
     // genommen und blanks rundherum abgeschnitten, falls von hand editiert wurde
     QStringList fl = mMainWindow->getAutoCalib()->getCalibFiles();
     for(int i = 0; i < fl.size(); ++i)
+    {
         if(QFileInfo(fl.at(i)).isRelative())
+        {
             fl.replace(i, fl.at(i) + ";" + QFileInfo(fl.at(i)).absoluteFilePath());
+        }
+    }
     subSubElem.setAttribute("CALIB_FILES", fl.join(", "));
     subElem.appendChild(subSubElem);
 
@@ -2544,7 +2748,9 @@ void Control::setXml(QDomElement &elem)
 
     QString ef = mMainWindow->getExtrCalibration()->getExtrCalibFile();
     if(ef != "")
+    {
         ef = getFileList(ef, mMainWindow->getProFileName());
+    }
     subSubElem.setAttribute("EXTERNAL_CALIB_FILE", ef);
 
     subSubElem.setAttribute("COORD_DIMENSION", coordTab->currentIndex());
@@ -2759,7 +2965,9 @@ void Control::setXml(QDomElement &elem)
     subSubElem = (elem.ownerDocument()).createElement("TRACK_FILE");
     fn         = mMainWindow->getTrackFileName();
     if(fn != "")
+    {
         fn = getFileList(fn, mMainWindow->getProFileName());
+    }
     subSubElem.setAttribute("FILENAME", fn);
     subElem.appendChild(subSubElem);
 
@@ -2838,36 +3046,52 @@ void Control::getXml(QDomElement &elem)
     QDomElement subElem, subSubElem, subSubSubElem;
 
     if(elem.hasAttribute("TAB"))
+    {
         tabs->setCurrentIndex(elem.attribute("TAB").toInt());
+    }
     for(subElem = elem.firstChildElement(); !subElem.isNull(); subElem = subElem.nextSiblingElement())
+    {
         if(subElem.tagName() == "CALIBRATION")
         {
             for(subSubElem = subElem.firstChildElement(); !subSubElem.isNull();
                 subSubElem = subSubElem.nextSiblingElement())
+            {
                 if(subSubElem.tagName() == "BRIGHTNESS")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         filterBrightContrast->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("VALUE"))
+                    {
                         filterBrightParam->setValue(subSubElem.attribute("VALUE").toInt());
+                    }
                 }
                 else if(subSubElem.tagName() == "CONTRAST")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         filterBrightContrast->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     //,mMainWindow->getContrastFilter()->getEnabled() ? "1" : "0" //Qt::Unchecked
                     if(subSubElem.hasAttribute("VALUE"))
+                    {
                         filterContrastParam->setValue(subSubElem.attribute("VALUE").toInt());
+                    }
                 }
                 else if(subSubElem.tagName() == "BORDER")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         filterBorder->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("VALUE"))
+                    {
                         filterBorderParamSize->setValue(subSubElem.attribute("VALUE").toInt());
+                    }
                     if(subSubElem.hasAttribute("COLOR"))
                     {
                         QColor color(subSubElem.attribute("COLOR"));
@@ -2879,24 +3103,36 @@ void Control::getXml(QDomElement &elem)
                 else if(subSubElem.tagName() == "SWAP")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         filterSwap->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("HORIZONTALLY"))
+                    {
                         filterSwapH->setCheckState(
                             subSubElem.attribute("HORIZONTALLY").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("VERTICALLY"))
+                    {
                         filterSwapV->setCheckState(
                             subSubElem.attribute("VERTICALLY").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "BG_SUB")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         filterBg->setCheckState(subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("UPDATE"))
+                    {
                         filterBgUpdate->setCheckState(
                             subSubElem.attribute("UPDATE").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("SHOW"))
+                    {
                         filterBgShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("FILE"))
                     {
                         QString f = subSubElem.attribute("FILE");
@@ -2908,113 +3144,183 @@ void Control::getXml(QDomElement &elem)
                                     getExistingFile(subSubElem.attribute("FILE"), mMainWindow->getProFileName()));
                             }
                             else
+                            {
                                 debout << "Warning: Background subtracting file not readable!" << std::endl;
+                            }
                         }
                     }
                     if(subSubElem.hasAttribute("DELETE"))
+                    {
                         filterBgDeleteTrj->setCheckState(
                             subSubElem.attribute("DELETE").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("DELETE_NUMBER"))
+                    {
                         filterBgDeleteNumber->setValue(subSubElem.attribute("DELETE_NUMBER").toInt());
+                    }
                 }
                 else if(subSubElem.tagName() == "PATTERN")
                 {
                     if(subSubElem.hasAttribute("BOARD_SIZE_X"))
+                    {
                         mMainWindow->getAutoCalib()->setBoardSizeX(subSubElem.attribute("BOARD_SIZE_X").toInt()); // 6
+                    }
                     if(subSubElem.hasAttribute("BOARD_SIZE_Y"))
+                    {
                         mMainWindow->getAutoCalib()->setBoardSizeY(
                             subSubElem.attribute("BOARD_SIZE_Y").toInt()); // 8 oder 9
+                    }
                     if(subSubElem.hasAttribute("SQUARE_SIZE"))
+                    {
                         mMainWindow->getAutoCalib()->setSquareSize(
                             subSubElem.attribute("SQUARE_SIZE").toDouble()); // in cm
+                    }
                 }
                 else if(subSubElem.tagName() == "INTRINSIC_PARAMETERS")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         apply->setCheckState(subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("FX"))
+                    {
                         fx->setValue(subSubElem.attribute("FX").toDouble());
+                    }
                     if(subSubElem.hasAttribute("FY"))
+                    {
                         fy->setValue(subSubElem.attribute("FY").toDouble());
+                    }
                     if(subSubElem.hasAttribute("CX"))
                     {
                         double cx_val = subSubElem.attribute("CX").toDouble();
                         if(cx_val < cx->minimum())
+                        {
                             cx->setMinimum(cx_val - 50);
+                        }
                         if(cx_val > cx->maximum())
+                        {
                             cx->setMaximum(cx_val + 50);
+                        }
                         cx->setValue(cx_val);
                     }
                     if(subSubElem.hasAttribute("CY"))
                     {
                         double cy_val = subSubElem.attribute("CY").toDouble();
                         if(cy_val < cy->minimum())
+                        {
                             cy->setMinimum(cy_val - 50);
+                        }
                         if(cy_val > cy->maximum())
+                        {
                             cy->setMaximum(cy_val + 50);
+                        }
                         cy->setValue(cy_val);
                     }
                     if(subSubElem.hasAttribute("R2"))
+                    {
                         r2->setValue(subSubElem.attribute("R2").toDouble());
+                    }
                     if(subSubElem.hasAttribute("R4"))
+                    {
                         r4->setValue(subSubElem.attribute("R4").toDouble());
+                    }
                     if(subSubElem.hasAttribute("R6"))
+                    {
                         r6->setValue(subSubElem.attribute("R6").toDouble());
+                    }
                     if(subSubElem.hasAttribute("TX"))
+                    {
                         tx->setValue(subSubElem.attribute("TX").toDouble());
+                    }
                     if(subSubElem.hasAttribute("TY"))
+                    {
                         ty->setValue(subSubElem.attribute("TY").toDouble());
+                    }
                     if(subSubElem.hasAttribute("K4"))
+                    {
                         k4->setValue(subSubElem.attribute("K4").toDouble());
+                    }
                     if(subSubElem.hasAttribute("K5"))
+                    {
                         k5->setValue(subSubElem.attribute("K5").toDouble());
+                    }
                     if(subSubElem.hasAttribute("K6"))
+                    {
                         k6->setValue(subSubElem.attribute("K6").toDouble());
+                    }
                     if(subSubElem.hasAttribute("QUAD_ASPECT_RATIO"))
+                    {
                         quadAspectRatio->setCheckState(
                             subSubElem.attribute("QUAD_ASPECT_RATIO").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("FIX_CENTER"))
+                    {
                         fixCenter->setCheckState(
                             subSubElem.attribute("FIX_CENTER").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("TANG_DIST"))
+                    {
                         tangDist->setCheckState(
                             subSubElem.attribute("TANG_DIST").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("CALIB_FILES"))
                     {
                         QStringList fl = (subSubElem.attribute("CALIB_FILES")).split(",");
                         QString     tmpStr;
                         for(int i = 0; i < fl.size(); ++i)
+                        {
                             if((fl[i] = fl[i].trimmed()) == "")
+                            {
                                 fl.removeAt(i);
+                            }
                             else
                             {
                                 tmpStr = getExistingFile(fl[i], mMainWindow->getProFileName());
                                 if(tmpStr != "")
+                                {
                                     fl[i] = tmpStr;
+                                }
                             }
+                        }
                         // auch setzen, wenn leer, vielleicht ist das ja gewuenscht
                         mMainWindow->getAutoCalib()->setCalibFiles(fl);
                         if(!fl.isEmpty())
+                        {
                             autoCalib->setEnabled(true);
+                        }
                     }
                 }
                 else if(subSubElem.tagName() == "EXTRINSIC_PARAMETERS")
                 {
                     if(subSubElem.hasAttribute("EXTR_ROT_1"))
+                    {
                         rot1->setValue(subSubElem.attribute("EXTR_ROT_1").toDouble());
+                    }
                     if(subSubElem.hasAttribute("EXTR_ROT_2"))
+                    {
                         rot2->setValue(subSubElem.attribute("EXTR_ROT_2").toDouble());
+                    }
                     if(subSubElem.hasAttribute("EXTR_ROT_3"))
+                    {
                         rot3->setValue(subSubElem.attribute("EXTR_ROT_3").toDouble());
+                    }
                     if(subSubElem.hasAttribute("EXTR_TRANS_1"))
+                    {
                         trans1->setValue(subSubElem.attribute("EXTR_TRANS_1").toDouble());
+                    }
                     if(subSubElem.hasAttribute("EXTR_TRANS_2"))
+                    {
                         trans2->setValue(subSubElem.attribute("EXTR_TRANS_2").toDouble());
+                    }
                     if(subSubElem.hasAttribute("EXTR_TRANS_3"))
+                    {
                         trans3->setValue(subSubElem.attribute("EXTR_TRANS_3").toDouble());
+                    }
                     if(subSubElem.hasAttribute("SHOW_CALIB_POINTS"))
+                    {
                         extCalibPointsShow->setCheckState(
                             subSubElem.attribute("SHOW_CALIB_POINTS").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
 
                     if(subSubElem.hasAttribute("COORD_DIMENSION"))
                     {
@@ -3039,52 +3345,84 @@ void Control::getXml(QDomElement &elem)
                     }
 
                     if(subSubElem.hasAttribute("SHOW"))
+                    {
                         coordShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("FIX"))
+                    {
                         coordFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("ROTATE"))
+                    {
                         coordRotate->setValue(subSubElem.attribute("ROTATE").toInt());
+                    }
                     if(subSubElem.hasAttribute("TRANS_X"))
                     {
                         int trans_x = subSubElem.attribute("TRANS_X").toInt();
                         if(trans_x > coordTransX->maximum())
+                        {
                             setCalibCoordTransXMax(trans_x);
+                        }
                         coordTransX->setValue(trans_x);
                     }
                     if(subSubElem.hasAttribute("TRANS_Y"))
                     {
                         int trans_y = subSubElem.attribute("TRANS_Y").toInt();
                         if(trans_y > coord3DTransY->maximum())
+                        {
                             setCalibCoordTransYMax(trans_y);
+                        }
                         coordTransY->setValue(trans_y);
                     }
                     coordTransY->setValue(subSubElem.attribute("TRANS_Y").toInt());
                     if(subSubElem.hasAttribute("SCALE"))
+                    {
                         coordScale->setValue(subSubElem.attribute("SCALE").toInt());
+                    }
                     if(subSubElem.hasAttribute("ALTITUDE"))
+                    {
                         coordAltitude->setValue(subSubElem.attribute("ALTITUDE").toDouble());
+                    }
                     if(subSubElem.hasAttribute("UNIT"))
+                    {
                         coordUnit->setValue(subSubElem.attribute("UNIT").toDouble());
+                    }
                     if(subSubElem.hasAttribute("USE_INTRINSIC_CENTER"))
+                    {
                         coordUseIntrinsic->setCheckState(
                             subSubElem.attribute("USE_INTRINSIC_CENTER").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("COORD3D_TRANS_X"))
+                    {
                         coord3DTransX->setValue(subSubElem.attribute("COORD3D_TRANS_X").toInt());
+                    }
                     if(subSubElem.hasAttribute("COORD3D_TRANS_Y"))
+                    {
                         coord3DTransY->setValue(subSubElem.attribute("COORD3D_TRANS_Y").toInt());
+                    }
                     if(subSubElem.hasAttribute("COORD3D_TRANS_Z"))
+                    {
                         coord3DTransZ->setValue(subSubElem.attribute("COORD3D_TRANS_Z").toInt());
+                    }
                     if(subSubElem.hasAttribute("COORD3D_AXIS_LEN"))
+                    {
                         coord3DAxeLen->setValue(subSubElem.attribute("COORD3D_AXIS_LEN").toInt());
+                    }
                     if(subSubElem.hasAttribute("COORD3D_SWAP_X"))
+                    {
                         coord3DSwapX->setCheckState(
                             subSubElem.attribute("COORD3D_SWAP_X").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("COORD3D_SWAP_Y"))
+                    {
                         coord3DSwapY->setCheckState(
                             subSubElem.attribute("COORD3D_SWAP_Y").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("COORD3D_SWAP_Z"))
+                    {
                         coord3DSwapZ->setCheckState(
                             subSubElem.attribute("COORD3D_SWAP_Z").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "ALIGNMENT_GRID")
                 {
@@ -3097,38 +3435,64 @@ void Control::getXml(QDomElement &elem)
                         gridTab->setCurrentIndex(1); //  = 2D
                     }
                     if(subSubElem.hasAttribute("SHOW"))
+                    {
                         gridShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("FIX"))
+                    {
                         gridFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("ROTATE"))
+                    {
                         gridRotate->setValue(subSubElem.attribute("ROTATE").toInt());
+                    }
                     if(subSubElem.hasAttribute("TRANS_X"))
+                    {
                         gridTransX->setValue(subSubElem.attribute("TRANS_X").toInt());
+                    }
                     if(subSubElem.hasAttribute("TRANS_Y"))
+                    {
                         gridTransY->setValue(subSubElem.attribute("TRANS_Y").toInt());
+                    }
                     if(subSubElem.hasAttribute("SCALE"))
+                    {
                         gridScale->setValue(subSubElem.attribute("SCALE").toInt());
+                    }
                     if(subSubElem.hasAttribute("GRID3D_TRANS_X"))
+                    {
                         grid3DTransX->setValue(subSubElem.attribute("GRID3D_TRANS_X").toInt());
+                    }
                     if(subSubElem.hasAttribute("GRID3D_TRANS_Y"))
+                    {
                         grid3DTransY->setValue(subSubElem.attribute("GRID3D_TRANS_Y").toInt());
+                    }
                     if(subSubElem.hasAttribute("GRID3D_TRANS_Z"))
+                    {
                         grid3DTransZ->setValue(subSubElem.attribute("GRID3D_TRANS_Z").toInt());
+                    }
                     if(subSubElem.hasAttribute("GRID3D_RESOLUTION"))
+                    {
                         grid3DResolution->setValue(subSubElem.attribute("GRID3D_RESOLUTION").toInt());
+                    }
                 }
                 else
+                {
                     debout << "Unknown CALIBRATION tag " << subSubElem.tagName() << std::endl;
+                }
+            }
         }
         else if(subElem.tagName() == "RECOGNITION")
         {
             for(subSubElem = subElem.firstChildElement(); !subSubElem.isNull();
                 subSubElem = subSubElem.nextSiblingElement())
+            {
                 if(subSubElem.tagName() == "PERFORM")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         performRecognition->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("METHOD"))
                     {
                         auto recognitionMethod =
@@ -3142,52 +3506,84 @@ void Control::getXml(QDomElement &elem)
                         recoMethod->setCurrentIndex(foundIndex);
                     }
                     if(subSubElem.hasAttribute("STEP"))
+                    {
                         recoStep->setValue(subSubElem.attribute("STEP").toInt());
+                    }
                 }
                 else if(subSubElem.tagName() == "REGION_OF_INTEREST")
                 {
                     double x = 0, y = 0, w = 0, h = 0;
                     if(subSubElem.hasAttribute("SHOW"))
+                    {
                         roiShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("FIX"))
+                    {
                         roiFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("X"))
+                    {
                         x = subSubElem.attribute("X").toDouble();
+                    }
                     if(subSubElem.hasAttribute("Y"))
+                    {
                         y = subSubElem.attribute("Y").toDouble();
+                    }
                     if(subSubElem.hasAttribute("WIDTH"))
+                    {
                         w = subSubElem.attribute("WIDTH").toDouble();
+                    }
                     if(subSubElem.hasAttribute("HEIGHT"))
+                    {
                         h = subSubElem.attribute("HEIGHT").toDouble();
+                    }
                     mMainWindow->getRecoRoiItem()->setRect(x, y, w, h);
                 }
                 else if(subSubElem.tagName() == "MARKER")
                 {
                     if(subSubElem.hasAttribute("BRIGHTNESS"))
+                    {
                         markerBrightness->setValue(subSubElem.attribute("BRIGHTNESS").toInt());
+                    }
                     if(subSubElem.hasAttribute("IGNORE_WITHOUT"))
+                    {
                         markerIgnoreWithout->setCheckState(
                             subSubElem.attribute("IGNORE_WITHOUT").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "SIZE_COLOR")
                 {
                     mColorChanging = true; // damit bei Anpassungen Farbbild nicht immer wieder neu bestimmt wird
                     if(subSubElem.hasAttribute("SHOW"))
+                    {
                         recoShowColor->setCheckState(
                             subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("AUTO_WB"))
+                    {
                         recoAutoWB->setCheckState(
                             subSubElem.attribute("AUTO_WB").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("X"))
+                    {
                         recoColorX->setCurrentIndex(subSubElem.attribute("X").toInt());
+                    }
                     if(subSubElem.hasAttribute("Y"))
+                    {
                         recoColorY->setCurrentIndex(subSubElem.attribute("Y").toInt());
+                    }
                     if(subSubElem.hasAttribute("Z"))
+                    {
                         recoColorZ->setValue(subSubElem.attribute("Z").toInt());
+                    }
                     if(subSubElem.hasAttribute("GREY_LEVEL"))
+                    {
                         recoGreyLevel->setValue(subSubElem.attribute("GREY_LEVEL").toInt());
+                    }
                     if(subSubElem.hasAttribute("SYMBOL_SIZE"))
+                    {
                         recoSymbolSize->setValue(subSubElem.attribute("SYMBOL_SIZE").toInt());
+                    }
                     mColorChanging = false; // MODEL setzen erzeugt Bild neu
                     if(subSubElem.hasAttribute("MODEL"))
                     {
@@ -3198,7 +3594,9 @@ void Control::getXml(QDomElement &elem)
                             on_recoColorModel_currentIndexChanged(recoColorModel->currentIndex());
                         }
                         else
+                        {
                             recoColorModel->setCurrentIndex(subSubElem.attribute("MODEL").toInt());
+                        }
                     }
 
                     double x = 0., y = 0., width = 0., height = 0., mapHeightValue = DEFAULT_HEIGHT;
@@ -3211,46 +3609,80 @@ void Control::getXml(QDomElement &elem)
                     colorPlot->getMapItem()->delMaps();
                     for(subSubSubElem = subSubElem.firstChildElement(); !subSubSubElem.isNull();
                         subSubSubElem = subSubSubElem.nextSiblingElement())
+                    {
                         if(subSubSubElem.tagName() == "MAP")
                         {
                             if(subSubSubElem.hasAttribute("X"))
+                            {
                                 x = subSubSubElem.attribute("X").toDouble();
+                            }
                             if(subSubSubElem.hasAttribute("Y"))
+                            {
                                 y = subSubSubElem.attribute("Y").toDouble();
+                            }
                             if(subSubSubElem.hasAttribute("WIDTH"))
+                            {
                                 width = subSubSubElem.attribute("WIDTH").toDouble();
+                            }
                             if(subSubSubElem.hasAttribute("HEIGHT"))
+                            {
                                 height = subSubSubElem.attribute("HEIGHT").toDouble();
+                            }
                             if(subSubSubElem.hasAttribute("COLORED"))
+                            {
                                 colored = subSubSubElem.attribute("COLORED").toInt();
+                            }
                             if(subSubSubElem.hasAttribute("MAP_HEIGHT"))
+                            {
                                 mapHeightValue = subSubSubElem.attribute("MAP_HEIGHT").toDouble();
+                            }
 
                             if(subSubSubElem.hasAttribute("FROM_HUE"))
+                            {
                                 h = subSubSubElem.attribute("FROM_HUE").toInt();
+                            }
                             if(subSubSubElem.hasAttribute("FROM_SAT"))
+                            {
                                 s = subSubSubElem.attribute("FROM_SAT").toInt();
+                            }
                             if(subSubSubElem.hasAttribute("FROM_VAL"))
+                            {
                                 v = subSubSubElem.attribute("FROM_VAL").toInt();
+                            }
                             if(h >= 0)
+                            {
                                 fromCol.setHsv(h, s, v);
+                            }
                             if(subSubSubElem.hasAttribute("TO_HUE"))
+                            {
                                 h = subSubSubElem.attribute("TO_HUE").toInt();
+                            }
                             if(subSubSubElem.hasAttribute("TO_SAT"))
+                            {
                                 s = subSubSubElem.attribute("TO_SAT").toInt();
+                            }
                             if(subSubSubElem.hasAttribute("TO_VAL"))
+                            {
                                 v = subSubSubElem.attribute("TO_VAL").toInt();
+                            }
                             if(h >= 0)
+                            {
                                 toCol.setHsv(h, s, v);
+                            }
                             if(subSubSubElem.hasAttribute("INV_HUE"))
+                            {
                                 invHue = subSubSubElem.attribute("INV_HUE").toInt();
+                            }
 
                             colorPlot->getMapItem()->addMap(
                                 x, y, width, height, colored, mapHeightValue, fromCol, toCol, invHue);
                         }
 
                         else
+                        {
                             debout << "Unknown RECOGNITION MAP tag " << subSubElem.tagName() << std::endl;
+                        }
+                    }
 
                     mapNr->setMaximum(colorPlot->getMapItem()->mapNum() - 1);
                     if(subSubElem.hasAttribute(
@@ -3262,7 +3694,9 @@ void Control::getXml(QDomElement &elem)
                                                                          // wuerde valueChanged nicht on_... durchlaufen
                     }
                     if(subSubElem.hasAttribute("DEFAULT_HEIGHT"))
+                    {
                         mapDefaultHeight->setValue(subSubElem.attribute("DEFAULT_HEIGHT").toDouble());
+                    }
                 }
 
                 else if(subSubElem.tagName() == "READ_HEIGHTS")
@@ -3288,228 +3722,330 @@ void Control::getXml(QDomElement &elem)
                     {
                         QString fm = subSubElem.attribute("MARKER_FILE");
                         if(getExistingFile(fm, mMainWindow->getProFileName()) != "")
+                        {
                             mMainWindow->setMarkerIDFileName(getExistingFile(fm, mMainWindow->getProFileName()));
+                        }
                         else
+                        {
                             mMainWindow->setMarkerIDFileName(fm);
+                        }
                     }
                 }
 
                 else
+                {
                     debout << "Unknown RECOGNITION tag " << subSubElem.tagName() << std::endl;
+                }
+            }
         }
         else if(subElem.tagName() == "TRACKING")
         {
             for(subSubElem = subElem.firstChildElement(); !subSubElem.isNull();
                 subSubElem = subSubElem.nextSiblingElement())
+            {
                 if(subSubElem.tagName() == "ONLINE_CALCULATION")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         trackOnlineCalc->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "REPEAT_BELOW")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         trackRepeat->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("QUALITY"))
+                    {
                         trackRepeatQual->setValue(subSubElem.attribute("QUALITY").toInt());
+                    }
                 }
                 else if(subSubElem.tagName() == "EXTRAPOLATION")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         trackExtrapolation->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "MERGE")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         trackMerge->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "ONLY_VISIBLE")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         trackOnlySelected->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "SEARCH_MISSING_FRAMES")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         trackMissingFrames->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "RECALCULATE_MEDIAN_HEIGHT")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         trackRecalcHeight->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "REGION_OF_INTEREST")
                 {
                     double x = 0, y = 0, w = 0, h = 0;
                     if(subSubElem.hasAttribute("SHOW"))
+                    {
                         trackRoiShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("FIX"))
+                    {
                         trackRoiFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("X"))
+                    {
                         x = subSubElem.attribute("X").toDouble();
+                    }
                     if(subSubElem.hasAttribute("Y"))
+                    {
                         y = subSubElem.attribute("Y").toDouble();
+                    }
                     if(subSubElem.hasAttribute("WIDTH"))
+                    {
                         w = subSubElem.attribute("WIDTH").toDouble();
+                    }
                     if(subSubElem.hasAttribute("HEIGHT"))
+                    {
                         h = subSubElem.attribute("HEIGHT").toDouble();
+                    }
                     mMainWindow->getTrackRoiItem()->setRect(x, y, w, h);
                 }
                 else if(subSubElem.tagName() == "ALLOW_ALTERNATE_HEIGHT")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         trackAlternateHeight->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "EXPORT_ELIMINATE_TRACKPOINT_WITHOUT_HEIGHT")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         exportElimTp->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "EXPORT_ELIMINATE_TRAJECTORY_WITHOUT_HEIGHT")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         exportElimTrj->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "EXPORT_SMOOTH")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         exportSmooth->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "EXPORT_VIEWING_DIRECTION")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         exportViewDir->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "EXPORT_ANGLE_OF_VIEW")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         exportAngleOfView->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "EXPORT_USE_METER")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         exportUseM->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "EXPORT_COMMENT")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         exportComment->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "EXPORT_MARKERID")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         exportMarkerID->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "TEST_EQUAL")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         testEqual->setCheckState(subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "TEST_VELOCITY")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         testVelocity->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "TEST_INSIDE")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         testInside->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "TEST_LENGTH")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         testLength->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "TRACK_FILE")
                 {
                     if(subSubElem.hasAttribute("FILENAME"))
                     {
                         if(getExistingFile(subSubElem.attribute("FILENAME"), mMainWindow->getProFileName()) != "")
+                        {
                             mMainWindow->setTrackFileName(
                                 getExistingFile(subSubElem.attribute("FILENAME"), mMainWindow->getProFileName()));
+                        }
                         else // eigentlich nicht lesbar, aber so wird wenigstens beim projekt speichern wieder mit
                              // weggeschrieben
+                        {
                             mMainWindow->setTrackFileName(subSubElem.attribute("FILENAME"));
+                        }
                     }
                 }
                 else if(subSubElem.tagName() == "SEARCH_REGION")
                 {
                     if(subSubElem.hasAttribute("SCALE"))
+                    {
                         trackRegionScale->setValue(subSubElem.attribute("SCALE").toInt());
+                    }
                     if(subSubElem.hasAttribute("LEVELS"))
+                    {
                         trackRegionLevels->setValue(subSubElem.attribute("LEVELS").toInt());
+                    }
                     if(subSubElem.hasAttribute("MAX_ERROR"))
+                    {
                         trackErrorExponent->setValue(subSubElem.attribute("MAX_ERROR").toInt());
+                    }
                     if(subSubElem.hasAttribute("SHOW"))
+                    {
                         trackShowSearchSize->setCheckState(
                             subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("ADAPTIVE"))
+                    {
                         adaptiveLevel->setCheckState(
                             subSubElem.attribute("ADAPTIVE").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "PATH")
                 {
                     if(subSubElem.hasAttribute("SHOW"))
+                    {
                         trackShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("FIX"))
+                    {
                         trackFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
 
                     if(subSubElem.hasAttribute("ONLY_VISIBLE"))
+                    {
                         trackShowOnlyVisible->setCheckState(
                             subSubElem.attribute("ONLY_VISIBLE").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("ONLY_PEOPLE"))
+                    {
                         trackShowOnly->setCheckState(
                             subSubElem.attribute("ONLY_PEOPLE").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
 
                     if(subSubElem.hasAttribute("ONLY_PEOPLE_LIST"))
+                    {
                         trackShowOnlyList->setCheckState(
                             subSubElem.attribute("ONLY_PEOPLE_LIST").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
 
                     // IMPORTANT: reading ONLY_PEOPLE_NR is done in petrack.cpp, as the trajectories need to be loaded
                     // before!
                     if(subSubElem.hasAttribute("SHOW_CURRENT_POINT"))
+                    {
                         trackShowCurrentPoint->setCheckState(
                             subSubElem.attribute("SHOW_CURRENT_POINT").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("SHOW_POINTS"))
+                    {
                         trackShowPoints->setCheckState(
                             subSubElem.attribute("SHOW_POINTS").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("SHOW_PATH"))
+                    {
                         trackShowPath->setCheckState(
                             subSubElem.attribute("SHOW_PATH").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("SHOW_COLLECTIVE_COLOR"))
+                    {
                         trackShowColColor->setCheckState(
                             subSubElem.attribute("SHOW_COLLECTIVE_COLOR").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("SHOW_COLOR_MARKER"))
+                    {
                         trackShowColorMarker->setCheckState(
                             subSubElem.attribute("SHOW_COLOR_MARKER").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("SHOW_NUMBER"))
+                    {
                         trackShowNumber->setCheckState(
                             subSubElem.attribute("SHOW_NUMBER").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("SHOW_GROUND_POSITION"))
+                    {
                         trackShowGroundPosition->setCheckState(
                             subSubElem.attribute("SHOW_GROUND_POSITION").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("SHOW_GROUND_PATH"))
+                    {
                         trackShowGroundPath->setCheckState(
                             subSubElem.attribute("SHOW_GROUND_PATH").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("TRACK_PATH_COLOR"))
                     {
                         QColor color(subSubElem.attribute("TRACK_PATH_COLOR"));
@@ -3521,79 +4057,131 @@ void Control::getXml(QDomElement &elem)
                         setTrackGroundPathColor(color);
                     }
                     if(subSubElem.hasAttribute("HEAD_SIZE"))
+                    {
                         trackHeadSized->setCheckState(
                             subSubElem.attribute("HEAD_SIZE").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("CURRENT_POINT_SIZE"))
+                    {
                         trackCurrentPointSize->setValue(subSubElem.attribute("CURRENT_POINT_SIZE").toInt());
+                    }
                     if(subSubElem.hasAttribute("POINTS_SIZE"))
+                    {
                         trackPointSize->setValue(subSubElem.attribute("POINTS_SIZE").toInt());
+                    }
                     if(subSubElem.hasAttribute("PATH_SIZE"))
+                    {
                         trackPathWidth->setValue(subSubElem.attribute("PATH_SIZE").toInt());
+                    }
                     if(subSubElem.hasAttribute("COLLECTIVE_COLOR_SIZE"))
+                    {
                         trackColColorSize->setValue(subSubElem.attribute("COLLECTIVE_COLOR_SIZE").toInt());
+                    }
                     if(subSubElem.hasAttribute("COLOR_MARKER_SIZE"))
+                    {
                         trackColorMarkerSize->setValue(subSubElem.attribute("COLOR_MARKER_SIZE").toInt());
+                    }
                     if(subSubElem.hasAttribute("NUMBER_SIZE"))
+                    {
                         trackNumberSize->setValue(subSubElem.attribute("NUMBER_SIZE").toInt());
+                    }
                     if(subSubElem.hasAttribute("GROUND_POSITION_SIZE"))
+                    {
                         trackGroundPositionSize->setValue(subSubElem.attribute("GROUND_POSITION_SIZE").toInt());
+                    }
                     if(subSubElem.hasAttribute("GROUND_PATH_SIZE"))
+                    {
                         trackGroundPathSize->setValue(subSubElem.attribute("GROUND_PATH_SIZE").toInt());
+                    }
                     if(subSubElem.hasAttribute("POINTS_COLORED"))
+                    {
                         trackShowPointsColored->setCheckState(
                             subSubElem.attribute("POINTS_COLORED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("NUMBER_BOLD"))
+                    {
                         trackNumberBold->setCheckState(
                             subSubElem.attribute("NUMBER_BOLD").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("BEFORE"))
+                    {
                         trackShowBefore->setValue(subSubElem.attribute("BEFORE").toInt());
+                    }
                     if(subSubElem.hasAttribute("AFTER"))
+                    {
                         trackShowAfter->setValue(subSubElem.attribute("AFTER").toInt());
+                    }
                 }
                 else
+                {
                     debout << "Unknown TRACKING tag " << subSubElem.tagName() << std::endl;
+                }
+            }
         }
         else if(subElem.tagName() == "ANALYSIS")
         {
             for(subSubElem = subElem.firstChildElement(); !subSubElem.isNull();
                 subSubElem = subSubElem.nextSiblingElement())
+            {
                 if(subSubElem.tagName() == "SEARCH_MISSING_FRAMES")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         anaMissingFrames->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "MARK_ACTUAL")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
+                    {
                         anaMarkAct->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else if(subSubElem.tagName() == "CALCULATION")
                 {
                     if(subSubElem.hasAttribute("STEP_SIZE"))
+                    {
                         anaStep->setValue(subSubElem.attribute("STEP_SIZE").toInt());
+                    }
                     if(subSubElem.hasAttribute("CONSIDER_X"))
+                    {
                         anaConsiderX->setCheckState(
                             subSubElem.attribute("CONSIDER_X").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("CONSIDER_Y"))
+                    {
                         anaConsiderY->setCheckState(
                             subSubElem.attribute("CONSIDER_Y").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("ABSOLUTE"))
+                    {
                         anaConsiderAbs->setCheckState(
                             subSubElem.attribute("ABSOLUTE").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("REVERSE"))
+                    {
                         anaConsiderRev->setCheckState(
                             subSubElem.attribute("REVERSE").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                     if(subSubElem.hasAttribute("SHOW_VORONOI"))
+                    {
                         showVoronoiCells->setCheckState(
                             subSubElem.attribute("SHOW_VORONOI").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
                 }
                 else
+                {
                     debout << "Unknown ANAYSIS tag " << subSubElem.tagName() << std::endl;
+                }
+            }
         }
         else
+        {
             debout << "Unknown CONTROL tag " << subElem.tagName() << std::endl;
+        }
+    }
 
     mMainWindow->updateCoord();
 }
@@ -3742,7 +4330,9 @@ void Control::saveChange(const QColor &fromColor, const QColor &toColor, RectPlo
         toColor.hue(), fromColor.hue(), toColor.saturation(), fromColor.saturation());
     mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 /**
@@ -3839,7 +4429,9 @@ void Control::expandRange(QColor &fromColor, QColor &toColor, const QColor &clic
     for(int i = 0; i < 3; ++i)
     {
         if(isInRange[i])
+        {
             continue;
+        }
 
         distToColor   = abs(toColorArr[i] - clickedColorArr[i]);
         distFromColor = abs(fromColorArr[i] - clickedColorArr[i]);

@@ -50,9 +50,13 @@ TrackPersonReal::TrackPersonReal(int frame, const TrackPointReal &p) :
 bool TrackPersonReal::trackPointExist(int frame) const
 {
     if(frame >= mFirstFrame && frame <= mLastFrame)
+    {
         return true;
+    }
     else
+    {
         return false;
+    }
 }
 const TrackPointReal &
 TrackPersonReal::trackPointAt(int frame) const // & macht bei else probleme, sonst mit [] zugreifbar
@@ -65,9 +69,13 @@ TrackPersonReal::trackPointAt(int frame) const // & macht bei else probleme, son
 double TrackPersonReal::distanceToNextFrame(int frame) const
 {
     if(frame >= mFirstFrame && frame + 1 <= mLastFrame)
+    {
         return at(frame - mFirstFrame).distanceToPoint(at(frame - mFirstFrame + 1));
+    }
     else
+    {
         return -1;
+    }
 }
 void TrackPersonReal::init(int firstFrame, double height, int markerID)
 {
@@ -153,8 +161,12 @@ int TrackerReal::calculate(
                 sum           = 0.;
                 // erzeugen distanz-map im aktuellen frame
                 for(i = 0; i < tracker->size(); ++i)
+                {
                     if((dist = tracker->at(i).distanceToNextFrame(f)) > -1)
+                    {
                         distanceMap[i] = dist;
+                    }
+                }
                 // distanzliste mit vorherigem frame vergleichen
                 iter = distanceMap.constBegin();
                 while(iter != distanceMap.constEnd())
@@ -164,7 +176,9 @@ int TrackerReal::calculate(
                     {
                         ++anz;
                         if(distanceMap[iter.key()] > 1.5 * lastDistanceMap[iter.key()])
+                        {
                             ++skipAnz;
+                        }
                     }
                     sum += distanceMap[iter.key()];
                     ++iter;
@@ -209,9 +223,13 @@ int TrackerReal::calculate(
             firstFrame = tracker->at(i).firstFrame();
 
             if((*tracker)[i].height() < MIN_HEIGHT + 1)
+            {
                 height = colorPlot->map((*tracker)[i].color());
+            }
             else
+            {
                 height = (*tracker)[i].height();
+            }
             //(*tracker)[i].setHeight(height);
             if(missingList.size() > 0)
             {
@@ -246,11 +264,15 @@ int TrackerReal::calculate(
                         while((j + nrFor < tsize) &&
                               ((*tracker)[i].at(j + nrFor).sp().z() <
                                0)) // nach && wird nur ausgefuehrt, wenn erstes true == size() also nicht
+                        {
                             nrFor++;
+                        }
                         while((j - nrRew >= 0) &&
                               ((*tracker)[i].at(j - nrRew).sp().z() <
                                0)) // nach && wird nur ausgefuehrt, wenn erstes true == size() also nicht
+                        {
                             nrRew++;
+                        }
 
                         if(((j - nrRew >= 0) && (j + nrFor == tsize)) ||
                            ((j - nrRew >= 0) && (nrRew < nrFor))) // nur oder eher in Vergangenheit hoeheninfo gefunden
@@ -308,14 +330,18 @@ int TrackerReal::calculate(
                 {
                     // border unberuecksichtigt
                     if(useCalibrationCenter)
+                    {
                         trackPersonReal.addEnd(
                             Vec3F(
                                 (*tracker)[i][j].sp().x() + center.x(),
                                 center.y() - (*tracker)[i][j].sp().y(),
                                 altitude - (*tracker)[i][j].sp().z()),
                             firstFrame + j);
+                    }
                     else
+                    {
                         trackPersonReal.addEnd((*tracker)[i][j].sp(), firstFrame + j);
+                    }
                 }
                 else
                 {
@@ -346,13 +372,17 @@ int TrackerReal::calculate(
                             }
                         }
                         else
+                        {
                             bestZ = altitude - bestZ;
+                        }
                         // ab hier kann bestZ auch negativ sein, obwohl hoehe inhalt hatte
 
                         if(extrapolated && exportElimTp)
                         {
                             if(extrapolated == 1) // zu beginn verworfen
+                            {
                                 trackPersonReal.setFirstFrame(trackPersonReal.firstFrame() + 1);
+                            }
                             debout << "Warning: no calculated height for trackpoint " << j << " (frame "
                                    << tracker->at(i).firstFrame() + j << ") of person " << i + 1
                                    << ", extrapolated height not used, trackpoint not inserted!" << std::endl;
@@ -360,14 +390,18 @@ int TrackerReal::calculate(
                         else
                         {
                             if(extrapolated)
+                            {
                                 debout << "Warning: no calculated height for trackpoint " << j << " (frame "
                                        << tracker->at(i).firstFrame() + j << ") of person " << i + 1
                                        << ", extrapolated height is used!" << std::endl;
+                            }
 
                             Vec2F moveDir(0, 0);
                             if(exportAutoCorrect)
+                            {
                                 moveDir +=
                                     reco::autoCorrectColorMarker((*tracker)[i][j], mMainWindow->getControlWidget());
+                            }
 
                             pos = imageItem->getPosReal(((*tracker)[i][j] + moveDir + br).toQPointF(), bestZ);
 
@@ -379,14 +413,18 @@ int TrackerReal::calculate(
                                 trackPersonReal.addEnd(pos, firstFrame + j, colPos - pos);
                             }
                             else
+                            {
                                 trackPersonReal.addEnd(Vec3F(pos.x(), pos.y(), bestZ), firstFrame + j);
+                            }
                         }
                     }
                     else
                     {
                         Vec2F moveDir(0, 0);
                         if(exportAutoCorrect)
+                        {
                             moveDir += reco::autoCorrectColorMarker((*tracker)[i][j], mMainWindow->getControlWidget());
+                        }
 
                         pos = imageItem->getPosReal(((*tracker)[i][j] + moveDir + br).toQPointF(), height);
                         // die frame nummer der animation wird TrackPoint der PersonReal mitgegeben,
@@ -401,7 +439,9 @@ int TrackerReal::calculate(
                             trackPersonReal.addEnd(pos, firstFrame + j, colPos - pos);
                         }
                         else
+                        {
                             trackPersonReal.addEnd(pos, firstFrame + j);
+                        }
                         if(exportAngleOfView)
                         {
                             angle = (90. - imageItem->getAngleToGround(
@@ -431,11 +471,15 @@ int TrackerReal::calculate(
                                 sp = (*tracker)[i][j].sp() +
                                      f * ((*tracker)[i][j + 1].sp() - (*tracker)[i][j].sp()) / (anz + 1);
                                 if(useCalibrationCenter)
+                                {
                                     trackPersonReal.addEnd(
                                         Vec3F(sp.x() + center.x(), center.y() - sp.y(), altitude - sp.z()),
                                         firstFrame + j);
+                                }
                                 else
+                                {
                                     trackPersonReal.addEnd(sp, -1); // -1 zeigt an, dass nur interpoliert
+                                }
                             }
                         }
                         else
@@ -451,15 +495,19 @@ int TrackerReal::calculate(
                             {
                                 Vec2F moveDir(0, 0);
                                 if(exportAutoCorrect)
+                                {
                                     moveDir +=
                                         reco::autoCorrectColorMarker((*tracker)[i][j], mMainWindow->getControlWidget());
+                                }
 
                                 pos2 =
                                     (imageItem->getPosReal(((*tracker)[i][j + 1] + moveDir + br).toQPointF(), height) -
                                      pos) /
                                     (anz + 1);
                                 for(f = 1; f <= anz; ++f)
+                                {
                                     trackPersonReal.addEnd(pos + f * pos2, -1); // -1 zeigt an, dass nur interpoliert
+                                }
                             }
                         }
                     }
@@ -511,12 +559,18 @@ int TrackerReal::calculate(
                 }
             }
             if(trackPersonReal.size() < 20)
+            {
                 debout << "Warning: Person " << i + 1 << " has only " << trackPersonReal.size() << " trackpoints!"
                        << std::endl;
+            }
             if(trackPersonReal.size() > 0)
+            {
                 append(trackPersonReal);
+            }
             else // ggf weil keine calculated height vorlag (siehe exportElimTrj)
+            {
                 debout << "Warning: Person " << i + 1 << " is not inserted, because of no trackpoints!" << std::endl;
+            }
         }
         return size();
     }
@@ -533,18 +587,28 @@ void TrackerReal::calcMinMax()
 {
     Vec3F pos;
     for(int i = 0; i < size(); ++i)
+    {
         for(int j = 0; j < at(i).size(); ++j)
         {
             pos = at(i).at(j);
             if(mXMin > pos.x())
+            {
                 mXMin = pos.x();
+            }
             else if(mXMax < pos.x())
+            {
                 mXMax = pos.x();
+            }
             if(mYMin > pos.y())
+            {
                 mYMin = pos.y();
+            }
             else if(mYMax < pos.y())
+            {
                 mYMax = pos.y();
+            }
         }
+    }
 }
 
 int TrackerReal::largestFirstFrame()
@@ -553,7 +617,9 @@ int TrackerReal::largestFirstFrame()
     for(i = 0; i < size(); ++i)
     {
         if(at(i).firstFrame() > max)
+        {
             max = at(i).firstFrame();
+        }
     }
     return max;
 }
@@ -563,7 +629,9 @@ int TrackerReal::largestLastFrame()
     for(i = 0; i < size(); ++i)
     {
         if(at(i).lastFrame() > max)
+        {
             max = at(i).lastFrame();
+        }
     }
     return max;
 }
@@ -573,7 +641,9 @@ int TrackerReal::smallestFirstFrame()
     for(i = 1; i < size(); ++i)
     {
         if(at(i).firstFrame() < min)
+        {
             min = at(i).firstFrame();
+        }
     }
     return min;
 }
@@ -583,7 +653,9 @@ int TrackerReal::smallestLastFrame()
     for(i = 1; i < size(); ++i)
     {
         if(at(i).lastFrame() < min)
+        {
             min = at(i).lastFrame();
+        }
     }
     return min;
 }
@@ -601,26 +673,46 @@ void TrackerReal::exportTxt(
 
     out << "# z: can be 3d position or height of person (alternating or not)" << Qt::endl;
     if(exportViewingDirection)
+    {
         out << "# viewDirX viewDirY: vector of direction of head of person" << Qt::endl;
+    }
     if(exportAngleOfView)
+    {
         out << "# viewAngle: angle of view of camera to person from perpendicular [0..Pi/2]" << Qt::endl;
+    }
     if(exportUseM)
+    {
         out << "# id frame x/m y/m z/m";
+    }
     else
+    {
         out << "# id frame x/cm y/cm z/cm";
+    }
     if(exportViewingDirection)
+    {
         out << " viewDirX viewDirY";
+    }
     if(exportAngleOfView)
+    {
         out << " viewAngle" << Qt::endl;
+    }
     if(exportMarkerID)
+    {
         out << " markerID" << Qt::endl;
+    }
     else
+    {
         out << Qt::endl;
+    }
 
     if(exportUseM)
+    {
         scale = .01f;
+    }
     else
+    {
         scale = 1.f;
+    }
 
     QProgressDialog progress("Export TXT-File", nullptr, 0, size(), mMainWindow->window());
     progress.setWindowTitle("Export .txt-File");
@@ -642,21 +734,33 @@ void TrackerReal::exportTxt(
                 << at(i).at(j).y() * scale << " ";
 
             if(alternateHeight || useTrackpoints)
+            {
                 out << at(i).at(j).z() * scale;
+            }
             else
+            {
                 out << at(i).height() * scale;
+            }
 
             if(exportViewingDirection) // && (at(i).at(j).viewDir() != Vec2F(0,0)) zeigt an, dass keine richtung
                                        // berechnet werden konnte
+            {
                 out << " " << at(i).at(j).viewDir();
+            }
 
             if(exportAngleOfView)
+            {
                 out << " " << at(i).at(j).angleOfView() << Qt::endl;
+            }
 
             if(exportMarkerID)
+            {
                 out << " " << at(i).getMarkerID() << Qt::endl;
+            }
             else
+            {
                 out << Qt::endl;
+            }
         }
     }
 }
@@ -680,9 +784,11 @@ void TrackerReal::exportDat(QTextStream &out, bool alternateHeight, bool useTrac
             progress.setValue(i + 1);
 
             for(int j = 0; j < at(i).size(); ++j)
+            {
                 // Umrechnung in coordSystem fehlt, auch camera altitude unberuecksichtigt!!!
                 out << at(i).firstFrame() + j << " " << at(i).at(j) << " " << at(i).at(j).z()
                     << Qt::endl; // z Koordinate ist Kopf
+            }
             out << Qt::endl;
         }
     }
@@ -698,11 +804,15 @@ void TrackerReal::exportDat(QTextStream &out, bool alternateHeight, bool useTrac
             for(int j = 0; j < at(i).size(); ++j)
             {
                 if(alternateHeight)
+                {
                     out << at(i).firstFrame() + j << " " << at(i).at(j) << " " << at(i).at(j).z()
                         << Qt::endl; // z Koordinate ist Kopf
+                }
                 else
+                {
                     out << at(i).firstFrame() + j << " " << at(i).at(j) << " " << at(i).height()
                         << Qt::endl; // z Koordinate ist Kopf
+                }
             }
             out << Qt::endl;
         }
@@ -728,11 +838,15 @@ void TrackerReal::exportXml(QTextStream &outXml, bool alternateHeight, bool useT
     {
         if(alternateHeight) // bei variierender groesse wird einfach durchschnittsgroesse genommen, da an treppen gar
                             // keine vernuempftige Groesse vorliegt
+        {
             outXml << "        <agentInfo ID=\"" << j + 1 << "\" color=\"100\" height=\"" << defaultPersonHeight
                    << "\"/>" << Qt::endl;
+        }
         else
+        {
             outXml << "        <agentInfo ID=\"" << j + 1 << "\" color=\"100\" height=\"" << at(j).height() << "\"/>"
                    << Qt::endl;
+        }
     }
     outXml << "    </shape>" << Qt::endl << Qt::endl;
 
@@ -752,15 +866,19 @@ void TrackerReal::exportXml(QTextStream &outXml, bool alternateHeight, bool useT
                 // person-datenentnommen
                 // personID, Frame ID(?) , X , Y , Z
                 if(useTrackpoints)
+                {
                     z = at(j).trackPointAt(i).z() + defaultPersonHeight;
-                // war, wenn ebene versuche sinnvoll:z = at(j).trackPointAt(i).z()+at(j).height();
-                else
+                }
+                else // war, wenn ebene versuche sinnvoll:z = at(j).trackPointAt(i).z()+at(j).height();
                 {
                     if(alternateHeight)
+                    {
                         z = at(j).trackPointAt(i).z() - defaultPersonHeight;
-                    // war, wenn ebene versuche sinnvoll: z = at(j).trackPointAt(i).z()-at(j).height();
-                    else
+                    }
+                    else // war, wenn ebene versuche sinnvoll: z = at(j).trackPointAt(i).z()-at(j).height();
+                    {
                         z = 0; // at(j).height();
+                    }
                 }
                 outXml << "        <agent ID=\"" << j + 1 << "\" xPos=\"" << at(j).trackPointAt(i).x() << "\" yPos=\""
                        << at(j).trackPointAt(i).y() << "\" zPos=\"" << z

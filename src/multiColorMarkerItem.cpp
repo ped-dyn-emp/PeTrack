@@ -49,13 +49,17 @@ MultiColorMarkerItem::MultiColorMarkerItem(QWidget *wParent, QGraphicsItem *pare
 QRectF MultiColorMarkerItem::boundingRect() const
 {
     if(mMainWindow->getImage())
+    {
         return QRectF(
             -mMainWindow->getImageBorderSize(),
             -mMainWindow->getImageBorderSize(),
             mMainWindow->getImage()->width(),
             mMainWindow->getImage()->height());
+    }
     else
+    {
         return QRectF(0, 0, 0, 0);
+    }
 }
 
 void MultiColorMarkerItem::setRect(Vec2F &v)
@@ -73,7 +77,9 @@ void MultiColorMarkerItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
             mImage = nullptr; // is not been done by delete
         }
         if(mImage == nullptr) // zu Beginn oder wenn sich die Groesse aendert
+        {
             mImage = new QImage(mMask.cols, mMask.rows, QImage::Format_ARGB32);
+        }
 
         int   x, y;
         auto *data      = mMask.data;

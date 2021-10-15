@@ -191,7 +191,9 @@ public:
     inline ReprojectionError        getReprojectionError()
     {
         if(!reprojectionError.isValid())
+        {
             calcReprojectionError();
+        }
         return reprojectionError;
     }
 

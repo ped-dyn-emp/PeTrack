@@ -70,18 +70,26 @@ cv::Mat BackgroundFilter::getForeground()
 bool BackgroundFilter::isForeground(int coloumn, int row)
 {
     if(!mForeground.empty())
+    {
         return (bool) mForeground.data[row * mForeground.cols + coloumn]; // 0 background, 1 foreground
+    }
     else
+    {
         return false;
+    }
 }
 
 /// zuruecksetzen, wenn zB helligkeit veraendert wird oder schaerfe
 void BackgroundFilter::reset()
 {
     if(!mForeground.empty())
+    {
         mForeground = cv::Scalar::all(0);
+    }
     if(!mBgModel.empty())
+    {
         mBgModel->clear();
+    }
 
     setChanged(true);
 }
@@ -213,7 +221,9 @@ bool BackgroundFilter::save(QString /*dest*/) // default = ""
 bool BackgroundFilter::load(QString dest) // default = ""
 {
     if(!mBgPointCloud.empty() || mBgModel != nullptr) // initialisierung
+    {
         debout << "Warning: Eliminate existing background!" << std::endl;
+    }
 
     if(1) // (*stereoContext()) // auskommentiert, damit bg auch angelegt werden kann, wenn noch kein video geladen
           // wurde
@@ -238,7 +248,9 @@ bool BackgroundFilter::load(QString dest) // default = ""
             }
 
             if(mBgPointCloud.empty())
+            {
                 mBgPointCloud.create(bgImg.rows, bgImg.cols, CV_32FC3);
+            }
 
             float min, max;
             // min max aus den ersten bytes auslesen
@@ -246,7 +258,9 @@ bool BackgroundFilter::load(QString dest) // default = ""
             memmove(&max, bgImg.data + sizeof(float), sizeof(float));
 
             if constexpr(sizeof(float) != 4)
+            {
                 debout << "Warning: the height range coded inside the background picture is not portable!" << std::endl;
+            }
 
             // uebetragen der z-werte in 8-bit-bild ---------------------------------------------------------
             // quantisierung fuehrt dazu, dass bei 10m maximaler spannweite pro grauwertstufe 4cm
@@ -263,9 +277,13 @@ bool BackgroundFilter::load(QString dest) // default = ""
                 for(x = 0; x < mBgPointCloud.cols; ++x)
                 {
                     if(*bgImgData != 0)
+                    {
                         data[2] = min + scale * (*bgImgData - 1); // -1, da 0 nicht gueltig markiert
-                    else                                          // schwarz bedeutet keine Info
+                    }
+                    else // schwarz bedeutet keine Info
+                    {
                         data[2] = -1;
+                    }
                     data += 3;
                     ++bgImgData;
                 }
@@ -285,15 +303,19 @@ bool BackgroundFilter::load(QString dest) // default = ""
             mLastFile = dest;
 
             if(mForeground.empty()) // wenn zuvor noch keine background subtraction an war oder ist
+            {
                 mForeground.create(
                     cv::Size(bgImg.cols, bgImg.rows),
                     CV_8UC1); // = cvCreateImage(cvSize(bgImg->width, bgImg->height), IPL_DEPTH_8U, 1); // CV_8UC1 8, 1
+            }
 
             debout << "import background subtraction file (min " << min << ", max " << max
                    << ") for stereo mode: " << dest << "." << std::endl;
         }
         else
+        {
             return false; // keine dest ausgesucht
+        }
     }
     else // nicht stereo
     {
@@ -422,7 +444,9 @@ cv::Mat BackgroundFilter::act(cv::Mat &img, cv::Mat &res)
 
 
             if(!mBgModel.empty())
+            {
                 mBgModel->clear();
+            }
 
             mBgModel = cv::createBackgroundSubtractorMOG2();
 

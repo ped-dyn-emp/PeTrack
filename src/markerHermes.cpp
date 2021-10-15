@@ -46,32 +46,48 @@ MarkerHermes::~MarkerHermes()
 bool MarkerHermes::isOverlappingHead(const MyEllipse &e) const
 {
     if(hasHead())
+    {
         return mHead.isInside(e.center()) || e.isInside(mHead.center());
+    }
     else
+    {
         return false;
+    }
 }
 bool MarkerHermes::isInsideHead(const Vec2F &p) const
 {
     if(hasHead())
+    {
         return mHead.isInside(p);
+    }
     else
+    {
         return false;
+    }
 }
 
 // returns spot number in spots list when inside, otherwise returns -1
 int MarkerHermes::isOverlappingSpots(const MyEllipse &e) const
 {
     for(int i = 0; i < mSpots.size(); ++i)
+    {
         if((mSpots[i].isInside(e.center()) || e.isInside(mSpots[i].center())) && // Mittelpkte liegen ineinander
            ((e.center() - mSpots[i].center()).length() < 2))                     // kein zu grosser Abstand
+        {
             return i;
+        }
+    }
     return -1;
 }
 int MarkerHermes::isInsideSpots(const Vec2F &p) const
 {
     for(int i = 0; i < mSpots.size(); ++i)
+    {
         if(mSpots[i].isInside(p))
+        {
             return i;
+        }
+    }
     return -1;
 }
 
@@ -86,8 +102,12 @@ void MarkerHermes::modifyHead(const MyEllipse &head)
     {
         if(mHead.outline() > 205 &&
            mHead.outline() < 268) // bevorzugte groesse - nur initial koennte andere erzeugt werden
+        {
             if(fabs(mHead.ratio() - 1.5) > fabs(head.ratio() - 1.5)) // because white plate is 14x21cm like a real head
+            {
                 mHead = head;
+            }
+        }
     }
     else
     {
@@ -104,7 +124,9 @@ void MarkerHermes::modifySpot(int i, const MyEllipse &spot)
         // - ob abstand zur mittellinie geringer
         // - ob form eher kreisfoermig
         if(spot.outline() > mSpots[i].outline())
+        {
             mSpots[i] = spot;
+        }
         ++mSpotCount[i];
     }
 }
@@ -126,11 +148,15 @@ void MarkerHermes::organize(const cv::Mat &img, bool /*autoWB*/)
 
     // direkt herausspringen, da nichts zu tun ist
     if(mSpots.size() == 0)
+    {
         return;
+    }
 
     // durch mgl wachsen der spots muss ueberprueft werden, ob sich im nachhinnein Ueberlagerungen ergeben
     for(i = 0; i < mSpots.size(); ++i)
+    {
         for(j = i + 1; j < mSpots.size(); ++j)
+        {
             if(mSpots[i].isInside(mSpots[j].center()) || mSpots[j].isInside(mSpots[i].center()))
             {
                 modifySpot(i, mSpots[j]);
@@ -138,6 +164,8 @@ void MarkerHermes::organize(const cv::Mat &img, bool /*autoWB*/)
                 j = i; // es muss von vorne begonnen werden, da i wachsen koennte und dann vorgaenger von j nun
                        // hineinpassen koennten // --j;
             }
+        }
+    }
 
     // nach groesse sortieren und loeschen koennte kreuz angreifen zugunsten von zahl
 
@@ -149,15 +177,21 @@ void MarkerHermes::organize(const cv::Mat &img, bool /*autoWB*/)
     // nur die spots mit am meisten treffern stehen lassen
     int maxCount = 0;
     for(i = 0; i < mSpotCount.size(); ++i)
+    {
         if(mSpotCount[i] > maxCount)
+        {
             maxCount = mSpotCount[i];
+        }
+    }
 
     for(i = 0; i < mSpotCount.size(); ++i)
+    {
         if(mSpotCount[i] < maxCount)
         {
             deleteSpot(i);
             --i;
         }
+    }
 
 
     // 1 spots heraussuchen, bei denen um center in quadrat. bereich in ellipse der dunkelste Pkt (kleiner value in hsv)
@@ -175,11 +209,15 @@ void MarkerHermes::organize(const cv::Mat &img, bool /*autoWB*/)
             int minVal = 256;                                             // groesser als komplett weiss (255)
             // bildrand muss nicht ueberprueft werden, da sie gar nicht erst hereingekommen waeren
             for(j = -r; j < r + 1; ++j)
+            {
                 for(k = -r; k < r + 1; ++k)
                 {
                     if(getValue(img, cx + j, cy + k).value() < minVal)
+                    {
                         minVal = getValue(img, cx + j, cy + k).value(); // Helligkeit
+                    }
                 }
+            }
             minValList.append(minVal);
         }
 
@@ -187,12 +225,14 @@ void MarkerHermes::organize(const cv::Mat &img, bool /*autoWB*/)
         QList<int> minValListSort = minValList;
         std::sort(minValListSort.begin(), minValListSort.end()); // sortiert aufsteigend
         for(i = 0; i < mSpots.size(); ++i)
+        {
             if(minValList[i] > minValListSort[0]) // nur der dunkelste bleibt uebrig
             {
                 deleteSpot(i);
                 minValList.removeAt(i);
                 --i;
             }
+        }
     }
 
     // ab hier nur noch 0 oder 1 spots!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -206,16 +246,30 @@ void MarkerHermes::organize(const cv::Mat &img, bool /*autoWB*/)
 
         // bildrand muss nicht ueberprueft werden, da sie gar nicht erst hereingekommen waeren
         for(j = -r; j < r + 1; ++j)
+        {
             for(k = -r; k < r + 1; ++k)
+            {
                 if(getValue(img, cx + j, cy + k).value() < minVal)
+                {
                     minVal = getValue(img, cx + j, cy + k).value(); // Helligkeit
+                }
+            }
+        }
         int maxVal = 0;
         for(j = -2 * r; j < 2 * r + 1; ++j)
+        {
             for(k = -2 * r; k < 2 * r + 1; ++k)
+            {
                 if((cx + j < img.cols) && (cx + j > -1) && (cy + k < img.rows) &&
                    (cy + k > -1)) // bildrand muss ueberprueft werden
+                {
                     if(getValue(img, cx + j, cy + k).value() > maxVal)
+                    {
                         maxVal = getValue(img, cx + j, cy + k).value(); // Helligkeit
+                    }
+                }
+            }
+        }
 
         if(maxVal - minVal < MIN_CONTRAST) // war 150bei zu geringem Kontrast wird spot geloescht
         {
@@ -230,9 +284,13 @@ void MarkerHermes::organize(const cv::Mat &img, bool /*autoWB*/)
 MyEllipse MarkerHermes::getCenterSpot() const
 {
     if(mCenterIndex == -1)
+    {
         return mHead; // good fallback ?
+    }
     else
+    {
         return mSpots[mCenterIndex];
+    }
 }
 
 void MarkerHermes::draw(cv::Mat &img) const
@@ -241,14 +299,20 @@ void MarkerHermes::draw(cv::Mat &img) const
 
     // head
     if(hasHead())
+    {
         head().draw(img, 50, 50, 255);
+    }
     // marker
     for(i = 0; i < mSpots.size(); ++i)
     {
         if(i == mCenterIndex)
+        {
             mSpots[i].draw(img, 150, 150, 0);
+        }
         else
+        {
             mSpots[i].draw(img, 0, 150, 150);
+        }
     }
     if(hasHead() && mSpots.size() == 0)
     {
@@ -317,16 +381,20 @@ bool MarkerHermesList::mayAddEllipse(const cv::Mat &img, const MyEllipse &e, boo
             else if(!at(i).hasHead())
             {
                 for(j = 0; j < at(i).spots().size(); ++j)
+                {
                     if(e.isInside(at(i).spots()[j].center()))
                     {
                         (*this)[i].modifyHead(e);
                         doesExist = true;
                         break;
                     }
+                }
             }
         }
         if(!doesExist)
+        {
             append(MarkerHermes(e));
+        }
         return true;
     }
     return false;
@@ -370,7 +438,9 @@ void MarkerHermesList::organize(const cv::Mat &img, bool autoWB)
             (*this)[i++].organize(img, autoWB);
         }
         else
+        {
             removeAt(i);
+        }
     }
 }
 
@@ -379,7 +449,9 @@ void MarkerHermesList::organize(const cv::Mat &img, bool autoWB)
 void MarkerHermesList::draw(cv::Mat &img) const
 {
     for(int i = 0; i < size(); ++i)
+    {
         at(i).draw(img);
+    }
 }
 
 void MarkerHermesList::toCrossList(QList<TrackPoint> *crossList, bool ignoreWithoutMarker) const

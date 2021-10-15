@@ -95,7 +95,9 @@ inline QTextStream &operator<<(QTextStream &s, const TrackPersonReal &tp)
 {
     int firstFrame = tp.firstFrame();
     for(int i = 0; i < tp.size(); ++i)
+    {
         s << firstFrame + i << tp.at(i) << tp.height() << Qt::endl;
+    }
     return s;
 }
 

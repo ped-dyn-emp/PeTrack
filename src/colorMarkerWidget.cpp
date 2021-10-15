@@ -102,20 +102,32 @@ void ColorMarkerWidget::getXml(QDomElement &elem)
         if(subElem.tagName() == "MASK")
         {
             if(subElem.hasAttribute("SHOW"))
+            {
                 showMask->setCheckState(subElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+            }
             if(subElem.hasAttribute("OPACITY"))
+            {
                 opacity->setValue(subElem.attribute("OPACITY").toInt());
+            }
             if(subElem.hasAttribute("MASK"))
+            {
                 maskMask->setCheckState(subElem.attribute("MASK").toInt() ? Qt::Checked : Qt::Unchecked);
+            }
         }
         if(subElem.tagName() == "FROM_COLOR")
         {
             if(subElem.hasAttribute("HUE"))
+            {
                 h = subElem.attribute("HUE").toInt();
+            }
             if(subElem.hasAttribute("SATURATION"))
+            {
                 s = subElem.attribute("SATURATION").toInt();
+            }
             if(subElem.hasAttribute("VALUE"))
+            {
                 v = subElem.attribute("VALUE").toInt();
+            }
 
             col.setHsv(h, s, v);
             if(col.isValid())
@@ -131,11 +143,17 @@ void ColorMarkerWidget::getXml(QDomElement &elem)
         if(subElem.tagName() == "TO_COLOR")
         {
             if(subElem.hasAttribute("HUE"))
+            {
                 h = subElem.attribute("HUE").toInt();
+            }
             if(subElem.hasAttribute("SATURATION"))
+            {
                 s = subElem.attribute("SATURATION").toInt();
+            }
             if(subElem.hasAttribute("VALUE"))
+            {
                 v = subElem.attribute("VALUE").toInt();
+            }
 
             col.setHsv(h, s, v);
             if(col.isValid())
@@ -151,21 +169,37 @@ void ColorMarkerWidget::getXml(QDomElement &elem)
         if(subElem.tagName() == "PARAM")
         {
             if(subElem.hasAttribute("INVERS_HUE"))
+            {
                 inversHue->setCheckState(subElem.attribute("INVERS_HUE").toInt() ? Qt::Checked : Qt::Unchecked);
+            }
             if(subElem.hasAttribute("CLOSE_RADIUS"))
+            {
                 closeRadius->setValue(subElem.attribute("CLOSE_RADIUS").toInt());
+            }
             if(subElem.hasAttribute("CLOSE_USED"))
+            {
                 useClose->setCheckState(subElem.attribute("CLOSE_USED").toInt() ? Qt::Checked : Qt::Unchecked);
+            }
             if(subElem.hasAttribute("OPEN_RADIUS"))
+            {
                 openRadius->setValue(subElem.attribute("OPEN_RADIUS").toInt());
+            }
             if(subElem.hasAttribute("OPEN_USED"))
+            {
                 useOpen->setCheckState(subElem.attribute("OPEN_USED").toInt() ? Qt::Checked : Qt::Unchecked);
+            }
             if(subElem.hasAttribute("MIN_AREA"))
+            {
                 minArea->setValue(subElem.attribute("MIN_AREA").toInt());
+            }
             if(subElem.hasAttribute("MAX_AREA"))
+            {
                 maxArea->setValue(subElem.attribute("MAX_AREA").toInt());
+            }
             if(subElem.hasAttribute("MAX_RATIO"))
+            {
                 maxRatio->setValue(subElem.attribute("MAX_RATIO").toDouble());
+            }
         }
     }
 }
@@ -179,7 +213,9 @@ void ColorMarkerWidget::on_fromTriangle_colorChanged(const QColor &col)
     fromColor->setStyleSheet(styleString);
     mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 void ColorMarkerWidget::on_toTriangle_colorChanged(const QColor &col)
 {
@@ -190,7 +226,9 @@ void ColorMarkerWidget::on_toTriangle_colorChanged(const QColor &col)
     toColor->setStyleSheet(styleString);
     mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
     if(!mMainWindow->isLoading())
+    {
         mMainWindow->updateImage();
+    }
 }
 
 void ColorMarkerWidget::on_fromColor_clicked()

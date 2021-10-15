@@ -580,11 +580,13 @@ void detail::refineWithBlackDot(
                     blob.color)); // 100 beste qualitaet
             }
             else
+            {
                 crossList.append(TrackPoint(
                     Vec2F(box.center.x, box.center.y),
                     90,
                     Vec2F(box.center.x, box.center.y),
                     blob.color)); // 100 beste qualitaet
+            }
         }
     }
 }
@@ -654,7 +656,9 @@ void detail::refineWithAruco(
         offsetCropRect2Roi.setY(cropRect.y);
 
         if(subImg.empty())
+        {
             continue;
+        }
         // TODO: Use Reference to actual codeMarkerOptions in MulticolorMarkerOptions
         // NOTE: For now, add as parameter of findMulticolorMarker
         codeOpt.setOffsetCropRect2Roi(offsetCropRect2Roi);
@@ -805,11 +809,17 @@ void findMultiColorMarker(
     {
         int nr;
         if(j == controlWidget->mapNr->value())
+        {
             nr = rectPlotItem->mapNum() - 1;
+        }
         else if(j == rectPlotItem->mapNum() - 1)
+        {
             nr = controlWidget->mapNr->value();
+        }
         else
+        {
             nr = j;
+        }
 
         ColorBlobDetectionParams param;
         param.fromColor   = rectPlotItem->getMap(nr).fromColor();
@@ -840,9 +850,13 @@ void findMultiColorMarker(
             // zentralen farbton heraussuchen
             QColor midHue;
             if(colParam.inversHue)
+            {
                 midHue.setHsv(2 * ((colParam.h_low + (colParam.h_high - colParam.h_low) / 2 + 90) % 180), 255, 255);
+            }
             else
+            {
                 midHue.setHsv(2 * (colParam.h_low + (colParam.h_high - colParam.h_low) / 2), 255, 255);
+            }
 
             BlackDotOptions options;
             options.ignoreWithoutMarker   = ignoreWithoutMarker;
@@ -982,9 +996,13 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *contro
         // contour at border of roi, than neglect because of object going out of region has moving center
         atEdge = false;
         for(size_t i = 0; i < contour.size(); i++)
+        {
             if((contour.at(i).x <= 1) || (contour.at(i).x >= img.cols - 2) || (contour.at(i).y <= 1) ||
                (contour.at(i).y >= img.rows - 2))
+            {
                 atEdge = true;
+            }
+        }
 
         if(!atEdge && area >= cmWidget->minArea->value() && area <= cmWidget->maxArea->value() &&
            ratio <= cmWidget->maxRatio->value())
@@ -1175,14 +1193,18 @@ void findContourMarker(
             cv::threshold(tgray, gray, threshold, 255, cv::THRESH_BINARY);
         }
         else if(img.channels() == 1)
+        {
             cv::threshold(
                 img,
                 gray,
                 threshold,
                 255,
                 cv::THRESH_BINARY); // cvThreshold(img, gray, threshold, 255, CV_THRESH_BINARY);
+        }
         else
+        {
             debout << "Error: Wrong number of channels: " << img.channels() << std::endl;
+        }
         grayFix = gray.clone();
 
 
@@ -1228,12 +1250,18 @@ void findContourMarker(
                     // contourArea koennte mit MyEllipse.area() verglichen werden und bei grossen abweichungen verworfen
                     // werden!!!
                     MyEllipse e(box.center.x, box.center.y, box.size.width * 0.5, box.size.height * 0.5, angle);
-                    if(recoMethod == RecognitionMethod::Casern) // Casern
+                    if(recoMethod == RecognitionMethod::Casern)
+                    {
                         markerCasernList.mayAddEllipse(grayFix, e, (contourArea > 0));
-                    else if(recoMethod == RecognitionMethod::Hermes) // Hermes
+                    }
+                    else if(recoMethod == RecognitionMethod::Hermes)
+                    {
                         markerHermesList.mayAddEllipse(grayFix, e, (contourArea > 0));
-                    else if(recoMethod == RecognitionMethod::Japan) // Japan
+                    }
+                    else if(recoMethod == RecognitionMethod::Japan)
+                    {
                         markerJapanList.mayAddEllipse(grayFix, e, (contourArea > 0));
+                    }
                 }
             }
             contours.pop_back();
@@ -1285,7 +1313,9 @@ Recognizer::getMarkerPos(cv::Mat &img, QRect &roi, Control *controlWidget, int b
           (mRecoMethod == RecognitionMethod::Code)));
 
     if(tImg.empty())
+    {
         return QList<TrackPoint>{};
+    }
 
     QList<TrackPoint> crossList;
     // offset of rect

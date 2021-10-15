@@ -84,7 +84,9 @@ void Parameter::setChanged(bool b)
 {
     mChg = b;
     if(mFilter)
+    {
         mFilter->setChanged(true);
+    }
 }
 
 //------------------------------------------------------------

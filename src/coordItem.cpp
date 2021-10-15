@@ -173,12 +173,16 @@ void CoordItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void CoordItem::updateData()
 {
     if(!mControlWidget->getCalibCoordFix())
+    {
         setFlag(
             ItemIsMovable); // noetig, damit mouseEvent leftmousebutton weitergegeben wird, aber drag mach ich selber
+    }
     else
+    {
         setFlag(
             ItemIsMovable,
             false); // noetig, damit mouseEvent leftmousebutton weitergegeben wird, aber drag mach ich selber
+    }
 
     if(mControlWidget->getCalibCoordDimension() == 1) // 2D
     {
@@ -270,9 +274,13 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 
 
     if(debug)
+    {
         debout << "**************** CoordItem:paint() aufgerufen" << std::endl;
+    }
     if(debug)
+    {
         debout << "show coord: " << mControlWidget->getCalibCoordShow() << std::endl;
+    }
     ////////////////////////////////
     // Drawing Calibration Points //
     ////////////////////////////////
@@ -321,22 +329,38 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 painter->drawText(QPointF(p2.x + 10, p2.y + font.pixelSize()), QObject::tr("%1").arg((i + 1)));
 
                 if(p2.x < calibPointsMin.x)
+                {
                     calibPointsMin.x = p2.x;
+                }
                 if(p2.x > calibPointsMax.x)
+                {
                     calibPointsMax.x = p2.x;
+                }
                 if(p3.x < calibPointsMin.x)
+                {
                     calibPointsMin.x = p3.x;
+                }
                 if(p3.x > calibPointsMax.x)
+                {
                     calibPointsMax.x = p3.x;
+                }
 
                 if(p2.y < calibPointsMin.y)
+                {
                     calibPointsMin.y = p2.y;
+                }
                 if(p2.y > calibPointsMax.y)
+                {
                     calibPointsMax.y = p2.y;
+                }
                 if(p3.y < calibPointsMin.y)
+                {
                     calibPointsMin.y = p3.y;
+                }
                 if(p3.y > calibPointsMax.y)
+                {
                     calibPointsMax.y = p3.y;
+                }
             }
         }
     }
@@ -561,12 +585,18 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 
 
                 if(debug)
+                {
                     debout << "Ursprungskoordinaten: " << ursprung.x << ", " << ursprung.y << std::endl;
+                }
                 if(debug)
+                {
                     debout << "Bildsize: " << mMainWindow->getImage()->width() << "x"
                            << mMainWindow->getImage()->height() << std::endl;
+                }
                 if(debug)
+                {
                     coordinaten = QString::asprintf("(%f  %f %f)", tX3D, tY3D, tZ3D);
+                }
 
                 //////////////////////////////
                 // Drawing the tick-markers //
@@ -617,9 +647,13 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 painter->setFont(QFont("Arial", 20));
 
                 if(debug)
+                {
                     coordinaten = QString::asprintf("(%.2f, %.2f)", ursprung.x, ursprung.y);
+                }
                 if(debug)
+                {
                     painter->drawText(QPoint(ursprung.x - 100, ursprung.y), coordinaten);
+                }
 
                 //////////////////////////////////////////////
                 // Drawing the peaks at the end of the axis //
@@ -656,14 +690,22 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 painter->drawLine(points[2], points[1]);
 
                 if(debug)
+                {
                     coordinaten = QString::asprintf("(% .2f, % .2f)", p[1].x, p[1].y);
+                }
                 if(debug)
+                {
                     painter->drawText(QPoint(p[3].x, p[3].y), coordinaten);
+                }
 
                 if(debug)
+                {
                     coordinaten = QString::fromLatin1("X");
+                }
                 if(debug)
+                {
                     painter->drawText(QPoint(p[1].x, p[1].y), coordinaten);
+                }
 
                 ///////
                 // Y //
@@ -694,14 +736,22 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 painter->drawLine(points[2], points[1]);
 
                 if(debug)
+                {
                     coordinaten = QString::asprintf("(%.2f, %.2f)", p[1].x, p[1].y);
+                }
                 if(debug)
+                {
                     painter->drawText(QPoint(p[3].x, p[3].y), coordinaten);
+                }
 
                 if(debug)
+                {
                     coordinaten = QString::fromLatin1("Y");
+                }
                 if(debug)
+                {
                     painter->drawText(QPoint(p[1].x, p[1].y), coordinaten);
+                }
 
                 ///////
                 // Z //
@@ -732,14 +782,22 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 painter->drawLine(points[2], points[1]);
 
                 if(debug)
+                {
                     coordinaten = QString::asprintf("(%.2f, %.2f)", p[1].x, p[1].y);
+                }
                 if(debug)
+                {
                     painter->drawText(QPoint(p[3].x, p[3].y), coordinaten);
+                }
 
                 if(debug)
+                {
                     coordinaten = QString::fromLatin1("Z");
+                }
                 if(debug)
+                {
                     painter->drawText(QPoint(p[1].x, p[1].y), coordinaten);
+                }
             }
         }
     }

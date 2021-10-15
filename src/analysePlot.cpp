@@ -167,20 +167,32 @@ void TrackerRealPlotItem::draw(QPainter *p, const QwtScaleMap &mapX, const QwtSc
         else if(anaConsiderX)
         {
             if(anaConsiderAbs)
+            {
                 titleY.setText("v<sub>|x|</sub> [m/s]", QwtText::RichText);
+            }
             else if(anaConsiderRev)
+            {
                 titleY.setText("v<sub>-x</sub> [m/s]", QwtText::RichText);
+            }
             else
+            {
                 titleY.setText("v<sub>x</sub> [m/s]", QwtText::RichText);
+            }
         }
         else // == if (anaConsiderY)
         {
             if(anaConsiderAbs)
+            {
                 titleY.setText("v<sub>|y|</sub> [m/s]", QwtText::RichText);
+            }
             else if(anaConsiderRev)
+            {
                 titleY.setText("v<sub>-y</sub> [m/s]", QwtText::RichText);
+            }
             else
+            {
                 titleY.setText("v<sub>y</sub> [m/s]", QwtText::RichText);
+            }
         }
         titleX.setFont(f);
         titleY.setFont(f);
@@ -197,7 +209,9 @@ void TrackerRealPlotItem::draw(QPainter *p, const QwtScaleMap &mapX, const QwtSc
         bool            markAct  = controlWidget->anaMarkAct->isChecked();
         double          fps      = controlWidget->getMainWindow()->getAnimation()->getFPS();
         if(fps < 0)
+        {
             fps = DEFAULT_FPS;
+        }
 
         if(!markAct)
         {
@@ -232,20 +246,32 @@ void TrackerRealPlotItem::draw(QPainter *p, const QwtScaleMap &mapX, const QwtSc
                 else if(anaConsiderX)
                 {
                     if(anaConsiderAbs)
+                    {
                         vel = fabs((mTrackerReal->at(i).at(j + step).x() - mTrackerReal->at(i).at(j).x()));
+                    }
                     else if(anaConsiderRev)
+                    {
                         vel = (mTrackerReal->at(i).at(j).x() - mTrackerReal->at(i).at(j + step).x());
+                    }
                     else
+                    {
                         vel = (mTrackerReal->at(i).at(j + step).x() - mTrackerReal->at(i).at(j).x());
+                    }
                 }
                 else // == if (anaConsiderY)
                 {
                     if(anaConsiderAbs)
+                    {
                         vel = fabs((mTrackerReal->at(i).at(j + step).y() - mTrackerReal->at(i).at(j).y()));
+                    }
                     else if(anaConsiderRev)
+                    {
                         vel = (mTrackerReal->at(i).at(j).y() - mTrackerReal->at(i).at(j + step).y());
+                    }
                     else
+                    {
                         vel = (mTrackerReal->at(i).at(j + step).y() - mTrackerReal->at(i).at(j).y());
+                    }
                 }
                 vel /= ((100. / fps) * step); // m/s, war: 100cm/25frames =4 => vel /=(4.*step);
 
@@ -273,7 +299,9 @@ void TrackerRealPlotItem::draw(QPainter *p, const QwtScaleMap &mapX, const QwtSc
                 point.setX(i);
                 point.setY(velVec[i] / velAnzVec[i]);
                 if((i != 0) && (velAnzVec[i - 1] != 0)) // nicht ganz hundertprozentig
+                {
                     p->drawLine(lastPoint, point);
+                }
                 lastPoint = point;
                 if(markAct && (i == velVecActIdx))
                 {
@@ -352,32 +380,56 @@ QPoint AnalysePlot::getPos(const QColor &col) const
         if(mControlWidget->recoColorModel->currentIndex() == 0) // HSV
         {
             if(x == 0) // nicht setX und setY, weil das width und height anpasst
+            {
                 p.setX(col.hue());
+            }
             else if(x == 1)
+            {
                 p.setX(col.saturation());
+            }
             else
+            {
                 p.setX(col.value());
+            }
             if(y == 0)
+            {
                 p.setY(ymax - col.hue());
+            }
             else if(y == 1)
+            {
                 p.setY(ymax - col.saturation());
+            }
             else
+            {
                 p.setY(ymax - col.value());
+            }
         }
         else // RGB
         {
             if(x == 0)
+            {
                 p.setX(col.red());
+            }
             else if(x == 1)
+            {
                 p.setX(col.green());
+            }
             else
+            {
                 p.setX(col.blue());
+            }
             if(y == 0)
+            {
                 p.setY(ymax - col.red());
+            }
             else if(y == 1)
+            {
                 p.setY(ymax - col.green());
+            }
             else
+            {
                 p.setY(ymax - col.blue());
+            }
         }
     }
 

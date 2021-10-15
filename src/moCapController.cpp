@@ -370,7 +370,9 @@ void MoCapController::getXml(const QDomElement &elem)
                     std::stringstream ss;
                     ss << "Element TIME_OFFSET of file " << path << " does not contain a valid floating-point number!";
                     if(!ok)
+                    {
                         throw std::invalid_argument(ss.str());
+                    }
                 }
                 if(subElem.hasAttribute("SAMPLE_RATE"))
                 {
@@ -378,7 +380,9 @@ void MoCapController::getXml(const QDomElement &elem)
                     std::stringstream ss;
                     ss << "Element SAMPLE_RATE of file " << path << " does not contain a valid integer!";
                     if(!ok)
+                    {
                         throw std::invalid_argument(ss.str());
+                    }
                 }
                 savedMetadata.push_back(metadata);
             }

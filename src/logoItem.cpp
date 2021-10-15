@@ -40,12 +40,18 @@ void Fader::fadeOut(LogoItem *lI, int frames)
 {
     mLogoItem = lI;
     if(frames < 1)
+    {
         mFrames = 1;
+    }
     else
+    {
         mFrames = frames;
+    }
     mStep = 1. / mFrames;
     if(mTimer) // wenn fadeOut schon mal aufgerufen wurde; so wird nur ein QTimer maximal angelegt
+    {
         delete mTimer;
+    }
     mTimer = new QTimer(this);
     connect(mTimer, SIGNAL(timeout()), this, SLOT(fadeOutStep()));
     mTimer->start(FRAME_INTERVAL); // fuer 25fps
@@ -57,7 +63,9 @@ void Fader::fadeOutStep()
 
     if(((double) (clock() - lastTime)) / CLOCKS_PER_SEC >
        FRAME_INTERVAL * .001) // beschleunigen, wenn zu langsam ausgeblendet wird
+    {
         mStep *= 2;
+    }
     lastTime = clock();
 
     if(mLogoItem->getOpacity() > 0.)

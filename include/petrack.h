@@ -245,7 +245,9 @@ public:
     inline void updateCoord()
     {
         if(mCoordItem)
+        {
             mCoordItem->updateData();
+        }
     }
 
     inline QPointF getMousePosOnImage() { return mMousePosOnImage; }
@@ -271,9 +273,13 @@ public:
     inline int getImageBorderSize()
     {
         if(getBorderFilter()->getEnabled())
+        {
             return (int) getBorderFilter()->getBorderSize()->getValue();
+        }
         else
+        {
             return 0;
+        }
     }
     inline void setImageBorderSize(int sz) { getBorderFilter()->getBorderSize()->setValue(sz); }
 

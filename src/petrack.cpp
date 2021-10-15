@@ -324,7 +324,9 @@ Petrack::~Petrack()
 void Petrack::dragEnterEvent(QDragEnterEvent *event)
 {
     if(event->mimeData()->hasUrls())
+    {
         event->acceptProposedAction();
+    }
 }
 
 /**
@@ -340,11 +342,17 @@ void Petrack::dropEvent(QDropEvent *event)
     if(event->mimeData()->hasUrls())
     {
         if(event->mimeData()->urls().first().toLocalFile().right(4) == ".pet")
+        {
             openProject(event->mimeData()->urls().first().toLocalFile());
+        }
         else if(event->mimeData()->urls().first().toLocalFile().right(4) == ".trc")
+        {
             importTracker(event->mimeData()->urls().first().toLocalFile());
+        }
         else
+        {
             openSequence(event->mimeData()->urls().first().toLocalFile());
+        }
         event->acceptProposedAction();
     }
 }
@@ -375,7 +383,9 @@ void Petrack::updateSceneRect()
         mScene->setSceneRect(xMin, yMin, xMax - xMin, yMax - yMin);
     }
     else
+    {
         mScene->setSceneRect(-bS, -bS, iW, iH);
+    }
 }
 
 /**
@@ -404,13 +414,17 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
                 seq            = elem.attribute("SRC");
                 QString tmpSeq = getExistingFile(seq, mProFileName);
                 if(tmpSeq != "")
+                {
                     seq = tmpSeq;
+                }
             }
             if(elem.hasAttribute("STATUS_HEIGHT"))
             {
                 if(mStatusPosRealHeight) // null kann eigentlich nicht vorkommen, da im constructor von petrack erzeugt
                                          // wird
+                {
                     mStatusPosRealHeight->setValue(elem.attribute("STATUS_HEIGHT").toDouble());
+                }
             }
         }
         else if(elem.tagName() == "STEREO")
@@ -438,9 +452,13 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
             mControlWidget->getXml(elem);
             QDomElement tmpElem = (elem.firstChildElement("TRACKING")).firstChildElement("PATH");
             if(tmpElem.hasAttribute("ONLY_PEOPLE_NR"))
+            {
                 onlyPeopleNr = tmpElem.attribute("ONLY_PEOPLE_NR").toInt();
+            }
             if(tmpElem.hasAttribute("ONLY_PEOPLE_NR_LIST"))
+            {
                 onlyPeopleNrList = tmpElem.attribute("ONLY_PEOPLE_NR_LIST");
+            }
         }
         else if(elem.tagName() == "EXTR_CALIBRATION")
         {
@@ -510,13 +528,17 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
             }
         }
         else
+        {
             debout << "Unknown PETRACK tag " << elem.tagName() << std::endl;
+        }
     }
     // open koennte am schluss passieren, dann wuerde nicht erst unveraendertes bild angezeigt,
     // dafuer koennte es aber sein, dass werte zb bei fx nicht einstellbar sind!
 
     if(openSeq && (seq != ""))
+    {
         openSequence(seq); // wenn leer, dann kommt abfrage hoch, welche datei; abbrechen, wenn aktuelle gewuenscht
+    }
 
     mViewWidget->setZoomLevel(zoom);
     mViewWidget->setRotateLevel(rotate);
@@ -527,7 +549,9 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     if(!mBackgroundFilter.getFilename().isEmpty())
     {
         if(!(loaded = mBackgroundFilter.load(mBackgroundFilter.getFilename())))
+        {
             debout << "Error: loading background file " << mBackgroundFilter.getFilename() << "!" << std::endl;
+        }
     }
 
     mPlayerWidget->setFrameInNum(sourceFrameIn == -1 ? mAnimation->getSourceInFrameNum() : sourceFrameIn);
@@ -537,12 +561,16 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     if(frame != -1)
     {
         if(mControlWidget->filterBg->isChecked() &&
-           !loaded)                    // mit dem anfangs geladenen bild wurde bereits faelschlicherweise bg bestimmt
+           !loaded) // mit dem anfangs geladenen bild wurde bereits faelschlicherweise bg bestimmt
+        {
             mBackgroundFilter.reset(); // erst nach dem springen zu einem frame background bestimmen
+        }
         mPlayerWidget->skipToFrame(frame); // hier wird updateImage ausgefuehrt
     }
     else if(loaded)
+    {
         updateImage();
+    }
 
     // nicht schon in control, sonst loescht opensequence wieder tracker
     if(mTrcFileName != "")
@@ -563,9 +591,13 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     mControlWidget->trackShowOnlyNrList->setText(onlyPeopleNrList);
 
     if(cam == cameraLeft)
+    {
         mCameraLeftViewAct->setChecked(true);
+    }
     else if(cam == cameraRight)
+    {
         mCameraRightViewAct->setChecked(true);
+    }
     setCamera();
     mPlayerWidget->setFPS(fps); // erst spaet setzen, damit Wert den des geladenen Videos ueberschreiben kann
     setLoading(false);
@@ -574,15 +606,21 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
 void Petrack::openProject(QString fileName, bool openSeq) // default fileName="", openSequence = true
 {
     if(!QFileInfo(mProFileName).isDir()) // a project is already loaded
+    {
         if(!maybeSave())
+        {
             return;
+        }
+    }
     // if no destination file or folder is given
     if(fileName.isEmpty())
+    {
         fileName = QFileDialog::getOpenFileName(
             this,
             tr("Select project file"),
             QFileInfo(mProFileName).path(),
             tr("PeTrack project file (*.pet);;All files (*.*)"));
+    }
 
     if(!fileName.isEmpty())
     {
@@ -634,7 +672,9 @@ void Petrack::saveXml(QDomDocument &doc)
     elem        = doc.createElement("MAIN");
     QString seq = "";
     if(mImage)
+    {
         seq = getFileList(mSeqFileName, mProFileName);
+    }
 
     elem.setAttribute("SRC", seq);
     elem.setAttribute("STATUS_HEIGHT", mStatusPosRealHeight->value());
@@ -765,7 +805,9 @@ bool Petrack::saveProject(QString fileName) // default fileName=""
         return true;
     }
     else
+    {
         return false;
+    }
 }
 
 void Petrack::writeXmlElement(QXmlStreamWriter &xmlStream, QDomElement element)
@@ -828,9 +870,13 @@ void Petrack::openCameraLiveStream(int camID /* =-1*/)
     updateWindowTitle();
     mPlayerWidget->setFPS(mAnimation->getFPS());
     if(mOpenGLAct->isChecked())
+    {
         mLogoItem->fadeOut(1);
+    }
     else
+    {
         mLogoItem->fadeOut(50);
+    }
     updateCoord();
 
     mPlayerWidget->play(PlayerState::FORWARD);
@@ -839,6 +885,7 @@ void Petrack::openCameraLiveStream(int camID /* =-1*/)
 void Petrack::openSequence(QString fileName) // default fileName = ""
 {
     if(fileName.isEmpty())
+    {
         fileName = QFileDialog::getOpenFileName(
             this,
             tr("Open video or image sequence"),
@@ -849,6 +896,7 @@ void Petrack::openSequence(QString fileName) // default fileName = ""
                "*.ras *.tiff *.tif *.exr *.jp2);;Windows bitmaps (*.bmp *.dib);;JPEG (*.jpeg *.jpg *.jpe);;Portable "
                "network graphics (*.png);;Portable image format (*.pbm *.pgm *.ppm);;Sun rasters (*.sr *.ras);;TIFF "
                "(*.tiff *.tif);;OpenEXR HDR (*.exr);;JPEG 2000 (*.jp2);;All files (*.*)"));
+    }
     if(!fileName.isEmpty())
     {
         if(!mAnimation->openAnimation(fileName))
@@ -895,9 +943,13 @@ void Petrack::openSequence(QString fileName) // default fileName = ""
         updateWindowTitle();
         mPlayerWidget->setFPS(mAnimation->getFPS());
         if(mOpenGLAct->isChecked())
+        {
             mLogoItem->fadeOut(1);
+        }
         else
+        {
             mLogoItem->fadeOut(50);
+        }
         updateCoord();
     }
 }
@@ -914,19 +966,27 @@ void Petrack::updateWindowTitle()
     QSize   size = mAnimation->getSize();
 
     if(QFileInfo(mProFileName).isDir())
+    {
         title = tr("PeTrack (v") + mPetrackVersion + tr("): ");
+    }
     else
     {
         title = tr("PeTrack (v") + mPetrackVersion + tr("): ") + QFileInfo(mProFileName).fileName();
         if(mAnimation->isVideo() || mAnimation->isImageSequence())
+        {
             title += "; ";
+        }
     }
     if(mAnimation->isVideo())
+    {
         title += "sequence: " + mAnimation->getCurrentFileName() + tr(" (%1").arg(mAnimation->getNumFrames()) +
                  tr(" frames; %1x%2").arg(size.width()).arg(size.height()) + " pixel)";
+    }
     else if(mAnimation->isImageSequence())
+    {
         title += "sequence: " + mAnimation->getCurrentFileName() + tr(" ... (%1").arg(mAnimation->getNumFrames()) +
                  tr(" frames; %1x%2").arg(size.width()).arg(size.height()) + " pixel)";
+    }
     setWindowTitle(title);
 }
 
@@ -967,7 +1027,9 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
     if(dest.isEmpty())
     {
         if(lastDir.isEmpty() && !mSeqFileName.isEmpty())
+        {
             lastDir = QFileInfo(mSeqFileName).path();
+        }
 
         if(saveVideo)
         {
@@ -980,26 +1042,34 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
         else
         {
             if(saveView)
+            {
                 dest = QFileDialog::getExistingDirectory(
                     this,
                     tr("Select directory to save view sequence"),
                     lastDir,
                     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+            }
             else
+            {
                 dest = QFileDialog::getExistingDirectory(
                     this,
                     tr("Select directory to save image sequence"),
                     lastDir,
                     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+            }
         }
     }
     else // uebergabe von saveVideo spielt keine roll mehr, sondern wird hier analysiert anhand von Dateiendung
     {
         //        autoSave = true; // command line option
         if(dest.right(4) == ".avi")
+        {
             saveVideo = true;
+        }
         else
+        {
             saveVideo = false;
+        }
     }
 
     if(!dest.isEmpty() && mImage)
@@ -1030,29 +1100,41 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
             if(saveView)
             {
                 if(mCropZoomViewAct->isChecked())
+                {
                     viewImage =
                         new QImage(mView->viewport()->width(), mView->viewport()->height(), QImage::Format_RGB32);
+                }
                 else
+                {
                     viewImage = new QImage((int) mScene->width(), (int) mScene->height(), QImage::Format_RGB32);
+                }
                 painter = new QPainter();
             }
             if(convert8To24bit)
+            {
                 mult = 3;
+            }
             else
+            {
                 mult = 1;
+            }
 
             bool ok = false;
 
             if(saveView)
+            {
                 ok = aviFile.open(
                     dest.toStdString().c_str(),
                     viewImage->width(),
                     viewImage->height(),
                     viewImage->depth(),
                     mAnimation->getFPS());
+            }
             else
+            {
                 ok = aviFile.open(
                     dest.toStdString().c_str(), mImg.cols, mImg.rows, mult * 8 * mImg.channels(), mAnimation->getFPS());
+            }
 
             if(!ok)
             {
@@ -1066,10 +1148,14 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
             if(saveView)
             {
                 if(mCropZoomViewAct->isChecked())
+                {
                     viewImage =
                         new QImage(mView->viewport()->width(), mView->viewport()->height(), QImage::Format_RGB32);
+                }
                 else
+                {
                     viewImage = new QImage((int) mScene->width(), (int) mScene->height(), QImage::Format_RGB32);
+                }
                 painter = new QPainter();
             }
 
@@ -1078,20 +1164,28 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
             {
                 // calculate string length of sequence number
                 while((rest /= 10) > 0)
+                {
                     numLength++;
+                }
                 fileName = (dest + "/" + mAnimation->getFileBase() + "%1.png")
                                .arg(mPlayerWidget->getPos(), numLength, 10, QChar('0'));
             }
             else
+            {
                 fileName = dest + "/" + mAnimation->getCurrentFileName();
+            }
 
             if(saveView)
             {
                 painter->begin(viewImage);
                 if(mCropZoomViewAct->isChecked())
+                {
                     mView->render(painter);
+                }
                 else
+                {
                     mScene->render(painter);
+                }
                 painter->end();
 
                 if(viewImage->save(fileName)) //, const char * format = 0 (format wird aus dateinamen geholt), int
@@ -1122,16 +1216,24 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
         if(saveVideo)
         {
             if(saveView)
+            {
                 progress.setLabelText("Save video view...");
+            }
             else
+            {
                 progress.setLabelText("Save video...");
+            }
         }
         else
         {
             if(saveView)
+            {
                 progress.setLabelText("Save view sequence...");
+            }
             else
+            {
                 progress.setLabelText("Save image sequence...");
+            }
         }
 
 
@@ -1141,7 +1243,9 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 mPlayerWidget->getPos() - memPos); // -mempos nur, wenn nicht an den anfang gesprungen wird
             qApp->processEvents();
             if(progress.wasCanceled())
+            {
                 break;
+            }
 
             if(saveVideo)
             {
@@ -1150,22 +1254,30 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 {
                     painter->begin(viewImage);
                     if(mCropZoomViewAct->isChecked())
+                    {
                         mView->render(painter);
+                    }
                     else
+                    {
                         mScene->render(painter);
+                    }
                     painter->end();
                 }
                 if((mImgFiltered.channels() == 1) /* && convert8To24bit*/)
                 {
                     cv::cvtColor(mImg, iplImgFilteredBGR, cv::COLOR_GRAY2BGR);
                     if(saveView)
+                    {
                         writeFrameRet = aviFile.appendFrame(
                             (const unsigned char *) viewImage->bits(),
                             true); // 2. param besagt, ob vertikal gespiegel werden soll
+                    }
                     else
+                    {
                         writeFrameRet = aviFile.appendFrame(
                             (const unsigned char *) iplImgFilteredBGR.data,
                             true); // 2. param besagt, ob vertikal gespiegel werden soll
+                    }
                 }
                 else
                 {
@@ -1200,9 +1312,13 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 {
                     painter->begin(viewImage);
                     if(mCropZoomViewAct->isChecked())
+                    {
                         mView->render(painter);
+                    }
                     else
+                    {
                         mScene->render(painter);
+                    }
                     painter->end();
                 }
                 if(mAnimation->isVideo())
@@ -1210,25 +1326,37 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                     fileName = (dest + "/" + mAnimation->getFileBase() + "%1.png")
                                    .arg(mPlayerWidget->getPos(), numLength, 10, QChar('0'));
                     if(saveView)
+                    {
                         saveRet = viewImage->save(fileName);
+                    }
                     else
+                    {
                         saveRet = mImage->save(fileName);
+                    }
                 }
                 else if(formatIsSaveAble)
                 {
                     fileName = dest + "/" + mAnimation->getCurrentFileName();
                     if(saveView)
+                    {
                         saveRet = viewImage->save(fileName);
+                    }
                     else
+                    {
                         saveRet = mImage->save(fileName);
+                    }
                 }
                 else
                 {
                     fileName = dest + "/" + QFileInfo(mAnimation->getCurrentFileName()).completeBaseName() + ".png";
                     if(saveView)
+                    {
                         saveRet = viewImage->save(fileName);
+                    }
                     else
+                    {
                         saveRet = mImage->save(fileName, "PNG"); //, int quality = -1 default normal (0..100)
+                    }
                 }
                 if(!saveRet)
                 {
@@ -1276,7 +1404,9 @@ void Petrack::saveView(QString dest) // default = ""
         if(dest.isEmpty())
         {
             if(lastFile.isEmpty() && !mSeqFileName.isEmpty())
+            {
                 lastFile = QFileInfo(mSeqFileName).path();
+            }
 
             // alle unetrstuetzen fileformate erhaelt man mit
             // QImageReader::supportedImageFormats() and QImageWriter::supportedImageFormats()
@@ -1300,27 +1430,41 @@ void Petrack::saveView(QString dest) // default = ""
                 printer.setOutputFileName(dest);
                 QPainter painter(&printer);
                 if(mCropZoomViewAct->isChecked())
+                {
                     mView->render(&painter);
+                }
                 else
+                {
                     mScene->render(&painter);
+                }
             }
             else
             {
                 // schwarzer rand links und unten?!
                 QImage *img;
                 if(mCropZoomViewAct->isChecked())
+                {
                     img = new QImage(mView->viewport()->width(), mView->viewport()->height(), QImage::Format_RGB32);
+                }
                 else
+                {
                     img = new QImage((int) mScene->width(), (int) mScene->height(), QImage::Format_RGB32);
+                }
                 QPainter painter(img);
                 if(mCropZoomViewAct->isChecked())
+                {
                     mView->render(&painter);
+                }
                 else
+                {
                     mScene->render(&painter);
+                }
                 painter.end();
                 if(!img->save(dest)) //, "PNG"
+                {
                     PCritical(
                         this, tr("PeTrack"), tr("Cannot save %1 maybe because of wrong file extension.").arg(dest));
+                }
                 delete img;
             }
             lastFile = dest;
@@ -1338,7 +1482,9 @@ void Petrack::saveImage(QString dest) // default = ""
         if(dest.isEmpty())
         {
             if(lastFile.isEmpty() && !mSeqFileName.isEmpty())
+            {
                 lastFile = QFileInfo(mSeqFileName).path();
+            }
 
 
             // alle unetrstuetzen fileformate erhaelt man mit
@@ -1372,8 +1518,10 @@ void Petrack::saveImage(QString dest) // default = ""
             else
             {
                 if(!mImage->save(dest)) //, "PNG"
+                {
                     PCritical(
                         this, tr("PeTrack"), tr("Cannot save %1 maybe because of wrong file extension.").arg(dest));
+                }
             }
             lastFile = dest;
         }
@@ -1397,7 +1545,9 @@ void Petrack::print()
         }
     }
     else
+    {
         PCritical(this, tr("PeTrack"), tr("Nothing to print!"));
+    }
 }
 
 void Petrack::resetSettings()
@@ -1469,7 +1619,9 @@ void Petrack::onlineHelp()
 {
     static QUrl url("https://jugit.fz-juelich.de/ped-dyn-emp/petrack/-/wikis/home");
     if(!(QDesktopServices::openUrl(url)))
+    {
         PCritical(this, tr("PeTrack"), tr("Cannot open external browser<br>with url ") + url.toString() + "!");
+    }
 }
 
 void Petrack::antialias()
@@ -2096,17 +2248,23 @@ void Petrack::setStatusStereo(float x, float y, float z)
     if(mStatusLabelStereo)
     {
         if(z < 0)
+        {
             mStatusLabelStereo->setText(QString("x= novalue  y= novalue  z= novalue  "));
+        }
         else
+        {
             mStatusLabelStereo->setText(
                 QString("x=%1cm  y=%2cm  z=%3cm  ").arg(x, 6, 'f', 1).arg(y, 6, 'f', 1).arg(z, 6, 'f', 1));
+        }
     }
 }
 
 void Petrack::setStatusTime()
 {
     if(mStatusLabelTime)
+    {
         mStatusLabelTime->setText(mAnimation->getTimeString());
+    }
 }
 
 void Petrack::setStatusFPS()
@@ -2122,11 +2280,17 @@ void Petrack::setStatusFPS()
         int    opacity = mPlayerWidget->getPlayerSpeedLimited() ? 128 : 20;
 
         if(diff < -6) // very slow ==> red
+        {
             color.setRgb(200, 0, 0, opacity);
+        }
         else if(diff < -2) // better ==> yellow
+        {
             color.setRgb(200, 200, 0, opacity);
+        }
         else if(diff > -2) // nearly ok ==> green
+        {
             color.setRgb(0, 200, 0, opacity);
+        }
 
         pal.setColor(QPalette::Window, color);
 
@@ -2136,9 +2300,13 @@ void Petrack::setStatusFPS()
 void Petrack::setShowFPS(double fps)
 {
     if((fps == 0.) || (mShowFPS == 0))
+    {
         mShowFPS = fps;
+    }
     else
+    {
         mShowFPS = mShowFPS * .9 + fps * .1; // glaetten durch Hinzunahme des alten Wertes
+    }
     setStatusFPS();
 }
 
@@ -2189,7 +2357,9 @@ void Petrack::updateShowFPS(bool skipped)
 void Petrack::setStatusPosReal() // pos in cm
 {
     if(mImageItem)
+    {
         setStatusPosReal(mImageItem->getPosReal(mMousePosOnImage, getStatusPosRealHeight()));
+    }
 }
 
 void Petrack::setStatusPosReal(const QPointF &pos) // pos in cm
@@ -2221,9 +2391,13 @@ void Petrack::setStatusColor(const QRgb &col)
     QString s("#%1%2%3"); // static moeglich?
     s = s.arg(qRed(col), 2, 16, QChar('0')).arg(qGreen(col), 2, 16, QChar('0')).arg(qBlue(col), 2, 16, QChar('0'));
     if((qRed(col) + qGreen(col) + qBlue(col)) / 3 < 128)
+    {
         mStatusLabelColor->setText(QString("<font color=\"#ffffff\">&nbsp;%1</font>").arg(s));
+    }
     else
+    {
         mStatusLabelColor->setText(QString("<font color=\"#000000\">&nbsp;%1</font>").arg(s));
+    }
 
     QPalette pal = mStatusLabelColor->palette(); // static moeglich?
     QColor   color(qRed(col), qGreen(col), qBlue(col));
@@ -2247,9 +2421,13 @@ void Petrack::setStatusColor()
 double Petrack::getStatusPosRealHeight()
 {
     if(mStatusPosRealHeight)
+    {
         return mStatusPosRealHeight->value();
+    }
     else
+    {
         return 0.;
+    }
 }
 
 /**
@@ -2293,7 +2471,9 @@ void Petrack::writeSettings()
     settings.setValue("seqFileName", mSeqFileName);
     settings.setValue("proFilePath", QFileInfo(mProFileName).path()); // nur path, damit bei saveCurrentProject
     if(!mAutoCalib.isEmptyCalibFiles())                               //! mCalibFiles.isEmpty()
+    {
         settings.setValue("calibFile", mAutoCalib.getCalibFile(0));
+    }
     settings.setValue("controlSplitterSizes", mSplitter->saveState());
 }
 
@@ -2312,14 +2492,22 @@ bool Petrack::maybeSave()
     if(ret == PMessageBox::StandardButton::Yes)
     {
         if(saveSameProject())
+        {
             return true;
+        }
         else
+        {
             return false;
+        }
     }
     else if(ret == PMessageBox::StandardButton::Cancel)
+    {
         return false;
+    }
     else
+    {
         return true;
+    }
 }
 
 void Petrack::closeEvent(QCloseEvent *event)
@@ -2330,7 +2518,9 @@ void Petrack::closeEvent(QCloseEvent *event)
         event->accept();
     }
     else
+    {
         event->ignore();
+    }
 }
 
 /**
@@ -2400,7 +2590,9 @@ void Petrack::updateControlImage(cv::Mat &img)
     static int lastBorderSize = -1;
 
     if(isLoading())
+    {
         lastBorderSize = -1;
+    }
 
     int diffBorderSize = 0;
     int iW             = img.cols;
@@ -2423,7 +2615,9 @@ void Petrack::updateControlImage(cv::Mat &img)
     else
     {
         if(lastBorderSize != -1)
+        {
             diffBorderSize = getImageBorderSize() - lastBorderSize;
+        }
         lastBorderSize = getImageBorderSize();
 
         mControlWidget->setCalibCxValue(cX + diffBorderSize);
@@ -2436,7 +2630,9 @@ void Petrack::importTracker(QString dest) // default = ""
     static QString lastFile;
 
     if(lastFile == "")
+    {
         lastFile = mTrcFileName;
+    }
 
     // if no destination file or folder is given
     if(dest.isEmpty())
@@ -2498,11 +2694,15 @@ void Petrack::importTracker(QString dest) // default = ""
                 in >> sz;
             }
             else
+            {
                 trcVersion = 1;
+            }
 
             if((sz > 0) && (mTracker->size() != 0))
+            {
                 debout << "Warning: Overlapping trajectories will be joined not until tracking adds new trackpoints."
                        << std::endl;
+            }
             for(i = 0; i < sz; ++i)
             {
                 if(trcVersion == 2)
@@ -2678,7 +2878,9 @@ void Petrack::testTracker()
         mControlWidget->testInside->isChecked(),
         mControlWidget->testLength->isChecked());
     if(pers.length() <= idx)
+    {
         idx = 0;
+    }
     if(pers.length() > idx)
     {
         mControlWidget->trackShowOnly->setCheckState(Qt::Checked);
@@ -2720,7 +2922,9 @@ void Petrack::exportTracker(QString dest) // default = ""
     static QString lastFile;
 
     if(lastFile == "")
+    {
         lastFile = mTrcFileName;
+    }
 
     if(mTracker)
     {
@@ -2802,16 +3006,22 @@ void Petrack::exportTracker(QString dest) // default = ""
                 qApp->processEvents();
 
                 if(QFile::exists(dest))
+                {
                     QFile::remove(dest);
+                }
 
                 if(!file.copy(dest))
+                {
                     PCritical(
                         this,
                         tr("PeTrack"),
                         tr("Could not export tracking data.\n"
                            "Please try again!"));
+                }
                 else
+                {
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
+                }
 
                 progress.setValue(mTracker->size() + 1);
 
@@ -2857,9 +3067,13 @@ void Petrack::exportTracker(QString dest) // default = ""
                 if(mControlWidget->trackRecalcHeight->checkState())
                 {
                     if(mControlWidget->getCalibCoordDimension() == 0) // 3D
+                    {
                         ; // Nothing to be done because z already the right height
-                    else  // 2D
+                    }
+                    else // 2D
+                    {
                         mTracker->recalcHeight(mControlWidget->coordAltitude->value());
+                    }
                 }
 #ifdef TIME_MEASUREMENT
                 time1 += clock() - tstart;
@@ -2939,16 +3153,22 @@ void Petrack::exportTracker(QString dest) // default = ""
                 file.close();
 
                 if(QFile::exists(dest))
+                {
                     QFile::remove(dest);
+                }
 
                 if(!file.copy(dest))
+                {
                     PCritical(
                         this,
                         tr("PeTrack"),
                         tr("Could not export tracking data.\n"
                            "Please try again!"));
+                }
                 else
+                {
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
+                }
 
                 std::cout << " finished" << std::endl;
 
@@ -3012,16 +3232,22 @@ void Petrack::exportTracker(QString dest) // default = ""
                 fileDat.close();
 
                 if(QFile::exists(dest))
+                {
                     QFile::remove(dest);
+                }
 
                 if(!fileDat.copy(dest))
+                {
                     PCritical(
                         this,
                         tr("PeTrack"),
                         tr("Could not export tracking data.\n"
                            "Please try again!"));
+                }
                 else
+                {
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
+                }
 
                 std::cout << " finished" << std::endl;
             }
@@ -3088,16 +3314,22 @@ void Petrack::exportTracker(QString dest) // default = ""
                 fileXml.close();
 
                 if(QFile::exists(dest))
+                {
                     QFile::remove(dest);
+                }
 
                 if(!fileXml.copy(dest))
+                {
                     PCritical(
                         this,
                         tr("PeTrack"),
                         tr("Could not export tracking data.\n"
                            "Please try again!"));
+                }
                 else
+                {
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
+                }
 
                 std::cout << " finished" << std::endl;
             }
@@ -3126,7 +3358,9 @@ void Petrack::playAll()
         progress.setValue(++progVal); // mPlayerWidget->getPos()
         qApp->processEvents();
         if(progress.wasCanceled())
+        {
             break;
+        }
     } while(mPlayerWidget->frameForward());
 
     mPlayerWidget->skipToFrame(memPos);
@@ -3167,7 +3401,9 @@ void Petrack::trackAll()
         progress.setValue(++progVal); // mPlayerWidget->getPos()
         qApp->processEvents();
         if(progress.wasCanceled())
+        {
             break;
+        }
     } while(mPlayerWidget->frameForward());
 
     if(mAutoBackTrack)
@@ -3190,12 +3426,18 @@ void Petrack::trackAll()
         do
         {
             if(progVal + 1 < 2 * mAnimation->getNumFrames() - memPos)
+            {
                 progress.setValue(++progVal); // mPlayerWidget->getPos()
+            }
             qApp->processEvents();
             if(progress.wasCanceled())
+            {
                 break;
+            }
             if(mPlayerWidget->getPos() == memPos + 1)
+            {
                 mControlWidget->performRecognition->setCheckState(Qt::Checked);
+            }
         } while(mPlayerWidget->frameBackward());
 
         // bei abbruch koennen es auch mPlayerWidget->getPos() frames sein, die bisher geschrieben wurden
@@ -3203,7 +3445,9 @@ void Petrack::trackAll()
     }
 
     if(mAutoTrackOptimizeColor)
+    {
         mTracker->optimizeColor();
+    }
 
     mControlWidget->performRecognition->setCheckState(memRecoState);
     mControlWidget->trackOnlineCalc->setCheckState(Qt::Unchecked);
@@ -3217,7 +3461,9 @@ int Petrack::winSize(QPointF *pos, int pers, int frame, int level)
     // default of mControlWidget->trackRegionScale->value() is 16, so that
     // a factor of 1.6 of the headsize is used
     if(level == -1)
+    {
         level = mControlWidget->trackRegionLevels->value();
+    }
     return (int) ((getHeadSize(pos, pers, frame) / pow(2., level)) * (mControlWidget->trackRegionScale->value() / 10.));
 }
 
@@ -3263,26 +3509,40 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 #endif
 
         if(imageChanged || swapChanged)
+        {
             mImgFiltered = mSwapFilter.apply(mImgFiltered);
+        }
         else
+        {
             mImgFiltered = mSwapFilter.getLastResult();
+        }
 
         if(imageChanged || swapChanged || brightContrastChanged)
+        {
             mImgFiltered = mBrightContrastFilter.apply(mImgFiltered);
+        }
         else
+        {
             mImgFiltered = mBrightContrastFilter.getLastResult();
+        }
 
         if(imageChanged || swapChanged || brightContrastChanged || borderChanged)
+        {
             mImgFiltered = mBorderFilter.apply(mImgFiltered); // mIplImg
+        }
         else
+        {
             mImgFiltered = mBorderFilter.getLastResult();
+        }
 
 #ifdef TIME_MEASUREMENT
         //        "==========: "
         debout << "nch filter: " << getElapsedTime() << endl;
 #endif
         if(borderChanged)
+        {
             updateControlImage(mImgFiltered);
+        }
 #ifndef STEREO_DISABLED
         if(imageChanged || swapChanged || brightContrastChanged || borderChanged || calibChanged)
         {
@@ -3296,9 +3556,13 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         debout << "vor  calib: " << getElapsedTime() << endl;
 #endif
         if(imageChanged || swapChanged || brightContrastChanged || borderChanged || calibChanged)
+        {
             mImgFiltered = mCalibFilter->apply(mImgFiltered);
+        }
         else
+        {
             mImgFiltered = mCalibFilter->getLastResult();
+        }
 
 #ifdef TIME_MEASUREMENT
         //        "==========: "
@@ -3310,16 +3574,24 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             // abfrage hinzugenommen, damit beim laden von .pet bg-file angegeben werden kann fuer mehrere versuche und
             // beim nachladen von versuch nicht bg geloescht wird
             if(mBackgroundFilter.getFilename() != "")
+            {
                 debout << "Warning: No background reset, because of explicit loaded background image!" << std::endl;
+            }
             else
+            {
                 mBackgroundFilter
                     .reset(); // alle gesammelten hintergrundinfos werden verworfen und bg.changed auf true gesetzt
+            }
         }
 
         if(imageChanged || mBackgroundFilter.changed())
+        {
             mImgFiltered = mBackgroundFilter.apply(mImgFiltered);
+        }
         else
+        {
             mImgFiltered = mBackgroundFilter.getLastResult();
+        }
 
 #ifdef TIME_MEASUREMENT
         //        "==========: "
@@ -3333,8 +3605,10 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             mTracker->clear();
             mTracker->reset();
             if(!isLoading())
+            {
                 debout << "Warning: deleted all tracking pathes because intrinsic parameters have changed."
                        << std::endl;
+            }
         }
         else
         {
@@ -3351,7 +3625,9 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 #endif
         }
         if(borderChanged)
+        {
             borderChangedForTracking = true;
+        }
         // tracking vor recognition, da dann neu gefundene punkte mit getrackten bereits ueberprueft werden koennen
         if((trackChanged() || imageChanged) &&
            (mControlWidget->trackOnlineCalc->checkState() == Qt::Checked)) // borderChanged ???
@@ -3407,7 +3683,9 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             borderChangedForTracking = false;
         }
         else
+        {
             mControlWidget->trackNumberNow->setText(QString("0"));
+        }
         // hier muesste fuer ameisen etc allgemeinABC.getPosList(...)
 
         if(((((lastRecoFrame + mControlWidget->recoStep->value()) <= frameNum) ||
@@ -3423,7 +3701,9 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                 mStereoContext->getDisparity(); // wird nicht neu berechnet, wenn vor tracking schon berechnet wurde
 #endif
             if(borderChanged)
+            {
                 mRecognitionRoiItem->checkRect();
+            }
 
             if(mControlWidget->performRecognition->checkState() == Qt::Checked)
             {
@@ -3461,21 +3741,29 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
                 // folgendes lieber im Anschluss, ggf beim exportieren oder statt test direkt del:
                 if(mStereoContext && mStereoWidget->stereoUseForReco->isChecked())
+                {
                     mTracker->purge(frameNum); // bereinigen wenn weniger als 0.2 recognition und nur getrackt
+                }
 
                 mControlWidget->recoNumberNow->setText(QString("%1").arg(persList.size()));
                 mRecognitionChanged = false;
 
                 if(false) // hier muss Abfage hin ob kasernen marker genutzt wird
+                {
                     mControlWidget->getColorPlot()
                         ->replot(); // oder nur wenn tab offen oder wenn sich mtracker geaendert hat???
+                }
             }
             else
+            {
                 mControlWidget->recoNumberNow->setText(QString("0"));
+            }
             lastRecoFrame = frameNum;
         }
         else
+        {
             mControlWidget->recoNumberNow->setText(QString("0"));
+        }
 
         mControlWidget->trackNumberAll->setText(
             QString("%1").arg(mTracker->size())); // kann sich durch reco und tracker aendern
@@ -3489,7 +3777,9 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         copyToQImage(*mImage, mImgFiltered);
 
         if(borderChanged)
+        {
             mImageItem->setImage(mImage);
+        }
         else
         {
             getScene()->update(); // repaint();
@@ -3533,10 +3823,14 @@ void Petrack::updateSequence()
     // mRecognitionRoiItem->rect().width() != 0 && oldImage == NULL wenn projektdatei eingelesen wird!!!!!
     if((mRecognitionRoiItem->rect().width() == 0) || // default while initialization, after that >= MIN_SIZE
        (oldImage && ((oldImage->width() != mImage->width()) || (oldImage->height() != mImage->height()))))
+    {
         mRecognitionRoiItem->setRect(-getImageBorderSize(), -getImageBorderSize(), mImage->width(), mImage->height());
+    }
     if((mTrackingRoiItem->rect().width() == 0) ||
        (oldImage && ((oldImage->width() != mImage->width()) || (oldImage->height() != mImage->height()))))
+    {
         mTrackingRoiItem->setRect(-getImageBorderSize(), -getImageBorderSize(), mImage->width(), mImage->height());
+    }
 
     cv::Size size2;
     size2.width  = mTrackingRoiItem->rect().width();
@@ -3591,7 +3885,9 @@ void Petrack::setHeadSize(double hS)
                     mCmPerPixel;
     }
     else
+    {
         mHeadSize = hS;
+    }
 }
 // gibt Kopfgroesse zurueck
 // default: (QPointF *pos=NULL, int pers=-1, int frame=-1)
@@ -3627,20 +3923,30 @@ double Petrack::getHeadSize(QPointF *pos, int pers, int frame)
             z = mTracker->at(pers).trackPointAt(frame).sp().z();
             h = mTracker->at(pers).height();
             if(z > 0)
+            {
                 return (HEAD_SIZE * mControlWidget->coordAltitude->value() / z) / getImageItem()->getCmPerPixel();
+            }
             else if(h > MIN_HEIGHT)
+            {
                 return (HEAD_SIZE * mControlWidget->coordAltitude->value() /
                         (mControlWidget->coordAltitude->value() - h)) /
                        getImageItem()->getCmPerPixel();
+            }
             else
+            {
                 return mHeadSize;
+            }
         }
     }
 
     if(pos != nullptr)
+    {
         return mHeadSize; // muss noch aus density map gelesen werden!!!
-    else                  //(pos == NULL) && (pers == -1)
+    }
+    else //(pos == NULL) && (pers == -1)
+    {
         return mHeadSize;
+    }
 }
 
 /**
@@ -3726,7 +4032,9 @@ void Petrack::addManualTrackPointOnlyVisible(const QPointF &pos)
 {
     int pers = addOrMoveManualTrackPoint(pos) + 1;
     if(pers == 0)
+    {
         pers = mTracker->size() + 1;
+    }
     pers = mControlWidget->trackShowOnlyNr->maximum();
     mControlWidget->trackShowOnlyNr->setValue(pers);
     mControlWidget->trackShowOnly->setChecked(true);

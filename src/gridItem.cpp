@@ -47,13 +47,17 @@ QRectF GridItem::boundingRect() const
     // -mMainWindow->getImageBorderSize(), -mMainWindow->getImageBorderSize() TUTS NICHT !!!!!
     // aber setMatrix istr hier nicht so schoen
     if(mMainWindow->getImage())
+    {
         return QRectF(
             -mMainWindow->getImageBorderSize(),
             -mMainWindow->getImageBorderSize(),
             mMainWindow->getImage()->width(),
             mMainWindow->getImage()->height());
+    }
     else
+    {
         return QRectF(0, 0, 0, 0);
+    }
     // FOLGENDE ZEILE HAT FUER ENDLOSSCHLEIFE GESORGT; DA QT INTERN SICH 2 FKT GEGENSEITIG AUFGERUFEN HABEN!!!!!!!!!!
     // return QRectF(0, 0, mMainWindow->getScene()->width(), mMainWindow->getScene()->height());
 }
@@ -107,7 +111,9 @@ void GridItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         }
     }
     else
+    {
         QGraphicsItem::mouseMoveEvent(event); // drag mach ich selber
+    }
 }
 
 void GridItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -283,7 +289,9 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         float m1 = (b2d.y - a2d.y) / (b2d.x - a2d.x), m2 = (d2d.y - c2d.y) / (d2d.x - c2d.x), n1 = a2d.y - m1 * a2d.x,
               n2 = c2d.y - m2 * c2d.x;
         if(debug)
+        {
             debout << "m1=" << m1 << ", m2=" << m2 << ", n1=" << n1 << ", n2=" << n2 << std::endl;
+        }
 
         x = (n2 - n1) / (m1 - m2);
         y = ((m1 * x + n1) + (m2 * x + n2)) / 2.0;
@@ -292,7 +300,9 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
 
 
         if(debug)
+        {
             debout << "Vanish Point (x): (x=" << x << ", y=" << y << ")" << std::endl;
+        }
 
         // create 2 parallel lines in y-direction
         a3d = cv::Point3f(-500, -500, 0), b3d = cv::Point3f(-500, 500, 0), c3d = cv::Point3f(500, -500, 0),
@@ -317,7 +327,9 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         n2 = c2d.y - m2 * c2d.x;
 
         if(debug)
+        {
             debout << "m1=" << m1 << ", m2=" << m2 << ", n1=" << n1 << ", n2=" << n2 << std::endl;
+        }
 
         x            = (n2 - n1) / (m1 - m2);
         y            = ((m1 * x + n1) + (m2 * x + n2)) / 2.0;
@@ -325,7 +337,9 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
 
 
         if(debug)
+        {
             debout << "Vanish Point: (x=" << x << ", y=" << y << ")" << std::endl;
+        }
 
         vanishPointYIsInsideImage = !extCalib->isOutsideImage(vanishPointY);
         vanishPointXIsInsideImage = !extCalib->isOutsideImage(vanishPointX);
@@ -333,12 +347,16 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         if(vanishPointYIsInsideImage)
         {
             if(debug)
+            {
                 debout << "Vanish Point 1 is inside the image!" << std::endl;
+            }
         }
         if(vanishPointXIsInsideImage)
         {
             if(debug)
+            {
                 debout << "Vanish Point 2 is inside the image!" << std::endl;
+            }
         }
 
 
@@ -375,7 +393,9 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         QPointF    pnt1, pnt2; // floating point
         int        bS = mMainWindow->getImageBorderSize();
         if(debug)
+        {
             debout << "Border-Size: " << bS << std::endl;
+        }
         int iW, iH;
         int maxExp;
 
@@ -392,7 +412,9 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         maxExp = iH > iW ? iH : iW;
 
         if(debug)
+        {
             debout << "Image-Size: " << iW << "x" << iH << std::endl;
+        }
 
 
         if(mControlWidget->getCalibGridDimension() == 1)
@@ -467,7 +489,9 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
                 }
 
                 if(debug)
+                {
                     std::cout << "y_offset: " << y_offset << std::endl;
+                }
                 cv::Point3f points[4];
                 // top left corner
                 points[0] = extCalib->get3DPoint(cv::Point2f(0 - bS, y_offset), tZ3D);
@@ -479,8 +503,10 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
                 points[3] = extCalib->get3DPoint(cv::Point2f(iW, iH), tZ3D);
 
                 if(debug)
+                {
                     debout << "iW: " << iW << " iH: " << iH << " bS: " << bS << " y_offset: " << y_offset
                            << " tZ3D: " << tZ3D << std::endl;
+                }
 
 
                 painter->setPen(Qt::green);
@@ -491,21 +517,29 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
                     y = points[i].y;
 
                     if(debug)
+                    {
                         debout << "x: " << x << " y: " << y << std::endl;
+                    }
 
                     max_x = x > max_x ? x : max_x;
                     min_x = x < min_x ? x : min_x;
                     max_y = y > max_y ? y : max_y;
                     min_y = y < min_y ? y : min_y;
                     if(debug)
+                    {
                         std::cout << ">>>" << points[i].x << ", " << points[i].y << ", " << points[i].z << std::endl;
+                    }
                 }
 
 
                 if(debug)
+                {
                     std::cout << "X: min=" << min_x << " min:" << max_x << std::endl;
+                }
                 if(debug)
+                {
                     std::cout << "Y: min=" << min_y << " max:" << max_y << std::endl;
+                }
 
                 cv::Point3f ursprung(0, 0, 0);
 
@@ -591,9 +625,11 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
                                                        // (Das Grid soll aber unabhngig davon gezeichnet werden)
 
                     if(debug)
+                    {
                         debout << "Grid x: " << tX3D << " y: " << tY3D << " z: " << tZ3D << " y_offset: " << y_offset
                                << " bS: " << bS << " iW: " << iW << " iH: " << iH << " min_x: " << min_x
                                << " max_x: " << max_x << " min_y: " << min_y << " max_y: " << max_y << std::endl;
+                    }
 
                     // horizontal lines from the left to the right on height tZ3D the lines start from origin point
                     // (tY3D) until max_y or if tY3D < min_y it starts with min_y because otherwise it is outside the

@@ -64,56 +64,72 @@ private slots:
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
 
     void on_useOpen_stateChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
 
     void on_useClose_stateChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
 
     void on_closeRadius_valueChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
 
     void on_openRadius_valueChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
 
     void on_minArea_valueChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
 
     void on_maxArea_valueChanged(int /*i*/)
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
 
     void on_maxRatio_valueChanged(double /*d*/)
     {
         mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
         if(!mMainWindow->isLoading())
+        {
             mMainWindow->updateImage();
+        }
     }
 
     void on_fromTriangle_colorChanged(const QColor &col);

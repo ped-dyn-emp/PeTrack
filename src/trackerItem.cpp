@@ -52,13 +52,17 @@ TrackerItem::TrackerItem(QWidget *wParent, Tracker *tracker, QGraphicsItem *pare
 QRectF TrackerItem::boundingRect() const
 {
     if(mMainWindow->getImage())
+    {
         return QRectF(
             -mMainWindow->getImageBorderSize(),
             -mMainWindow->getImageBorderSize(),
             mMainWindow->getImage()->width(),
             mMainWindow->getImage()->height());
+    }
     else
+    {
         return QRectF(0, 0, 0, 0);
+    }
 }
 void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
@@ -122,7 +126,9 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             if(height < MIN_HEIGHT + 1)
             {
                 if(tp.color().isValid())
+                {
                     height = mControlWidget->getColorPlot()->map(tp.color());
+                }
             }
             else
             {
@@ -139,7 +145,9 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             delPastTrj   = menu.addAction("Delete future part of the trajectory");
             setHeight    = menu.addAction("Set person height");
             if(height_set_by_user)
+            {
                 resetHeight = menu.addAction("Reset height");
+            }
             addComment = menu.addAction("Edit comment");
         }
         else
@@ -303,9 +311,13 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     ellipsePen.setWidth(3);
 
     if(mControlWidget->trackNumberBold->checkState() == Qt::Checked)
+    {
         font.setBold(true);
+    }
     else
+    {
         font.setBold(false);
+    }
     font.setPixelSize(mControlWidget->trackNumberSize->value());
     heightFont.setPixelSize(mControlWidget->trackColColorSize->value());
     painter->setFont(font);
@@ -352,16 +364,22 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
             if(mTracker->at(i).trackPointExist(curFrame))
             {
                 if(mControlWidget->trackHeadSized->checkState() == Qt::Checked)
+                {
                     pSP = mMainWindow->getHeadSize(nullptr, i, curFrame); // headSize;
+                }
                 const TrackPoint &tp = (*mTracker)[i][curFrame - mTracker->at(i).firstFrame()];
                 if(mControlWidget->trackShowCurrentPoint->checkState() ==
                    Qt::Checked) //(mControlWidget->recoShowColor->checkState() == Qt::Checked)
                 {
                     painter->setBrush(Qt::NoBrush);
                     if(mTracker->at(i).newReco())
+                    {
                         painter->setPen(Qt::green);
+                    }
                     else
+                    {
                         painter->setPen(Qt::blue);
+                    }
                     rect.setRect(tp.x() - pSP / 2., tp.y() - pSP / 2., pSP, pSP);
                     painter->drawEllipse(rect); // direkt waere nur int erlaubt tp.x()-5., tp.y()-5., 10., 10.
                 }
@@ -372,7 +390,9 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     painter->setPen(Qt::yellow);
                     hS = mMainWindow->winSize(nullptr, i, curFrame);
                     if(hS < 2)
+                    {
                         hS = 2; // entspricht Vorgehen in tracker.cpp
+                    }
                     for(int j = 0; j <= mControlWidget->trackRegionLevels->value(); ++j)
                     {
                         rect.setRect(tp.x() - hS / 2., tp.y() - hS / 2., hS, hS);
@@ -409,7 +429,9 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         normalVector = (tp - tp.colPoint()).normal();
                         normalVector.normalize();
                         if(normalVector.length() < .001) // wenn to und colpoint aufeinander liegen z bei colorMarker!
+                        {
                             normalVector.set(1., 0.);
+                        }
                     }
                     else
                     {
@@ -417,23 +439,27 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         normalVector.set(1., 0.);
                         // den vorherigen trackpoint finden, wo reco farbe erzeugt hat und somit colpoint vorliegt
                         for(int j = curFrame - mTracker->at(i).firstFrame(); j > -1; --j)
+                        {
                             if(mTracker->at(i).at(j).color().isValid())
                             {
                                 normalVector = (mTracker->at(i).at(j) - mTracker->at(i).at(j).colPoint()).normal();
                                 normalVector.normalize();
                                 break;
                             }
+                        }
                         // einen nachfolgenden trackpoint suchen, wenn vorher keiner mit farbe war
                         // zB wenn rueckwaerts abgespielt wird
                         if((normalVector.x() == 1.) && (normalVector.y() == 0.))
                         {
                             for(int j = curFrame - mTracker->at(i).firstFrame() + 1; j < mTracker->at(i).size(); ++j)
+                            {
                                 if(mTracker->at(i).at(j).color().isValid())
                                 {
                                     normalVector = (mTracker->at(i).at(j) - mTracker->at(i).at(j).colPoint()).normal();
                                     normalVector.normalize();
                                     break;
                                 }
+                            }
                         }
                     }
                 }
@@ -487,34 +513,42 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         if(height < MIN_HEIGHT + 1)
                         {
                             if(mControlWidget->getCalibCoordDimension() == 0) // 3D
+                            {
                                 painter->drawText(
                                     rect,
                                     Qt::AlignHCenter,
                                     QString("-\n%2").arg(
                                         -mControlWidget->getCalibExtrTrans3() - tp.sp().z(), 6, 'f', 1));
+                            }
                             else
+                            {
                                 painter->drawText(
                                     rect,
                                     Qt::AlignHCenter,
                                     QString("-\n%2").arg(
                                         mControlWidget->coordAltitude->value() - tp.sp().z(), 6, 'f', 1));
+                            }
                         }
                         else
                         {
                             if(mControlWidget->getCalibCoordDimension() == 0) // 3D
+                            {
                                 painter->drawText(
                                     rect,
                                     Qt::AlignHCenter,
                                     QString("%1\n%2")
                                         .arg(height, 6, 'f', 1)
                                         .arg(-mControlWidget->getCalibExtrTrans3() - tp.sp().z(), 6, 'f', 1));
+                            }
                             else
+                            {
                                 painter->drawText(
                                     rect,
                                     Qt::AlignHCenter,
                                     QString("%1\n%2")
                                         .arg(height, 6, 'f', 1)
                                         .arg(mControlWidget->coordAltitude->value() - tp.sp().z(), 6, 'f', 1));
+                            }
                         }
                     }
                     else
@@ -560,11 +594,15 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         else
                         {
                             if(tp.sp().z() > 0)
+                            {
                                 p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(
                                     cv::Point2f(tp.x(), tp.y()), -mControlWidget->getCalibExtrTrans3() - tp.sp().z());
+                            }
                             else
+                            {
                                 p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(
                                     cv::Point2f(tp.x(), tp.y()), height /*mControlWidget->mapDefaultHeight->value()*/);
+                            }
                         }
                         p3d_height.z           = 0;
                         cv::Point2f p2d_ground = mMainWindow->getExtrCalibration()->getImagePoint(p3d_height);
@@ -599,11 +637,15 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         else
                         {
                             if(tp.sp().z() > 0)
+                            {
                                 p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(
                                     cv::Point2f(tp.x(), tp.y()), -mControlWidget->getCalibExtrTrans3() - tp.sp().z());
+                            }
                             else
+                            {
                                 p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(
                                     cv::Point2f(tp.x(), tp.y()), height /*mControlWidget->mapDefaultHeight->value()*/);
+                            }
                         }
 
                         debout << "insert P(" << p3d_height.x + x_offset << ", " << p3d_height.y + y_offset
@@ -624,20 +666,28 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 (mControlWidget->trackShowOnlyVisible->checkState() == Qt::Unchecked)))
             {
                 if(mControlWidget->trackShowBefore->value() == -1)
+                {
                     from = 0;
+                }
                 else
                 {
                     from = curFrame - mTracker->at(i).firstFrame() - mControlWidget->trackShowBefore->value();
                     if(from < 0)
+                    {
                         from = 0;
+                    }
                 }
                 if(mControlWidget->trackShowAfter->value() == -1)
+                {
                     to = mTracker->at(i).size();
+                }
                 else
                 {
                     to = curFrame - mTracker->at(i).firstFrame() + mControlWidget->trackShowAfter->value() + 1;
                     if(to > mTracker->at(i).size())
+                    {
                         to = mTracker->at(i).size();
+                    }
                 }
                 for(int j = from; j < to; ++j) // ueber TrackPoint
                 {
@@ -653,10 +703,14 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                             // die Unterscheidung ist noetig, da Qt sonst grosses quadrat beim ranzoomen zeichnet
                             if((mTracker->at(i).at(j - 1).toQPointF().x() != mTracker->at(i).at(j).toQPointF().x()) ||
                                (mTracker->at(i).at(j - 1).toQPointF().y() != mTracker->at(i).at(j).toQPointF().y()))
+                            {
                                 painter->drawLine(
                                     mTracker->at(i).at(j - 1).toQPointF(), mTracker->at(i).at(j).toQPointF());
+                            }
                             else
+                            {
                                 painter->drawPoint(mTracker->at(i).at(j - 1).toQPointF());
+                            }
                         }
                     }
                     // path on ground
@@ -709,10 +763,14 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                 // nur Linie zeichnen, wenn x oder y sich unterscheidet, sonst Punkt
                                 // die Unterscheidung ist noetig, da Qt sonst grosses quadrat beim ranzoomen zeichnet
                                 if(p2d_ground_p1.x != p2d_ground_p2.x || p2d_ground_p1.y != p2d_ground_p2.y)
+                                {
                                     painter->drawLine(
                                         QLineF(p2d_ground_p1.x, p2d_ground_p1.y, p2d_ground_p2.x, p2d_ground_p2.y));
+                                }
                                 else
+                                {
                                     painter->drawPoint(p2d_ground_p1.x, p2d_ground_p1.y);
+                                }
                             }
                             else // 2D
                             {
@@ -897,7 +955,9 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
             painter->setBrush(color);
             painter->setPen(Qt::black);
             if(ifacet2D.size() == 0)
+            {
                 painter->drawEllipse(QPointF(center2D.x, center2D.y), 100, 100);
+            }
             painter->drawConvexPolygon(QPolygonF(ifacet_vec));
 
             // voronoi cell point

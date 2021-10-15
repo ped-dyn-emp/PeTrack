@@ -43,13 +43,21 @@ cv::Mat SwapFilter::act(cv::Mat &img, cv::Mat &res)
     bool sH = (bool) mSwapHorizontally.getValue();
 
     if(sV && sH)
+    {
         cv::flip(img, res, -1); // both
+    }
     else if(sV)
+    {
         cv::flip(img, res, 0); // vertical
+    }
     else if(sH)
+    {
         cv::flip(img, res, 1); // horizontal
+    }
     else
+    {
         res = img; // nothing to do
+    }
 
 
     return res;

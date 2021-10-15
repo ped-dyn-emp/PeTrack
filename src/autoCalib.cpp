@@ -66,9 +66,13 @@ void AutoCalib::addCalibFile(const QString &f)
 QString AutoCalib::getCalibFile(int i)
 {
     if(i < mCalibFiles.size())
+    {
         return mCalibFiles.at(i);
+    }
     else
+    {
         return QString();
+    }
 }
 
 QStringList AutoCalib::getCalibFiles()
@@ -88,7 +92,9 @@ bool AutoCalib::openCalibFiles()
         static QString lastDir;
 
         if(!mCalibFiles.isEmpty())
+        {
             lastDir = QFileInfo(mCalibFiles.first()).path();
+        }
 
         QStringList calibFiles = QFileDialog::getOpenFileNames(
             mMainWindow,
@@ -144,7 +150,9 @@ void AutoCalib::autoCalib()
 
 #ifdef SHOW_CALIB_MAINWINDOW
         if(!mMainWindow->getImg().empty())
+        {
             origImg = mMainWindow->getImg().clone(); // must be cloned, because mIplImg will be deleted in updateImage
+        }
 #endif
 
         QProgressDialog progress(
@@ -160,7 +168,9 @@ void AutoCalib::autoCalib()
             progress.setValue(i);
             qApp->processEvents();
             if(progress.wasCanceled())
+            {
                 break;
+            }
 
             // cannot load image
             view = cv::imread(mCalibFiles.at(i).toStdString(), cv::IMREAD_COLOR);
@@ -183,7 +193,9 @@ void AutoCalib::autoCalib()
 
             // muss nur bei einem bild gemacht werden
             if(i == 0)
+            {
                 imgSize = cv::Size(view.rows, view.cols);
+            }
 
             // search for chessboard corners
             found = findChessboardCorners(view, board_size, corners, cv::CALIB_CB_ADAPTIVE_THRESH);
@@ -215,7 +227,9 @@ void AutoCalib::autoCalib()
                 min_one_pattern_found = true;
             }
             else
+            {
                 debout << "Calibration pattern not found in: " << mCalibFiles.at(i).toStdString() << std::endl;
+            }
         }
 
         if(!min_one_pattern_found)
@@ -232,12 +246,19 @@ void AutoCalib::autoCalib()
 
         // set flags for calibration
         if(mControlWidget->quadAspectRatio->isChecked())
+        {
             flags |= CV_CALIB_FIX_ASPECT_RATIO; // durch setzen von aspect_ratio kann fix ascpect anders als 1:1
                                                 // eingestellt werden
+        }
+
         if(mControlWidget->fixCenter->isChecked())
+        {
             flags |= CV_CALIB_FIX_PRINCIPAL_POINT;
+        }
         if(!mControlWidget->tangDist->isChecked())
+        {
             flags |= CV_CALIB_ZERO_TANGENT_DIST;
+        }
         // run calibration
 
         bool ok = runCalibration(

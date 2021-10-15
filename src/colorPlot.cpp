@@ -72,6 +72,7 @@ public:
         if(model == 0) // HSV
         {
             for(i = 0; i < (x == 0 ? 360 : 256); ++i)
+            {
                 for(j = 0; j < (y == 0 ? 360 : 256); ++j)
                 {
                     col.setHsv(
@@ -80,10 +81,12 @@ public:
                         x == 2 ? (y == 2 ? std::min(i, j) : i) : (y == 2 ? j : z));
                     mImage->setPixel(i, (y == 0 ? 359 : 255) - j, col.rgb());
                 }
+            }
         }
         else // RGB
         {
             for(i = 0; i < 256; ++i)
+            {
                 for(j = 0; j < 256; ++j)
                 {
                     col.setRgb(
@@ -92,6 +95,7 @@ public:
                         x == 2 ? (y == 2 ? std::min(i, j) : i) : (y == 2 ? j : z));
                     mImage->setPixel(i, 255 - j, col.rgb());
                 }
+            }
         }
     }
 
@@ -156,9 +160,13 @@ void TrackerPlotItem::draw(QPainter *p, const QwtScaleMap &mapX, const QwtScaleM
 
                 p->setBrush(QBrush((*mTracker)[i].color()));
                 if(((ColorPlot *) plot())->isGrey((*mTracker)[i].color()))
+                {
                     p->setPen(Qt::red);
+                }
                 else
+                {
                     p->setPen(mPen);
+                }
 
                 p->drawEllipse(rect);
             }
@@ -217,14 +225,22 @@ double RectPlotItem::map(const QColor &col) const // const TrackPerson &tp RectM
             contains = map.contains(((ColorPlot *) plot())->getPos(col));
         }
         if(!isGrey && map.colored() && contains)
+        {
             return map.mapHeight();
+        }
         else if(isGrey && !map.colored() && contains)
+        {
             return map.mapHeight();
+        }
         else if(!isGrey && !map.colored() && contains && fallback == -1) // fallback == -1 damit der erste gefundene
                                                                          // genommen wird
+        {
             fallback = map.mapHeight();
+        }
         else if(isGrey && map.colored() && contains && fallback == -1)
+        {
             fallback = map.mapHeight();
+        }
     }
     return fallback; // -1 soll anzeigen, dass nichts gefunden wurde
 }
@@ -245,17 +261,25 @@ int RectPlotItem::addMap(
     mMaps.last().setToColor(toCol);
     mMaps.last().setInvHue(invHue);
     if(mActIndex < 0)
+    {
         mActIndex = 0;
+    }
     return mMaps.size() - 1;
 }
 int RectPlotItem::addMap()
 {
     if(mMaps.size() > 0)
+    {
         mMaps.append(mMaps.last());
+    }
     else
+    {
         mMaps.append(RectMap(0, 0, 0, 0, true, DEFAULT_HEIGHT));
+    }
     if(mActIndex < 0)
+    {
         mActIndex = 0;
+    }
     return mMaps.size() - 1;
 }
 
@@ -347,9 +371,13 @@ QColor RectPlotItem::getActMapFromColor()
 RectMap RectPlotItem::getMap(int index) const
 {
     if(index >= 0 && index < mMaps.size())
+    {
         return mMaps[index];
+    }
     else
+    {
         return RectMap();
+    }
 }
 
 /**
@@ -382,11 +410,17 @@ void RectPlotItem::draw(QPainter *p, const QwtScaleMap &mapX, const QwtScaleMap 
     for(i = 0; i < mMaps.size(); ++i)
     {
         if(i == mActIndex)
+        {
             p->setPen(Qt::green);
+        }
         else if(!mMaps[i].colored())
+        {
             p->setPen(Qt::red);
+        }
         else
+        {
             p->setPen(mPen);
+        }
 
         if(mMaps[i].invHue())
         {
@@ -617,9 +651,13 @@ double ColorPlot::map(const QColor &col) const
 {
     double height = mRectItem->map(col);
     if(height < 0)
+    {
         return mControlWidget->mapDefaultHeight->value();
+    }
     else
+    {
         return height;
+    }
 }
 
 // gibt false zurueck, wenn es keine groessenverteilung ueber farbe gab
@@ -644,7 +682,9 @@ bool ColorPlot::printDistribution() const
         ++j;
     }
     if(anz == 0)
+    {
         return false;
+    }
     j = dict.constBegin();
     while(j != dict.constEnd())
     {
@@ -659,9 +699,13 @@ bool ColorPlot::isGrey(const QColor &col) const
 {
     if(abs(col.red() - col.green()) < mGreyDiff && abs(col.green() - col.blue()) < mGreyDiff &&
        abs(col.blue() - col.red()) < mGreyDiff)
+    {
         return true;
+    }
     else
+    {
         return false;
+    }
 }
 
 void ColorPlot::setCursor(const QColor &col)
@@ -696,49 +740,85 @@ QPoint ColorPlot::getPos(const QColor &col, int *z) const
         if(mControlWidget->recoColorModel->currentIndex() == 0) // HSV
         {
             if(x == 0) // nicht setX und setY, weil das width und height anpasst
+            {
                 p.setX(col.hue());
+            }
             else if(x == 1)
+            {
                 p.setX(col.saturation());
+            }
             else
+            {
                 p.setX(col.value());
+            }
             if(y == 0)
+            {
                 p.setY(ymax - col.hue());
+            }
             else if(y == 1)
+            {
                 p.setY(ymax - col.saturation());
+            }
             else
+            {
                 p.setY(ymax - col.value());
+            }
             if(z != nullptr)
             {
                 if(x != 0 && y != 0)
+                {
                     *z = col.hue();
+                }
                 else if(x != 1 && y != 1)
+                {
                     *z = col.saturation();
+                }
                 else
+                {
                     *z = col.value();
+                }
             }
         }
         else // RGB
         {
             if(x == 0)
+            {
                 p.setX(col.red());
+            }
             else if(x == 1)
+            {
                 p.setX(col.green());
+            }
             else
+            {
                 p.setX(col.blue());
+            }
             if(y == 0)
+            {
                 p.setY(ymax - col.red());
+            }
             else if(y == 1)
+            {
                 p.setY(ymax - col.green());
+            }
             else
+            {
                 p.setY(ymax - col.blue());
+            }
             if(z != nullptr)
             {
                 if(x != 0 && y != 0)
+                {
                     *z = col.red();
+                }
                 else if(x != 1 && y != 1)
+                {
                     *z = col.green();
+                }
                 else
+                {
                     *z = col.blue();
+                }
             }
         }
     }
@@ -771,9 +851,13 @@ void ColorPlot::setScale()
         if(model == 0) // HSV
         {
             if(x == 0)
+            {
                 mXMax = 359.;
+            }
             if(y == 0)
+            {
                 mYMax = 359.;
+            }
         }
 
         setAxisScale(QwtPlot::xBottom, 0., mXMax);
@@ -826,9 +910,13 @@ void ColorPlot::generateImage()
 int ColorPlot::zValue() const
 {
     if(mControlWidget)
+    {
         return mControlWidget->recoColorZ->value();
+    }
     else
+    {
         return 0;
+    }
 }
 
 #include "moc_colorPlot.cpp"

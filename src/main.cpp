@@ -93,9 +93,13 @@ int main(int argc, char *argv[])
             return 0; // 0 means exit success // 1?
         }
         else if(arg.at(i) == "-project")
+        {
             project = arg.at(++i);
+        }
         else if(arg.at(i) == "-sequence")
+        {
             sequence = arg.at(++i);
+        }
         else if((arg.at(i) == "-autoSave") || (arg.at(i) == "-autosave"))
         {
             autoSave     = true;
@@ -118,7 +122,9 @@ int main(int argc, char *argv[])
         {
             // -project option ueberschreibt *.pet uebergabe ohne option!!
             if(project.isEmpty())
+            {
                 project = arg.at(i);
+            }
         }
         else if((arg.at(i) == "-autoReadMarkerID") || (arg.at(i) == "-autoreadmarkerid"))
         {
@@ -168,21 +174,31 @@ int main(int argc, char *argv[])
     if(!project.isEmpty())
     {
         if(sequence.isEmpty())
+        {
             petrack.openProject(project);
+        }
         else
+        {
             petrack.openProject(project, false);
+        }
     }
     if(!sequence.isEmpty()) // nach project so dass dies datei in project ueberschreibt
+    {
         petrack.openSequence(sequence);
+    }
     if(autoSave && (autoSaveDest.right(4) != ".pet"))
     {
         if((autoSaveDest.right(4) == ".txt") || (autoSaveDest.right(5) == ".trav") || (autoSaveDest.right(4) == ".dat"))
+        {
             petrack.exportTracker(autoSaveDest); // projekt wird geladen und nur Trajektoprien herausgeschrieben (zB
                                                  // wenn sich .pet (altitude) oder .trc aendert (delrec))
+        }
         else
+        {
             petrack.saveSequence(
                 true, false, autoSaveDest); // true spielt keine rolle, sondern wird durch dateiendung bestimmt
-        return EXIT_SUCCESS;                // 0 means exit success// Programm beenden nach speichern! // 1?
+        }
+        return EXIT_SUCCESS; // 0 means exit success// Programm beenden nach speichern! // 1?
     }
     // hat tracker_file bestimmte Dateiendung txt oder trc, dann wird nur genau diese exportiert, sonst beide
     if(autoTrack)

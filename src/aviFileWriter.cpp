@@ -155,18 +155,20 @@ bool AviFileWriter::open(const char *pszFilename, int iCols, int iRows, int ibpp
     }
 
     if(m_pTempBMPBuffer == nullptr || m_pTempBuffer == nullptr)
+    {
         return false;
+    }
 
-        //
-        // If this function is called from openSizeLimitedAVI(), pszFilename
-        // is the file to open. m_szAVIDestFile should not be changed because
-        // it is the base file name used in appendFrame() to generate the next
-        // split file name.
-        //
-        // If this function is called directly (not by openSizeLimitedAVI()),
-        // the AVI file can not be splited and m_szAVIDestFile is not used.
-        // So we do not need to save the file name to m_szAVIDestFile.
-        //
+    //
+    // If this function is called from openSizeLimitedAVI(), pszFilename
+    // is the file to open. m_szAVIDestFile should not be changed because
+    // it is the base file name used in appendFrame() to generate the next
+    // split file name.
+    //
+    // If this function is called directly (not by openSizeLimitedAVI()),
+    // the AVI file can not be splited and m_szAVIDestFile is not used.
+    // So we do not need to save the file name to m_szAVIDestFile.
+    //
 #if 0
    sprintf(m_szAVIDestFile, "%s", pszFilename );
 
@@ -260,7 +262,9 @@ bool AviFileWriter::appendFrame(const unsigned char *pBuffer, bool /*bInvert*/)
             szAVIFile = stringStream.str();
 
             if(!open(szAVIFile.c_str(), m_iCols, m_iRows, m_iBPP, m_frameRate))
+            {
                 return false;
+            }
         }
     }
 
