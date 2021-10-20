@@ -42,7 +42,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="../icons/icons.qrc">:/petrack.icns</pixmap>
+    <pixmap resource="../icons/icons.qrc">:/icon</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>

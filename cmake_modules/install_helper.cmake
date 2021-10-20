@@ -1,19 +1,13 @@
 #########################################################
 #                    INSTALL                            #
 #########################################################
-
 include(InstallRequiredSystemLibraries)
 include(GNUInstallDirs)
 
-install(TARGETS petrack)
+install(TARGETS petrack
+    BUNDLE DESTINATION .
+)
 
-# install Qwt and OpenCV
-install(CODE "
-include(BundleUtilities)
-fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/petrack${CMAKE_EXECUTABLE_SUFFIX}\"  \"\" \"\")
-")
-
-# NOTE: For Future Mac installer, use macdeployqt utility (think about the licenses as well)
 if (WIN32)
     # Install Qt dlls
     set (WINDEPLOYQT_APP \"${Qt5Core_DIR}/../../../bin/windeployqt\")
@@ -29,10 +23,43 @@ if (WIN32)
     install(DIRECTORY "${OpenCV_DIR}/etc/licenses" DESTINATION "Licenses/OpenCV_Licenses")
     install(FILES "${OpenCV_DIR}/LICENSE/" DESTINATION "Licenses/OpenCV_Licenses")
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/ezc3d/LICENSE" DESTINATION "Licenses/ezc3d_license/")
+    install(FILES "${CMAKE_SOURCE_DIR}/.zenodo.json" DESTINATION "bin")
+
+    # install Qwt and OpenCV
+    install(CODE "
+        include(BundleUtilities)
+        fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/petrack${CMAKE_EXECUTABLE_SUFFIX}\"  \"\" \"\")
+    ")
+
+elseif(APPLE)
+    set_target_properties(petrack PROPERTIES
+        MACOSX_BUNDLE_BUNDLE_VERSION       "${PROJECT_VERSION}"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
+    )
+
+    set_target_properties(petrack PROPERTIES
+        INSTALL_RPATH @executable_path/../Frameworks
+    )
+
+     install(CODE [[
+         include(BundleUtilities)
+
+         # This string is crazy-long enough that it's worth folding into a var...
+         set (_plugin_file "$<TARGET_FILE_NAME:Qt5::QCocoaIntegrationPlugin>")
+
+         # Ditto the output paths for our installation
+         set (_appdir "${CMAKE_INSTALL_PREFIX}/petrack.app")
+         set (_outdir "${_appdir}/Contents/PlugIns/platforms")
+
+         file(INSTALL DESTINATION "${_outdir}"
+           TYPE FILE FILES "$<TARGET_FILE:Qt5::QCocoaIntegrationPlugin>")
+
+         fixup_bundle("${_appdir}/Contents/MacOS/petrack" "${_outdir}/${_plugin_file}" "")
+     ]] COMPONENT Runtime)
+
 endif()
 
 install(FILES "${CMAKE_SOURCE_DIR}/ReadMe.md" "${CMAKE_SOURCE_DIR}/LICENSE" DESTINATION ".")
-install(FILES "${CMAKE_SOURCE_DIR}/.zenodo.json" DESTINATION "bin")
 
 ##################################################################
 #                         PACKAGE                                #
@@ -51,7 +78,6 @@ set(CPACK_PACKAGE_EXECUTABLES "petrack;PeTrack")
 set(CPACK_MONOLITHIC_INSTALL TRUE)
 set(CPACK_CREATE_DESKTOP_LINKS petrack)
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
-
 
 if(WIN32)
     set(CPACK_GENERATOR "NSIS" CACHE STRING "Generator used by CPack")
@@ -90,12 +116,16 @@ if(WIN32)
       DeleteRegValue HKLM 'SOFTWARE\\\\WOW6432Node\\\\RegisteredApplications' 'petrack'
       DeleteRegKey HKCU 'Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Explorer\\\\FileExts\\\\.pet'
     ")
+elseif(APPLE)
+    set(CPACK_GENERATOR "DragNDrop" CACHE STRING "Generator used by CPack")
+
+    SET(MACOSX_BUNDLE_ICON_FILE petrack.icns)
+    SET(MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2015-2021 Forschungszentrum Juelich. All rights reserved.")
+    SET(MACOSX_BUNDLE_INFO_STRING "PeTrack is a software for the automated extraction of pedestrian trajectories from videos.")
+    SET(MACOSX_BUNDLE_BUNDLE_NAME "PeTrack")
+    SET(MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}")
+    SET(MACOSX_BUNDLE_LONG_VERSION_STRING "version ${PROJECT_VERSION}")
+    SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
 endif()
 
 include(CPack)
-
-
-
-
-
-

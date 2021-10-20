@@ -8,6 +8,7 @@
 # petrack options:
 # -DUSE_3RD_PARTY=ON (default ON on Windows, OFF else) use the libraries provided in 3rdparty
 # -DBUILD_UNIT_TESTS=ON (default ON) for unit tests
+# -DBUILD_BUNDLE=ON (default OFF) builds a MacOS Bundle for deployment
 #
 # currently not supported:
 # -DSTEREO=ON (default OFF)
@@ -41,6 +42,17 @@ check_prefix_path()
 include(CMakeDependentOption)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+# use, i.e. don't skip the full RPATH for the build tree
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+
+# when building, don't use the install RPATH already
+# (but later on when installing)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_INSTALL_RPATH @executable_path/../Frameworks)
+
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ################################################################################
 # Optional features
 ################################################################################
@@ -58,6 +70,9 @@ print_var(BUILD_UNIT_TESTS)
 
 CMAKE_DEPENDENT_OPTION(USE_3RD_PARTY "Use the default libraries provided in 3rd party" ON WIN32 OFF)
 print_var(USE_3RD_PARTY)
+
+option(BUILD_BUNDLE "Builds a MacOS Bundle for deployment" OFF)
+print_var(BUILD_BUNDLE)
 
 ################################################################################
 # Compilation flags
@@ -98,6 +113,10 @@ endif()
 # Stero only allowed
 if (NOT DISABLE_STEREO OR STEREO)
   message(FATAL_ERROR "Currently the stereo feature needs to be disabled.")
+endif()
+
+if (NOT APPLE AND BUILD_BUNDLE)
+  message(WARNING "The BUILD_BUNDLE is only available on MacOS. And will be ignored otherwise.")
 endif()
 
 ################################################################################
@@ -161,11 +180,31 @@ set(CMAKE_AUTORCC ON)
 set(AUTOGEN_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/${NAME}_autogen")
 
 #**********************************************************
-# Create library and exectuable                           *
+# Create library and executable                           *
 #**********************************************************
 get_git_info()
 add_library(petrack_core STATIC)
-add_executable(petrack src/main.cpp)
+
+set(author_file "${CMAKE_SOURCE_DIR}/.zenodo.json")
+
+if (BUILD_BUNDLE)
+    set(app_icon_macos "${CMAKE_SOURCE_DIR}/petrack.icns" "${CMAKE_SOURCE_DIR}/qt.conf")
+
+    set_source_files_properties(${app_icon_macos} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    set_source_files_properties("${author_file}" PROPERTIES MACOSX_PACKAGE_LOCATION "MacOS")
+
+    add_executable(petrack
+        MACOSX_BUNDLE
+        src/main.cpp ${app_icon_macos} ${author_file}
+    )
+else()
+    configure_file("${author_file}" "${CMAKE_CURRENT_BINARY_DIR}" COPYONLY)
+
+    add_executable(petrack
+        src/main.cpp
+    )
+endif()
+
 target_link_libraries(petrack PRIVATE petrack_core git-info)
 target_compile_definitions(petrack PUBLIC PETRACK_VERSION="${PROJECT_VERSION}")
 
@@ -189,8 +228,6 @@ target_include_directories(petrack_core PRIVATE "${CMAKE_SOURCE_DIR}/ui")
 #*****************************************************************
 # Linking OpenCV                                                 *
 #*****************************************************************
-add_library(opencv INTERFACE IMPORTED)
-
 # Debug Version of slows our debug down to a unusable degree
 set_target_properties(${OpenCV_LIBS} PROPERTIES
     MAP_IMPORTED_CONFIG_DEBUG RELEASE
@@ -432,9 +469,6 @@ endif(${STEREO})
 
 # # fuer pgrAviFile win32:LIBS += -lavifil32 win32:LIBS += -lmsvfw32 win64:LIBS
 # += -lavifil32 win64:LIBS += -lmsvfw32
-
-# Copy author file to build directory
-configure_file("${CMAKE_SOURCE_DIR}/.zenodo.json" "${CMAKE_CURRENT_BINARY_DIR}/.zenodo.json" COPYONLY)
 
 #####################################################
 # Installer                                         #
