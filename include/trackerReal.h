@@ -28,6 +28,8 @@
 
 #include <QList>
 
+class PersonStorage;
+
 // point in x/y in cm
 class TrackPointReal : public Vec3F
 {
@@ -115,8 +117,9 @@ inline QTextStream &operator<<(QTextStream &s, const TrackPersonReal &tp)
 class TrackerReal : public QList<TrackPersonReal>
 {
 private:
-    double   mXMin, mXMax, mYMin, mYMax;
-    Petrack *mMainWindow;
+    double         mXMin, mXMax, mYMin, mYMax;
+    Petrack *      mMainWindow;
+    PersonStorage &mPersonStorage;
 
 public:
     inline double xMin() const { return mXMin; }
@@ -124,7 +127,7 @@ public:
     inline double yMin() const { return mYMin; }
     inline double yMax() const { return mYMax; }
 
-    TrackerReal(QWidget *wParent);
+    TrackerReal(QWidget *wParent, PersonStorage &storage);
 
 
     // calculate height of person

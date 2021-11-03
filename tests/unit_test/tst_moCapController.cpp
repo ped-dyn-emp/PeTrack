@@ -20,6 +20,8 @@
 
 #include "moCapController.h"
 #include "moCapPerson.h"
+#include "personStorage.h"
+#include "petrack.h"
 
 #include <catch2/catch.hpp>
 #include <catch2/trompeloeil.hpp>
@@ -29,6 +31,7 @@ using namespace Catch::Matchers;
 class ExtrCalibMock : public trompeloeil::mock_interface<ExtrCalibration>
 {
 public:
+    ExtrCalibMock(PersonStorage &storage) : trompeloeil::mock_interface<ExtrCalibration>(storage) {}
     MAKE_MOCK1(getImagePoint, cv::Point2f(cv::Point3f), override);
 };
 
@@ -56,7 +59,9 @@ SCENARIO("I want to get the render data with one person loaded", "[ui]")
     person.setSamplerate(1);
     // default time offset 0
 
-    ExtrCalibMock extrCalib;
+    Petrack       pet;
+    PersonStorage st{pet};
+    ExtrCalibMock extrCalib{st};
 
     /*
      * We Mock extrCalib and just return the x and y coordinate

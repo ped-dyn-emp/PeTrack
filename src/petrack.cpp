@@ -75,7 +75,9 @@ Control *cw;
 int Petrack::trcVersion = 0;
 
 // Reihenfolge des anlegens der objekte ist sehr wichtig
-Petrack::Petrack() : mAuthors(IO::readAuthors(QCoreApplication::applicationDirPath() + "/.zenodo.json"))
+Petrack::Petrack() :
+    mExtrCalibration(mPersonStorage),
+    mAuthors(IO::readAuthors(QCoreApplication::applicationDirPath() + "/.zenodo.json"))
 {
     QIcon icon;
     icon.addFile(":/icon");          // about
@@ -162,33 +164,13 @@ Petrack::Petrack() : mAuthors(IO::readAuthors(QCoreApplication::applicationDirPa
     mViewWidget = new ViewWidget(this);
     mView       = mViewWidget->view();
     mView->setScene(mScene);
-    connect(mView, SIGNAL(mouseDoubleClick()), this, SLOT(openSequence()));
-    connect(
-        mView,
-        SIGNAL(mouseShiftDoubleClick(QPointF)),
-        this,
-        SLOT(addManualTrackPointOnlyVisible(QPointF))); // const QPoint &pos funktionierte nicht
-    connect(
-        mView,
-        SIGNAL(mouseShiftControlDoubleClick(QPointF)),
-        this,
-        SLOT(splitTrackPerson(QPointF))); // const QPoint &pos funktionierte nicht
-    connect(
-        mView,
-        SIGNAL(mouseControlDoubleClick(QPointF)),
-        this,
-        SLOT(addOrMoveManualTrackPoint(QPointF))); // const QPoint &pos funktionierte nicht
-    connect(
-        mView,
-        SIGNAL(mouseRightDoubleClick(QPointF, int)),
-        this,
-        SLOT(deleteTrackPoint(QPointF, int))); // const QPoint &pos funktionierte nicht
-    connect(
-        mView,
-        SIGNAL(mouseMiddleDoubleClick(int)),
-        this,
-        SLOT(deleteTrackPointAll(int))); // const QPoint &pos funktionierte nicht
-    connect(mView, SIGNAL(mouseShiftWheel(int)), this, SLOT(skipToFrameWheel(int)));
+    connect(mView, &GraphicsView::mouseDoubleClick, this, [this]() { this->openSequence(); });
+    connect(mView, &GraphicsView::mouseShiftDoubleClick, this, &Petrack::addManualTrackPointOnlyVisible);
+    connect(mView, &GraphicsView::mouseShiftControlDoubleClick, this, &Petrack::splitTrackPerson);
+    connect(mView, &GraphicsView::mouseControlDoubleClick, this, &Petrack::addOrMoveManualTrackPoint);
+    connect(mView, &GraphicsView::mouseRightDoubleClick, this, &Petrack::deleteTrackPoint);
+    connect(mView, &GraphicsView::mouseMiddleDoubleClick, this, &Petrack::deleteTrackPointAll);
+    connect(mView, &GraphicsView::mouseShiftWheel, this, &Petrack::skipToFrameWheel);
 
     mPlayerWidget = new Player(mAnimation, this);
 
@@ -199,12 +181,12 @@ Petrack::Petrack() : mAuthors(IO::readAuthors(QCoreApplication::applicationDirPa
 
     //---------------------------
 
-    mTracker     = new Tracker(this);
-    mTrackerReal = new TrackerReal(this);
-    mTrackerItem = new TrackerItem(this, mTracker);
+    mTracker     = new Tracker(this, mPersonStorage);
+    mTrackerReal = new TrackerReal(this, mPersonStorage);
+    mTrackerItem = new TrackerItem(this, mPersonStorage);
     mTrackerItem->setZValue(5); // groesser heisst weiter oben
 
-    mControlWidget->getColorPlot()->setTracker(mTracker);
+    mControlWidget->getColorPlot()->setPersonStorage(&mPersonStorage);
 #ifdef QWT
     mControlWidget->getAnalysePlot()->setTrackerReal(mTrackerReal);
 #endif
@@ -579,9 +561,9 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
         // mgl zwei trackpoints
         // beim haendischen importieren sind weiterhin parallele trajektorien moeglich (warnung wird ausgegeben)
         frame = 0; // default
-        if((mTracker->largestLastFrame() >= frame) && (mTracker->smallestFirstFrame() <= frame))
+        if((mPersonStorage.largestLastFrame() >= frame) && (getPersonStorage().smallestFirstFrame() <= frame))
         {
-            mTracker->clear();
+            mPersonStorage.clear();
             mTracker->reset();
         }
         importTracker(mTrcFileName);
@@ -1859,22 +1841,25 @@ void Petrack::createActions()
     connect(mPlayerLooping, &QAction::triggered, mPlayerWidget, &Player::setLooping);
     // -------------------------------------------------------------------------------------------------------
 
-    QSignalMapper *signalMapper = new QSignalMapper(this);
 
     mDelPastAct = new QAction(tr("&Past part of all trj."), this);
-    connect(mDelPastAct, SIGNAL(triggered()), signalMapper, SLOT(map()));
-    signalMapper->setMapping(mDelPastAct, -1);
-    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(deleteTrackPointAll(int))); // -1
+    connect(
+        mDelPastAct,
+        &QAction::triggered,
+        this,
+        [this]() { this->deleteTrackPointAll(PersonStorage::Direction::Previous); });
 
     mDelFutureAct = new QAction(tr("&Future part of all trj."), this);
-    connect(mDelFutureAct, SIGNAL(triggered()), signalMapper, SLOT(map()));
-    signalMapper->setMapping(mDelFutureAct, 1);
-    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(deleteTrackPointAll(int))); // 1
+    connect(
+        mDelFutureAct,
+        &QAction::triggered,
+        this,
+        [this]() { this->deleteTrackPointAll(PersonStorage::Direction::Following); });
 
     mDelAllRoiAct = new QAction(tr("&Trj. moving through ROI"), this);
-    connect(mDelAllRoiAct, SIGNAL(triggered()), this, SLOT(deleteTrackPointROI()));
+    connect(mDelAllRoiAct, &QAction::triggered, this, &Petrack::deleteTrackPointROI);
     mDelPartRoiAct = new QAction(tr("Part of Trj. inside &ROI"), this);
-    connect(mDelPartRoiAct, SIGNAL(triggered()), this, SLOT(deleteTrackPointInsideROI()));
+    connect(mDelPartRoiAct, &QAction::triggered, this, &Petrack::deleteTrackPointInsideROI);
 
     // -------------------------------------------------------------------------------------------------------
 
@@ -2698,7 +2683,7 @@ void Petrack::importTracker(QString dest) // default = ""
                 trcVersion = 1;
             }
 
-            if((sz > 0) && (mTracker->size() != 0))
+            if((sz > 0) && (mPersonStorage.nbPersons() != 0))
             {
                 debout << "Warning: Overlapping trajectories will be joined not until tracking adds new trackpoints."
                        << std::endl;
@@ -2713,14 +2698,14 @@ void Petrack::importTracker(QString dest) // default = ""
                 {
                     in >> tp;
                 }
-                mTracker->append(tp);
+                mPersonStorage.addPerson(tp);
                 tp.clear(); // loeschen, sonst immer weitere pfade angehangen werden
             }
 
-            mControlWidget->trackNumberAll->setText(QString("%1").arg(mTracker->size()));
-            mControlWidget->trackShowOnlyNr->setMaximum(MAX(mTracker->size(), 1));
+            mControlWidget->trackNumberAll->setText(QString("%1").arg(mPersonStorage.nbPersons()));
+            mControlWidget->trackShowOnlyNr->setMaximum(MAX(mPersonStorage.nbPersons(), 1));
             mControlWidget->trackNumberVisible->setText(
-                QString("%1").arg(mTracker->visible(mAnimation->getCurrentFrameNum())));
+                QString("%1").arg(mPersonStorage.visible(mAnimation->getCurrentFrameNum())));
             mControlWidget->colorPlot->replot();
             file.close();
             debout << "import " << dest << " (" << sz << " person(s), file version " << trcVersion << ")" << std::endl;
@@ -2768,7 +2753,7 @@ void Petrack::importTracker(QString dest) // default = ""
                 if(in.atEnd())
                 {
                     tp.setLastFrame(frameNr);
-                    mTracker->append(tp);
+                    mPersonStorage.addPerson(tp);
                     ++sz;
                     tp.clear();
                     break;
@@ -2826,7 +2811,7 @@ void Petrack::importTracker(QString dest) // default = ""
                 // Neue ID ? ==> letzte Person beendet ==> abspeichern
                 if(personNr > current_personNr)
                 {
-                    mTracker->append(tp);
+                    mPersonStorage.addPerson(tp);
                     ++sz;
                     current_personNr++;
                     tp.clear();
@@ -2847,10 +2832,10 @@ void Petrack::importTracker(QString dest) // default = ""
                 }
             }
 
-            mControlWidget->trackNumberAll->setText(QString("%1").arg(mTracker->size()));
-            mControlWidget->trackShowOnlyNr->setMaximum(MAX(mTracker->size(), 1));
+            mControlWidget->trackNumberAll->setText(QString("%1").arg(mPersonStorage.nbPersons()));
+            mControlWidget->trackShowOnlyNr->setMaximum(MAX(mPersonStorage.nbPersons(), 1));
             mControlWidget->trackNumberVisible->setText(
-                QString("%1").arg(mTracker->visible(mAnimation->getCurrentFrameNum())));
+                QString("%1").arg(mPersonStorage.visible(mAnimation->getCurrentFrameNum())));
             mControlWidget->colorPlot->replot();
             file.close();
             debout << "import " << dest << " (" << sz << " person(s) )" << std::endl;
@@ -2870,7 +2855,7 @@ void Petrack::testTracker()
     static int idx = 0; // index in Fehlerliste, die als letztes angesprungen wurde
     QList<int> pers, frame;
 
-    mTracker->checkPlausibility(
+    mPersonStorage.checkPlausibility(
         pers,
         frame,
         mControlWidget->testEqual->isChecked(),
@@ -2961,14 +2946,13 @@ void Petrack::exportTracker(QString dest) // default = ""
                 tstart       = clock();
 #endif
                 QTemporaryFile file;
-                int            i;
 
                 if(!file.open() /*!file.open(QIODevice::WriteOnly | QIODevice::Text)*/)
                 {
                     PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(file.errorString()));
                     return;
                 }
-                QProgressDialog progress("Export TRC-File", nullptr, 0, mTracker->size() + 1, this->window());
+                QProgressDialog progress("Export TRC-File", nullptr, 0, mPersonStorage.nbPersons() + 1, this->window());
                 progress.setWindowTitle("Export .trc-File");
                 progress.setWindowModality(Qt::WindowModal);
                 progress.setVisible(true);
@@ -2979,18 +2963,20 @@ void Petrack::exportTracker(QString dest) // default = ""
 
                 trcVersion = 4;
 
-                debout << "export tracking data to " << dest << " (" << mTracker->size() << " person(s), file version "
-                       << trcVersion << ")..." << std::endl;
+                debout << "export tracking data to " << dest << " (" << mPersonStorage.nbPersons()
+                       << " person(s), file version " << trcVersion << ")..." << std::endl;
                 QTextStream out(&file);
 
                 out << "version " << trcVersion << Qt::endl;
-                out << mTracker->size() << Qt::endl;
-                for(i = 0; i < mTracker->size(); ++i)
+                out << mPersonStorage.nbPersons() << Qt::endl;
+                const auto &persons = mPersonStorage.getPersons();
+                for(size_t i = 0; i < persons.size(); ++i)
                 {
                     qApp->processEvents();
-                    progress.setLabelText(QString("Export person %1 of %2 ...").arg(i + 1).arg(mTracker->size()));
+                    progress.setLabelText(
+                        QString("Export person %1 of %2 ...").arg(i + 1).arg(mPersonStorage.nbPersons()));
                     progress.setValue(i + 1);
-                    out << (*mTracker)[i] << Qt::endl;
+                    out << persons[i] << Qt::endl;
                 }
                 file.flush();
                 file.close();
@@ -3023,7 +3009,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
                 }
 
-                progress.setValue(mTracker->size() + 1);
+                progress.setValue(mPersonStorage.nbPersons() + 1);
 
                 std::cout << " finished " << std::endl;
 
@@ -3054,7 +3040,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     return;
                 }
 
-                debout << "export tracking data to " << dest << " (" << mTracker->size() << " person(s))..."
+                debout << "export tracking data to " << dest << " (" << mPersonStorage.nbPersons() << " person(s))..."
                        << std::endl;
 
 #ifdef TIME_MEASUREMENT
@@ -3072,7 +3058,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     }
                     else // 2D
                     {
-                        mTracker->recalcHeight(mControlWidget->coordAltitude->value());
+                        mPersonStorage.recalcHeight(mControlWidget->coordAltitude->value());
                     }
                 }
 #ifdef TIME_MEASUREMENT
@@ -3125,15 +3111,15 @@ void Petrack::exportTracker(QString dest) // default = ""
                     std::cout << "ID  | Comment" << std::endl;
                     std::cout << "----|----------------" << std::endl;
 
-                    for(int i = 0; i < mTracker->size(); ++i)
+                    for(int i = 0; i < static_cast<int>(mPersonStorage.nbPersons()); ++i)
                     {
-                        auto commentSplit = mTracker->at(i).comment().split("\n", Qt::KeepEmptyParts);
+                        auto commentSplit = mPersonStorage.at(i).comment().split("\n", Qt::KeepEmptyParts);
                         out << "#" << qSetFieldWidth(3) << (i + 1) << qSetFieldWidth(0) << "|" << commentSplit.at(0)
                             << Qt::endl;
                         std::cout << std::setw(4) << (i + 1) << "|" << commentSplit.at(0) << std::endl;
 
                         commentSplit.pop_front();
-                        for(const auto &line : commentSplit)
+                        for(const QString &line : commentSplit)
                         {
                             out << "#" << qSetFieldWidth(3) << " " << qSetFieldWidth(0) << "|" << line << Qt::endl;
                             std::cout << "    |" << line << std::endl;
@@ -3201,7 +3187,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                 // einfliessen zu lassen)
                 if(mControlWidget->trackRecalcHeight->checkState())
                 {
-                    mTracker->recalcHeight(mControlWidget->coordAltitude->value());
+                    mPersonStorage.recalcHeight(mControlWidget->coordAltitude->value());
                 }
                 mTrackerReal->calculate(
                     mTracker,
@@ -3221,7 +3207,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     mControlWidget->exportMarkerID->isChecked(),
                     autoCorrectOnlyExport);
 
-                debout << "export tracking data to " << dest << " (" << mTracker->size() << " person(s))..."
+                debout << "export tracking data to " << dest << " (" << mPersonStorage.nbPersons() << " person(s))..."
                        << std::endl;
                 QTextStream outDat(&fileDat);
                 mTrackerReal->exportDat(
@@ -3258,7 +3244,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                 // einfliessen zu lassen)
                 if(mControlWidget->trackRecalcHeight->checkState())
                 {
-                    mTracker->recalcHeight(mControlWidget->coordAltitude->value());
+                    mPersonStorage.recalcHeight(mControlWidget->coordAltitude->value());
                 }
 
                 mTrackerReal->calculate(
@@ -3285,7 +3271,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(fileXml.errorString()));
                     return;
                 }
-                debout << "export tracking data to " << dest << " (" << mTracker->size() << " person(s))..."
+                debout << "export tracking data to " << dest << " (" << mPersonStorage.nbPersons() << " person(s))..."
                        << std::endl;
                 // already done: mTrackerReal->calculate(mTracker, mImageItem, mControlWidget->getColorPlot(),
                 // getImageBorderSize(), mControlWidget->trackMissingFrames->checkState());
@@ -3295,7 +3281,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                 outXml << "    <header version=\"1.0\">" << Qt::endl;
                 outXml << "        <roomCaption>PeTrack: " << mAnimation->getFileBase() << "</roomCaption>" << Qt::endl;
                 outXml << "        <roomID>0</roomID>" << Qt::endl;
-                outXml << "        <agents>" << mTracker->size() << "</agents>" << Qt::endl;
+                outXml << "        <agents>" << mPersonStorage.nbPersons() << "</agents>" << Qt::endl;
                 outXml << "        <frameRate>" << mAnimation->getFPS() << "</frameRate> <!--per second-->" << Qt::endl;
                 // outXml << "        <timeStep>" << 1000./mAnimation->getFPS() << "</timeStep>   <!-- millisecond-->"
                 // << endl; inverse von
@@ -3411,7 +3397,7 @@ void Petrack::trackAll()
         // zuruecksprinegn an die stelle, wo der letzte trackPath nicht vollstaendig
         // etwas spaeter, da erste punkte in reco path meist nur ellipse ohne markererkennung
         mControlWidget->trackOnlineCalc->setCheckState(Qt::Unchecked);
-        mPlayerWidget->skipToFrame(mTracker->largestFirstFrame() + 5);
+        mPlayerWidget->skipToFrame(mPersonStorage.largestFirstFrame() + 5);
         mControlWidget->trackOnlineCalc->setCheckState(Qt::Checked);
         // progVal = 2*mAnimation->getNumFrames()-memPos-mPlayerWidget->getPos();
         progVal += mAnimation->getNumFrames() - mPlayerWidget->getPos();
@@ -3446,7 +3432,7 @@ void Petrack::trackAll()
 
     if(mAutoTrackOptimizeColor)
     {
-        mTracker->optimizeColor();
+        mPersonStorage.optimizeColor();
     }
 
     mControlWidget->performRecognition->setCheckState(memRecoState);
@@ -3599,10 +3585,10 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 #endif
 
         // delete track list, if intrinsic param have changed
-        if(calibChanged && mTracker->size() > 0) // mCalibFilter.getEnabled() &&
+        if(calibChanged && mPersonStorage.nbPersons() > 0) // mCalibFilter.getEnabled() &&
         {
             // Evtl. nicht Tracker loeschen sondern entsprechend der neuen Calibration verschieben?!?!?
-            mTracker->clear();
+            mPersonStorage.clear();
             mTracker->reset();
             if(!isLoading())
             {
@@ -3620,7 +3606,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                 // buildt disparity picture if it should be used for height detection
                 mStereoContext->getDisparity();
 
-                mTracker->calcPosition(frameNum);
+                mPersonStorage.calcPosition(frameNum);
             }
 #endif
         }
@@ -3737,12 +3723,12 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                 //        "==========: "
                 debout << "nach  reco: " << getElapsedTime() << endl;
 #endif
-                mTracker->addPoints(persList, frameNum, mReco.getRecoMethod());
+                mPersonStorage.addPoints(persList, frameNum, mReco.getRecoMethod());
 
                 // folgendes lieber im Anschluss, ggf beim exportieren oder statt test direkt del:
                 if(mStereoContext && mStereoWidget->stereoUseForReco->isChecked())
                 {
-                    mTracker->purge(frameNum); // bereinigen wenn weniger als 0.2 recognition und nur getrackt
+                    mPersonStorage.purge(frameNum); // bereinigen wenn weniger als 0.2 recognition und nur getrackt
                 }
 
                 mControlWidget->recoNumberNow->setText(QString("%1").arg(persList.size()));
@@ -3766,11 +3752,11 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         }
 
         mControlWidget->trackNumberAll->setText(
-            QString("%1").arg(mTracker->size())); // kann sich durch reco und tracker aendern
+            QString("%1").arg(mPersonStorage.nbPersons())); // kann sich durch reco und tracker aendern
         mControlWidget->trackShowOnlyNr->setMaximum(
-            MAX(mTracker->size(), 1)); // kann sich durch reco und tracker aendern
+            MAX(mPersonStorage.nbPersons(), 1)); // kann sich durch reco und tracker aendern
         mControlWidget->trackNumberVisible->setText(
-            QString("%1").arg(mTracker->visible(frameNum))); // kann sich durch reco und tracker aendern
+            QString("%1").arg(mPersonStorage.visible(frameNum))); // kann sich durch reco und tracker aendern
 
         // in anzuzeigendes Bild kopieren
         // erst hier wird die bildgroesse von mimage an filteredimg mit border angepasst
@@ -3895,13 +3881,15 @@ double Petrack::getHeadSize(QPointF *pos, int pers, int frame)
 {
     double z, h;
 
-    if((pers >= 0) && (pers < mTracker->size()) && mTracker->at(pers).trackPointExist(frame))
+    if((pers >= 0) && (pers < static_cast<int>(mPersonStorage.nbPersons())) &&
+       mPersonStorage.at(pers).trackPointExist(frame))
     {
         if(mControlWidget->getCalibCoordDimension() == 0)
         {
             int         diff;
             cv::Point3f p3d = getExtrCalibration()->get3DPoint(
-                cv::Point2f(mTracker->at(pers).trackPointAt(frame).x(), mTracker->at(pers).trackPointAt(frame).y()),
+                cv::Point2f(
+                    mPersonStorage.at(pers).trackPointAt(frame).x(), mPersonStorage.at(pers).trackPointAt(frame).y()),
                 mControlWidget->mapDefaultHeight->value());
 
             cv::Point2f p3d_x1 =
@@ -3920,8 +3908,8 @@ double Petrack::getHeadSize(QPointF *pos, int pers, int frame)
         }
         else
         {
-            z = mTracker->at(pers).trackPointAt(frame).sp().z();
-            h = mTracker->at(pers).height();
+            z = mPersonStorage.at(pers).trackPointAt(frame).sp().z();
+            h = mPersonStorage.at(pers).height();
             if(z > 0)
             {
                 return (HEAD_SIZE * mControlWidget->coordAltitude->value() / z) / getImageItem()->getCmPerPixel();
@@ -4033,23 +4021,23 @@ void Petrack::addManualTrackPointOnlyVisible(const QPointF &pos)
     int pers = addOrMoveManualTrackPoint(pos) + 1;
     if(pers == 0)
     {
-        pers = mTracker->size() + 1;
+        pers = static_cast<int>(mPersonStorage.nbPersons()) + 1;
     }
-    pers = mControlWidget->trackShowOnlyNr->maximum();
     mControlWidget->trackShowOnlyNr->setValue(pers);
     mControlWidget->trackShowOnly->setChecked(true);
 }
 
 void Petrack::updateControlWidget()
 {
-    mControlWidget->trackNumberAll->setText(QString("%1").arg(mTracker->size()));
-    mControlWidget->trackShowOnlyNr->setMaximum(MAX(mTracker->size(), 1));
-    mControlWidget->trackNumberVisible->setText(QString("%1").arg(mTracker->visible(mAnimation->getCurrentFrameNum())));
+    mControlWidget->trackNumberAll->setText(QString("%1").arg(mPersonStorage.nbPersons()));
+    mControlWidget->trackShowOnlyNr->setMaximum(MAX(mPersonStorage.nbPersons(), 1));
+    mControlWidget->trackNumberVisible->setText(
+        QString("%1").arg(mPersonStorage.visible(mAnimation->getCurrentFrameNum())));
 }
 
 void Petrack::splitTrackPerson(QPointF pos)
 {
-    mTracker->splitPersonAt((Vec2F) pos, mAnimation->getCurrentFrameNum(), getPedestrianUserSelection());
+    mPersonStorage.splitPersonAt((Vec2F) pos, mAnimation->getCurrentFrameNum(), getPedestrianUserSelection());
     updateControlWidget();
 }
 
@@ -4068,7 +4056,7 @@ int Petrack::addOrMoveManualTrackPoint(const QPointF &pos)
     int        pers = -1;
     TrackPoint tP(Vec2F{pos}, 110); // 110 is higher than 100 (max. quality) and gets clamped to 100 after insertion
     // allows replacemet of every point (check for better quality always passes)
-    mTracker->addPoint(
+    mPersonStorage.addPoint(
         tP, mAnimation->getCurrentFrameNum(), getPedestrianUserSelection(), mReco.getRecoMethod(), &pers);
     updateControlWidget();
     return pers;
@@ -4078,43 +4066,45 @@ int Petrack::addOrMoveManualTrackPoint(const QPointF &pos)
 // loeschen von Trackpoints einer Trajektorie
 void Petrack::deleteTrackPoint(QPointF pos, int direction) // const QPoint &pos
 {
-    mTracker->delPoint((Vec2F) pos, direction, mAnimation->getCurrentFrameNum(), getPedestrianUserSelection());
+    mPersonStorage.delPoint((Vec2F) pos, direction, mAnimation->getCurrentFrameNum(), getPedestrianUserSelection());
     updateControlWidget();
 }
 void Petrack::editTrackPersonComment(QPointF pos)
 {
-    mTracker->editTrackPersonComment((Vec2F) pos, mAnimation->getCurrentFrameNum(), getPedestrianUserSelection());
+    mPersonStorage.editTrackPersonComment((Vec2F) pos, mAnimation->getCurrentFrameNum(), getPedestrianUserSelection());
     updateControlWidget();
 }
 void Petrack::setTrackPersonHeight(QPointF pos)
 {
-    mTracker->setTrackPersonHeight((Vec2F) pos, mAnimation->getCurrentFrameNum(), getPedestrianUserSelection());
+    mPersonStorage.setTrackPersonHeight((Vec2F) pos, mAnimation->getCurrentFrameNum(), getPedestrianUserSelection());
     updateControlWidget();
 }
 void Petrack::resetTrackPersonHeight(QPointF pos)
 {
-    mTracker->resetTrackPersonHeight((Vec2F) pos, mAnimation->getCurrentFrameNum(), getPedestrianUserSelection());
+    mPersonStorage.resetTrackPersonHeight((Vec2F) pos, mAnimation->getCurrentFrameNum(), getPedestrianUserSelection());
     updateControlWidget();
 }
 
-// direction zeigt an, ob bis zum aktuellen (-1), ab dem aktuellen (1) oder ganzer trackpath (0)
-// loeschen von Trackpoints aller Trajektorien
-void Petrack::deleteTrackPointAll(int direction) // const QPoint &pos
+/**
+ * @brief Delete the following, previous or whole trajectory of **all** trajectories
+ * @param direction previous, following or whole
+ */
+void Petrack::deleteTrackPointAll(PersonStorage::Direction direction) // const QPoint &pos
 {
-    mTracker->delPointAll(direction, mAnimation->getCurrentFrameNum());
+    mPersonStorage.delPointAll(direction, mAnimation->getCurrentFrameNum());
     updateControlWidget();
 }
 
 void Petrack::deleteTrackPointROI()
 {
-    mTracker->delPointROI();
+    mPersonStorage.delPointROI();
     updateControlWidget();
     mScene->update();
 }
 
 void Petrack::deleteTrackPointInsideROI()
 {
-    mTracker->delPointInsideROI();
+    getPersonStorage().delPointInsideROI();
     updateControlWidget();
     mScene->update();
 }

@@ -34,26 +34,24 @@ class TrackerPlotItem;
 class Control;
 class Zoomer;
 class RectPlotItem;
+class PersonStorage;
 class ViewColorPlotItem;
 
 
 class TrackerPlotItem : public QwtPlotItem
 {
 public:
-    TrackerPlotItem();
-
     void draw(QPainter *p, const QwtScaleMap &mapX, const QwtScaleMap &mapY, const QRectF &re) const;
 
     void setPen(const QPen &pen);
 
     void setModel(int model, int x, int y);
 
-    void     setTracker(Tracker *tracker);
-    Tracker *getTracker();
+    void setPersonStorage(const PersonStorage *storage);
 
 private:
-    Tracker *mTracker;
-    QPen     mPen;
+    const PersonStorage *mPersonStorage = nullptr;
+    QPen                 mPen;
 };
 
 
@@ -163,7 +161,7 @@ public:
     bool   printDistribution() const;
 
     void setControlWidget(Control *control);
-    void setTracker(Tracker *tracker);
+    void setPersonStorage(const PersonStorage *storage);
     void setScale();
     void generateImage();
 
@@ -180,16 +178,17 @@ public:
     inline RectPlotItem *   getMapItem() const { return mRectItem; }
 
 private:
-    double             mSymbolSize;
-    double             mXMax;
-    double             mYMax;
-    Control *          mControlWidget;
-    ImagePlotItem *    mImageItem;
-    TrackerPlotItem *  mTrackerItem;
-    RectPlotItem *     mRectItem;
-    ViewColorPlotItem *mViewColorItem;
-    Zoomer *           mZoomer;
-    int                mGreyDiff;
+    const PersonStorage *mPersonStorage;
+    double               mSymbolSize;
+    double               mXMax;
+    double               mYMax;
+    Control *            mControlWidget;
+    ImagePlotItem *      mImageItem;
+    TrackerPlotItem *    mTrackerItem;
+    RectPlotItem *       mRectItem;
+    ViewColorPlotItem *  mViewColorItem;
+    Zoomer *             mZoomer;
+    int                  mGreyDiff;
 };
 
 #endif

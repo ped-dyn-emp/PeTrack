@@ -39,6 +39,7 @@
 #include "extrCalibration.h"
 #include "moCapController.h"
 #include "moCapPerson.h"
+#include "personStorage.h"
 #include "recognition.h"
 #include "swapFilter.h"
 
@@ -149,7 +150,7 @@ public slots:
     void setTrackPersonHeight(QPointF pos);
     void resetTrackPersonHeight(QPointF pos);
     void deleteTrackPoint(QPointF pos, int direction);
-    void deleteTrackPointAll(int direction);
+    void deleteTrackPointAll(PersonStorage::Direction direction);
     void deleteTrackPointROI();
     void deleteTrackPointInsideROI();
     //    void showContextMenu(QPointF pos);
@@ -226,6 +227,8 @@ public:
     inline QImage *                getImage() { return mImage; }
     inline cv::Mat                 getImg() { return mImg; }
     inline cv::Mat                 getImageFiltered() { return mImgFiltered; }
+    inline PersonStorage &         getPersonStorage() { return mPersonStorage; }
+    inline const PersonStorage &   getPersonStorage() const { return mPersonStorage; }
     inline Tracker *               getTracker() { return mTracker; }
     inline TrackerReal *           getTrackerReal() { return mTrackerReal; }
     inline ImageItem *             getImageItem() { return mImageItem; }
@@ -454,10 +457,11 @@ private:
 
     reco::Recognizer mReco;
 
-    Tracker *    mTracker;
-    TrackerReal *mTrackerReal;
-    double       mHeadSize;
-    double       mCmPerPixel;
+    PersonStorage mPersonStorage{*this};
+    Tracker *     mTracker;
+    TrackerReal * mTrackerReal;
+    double        mHeadSize;
+    double        mCmPerPixel;
 
     QDomDocument mDefaultSettings;
 

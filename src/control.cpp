@@ -1247,30 +1247,30 @@ void Control::on_trackShowOnlyNrList_textChanged(const QString & /*arg1*/)
 
 void Control::on_trackGotoNr_clicked()
 {
-    if(mMainWindow->getTracker()->size() >= trackShowOnlyNr->value())
+    if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= trackShowOnlyNr->value())
     {
         int idx        = trackShowOnlyNr->value() - 1;
-        int firstFrame = mMainWindow->getTracker()->at(idx).firstFrame();
-        int lastFrame  = mMainWindow->getTracker()->at(idx).lastFrame();
+        int firstFrame = mMainWindow->getPersonStorage().at(idx).firstFrame();
+        int lastFrame  = mMainWindow->getPersonStorage().at(idx).lastFrame();
         mMainWindow->getPlayer()->skipToFrame((lastFrame + firstFrame) / 2);
     }
 }
 
 void Control::on_trackGotoStartNr_clicked()
 {
-    if(mMainWindow->getTracker()->size() >= trackShowOnlyNr->value())
+    if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= trackShowOnlyNr->value())
     {
         int idx = trackShowOnlyNr->value() - 1;
-        mMainWindow->getPlayer()->skipToFrame(mMainWindow->getTracker()->at(idx).firstFrame());
+        mMainWindow->getPlayer()->skipToFrame(mMainWindow->getPersonStorage().at(idx).firstFrame());
     }
 }
 
 void Control::on_trackGotoEndNr_clicked()
 {
-    if(mMainWindow->getTracker()->size() >= trackShowOnlyNr->value())
+    if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= trackShowOnlyNr->value())
     {
         int idx = trackShowOnlyNr->value() - 1;
-        mMainWindow->getPlayer()->skipToFrame(mMainWindow->getTracker()->at(idx).lastFrame());
+        mMainWindow->getPlayer()->skipToFrame(mMainWindow->getPersonStorage().at(idx).lastFrame());
     }
 }
 
@@ -1285,7 +1285,7 @@ void Control::on_trackShowOnlyListButton_clicked()
     QGridLayout *        layout = (QGridLayout *) nrListBox.layout();
     QVector<QCheckBox *> checkBox;
 
-    for(int i = 0; i < mMainWindow->getTracker()->size(); i++)
+    for(int i = 0; i < static_cast<int>(mMainWindow->getPersonStorage().nbPersons()); i++)
     {
         /// ToDo: parse from lineEdit
         checkBox.push_back(new QCheckBox(QString::number(i + 1)));
@@ -1305,7 +1305,7 @@ void Control::on_trackShowOnlyListButton_clicked()
     {
         QStringList list;
         int         first = -1, last = -1;
-        for(int i = 0; i < mMainWindow->getTracker()->size(); i++)
+        for(int i = 0; i < static_cast<int>(mMainWindow->getPersonStorage().nbPersons()); i++)
         {
             if(checkBox.at(i)->isChecked())
             {
@@ -1378,7 +1378,7 @@ void Control::on_recoShowColor_stateChanged(int i)
 
 void Control::on_recoOptimizeColor_clicked()
 {
-    mMainWindow->getTracker()->optimizeColor();
+    mMainWindow->getPersonStorage().optimizeColor();
     colorPlot->replot();
     mScene->update(); // damit mgl angezeige farbpunkte geaendert/weggenommen werden
 }
@@ -1675,17 +1675,17 @@ void Control::on_mapDistribution_clicked()
 {
     if(!colorPlot->printDistribution())
     {
-        mMainWindow->getTracker()->printHeightDistribution();
+        mMainWindow->getPersonStorage().printHeightDistribution();
     }
 }
 void Control::on_mapResetHeight_clicked()
 {
-    mMainWindow->getTracker()->resetHeight();
+    mMainWindow->getPersonStorage().resetHeight();
     mScene->update();
 }
 void Control::on_mapResetPos_clicked()
 {
-    mMainWindow->getTracker()->resetPos();
+    mMainWindow->getPersonStorage().resetPos();
     mScene->update();
 }
 void Control::on_mapDefaultHeight_valueChanged(double d)
@@ -1706,8 +1706,8 @@ void Control::on_mapReadHeights_clicked()
 
     if(std::holds_alternative<std::unordered_map<int, float>>(heights)) // heights contains the height map
     {
-        mMainWindow->getTracker()->resetHeight();
-        mMainWindow->getTracker()->setMarkerHeights(std::get<std::unordered_map<int, float>>(heights));
+        mMainWindow->getPersonStorage().resetHeight();
+        mMainWindow->getPersonStorage().setMarkerHeights(std::get<std::unordered_map<int, float>>(heights));
         mMainWindow->setHeightFileName(heightFile);
     }
     else // heights contains an error string
@@ -1715,7 +1715,7 @@ void Control::on_mapReadHeights_clicked()
         PCritical(mMainWindow, Petrack::tr("PeTrack"), Petrack::tr(std::get<std::string>(heights).c_str()));
     }
 
-    mMainWindow->getTracker()->printHeightDistribution();
+    mMainWindow->getPersonStorage().printHeightDistribution();
     mScene->update();
 }
 
@@ -1731,7 +1731,7 @@ void Control::on_mapReadMarkerID_clicked()
 
     if(std::holds_alternative<std::unordered_map<int, int>>(markerIDs)) // markerIDs contains the marker information
     {
-        mMainWindow->getTracker()->setMarkerIDs(std::get<std::unordered_map<int, int>>(markerIDs));
+        mMainWindow->getPersonStorage().setMarkerIDs(std::get<std::unordered_map<int, int>>(markerIDs));
         mMainWindow->setMarkerIDFileName(markerFile);
     }
     else // heights contains an error string
@@ -1740,7 +1740,7 @@ void Control::on_mapReadMarkerID_clicked()
             mMainWindow, Petrack::tr("PeTrack"), Petrack::tr(std::get<std::string>(markerIDs).c_str()));
     }
 
-    mMainWindow->getTracker()->printHeightDistribution();
+    mMainWindow->getPersonStorage().printHeightDistribution();
     mScene->update();
 }
 

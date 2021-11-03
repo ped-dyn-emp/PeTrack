@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
             auto markerIDs = IO::readMarkerIDFile(autoReadMarkerFile);
             if(std::holds_alternative<std::unordered_map<int, int>>(markerIDs)) // heights contains the height map
             {
-                petrack.getTracker()->setMarkerIDs(std::get<std::unordered_map<int, int>>(markerIDs));
+                petrack.getPersonStorage().setMarkerIDs(std::get<std::unordered_map<int, int>>(markerIDs));
                 petrack.setMarkerIDFileName(autoReadHeightFile);
             }
             else // markerIDs contains an error string
@@ -225,8 +225,8 @@ int main(int argc, char *argv[])
             auto markerHeights = IO::readHeightFile(autoReadHeightFile);
             if(std::holds_alternative<std::unordered_map<int, float>>(markerHeights)) // heights contains the height map
             {
-                petrack.getTracker()->resetHeight();
-                petrack.getTracker()->setMarkerHeights(std::get<std::unordered_map<int, float>>(markerHeights));
+                petrack.getPersonStorage().resetHeight();
+                petrack.getPersonStorage().setMarkerHeights(std::get<std::unordered_map<int, float>>(markerHeights));
                 petrack.setHeightFileName(autoReadHeightFile);
             }
             else // markerHeights contains an error string
@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
         auto markerIDs = IO::readMarkerIDFile(autoReadMarkerFile);
         if(std::holds_alternative<std::unordered_map<int, int>>(markerIDs)) // heights contains the height map
         {
-            petrack.getTracker()->setMarkerIDs(std::get<std::unordered_map<int, int>>(markerIDs));
+            petrack.getPersonStorage().setMarkerIDs(std::get<std::unordered_map<int, int>>(markerIDs));
             petrack.setMarkerIDFileName(autoReadHeightFile);
         }
         else // heights contains an error string
@@ -276,8 +276,8 @@ int main(int argc, char *argv[])
         auto markerHeights = IO::readHeightFile(autoReadHeightFile);
         if(std::holds_alternative<std::unordered_map<int, float>>(markerHeights)) // heights contains the height map
         {
-            petrack.getTracker()->resetHeight();
-            petrack.getTracker()->setMarkerHeights(std::get<std::unordered_map<int, float>>(markerHeights));
+            petrack.getPersonStorage().resetHeight();
+            petrack.getPersonStorage().setMarkerHeights(std::get<std::unordered_map<int, float>>(markerHeights));
             petrack.setHeightFileName(autoReadHeightFile);
         }
         else // heights contains an error string

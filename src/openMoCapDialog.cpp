@@ -25,6 +25,7 @@
 #include "ui_openMoCapDialog.h"
 
 #include <QFileDialog>
+#include <QMessageBox>
 
 OpenMoCapDialog::OpenMoCapDialog(QWidget *parent, MoCapController &controller) :
     QDialog(parent), mUi(new Ui::OpenMoCapDialog), mController(controller), mParent(parent)

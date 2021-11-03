@@ -29,7 +29,7 @@
 
 #define MAX_AV_ERROR 20
 
-ExtrCalibration::ExtrCalibration()
+ExtrCalibration::ExtrCalibration(PersonStorage &storage) : mPersonStorage(storage)
 {
     mMainWindow    = nullptr;
     mControlWidget = nullptr;
@@ -316,7 +316,7 @@ bool ExtrCalibration::loadExtrCalibFile()
 bool ExtrCalibration::fetch2DPoints()
 {
     bool all_ok = true;
-    if(!mMainWindow->getTracker() || mMainWindow->getTracker()->size() < 4)
+    if(!mMainWindow->getTracker() || mPersonStorage.nbPersons() < 4)
     {
         PCritical(
             mMainWindow,
@@ -326,7 +326,7 @@ bool ExtrCalibration::fetch2DPoints()
     }
     else
     {
-        size_t sz_2d = mMainWindow->getTracker()->size();
+        size_t sz_2d = mPersonStorage.nbPersons();
 
         if(points3D.size() > 0 && sz_2d != points3D.size())
         {
@@ -346,14 +346,13 @@ bool ExtrCalibration::fetch2DPoints()
                 // debout << "[" << i << "]: (" << mMainWindow->getTracker()->at(i).at(0).x() << ", " <<
                 // mMainWindow->getTracker()->at(i).at(0).y() << ")" << endl;
                 //  Info: Tracker->TrackPerson->TrackPoint->Vec2F
-                points2D.push_back(cv::Point2f(
-                    mMainWindow->getTracker()->at(i).at(0).x(), mMainWindow->getTracker()->at(i).at(0).y()));
+                points2D.push_back(cv::Point2f(mPersonStorage.at(i).at(0).x(), mPersonStorage.at(i).at(0).y()));
             }
         }
     }
     if(all_ok)
     {
-        mMainWindow->getTracker()->clear();
+        mPersonStorage.clear();
         calibExtrParams();
     }
     return all_ok;

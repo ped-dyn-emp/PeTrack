@@ -25,17 +25,17 @@
 
 class Petrack;
 class Control;
-class Tracker;
+class PersonStorage;
 
 class TrackerItem : public QGraphicsItem
 {
 private:
-    Petrack *mMainWindow;
-    Control *mControlWidget;
-    Tracker *mTracker;
+    Petrack *      mMainWindow;
+    Control *      mControlWidget;
+    PersonStorage &mPersonStorage;
 
 public:
-    TrackerItem(QWidget *wParent, Tracker *tracker, QGraphicsItem *parent = nullptr);
+    TrackerItem(QWidget *wParent, PersonStorage &tracker, QGraphicsItem *parent = nullptr);
     void   contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     QRectF boundingRect() const;
     void   paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

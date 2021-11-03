@@ -218,7 +218,7 @@ signals:
 // berechnet pixelverschiebung aufgrund von schraegsicht bei einem farbmarker
 // Maik Dissertation Seite 138
 // boxImageCentre ohne Border
-Vec2F autoCorrectColorMarker(Vec2F &boxImageCentre, Control *controlWidget);
+Vec2F autoCorrectColorMarker(const Vec2F &boxImageCentre, Control *controlWidget);
 
 
 namespace detail

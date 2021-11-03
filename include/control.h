@@ -21,13 +21,13 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#include "petrack.h"
 #include "recognition.h"
 #include "ui_control.h"
 
 #include <Qt>
 #include <QtWidgets>
 
-class Petrack;
 class QGraphicsScene;
 class QDomElement;
 

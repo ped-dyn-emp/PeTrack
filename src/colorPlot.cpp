@@ -109,10 +109,6 @@ private:
 //-----------------------------------------------------------------------------------------
 
 // die kreise liegen mgl nicht genau auf kreuz - noch zu testen
-TrackerPlotItem::TrackerPlotItem()
-{
-    mTracker = nullptr;
-}
 
 /**
  * @brief Draws a circle in the colorplot for every color associated with a trackperson.
@@ -128,7 +124,7 @@ void TrackerPlotItem::draw(QPainter *p, const QwtScaleMap &mapX, const QwtScaleM
     double sy         = mapY.p1() / (mapY.s2() - mapY.s1());
     double yMax       = ((ColorPlot *) plot())->yMax();
     double circleSize = ((ColorPlot *) plot())->symbolSize();
-    int    i, z;
+    int    z;
     int    plotZ = ((ColorPlot *) plot())->zValue();
     double diff;
 
@@ -143,23 +139,22 @@ void TrackerPlotItem::draw(QPainter *p, const QwtScaleMap &mapX, const QwtScaleM
     sx = circleSize / sx;
     sy = circleSize / sy;
 
-    if(mTracker)
+    if(mPersonStorage)
     {
-        for(i = 0; i < mTracker->size(); ++i)
+        const auto &persons = mPersonStorage->getPersons();
+        for(const auto &person : persons)
         {
-            if((*mTracker)[i]
-                   .color()
-                   .isValid()) // insbesondere von hand eingefuegte trackpoint/persons haben keine farbe
+            if(person.color().isValid()) // insbesondere von hand eingefuegte trackpoint/persons haben keine farbe
             {
-                QPoint point = ((ColorPlot *) plot())->getPos((*mTracker)[i].color(), &z);
+                QPoint point = ((ColorPlot *) plot())->getPos(person.color(), &z);
                 diff         = (255. - abs(z - plotZ)) / 255.;
                 rect.setWidth(diff * sx);
                 rect.setHeight(diff * sy);
                 rect.moveLeft(point.x() - diff * sx / 2.);
                 rect.moveTop(point.y() - diff * sy / 2.);
 
-                p->setBrush(QBrush((*mTracker)[i].color()));
-                if(((ColorPlot *) plot())->isGrey((*mTracker)[i].color()))
+                p->setBrush(QBrush(person.color()));
+                if(((ColorPlot *) plot())->isGrey(person.color()))
                 {
                     p->setPen(Qt::red);
                 }
@@ -180,13 +175,9 @@ void TrackerPlotItem::setPen(const QPen &pen)
     mPen = pen;
 }
 
-void TrackerPlotItem::setTracker(Tracker *tracker)
+void TrackerPlotItem::setPersonStorage(const PersonStorage *storage)
 {
-    mTracker = tracker;
-}
-Tracker *TrackerPlotItem::getTracker()
-{
-    return mTracker;
+    mPersonStorage = storage;
 }
 
 
@@ -611,9 +602,7 @@ private:
 
 //-----------------------------------------------------------------------------------------
 
-ColorPlot::ColorPlot(QWidget *parent) // default= NULL
-    :
-    QwtPlot(parent)
+ColorPlot::ColorPlot(QWidget *parent) : QwtPlot(parent)
 {
     mControlWidget = nullptr;
     mGreyDiff      = 50;
@@ -665,14 +654,13 @@ bool ColorPlot::printDistribution() const
 {
     QMap<double, int>                 dict;
     QMap<double, int>::const_iterator j;
-    Tracker *                         tr = mTrackerItem->getTracker();
-    int                               i, anz = 0;
+    int                               anz = 0;
 
-    for(i = 0; i < tr->size(); ++i)
+    for(auto const &person : mPersonStorage->getPersons())
     {
-        if((*tr)[i].color().isValid()) // insbesondere von hand eingefuegte trackpoint/persons haben keine farbe
+        if(person.color().isValid()) // insbesondere von hand eingefuegte trackpoint/persons haben keine farbe
         {
-            ++dict[map((*tr)[i].color())];
+            ++dict[map(person.color())];
         }
     }
     j = dict.constBegin();
@@ -831,9 +819,10 @@ void ColorPlot::setControlWidget(Control *control)
     mControlWidget = control;
 }
 
-void ColorPlot::setTracker(Tracker *tracker)
+void ColorPlot::setPersonStorage(const PersonStorage *storage)
 {
-    mTrackerItem->setTracker(tracker);
+    mPersonStorage = storage;
+    mTrackerItem->setPersonStorage(storage);
 }
 
 void ColorPlot::setScale()

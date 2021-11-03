@@ -22,6 +22,7 @@
 
 #include "animation.h"
 #include "control.h"
+#include "personStorage.h"
 #include "petrack.h"
 #include "recognitionRoiItem.h"
 #include "tracker.h"
@@ -34,11 +35,11 @@
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,
 // so dass pixel quadratisch
-TrackerItem::TrackerItem(QWidget *wParent, Tracker *tracker, QGraphicsItem *parent) : QGraphicsItem(parent)
+TrackerItem::TrackerItem(QWidget *wParent, PersonStorage &storage, QGraphicsItem *parent) :
+    QGraphicsItem(parent), mPersonStorage(storage)
 {
     mMainWindow    = (class Petrack *) wParent;
     mControlWidget = mMainWindow->getControlWidget();
-    mTracker       = tracker;
 }
 
 /**
@@ -72,20 +73,23 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         TrackPoint p(
             (Vec2F) event->pos(),
             110); // 110 ist ueber 100 (hoechste Qualitaetsstufe) und wird nach einfuegen auf 100 gesetzt
-        bool  found = false;
-        int   i, iNearest   = -1;
+        bool  found    = false;
+        int   iNearest = -1;
         float dist, minDist = 1000000.;
 
         QSet<int> onlyVisible = mMainWindow->getPedestrianUserSelection();
         int       frame       = mMainWindow->getAnimation()->getCurrentFrameNum();
 
-        for(i = 0; i < mTracker->size(); ++i) // !found &&  // ueber TrackPerson
+        const auto &persons = mPersonStorage.getPersons();
+        size_t      i;
+        for(i = 0; i < persons.size(); ++i)
         {
-            if(((onlyVisible.empty()) || (onlyVisible.contains(i))) && mTracker->at(i).trackPointExist(frame))
+            const auto &person = persons[i];
+            if(((onlyVisible.empty()) || (onlyVisible.contains(i))) && person.trackPointExist(frame))
             {
-                dist = mTracker->at(i).trackPointAt(frame).distanceToPoint(p);
+                dist = person.trackPointAt(frame).distanceToPoint(p);
                 if((dist < mMainWindow->getHeadSize(nullptr, i, frame) / 2.) ||
-                   ((mTracker->at(i).trackPointAt(frame).distanceToPoint(p.colPoint()) <
+                   ((person.trackPointAt(frame).distanceToPoint(p.colPoint()) <
                      mMainWindow->getHeadSize(nullptr, i, frame) / 2.)))
                 {
                     if(found)
@@ -120,7 +124,7 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         if(found)
         {
             i      = iNearest;
-            tp     = mTracker->at(i);
+            tp     = persons[i];
             height = tp.height();
 
             if(height < MIN_HEIGHT + 1)
@@ -328,7 +332,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     groundPathPen.setWidth(pSGP);
 
 
-    if(mControlWidget->showVoronoiCells->isChecked() && !mTracker->isEmpty())
+    if(mControlWidget->showVoronoiCells->isChecked() && mPersonStorage.nbPersons() != 0)
     {
         // ToDo: adjust subdiv rect to correct area
         QRectF qrect = mMainWindow->getRecoRoiItem()->rect();
@@ -355,24 +359,26 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
         subdiv.initDelaunay(delaunyROI);
     }
 
-    auto pedestrianToPaint = mMainWindow->getPedestrianUserSelection();
-    for(int i = 0; i < mTracker->size(); ++i) // ueber TrackPerson
+    auto        pedestrianToPaint = mMainWindow->getPedestrianUserSelection();
+    const auto &persons           = mPersonStorage.getPersons();
+    for(size_t i = 0; i < persons.size(); ++i) // ueber TrackPerson
     {
+        const auto &person = persons[i];
         // show current frame
         if(pedestrianToPaint.contains(i) || pedestrianToPaint.empty())
         {
-            if(mTracker->at(i).trackPointExist(curFrame))
+            if(person.trackPointExist(curFrame))
             {
                 if(mControlWidget->trackHeadSized->checkState() == Qt::Checked)
                 {
                     pSP = mMainWindow->getHeadSize(nullptr, i, curFrame); // headSize;
                 }
-                const TrackPoint &tp = (*mTracker)[i][curFrame - mTracker->at(i).firstFrame()];
+                const TrackPoint &tp = person[curFrame - person.firstFrame()];
                 if(mControlWidget->trackShowCurrentPoint->checkState() ==
                    Qt::Checked) //(mControlWidget->recoShowColor->checkState() == Qt::Checked)
                 {
                     painter->setBrush(Qt::NoBrush);
-                    if(mTracker->at(i).newReco())
+                    if(person.newReco())
                     {
                         painter->setPen(Qt::green);
                     }
@@ -415,11 +421,10 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 }
 
                 // berechnung der normalen, die zur positionierung der nummerieung und der gesamtfarbe dient
-                if(((mControlWidget->trackShowColColor->checkState() == Qt::Checked) &&
-                    (mTracker->at(i).color().isValid())) ||
+                if(((mControlWidget->trackShowColColor->checkState() == Qt::Checked) && (person.color().isValid())) ||
                    (mControlWidget->trackShowNumber->checkState() == Qt::Checked) ||
                    ((mControlWidget->trackShowColColor->checkState() == Qt::Checked) &&
-                    ((mTracker->at(i).height() > MIN_HEIGHT) ||
+                    ((person.height() > MIN_HEIGHT) ||
                      ((tp.sp().z() > 0.) && (mControlWidget->trackShowHeightIndividual->checkState() ==
                                              Qt::Checked))))) //  Hoehe kann auf Treppen auch negativ werden, wenn koord
                                                               //  weiter oben angesetzt wird
@@ -438,11 +443,11 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         // man koennte auch lastNormal von anderem trackpath nehmen statt 1, 0
                         normalVector.set(1., 0.);
                         // den vorherigen trackpoint finden, wo reco farbe erzeugt hat und somit colpoint vorliegt
-                        for(int j = curFrame - mTracker->at(i).firstFrame(); j > -1; --j)
+                        for(int j = curFrame - person.firstFrame(); j > -1; --j)
                         {
-                            if(mTracker->at(i).at(j).color().isValid())
+                            if(person.at(j).color().isValid())
                             {
-                                normalVector = (mTracker->at(i).at(j) - mTracker->at(i).at(j).colPoint()).normal();
+                                normalVector = (person.at(j) - person.at(j).colPoint()).normal();
                                 normalVector.normalize();
                                 break;
                             }
@@ -451,11 +456,11 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         // zB wenn rueckwaerts abgespielt wird
                         if((normalVector.x() == 1.) && (normalVector.y() == 0.))
                         {
-                            for(int j = curFrame - mTracker->at(i).firstFrame() + 1; j < mTracker->at(i).size(); ++j)
+                            for(int j = curFrame - person.firstFrame() + 1; j < person.size(); ++j)
                             {
-                                if(mTracker->at(i).at(j).color().isValid())
+                                if(person.at(j).color().isValid())
                                 {
-                                    normalVector = (mTracker->at(i).at(j) - mTracker->at(i).at(j).colPoint()).normal();
+                                    normalVector = (person.at(j) - person.at(j).colPoint()).normal();
                                     normalVector.normalize();
                                     break;
                                 }
@@ -465,13 +470,13 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 }
 
                 // farbe der gesamten trackperson
-                double height = mTracker->at(i).height();
+                double height = person.height();
                 if(mControlWidget->trackShowColColor->checkState() == Qt::Checked)
                 {
                     painter->setPen(numberPen);
                     painter->setBrush(Qt::NoBrush);
                     rect.setRect(tp.x() + 10, tp.y() + 10, 15 * pSC, 10 * pSC);
-                    painter->drawText(rect, mTracker->at(i).comment());
+                    painter->drawText(rect, person.comment());
                     rect.setRect(tp.x() - pSC, tp.y() - pSC, 50, 50);
                     if(tp.getMarkerID() > 0)
                     {
@@ -479,11 +484,10 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     }
                 }
 
-                if((mControlWidget->trackShowColColor->checkState() == Qt::Checked) &&
-                   (mTracker->at(i).color().isValid()))
+                if((mControlWidget->trackShowColColor->checkState() == Qt::Checked) && (person.color().isValid()))
                 {
                     painter->setPen(Qt::NoPen);
-                    painter->setBrush(QBrush(mTracker->at(i).color()));
+                    painter->setBrush(QBrush(person.color()));
                     rect.setRect(
                         tp.x() + (pSP + pSC) * 0.6 * normalVector.x() - pSC / 2.,
                         tp.y() + (pSP + pSC) * 0.6 * normalVector.y() - pSC / 2.,
@@ -496,7 +500,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     ((height > MIN_HEIGHT) ||
                      ((tp.sp().z() > 0.) &&
                       (mControlWidget->trackShowHeightIndividual->checkState() ==
-                       Qt::Checked)))) // Hoehe  && (mTracker->at(i).height() > 0.) Hoehe kann auf Treppen auch negativ
+                       Qt::Checked)))) // Hoehe  && (person.height() > 0.) Hoehe kann auf Treppen auch negativ
                                        // werden, wenn koord weiter oben angesetzt wird
                 {
                     painter->setFont(heightFont);
@@ -588,8 +592,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         if(height < MIN_HEIGHT + 1)
                         {
                             p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(
-                                cv::Point2f(tp.x(), tp.y()),
-                                mControlWidget->getColorPlot()->map(mTracker->at(i).color()));
+                                cv::Point2f(tp.x(), tp.y()), mControlWidget->getColorPlot()->map(person.color()));
                         }
                         else
                         {
@@ -631,8 +634,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         if(height < MIN_HEIGHT + 1)
                         {
                             p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(
-                                cv::Point2f(tp.x(), tp.y()),
-                                mControlWidget->getColorPlot()->map(mTracker->at(i).color()));
+                                cv::Point2f(tp.x(), tp.y()), mControlWidget->getColorPlot()->map(person.color()));
                         }
                         else
                         {
@@ -662,7 +664,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
             if(((mControlWidget->trackShowPoints->checkState() == Qt::Checked) ||
                 (mControlWidget->trackShowPath->checkState() == Qt::Checked) ||
                 (mControlWidget->trackShowGroundPath->checkState() == Qt::Checked)) &&
-               ((mTracker->at(i).trackPointExist(curFrame)) ||
+               ((person.trackPointExist(curFrame)) ||
                 (mControlWidget->trackShowOnlyVisible->checkState() == Qt::Unchecked)))
             {
                 if(mControlWidget->trackShowBefore->value() == -1)
@@ -671,7 +673,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 }
                 else
                 {
-                    from = curFrame - mTracker->at(i).firstFrame() - mControlWidget->trackShowBefore->value();
+                    from = curFrame - person.firstFrame() - mControlWidget->trackShowBefore->value();
                     if(from < 0)
                     {
                         from = 0;
@@ -679,14 +681,14 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 }
                 if(mControlWidget->trackShowAfter->value() == -1)
                 {
-                    to = mTracker->at(i).size();
+                    to = person.size();
                 }
                 else
                 {
-                    to = curFrame - mTracker->at(i).firstFrame() + mControlWidget->trackShowAfter->value() + 1;
-                    if(to > mTracker->at(i).size())
+                    to = curFrame - person.firstFrame() + mControlWidget->trackShowAfter->value() + 1;
+                    if(to > person.size())
                     {
-                        to = mTracker->at(i).size();
+                        to = person.size();
                     }
                 }
                 for(int j = from; j < to; ++j) // ueber TrackPoint
@@ -701,15 +703,14 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
 
                             // nur Linie zeichnen, wenn x oder y sich unterscheidet, sonst Punkt
                             // die Unterscheidung ist noetig, da Qt sonst grosses quadrat beim ranzoomen zeichnet
-                            if((mTracker->at(i).at(j - 1).toQPointF().x() != mTracker->at(i).at(j).toQPointF().x()) ||
-                               (mTracker->at(i).at(j - 1).toQPointF().y() != mTracker->at(i).at(j).toQPointF().y()))
+                            if((person.at(j - 1).toQPointF().x() != person.at(j).toQPointF().x()) ||
+                               (person.at(j - 1).toQPointF().y() != person.at(j).toQPointF().y()))
                             {
-                                painter->drawLine(
-                                    mTracker->at(i).at(j - 1).toQPointF(), mTracker->at(i).at(j).toQPointF());
+                                painter->drawLine(person.at(j - 1).toQPointF(), person.at(j).toQPointF());
                             }
                             else
                             {
-                                painter->drawPoint(mTracker->at(i).at(j - 1).toQPointF());
+                                painter->drawPoint(person.at(j - 1).toQPointF());
                             }
                         }
                     }
@@ -724,34 +725,32 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                             if(mControlWidget->getCalibCoordDimension() == 0) // 3D
                             {
                                 cv::Point3f p3d_height_p1, p3d_height_p2;
-                                if(mTracker->at(i).height() < MIN_HEIGHT + 1)
+                                if(person.height() < MIN_HEIGHT + 1)
                                 {
                                     p3d_height_p1 = mMainWindow->getExtrCalibration()->get3DPoint(
-                                        cv::Point2f(mTracker->at(i).at(j - 1).x(), mTracker->at(i).at(j - 1).y()),
-                                        mControlWidget->getColorPlot()->map(mTracker->at(i).color()));
+                                        cv::Point2f(person.at(j - 1).x(), person.at(j - 1).y()),
+                                        mControlWidget->getColorPlot()->map(person.color()));
                                     p3d_height_p2 = mMainWindow->getExtrCalibration()->get3DPoint(
-                                        cv::Point2f(mTracker->at(i).at(j).x(), mTracker->at(i).at(j).y()),
-                                        mControlWidget->getColorPlot()->map(mTracker->at(i).color()));
+                                        cv::Point2f(person.at(j).x(), person.at(j).y()),
+                                        mControlWidget->getColorPlot()->map(person.color()));
                                 }
                                 else
                                 {
-                                    if(mTracker->at(i).at(j - 1).sp().z() > 0 && mTracker->at(i).at(j).sp().z() > 0)
+                                    if(person.at(j - 1).sp().z() > 0 && person.at(j).sp().z() > 0)
                                     {
                                         p3d_height_p1 = mMainWindow->getExtrCalibration()->get3DPoint(
-                                            cv::Point2f(mTracker->at(i).at(j - 1).x(), mTracker->at(i).at(j - 1).y()),
-                                            -mControlWidget->getCalibExtrTrans3() - mTracker->at(i).at(j - 1).sp().z());
+                                            cv::Point2f(person.at(j - 1).x(), person.at(j - 1).y()),
+                                            -mControlWidget->getCalibExtrTrans3() - person.at(j - 1).sp().z());
                                         p3d_height_p2 = mMainWindow->getExtrCalibration()->get3DPoint(
-                                            cv::Point2f(mTracker->at(i).at(j).x(), mTracker->at(i).at(j).y()),
-                                            -mControlWidget->getCalibExtrTrans3() - mTracker->at(i).at(j).sp().z());
+                                            cv::Point2f(person.at(j).x(), person.at(j).y()),
+                                            -mControlWidget->getCalibExtrTrans3() - person.at(j).sp().z());
                                     }
                                     else
                                     {
                                         p3d_height_p1 = mMainWindow->getExtrCalibration()->get3DPoint(
-                                            cv::Point2f(mTracker->at(i).at(j - 1).x(), mTracker->at(i).at(j - 1).y()),
-                                            mTracker->at(i).height());
+                                            cv::Point2f(person.at(j - 1).x(), person.at(j - 1).y()), person.height());
                                         p3d_height_p2 = mMainWindow->getExtrCalibration()->get3DPoint(
-                                            cv::Point2f(mTracker->at(i).at(j).x(), mTracker->at(i).at(j).y()),
-                                            mTracker->at(i).height());
+                                            cv::Point2f(person.at(j).x(), person.at(j).y()), person.height());
                                     }
                                 }
                                 p3d_height_p1.z = 0;
@@ -781,27 +780,21 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     // points before and after
                     if(mControlWidget->trackShowPoints->checkState() == Qt::Checked)
                     {
-                        if(mTracker->at(i).firstFrame() + j != curFrame)
+                        if(person.firstFrame() + j != curFrame)
                         {
                             if((mControlWidget->trackShowPointsColored->checkState() == Qt::Checked) &&
-                               (mTracker->at(i).at(j).color().isValid()))
+                               (person.at(j).color().isValid()))
                             {
                                 painter->setPen(Qt::NoPen);
-                                painter->setBrush(QBrush(mTracker->at(i).at(j).color()));
-                                rect.setRect(
-                                    mTracker->at(i).at(j).x() - pS / 2.,
-                                    mTracker->at(i).at(j).y() - pS / 2.,
-                                    pS,
-                                    pS); // 7
+                                painter->setBrush(QBrush(person.at(j).color()));
+                                rect.setRect(person.at(j).x() - pS / 2., person.at(j).y() - pS / 2., pS,
+                                             pS); // 7
                             }
                             else
                             {
                                 painter->setPen(Qt::red);
                                 painter->setBrush(Qt::NoBrush);
-                                // war noetig fuer alte qt-version: rect.setRect(mTracker->at(i).at(j).x()-(pS-1.)/2.,
-                                // mTracker->at(i).at(j).y()-(pS-1.)/2., pS-1., pS-1.); // 6
-                                rect.setRect(
-                                    mTracker->at(i).at(j).x() - pS / 2., mTracker->at(i).at(j).y() - pS / 2., pS, pS);
+                                rect.setRect(person.at(j).x() - pS / 2., person.at(j).y() - pS / 2., pS, pS);
                             }
                             painter->drawEllipse(rect);
                         }
@@ -812,7 +805,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     }
 
     // Mat& img, Subdiv2D& subdiv )
-    if(mControlWidget->showVoronoiCells->checkState() == Qt::Checked && !mTracker->isEmpty())
+    if(mControlWidget->showVoronoiCells->checkState() == Qt::Checked && !mPersonStorage.getPersons().empty())
     {
         std::vector<std::vector<cv::Point2f>> facets3D;
         std::vector<cv::Point2f>              centers3D;
