@@ -372,6 +372,7 @@ target_sources(petrack_core PRIVATE
     include/moCapPersonMetadata.h
     include/pMessageBox.h
     include/moCapSelectionWidget.h
+    include/personStorage.h
     )
 
 target_sources(petrack_core PRIVATE
@@ -431,6 +432,7 @@ target_sources(petrack_core PRIVATE
     src/moCapPersonMetadata.cpp
     src/pMessageBox.cpp
     src/moCapSelectionWidget.cpp
+    src/personStorage.cpp
     ui/about.ui
     ui/codeMarker.ui
     ui/colorMarker.ui

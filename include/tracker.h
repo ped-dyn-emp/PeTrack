@@ -21,12 +21,16 @@
 #ifndef TRACKER_H
 #define TRACKER_H
 
-#include "petrack.h"
+#include "recognition.h"
 #include "vector.h"
 
 #include <QColor>
 #include <QList>
+#include <QRegularExpression>
 #include <QTextStream>
+
+class PersonStorage;
+class Petrack;
 
 // war 1.5, aber bei bildauslassungen kann es ungewollt zuschlagen (bei 3 ist ein ausgelassener frame mgl, bei 2 wieder
 // ein problem)
@@ -90,85 +94,9 @@ public:
 };
 
 
-inline QTextStream &operator>>(QTextStream &s, TrackPoint &tp)
-{
-    double d;
-    Vec2F  p;
-    Vec3F  sp;
-    QColor col;
-    int    qual;
-    int    markerID;
-
-    s >> d;
-    tp.setX(d);
-    s >> d;
-    tp.setY(d);
-    if(Petrack::trcVersion > 1)
-    {
-        s >> d;
-        sp.setX(d);
-        s >> d;
-        sp.setY(d);
-        s >> d;
-        sp.setZ(d);
-        tp.setSp(sp);
-    }
-    s >> qual;
-    tp.setQual(qual);
-    s >> d;
-    p.setX(d);
-    s >> d;
-    p.setY(d);
-    tp.setColPoint(p);
-    s >> col;
-    tp.setColor(col);
-    if(Petrack::trcVersion > 2)
-    {
-        s >> markerID;
-        tp.setMarkerID(markerID);
-    }
-    return s;
-}
-inline QTextStream &operator<<(QTextStream &s, const TrackPoint &tp)
-{
-    if(Petrack::trcVersion > 2)
-    {
-        s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " "
-          << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color() << " "
-          << tp.getMarkerID();
-    }
-    else if(Petrack::trcVersion == 2)
-    {
-        s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " "
-          << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color();
-    }
-    else
-    {
-        s << tp.x() << " " << tp.y() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " "
-          << tp.color();
-    }
-    return s;
-}
-inline std::ostream &operator<<(std::ostream &s, const TrackPoint &tp)
-{
-    if(Petrack::trcVersion > 2)
-    {
-        s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " "
-          << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color() << " "
-          << tp.getMarkerID();
-    }
-    else if(Petrack::trcVersion > 1)
-    {
-        s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " "
-          << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color();
-    }
-    else
-    {
-        s << tp.x() << " " << tp.y() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " "
-          << tp.color();
-    }
-    return s;
-}
+QTextStream & operator>>(QTextStream &s, TrackPoint &tp);
+QTextStream & operator<<(QTextStream &s, const TrackPoint &tp);
+std::ostream &operator<<(std::ostream &s, const TrackPoint &tp);
 
 //--------------------------------------------------------------------------
 
@@ -219,7 +147,7 @@ public:
         mHeightCount = 0;
     }
     void   recalcHeight(float altitude);
-    double getNearestZ(int i, int *extrapolated);
+    double getNearestZ(int i, int *extrapolated) const;
 
     inline int           getMarkerID() const { return mMarkerID; }
     inline void          setMarkerID(const int markerID) { mMarkerID = markerID; }
@@ -258,86 +186,11 @@ public:
 // mHeightCount wird nicht e3xportiert und auch nicht wieder eingelesen -> nach import auf 0 obwohl auf height ein wert
 // steht, daher immer mheight auf -1 testen!!!
 // keine Konsistenzueberpruefung
-inline QTextStream &operator>>(QTextStream &s, TrackPerson &tp)
-{
-    double     d;
-    QColor     col;
-    int        n;
-    TrackPoint p;
-    int        markerID;
+QTextStream &operator>>(QTextStream &s, TrackPerson &tp);
 
-    s.skipWhiteSpace();
-    QString str = s.readLine();
+QTextStream &operator<<(QTextStream &s, const TrackPerson &tp);
 
-    QTextStream trjInfoLine(&str);
-
-    trjInfoLine >> n;
-    tp.setNr(n);
-    trjInfoLine >> d;
-    tp.setHeight(d);
-    trjInfoLine >> n;
-    tp.setFirstFrame(n);
-    trjInfoLine >> n;
-    tp.setLastFrame(n);
-    trjInfoLine >> n;
-    tp.setColCount(n);
-    trjInfoLine >> col;
-    tp.setColor(col);
-    if(Petrack::trcVersion > 3)
-    {
-        trjInfoLine >> markerID;
-        tp.setMarkerID(markerID);
-    }
-    trjInfoLine >> n;           // size of list
-    if(Petrack::trcVersion > 2) // Reading the comment line
-    {
-        // Kommentarzeile lesen
-        str = s.readLine();
-        tp.setComment(str.replace(QRegularExpression("<br>"), "\n"));
-    }
-
-
-    for(int i = 0; i < n; ++i)
-    {
-        s >> p;
-        tp.append(p);
-    }
-    return s;
-}
-
-inline QTextStream &operator<<(QTextStream &s, const TrackPerson &tp)
-{
-    s << tp.nr() << " " << tp.height() << " " << tp.firstFrame() << " " << tp.lastFrame() << " " << tp.colCount() << " "
-      << tp.color();
-    if(Petrack::trcVersion > 3)
-    {
-        s << " " << tp.getMarkerID();
-    }
-    s << " " << tp.size();
-    s << Qt::endl << tp.serializeComment() << Qt::endl;
-    for(int i = 0; i < tp.size(); ++i)
-    {
-        s << tp.at(i) << Qt::endl;
-    }
-    return s;
-}
-
-inline std::ostream &operator<<(std::ostream &s, const TrackPerson &tp)
-{
-    s << tp.nr() << " " << tp.height() << " " << tp.firstFrame() << " " << tp.lastFrame() << " " << tp.colCount() << " "
-      << tp.color();
-    if(Petrack::trcVersion > 3)
-    {
-        s << " " << tp.getMarkerID();
-    }
-    s << " " << tp.size();
-    s << std::endl << tp.serializeComment() << std::endl;
-    for(int i = 0; i < tp.size(); ++i)
-    {
-        s << tp.at(i) << std::endl;
-    }
-    return s;
-}
+std::ostream &operator<<(std::ostream &s, const TrackPerson &tp);
 
 //----------------------------------------------------------------------------
 
@@ -353,7 +206,7 @@ inline std::ostream &operator<<(std::ostream &s, const TrackPerson &tp)
  * 6. calculate color over tracking (accumulated over tracking while procedure above) path and set height
  * 7. recalc coord with real coord with known height
  */
-class Tracker : public QList<TrackPerson>
+class Tracker
 {
 private:
     Petrack *                mMainWindow;
@@ -365,9 +218,10 @@ private:
     std::vector<int>         mPrevFeaturePointsIdx;
     std::vector<float>       mTrackError;
     cv::TermCriteria         mTermCriteria;
+    PersonStorage &          mPersonStorage;
 
 public:
-    Tracker(QWidget *wParent);
+    Tracker(QWidget *wParent, PersonStorage &storage);
 
     // neben loeschen der liste muessen auch ...
     void init(cv::Size size);
@@ -375,45 +229,6 @@ public:
     void reset();
 
     void resize(cv::Size size);
-
-    void splitPerson(int pers, int frame);
-    bool splitPersonAt(const Vec2F &p, int frame, QSet<int> onlyVisible);
-
-    bool delPointOf(int pers, int direction, int frame);
-    bool delPoint(const Vec2F &p, int direction, int frame, QSet<int> onlyVisible);
-    void delPointAll(int direction, int frame);
-    void delPointROI();
-    void delPointInsideROI();
-    bool editTrackPersonComment(const Vec2F &p, int frame, const QSet<int> &onlyVisible);
-    bool setTrackPersonHeight(const Vec2F &p, int frame, QSet<int> onlyVisible);
-    bool resetTrackPersonHeight(const Vec2F &p, int frame, QSet<int> onlyVisible);
-
-    // used for calculation of 3D point for all points in frame
-    // returns number of found points or -1 if no stereoContext available (also points without disp found are counted)
-    int calcPosition(int frame);
-
-    // true, if new traj is inserted with point p and initial frame frame
-    // p in pixel coord
-    // pers wird gesetzt, wenn existierender trackpoint einer person verschoben wird
-    bool addPoint(
-        TrackPoint &            p,
-        int                     frame,
-        const QSet<int> &       onlyVisible,
-        reco::RecognitionMethod method,
-        int *                   pers = nullptr);
-
-    // hier sollte direkt die farbe mit uebergeben werden
-    void addPoints(QList<TrackPoint> &pL, int frame, reco::RecognitionMethod method);
-
-    // calculate height of person
-
-    // convert all trajectorie coordinates in real coordinate (height needed)
-
-    int visible(int frameNum);
-    int largestFirstFrame();
-    int largestLastFrame();
-    int smallestFirstFrame();
-    int smallestLastFrame();
 
     size_t calcPrevFeaturePoints(
         int       prevFrame,
@@ -438,32 +253,6 @@ public:
         int                     level              = 3,
         QSet<int>               onlyVisible        = QSet<int>(),
         int                     errorScaleExponent = 0);
-
-
-    void checkPlausibility(
-        QList<int> &pers,
-        QList<int> &frame,
-        bool        testEqual    = true,
-        bool        testVelocity = true,
-        bool        testInside   = true,
-        bool        testLength   = true);
-    void optimizeColor();
-
-    // reset the height of all persons, but not the pos of the trackpoints
-    void resetHeight();
-    // reset the pos of the tzrackpoints, but not the heights
-    void resetPos();
-    void recalcHeight(float altitude);
-
-    void setMarkerHeights(const std::unordered_map<int, float> &heights);
-
-    void setMarkerIDs(const std::unordered_map<int, int> &markerIDs);
-
-    // gibt groessenverteilung der personen auf stdout aus
-    // rueckgabewert false wenn keine hoeheninformationen in tracker datensatz vorliegt
-    bool printHeightDistribution();
-
-    void purge(int frame);
 
 private:
     bool tryMergeTrajectories(const TrackPoint &v, size_t i, int frame);

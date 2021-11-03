@@ -21,6 +21,8 @@
 #ifndef VIEW_H
 #define VIEW_H
 
+#include "personStorage.h" // for Direction
+
 #include <QFrame>
 #include <QGraphicsView>
 #include <QKeyEvent>
@@ -54,7 +56,7 @@ signals:
     void mouseShiftDoubleClick(QPointF pos);
     void mouseControlDoubleClick(QPointF pos);
     void mouseRightDoubleClick(QPointF pos, int direction);
-    void mouseMiddleDoubleClick(int direction);
+    void mouseMiddleDoubleClick(PersonStorage::Direction direction);
     void mouseShiftWheel(int delta);
     void colorSelected();
     void setColorEvent();

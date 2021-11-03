@@ -161,7 +161,7 @@ void setColorParameter(const QColor &fromColor, const QColor &toColor, bool inve
  * @param controlWidget
  * @return
  */
-Vec2F autoCorrectColorMarker(Vec2F &boxImageCentre, Control *controlWidget)
+Vec2F autoCorrectColorMarker(const Vec2F &boxImageCentre, Control *controlWidget)
 {
     Petrack *   mainWindow = controlWidget->getMainWindow();
     cv::Point2f tp         = mainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(

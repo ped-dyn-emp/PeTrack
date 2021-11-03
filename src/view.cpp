@@ -111,15 +111,15 @@ void GraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
     {
         if(event->modifiers() == Qt::ShiftModifier) // nur shift zugelassen ...
         {
-            emit mouseMiddleDoubleClick(-1);
+            emit mouseMiddleDoubleClick(PersonStorage::Direction::Previous);
         }
         else if(event->modifiers() == Qt::ControlModifier)
         {
-            emit mouseMiddleDoubleClick(0);
+            emit mouseMiddleDoubleClick(PersonStorage::Direction::Whole);
         }
         else if(event->modifiers() == Qt::AltModifier)
         {
-            emit mouseMiddleDoubleClick(1);
+            emit mouseMiddleDoubleClick(PersonStorage::Direction::Following);
         }
     }
 

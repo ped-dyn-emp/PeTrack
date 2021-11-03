@@ -30,7 +30,7 @@
 
 class Petrack;
 class Control;
-
+class PersonStorage;
 
 class ReprojectionError
 {
@@ -144,8 +144,9 @@ public:
 class ExtrCalibration
 {
 private:
-    Petrack *mMainWindow;
-    Control *mControlWidget;
+    Petrack *      mMainWindow;
+    Control *      mControlWidget;
+    PersonStorage &mPersonStorage;
 
     std::vector<cv::Point3f> points3D;
     std::vector<cv::Point2f> points2D;
@@ -164,7 +165,7 @@ private:
     void              init();
 
 public:
-    ExtrCalibration();
+    ExtrCalibration(PersonStorage &storage);
     ~ExtrCalibration();
     void                            setMainWindow(Petrack *mw);
     bool                            isEmptyExtrCalibFile();
