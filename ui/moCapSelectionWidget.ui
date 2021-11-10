@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>544</width>
-    <height>71</height>
+    <height>80</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,14 +22,14 @@
      <item>
       <widget class="QPushButton" name="browseFileButton">
        <property name="text">
-        <string>Browse File</string>
+        <string>browse file</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="filePathLabel">
        <property name="text">
-        <string>File</string>
+        <string>file</string>
        </property>
        <property name="textInteractionFlags">
         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
@@ -53,7 +53,7 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Offset(sec):</string>
+        <string>offset [s]:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -66,7 +66,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Samplerate(Hz):</string>
+        <string>samplerate [Hz]:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -79,7 +79,7 @@
      <item>
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>System:</string>
+        <string>system:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
