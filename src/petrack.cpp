@@ -744,7 +744,7 @@ bool Petrack::saveSameProject()
 bool Petrack::saveProject(QString fileName) // default fileName=""
 {
     // if no destination file or folder is given
-    if(fileName.isEmpty() || QFileInfo(mProFileName).isDir())
+    if(fileName.isEmpty() && QFileInfo(mProFileName).isDir())
     {
         fileName = QFileDialog::getSaveFileName(
             this, tr("Select project file"), mProFileName, tr("PeTrack project file (*.pet);;All files (*.*)"));
