@@ -72,8 +72,10 @@ int main(int argc, char *argv[])
     bool        autoSave = false;
     QString     autoTrackDest;
     QString     autoPlayDest;
-    bool        autoTrack = false;
-    bool        autoPlay  = false;
+    bool        autoTrack     = false;
+    bool        autoPlay      = false;
+    bool        autoIntrinsic = false;
+    QString     intrinsicDir;
 
     QString autoReadHeightFile;
     bool    autoReadHeight = false;
@@ -147,6 +149,11 @@ int main(int argc, char *argv[])
             autoSaveTracker     = true;
             autoSaveTrackerFile = arg.at(++i);
         }
+        else if((arg.at(i) == "-autointrinsic") || (arg.at(i) == "-autoIntrinsic"))
+        {
+            autoIntrinsic = true;
+            intrinsicDir  = arg.at(++i);
+        }
         else
         {
             // hier koennte je nach dateiendung *pet oder *avi oder *png angenommern werden
@@ -200,6 +207,25 @@ int main(int argc, char *argv[])
         }
         return EXIT_SUCCESS; // 0 means exit success// Programm beenden nach speichern! // 1?
     }
+
+    if(autoIntrinsic)
+    {
+        QDir      intrinsicImagesDir{intrinsicDir};
+        QFileInfo info{intrinsicImagesDir.absolutePath()};
+        if(!(intrinsicImagesDir.exists() && info.isDir()))
+        {
+            std::cout << "Error: " << intrinsicDir << " isn't an existing directory.\n";
+            return EXIT_FAILURE;
+        }
+        QStringList calibFiles;
+        for(const auto &file : intrinsicImagesDir.entryInfoList(QDir::Files | QDir::Readable))
+        {
+            calibFiles.append(file.absoluteFilePath());
+        }
+        petrack.getAutoCalib()->setCalibFiles(calibFiles);
+        petrack.getAutoCalib()->autoCalib();
+    }
+
     // hat tracker_file bestimmte Dateiendung txt oder trc, dann wird nur genau diese exportiert, sonst beide
     if(autoTrack)
     {
