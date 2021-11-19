@@ -134,6 +134,7 @@ public slots:
     void openProject(QString fileName = "", bool openSequence = true);
     void saveXml(QDomDocument &doc);
     bool saveSameProject();
+    bool saveProjectAs();
     bool saveProject(QString fileName = "");
     void writeXmlElement(QXmlStreamWriter &xmlStream, QDomElement element);
     void openSequence(QString fileName = "");
