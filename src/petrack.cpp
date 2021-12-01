@@ -740,6 +740,13 @@ bool Petrack::saveSameProject()
     return saveProject(mProFileName);
 }
 
+bool Petrack::saveProjectAs()
+{
+    auto fileName = QFileDialog::getSaveFileName(
+        this, tr("Select project file"), mProFileName, tr("PeTrack project file (*.pet);;All files (*.*)"));
+    return saveProject(fileName);
+}
+
 /// rueckgabewert zeigt an, ob gesichert werden konnte
 bool Petrack::saveProject(QString fileName) // default fileName=""
 {
@@ -1728,7 +1735,7 @@ void Petrack::createActions()
 
     mSavePrAct = new QAction(tr("&Save Project As"), this);
     mSavePrAct->setShortcut(tr("Ctrl+Shift+S"));
-    connect(mSavePrAct, SIGNAL(triggered()), this, SLOT(saveProject()));
+    connect(mSavePrAct, &QAction::triggered, this, &Petrack::saveProjectAs);
 
     mSaveAct = new QAction(tr("&Save Project"), this);
     mSaveAct->setShortcut(tr("Ctrl+S"));
