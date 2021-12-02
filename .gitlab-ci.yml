@@ -32,7 +32,7 @@ stages:
 # from the repository
 build_container:
   stage: build_environment
-  image: 
+  image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   script:
@@ -72,9 +72,10 @@ unit_test_linux:
   artifacts:
     when: always
     paths:
-        - build/tests/unit_test/unit_test_report.xml
+      - build/tests/unit_test/unit_test_report.xml
     reports:
       junit: "build/tests/unit_test/unit_test_report.xml"
+  needs: ["build_linux"]
 
 # Execute regression tests
 regression_test_linux:
@@ -82,13 +83,14 @@ regression_test_linux:
   stage: test
   script:
     - cd tests/regression_test/tests
-    - python3 -m pytest --path=../../../build/petrack --junitxml=pytest_report.xml >> "RegressionTestLog.txt"
+    - python3 -m pytest --path=../../../build/petrack --junitxml=pytest_report.xml | tee "RegressionTestLog.txt"
   artifacts:
     when: on_failure
     paths:
       - "tests/regression_test/tests/RegressionTestLog.txt"
     reports:
       junit: "tests/regression_test/tests/pytest_report.xml"
+  needs: ["build_linux"]
 
 
 ###############################################################################
@@ -122,7 +124,7 @@ unit_test_windows:
   artifacts:
     when: always
     paths:
-        - build/tests/unit_test/unit_test_report.xml
+      - build/tests/unit_test/unit_test_report.xml
     reports:
       junit: "build/tests/unit_test/unit_test_report.xml"
   needs: ["build_windows"]
@@ -143,7 +145,7 @@ regression_test_windows:
       junit: "tests/regression_test/tests/pytest_report.xml"
   needs: ["build_windows"]
 
-build_windows_installer:
+build_installer_windows:
   stage: build_installer
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
@@ -163,17 +165,99 @@ build_windows_installer:
       - "build/petrack-installer-*"
     expire_in: 2hrs
 
-make_release:
+make_release_windows:
   image: alpine
   stage: deploy
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  needs: ["build_windows_installer"]
+  needs: ["build_installer_windows"]
   script:
     - apk --no-cache add curl
     - cd build
     - winInst=$(echo petrack-installer-*)
-    - curl -k -T $winInst -u "${SCIEBO_TOKEN}:" https://fz-juelich.sciebo.de/public.php/webdav/$winInst
+    - curl -k -T $winInst -u "${SCIEBO_WIN_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$winInst
 
+
+###############################################################################
+# MacOS CI
+###############################################################################
+# Build petrack and petrack unit_tests
+build_macos:
+  stage: build
+  tags:
+    - macos
+  script:
+    - mkdir build
+    - cd build
+    - cmake -G Ninja .. -DBUILD_BUNDLE=ON -DBUILD_UNIT_TESTS=ON -DCMAKE_PREFIX_PATH=/Users/tobias/programs/petrack-deps -DCatch2_DIR=/Users/tobias/programs/petrack-deps/lib/cmake/Catch2/ -Dtrompeloeil_DIR=/Users/tobias/programs/petrack-deps/lib/cmake/trompeloeil/
+    - cmake --build .
+    - cpack -C Release -G DragNDrop --verbose
+    - rm -r petrack.app
+    - find _CPack_Packages/ -type d -name "petrack.app" | xargs -I _ cp -r _  petrack.app
+  artifacts:
+    paths:
+      - "./build/"
+    expire_in: 2 hrs
+
+## Execute unit tests
+unit_test_macos:
+  stage: test
+  tags:
+    - macos
+  script:
+    - cd build/tests/unit_test
+    - ./petrack_tests -r junit -o unit_test_report.xml
+  artifacts:
+    when: always
+    paths:
+      - build/tests/unit_test/unit_test_report.xml
+    reports:
+      junit: "build/tests/unit_test/unit_test_report.xml"
+  needs: ["build_macos"]
+
+## Execute regression tests
+regression_test_macos:
+  stage: test
+  tags:
+    - macos
+  script:
+    - cd tests/regression_test/tests
+    - python3 -m pytest --path=../../../build/petrack.app/Contents/MacOS/petrack --junitxml=pytest_report.xml | tee "RegressionTestLog.txt"
+  artifacts:
+    when: on_failure
+    paths:
+      - "tests/regression_test/tests/RegressionTestLog.txt"
+    reports:
+      junit: "tests/regression_test/tests/pytest_report.xml"
+  needs: ["build_macos"]
+
+build_installer_macos:
+  stage: build_installer
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  tags:
+    - macos
+  script:
+    - cd build
+  artifacts:
+    paths:
+      - "build-bundle/petrack-installer-*"
+    expire_in: 2hrs
+
+make_release_macos:
+  image: alpine
+  stage: deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  needs: ["build_installer_macos"]
+  script:
+    - apk --no-cache add curl
+    - cd build-bundle
+    - macosInst=$(echo petrack-installer-*)
+    - curl -k -T $macosInst -u "${SCIEBO_MACOS_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$macosInst

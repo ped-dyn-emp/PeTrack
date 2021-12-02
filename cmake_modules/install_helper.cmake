@@ -41,21 +41,23 @@ elseif(APPLE)
         INSTALL_RPATH @executable_path/../Frameworks
     )
 
-     install(CODE [[
-         include(BundleUtilities)
+    install(CODE [[
+        include(BundleUtilities)
 
-         # This string is crazy-long enough that it's worth folding into a var...
-         set (_plugin_file "$<TARGET_FILE_NAME:Qt5::QCocoaIntegrationPlugin>")
+        # the output paths for our installation
+        set (_appdir "${CMAKE_INSTALL_PREFIX}/petrack.app")
+        set (_outdir "${_appdir}/Contents/PlugIns/platforms")
 
-         # Ditto the output paths for our installation
-         set (_appdir "${CMAKE_INSTALL_PREFIX}/petrack.app")
-         set (_outdir "${_appdir}/Contents/PlugIns/platforms")
+        # copy the needed plugins
+        file(INSTALL DESTINATION "${_outdir}"
+            TYPE FILE FILES "$<TARGET_FILE:Qt5::QCocoaIntegrationPlugin>" "$<TARGET_FILE:Qt5::QOffscreenIntegrationPlugin>")
 
-         file(INSTALL DESTINATION "${_outdir}"
-           TYPE FILE FILES "$<TARGET_FILE:Qt5::QCocoaIntegrationPlugin>")
-
-         fixup_bundle("${_appdir}/Contents/MacOS/petrack" "${_outdir}/${_plugin_file}" "")
-     ]] COMPONENT Runtime)
+        fixup_bundle(
+            "${_appdir}/Contents/MacOS/petrack"
+            "${_outdir}/$<TARGET_FILE_NAME:Qt5::QCocoaIntegrationPlugin>;${_outdir}/$<TARGET_FILE_NAME:Qt5::QOffscreenIntegrationPlugin>"
+            ""
+        )
+    ]] COMPONENT Runtime)
 
 endif()
 
