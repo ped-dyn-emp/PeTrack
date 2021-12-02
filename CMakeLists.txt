@@ -142,7 +142,7 @@ endif ()
 # Qt
 find_package(
   Qt5 5.14
-  COMPONENTS Widgets OpenGL Xml Core PrintSupport Concurrent
+  COMPONENTS Widgets OpenGL Xml Core PrintSupport Concurrent Test
   REQUIRED
 )
 message("Building with Qt${QT_DEFAULT_MAJOR_VERSION} (${Qt5Core_VERSION_STRING})")
@@ -288,8 +288,6 @@ if(BUILD_UNIT_TESTS)
       find_package(Catch2 REQUIRED)
       find_package(trompeloeil REQUIRED)
     endif()
-
-    find_package(Qt5Test REQUIRED)
 
     add_subdirectory(${CMAKE_SOURCE_DIR}/tests/unit_test)
     target_link_libraries(petrack_tests PRIVATE petrack_core git-info)
