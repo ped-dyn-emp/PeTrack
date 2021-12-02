@@ -164,6 +164,7 @@ build_installer_windows:
     paths:
       - "build/petrack-installer-*"
     expire_in: 2hrs
+  dependencies: []
 
 make_release_windows:
   image: alpine
@@ -247,6 +248,8 @@ build_installer_macos:
     paths:
       - "build-bundle/petrack-installer-*"
     expire_in: 2hrs
+  dependencies:
+    - build_macos
 
 make_release_macos:
   image: alpine
