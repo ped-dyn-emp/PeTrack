@@ -178,7 +178,7 @@ make_release_windows:
     - apk --no-cache add curl
     - cd build
     - winInst=$(echo petrack-installer-*)
-    - curl -k -T $winInst -u "${SCIEBO_WIN_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$winInst
+    - curl -k -T $winInst -u "${SCIEBO_WIN_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$winInst --fail-with-body
 
 
 ###############################################################################
@@ -199,10 +199,11 @@ build_macos:
     - find _CPack_Packages/ -type d -name "petrack.app" | xargs -I _ cp -r _  petrack.app
   artifacts:
     paths:
-      - "./build/"
+      - "build/"
+      - "build/petrack-installer-*"
     expire_in: 2 hrs
 
-## Execute unit tests
+# Execute unit tests
 unit_test_macos:
   stage: test
   tags:
@@ -218,7 +219,7 @@ unit_test_macos:
       junit: "build/tests/unit_test/unit_test_report.xml"
   needs: ["build_macos"]
 
-## Execute regression tests
+# Execute regression tests
 regression_test_macos:
   stage: test
   tags:
@@ -234,23 +235,6 @@ regression_test_macos:
       junit: "tests/regression_test/tests/pytest_report.xml"
   needs: ["build_macos"]
 
-build_installer_macos:
-  stage: build_installer
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: never
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  tags:
-    - macos
-  script:
-    - cd build
-  artifacts:
-    paths:
-      - "build-bundle/petrack-installer-*"
-    expire_in: 2hrs
-  dependencies:
-    - build_macos
-
 make_release_macos:
   image: alpine
   stage: deploy
@@ -258,9 +242,9 @@ make_release_macos:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  needs: ["build_installer_macos"]
   script:
     - apk --no-cache add curl
-    - cd build-bundle
+    - cd build
     - macosInst=$(echo petrack-installer-*)
-    - curl -k -T $macosInst -u "${SCIEBO_MACOS_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$macosInst
+    - curl -k -T $macosInst -u "${SCIEBO_MACOS_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$macosInst --fail-with-body
+  dependencies: [ "build_macos" ]
