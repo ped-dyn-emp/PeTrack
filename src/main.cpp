@@ -41,7 +41,6 @@ static QApplication *gApp = nullptr;
 void                 quit(int sig_number)
 {
     gApp->quit();
-    return;
 }
 
 int main(int argc, char *argv[])
@@ -76,13 +75,14 @@ int main(int argc, char *argv[])
     bool        autoPlay      = false;
     bool        autoIntrinsic = false;
     QString     intrinsicDir;
-
-    QString autoReadHeightFile;
-    bool    autoReadHeight = false;
-    QString autoReadMarkerFile;
-    bool    autoReadMarkerID = false;
-    QString autoSaveTrackerFile;
-    bool    autoSaveTracker = false;
+    QString     autoReadHeightFile;
+    bool        autoReadHeight = false;
+    QString     autoReadMarkerFile;
+    bool        autoReadMarkerID = false;
+    QString     autoSaveTrackerFile;
+    bool        autoSaveTracker = false;
+    bool        autoExportView  = false;
+    QString     exportViewFile;
 
     for(int i = 1; i < arg.size(); ++i) // i=0 ist Programmname
     {
@@ -154,6 +154,11 @@ int main(int argc, char *argv[])
             autoIntrinsic = true;
             intrinsicDir  = arg.at(++i);
         }
+        else if((arg.at(i) == "-autoExportView") || (arg.at(i) == "-autoexportview"))
+        {
+            autoExportView = true;
+            exportViewFile = arg.at(++i);
+        }
         else
         {
             // hier koennte je nach dateiendung *pet oder *avi oder *png angenommern werden
@@ -224,6 +229,13 @@ int main(int argc, char *argv[])
         }
         petrack.getAutoCalib()->setCalibFiles(calibFiles);
         petrack.getAutoCalib()->autoCalib();
+    }
+
+    if(autoExportView)
+    {
+        QFile outputFile{exportViewFile};
+        petrack.saveSequence(true, true, outputFile.fileName());
+        return EXIT_SUCCESS;
     }
 
     // hat tracker_file bestimmte Dateiendung txt oder trc, dann wird nur genau diese exportiert, sonst beide
