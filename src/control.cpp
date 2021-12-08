@@ -70,12 +70,7 @@ Control::Control(QWidget &parent, QGraphicsScene &scene, reco::Recognizer &recog
     // calibrateCamera die Flag CALIB_RATIONAL_MODEL übergibt; Ergibt eine genauere Kalibration Auch rechenintensiver,
     // aber da wir das einmal machen und dann Speichern, ist das auch egal Diese Boxen müssten in die UI eingebaut und
     // der entsprechende Aufruf in AutoCalib müsste angepasst werden
-    k4 = new QDoubleSpinBox(this);
-    k4->hide();
-    k5 = new QDoubleSpinBox(this);
-    k5->hide();
-    k6 = new QDoubleSpinBox(this);
-    k6->hide();
+
 
     filterBrightContrast->setCheckState(
         mMainWindow->getBrightContrastFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
@@ -133,6 +128,38 @@ Control::Control(QWidget &parent, QGraphicsScene &scene, reco::Recognizer &recog
     setCalibK6Max(mMainWindow->getCalibFilter()->getK6()->getMaximum());
     setCalibK6Value(mMainWindow->getCalibFilter()->getK6()->getValue());
 
+    setCalibS1Min(mMainWindow->getCalibFilter()->getS1()->getMinimum());
+    setCalibS1Max(mMainWindow->getCalibFilter()->getS1()->getMaximum());
+    setCalibS1Value(mMainWindow->getCalibFilter()->getS1()->getValue());
+
+    setCalibS2Min(mMainWindow->getCalibFilter()->getS2()->getMinimum());
+    setCalibS2Max(mMainWindow->getCalibFilter()->getS2()->getMaximum());
+    setCalibS2Value(mMainWindow->getCalibFilter()->getS2()->getValue());
+
+    setCalibS3Min(mMainWindow->getCalibFilter()->getS3()->getMinimum());
+    setCalibS3Max(mMainWindow->getCalibFilter()->getS3()->getMaximum());
+    setCalibS3Value(mMainWindow->getCalibFilter()->getS3()->getValue());
+
+    setCalibS4Min(mMainWindow->getCalibFilter()->getS4()->getMinimum());
+    setCalibS4Max(mMainWindow->getCalibFilter()->getS4()->getMaximum());
+    setCalibS4Value(mMainWindow->getCalibFilter()->getS4()->getValue());
+
+    setCalibTAUXMin(mMainWindow->getCalibFilter()->getTAUX()->getMinimum());
+    setCalibTAUXMax(mMainWindow->getCalibFilter()->getTAUX()->getMaximum());
+    setCalibTAUXValue(mMainWindow->getCalibFilter()->getTAUX()->getValue());
+
+    setCalibTAUYMin(mMainWindow->getCalibFilter()->getTAUY()->getMinimum());
+    setCalibTAUYMax(mMainWindow->getCalibFilter()->getTAUY()->getMaximum());
+    setCalibTAUYValue(mMainWindow->getCalibFilter()->getTAUY()->getValue());
+    setCalibReprErrorValue(mMainWindow->getCalibFilter()->getReprojectionError());
+
+
+    // statt folgender Zeile kann zB on_cx_valueChanged einfach kodiert werden (su)
+    //  connect(cx, SIGNAL(valueChanged(double cx)), this, SLOT(on_cx_valueChanged));
+
+    // will be done by designer: colorPlot->setParent(colorBox); //because it is just integrated via frame in designer
+
+    connect(newModelCheckBox, &QCheckBox::stateChanged, this, &Control::on_newModelCheckBox_stateChanged);
     colorPlot->setControlWidget(this);
 
     mIndexChanging = false;
@@ -337,7 +364,7 @@ int Control::getFilterBorderSize()
     return filterBorderParamSize->value();
 }
 
-double Control::getCalibFxValue()
+double Control::getCalibFxValue() const
 {
     return fx->value();
 }
@@ -357,7 +384,7 @@ void Control::setCalibFxMax(double d)
     fx->setMaximum(d);
 }
 
-double Control::getCalibFyValue()
+double Control::getCalibFyValue() const
 {
     return fy->value();
 }
@@ -377,7 +404,7 @@ void Control::setCalibFyMax(double d)
     fy->setMaximum(d);
 }
 
-double Control::getCalibCxValue()
+double Control::getCalibCxValue() const
 {
     return cx->value();
 }
@@ -397,7 +424,7 @@ void Control::setCalibCxMax(double d)
     cx->setMaximum(d);
 }
 
-double Control::getCalibCyValue()
+double Control::getCalibCyValue() const
 {
     return cy->value();
 }
@@ -417,7 +444,7 @@ void Control::setCalibCyMax(double d)
     cy->setMaximum(d);
 }
 
-double Control::getCalibR2Value()
+double Control::getCalibR2Value() const
 {
     return r2->value();
 }
@@ -437,7 +464,7 @@ void Control::setCalibR2Max(double d)
     r2->setMaximum(d);
 }
 
-double Control::getCalibR4Value()
+double Control::getCalibR4Value() const
 {
     return r4->value();
 }
@@ -457,7 +484,7 @@ void Control::setCalibR4Max(double d)
     r4->setMaximum(d);
 }
 
-double Control::getCalibR6Value()
+double Control::getCalibR6Value() const
 {
     return r6->value();
 }
@@ -475,6 +502,125 @@ void Control::setCalibR6Max(double d)
 {
     r6->setMaximum(d);
 }
+
+double Control::getCalibS1Value() const
+{
+    return s1->value();
+}
+void Control::setCalibS1Value(double d)
+{
+    s1->setValue(d);
+}
+void Control::setCalibS1Min(double d)
+{
+    s1->setMinimum(d);
+}
+void Control::setCalibS1Max(double d)
+{
+    s1->setMaximum(d);
+}
+
+double Control::getCalibS2Value() const
+{
+    return s2->value();
+}
+void Control::setCalibS2Value(double d)
+{
+    s2->setValue(d);
+}
+void Control::setCalibS2Min(double d)
+{
+    s2->setMinimum(d);
+}
+void Control::setCalibS2Max(double d)
+{
+    s2->setMaximum(d);
+}
+
+double Control::getCalibS3Value() const
+{
+    return s3->value();
+}
+void Control::setCalibS3Value(double d)
+{
+    s3->setValue(d);
+}
+void Control::setCalibS3Min(double d)
+{
+    s3->setMinimum(d);
+}
+void Control::setCalibS3Max(double d)
+{
+    s3->setMaximum(d);
+}
+
+double Control::getCalibS4Value() const
+{
+    return s4->value();
+}
+void Control::setCalibS4Value(double d)
+{
+    s4->setValue(d);
+}
+void Control::setCalibS4Min(double d)
+{
+    s4->setMinimum(d);
+}
+void Control::setCalibS4Max(double d)
+{
+    s4->setMaximum(d);
+}
+
+double Control::getCalibTAUXValue() const
+{
+    return taux->value();
+}
+void Control::setCalibTAUXValue(double d)
+{
+    taux->setValue(d);
+}
+void Control::setCalibTAUXMin(double d)
+{
+    taux->setMinimum(d);
+}
+void Control::setCalibTAUXMax(double d)
+{
+    taux->setMaximum(d);
+}
+
+double Control::getCalibTAUYValue() const
+{
+    return tauy->value();
+}
+void Control::setCalibTAUYValue(double d)
+{
+    tauy->setValue(d);
+}
+void Control::setCalibTAUYMin(double d)
+{
+    tauy->setMinimum(d);
+}
+void Control::setCalibTAUYMax(double d)
+{
+    tauy->setMaximum(d);
+}
+
+void Control::setCalibReprErrorValue(double d)
+{
+    intrError->setText(QString("%1").arg(d));
+}
+void Control::setNewModelChecked(bool b)
+{
+    if(b)
+    {
+        newModelCheckBox->setChecked(true);
+    }
+    else
+    {
+        newModelCheckBox->setChecked(false);
+    }
+}
+
 
 double Control::getCalibExtrRot1()
 {
@@ -536,7 +682,7 @@ void Control::setCalibExtrTrans3(double d)
     trans3->setValue(d);
 }
 
-double Control::getCalibTxValue()
+double Control::getCalibTxValue() const
 {
     return tx->value();
 }
@@ -556,7 +702,7 @@ void Control::setCalibTxMax(double d)
     tx->setMaximum(d);
 }
 
-double Control::getCalibTyValue()
+double Control::getCalibTyValue() const
 {
     return ty->value();
 }
@@ -576,7 +722,7 @@ void Control::setCalibTyMax(double d)
     ty->setMaximum(d);
 }
 
-double Control::getCalibK4Value()
+double Control::getCalibK4Value() const
 {
     return k4->value();
 }
@@ -596,7 +742,7 @@ void Control::setCalibK4Max(double d)
     k4->setMaximum(d);
 }
 
-double Control::getCalibK5Value()
+double Control::getCalibK5Value() const
 {
     return k5->value();
 }
@@ -616,7 +762,7 @@ void Control::setCalibK5Max(double d)
     k5->setMaximum(d);
 }
 
-double Control::getCalibK6Value()
+double Control::getCalibK6Value() const
 {
     return k6->value();
 }
@@ -2064,6 +2210,7 @@ void Control::on_fx_valueChanged(double d)
         mMainWindow->updateImage();
     }
     setMeasuredAltitude();
+    intrError->setText(QString("invalid"));
 }
 
 void Control::on_fy_valueChanged(double d)
@@ -2074,6 +2221,7 @@ void Control::on_fy_valueChanged(double d)
         mMainWindow->updateImage();
     }
     setMeasuredAltitude();
+    intrError->setText(QString("invalid"));
 }
 
 void Control::on_cx_valueChanged(double d)
@@ -2084,6 +2232,7 @@ void Control::on_cx_valueChanged(double d)
     {
         mMainWindow->updateCoord();
     }
+    intrError->setText(QString("invalid"));
 }
 
 void Control::on_cy_valueChanged(double d)
@@ -2094,6 +2243,7 @@ void Control::on_cy_valueChanged(double d)
     {
         mMainWindow->updateCoord();
     }
+    intrError->setText(QString("invalid"));
 }
 
 void Control::on_r2_valueChanged(double d)
@@ -2103,6 +2253,7 @@ void Control::on_r2_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
+    intrError->setText(QString("invalid"));
 }
 
 void Control::on_r4_valueChanged(double d)
@@ -2112,6 +2263,7 @@ void Control::on_r4_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
+    intrError->setText(QString("invalid"));
 }
 
 void Control::on_r6_valueChanged(double d)
@@ -2121,7 +2273,63 @@ void Control::on_r6_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
+    intrError->setText(QString("invalid"));
 }
+void Control::on_s1_valueChanged(double d)
+{
+    mMainWindow->getCalibFilter()->getS1()->setValue(d);
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+    intrError->setText(QString("invalid"));
+}
+void Control::on_s2_valueChanged(double d)
+{
+    mMainWindow->getCalibFilter()->getS2()->setValue(d);
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+    intrError->setText(QString("invalid"));
+}
+void Control::on_s3_valueChanged(double d)
+{
+    mMainWindow->getCalibFilter()->getS3()->setValue(d);
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+    intrError->setText(QString("invalid"));
+}
+void Control::on_s4_valueChanged(double d)
+{
+    mMainWindow->getCalibFilter()->getS4()->setValue(d);
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+    intrError->setText(QString("invalid"));
+}
+void Control::on_taux_valueChanged(double d)
+{
+    mMainWindow->getCalibFilter()->getTAUX()->setValue(d);
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+    intrError->setText(QString("invalid"));
+}
+void Control::on_tauy_valueChanged(double d)
+{
+    mMainWindow->getCalibFilter()->getTAUY()->setValue(d);
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+    intrError->setText(QString("invalid"));
+}
+
 
 void Control::on_tx_valueChanged(double d)
 {
@@ -2130,6 +2338,7 @@ void Control::on_tx_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
+    intrError->setText(QString("invalid"));
 }
 
 void Control::on_ty_valueChanged(double d)
@@ -2139,8 +2348,35 @@ void Control::on_ty_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
+    intrError->setText(QString("invalid"));
 }
-
+void Control::on_k4_valueChanged(double d)
+{
+    mMainWindow->getCalibFilter()->getK4()->setValue(d);
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+    intrError->setText(QString("invalid"));
+}
+void Control::on_k5_valueChanged(double d)
+{
+    mMainWindow->getCalibFilter()->getK5()->setValue(d);
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+    intrError->setText(QString("invalid"));
+}
+void Control::on_k6_valueChanged(double d)
+{
+    mMainWindow->getCalibFilter()->getK6()->setValue(d);
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+    intrError->setText(QString("invalid"));
+}
 void Control::on_quadAspectRatio_stateChanged(int i)
 {
     static double oldFyValue = 0;
@@ -2156,6 +2392,7 @@ void Control::on_quadAspectRatio_stateChanged(int i)
         fy->setEnabled(true);
         fy->setValue(oldFyValue);
     }
+    intrError->setText(QString("invalid"));
 }
 
 void Control::on_fixCenter_stateChanged(int i)
@@ -2182,6 +2419,7 @@ void Control::on_fixCenter_stateChanged(int i)
         cx->setValue(oldCxValue);
         cy->setValue(oldCyValue);
     }
+    intrError->setText(QString("invalid"));
 }
 
 void Control::on_tangDist_stateChanged(int i)
@@ -2205,8 +2443,37 @@ void Control::on_tangDist_stateChanged(int i)
         tx->setDisabled(true);
         ty->setDisabled(true);
     }
+    intrError->setText(QString("invalid"));
 }
 
+void Control::on_newModelCheckBox_stateChanged(int i)
+{
+    if(i == Qt::Checked)
+    {
+        k4->setEnabled(true);
+        k5->setEnabled(true);
+        k6->setEnabled(true);
+        s1->setEnabled(true);
+        s2->setEnabled(true);
+        s3->setEnabled(true);
+        s4->setEnabled(true);
+        taux->setEnabled(true);
+        tauy->setEnabled(true);
+    }
+    else if(i == Qt::Unchecked)
+    {
+        k4->setDisabled(true);
+        k5->setDisabled(true);
+        k6->setDisabled(true);
+        s1->setDisabled(true);
+        s2->setDisabled(true);
+        s3->setDisabled(true);
+        s4->setDisabled(true);
+        taux->setDisabled(true);
+        tauy->setDisabled(true);
+    }
+    intrError->setText(QString("invalid"));
+}
 void Control::on_autoCalib_clicked()
 {
     mMainWindow->getAutoCalib()->autoCalib();
@@ -2719,6 +2986,14 @@ void Control::setXml(QDomElement &elem)
     subSubElem.setAttribute("K4", k4->value());
     subSubElem.setAttribute("K5", k5->value());
     subSubElem.setAttribute("K6", k6->value());
+    subSubElem.setAttribute("S1", s1->value());
+    subSubElem.setAttribute("S2", s2->value());
+    subSubElem.setAttribute("S3", s3->value());
+    subSubElem.setAttribute("S4", s4->value());
+    subSubElem.setAttribute("TAUX", taux->value());
+    subSubElem.setAttribute("TAUY", tauy->value());
+    subSubElem.setAttribute("ReprError", mMainWindow->getCalibFilter()->getReprojectionError());
+
     subSubElem.setAttribute("QUAD_ASPECT_RATIO", quadAspectRatio->isChecked());
     subSubElem.setAttribute("FIX_CENTER", fixCenter->isChecked());
     subSubElem.setAttribute("TANG_DIST", tangDist->isChecked());
@@ -2734,6 +3009,7 @@ void Control::setXml(QDomElement &elem)
     }
     subSubElem.setAttribute("CALIB_FILES", fl.join(", "));
     subElem.appendChild(subSubElem);
+
 
     subSubElem = (elem.ownerDocument()).createElement("EXTRINSIC_PARAMETERS");
 
@@ -3247,6 +3523,34 @@ void Control::getXml(QDomElement &elem)
                     if(subSubElem.hasAttribute("K6"))
                     {
                         k6->setValue(subSubElem.attribute("K6").toDouble());
+                    }
+                    if(subSubElem.hasAttribute("S1"))
+                    {
+                        s1->setValue(subSubElem.attribute("S1").toDouble());
+                    }
+                    if(subSubElem.hasAttribute("S2"))
+                    {
+                        s2->setValue(subSubElem.attribute("S2").toDouble());
+                    }
+                    if(subSubElem.hasAttribute("S3"))
+                    {
+                        s3->setValue(subSubElem.attribute("S3").toDouble());
+                    }
+                    if(subSubElem.hasAttribute("S4"))
+                    {
+                        s4->setValue(subSubElem.attribute("S4").toDouble());
+                    }
+                    if(subSubElem.hasAttribute("TAUX"))
+                    {
+                        taux->setValue(subSubElem.attribute("TAUX").toDouble());
+                    }
+                    if(subSubElem.hasAttribute("TAUY"))
+                    {
+                        tauy->setValue(subSubElem.attribute("TAUY").toDouble());
+                    }
+                    if(subSubElem.hasAttribute("ReprError"))
+                    {
+                        intrError->setText(QString("%1").arg(subSubElem.attribute("ReprError").toDouble()));
                     }
                     if(subSubElem.hasAttribute("QUAD_ASPECT_RATIO"))
                     {

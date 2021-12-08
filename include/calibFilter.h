@@ -44,6 +44,13 @@ private:
     Parameter mK4;
     Parameter mK5;
     Parameter mK6;
+    Parameter mS1;
+    Parameter mS2;
+    Parameter mS3;
+    Parameter mS4;
+    Parameter mTAUX;
+    Parameter mTAUY;
+    double    mReprojectionError;
     cv::Mat   map1;
     cv::Mat   map2;
 
@@ -64,6 +71,14 @@ public:
     Parameter *getK4();
     Parameter *getK5();
     Parameter *getK6();
+    Parameter *getS1();
+    Parameter *getS2();
+    Parameter *getS3();
+    Parameter *getS4();
+    Parameter *getTAUX();
+    Parameter *getTAUY();
+    double     getReprojectionError() const;
+    void       setReprojectionError(double d);
 };
 
 #endif

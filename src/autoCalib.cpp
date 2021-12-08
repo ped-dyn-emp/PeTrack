@@ -95,7 +95,6 @@ bool AutoCalib::openCalibFiles()
         {
             lastDir = QFileInfo(mCalibFiles.first()).path();
         }
-
         QStringList calibFiles = QFileDialog::getOpenFileNames(
             mMainWindow,
             Petrack::tr("Open calibration sequence"),
@@ -140,7 +139,7 @@ void AutoCalib::autoCalib()
         std::vector<cv::Point2f>              corners;
         std::vector<std::vector<cv::Point2f>> image_points;
         cv::Mat                               camera_matrix = cv::Mat::eye(3, 3, CV_64F);
-        cv::Mat                               dist_coeffs   = cv::Mat::zeros(1, 8, CV_64F);
+        cv::Mat                               dist_coeffs   = cv::Mat::zeros(1, 14, CV_64F);
         cv::Mat                               extr_params;
         double                                reproj_errs;
         cv::Mat                               view, view_gray;
@@ -172,6 +171,7 @@ void AutoCalib::autoCalib()
                 break;
             }
 
+
             // cannot load image
             view = cv::imread(mCalibFiles.at(i).toStdString(), cv::IMREAD_COLOR);
             if(view.empty())
@@ -196,7 +196,6 @@ void AutoCalib::autoCalib()
             {
                 imgSize = cv::Size(view.rows, view.cols);
             }
-
             // search for chessboard corners
             found = findChessboardCorners(view, board_size, corners, cv::CALIB_CB_ADAPTIVE_THRESH);
 
@@ -243,14 +242,12 @@ void AutoCalib::autoCalib()
                     .arg(board_size.height));
             return;
         }
-
         // set flags for calibration
         if(mControlWidget->quadAspectRatio->isChecked())
         {
             flags |= CV_CALIB_FIX_ASPECT_RATIO; // durch setzen von aspect_ratio kann fix ascpect anders als 1:1
                                                 // eingestellt werden
         }
-
         if(mControlWidget->fixCenter->isChecked())
         {
             flags |= CV_CALIB_FIX_PRINCIPAL_POINT;
@@ -259,7 +256,10 @@ void AutoCalib::autoCalib()
         {
             flags |= CV_CALIB_ZERO_TANGENT_DIST;
         }
-        // run calibration
+        if(mControlWidget->newModelCheckBox->isChecked())
+        {
+            flags |= CV_CALIB_RATIONAL_MODEL + CV_CALIB_THIN_PRISM_MODEL + CV_CALIB_TILTED_MODEL;
+        }
 
         bool ok = runCalibration(
             image_points,
@@ -291,6 +291,9 @@ void AutoCalib::autoCalib()
         debout << "tx: " << dist_coeffs.at<double>(0, 2) << " ty: " << dist_coeffs.at<double>(0, 3) << std::endl;
         debout << "k4: " << dist_coeffs.at<double>(0, 5) << " k5: " << dist_coeffs.at<double>(0, 6)
                << " k6: " << dist_coeffs.at<double>(0, 7) << std::endl;
+        debout << "s1: " << dist_coeffs.at<double>(0, 8) << " s2: " << dist_coeffs.at<double>(0, 9)
+               << " s3: " << dist_coeffs.at<double>(0, 10) << " s4: " << dist_coeffs.at<double>(0, 11) << std::endl;
+        debout << "taux: " << dist_coeffs.at<double>(0, 12) << " tauy: " << dist_coeffs.at<double>(0, 13) << std::endl;
 
         // set calibration values
         mControlWidget->setCalibFxValue(camera_matrix.at<double>(0, 0));
@@ -305,6 +308,13 @@ void AutoCalib::autoCalib()
         mControlWidget->setCalibK4Value(dist_coeffs.at<double>(0, 5));
         mControlWidget->setCalibK5Value(dist_coeffs.at<double>(0, 6));
         mControlWidget->setCalibK6Value(dist_coeffs.at<double>(0, 7));
+        mControlWidget->setCalibS1Value(dist_coeffs.at<double>(0, 8));
+        mControlWidget->setCalibS2Value(dist_coeffs.at<double>(0, 9));
+        mControlWidget->setCalibS3Value(dist_coeffs.at<double>(0, 10));
+        mControlWidget->setCalibS4Value(dist_coeffs.at<double>(0, 11));
+        mControlWidget->setCalibTAUXValue(dist_coeffs.at<double>(0, 12));
+        mControlWidget->setCalibTAUYValue(dist_coeffs.at<double>(0, 13));
+        mControlWidget->setCalibReprErrorValue(reproj_errs);
 
 
 #ifdef SHOW_CALIB_MAINWINDOW
@@ -368,8 +378,10 @@ int AutoCalib::runCalibration(
         camera_matrix.ptr<double>(1)[1] = 1.;
     }
 
+
     *reproj_errs = calibrateCamera(
         object_points, image_points, img_size, camera_matrix, dist_coeffs, rot_vects, trans_vects, flags);
+
 
     code = 1;
     return code;

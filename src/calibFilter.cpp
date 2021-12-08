@@ -84,6 +84,38 @@ CalibFilter::CalibFilter() : Filter()
     getK6()->setMaximum(5.);
     getK6()->setValue(0.);
     getK6()->setFilter(this);
+
+    getS1()->setMinimum(-5.);
+    getS1()->setMaximum(5.);
+    getS1()->setValue(0.);
+    getS1()->setFilter(this);
+
+    getS2()->setMinimum(-5.);
+    getS2()->setMaximum(5.);
+    getS2()->setValue(0.);
+    getS2()->setFilter(this);
+
+    getS3()->setMinimum(-5.);
+    getS3()->setMaximum(5.);
+    getS3()->setValue(0.);
+    getS3()->setFilter(this);
+
+    getS4()->setMinimum(-5.);
+    getS4()->setMaximum(5.);
+    getS4()->setValue(0.);
+    getS4()->setFilter(this);
+
+    getTAUX()->setMinimum(-5.);
+    getTAUX()->setMaximum(5.);
+    getTAUX()->setValue(0.);
+    getTAUX()->setFilter(this);
+
+    getTAUY()->setMinimum(-5.);
+    getTAUY()->setMaximum(5.);
+    getTAUY()->setValue(0.);
+    getTAUY()->setFilter(this);
+
+    mReprojectionError = std::numeric_limits<double>::quiet_NaN();
 }
 
 /**
@@ -111,14 +143,20 @@ cv::Mat CalibFilter::act(cv::Mat &img, cv::Mat &res)
              0,
              1);
         cv::Mat dist =
-            (cv::Mat_<float>(1, 8) << getR2()->getValue(),
+            (cv::Mat_<float>(1, 14) << getR2()->getValue(),
              getR4()->getValue(),
              getTx()->getValue(),
              getTy()->getValue(),
              getR6()->getValue(),
              getK4()->getValue(),
              getK5()->getValue(),
-             getK6()->getValue());
+             getK6()->getValue(),
+             getS1()->getValue(),
+             getS2()->getValue(),
+             getS3()->getValue(),
+             getS4()->getValue(),
+             getTAUX()->getValue(),
+             getTAUY()->getValue());
 
 
         initUndistortRectifyMap(camera, dist, cv::Mat_<double>::eye(3, 3), camera, img.size(), CV_16SC2, map1, map2);
@@ -175,4 +213,36 @@ Parameter *CalibFilter::getK5()
 Parameter *CalibFilter::getK6()
 {
     return &mK6;
+}
+Parameter *CalibFilter::getS1()
+{
+    return &mS1;
+}
+Parameter *CalibFilter::getS2()
+{
+    return &mS2;
+}
+Parameter *CalibFilter::getS3()
+{
+    return &mS3;
+}
+Parameter *CalibFilter::getS4()
+{
+    return &mS4;
+}
+Parameter *CalibFilter::getTAUX()
+{
+    return &mTAUX;
+}
+Parameter *CalibFilter::getTAUY()
+{
+    return &mTAUY;
+}
+double CalibFilter::getReprojectionError() const
+{
+    return mReprojectionError;
+}
+void CalibFilter::setReprojectionError(double d)
+{
+    mReprojectionError = d;
 }

@@ -64,54 +64,81 @@ public:
 
     int getFilterBorderSize();
 
-    double getCalibFxValue();
+    double getCalibFxValue() const;
     void   setCalibFxValue(double d);
     void   setCalibFxMin(double d);
     void   setCalibFxMax(double d);
-    double getCalibFyValue();
+    double getCalibFyValue() const;
     void   setCalibFyValue(double d);
     void   setCalibFyMin(double d);
     void   setCalibFyMax(double d);
-    double getCalibCxValue();
+    double getCalibCxValue() const;
     void   setCalibCxValue(double d);
     void   setCalibCxMin(double d);
     void   setCalibCxMax(double d);
-    double getCalibCyValue();
+    double getCalibCyValue() const;
     void   setCalibCyValue(double d);
     void   setCalibCyMin(double d);
     void   setCalibCyMax(double d);
-    double getCalibR2Value();
+    double getCalibR2Value() const;
     void   setCalibR2Value(double d);
     void   setCalibR2Min(double d);
     void   setCalibR2Max(double d);
-    double getCalibR4Value();
+    double getCalibR4Value() const;
     void   setCalibR4Value(double d);
     void   setCalibR4Min(double d);
     void   setCalibR4Max(double d);
-    double getCalibTxValue();
+    double getCalibTxValue() const;
     void   setCalibTxValue(double d);
     void   setCalibTxMin(double d);
     void   setCalibTxMax(double d);
-    double getCalibTyValue();
+    double getCalibTyValue() const;
     void   setCalibTyValue(double d);
     void   setCalibTyMin(double d);
     void   setCalibTyMax(double d);
-    double getCalibR6Value();
+    double getCalibR6Value() const;
     void   setCalibR6Value(double d);
     void   setCalibR6Min(double d);
     void   setCalibR6Max(double d);
-    double getCalibK4Value();
+    double getCalibK4Value() const;
     void   setCalibK4Value(double d);
     void   setCalibK4Min(double d);
     void   setCalibK4Max(double d);
-    double getCalibK5Value();
+    double getCalibK5Value() const;
     void   setCalibK5Value(double d);
     void   setCalibK5Min(double d);
     void   setCalibK5Max(double d);
-    double getCalibK6Value();
+    double getCalibK6Value() const;
     void   setCalibK6Value(double d);
     void   setCalibK6Min(double d);
     void   setCalibK6Max(double d);
+    double getCalibS1Value() const;
+    void   setCalibS1Value(double d);
+    void   setCalibS1Min(double d);
+    void   setCalibS1Max(double d);
+    double getCalibS2Value() const;
+    void   setCalibS2Value(double d);
+    void   setCalibS2Min(double d);
+    void   setCalibS2Max(double d);
+    double getCalibS3Value() const;
+    void   setCalibS3Value(double d);
+    void   setCalibS3Min(double d);
+    void   setCalibS3Max(double d);
+    double getCalibS4Value() const;
+    void   setCalibS4Value(double d);
+    void   setCalibS4Min(double d);
+    void   setCalibS4Max(double d);
+    double getCalibTAUXValue() const;
+    void   setCalibTAUXValue(double d);
+    void   setCalibTAUXMin(double d);
+    void   setCalibTAUXMax(double d);
+    double getCalibTAUYValue() const;
+    void   setCalibTAUYValue(double d);
+    void   setCalibTAUYMin(double d);
+    void   setCalibTAUYMax(double d);
+    double getCalibReprErrorValue() const;
+    void   setCalibReprErrorValue(double d);
+    void   setNewModelChecked(bool b);
 
     double getCalibExtrRot1();
     void   setCalibExtrRot1(double d);
@@ -459,9 +486,20 @@ private slots:
     void on_r6_valueChanged(double d);
     void on_tx_valueChanged(double d);
     void on_ty_valueChanged(double d);
+    void on_k4_valueChanged(double d);
+    void on_k5_valueChanged(double d);
+    void on_k6_valueChanged(double d);
+    void on_s1_valueChanged(double d);
+    void on_s2_valueChanged(double d);
+    void on_s3_valueChanged(double d);
+    void on_s4_valueChanged(double d);
+    void on_taux_valueChanged(double d);
+    void on_tauy_valueChanged(double d);
+
     void on_quadAspectRatio_stateChanged(int i);
     void on_fixCenter_stateChanged(int i);
     void on_tangDist_stateChanged(int i);
+    void on_newModelCheckBox_stateChanged(int i);
     void on_autoCalib_clicked();
     void on_calibFiles_clicked();
 
@@ -546,8 +584,7 @@ private:
     bool            mColorChanging;
     bool mIndexChanging; // shows, if the index of the color model is really changing; nor while constructor (initialer
                          // durchlauf) and may be while loading xml file
-    bool            mLoading;     // shows, if new project is just loading
-    QDoubleSpinBox *k4, *k5, *k6; // Muss noch in die Oberflaeche eingebaut werden
+    bool mLoading;       // shows, if new project is just loading
 };
 
 #endif
