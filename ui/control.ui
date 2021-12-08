@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>393</width>
+    <width>503</width>
     <height>604</height>
    </rect>
   </property>
@@ -135,9 +135,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
-            <width>369</width>
-            <height>1093</height>
+            <y>-187</y>
+            <width>476</width>
+            <height>1328</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -549,14 +549,44 @@
                <number>5</number>
               </property>
               <item>
-               <widget class="QCheckBox" name="apply">
-                <property name="text">
-                 <string>apply</string>
+               <layout class="QGridLayout" name="gridLayout_9">
+                <property name="leftMargin">
+                 <number>0</number>
                 </property>
-               </widget>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="spacing">
+                 <number>4</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QCheckBox" name="apply">
+                  <property name="text">
+                   <string>apply</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLabel" name="label_intr_error">
+                  <property name="text">
+                   <string>Error [px]:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QLabel" name="intrError">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
               <item>
-               <layout class="QGridLayout" columnstretch="0,1,0,1">
+               <layout class="QGridLayout" columnstretch="0,0,0,0">
                 <property name="leftMargin">
                  <number>0</number>
                 </property>
@@ -591,62 +621,56 @@
                   </property>
                  </widget>
                 </item>
-                <item row="4" column="3">
-                 <widget class="QDoubleSpinBox" name="ty">
-                  <property name="alignment">
-                   <set>Qt::AlignRight</set>
-                  </property>
-                  <property name="decimals">
-                   <number>6</number>
-                  </property>
-                  <property name="minimum">
-                   <double>-5.000000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>5.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.001000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QDoubleSpinBox" name="r2">
-                  <property name="alignment">
-                   <set>Qt::AlignRight</set>
-                  </property>
-                  <property name="decimals">
-                   <number>6</number>
-                  </property>
-                  <property name="minimum">
-                   <double>-5.000000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>5.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.010000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="label_7">
-                  <property name="font">
-                   <font>
-                    <pointsize>8</pointsize>
-                   </font>
-                  </property>
-                  <property name="layoutDirection">
-                   <enum>Qt::LeftToRight</enum>
-                  </property>
+                <item row="6" column="0">
+                 <widget class="QLabel" name="label_k6">
                   <property name="text">
-                   <string>tangential distortion: x:</string>
+                   <string>k6:</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
-                  <property name="buddy">
-                   <cstring>tx</cstring>
+                 </widget>
+                </item>
+                <item row="8" column="2">
+                 <widget class="QLabel" name="label_s4">
+                  <property name="text">
+                   <string>s4:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="3">
+                 <widget class="QDoubleSpinBox" name="s4">
+                  <property name="decimals">
+                   <number>6</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="3">
+                 <widget class="QDoubleSpinBox" name="s2">
+                  <property name="decimals">
+                   <number>6</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="3">
+                 <widget class="QDoubleSpinBox" name="cy">
+                  <property name="alignment">
+                   <set>Qt::AlignRight</set>
+                  </property>
+                  <property name="decimals">
+                   <number>2</number>
+                  </property>
+                  <property name="minimum">
+                   <double>1.000000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>1080.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>540.000000000000000</double>
                   </property>
                  </widget>
                 </item>
@@ -685,6 +709,44 @@
                   </property>
                  </widget>
                 </item>
+                <item row="2" column="1">
+                 <widget class="QDoubleSpinBox" name="r2">
+                  <property name="alignment">
+                   <set>Qt::AlignRight</set>
+                  </property>
+                  <property name="decimals">
+                   <number>6</number>
+                  </property>
+                  <property name="minimum">
+                   <double>-5.000000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>5.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.010000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="3">
+                 <widget class="QDoubleSpinBox" name="ty">
+                  <property name="alignment">
+                   <set>Qt::AlignRight</set>
+                  </property>
+                  <property name="decimals">
+                   <number>6</number>
+                  </property>
+                  <property name="minimum">
+                   <double>-5.000000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>5.000000000000000</double>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.001000000000000</double>
+                  </property>
+                 </widget>
+                </item>
                 <item row="2" column="2">
                  <widget class="QLabel" name="label_6">
                   <property name="text">
@@ -698,16 +760,31 @@
                   </property>
                  </widget>
                 </item>
-                <item row="4" column="2">
-                 <widget class="QLabel" name="label_8">
+                <item row="4" column="0">
+                 <widget class="QLabel" name="label_7">
+                  <property name="font">
+                   <font>
+                    <pointsize>8</pointsize>
+                   </font>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
                   <property name="text">
-                   <string>y:</string>
+                   <string>tangential distortion: x:</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                   <property name="buddy">
-                   <cstring>ty</cstring>
+                   <cstring>tx</cstring>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="1">
+                 <widget class="QDoubleSpinBox" name="s3">
+                  <property name="decimals">
+                   <number>6</number>
                   </property>
                  </widget>
                 </item>
@@ -727,6 +804,36 @@
                   </property>
                   <property name="singleStep">
                    <double>0.010000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2">
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>y:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="buddy">
+                   <cstring>cy</cstring>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="2">
+                 <widget class="QLabel" name="label_s2">
+                  <property name="text">
+                   <string>s2:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="1">
+                 <widget class="QDoubleSpinBox" name="k6">
+                  <property name="decimals">
+                   <number>6</number>
                   </property>
                  </widget>
                 </item>
@@ -773,8 +880,8 @@
                   </property>
                  </widget>
                 </item>
-                <item row="1" column="2">
-                 <widget class="QLabel" name="label_4">
+                <item row="0" column="2">
+                 <widget class="QLabel" name="label_2">
                   <property name="text">
                    <string>y:</string>
                   </property>
@@ -782,26 +889,7 @@
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                   <property name="buddy">
-                   <cstring>cy</cstring>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="3">
-                 <widget class="QDoubleSpinBox" name="cy">
-                  <property name="alignment">
-                   <set>Qt::AlignRight</set>
-                  </property>
-                  <property name="decimals">
-                   <number>2</number>
-                  </property>
-                  <property name="minimum">
-                   <double>1.000000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>1080.000000000000000</double>
-                  </property>
-                  <property name="value">
-                   <double>540.000000000000000</double>
+                   <cstring>fy</cstring>
                   </property>
                  </widget>
                 </item>
@@ -824,16 +912,20 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="2">
-                 <widget class="QLabel" name="label_2">
+                <item row="7" column="1">
+                 <widget class="QDoubleSpinBox" name="s1">
+                  <property name="decimals">
+                   <number>6</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="8" column="0">
+                 <widget class="QLabel" name="label_s3">
                   <property name="text">
-                   <string>y:</string>
+                   <string>s3:</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                  </property>
-                  <property name="buddy">
-                   <cstring>fy</cstring>
                   </property>
                  </widget>
                 </item>
@@ -858,6 +950,66 @@
                   </property>
                  </widget>
                 </item>
+                <item row="5" column="0">
+                 <widget class="QLabel" name="label_k4">
+                  <property name="text">
+                   <string>k4:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="2">
+                 <widget class="QLabel" name="label_k5">
+                  <property name="text">
+                   <string>k5:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="0">
+                 <widget class="QLabel" name="label_s1">
+                  <property name="text">
+                   <string>s1:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0" alignment="Qt::AlignRight">
+                 <widget class="QLabel" name="label_64">
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>6th:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                  <property name="buddy">
+                   <cstring>r2</cstring>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="3">
+                 <widget class="QDoubleSpinBox" name="k5">
+                  <property name="decimals">
+                   <number>6</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="1">
+                 <widget class="QDoubleSpinBox" name="k4">
+                  <property name="decimals">
+                   <number>6</number>
+                  </property>
+                 </widget>
+                </item>
                 <item row="3" column="1">
                  <widget class="QDoubleSpinBox" name="r6">
                   <property name="alignment">
@@ -877,19 +1029,50 @@
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="0" alignment="Qt::AlignRight">
-                 <widget class="QLabel" name="label_64">
-                  <property name="layoutDirection">
-                   <enum>Qt::LeftToRight</enum>
-                  </property>
+                <item row="4" column="2">
+                 <widget class="QLabel" name="label_8">
                   <property name="text">
-                   <string>6th:</string>
+                   <string>y:</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                   <property name="buddy">
-                   <cstring>r2</cstring>
+                   <cstring>ty</cstring>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="0">
+                 <widget class="QLabel" name="label_taux">
+                  <property name="text">
+                   <string>taux:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="2">
+                 <widget class="QLabel" name="label_tauy">
+                  <property name="text">
+                   <string>tauy:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="1">
+                 <widget class="QDoubleSpinBox" name="taux">
+                  <property name="decimals">
+                   <number>6</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="9" column="3">
+                 <widget class="QDoubleSpinBox" name="tauy">
+                  <property name="decimals">
+                   <number>6</number>
                   </property>
                  </widget>
                 </item>
@@ -912,10 +1095,13 @@
                 <property name="spacing">
                  <number>4</number>
                 </property>
-                <item row="0" column="1">
-                 <widget class="QCheckBox" name="fixCenter">
+                <item row="0" column="2">
+                 <widget class="QCheckBox" name="tangDist">
                   <property name="text">
-                   <string>fix center</string>
+                   <string>tang. dist.</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -926,10 +1112,20 @@
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="2">
-                 <widget class="QCheckBox" name="tangDist">
+                <item row="0" column="1">
+                 <widget class="QCheckBox" name="fixCenter">
                   <property name="text">
-                   <string>tang. dist.</string>
+                   <string>fix center</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="3">
+                 <widget class="QCheckBox" name="newModelCheckBox">
+                  <property name="toolTip">
+                   <string>Perform calibration with extended parameter set (14 instead of 5)</string>
+                  </property>
+                  <property name="text">
+                   <string>ext. model</string>
                   </property>
                   <property name="checked">
                    <bool>true</bool>
@@ -3244,8 +3440,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>358</width>
-            <height>923</height>
+            <width>465</width>
+            <height>991</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -4506,9 +4702,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-538</y>
-            <width>355</width>
-            <height>1095</height>
+            <y>0</y>
+            <width>465</width>
+            <height>1203</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -7337,8 +7533,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>369</width>
-            <height>557</height>
+            <width>479</width>
+            <height>553</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -7557,7 +7753,6 @@
   <tabstop>fixCenter</tabstop>
   <tabstop>quadAspectRatio</tabstop>
   <tabstop>tangDist</tabstop>
-  <tabstop>apply</tabstop>
   <tabstop>markerIgnoreWithout</tabstop>
   <tabstop>roiShow</tabstop>
   <tabstop>roiFix</tabstop>

@@ -638,6 +638,16 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
             }
         }
         openXml(doc, openSeq);
+        if(mControlWidget->getCalibS1Value() == 0 && mControlWidget->getCalibS2Value() == 0 &&
+           mControlWidget->getCalibS3Value() == 0 && mControlWidget->getCalibS4Value() == 0 &&
+           mControlWidget->getCalibTAUXValue() == 0 && mControlWidget->getCalibTAUYValue() == 0)
+        {
+            PWarning(
+                this,
+                tr("PeTrack"),
+                tr("You are using an old project! Therefore the old intr. calibration model is set the default"));
+            mControlWidget->setNewModelChecked(false);
+        }
         updateWindowTitle();
     }
 }
@@ -2055,6 +2065,15 @@ void Petrack::resetUI()
     mControlWidget->r6->setValue(0);
     mControlWidget->tx->setValue(0);
     mControlWidget->ty->setValue(0);
+    mControlWidget->k4->setValue(0);
+    mControlWidget->k5->setValue(0);
+    mControlWidget->k6->setValue(0);
+    mControlWidget->s1->setValue(0);
+    mControlWidget->s2->setValue(0);
+    mControlWidget->s3->setValue(0);
+    mControlWidget->s4->setValue(0);
+    mControlWidget->taux->setValue(0);
+    mControlWidget->tauy->setValue(0);
     mControlWidget->quadAspectRatio->setCheckState(Qt::Unchecked);
     mControlWidget->fixCenter->setCheckState(Qt::Unchecked);
     mControlWidget->tangDist->setCheckState(Qt::Checked);
