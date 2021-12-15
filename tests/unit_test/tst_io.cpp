@@ -501,7 +501,8 @@ SCENARIO("I want to read a XSens c3d file", "[io]")
         unit.set("cm");
         c3d.parameter("POINT", unit);
 
-        for(int i = 0; i < 64; ++i)
+        constexpr int numPoints = 87;
+        for(int i = 0; i < numPoints; ++i)
         {
             c3d.point("marker_" + std::to_string(i + 1));
         }
@@ -544,7 +545,7 @@ SCENARIO("I want to read a XSens c3d file", "[io]")
                 auto root     = skeleton.getRoot();
                 // NOTE checking everything should be part of a test for the SkeletonFactory
 
-                REQUIRE(root.getPos() == cv::Point3f{7, 7, 7});                    // pSacrum point[7]
+                REQUIRE(root.getPos() == cv::Point3f{0, 0, 0});                    // pSacrum point[7]
                 REQUIRE(root.getChildById(1).getPos() == cv::Point3f(15, 15, 15)); // pC7SpinalProcess point[15]
             }
         }

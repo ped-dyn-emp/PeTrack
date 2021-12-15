@@ -53,18 +53,19 @@ TEST_CASE("SkeletonTree for XSenseData is built")
 
         // check neck next
         auto &neckNode = rootNode.getChildById(1);
-        REQUIRE(neckNode.getPos() == XSENSE_DUMMY_DATA.mNeck);
+        REQUIRE(neckNode.getPos() == XSENSE_DUMMY_DATA.mNeck1);
         REQUIRE(neckNode.getChildrenCount() == 3);
 
         // head
-        REQUIRE_NOTHROW(neckNode.getChildById(2));
+        auto &upperNeckNode = neckNode.getChildById(19);
+        REQUIRE_NOTHROW(upperNeckNode.getChildById(2));
         // left shoulder
         REQUIRE_NOTHROW(neckNode.getChildById(3));
         // right shoulder
         REQUIRE_NOTHROW(neckNode.getChildById(7));
 
         // head
-        auto &headNode = neckNode.getChildById(2);
+        auto &headNode = upperNeckNode.getChildById(2);
         REQUIRE(headNode.getPos() == XSENSE_DUMMY_DATA.mHeadTop);
         REQUIRE(headNode.getChildrenCount() == 0);
 
@@ -137,19 +138,26 @@ TEST_CASE("SkeletonTree for XSenseData is built")
         REQUIRE(lKneeNode.getPos() == XSENSE_DUMMY_DATA.mKneeL);
         REQUIRE(lKneeNode.getChildrenCount() == 1);
 
-        REQUIRE_NOTHROW(lKneeNode.getChildById(13));
+        REQUIRE_NOTHROW(lKneeNode.getChildById(20));
+
+        // left ankle
+        auto &lAnkle = lKneeNode.getChildById(20);
+        REQUIRE(lAnkle.getPos() == XSENSE_DUMMY_DATA.mAnkleL);
+        REQUIRE(lAnkle.getChildrenCount() == 1);
+
+        REQUIRE_NOTHROW(lAnkle.getChildById(13));
 
         // left heel
-        auto &lHeelNode = lKneeNode.getChildById(13);
-        REQUIRE(lKneeNode.getPos() == XSENSE_DUMMY_DATA.mKneeL);
-        REQUIRE(lKneeNode.getChildrenCount() == 1);
+        auto &lHeel = lAnkle.getChildById(13);
+        REQUIRE(lHeel.getPos() == XSENSE_DUMMY_DATA.mHeelL);
+        REQUIRE(lHeel.getChildrenCount() == 1);
 
-        REQUIRE_NOTHROW(lHeelNode.getChildById(14));
+        REQUIRE_NOTHROW(lHeel.getChildById(14));
 
-        // left toe
-        auto &lToeNode = lHeelNode.getChildById(14);
-        REQUIRE(lToeNode.getPos() == XSENSE_DUMMY_DATA.mToeL);
-        REQUIRE(lToeNode.getChildrenCount() == 0);
+        // left Toe
+        auto &lToe = lHeel.getChildById(14);
+        REQUIRE(lToe.getPos() == XSENSE_DUMMY_DATA.mToeL);
+        REQUIRE(lToe.getChildrenCount() == 0);
 
         // right hip
         auto &rHipNode = rootNode.getChildById(15);
@@ -163,25 +171,32 @@ TEST_CASE("SkeletonTree for XSenseData is built")
         REQUIRE(rKneeNode.getPos() == XSENSE_DUMMY_DATA.mKneeR);
         REQUIRE(rKneeNode.getChildrenCount() == 1);
 
-        REQUIRE_NOTHROW(rKneeNode.getChildById(17));
+        REQUIRE_NOTHROW(rKneeNode.getChildById(21));
+
+        // right ankle
+        auto &rAnkle = rKneeNode.getChildById(21);
+        REQUIRE(rAnkle.getPos() == XSENSE_DUMMY_DATA.mAnkleR);
+        REQUIRE(rAnkle.getChildrenCount() == 1);
+
+        REQUIRE_NOTHROW(rAnkle.getChildById(17));
 
         // right heel
-        auto &rHeelNode = rKneeNode.getChildById(17);
-        REQUIRE(rKneeNode.getPos() == XSENSE_DUMMY_DATA.mKneeR);
-        REQUIRE(rKneeNode.getChildrenCount() == 1);
+        auto &rHeel = rAnkle.getChildById(17);
+        REQUIRE(rHeel.getPos() == XSENSE_DUMMY_DATA.mHeelR);
+        REQUIRE(rHeel.getChildrenCount() == 1);
 
-        REQUIRE_NOTHROW(rHeelNode.getChildById(18));
+        REQUIRE_NOTHROW(rHeel.getChildById(18));
 
-        // right toe
-        auto &rToeNode = rHeelNode.getChildById(18);
-        REQUIRE(rToeNode.getPos() == XSENSE_DUMMY_DATA.mToeR);
-        REQUIRE(rToeNode.getChildrenCount() == 0);
+        // right Toe
+        auto &rToe = rHeel.getChildById(18);
+        REQUIRE(rToe.getPos() == XSENSE_DUMMY_DATA.mToeR);
+        REQUIRE(rToe.getChildrenCount() == 0);
     }
 
     SECTION("Test the line data")
     {
         auto lines = skel.getLines();
-        REQUIRE(lines.size() == 18);
+        REQUIRE(lines.size() == 21);
         for(SkeletonLine &line : lines)
         {
             REQUIRE(line.start_id != line.end_id);

@@ -95,7 +95,7 @@ void MoCapController::transformPersonSkeleton(
     for(const auto &pair : interpolatedPairs)
     {
         projectedPairs.emplace_back(mExtrCalib.getImagePoint(pair.start), mExtrCalib.getImagePoint(pair.end));
-        if(pair.start_id == 1 && pair.end_id == 2)
+        if(pair.start_id == 19 && pair.end_id == 2)
         {
             neckToHead   = pair;
             neckToHead3D = Vec3F(pair.end - pair.start);
