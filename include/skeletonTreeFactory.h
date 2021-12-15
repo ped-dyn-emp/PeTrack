@@ -36,38 +36,42 @@
  **/
 struct XSenseStruct
 {
-    cv::Point3f mRoot; /***< pSacrum used as sacrum and root. Id is 0. */
+    cv::Point3f mRoot; /**< used as root. Id is 0. */
 
-    cv::Point3f mNeck; /**< pC7SpinalProcess used as atlas bone. Id is 1. */
+    cv::Point3f mNeck1; /**< used as atlas bone. Id is 1. */
+    cv::Point3f mNeck2; /**< used as atlas bone. Id is 19. */
 
-    cv::Point3f mHeadTop; /**< pTopOfHead used as the top of the head. Id is 2. */
+    cv::Point3f mHeadTop; /**< used as the top of the head. Id is 2. */
 
-    cv::Point3f mShldrR; /**< pRightAcromion used as right shoulder. Id is 7. */
-    cv::Point3f mShldrL; /**< pLeftAcromion used as left shoulder. Id is 3. */
+    cv::Point3f mShldrR; /**< used as right shoulder. Id is 7. */
+    cv::Point3f mShldrL; /**< used as left shoulder. Id is 3. */
 
-    cv::Point3f mElbowR; /**< pRightOlecranon used as right elbow. Id is 8. */
-    cv::Point3f mElbowL; /**< pLeftOlecranon used as left elbow. Id is 4. */
+    cv::Point3f mElbowR; /**< used as right elbow. Id is 8. */
+    cv::Point3f mElbowL; /**< used as left elbow. Id is 4. */
 
-    cv::Point3f mWristR; /**< pRightStyloid used as right wrist. Id is 9. */
-    cv::Point3f mWristL; /**< pLeftStyloid used as left wrist. Id is 5. */
+    cv::Point3f mWristR; /**< used as right wrist. Id is 9. */
+    cv::Point3f mWristL; /**< used as left wrist. Id is 5. */
 
-    cv::Point3f mHandR; /**< pRightTopOfHand used as the right hand. Id is 10. */
-    cv::Point3f mHandL; /**< pLeftTopOfHand used as the left hand. Id is 6.*/
+    cv::Point3f mHandR; /**< used as the right hand. Id is 10. */
+    cv::Point3f mHandL; /**< used as the left hand. Id is 6.*/
 
-    cv::Point3f mHipR; /**< pRightIschialTub used as the right hip. Id is 15. */
-    cv::Point3f mHipL; /**< pLeftIschialTub used as the left hip. Id is 11. */
+    cv::Point3f mHipR; /**< used as the right hip. Id is 15. */
+    cv::Point3f mHipL; /**< used as the left hip. Id is 11. */
 
-    cv::Point3f mKneeR; /**< pRightPatella used as the right knee. Id is 16. */
-    cv::Point3f mKneeL; /**< pLeftPatella used as the left knee. Id is 12. */
+    cv::Point3f mKneeR; /**< used as the right knee. Id is 16. */
+    cv::Point3f mKneeL; /**< used as the left knee. Id is 12. */
 
-    cv::Point3f mHeelR; /**< pRightHeelFoot used as the right heel. Id is 17. */
-    cv::Point3f mHeelL; /**< pLeftHeelFoot used as the left heel. Id is 13 .*/
+    cv::Point3f mAnkleR; /**< used as the right ankle. Id is 20. */
+    cv::Point3f mAnkleL; /**< used as the left ankle. Id is 21. */
 
-    cv::Point3f mToeR; /**< pRightHeel used as the right of the right foot. Id is 18. */
-    cv::Point3f mToeL; /**< pLeftHeel used as the right of the left foot. Id is 14. */
+    cv::Point3f mHeelR; /**< used as the right heel. Id is 17. */
+    cv::Point3f mHeelL; /**< used as the left heel. Id is 13 .*/
 
-    cv::Point3f mEarR; /**< pRightAuricularis used as the right ear. No id. */
-    cv::Point3f mEarL; /**< pLeftAuricularis used as the left ear. No id. */
+    cv::Point3f mToeR; /**< used as the right of the right foot. Id is 18. */
+    cv::Point3f mToeL; /**< used as the right of the left foot. Id is 14. */
+
+    cv::Point3f mEarR; /**< used as the right ear. No id. */
+    cv::Point3f mEarL; /**< used as the left ear. No id. */
 };
 
 /** @brief This class is used to construct a SkeletonTree.

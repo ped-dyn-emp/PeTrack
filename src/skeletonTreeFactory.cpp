@@ -37,15 +37,16 @@ SkeletonTree SkeletonTreeFactory::generateTree(const XSenseStruct &points)
 {
     // Start from the root
     SkeletonNode  root(0, points.mRoot);
-    SkeletonNode &neck = root.addChild(SkeletonNode(1, points.mNeck));
+    SkeletonNode &neck = root.addChild(SkeletonNode(1, points.mNeck1));
 
     // continue with the neck
-    neck.addChild(SkeletonNode(2, points.mHeadTop));
-    SkeletonNode &lShoulder = neck.addChild(SkeletonNode(3, points.mShldrL));
+    SkeletonNode &neck2 = neck.addChild(SkeletonNode(19, points.mNeck2));
+    neck2.addChild(SkeletonNode(2, points.mHeadTop));
 
     // add the left arm
-    SkeletonNode &lElbow = lShoulder.addChild(SkeletonNode(4, points.mElbowL));
-    SkeletonNode &lWrist = lElbow.addChild(SkeletonNode(5, points.mWristL));
+    SkeletonNode &lShoulder = neck.addChild(SkeletonNode(3, points.mShldrL));
+    SkeletonNode &lElbow    = lShoulder.addChild(SkeletonNode(4, points.mElbowL));
+    SkeletonNode &lWrist    = lElbow.addChild(SkeletonNode(5, points.mWristL));
     lWrist.addChild(SkeletonNode(6, points.mHandL));
 
     // add the right arm
@@ -55,19 +56,21 @@ SkeletonTree SkeletonTreeFactory::generateTree(const XSenseStruct &points)
     rWrist.addChild(SkeletonNode(10, points.mHandR));
 
     // add the left leg
-    SkeletonNode &lHip  = root.addChild(SkeletonNode(11, points.mHipL));
-    SkeletonNode &lKnee = lHip.addChild(SkeletonNode(12, points.mKneeL));
-    SkeletonNode &lHeel = lKnee.addChild(SkeletonNode(13, points.mHeelL));
+    SkeletonNode &lHip   = root.addChild(SkeletonNode(11, points.mHipL));
+    SkeletonNode &lKnee  = lHip.addChild(SkeletonNode(12, points.mKneeL));
+    SkeletonNode &lAnkle = lKnee.addChild(SkeletonNode(20, points.mAnkleL));
+    SkeletonNode &lHeel  = lAnkle.addChild(SkeletonNode(13, points.mHeelL));
     lHeel.addChild(SkeletonNode(14, points.mToeL));
 
-    SkeletonNode &rHip  = root.addChild(SkeletonNode(15, points.mHipR));
-    SkeletonNode &rKnee = rHip.addChild(SkeletonNode(16, points.mKneeR));
-    SkeletonNode &rHeel = rKnee.addChild(SkeletonNode(17, points.mHeelR));
+    SkeletonNode &rHip   = root.addChild(SkeletonNode(15, points.mHipR));
+    SkeletonNode &rKnee  = rHip.addChild(SkeletonNode(16, points.mKneeR));
+    SkeletonNode &rAnkle = rKnee.addChild(SkeletonNode(21, points.mAnkleR));
+    SkeletonNode &rHeel  = rAnkle.addChild(SkeletonNode(17, points.mHeelR));
     rHeel.addChild(SkeletonNode(18, points.mToeR));
 
 
     // calculate view direction of the head
-    cv::Point3f headUp      = points.mHeadTop - points.mNeck;
+    cv::Point3f headUp      = points.mHeadTop - points.mNeck2;
     cv::Point3f rightVector = points.mEarR - points.mEarL;
     // the direction is calculated using the cross product
     cv::Point3f dir = headUp.cross(rightVector);

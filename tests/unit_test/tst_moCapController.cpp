@@ -46,13 +46,13 @@ SCENARIO("I want to get the render data with one person loaded", "[ui]")
      * Resulting Lines should be: root to child; child to grandchild;
      */
     SkeletonNode  rootA{0, cv::Point3f{100, 100, 0}};
-    SkeletonNode &childA      = rootA.addChild({1, cv::Point3f{200, 100, 69}});
-    SkeletonNode &grandchildA = childA.addChild({1, cv::Point3f{50, 50, 42}});
+    SkeletonNode &childA      = rootA.addChild({19, cv::Point3f{200, 100, 69}});
+    SkeletonNode &grandchildA = childA.addChild({19, cv::Point3f{50, 50, 42}});
     grandchildA.addChild({2, cv::Point3f{150, 150, 1337}});
 
     SkeletonNode  rootB{0, cv::Point3f{50, 50, 0}};
-    SkeletonNode &childB      = rootB.addChild({1, cv::Point3f{100, 50, 69}});
-    SkeletonNode &grandchildB = childB.addChild({1, cv::Point3f{25, 25, 42}});
+    SkeletonNode &childB      = rootB.addChild({19, cv::Point3f{100, 50, 69}});
+    SkeletonNode &grandchildB = childB.addChild({19, cv::Point3f{25, 25, 42}});
     grandchildB.addChild({2, cv::Point3f{75, 75, 1337}});
 
     MoCapPerson person;

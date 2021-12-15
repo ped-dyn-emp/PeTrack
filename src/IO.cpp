@@ -212,55 +212,40 @@ void IO::readSkeletonC3D_XSENS(
     MoCapPerson &                                                               person,
     const std::function<cv::Point3f(const ezc3d::DataNS::Points3dNS::Point &)> &c3dToPoint3f)
 {
-    /*
-     * Points from XSens
-     * 1 based so everything minus 1
-     * hip/Sacrum: 8
-     * C7: 16
-     * right shoulder: 21
-     * left shoulder: 22
-     * right elbow: 29
-     * left elbow: 32
-     * right wrist: 28
-     * left wrist: 31
-     * right top of hand: 33
-     * left top of hand: 36
-     * top of head: 17
-     * right ischial tub: 6
-     * left ischial tub: 7
-     * right kneecap: 42
-     * left kneecap: 46
-     * right heel: 53
-     * left heel: 59
-     * right toe: 58
-     * left toe: 64
-     */
-
     const auto &frames = c3d.data().frames();
 
     for(const auto &frame : frames)
     {
-        const auto & points = frame.points().points();
+        const auto &points = frame.points().points();
+        if(points.size() != 87)
+        {
+            PCritical(nullptr, "Wrong C3D", "You need a C3D-File with joints for visualization in PeTrack.");
+            break;
+        }
+
         XSenseStruct skeletonStruct;
-        skeletonStruct.mHipR    = c3dToPoint3f(points[5]);
-        skeletonStruct.mHipL    = c3dToPoint3f(points[6]);
-        skeletonStruct.mRoot    = c3dToPoint3f(points[7]);
-        skeletonStruct.mNeck    = c3dToPoint3f(points[15]);
+        skeletonStruct.mHipR    = c3dToPoint3f(points[78]);
+        skeletonStruct.mHipL    = c3dToPoint3f(points[82]);
+        skeletonStruct.mRoot    = c3dToPoint3f(points[0]);
+        skeletonStruct.mNeck1   = c3dToPoint3f(points[15]);
+        skeletonStruct.mNeck2   = c3dToPoint3f(points[69]);
         skeletonStruct.mHeadTop = c3dToPoint3f(points[16]);
         skeletonStruct.mEarR    = c3dToPoint3f(points[17]);
         skeletonStruct.mEarL    = c3dToPoint3f(points[18]);
-        skeletonStruct.mShldrR  = c3dToPoint3f(points[20]);
-        skeletonStruct.mShldrL  = c3dToPoint3f(points[21]);
-        skeletonStruct.mWristR  = c3dToPoint3f(points[27]);
-        skeletonStruct.mElbowR  = c3dToPoint3f(points[28]);
-        skeletonStruct.mWristL  = c3dToPoint3f(points[30]);
-        skeletonStruct.mElbowL  = c3dToPoint3f(points[31]);
+        skeletonStruct.mShldrR  = c3dToPoint3f(points[71]);
+        skeletonStruct.mShldrL  = c3dToPoint3f(points[75]);
+        skeletonStruct.mWristR  = c3dToPoint3f(points[73]);
+        skeletonStruct.mElbowR  = c3dToPoint3f(points[72]);
+        skeletonStruct.mWristL  = c3dToPoint3f(points[77]);
+        skeletonStruct.mElbowL  = c3dToPoint3f(points[76]);
         skeletonStruct.mHandR   = c3dToPoint3f(points[32]);
         skeletonStruct.mHandL   = c3dToPoint3f(points[35]);
-        skeletonStruct.mKneeR   = c3dToPoint3f(points[41]);
-        skeletonStruct.mKneeL   = c3dToPoint3f(points[45]);
+        skeletonStruct.mKneeR   = c3dToPoint3f(points[79]);
+        skeletonStruct.mKneeL   = c3dToPoint3f(points[83]);
+        skeletonStruct.mAnkleR  = c3dToPoint3f(points[80]);
         skeletonStruct.mHeelR   = c3dToPoint3f(points[52]);
         skeletonStruct.mToeR    = c3dToPoint3f(points[57]);
+        skeletonStruct.mAnkleL  = c3dToPoint3f(points[84]);
         skeletonStruct.mHeelL   = c3dToPoint3f(points[58]);
         skeletonStruct.mToeL    = c3dToPoint3f(points[63]);
 
