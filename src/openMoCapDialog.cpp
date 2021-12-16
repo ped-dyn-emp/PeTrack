@@ -106,6 +106,8 @@ OpenMoCapDialog::~OpenMoCapDialog()
 
 void OpenMoCapDialog::on_btnAddSelection_clicked()
 {
+    static QString lastSelectedDir = QDir::currentPath();
+
     std::stringstream extensions;
     extensions << "All MoCap File Types (";
     for(const auto &extension : moCapFileExtensions)
@@ -114,11 +116,16 @@ void OpenMoCapDialog::on_btnAddSelection_clicked()
     }
     extensions << ")";
     auto selectedFiles = QFileDialog::getOpenFileNames(
-        this, tr("Open C3D File"), QDir::currentPath(), QString::fromStdString(extensions.str()));
+        this, tr("Open C3D File"), lastSelectedDir, QString::fromStdString(extensions.str()));
     for(const auto &file : selectedFiles)
     {
-        MoCapSelectionWidget *widget = new MoCapSelectionWidget(this, mMoCapSystems);
+        auto *widget = new MoCapSelectionWidget(this, mMoCapSystems);
         widget->setFileName(file);
         mUi->moCapSelections->layout()->addWidget(widget);
+    }
+
+    if(!selectedFiles.isEmpty())
+    {
+        lastSelectedDir = QFileInfo(selectedFiles[0]).absolutePath();
     }
 }
