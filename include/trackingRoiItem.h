@@ -45,8 +45,8 @@ class TrackingRoiItem : public QGraphicsRectItem
     };
 
 private:
-    Petrack *          mMainWindow;
-    Control *          mControlWidget;
+    Petrack           *mMainWindow;
+    Control           *mControlWidget;
     QRect              mPressRect;
     QPointF            mPressPos;
     enum pressLocation mPressLocation;

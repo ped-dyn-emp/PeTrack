@@ -48,8 +48,8 @@ public:
     void                       setFileTimeOffset(double timeOffset);
     void                       setMetadata(const MoCapPersonMetadata &metadata);
     void                       addSkeleton(const SkeletonTree &skeleton);
-    const SkeletonTree &       getSkeleton(size_t samples) const;
-    const std::string &        getFilename() const;
+    const SkeletonTree        &getSkeleton(size_t samples) const;
+    const std::string         &getFilename() const;
     const MoCapPersonMetadata &getMetadata() const;
 
 
@@ -68,7 +68,7 @@ private:
 public:
     void                            addPerson(const MoCapPerson &person);
     void                            addPerson(MoCapPerson &&person);
-    std::vector<MoCapPerson> &      getPersons() { return mPersons; }
+    std::vector<MoCapPerson>       &getPersons() { return mPersons; }
     const std::vector<MoCapPerson> &getPersons() const { return mPersons; }
 };
 

@@ -163,7 +163,7 @@ void setColorParameter(const QColor &fromColor, const QColor &toColor, bool inve
  */
 Vec2F autoCorrectColorMarker(const Vec2F &boxImageCentre, Control *controlWidget)
 {
-    Petrack *   mainWindow = controlWidget->getMainWindow();
+    Petrack    *mainWindow = controlWidget->getMainWindow();
     cv::Point2f tp         = mainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(
         -controlWidget->getCalibCoord3DTransX() - controlWidget->getCalibExtrTrans1(),
         -controlWidget->getCalibCoord3DTransY() - controlWidget->getCalibExtrTrans2(),
@@ -453,20 +453,20 @@ cv::Mat detail::customBgr2Gray(const cv::Mat &subImg, const QColor &midHue)
  */
 void detail::refineWithBlackDot(
     std::vector<ColorBlob> &blobs,
-    const cv::Mat &         img,
-    QList<TrackPoint> &     crossList,
-    const BlackDotOptions & options)
+    const cv::Mat          &img,
+    QList<TrackPoint>      &crossList,
+    const BlackDotOptions  &options)
 {
     constexpr int border                = 4; // zusaetzlicher rand um subrects
     const int     bS                    = options.borderSize;
     const bool    restrictPosition      = options.restrictPosition;
-    ImageItem *   imageItem             = options.imageItem;
+    ImageItem    *imageItem             = options.imageItem;
     const QColor  midHue                = options.midHue;
     const double  dotSize               = options.dotSize;
     const bool    ignoreWithoutMarker   = options.ignoreWithoutMarker;
     const bool    autoCorrect           = options.autoCorrect;
     const bool    autoCorrectOnlyExport = options.autoCorrectOnlyExport;
-    Control *     controlWidget         = options.controlWidget;
+    Control      *controlWidget         = options.controlWidget;
 
     for(ColorBlob &blob : blobs)
     {
@@ -609,9 +609,9 @@ void detail::refineWithBlackDot(
  */
 void detail::refineWithAruco(
     std::vector<ColorBlob> &blobs,
-    const cv::Mat &         img,
-    QList<TrackPoint> &     crossList,
-    ArucoOptions &          options)
+    const cv::Mat          &img,
+    QList<TrackPoint>      &crossList,
+    ArucoOptions           &options)
 {
     constexpr int border = 4; // zusaetzlicher rand um subrects
 
@@ -732,7 +732,7 @@ void detail::refineWithAruco(
 void detail::resolveMoreThanOneCode(
     const int          lengthini,
     QList<TrackPoint> &crossList,
-    const ColorBlob &  blob,
+    const ColorBlob   &blob,
     const Vec2F        offset)
 {
     if(lengthini + 1 < crossList.size())
@@ -776,16 +776,16 @@ void detail::resolveMoreThanOneCode(
  * @param offset
  */
 void findMultiColorMarker(
-    cv::Mat &          img,
+    cv::Mat           &img,
     QList<TrackPoint> &crossList,
-    Control *          controlWidget,
+    Control           *controlWidget,
     bool               ignoreWithoutMarker,
-    Vec2F &            offset,
+    Vec2F             &offset,
     RecognitionMethod  method,
     CodeMarkerOptions &codeOpt)
 {
-    Petrack *               mainWindow = controlWidget->getMainWindow();
-    MultiColorMarkerItem *  cmItem     = mainWindow->getMultiColorMarkerItem();
+    Petrack                *mainWindow = controlWidget->getMainWindow();
+    MultiColorMarkerItem   *cmItem     = mainWindow->getMultiColorMarkerItem();
     MultiColorMarkerWidget *cmWidget   = mainWindow->getMultiColorMarkerWidget();
     int                     bS         = mainWindow->getImageBorderSize();
 
@@ -921,7 +921,7 @@ void findMultiColorMarker(
 void findColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *controlWidget)
 {
     ColorParameters    param;
-    ColorMarkerItem *  cmItem   = controlWidget->getMainWindow()->getColorMarkerItem();
+    ColorMarkerItem   *cmItem   = controlWidget->getMainWindow()->getColorMarkerItem();
     ColorMarkerWidget *cmWidget = controlWidget->getMainWindow()->getColorMarkerWidget();
 
     QColor fromColor = cmWidget->fromColor->palette().color(QPalette::Button);
@@ -1025,14 +1025,14 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *contro
  * @param controlWidget
  */
 void detail::findCodeMarker(
-    cv::Mat &                img,
-    QList<TrackPoint> &      crossList,
+    cv::Mat                 &img,
+    QList<TrackPoint>       &crossList,
     RecognitionMethod        recoMethod,
     const CodeMarkerOptions &opt)
 {
     CodeMarkerItem *codeMarkerItem = opt.getCodeMarkerItem();
-    Control *       controlWidget  = opt.getControlWidget();
-    const auto &    par            = opt.getDetectorParams();
+    Control        *controlWidget  = opt.getControlWidget();
+    const auto     &par            = opt.getDetectorParams();
 
     cv::Ptr<cv::aruco::Dictionary> dictionary =
         cv::aruco::getPredefinedDictionary(cv::aruco::PREDEFINED_DICTIONARY_NAME(opt.getIndexOfMarkerDict()));
@@ -1153,7 +1153,7 @@ void detail::findCodeMarker(
 }
 
 void findContourMarker(
-    cv::Mat &          img,
+    cv::Mat           &img,
     QList<TrackPoint> *crossList,
     int                markerBrightness,
     bool               ignoreWithoutMarker,

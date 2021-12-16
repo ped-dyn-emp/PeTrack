@@ -934,8 +934,8 @@ bool Tracker::tryMergeTrajectories(const TrackPoint &v, size_t i, int frame)
  * @return Number of tracked points
  */
 int Tracker::track(
-    cv::Mat &               img,
-    cv::Rect &              rect,
+    cv::Mat                &img,
+    cv::Rect               &rect,
     int                     frame,
     bool                    reTrack,
     int                     reQual,

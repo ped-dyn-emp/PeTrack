@@ -144,8 +144,8 @@ public:
 class ExtrCalibration
 {
 private:
-    Petrack *      mMainWindow;
-    Control *      mControlWidget;
+    Petrack       *mMainWindow;
+    Control       *mControlWidget;
     PersonStorage &mPersonStorage;
 
     std::vector<cv::Point3f> points3D;

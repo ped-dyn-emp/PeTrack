@@ -216,35 +216,35 @@ public:
     inline QString getMarkerIDFileName() { return mMarkerIDFileName; }
     inline void    setMarkerIDFileName(const QString &fn) { mMarkerIDFileName = fn; }
 
-    inline Control *               getControlWidget() { return mControlWidget; }
-    inline reco::Recognizer &      getRecognizer() { return mReco; }
-    inline StereoWidget *          getStereoWidget() { return mStereoWidget; }
-    inline ColorRangeWidget *      getColorRangeWidget() { return mColorRangeWidget; }
-    inline ColorMarkerWidget *     getColorMarkerWidget() { return mColorMarkerWidget; }
-    inline CodeMarkerWidget *      getCodeMarkerWidget() { return mCodeMarkerWidget; }
+    inline Control                *getControlWidget() { return mControlWidget; }
+    inline reco::Recognizer       &getRecognizer() { return mReco; }
+    inline StereoWidget           *getStereoWidget() { return mStereoWidget; }
+    inline ColorRangeWidget       *getColorRangeWidget() { return mColorRangeWidget; }
+    inline ColorMarkerWidget      *getColorMarkerWidget() { return mColorMarkerWidget; }
+    inline CodeMarkerWidget       *getCodeMarkerWidget() { return mCodeMarkerWidget; }
     inline MultiColorMarkerWidget *getMultiColorMarkerWidget() { return mMultiColorMarkerWidget; }
-    inline GraphicsView *          getView() { return mView; }
-    inline QGraphicsScene *        getScene() { return mScene; }
-    inline QImage *                getImage() { return mImage; }
+    inline GraphicsView           *getView() { return mView; }
+    inline QGraphicsScene         *getScene() { return mScene; }
+    inline QImage                 *getImage() { return mImage; }
     inline cv::Mat                 getImg() { return mImg; }
     inline cv::Mat                 getImageFiltered() { return mImgFiltered; }
-    inline PersonStorage &         getPersonStorage() { return mPersonStorage; }
-    inline const PersonStorage &   getPersonStorage() const { return mPersonStorage; }
-    inline Tracker *               getTracker() { return mTracker; }
-    inline TrackerReal *           getTrackerReal() { return mTrackerReal; }
-    inline ImageItem *             getImageItem() { return mImageItem; }
-    inline StereoItem *            getStereoItem() { return mStereoItem; }
-    inline ColorMarkerItem *       getColorMarkerItem() { return mColorMarkerItem; }
-    inline CodeMarkerItem *        getCodeMarkerItem() { return mCodeMarkerItem; }
-    inline MultiColorMarkerItem *  getMultiColorMarkerItem() { return mMultiColorMarkerItem; }
-    inline BackgroundItem *        getBackgroundItem() { return mBackgroundItem; }
-    inline MoCapItem *             getMoCapItem() { return mMoCapItem; }
-    inline RecognitionRoiItem *    getRecoRoiItem() { return mRecognitionRoiItem; }
-    inline TrackingRoiItem *       getTrackRoiItem() { return mTrackingRoiItem; }
+    inline PersonStorage          &getPersonStorage() { return mPersonStorage; }
+    inline const PersonStorage    &getPersonStorage() const { return mPersonStorage; }
+    inline Tracker                *getTracker() { return mTracker; }
+    inline TrackerReal            *getTrackerReal() { return mTrackerReal; }
+    inline ImageItem              *getImageItem() { return mImageItem; }
+    inline StereoItem             *getStereoItem() { return mStereoItem; }
+    inline ColorMarkerItem        *getColorMarkerItem() { return mColorMarkerItem; }
+    inline CodeMarkerItem         *getCodeMarkerItem() { return mCodeMarkerItem; }
+    inline MultiColorMarkerItem   *getMultiColorMarkerItem() { return mMultiColorMarkerItem; }
+    inline BackgroundItem         *getBackgroundItem() { return mBackgroundItem; }
+    inline MoCapItem              *getMoCapItem() { return mMoCapItem; }
+    inline RecognitionRoiItem     *getRecoRoiItem() { return mRecognitionRoiItem; }
+    inline TrackingRoiItem        *getTrackRoiItem() { return mTrackingRoiItem; }
 
     inline TrackerItem *getTrackerItem() { return mTrackerItem; }
-    inline Animation *  getAnimation() { return mAnimation; }
-    inline Player *     getPlayer() { return mPlayerWidget; }
+    inline Animation   *getAnimation() { return mAnimation; }
+    inline Player      *getPlayer() { return mPlayerWidget; }
 
     inline void updateCoord()
     {
@@ -270,9 +270,9 @@ public:
     inline CalibStereoFilter *getCalibStereoFilter() { return (CalibStereoFilter *) mCalibFilter; }
 #endif
     inline BrightContrastFilter *getBrightContrastFilter() { return &mBrightContrastFilter; }
-    inline BorderFilter *        getBorderFilter() { return &mBorderFilter; }
-    inline SwapFilter *          getSwapFilter() { return &mSwapFilter; }
-    inline BackgroundFilter *    getBackgroundFilter() { return &mBackgroundFilter; }
+    inline BorderFilter         *getBorderFilter() { return &mBorderFilter; }
+    inline SwapFilter           *getSwapFilter() { return &mSwapFilter; }
+    inline BackgroundFilter     *getBackgroundFilter() { return &mBackgroundFilter; }
 
     inline int getImageBorderSize()
     {
@@ -287,7 +287,7 @@ public:
     }
     inline void setImageBorderSize(int sz) { getBorderFilter()->getBorderSize()->setValue(sz); }
 
-    inline AutoCalib *      getAutoCalib() { return &mAutoCalib; }
+    inline AutoCalib       *getAutoCalib() { return &mAutoCalib; }
     inline ExtrCalibration *getExtrCalibration() { return &mExtrCalibration; }
     inline double           getStatusFPS() const { return mShowFPS; }
     inline MoCapController &getMoCapController() { return mMoCapController; }
@@ -342,61 +342,61 @@ private:
 
     QHBoxLayout *mCentralLayout;
 
-    QFrame *                mCentralWidget;
-    Control *               mControlWidget;
-    QSplitter *             mSplitter;
-    StereoWidget *          mStereoWidget;
-    ColorRangeWidget *      mColorRangeWidget;
-    ColorMarkerWidget *     mColorMarkerWidget;
-    CodeMarkerWidget *      mCodeMarkerWidget;
+    QFrame                 *mCentralWidget;
+    Control                *mControlWidget;
+    QSplitter              *mSplitter;
+    StereoWidget           *mStereoWidget;
+    ColorRangeWidget       *mColorRangeWidget;
+    ColorMarkerWidget      *mColorMarkerWidget;
+    CodeMarkerWidget       *mCodeMarkerWidget;
     MultiColorMarkerWidget *mMultiColorMarkerWidget;
 
-    QAction *     mOpenSeqAct;
-    QAction *     mOpenCameraAct;
-    QAction *     mOpenMoCapAct;
-    QAction *     mSaveSeqVidAct;
-    QAction *     mSaveSeqVidViewAct;
-    QAction *     mSaveSeqImgAct;
-    QAction *     mSaveSeqViewAct;
-    QAction *     mOpenPrAct;
-    QAction *     mSaveAct;
-    QAction *     mSavePrAct;
-    QAction *     mSaveImageAct;
-    QAction *     mSaveViewAct;
-    QAction *     mPrintAct;
-    QAction *     mResetSettingsAct;
-    QAction *     mExitAct;
-    QAction *     mFontAct;
-    QAction *     mHideControlsAct;
-    QAction *     mAntialiasAct;
-    QAction *     mCropZoomViewAct;
-    QAction *     mOpenGLAct;
-    QAction *     mResetAct;
-    QAction *     mFitViewAct;
-    QAction *     mFitROIAct;
-    QAction *     mCameraLeftViewAct;
-    QAction *     mCameraRightViewAct;
-    QAction *     mLimitPlaybackSpeed;
-    QAction *     mFixPlaybackSpeed;
-    QAction *     mSetToRealtime;
-    QAction *     mSetTo0p75;
-    QAction *     mSetTo0p50;
-    QAction *     mSetTo0p25;
-    QAction *     mSetTo1p25;
-    QAction *     mSetTo1p50;
-    QAction *     mSetTo1p75;
-    QAction *     mSetTo2p00;
-    QAction *     mPlayerLooping;
-    QAction *     mDelPastAct;
-    QAction *     mDelFutureAct;
-    QAction *     mDelAllRoiAct;
-    QAction *     mDelPartRoiAct;
-    QAction *     mCommandAct;
-    QAction *     mKeyAct;
-    QAction *     mAboutAct;
-    QAction *     mOnlineHelpAct;
+    QAction      *mOpenSeqAct;
+    QAction      *mOpenCameraAct;
+    QAction      *mOpenMoCapAct;
+    QAction      *mSaveSeqVidAct;
+    QAction      *mSaveSeqVidViewAct;
+    QAction      *mSaveSeqImgAct;
+    QAction      *mSaveSeqViewAct;
+    QAction      *mOpenPrAct;
+    QAction      *mSaveAct;
+    QAction      *mSavePrAct;
+    QAction      *mSaveImageAct;
+    QAction      *mSaveViewAct;
+    QAction      *mPrintAct;
+    QAction      *mResetSettingsAct;
+    QAction      *mExitAct;
+    QAction      *mFontAct;
+    QAction      *mHideControlsAct;
+    QAction      *mAntialiasAct;
+    QAction      *mCropZoomViewAct;
+    QAction      *mOpenGLAct;
+    QAction      *mResetAct;
+    QAction      *mFitViewAct;
+    QAction      *mFitROIAct;
+    QAction      *mCameraLeftViewAct;
+    QAction      *mCameraRightViewAct;
+    QAction      *mLimitPlaybackSpeed;
+    QAction      *mFixPlaybackSpeed;
+    QAction      *mSetToRealtime;
+    QAction      *mSetTo0p75;
+    QAction      *mSetTo0p50;
+    QAction      *mSetTo0p25;
+    QAction      *mSetTo1p25;
+    QAction      *mSetTo1p50;
+    QAction      *mSetTo1p75;
+    QAction      *mSetTo2p00;
+    QAction      *mPlayerLooping;
+    QAction      *mDelPastAct;
+    QAction      *mDelFutureAct;
+    QAction      *mDelAllRoiAct;
+    QAction      *mDelPartRoiAct;
+    QAction      *mCommandAct;
+    QAction      *mKeyAct;
+    QAction      *mAboutAct;
+    QAction      *mOnlineHelpAct;
     QActionGroup *mCameraGroupView;
-    QMenu *       mPlaybackSpeedMenu;
+    QMenu        *mPlaybackSpeedMenu;
 
     QMenu *mFileMenu;
     QMenu *mViewMenu;
@@ -412,39 +412,39 @@ private:
 
     cv::Mat             mImg;
     cv::Mat             mImgFiltered;
-    QImage *            mImage;
-    Animation *         mAnimation;
+    QImage             *mImage;
+    Animation          *mAnimation;
     pet::StereoContext *mStereoContext;
-    Player *            mPlayerWidget;
+    Player             *mPlayerWidget;
 
-    ViewWidget *          mViewWidget;
-    GraphicsView *        mView;
-    QGraphicsScene *      mScene;
-    ImageItem *           mImageItem;
-    LogoItem *            mLogoItem;
-    CoordItem *           mCoordItem;
-    GridItem *            mGridItem;
-    RecognitionRoiItem *  mRecognitionRoiItem;
-    TrackingRoiItem *     mTrackingRoiItem;
-    TrackerItem *         mTrackerItem;
-    StereoItem *          mStereoItem;
-    ColorMarkerItem *     mColorMarkerItem;
-    CodeMarkerItem *      mCodeMarkerItem;
+    ViewWidget           *mViewWidget;
+    GraphicsView         *mView;
+    QGraphicsScene       *mScene;
+    ImageItem            *mImageItem;
+    LogoItem             *mLogoItem;
+    CoordItem            *mCoordItem;
+    GridItem             *mGridItem;
+    RecognitionRoiItem   *mRecognitionRoiItem;
+    TrackingRoiItem      *mTrackingRoiItem;
+    TrackerItem          *mTrackerItem;
+    StereoItem           *mStereoItem;
+    ColorMarkerItem      *mColorMarkerItem;
+    CodeMarkerItem       *mCodeMarkerItem;
     MultiColorMarkerItem *mMultiColorMarkerItem;
-    BackgroundItem *      mBackgroundItem;
-    MoCapItem *           mMoCapItem;
+    BackgroundItem       *mBackgroundItem;
+    MoCapItem            *mMoCapItem;
 
     QDoubleSpinBox *mStatusPosRealHeight;
-    QLabel *        mStatusLabelStereo;
-    QLabel *        mStatusLabelTime;
-    QLabel *        mStatusLabelFPS;
-    QLabel *        mStatusLabelPosReal;
-    QLabel *        mStatusLabelPos;
-    QLabel *        mStatusLabelColor;
+    QLabel         *mStatusLabelStereo;
+    QLabel         *mStatusLabelTime;
+    QLabel         *mStatusLabelFPS;
+    QLabel         *mStatusLabelPosReal;
+    QLabel         *mStatusLabelPos;
+    QLabel         *mStatusLabelColor;
 
     QPointF mMousePosOnImage;
 
-    Filter *             mCalibFilter;
+    Filter              *mCalibFilter;
     BrightContrastFilter mBrightContrastFilter;
     BorderFilter         mBorderFilter;
     SwapFilter           mSwapFilter;
@@ -459,8 +459,8 @@ private:
     reco::Recognizer mReco;
 
     PersonStorage mPersonStorage{*this};
-    Tracker *     mTracker;
-    TrackerReal * mTrackerReal;
+    Tracker      *mTracker;
+    TrackerReal  *mTrackerReal;
     double        mHeadSize;
     double        mCmPerPixel;
 

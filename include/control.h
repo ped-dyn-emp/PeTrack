@@ -579,7 +579,7 @@ signals:
     void userChangedRecoMethod(reco::RecognitionMethod method);
 
 private:
-    Petrack *       mMainWindow;
+    Petrack        *mMainWindow;
     QGraphicsScene *mScene;
     bool            mColorChanging;
     bool mIndexChanging; // shows, if the index of the color model is really changing; nor while constructor (initialer

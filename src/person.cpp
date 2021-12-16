@@ -143,7 +143,7 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
     }
 
     // grauwertbild erstellen zwischen min und max - ungueltige werte auf 255 setzen
-    IplImage *     gray      = cvCreateImage(imgSize, IPL_DEPTH_8U, 1);
+    IplImage      *gray      = cvCreateImage(imgSize, IPL_DEPTH_8U, 1);
     unsigned char *grayData  = (unsigned char *) gray->imageData;
     unsigned char *yGrayData = grayData;
 
@@ -176,10 +176,10 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
     // int threshold;
     float     threshold;
     double    angle;
-    CvSeq *   contours, *firstContour;
+    CvSeq    *contours, *firstContour;
     IplImage *binImg = cvCreateImage(imgSize, IPL_DEPTH_8U, 1);
     ;
-    CvPoint *     PointArray;
+    CvPoint      *PointArray;
     CvPoint2D32f *PointArray2D32f;
     // CvPoint center;
     // CvSize sizeTmp;
@@ -777,11 +777,11 @@ void PersonList::optimize()
 
 // bestimmt kopfposition in markerlosen Ueberkopfaufnahmen aus Hoehenbild
 void PersonList::calcPersonPos(
-    const Mat &         img,
-    QRect &             roi,
-    QList<TrackPoint> & persList,
+    const Mat          &img,
+    QRect              &roi,
+    QList<TrackPoint>  &persList,
     pet::StereoContext *sc,
-    BackgroundFilter *  bgFilter,
+    BackgroundFilter   *bgFilter,
     bool                markerLess)
 {
     int i, j;

@@ -115,7 +115,7 @@ public:
 
 protected:
     Animation *mAnimation;
-    Petrack *  mMain;
+    Petrack   *mMain;
 #ifdef STEREO
     TriclopsContext mTriclopsContext;
     TriclopsInput   mTriclopsInput;
@@ -134,8 +134,8 @@ protected:
 
 
     cv::Ptr<cv::StereoSGBM> mSgbm;
-    CvMat *                 mBMdisparity16;
-    CvMat *                 mPointCloud;
+    CvMat                  *mBMdisparity16;
+    CvMat                  *mPointCloud;
     unsigned char           mSurfaceValue;
     unsigned char           mBackForthValue;
     unsigned short int      mMin;

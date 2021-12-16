@@ -31,7 +31,7 @@ class BackgroundItem : public QGraphicsItem
 {
 private:
     Petrack *mMainWindow;
-    QImage * mImage;
+    QImage  *mImage;
 
 public:
     BackgroundItem(QWidget *wParent, QGraphicsItem *parent = nullptr);

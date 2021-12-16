@@ -118,7 +118,7 @@ class TrackerReal : public QList<TrackPersonReal>
 {
 private:
     double         mXMin, mXMax, mYMin, mYMax;
-    Petrack *      mMainWindow;
+    Petrack       *mMainWindow;
     PersonStorage &mPersonStorage;
 
 public:
@@ -139,7 +139,7 @@ public:
     // mControlWidget->getColorPlot()
     // petrack...mImageItem
     int calculate(
-        Tracker *  tracker,
+        Tracker   *tracker,
         ImageItem *imageItem,
         ColorPlot *colorPlot,
         int        imageBorderSize        = 0,

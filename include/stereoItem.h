@@ -29,7 +29,7 @@ class StereoItem : public QGraphicsItem
 {
 private:
     Petrack *mMainWindow;
-    QImage * mImage;
+    QImage  *mImage;
     bool     mDispNew; // indicates that a new disparity has been generated after the last drawing
 
 public:

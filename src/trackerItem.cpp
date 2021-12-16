@@ -118,7 +118,7 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         TrackPerson tp;
         float       height             = 0.f;
         bool        height_set_by_user = false;
-        QAction *   delTrj = nullptr, *delFutureTrj = nullptr, *delPastTrj = nullptr, *creTrj = nullptr,
+        QAction    *delTrj = nullptr, *delFutureTrj = nullptr, *delPastTrj = nullptr, *creTrj = nullptr,
                 *infoTrj = nullptr, *addComment = nullptr, *setHeight = nullptr, *resetHeight = nullptr;
 
         if(found)

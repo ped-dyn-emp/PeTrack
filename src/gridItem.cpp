@@ -388,7 +388,7 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
 
     if(mControlWidget->getCalibGridShow())
     {
-        QImage *   img = mMainWindow->getImage();
+        QImage    *img = mMainWindow->getImage();
         QTransform matrixPaint;
         QPointF    pnt1, pnt2; // floating point
         int        bS = mMainWindow->getImageBorderSize();

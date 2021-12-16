@@ -7,4 +7,4 @@ files=$(find "$(readlink -f "${origin}"/../src)" -type f -regex "^.*\.\(hpp\|cpp
 files+=$'\n'$(find "$(readlink -f "${origin}"/../include)" -type f -regex "^.*\.\(hpp\|cpp\|h\|c\)$")
 files+=$'\n'$(find "$(readlink -f "${origin}"/../tests)" -type f -regex "^.*\.\(hpp\|cpp\|h\|c\)$")
 
-echo "${files}" | parallel clang-format-12 --dry-run -Werror
+echo "${files}" | parallel clang-format-13 --dry-run -Werror

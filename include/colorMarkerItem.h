@@ -33,7 +33,7 @@ class ColorMarkerItem : public QGraphicsItem
 {
 private:
     Petrack *mMainWindow;
-    QImage * mImage;
+    QImage  *mImage;
     cv::Mat  mMask;
     Vec2F    mUlc; // upper left corner to draw
 

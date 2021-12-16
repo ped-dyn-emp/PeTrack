@@ -73,11 +73,11 @@ public:
 
     // bestimmt kopfposition in markerlosen Ueberkopfaufnahmen aus Hoehenbild
     void calcPersonPos(
-        const cv::Mat &     img,
-        QRect &             roi,
-        QList<TrackPoint> & persList,
+        const cv::Mat      &img,
+        QRect              &roi,
+        QList<TrackPoint>  &persList,
         pet::StereoContext *sc,
-        BackgroundFilter *  bgFilter,
+        BackgroundFilter   *bgFilter,
         bool                markerLess = true);
 };
 

@@ -30,8 +30,8 @@ class PersonStorage;
 class TrackerItem : public QGraphicsItem
 {
 private:
-    Petrack *      mMainWindow;
-    Control *      mControlWidget;
+    Petrack       *mMainWindow;
+    Control       *mControlWidget;
     PersonStorage &mPersonStorage;
 
 public:

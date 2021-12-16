@@ -29,9 +29,9 @@ class Control;
 class ImageItem : public QGraphicsItem
 {
 private:
-    Petrack *      mMainWindow;
-    Control *      mControlWidget;
-    QImage *       mImage;
+    Petrack       *mMainWindow;
+    Control       *mControlWidget;
+    QImage        *mImage;
     QGraphicsItem *mCoordItem;
 
 public:

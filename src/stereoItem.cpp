@@ -114,7 +114,7 @@ void StereoItem::updateData(IplImage *disp)
         int             x, y;
         unsigned short *data  = (unsigned short *) disp->imageData; // char*
         unsigned short *yData = data;
-        char *          p;
+        char           *p;
         QColor          color;
         unsigned short  min   = mMainWindow->getStereoContext()->getMin();
         unsigned short  max   = mMainWindow->getStereoContext()->getMax();

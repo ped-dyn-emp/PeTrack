@@ -466,11 +466,11 @@ int PersonStorage::calcPosition(int /*frame*/)
  * @return true if new trajectory was created; false otherwise
  */
 bool PersonStorage::addPoint(
-    TrackPoint &            point,
+    TrackPoint             &point,
     int                     frame,
-    const QSet<int> &       onlyVisible,
+    const QSet<int>        &onlyVisible,
     reco::RecognitionMethod method,
-    int *                   pers)
+    int                    *pers)
 {
     bool  found = false;
     int   i, iNearest = 0.;
@@ -1177,8 +1177,8 @@ void PersonStorage::insertFeaturePoint(
  */
 int PersonStorage::merge(int pers1, int pers2)
 {
-    auto &     person      = mPersons.at(pers1);
-    auto &     other       = mPersons.at(pers2);
+    auto      &person      = mPersons.at(pers1);
+    auto      &other       = mPersons.at(pers2);
     const bool extrapolate = mMainWindow.getControlWidget()->trackExtrapolation->checkState() == Qt::Checked;
     int        deleteIndex;
     if(other.firstFrame() < person.firstFrame() && other.lastFrame() > person.lastFrame())

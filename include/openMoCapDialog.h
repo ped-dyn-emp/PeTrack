@@ -59,10 +59,10 @@ private slots:
     void on_btnAddSelection_clicked();
 
 private:
-    Ui::OpenMoCapDialog *      mUi;
+    Ui::OpenMoCapDialog       *mUi;
     QMap<QString, MoCapSystem> mMoCapSystems;
-    MoCapController &          mController;
-    QWidget *                  mParent;
+    MoCapController           &mController;
+    QWidget                   *mParent;
 };
 
 #endif // OPENMOCAPDIALOG_H

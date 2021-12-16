@@ -39,9 +39,9 @@ class MoCapSelectionWidget : public QWidget
 public:
     explicit MoCapSelectionWidget(QWidget *parent, const QMap<QString, MoCapSystem> &moCapSystems);
     explicit MoCapSelectionWidget(
-        QWidget *                         parent,
+        QWidget                          *parent,
         const QMap<QString, MoCapSystem> &moCapSystems,
-        const MoCapPersonMetadata &       metadata);
+        const MoCapPersonMetadata        &metadata);
     MoCapSelectionWidget(const MoCapSelectionWidget &) = delete;
     MoCapSelectionWidget(MoCapSelectionWidget &&)      = delete;
     MoCapSelectionWidget &operator=(const MoCapSelectionWidget &) = delete;
@@ -55,7 +55,7 @@ public:
     bool isFilledOut() const;
 
 private:
-    Ui::MoCapSelectionWidget *        mUi;
+    Ui::MoCapSelectionWidget         *mUi;
     const QMap<QString, MoCapSystem> &mMoCapSystems;
     bool                              mFilledOut = false;
 };

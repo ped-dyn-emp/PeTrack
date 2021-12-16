@@ -56,7 +56,7 @@ public:
     MoCapController(MoCapStorage &storage, ExtrCalibration &extrCalib) : mStorage(storage), mExtrCalib(extrCalib){};
 
     void transformPersonSkeleton(
-        const MoCapPerson &             person,
+        const MoCapPerson              &person,
         double                          framerate,
         int                             currentFrame,
         std::vector<SegmentRenderData> &renderData) const;
@@ -82,7 +82,7 @@ private:
     interpolate(const std::vector<SkeletonLine> &prePairs, const std::vector<SkeletonLine> &postPairs, double weight);
 
 
-    MoCapStorage &   mStorage;
+    MoCapStorage    &mStorage;
     bool             mShowMoCap = false;
     QColor           mColor     = QColor(255, 255, 55);
     int              mThickness = 2;

@@ -38,8 +38,8 @@ std::variant<std::unordered_map<int, float>, std::string> readHeightFile(const Q
 
 void readMoCapC3D(MoCapStorage &storage, const MoCapPersonMetadata &metadata);
 void readSkeletonC3D_XSENS(
-    const ezc3d::c3d &                                                          c3d,
-    MoCapPerson &                                                               person,
+    const ezc3d::c3d                                                           &c3d,
+    MoCapPerson                                                                &person,
     const std::function<cv::Point3f(const ezc3d::DataNS::Points3dNS::Point &)> &c3dToPoint3f);
 
 std::variant<std::unordered_map<int, int>, std::string> readMarkerIDFile(const QString &markerFileName);

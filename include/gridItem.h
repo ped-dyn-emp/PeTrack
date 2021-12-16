@@ -31,9 +31,9 @@ class Control;
 class GridItem : public QGraphicsItem
 {
 private:
-    Petrack *        mMainWindow;
+    Petrack         *mMainWindow;
     ExtrCalibration *extCalib;
-    Control *        mControlWidget;
+    Control         *mControlWidget;
     float            mouse_x, mouse_y;
     int              gridTrans_x, gridTrans_y;
     int              gridDimension;

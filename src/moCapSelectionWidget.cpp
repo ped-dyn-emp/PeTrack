@@ -52,9 +52,9 @@ MoCapSelectionWidget::MoCapSelectionWidget(QWidget *parent, const QMap<QString, 
  * @param metadata Metadata which should be represented by this widget
  */
 MoCapSelectionWidget::MoCapSelectionWidget(
-    QWidget *                         parent,
+    QWidget                          *parent,
     const QMap<QString, MoCapSystem> &moCapSystems,
-    const MoCapPersonMetadata &       metadata) :
+    const MoCapPersonMetadata        &metadata) :
     MoCapSelectionWidget(parent, moCapSystems)
 {
     auto usedMoCapSystem = std::find(moCapSystems.begin(), moCapSystems.end(), metadata.getSystem());

@@ -57,7 +57,7 @@ private slots:
     void on_toColor_clicked();
 
 private:
-    Petrack *  mMainWindow;
+    Petrack   *mMainWindow;
     ColorPlot *mColorPlot;
 };
 

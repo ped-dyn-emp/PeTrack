@@ -118,7 +118,7 @@ TrackerReal::TrackerReal(QWidget *wParent, PersonStorage &storage) :
 
 // default: int imageBorderSize = 0, bool missingFramesInserted = true, bool useTrackpoints = false
 int TrackerReal::calculate(
-    Tracker *  tracker,
+    Tracker   *tracker,
     ImageItem *imageItem,
     ColorPlot *colorPlot,
     int        imageBorderSize,

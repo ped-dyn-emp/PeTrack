@@ -1295,8 +1295,8 @@ CvMat *pet::StereoContext::getPointCloud()
 
         unsigned short *data    = (unsigned short *) mDisparity.imageData;
         unsigned short *yData   = data;
-        float *         pcData  = (float *) mPointCloud->data.fl;
-        float *         pcyData = pcData;
+        float          *pcData  = (float *) mPointCloud->data.fl;
+        float          *pcyData = pcData;
         // float x, y, z;
         int i, j;
 
@@ -1485,7 +1485,7 @@ bool pet::StereoContext::exportPointCloud(QString dest) // default = ""
                 int             i, j, k = 0;
                 int             nPoints = 0;
                 unsigned char   c;
-                unsigned char * iD = (unsigned char *) getRectified(cameraRight)->imageData;
+                unsigned char  *iD = (unsigned char *) getRectified(cameraRight)->imageData;
 
                 for(i = 0; i < mDisparity.height; ++i)
                 {

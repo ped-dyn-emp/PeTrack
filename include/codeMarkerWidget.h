@@ -66,7 +66,7 @@ private slots:
 private:
     Ui::CodeMarker *mUi;
 
-    Petrack *                mMainWindow;
+    Petrack                 *mMainWindow;
     reco::CodeMarkerOptions &mCodeMarkerOpt;
 };
 

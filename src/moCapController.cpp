@@ -51,7 +51,7 @@ bool operator==(const SegmentRenderData &lhs, const SegmentRenderData &rhs)
  * @param [out]renderData array of SegmentRenderData, to which to append the result
  */
 void MoCapController::transformPersonSkeleton(
-    const MoCapPerson &             person,
+    const MoCapPerson              &person,
     double                          framerate,
     int                             currentFrame,
     std::vector<SegmentRenderData> &renderData) const
@@ -345,7 +345,7 @@ void MoCapController::getXml(const QDomElement &elem)
                     const QString file = getExistingFile(path);
                     path               = path.split(";").size() == 2 ? path.split(";").at(1) :
                                                                        "Saved path is invalid"
-                                                         "";
+                                                                       "";
                     int system         = subElem.attribute("SYSTEM").toInt(&ok);
 
                     if(!ok)

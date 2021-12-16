@@ -1,10 +1,10 @@
 FROM ubuntu:20.10
 
 # Update the repositories
-RUN apt-get update && apt-get install -y software-properties-common
+RUN apt-get update && apt-get install -y software-properties-common wget
 
 # Install the needed tools
-RUN echo "deb [trusted=yes] http://apt.llvm.org/groovy/ llvm-toolchain-groovy-12 main" | tee /etc/apt/sources.list.d/clang.list && \
+RUN echo "deb [trusted=yes] http://apt.llvm.org/groovy/ llvm-toolchain-groovy-13 main" | tee /etc/apt/sources.list.d/clang.list && \
     apt-get update && \
     apt-get install -y \
         wget \
@@ -15,7 +15,7 @@ RUN echo "deb [trusted=yes] http://apt.llvm.org/groovy/ llvm-toolchain-groovy-12
         cmake \
         parallel \
         catch2 \
-        clang-format-12
+        clang-format-13
 
 # Install the needed libraries
 RUN apt-get update && apt-get install -y \

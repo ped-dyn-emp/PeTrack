@@ -75,10 +75,10 @@ public:
 private:
     double               mSymbolSize;
     double               mXMin, mXMax, mYMin, mYMax;
-    Control *            mControlWidget;
-    TrackerReal *        mTrackerReal;
+    Control             *mControlWidget;
+    TrackerReal         *mTrackerReal;
     TrackerRealPlotItem *mTrackerRealItem;
-    QwtPlotZoomer *      mZoomer;
+    QwtPlotZoomer       *mZoomer;
     int                  mActFrame;
 };
 

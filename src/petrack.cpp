@@ -1084,7 +1084,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
 #endif
         bool      formatIsSaveAble = false;
         bool      saveRet;
-        QImage *  viewImage = nullptr;
+        QImage   *viewImage = nullptr;
         QPainter *painter   = nullptr;
         int       progEnd   = mAnimation->getSourceOutFrameNum() -
                       mPlayerWidget->getPos(); // nur wenn nicht an anfang gesprungen wird:-mPlayerWidget->getPos()
