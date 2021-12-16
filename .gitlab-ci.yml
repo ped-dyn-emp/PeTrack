@@ -167,7 +167,7 @@ build_installer_windows:
   dependencies: []
 
 make_release_windows:
-  image: alpine
+  image: $CI_REGISTRY/ped-dyn-emp/petrack/alpine
   stage: deploy
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
@@ -175,7 +175,6 @@ make_release_windows:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   needs: ["build_installer_windows"]
   script:
-    - apk --no-cache add curl
     - cd build
     - winInst=$(echo petrack-installer-*)
     - curl -k -T $winInst -u "${SCIEBO_WIN_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$winInst --fail-with-body
@@ -236,14 +235,13 @@ regression_test_macos:
   needs: ["build_macos"]
 
 make_release_macos:
-  image: alpine
+  image: $CI_REGISTRY/ped-dyn-emp/petrack/alpine
   stage: deploy
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
-    - apk --no-cache add curl
     - cd build
     - macosInst=$(echo petrack-installer-*)
     - curl -k -T $macosInst -u "${SCIEBO_MACOS_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$macosInst --fail-with-body
