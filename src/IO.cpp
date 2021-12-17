@@ -208,8 +208,8 @@ void IO::readMoCapC3D(MoCapStorage &storage, const MoCapPersonMetadata &metadata
  * @param c3dToPoint3f[in] function which converts a c3d point to a cv::Point3f in cm
  */
 void IO::readSkeletonC3D_XSENS(
-    const ezc3d::c3d &                                                          c3d,
-    MoCapPerson &                                                               person,
+    const ezc3d::c3d                                                           &c3d,
+    MoCapPerson                                                                &person,
     const std::function<cv::Point3f(const ezc3d::DataNS::Points3dNS::Point &)> &c3dToPoint3f)
 {
     const auto &frames = c3d.data().frames();

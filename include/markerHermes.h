@@ -41,7 +41,7 @@ public:
     MarkerHermes();
     ~MarkerHermes();
 
-    inline const MyEllipse &       head() const { return mHead; }
+    inline const MyEllipse        &head() const { return mHead; }
     inline const QList<MyEllipse> &spots() const // reference to be faster
     {
         return mSpots;

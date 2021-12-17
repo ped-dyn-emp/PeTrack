@@ -23,14 +23,14 @@
 #include "ui_about.h"
 
 AboutDialog::AboutDialog(
-    QWidget *                       parent,
-    const QString &                 version,
-    const QString &                 commitHash,
-    const QString &                 commitDate,
-    const QString &                 commitBranch,
-    const QString &                 compiler,
-    const QString &                 compilerVersion,
-    const QString &                 compileDate,
+    QWidget                        *parent,
+    const QString                  &version,
+    const QString                  &commitHash,
+    const QString                  &commitDate,
+    const QString                  &commitBranch,
+    const QString                  &compiler,
+    const QString                  &compilerVersion,
+    const QString                  &compileDate,
     const std::vector<std::string> &authors) :
     QDialog(parent), mUi(new Ui::About)
 {

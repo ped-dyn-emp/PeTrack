@@ -99,7 +99,7 @@ private:
     bool backward();
     void playVideo();
 
-    Animation *    mAnimation;
+    Animation     *mAnimation;
     QTemporaryFile mTmpFile;
     PlayerState    mState = PlayerState::PAUSE;
     bool           mPlayerSpeedLimited;
@@ -115,20 +115,20 @@ private:
 #endif
 
     // GUI
-    QToolButton *  mFrameForwardButton, *mFrameBackwardButton, *mPlayForwardButton, *mPlayBackwardButton, *mPauseButton;
-    QToolButton *  mRecButton;
+    QToolButton   *mFrameForwardButton, *mFrameBackwardButton, *mPlayForwardButton, *mPlayBackwardButton, *mPauseButton;
+    QToolButton   *mRecButton;
     cv::Mat        mImg;
-    QHBoxLayout *  mPlayerLayout;
-    Petrack *      mMainWindow;
-    QSlider *      mSlider;
-    QLineEdit *    mFrameNum;
-    QLineEdit *    mFrameInNum;
-    QLineEdit *    mFrameOutNum;
-    QLineEdit *    mFpsNum;
-    QLabel *       mAtLabel;
-    QLabel *       mSourceInLabel;
-    QLabel *       mSourceOutLabel;
-    QLabel *       mFpsLabel;
+    QHBoxLayout   *mPlayerLayout;
+    Petrack       *mMainWindow;
+    QSlider       *mSlider;
+    QLineEdit     *mFrameNum;
+    QLineEdit     *mFrameInNum;
+    QLineEdit     *mFrameOutNum;
+    QLineEdit     *mFpsNum;
+    QLabel        *mAtLabel;
+    QLabel        *mSourceInLabel;
+    QLabel        *mSourceOutLabel;
+    QLabel        *mFpsLabel;
     QIntValidator *mFrameNumValidator;
     QIntValidator *mFrameInNumValidator;
     QIntValidator *mFrameOutNumValidator;

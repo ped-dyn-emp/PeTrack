@@ -175,19 +175,19 @@ public:
     int           zValue() const;
 
     inline TrackerPlotItem *getTrackerItem() const { return mTrackerItem; }
-    inline RectPlotItem *   getMapItem() const { return mRectItem; }
+    inline RectPlotItem    *getMapItem() const { return mRectItem; }
 
 private:
     const PersonStorage *mPersonStorage;
     double               mSymbolSize;
     double               mXMax;
     double               mYMax;
-    Control *            mControlWidget;
-    ImagePlotItem *      mImageItem;
-    TrackerPlotItem *    mTrackerItem;
-    RectPlotItem *       mRectItem;
-    ViewColorPlotItem *  mViewColorItem;
-    Zoomer *             mZoomer;
+    Control             *mControlWidget;
+    ImagePlotItem       *mImageItem;
+    TrackerPlotItem     *mTrackerItem;
+    RectPlotItem        *mRectItem;
+    ViewColorPlotItem   *mViewColorItem;
+    Zoomer              *mZoomer;
     int                  mGreyDiff;
 };
 

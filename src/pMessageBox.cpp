@@ -42,11 +42,11 @@
  * @param defaultButton button used when pressing enter
  */
 PMessageBox::PMessageBox(
-    QWidget *       parent,
-    const QString & title,
-    const QString & msg,
-    const QIcon &   icon,
-    const QString & informativeText,
+    QWidget        *parent,
+    const QString  &title,
+    const QString  &msg,
+    const QIcon    &icon,
+    const QString  &informativeText,
     StandardButtons buttons,
     StandardButton  defaultButton) :
     QDialog(
@@ -140,12 +140,12 @@ PMessageBox::PMessageBox(
  * @return clicked button
  */
 int PMessageBox::information(
-    const char *                 file,
-    const char *                 func,
+    const char                  *file,
+    const char                  *func,
     int                          line,
-    QWidget *                    parent,
-    const QString &              title,
-    const QString &              text,
+    QWidget                     *parent,
+    const QString               &title,
+    const QString               &text,
     PMessageBox::StandardButtons buttons,
     PMessageBox::StandardButton  defaultButton)
 {
@@ -185,12 +185,12 @@ int PMessageBox::information(
  * @return clicked button
  */
 int PMessageBox::warning(
-    const char *                 file,
-    const char *                 func,
+    const char                  *file,
+    const char                  *func,
     int                          line,
-    QWidget *                    parent,
-    const QString &              title,
-    const QString &              text,
+    QWidget                     *parent,
+    const QString               &title,
+    const QString               &text,
     PMessageBox::StandardButtons buttons,
     PMessageBox::StandardButton  defaultButton)
 {
@@ -230,12 +230,12 @@ int PMessageBox::warning(
  * @return clicked button
  */
 int PMessageBox::critical(
-    const char *                 file,
-    const char *                 func,
+    const char                  *file,
+    const char                  *func,
     int                          line,
-    QWidget *                    parent,
-    const QString &              title,
-    const QString &              text,
+    QWidget                     *parent,
+    const QString               &title,
+    const QString               &text,
     PMessageBox::StandardButtons buttons,
     PMessageBox::StandardButton  defaultButton)
 {
@@ -278,9 +278,9 @@ int PMessageBox::question(
     const char * /*file*/,
     const char * /*func*/,
     int /*line*/,
-    QWidget *                    parent,
-    const QString &              title,
-    const QString &              text,
+    QWidget                     *parent,
+    const QString               &title,
+    const QString               &text,
     PMessageBox::StandardButtons buttons,
     PMessageBox::StandardButton  defaultButton)
 {

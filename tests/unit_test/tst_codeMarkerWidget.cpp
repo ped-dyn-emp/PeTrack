@@ -29,7 +29,7 @@ SCENARIO("The user opens the CodeMarkerWidget", "[ui]")
     // create the dialog
     Petrack                 petrack;
     reco::CodeMarkerOptions options;
-    Ui::CodeMarker *        view = new Ui::CodeMarker();
+    Ui::CodeMarker         *view = new Ui::CodeMarker();
     CodeMarkerWidget        widget{&petrack, options, view};
 
     THEN("The view shows the correct values")

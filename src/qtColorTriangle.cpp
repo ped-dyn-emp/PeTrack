@@ -726,11 +726,11 @@ Draws a trigon (polygon with three corners \a pa, \a pb and \a pc
     gradient.
 */
 void QtColorTriangle::drawTrigon(
-    QImage *       buf,
+    QImage        *buf,
     const QPointF &pa,
     const QPointF &pb,
     const QPointF &pc,
-    const QColor & color)
+    const QColor  &color)
 {
     // Create three Vertex objects. A Vertex contains a double-point
     // coordinate and a color.

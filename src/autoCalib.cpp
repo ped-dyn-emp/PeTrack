@@ -350,9 +350,9 @@ int AutoCalib::runCalibration(
     float                                 square_size,
     float                                 aspect_ratio,
     int                                   flags,
-    cv::Mat &                             camera_matrix,
-    cv::Mat &                             dist_coeffs,
-    double *                              reproj_errs)
+    cv::Mat                              &camera_matrix,
+    cv::Mat                              &dist_coeffs,
+    double                               *reproj_errs)
 {
     int code;
 

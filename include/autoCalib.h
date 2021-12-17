@@ -90,12 +90,12 @@ private:
         float                                 square_size,
         float                                 aspect_ratio,
         int                                   flags,
-        cv::Mat &                             camera_matrix,
-        cv::Mat &                             dist_coeffs,
-        double *                              reproj_errs);
+        cv::Mat                              &camera_matrix,
+        cv::Mat                              &dist_coeffs,
+        double                               *reproj_errs);
 
-    Petrack *   mMainWindow;
-    Control *   mControlWidget;
+    Petrack    *mMainWindow;
+    Control    *mControlWidget;
     QStringList mCalibFiles;
     int         mBoardSizeX, mBoardSizeY;
     float       mSquareSize;

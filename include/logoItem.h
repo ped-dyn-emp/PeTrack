@@ -39,7 +39,7 @@ public:
     LogoItem *mLogoItem;
     int       mFrames;
     double    mStep;
-    QTimer *  mTimer;
+    QTimer   *mTimer;
 };
 
 class LogoItem : public QGraphicsItem
@@ -56,7 +56,7 @@ public:
 
 private:
     Petrack *mMainWindow;
-    QImage * mImage;
+    QImage  *mImage;
     float    mOpacity;
     Fader    fader;
 };

@@ -97,11 +97,11 @@ private slots:
     void hideShowControls();
 
 private:
-    Petrack *     mMainWindow;
+    Petrack      *mMainWindow;
     GraphicsView *mGraphicsView;
-    QToolButton * hideShowControlsButton;
-    QSlider *     mZoomSlider;
-    QSlider *     mRotateSlider;
+    QToolButton  *hideShowControlsButton;
+    QSlider      *mZoomSlider;
+    QSlider      *mRotateSlider;
 };
 
 #endif

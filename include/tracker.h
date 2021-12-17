@@ -68,7 +68,7 @@ public:
     TrackPoint(const Vec2F &p, int qual, const QColor &col);
     TrackPoint(const Vec2F &p, int qual, const Vec2F &colPoint, const QColor &col);
 
-    inline const Vec2F & colPoint() const { return mColPoint; }
+    inline const Vec2F  &colPoint() const { return mColPoint; }
     inline void          setColPoint(Vec2F &cp) { mColPoint = cp; }
     inline const QColor &color() const { return mCol; }
     inline void          setColor(QColor &col) { mCol = col; }
@@ -94,8 +94,8 @@ public:
 };
 
 
-QTextStream & operator>>(QTextStream &s, TrackPoint &tp);
-QTextStream & operator<<(QTextStream &s, const TrackPoint &tp);
+QTextStream  &operator>>(QTextStream &s, TrackPoint &tp);
+QTextStream  &operator<<(QTextStream &s, const TrackPoint &tp);
 std::ostream &operator<<(std::ostream &s, const TrackPoint &tp);
 
 //--------------------------------------------------------------------------
@@ -209,7 +209,7 @@ std::ostream &operator<<(std::ostream &s, const TrackPerson &tp);
 class Tracker
 {
 private:
-    Petrack *                mMainWindow;
+    Petrack                 *mMainWindow;
     cv::Mat                  mGrey, mPrevGrey;
     std::vector<cv::Mat>     mPrevPyr, mCurrentPyr;
     std::vector<cv::Point2f> mPrevFeaturePoints, mFeaturePoints;
@@ -218,7 +218,7 @@ private:
     std::vector<int>         mPrevFeaturePointsIdx;
     std::vector<float>       mTrackError;
     cv::TermCriteria         mTermCriteria;
-    PersonStorage &          mPersonStorage;
+    PersonStorage           &mPersonStorage;
 
 public:
     Tracker(QWidget *wParent, PersonStorage &storage);
@@ -243,8 +243,8 @@ public:
 
     // frame ist frame fuer naechsten prev frame
     int track(
-        cv::Mat &               img,
-        cv::Rect &              rect,
+        cv::Mat                &img,
+        cv::Rect               &rect,
         int                     frame,
         bool                    reTrack,
         int                     reQual,

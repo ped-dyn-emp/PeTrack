@@ -45,7 +45,7 @@ struct OffsetMarker
 class CodeMarkerItem : public QGraphicsItem
 {
 private:
-    Petrack *                      mMainWindow;
+    Petrack                       *mMainWindow;
     const reco::CodeMarkerOptions &mArucoOptions;
     const QColor                   mRejectedColor = QColor(255, 0, 0); // red
     const QColor                   mCornerColor   = QColor(0, 0, 255); // blue

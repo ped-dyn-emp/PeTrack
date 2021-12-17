@@ -32,9 +32,9 @@ class ExtrCalibration;
 class CoordItem : public QGraphicsItem
 {
 private:
-    Petrack *        mMainWindow;
+    Petrack         *mMainWindow;
     ExtrCalibration *extCalib;
-    Control *        mControlWidget;
+    Control         *mControlWidget;
     cv::Point2f      ursprung, x, y, z;
     cv::Point2f      calibPointsMin, calibPointsMax;
     cv::Point3f      x3D, y3D, z3D;

@@ -52,7 +52,7 @@ public:
     bool resetTrackPersonHeight(const Vec2F &p, int frame, QSet<int> onlyVisible);
 
     size_t                          nbPersons() const { return mPersons.size(); }
-    const TrackPerson &             at(size_t i) const { return mPersons.at(i); }
+    const TrackPerson              &at(size_t i) const { return mPersons.at(i); }
     void                            addPerson(const TrackPerson &person) { mPersons.push_back(person); }
     const std::vector<TrackPerson> &getPersons() const { return mPersons; }
 
@@ -64,11 +64,11 @@ public:
     // p in pixel coord
     // pers wird gesetzt, wenn existierender trackpoint einer person verschoben wird
     bool addPoint(
-        TrackPoint &            p,
+        TrackPoint             &p,
         int                     frame,
-        const QSet<int> &       onlyVisible,
+        const QSet<int>        &onlyVisible,
         reco::RecognitionMethod method,
-        int *                   pers = nullptr);
+        int                    *pers = nullptr);
 
     // hier sollte direkt die farbe mit uebergeben werden
     void addPoints(QList<TrackPoint> &pL, int frame, reco::RecognitionMethod method);
@@ -120,7 +120,7 @@ public:
 
 private:
     std::vector<TrackPerson> mPersons;
-    Petrack &                mMainWindow;
+    Petrack                 &mMainWindow;
 };
 
 #endif // PERSONSTORAGE_H

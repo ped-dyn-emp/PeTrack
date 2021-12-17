@@ -86,7 +86,7 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
     GIVEN("I click the colorPickerButton")
     {
         QTestEventList eventList;
-        QPushButton *  colorPickerButton = con->findChild<QPushButton *>("colorPickerButton");
+        QPushButton   *colorPickerButton = con->findChild<QPushButton *>("colorPickerButton");
         eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier);
         eventList.simulate(colorPickerButton);
 

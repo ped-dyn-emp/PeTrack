@@ -165,7 +165,7 @@ public:
     // cannot properly set these in constructor because of
     // bidirectional dependecies
     CodeMarkerItem *getCodeMarkerItem() const { return codeMarkerItem; }
-    Control *       getControlWidget() const { return controlWidget; }
+    Control        *getControlWidget() const { return controlWidget; }
     ArucoCodeParams getDetectorParams() const { return detectorParams; }
     int             getIndexOfMarkerDict() const { return indexOfMarkerDict; }
 
@@ -261,7 +261,7 @@ namespace detail
         ImageItem *imageItem = nullptr; ///< used for getAngleToGround and such
         QColor     midHue;              ///< middle hue of the color map
         double     dotSize       = 5;   ///< size of the black dot
-        Control *  controlWidget = nullptr; ///< pointer to Control used for autoCorrect
+        Control   *controlWidget = nullptr; ///< pointer to Control used for autoCorrect
     };
 
     struct ArucoOptions
@@ -281,24 +281,24 @@ namespace detail
     cv::Mat                customBgr2Gray(const cv::Mat &subImg, const QColor &midHue);
     void                   refineWithBlackDot(
                           std::vector<ColorBlob> &blobs,
-                          const cv::Mat &         img,
-                          QList<TrackPoint> &     crossList,
-                          const BlackDotOptions & options);
+                          const cv::Mat          &img,
+                          QList<TrackPoint>      &crossList,
+                          const BlackDotOptions  &options);
     void refineWithAruco(
         std::vector<ColorBlob> &blobs,
-        const cv::Mat &         img,
-        QList<TrackPoint> &     crossList,
-        ArucoOptions &          options);
+        const cv::Mat          &img,
+        QList<TrackPoint>      &crossList,
+        ArucoOptions           &options);
 
     void resolveMoreThanOneCode(
         const int          lengthini,
         QList<TrackPoint> &crossList,
-        const ColorBlob &  blob,
+        const ColorBlob   &blob,
         const Vec2F        offset);
 
     void findCodeMarker(
-        cv::Mat &                img,
-        QList<TrackPoint> &      crossList,
+        cv::Mat                 &img,
+        QList<TrackPoint>       &crossList,
         RecognitionMethod        recoMethod,
         const CodeMarkerOptions &opt);
     cv::Ptr<cv::aruco::Dictionary> getDictMip36h12();

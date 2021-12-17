@@ -50,48 +50,48 @@ public:
     using StandardButtons = QDialogButtonBox::StandardButtons;
 
     PMessageBox(
-        QWidget *       parent,
-        const QString & title,
-        const QString & msg,
-        const QIcon &   icon,
-        const QString & informativeText = QString(),
+        QWidget        *parent,
+        const QString  &title,
+        const QString  &msg,
+        const QIcon    &icon,
+        const QString  &informativeText = QString(),
         StandardButtons buttons         = StandardButton::Ok,
         StandardButton  defaultButton   = StandardButton::NoButton);
 
     static int information(
-        const char *    file,
-        const char *    func,
+        const char     *file,
+        const char     *func,
         int             line,
-        QWidget *       parent,
-        const QString & title,
-        const QString & text,
+        QWidget        *parent,
+        const QString  &title,
+        const QString  &text,
         StandardButtons buttons       = StandardButton::Ok,
         StandardButton  defaultButton = StandardButton::NoButton);
     static int warning(
-        const char *    file,
-        const char *    func,
+        const char     *file,
+        const char     *func,
         int             line,
-        QWidget *       parent,
-        const QString & title,
-        const QString & text,
+        QWidget        *parent,
+        const QString  &title,
+        const QString  &text,
         StandardButtons buttons       = StandardButton::Ok,
         StandardButton  defaultButton = StandardButton::NoButton);
     static int critical(
-        const char *    file,
-        const char *    func,
+        const char     *file,
+        const char     *func,
         int             line,
-        QWidget *       parent,
-        const QString & title,
-        const QString & text,
+        QWidget        *parent,
+        const QString  &title,
+        const QString  &text,
         StandardButtons buttons       = StandardButton::Ok,
         StandardButton  defaultButton = StandardButton::NoButton);
     [[nodiscard]] static int question(
-        const char *    file,
-        const char *    func,
+        const char     *file,
+        const char     *func,
         int             line,
-        QWidget *       parent,
-        const QString & title,
-        const QString & text,
+        QWidget        *parent,
+        const QString  &title,
+        const QString  &text,
         StandardButtons buttons       = (StandardButton::Yes | StandardButton::No),
         StandardButton  defaultButton = StandardButton::NoButton);
 

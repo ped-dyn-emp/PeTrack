@@ -46,8 +46,8 @@ public:
     MarkerJapan();
     ~MarkerJapan();
 
-    inline const MyEllipse &       head() const { return mHead; }
-    inline const Vec2F *           quadrangle() const { return mQuadrangle; }
+    inline const MyEllipse        &head() const { return mHead; }
+    inline const Vec2F            *quadrangle() const { return mQuadrangle; }
     inline const QList<MyEllipse> &spots() const // reference to be faster
     {
         return mSpots;
