@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>369</width>
-    <height>397</height>
+    <width>387</width>
+    <height>416</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -153,7 +153,7 @@
      <item>
       <widget class="QCheckBox" name="autoCorrectOnlyExport">
        <property name="toolTip">
-        <string>if auto correct is enabled only the exported real trajectories will be corrected</string>
+        <string>if auto correct is enabled only the exported real trajectories will be corrected (recommended)</string>
        </property>
        <property name="text">
         <string>only for export</string>
@@ -167,7 +167,7 @@
      <item>
       <widget class="QCheckBox" name="showMask">
        <property name="toolTip">
-        <string>show mask in main window</string>
+        <string>show selected color as mask in main window</string>
        </property>
        <property name="text">
         <string>show mask</string>
@@ -180,13 +180,19 @@
     <layout class="QGridLayout" name="gridLayout">
      <item row="1" column="0">
       <widget class="QLabel" name="label">
+       <property name="toolTip">
+        <string>Fills holes with a radius smaller than the given one.</string>
+       </property>
        <property name="text">
-        <string>close radius</string>
+        <string>close radius [px]</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
       <widget class="QSpinBox" name="closeRadius">
+       <property name="toolTip">
+        <string>Fills holes with a radius smaller than the given one.</string>
+       </property>
        <property name="keyboardTracking">
         <bool>false</bool>
        </property>
@@ -206,13 +212,19 @@
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_2">
+       <property name="toolTip">
+        <string>Removes speckles with radius smaller than the parameter. Executed after closing.</string>
+       </property>
        <property name="text">
-        <string>open radius</string>
+        <string>open radius [px]</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
       <widget class="QSpinBox" name="openRadius">
+       <property name="toolTip">
+        <string>Removes speckles with radius smaller than the parameter. Executed after closing.</string>
+       </property>
        <property name="keyboardTracking">
         <bool>false</bool>
        </property>
@@ -232,6 +244,9 @@
      </item>
      <item row="2" column="2">
       <widget class="QCheckBox" name="useOpen">
+       <property name="toolTip">
+        <string>Removes speckles with radius smaller than the parameter. Executed after closing.</string>
+       </property>
        <property name="text">
         <string>use</string>
        </property>
@@ -242,13 +257,19 @@
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_3">
+       <property name="toolTip">
+        <string>Restricts the area in pixels a head can have.</string>
+       </property>
        <property name="text">
-        <string>area</string>
+        <string>area [px²]</string>
        </property>
       </widget>
      </item>
      <item row="3" column="1">
       <widget class="QSpinBox" name="minArea">
+       <property name="toolTip">
+        <string>Restricts the area in pixels a head can have.</string>
+       </property>
        <property name="keyboardTracking">
         <bool>false</bool>
        </property>
@@ -268,6 +289,9 @@
      </item>
      <item row="4" column="0">
       <widget class="QLabel" name="label_4">
+       <property name="toolTip">
+        <string>Maximum ratio between length and width for a potential head</string>
+       </property>
        <property name="text">
         <string>max ratio</string>
        </property>
@@ -275,13 +299,19 @@
      </item>
      <item row="8" column="0">
       <widget class="QLabel" name="label_5">
+       <property name="toolTip">
+        <string>Opacity of the mask which visualizes the selected color</string>
+       </property>
        <property name="text">
-        <string>opacity</string>
+        <string>opacity [%]</string>
        </property>
       </widget>
      </item>
      <item row="8" column="1">
       <widget class="QSpinBox" name="opacity">
+       <property name="toolTip">
+        <string>Opacity of the mask which visualizes the selected color</string>
+       </property>
        <property name="maximum">
         <number>100</number>
        </property>
@@ -292,6 +322,9 @@
      </item>
      <item row="8" column="2">
       <widget class="QCheckBox" name="maskMask">
+       <property name="toolTip">
+        <string>Whether to show selected color as color or as white</string>
+       </property>
        <property name="text">
         <string>mask</string>
        </property>
@@ -302,6 +335,9 @@
      </item>
      <item row="4" column="1">
       <widget class="QDoubleSpinBox" name="maxRatio">
+       <property name="toolTip">
+        <string>Maximum ratio between length and width for a potential head</string>
+       </property>
        <property name="minimum">
         <double>1.000000000000000</double>
        </property>
@@ -312,6 +348,9 @@
      </item>
      <item row="1" column="2">
       <widget class="QCheckBox" name="useClose">
+       <property name="toolTip">
+        <string>Fills holes with a radius smaller than the given one.</string>
+       </property>
        <property name="text">
         <string>use</string>
        </property>
@@ -322,6 +361,9 @@
      </item>
      <item row="3" column="2">
       <widget class="QSpinBox" name="maxArea">
+       <property name="toolTip">
+        <string>Restricts the area in pixels a head can have.</string>
+       </property>
        <property name="minimum">
         <number>1</number>
        </property>
@@ -338,6 +380,9 @@
      </item>
      <item row="3" column="3">
       <widget class="QCheckBox" name="useHeadSize">
+       <property name="toolTip">
+        <string>Use prototypical head size to calculate the minimum and maximum area</string>
+       </property>
        <property name="text">
         <string>head size</string>
        </property>
