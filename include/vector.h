@@ -122,11 +122,15 @@ protected:
 public:
     Vec2F();
     Vec2F(double x, double y);
-    Vec2F(const Vec2F &v) = default;
     Vec2F(const QPointF &v);
     Vec2F(const cv::Point2f &p);
     Vec2F(const CvPoint *v);
     Vec2F(const CvPoint2D32f *v);
+    Vec2F(const Vec2F &c) = default;
+    Vec2F(Vec2F &&c)      = default;
+    Vec2F &operator=(const Vec2F &c) = default;
+    Vec2F &operator=(Vec2F &&c) = default;
+    ~Vec2F()                    = default;
 
     cv::Point    toCvPoint() const;
     CvPoint2D32f toCvPoint2D32f() const;
