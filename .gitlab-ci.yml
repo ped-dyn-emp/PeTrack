@@ -55,7 +55,7 @@ build_linux:
   script:
     - mkdir build
     - cd build
-    - cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -G Ninja
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -DFAIL_ON_WARNINGS=ON -G Ninja
     - cmake --build .
   artifacts:
     paths:
@@ -105,7 +105,7 @@ build_windows:
     - mkdir -Force build
     - $env:Path += ";C:\Program Files\CMake\bin"
     - cd build
-    - cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -DUSE_3RD_PARTY=ON ..
+    - cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -DUSE_3RD_PARTY=ON -DFAIL_ON_WARNINGS=ON ..
     - cmake --build . -- -j6
   artifacts:
     paths:
@@ -191,7 +191,7 @@ build_macos:
   script:
     - mkdir build
     - cd build
-    - cmake -G Ninja .. -DBUILD_BUNDLE=ON -DBUILD_UNIT_TESTS=ON -DCMAKE_PREFIX_PATH=/Users/tobias/programs/petrack-deps -DCatch2_DIR=/Users/tobias/programs/petrack-deps/lib/cmake/Catch2/ -Dtrompeloeil_DIR=/Users/tobias/programs/petrack-deps/lib/cmake/trompeloeil/
+    - cmake -G Ninja .. -DBUILD_BUNDLE=ON -DBUILD_UNIT_TESTS=ON -DCMAKE_PREFIX_PATH=/Users/tobias/programs/petrack-deps -DCatch2_DIR=/Users/tobias/programs/petrack-deps/lib/cmake/Catch2/ -Dtrompeloeil_DIR=/Users/tobias/programs/petrack-deps/lib/cmake/trompeloeil/ -DFAIL_ON_WARNINGS=ON
     - cmake --build .
     - cpack -C Release -G DragNDrop --verbose
     - rm -r petrack.app
