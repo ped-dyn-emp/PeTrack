@@ -9,6 +9,7 @@
 # -DUSE_3RD_PARTY=ON (default ON on Windows, OFF else) use the libraries provided in 3rdparty
 # -DBUILD_UNIT_TESTS=ON (default ON) for unit tests
 # -DBUILD_BUNDLE=ON (default OFF) builds a MacOS Bundle for deployment
+# -DFAIL_ON_WARNINGS=ON (default OFF) use Werror when building (for CI builds!)
 #
 # currently not supported:
 # -DSTEREO=ON (default OFF)
@@ -74,6 +75,9 @@ print_var(USE_3RD_PARTY)
 option(BUILD_BUNDLE "Builds a MacOS Bundle for deployment" OFF)
 print_var(BUILD_BUNDLE)
 
+option(FAIL_ON_WARNINGS "Handle compiler warnings as error (for CI use)" OFF)
+print_var(FAIL_ON_WARNINGS)
+
 ################################################################################
 # Compilation flags
 ################################################################################
@@ -90,9 +94,11 @@ list(APPEND COMMON_COMPILE_OPTIONS
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-Wextra>
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-fdiagnostics-color=always>
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-pedantic>
+    $<$<AND:$<BOOL:${FAIL_ON_WARNINGS}>,$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>>:-Werror>
     $<$<CXX_COMPILER_ID:MSVC>:/W3>
     $<$<CXX_COMPILER_ID:MSVC>:/EHsc>
     $<$<CXX_COMPILER_ID:MSVC>:/permissive->
+    $<$<AND:$<BOOL:${FAIL_ON_WARNINGS}>,$<CXX_COMPILER_ID:MSVC>>:/WX>
 )
 
 ################################################################################
