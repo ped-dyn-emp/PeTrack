@@ -3263,7 +3263,7 @@ void Control::setXml(QDomElement &elem)
     subSubElem.setAttribute("ONLY_PEOPLE", trackShowOnly->isChecked());
     subSubElem.setAttribute("ONLY_PEOPLE_LIST", trackShowOnlyList->isChecked());
     subSubElem.setAttribute("ONLY_PEOPLE_NR", trackShowOnlyNr->value());
-    subSubElem.setAttribute("ONLY_PEOPLE_NR_LIST", trackShowOnlyNr->text());
+    subSubElem.setAttribute("ONLY_PEOPLE_NR_LIST", trackShowOnlyNrList->text());
 
     subSubElem.setAttribute("SHOW_CURRENT_POINT", trackShowCurrentPoint->isChecked());
     subSubElem.setAttribute("SHOW_POINTS", trackShowPoints->isChecked());
