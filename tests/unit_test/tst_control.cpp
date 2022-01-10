@@ -258,3 +258,42 @@ SCENARIO("Open PeTrack check defaults", "[ui][config]")
     Petrack pet{};
     REQUIRE(pet.getRecognizer().getRecoMethod() == reco::RecognitionMethod::MultiColor);
 }
+
+/**
+ * @brief Transforms node to QString for debugging/logging
+ */
+QString nodeToString(QDomNode &node)
+{
+    QString     str;
+    QTextStream stream(&str);
+    node.save(stream, 4 /*indent*/);
+    return str;
+}
+
+TEST_CASE("Loading from and saving to XML node", "[config]")
+{
+    Petrack      pet{};
+    Control     *control = pet.getControlWidget();
+    QDomDocument doc;
+    QDomElement  save = doc.createElement("CONTROL");
+    control->setXml(save);
+
+    SECTION("PATH")
+    {
+        QDomElement pathNode = save.elementsByTagName("PATH").at(0).toElement();
+        REQUIRE(!pathNode.isNull());
+        SECTION("ONLY_PEOPLE_NR_LIST")
+        {
+            REQUIRE(pathNode.hasAttribute("ONLY_PEOPLE_NR_LIST"));
+
+            // IMPORTANT: reading ONLY_PEOPLE_NR is done in petrack.cpp, as the trajectories need to be loaded
+            // before! Therefore using save from petrack, not Control
+            QDomDocument doc;
+            pet.saveXml(doc);
+            const QString testValue{"101-987"};
+            doc.elementsByTagName("PATH").at(0).toElement().setAttribute("ONLY_PEOPLE_NR_LIST", testValue);
+            pet.openXml(doc, false);
+            REQUIRE(control->trackShowOnlyNrList->text() == testValue);
+        }
+    }
+}
