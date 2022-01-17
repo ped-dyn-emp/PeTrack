@@ -26,6 +26,7 @@
 #include <QMainWindow>
 #include <QMouseEvent>
 #include <opencv2/opencv.hpp>
+#include <optional>
 
 #ifdef STEREO
 #include "calibStereoFilter.h"
@@ -487,5 +488,11 @@ private:
 
     std::vector<std::string> mAuthors;
 };
+
+namespace util
+{
+std::optional<QSet<int>> splitStringToInt(const QString &input);
+}
+
 
 #endif

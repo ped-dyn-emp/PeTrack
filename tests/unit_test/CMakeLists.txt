@@ -9,6 +9,5 @@ target_sources(petrack_tests PRIVATE
     tst_moCapController.cpp
     tst_recognition.cpp
     tst_codeMarkerWidget.cpp
+    tst_petrack.cpp
 )
-
-

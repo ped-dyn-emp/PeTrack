@@ -3977,51 +3977,89 @@ QSet<int> Petrack::getPedestrianUserSelection()
     if(mControlWidget->trackShowOnly->checkState() == Qt::Checked)
     {
         QSet<int> onlyVisible;
+        // subtraction needed as in UI ID start at 1 and internally at 0
         onlyVisible.insert(mControlWidget->trackShowOnlyNr->value() - 1);
         return onlyVisible;
     }
     if(mControlWidget->trackShowOnlyList->checkState() == Qt::Checked)
     {
-        QStringList list = mControlWidget->trackShowOnlyNrList->text().split(",", Qt::SkipEmptyParts);
-        QSet<int>   onlyVisible;
-        foreach(QString s, list)
+        auto enteredIDs = util::splitStringToInt(mControlWidget->trackShowOnlyNrList->text());
+        if(enteredIDs.has_value())
         {
-            bool ok = false;
-            int  nr = s.toInt(&ok);
-            if(ok /* && nr <= maxPed && nr > 0*/) // einzelne ID
+            QSet<int> selectedIDs;
+            for(auto id : enteredIDs.value())
             {
-                onlyVisible.insert(nr - 1);
+                // subtraction needed as in UI ID start at 1 and internally at 0
+                selectedIDs.insert(id - 1);
             }
-            else // error or IDs range (e.g. 1-3, 6-10, etc.)
+            mControlWidget->trackShowOnlyNrList->setStyleSheet("");
+            return selectedIDs;
+        }
+        else
+        {
+            mControlWidget->trackShowOnlyNrList->setStyleSheet("border: 1px solid red");
+        }
+    }
+    return QSet<int>();
+}
+
+/**
+ * @brief Splits the given text to get a set of integers.
+ *
+ * The given text will be split on ',' and then each element will be checked if it is a range. Ranges are marked with
+ * '-' as divider. Only positive integer values are allowed.
+ *
+ * Examples:
+ * '1,5,6' -> (1, 5, 6)
+ * '1-5' -> (1, 2, 3, 4, 5)
+ *
+ * @param input given text
+ * @return Set of int in the given text
+ */
+std::optional<QSet<int>> util::splitStringToInt(const QString &input)
+{
+    QSet<int> ids;
+
+    for(const auto &id : input.split(",", Qt::SkipEmptyParts))
+    {
+        bool ok        = false;
+        int  enteredID = id.toInt(&ok);
+        if(ok && enteredID >= 0) // parse single values
+        {
+            ids.insert(enteredID);
+        }
+        else // error or IDs range (e.g. 1-3, 6-10, etc.)
+        {
+            if(id.startsWith("-"))
             {
-                QStringList range = s.split("-", Qt::SkipEmptyParts);
-                int         last, first = range[0].toInt(&ok);
-
-                if(ok /* && first <= maxPed && nr > 0*/)
+                ok = false;
+            }
+            auto range = id.split("-");
+            int  first = range[0].toInt(&ok);
+            ok         = ok && range.size() == 2 && !range[1].isEmpty();
+            if(ok)
+            {
+                int last = range[1].toInt(&ok);
+                if(ok)
                 {
-                    last = range[1].toInt(&ok);
-                    if(ok /* && last <= maxPed && nr > 0*/)
+                    if(first > last)
                     {
-                        if(first > last)
-                        {
-                            std::swap(first, last);
-                        }
+                        std::swap(first, last);
+                    }
 
-                        for(int i = first; i <= last; i++)
-                        {
-                            onlyVisible.insert(i - 1);
-                        }
+                    for(int i = first; i <= last; i++)
+                    {
+                        ids.insert(i);
                     }
                 }
             }
-            if(!ok)
-            {
-                debout << "Warning: error while reading showOnlyVisible list from input line!" << std::endl;
-            }
         }
-        return onlyVisible; // in anzeige wird ab 1 gezaehlt, in datenstruktur ab 0
+        if(!ok)
+        {
+            return std::nullopt;
+        }
     }
-    return QSet<int>();
+    return ids;
 }
 
 /**

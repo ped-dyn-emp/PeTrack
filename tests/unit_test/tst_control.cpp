@@ -297,3 +297,95 @@ TEST_CASE("Loading from and saving to XML node", "[config]")
         }
     }
 }
+
+SCENARIO("Change the show only people list", "[ui][config][tracking][path]")
+{
+    Petrack           pet{};
+    QPointer<Control> control = pet.getControlWidget();
+    control->trackShowOnlyList->setCheckState(Qt::Checked);
+
+    GIVEN("No filter given")
+    {
+        REQUIRE(control->trackShowOnlyList->isChecked());
+        REQUIRE(control->trackShowOnlyNrList->text().isEmpty());
+
+        WHEN("Enter valid filter (single values)")
+        {
+            QSet<int> enteredIDs{1, 4, 6, 7};
+            QSet<int> expectedIDs;
+            for(auto id : enteredIDs)
+            {
+                expectedIDs.insert(id - 1);
+            }
+
+            std::stringstream input;
+            std::copy(enteredIDs.begin(), enteredIDs.end(), std::ostream_iterator<int>(input, ","));
+
+            QTest::keyClicks(control->trackShowOnlyNrList, input.str().c_str(), Qt::NoModifier, 50);
+            auto receivedIDs = pet.getPedestrianUserSelection();
+
+            THEN("the entered ids should be returned")
+            {
+                REQUIRE(expectedIDs == receivedIDs);
+                REQUIRE(control->trackShowOnlyNrList->styleSheet().isEmpty());
+            }
+        }
+
+        WHEN("Enter valid filter (range)")
+        {
+            QSet<int> enteredIDs{1, 2, 3, 4};
+            QSet<int> expectedIDs;
+            for(auto id : enteredIDs)
+            {
+                expectedIDs.insert(id - 1);
+            }
+
+            QString input("1-4");
+
+            QSet<int> receivedIDs;
+            QTest::keyClicks(control->trackShowOnlyNrList, input, Qt::NoModifier, 50);
+            receivedIDs = pet.getPedestrianUserSelection();
+
+            THEN("the entered ids should be returned")
+            {
+                REQUIRE(expectedIDs == receivedIDs);
+                REQUIRE(control->trackShowOnlyNrList->styleSheet().isEmpty());
+            }
+        }
+
+        WHEN("Enter invalid filter")
+        {
+            QString input("1-");
+
+            THEN("the border should be red")
+            {
+                QTest::keyClicks(control->trackShowOnlyNrList, input, Qt::NoModifier, 50);
+                auto receivedIDs = pet.getPedestrianUserSelection();
+                REQUIRE(receivedIDs.isEmpty());
+                REQUIRE(control->trackShowOnlyNrList->styleSheet().contains("border: 1px solid red"));
+            }
+        }
+
+        WHEN("Enter filter (element-wise)")
+        {
+            QString input("1, 3,4,10, 20-40, 50-45, 100");
+            THEN("no exception should be thrown")
+            {
+                for(auto character : input.toStdString())
+                {
+                    QTest::keyClick(control->trackShowOnlyNrList, character, Qt::NoModifier, 10);
+
+                    QSet<int> receivedIDs = pet.getPedestrianUserSelection();
+                    if(receivedIDs.isEmpty())
+                    {
+                        REQUIRE(control->trackShowOnlyNrList->styleSheet().contains("border: 1px solid red"));
+                    }
+                    else
+                    {
+                        REQUIRE(control->trackShowOnlyNrList->styleSheet().isEmpty());
+                    }
+                }
+            }
+        }
+    }
+}
