@@ -325,6 +325,9 @@ public:
         const std::string &compilerID,
         const std::string &compilerVersion);
 
+    const QString &getLastTrackerExport() const;
+    void           setLastTrackerExport(const QString &newLastTrackerExport);
+
 private:
     void createActions();
     void createMenus();
@@ -408,6 +411,7 @@ private:
     QString mSeqFileName;
     QString mProFileName;
     QString mTrcFileName;
+    QString mLastTrackerExport;
     QString mHeightFileName;
     QString mMarkerIDFileName;
 

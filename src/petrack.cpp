@@ -638,6 +638,8 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
             }
         }
         openXml(doc, openSeq);
+        mLastTrackerExport = mTrcFileName;
+
         if(mControlWidget->getCalibS1Value() == 0 && mControlWidget->getCalibS2Value() == 0 &&
            mControlWidget->getCalibS3Value() == 0 && mControlWidget->getCalibS4Value() == 0 &&
            mControlWidget->getCalibTAUXValue() == 0 && mControlWidget->getCalibTAUYValue() == 0)
@@ -2594,6 +2596,16 @@ void Petrack::mousePressEvent(QMouseEvent *event)
     }
 }
 
+const QString &Petrack::getLastTrackerExport() const
+{
+    return mLastTrackerExport;
+}
+
+void Petrack::setLastTrackerExport(const QString &newLastTrackerExport)
+{
+    mLastTrackerExport = newLastTrackerExport;
+}
+
 /// update control widget, if image size changed (especially because of changing border)
 void Petrack::updateControlImage(cv::Mat &img)
 {
@@ -2930,13 +2942,6 @@ int Petrack::calculateRealTracker()
 
 void Petrack::exportTracker(QString dest) // default = ""
 {
-    static QString lastFile;
-
-    if(lastFile == "")
-    {
-        lastFile = mTrcFileName;
-    }
-
     if(mTracker)
     {
         // if no destination file or folder is given
@@ -2945,7 +2950,7 @@ void Petrack::exportTracker(QString dest) // default = ""
             QFileDialog fileDialog(
                 this,
                 tr("Select file for exporting tracking pathes"),
-                lastFile,
+                mLastTrackerExport,
                 tr("Tracker (*.*);;Petrack tracker (*.trc);;Text (*.txt);;Text for gnuplot(*.dat);;XML Travisto "
                    "(*.trav);;All supported types (*.txt *.trc *.dat *.trav *.);;All files (*.*)"));
             fileDialog.setAcceptMode(QFileDialog::AcceptSave);
@@ -3350,7 +3355,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                 exportTracker(dest + ".trc");
                 exportTracker(dest + ".txt");
             }
-            lastFile = dest;
+            mLastTrackerExport = dest;
         }
     }
 }
