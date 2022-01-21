@@ -53,22 +53,10 @@ function(get_git_info)
                 WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
                 OUTPUT_VARIABLE GIT_TAG
                 ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-        # the subject of the commit
-        execute_process(COMMAND
-                "${GIT_EXECUTABLE}" log -1 --format=%s
-                WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-                OUTPUT_VARIABLE GIT_COMMIT_SUBJECT
-                ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-        # remove # from subject
-        string(REGEX REPLACE "[\#\"]+"
-                "" GIT_COMMIT_SUBJECT
-                ${GIT_COMMIT_SUBJECT})
     else()
         message(STATUS "Not in a git repo")
         set(GIT_SHA1 "UNKNOWN")
         set(GIT_DATE "UNKNOWN")
-        set(GIT_COMMIT_SUBJECT "UNKNOWN")
         set(GIT_BRANCH "UNKNOWN")
         set(GIT_TAG "UNKNOWN")
     endif()
@@ -78,7 +66,6 @@ function(get_git_info)
             GIT_COMMIT_HASH="${GIT_SHA1}"
             GIT_COMMIT_DATE="${GIT_DATE}"
             GIT_TAG="${GIT_TAG}"
-            GIT_COMMIT_SUBJECT="${GIT_COMMIT_SUBJECT}"
             GIT_BRANCH="${GIT_BRANCH}"
             )
 
