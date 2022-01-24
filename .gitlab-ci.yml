@@ -109,8 +109,7 @@ build_windows:
     - cmake --build . -- -j6
   artifacts:
     paths:
-      - "./build/petrack.exe"
-      - "./build/tests/unit_test/petrack_tests.exe"
+      - "./build"
     expire_in: 2 hrs
 
 # Execute unit tests
@@ -154,17 +153,14 @@ build_installer_windows:
   tags:
     - windows
   script:
-    - mkdir -Force build
     - $env:Path += ";C:\Program Files\CMake\bin"
     - cd build
-    - Remove-Item -Force -Recurse -Path *
-    - cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -DUSE_3RD_PARTY=ON ..
     - cpack -C Release
   artifacts:
     paths:
       - "build/petrack-installer-*"
     expire_in: 2hrs
-  dependencies: []
+  dependencies: ["build_windows"]
 
 make_release_windows:
   image: $CI_REGISTRY/ped-dyn-emp/petrack/alpine
