@@ -32,6 +32,13 @@ with saving the project to project.pet again:
 petrack.exe -project project.pet -sequence frame000.jpg -autoTrack tracker_file -autoSave project.pet
 ```
 
+
+## Tutorial & demo
+A small demo project is provided in the `demo` folder. It contains all necessary files for setting up a project with
+PeTrack. A tutorial leading through all steps can be found in the
+[Wiki](https://jugit.fz-juelich.de/ped-dyn-emp/petrack/-/wikis/usage/Workflow%20for%20performing%20experiments%20to%20by%20analyzed%20with%20PeTrack#using-petrack).
+The intermediate project files for each step are also included in the `demo` folder.
+
 ## License
 This project is licensed under the terms of the GPLv3 license. For further information see [LICENSE](./LICENSE).
 
