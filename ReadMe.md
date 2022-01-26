@@ -32,12 +32,58 @@ with saving the project to project.pet again:
 petrack.exe -project project.pet -sequence frame000.jpg -autoTrack tracker_file -autoSave project.pet
 ```
 
-
 ## Tutorial & demo
 A small demo project is provided in the `demo` folder. It contains all necessary files for setting up a project with
 PeTrack. A tutorial leading through all steps can be found in the
 [Wiki](https://jugit.fz-juelich.de/ped-dyn-emp/petrack/-/wikis/usage/Workflow%20for%20performing%20experiments%20to%20by%20analyzed%20with%20PeTrack#using-petrack).
 The intermediate project files for each step are also included in the `demo` folder.
+
+## How to cite
+Please cite the general paper and the corresponding software version in your publications if PeTrack helps your research.
+
+In general:
+- Boltes, M. and Seyfried, A.: Collecting Pedestrian Trajectories; In: Neurocomputing, Special Issue on Behaviours in Video, vol. 100, pp. 127-133 (2013)
+```
+@article{BOLTES2013127,
+    title = {Collecting pedestrian trajectories},
+    journal = {Neurocomputing},
+    volume = {100},
+    pages = {127-133},
+    year = {2013},
+    note = {Special issue: Behaviours in video},
+    issn = {0925-2312},
+    doi = {https://doi.org/10.1016/j.neucom.2012.01.036},
+    author = {Maik Boltes and Armin Seyfried},
+    keywords = {Pedestrian detection, Laboratory experiment},
+}
+```
+
+Software version (v0.9):
+```
+@software{boltes_maik_2021_5126562,
+  author       = {Boltes, Maik and
+                  Boomers, Ann Katrin and
+                  Adrian, Juliane and
+                  Brualla, Ricardo Martin and
+                  Graf, Arne and
+                  Häger, Paul and
+                  Hillebrand, Daniel and
+                  Kilic, Deniz and
+                  Lieberenz, Paul and
+                  Salden, Daniel and
+                  Schrödter, Tobias},
+  title        = {PeTrack},
+  month        = jul,
+  year         = 2021,
+  publisher    = {Zenodo},
+  version      = {v0.9},
+  doi          = {10.5281/zenodo.5126562},
+  url          = {https://doi.org/10.5281/zenodo.5126562}
+}
+```
+
+A list of all versions can be found [here]( https://doi.org/10.5281/zenodo.5078176).
+To find your corresponding version, check the `about` menu or look into the terminal output of PeTrack.
 
 ## License
 This project is licensed under the terms of the GPLv3 license. For further information see [LICENSE](./LICENSE).
