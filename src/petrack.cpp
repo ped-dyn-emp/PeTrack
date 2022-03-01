@@ -2919,6 +2919,7 @@ int Petrack::calculateRealTracker()
                                  mMultiColorMarkerWidget->autoCorrect->isChecked() &&
                                  mMultiColorMarkerWidget->autoCorrectOnlyExport->isChecked();
     int anz = mTrackerReal->calculate(
+        this,
         mTracker,
         mImageItem,
         mControlWidget->getColorPlot(),
@@ -3101,6 +3102,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                 tstart = clock();
 #endif
                 mTrackerReal->calculate(
+                    this,
                     mTracker,
                     mImageItem,
                     mControlWidget->getColorPlot(),
@@ -3221,6 +3223,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     mPersonStorage.recalcHeight(mControlWidget->coordAltitude->value());
                 }
                 mTrackerReal->calculate(
+                    this,
                     mTracker,
                     mImageItem,
                     mControlWidget->getColorPlot(),
@@ -3279,6 +3282,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                 }
 
                 mTrackerReal->calculate(
+                    this,
                     mTracker,
                     mImageItem,
                     mControlWidget->getColorPlot(),
