@@ -30,6 +30,12 @@
 
 class PersonStorage;
 
+struct MissingFrame
+{
+    size_t mNumber; //< frame number, where mCount of frames are missing
+    int    mCount;  //< count of frames missing between frame mNumber and mNumber+1
+};
+
 // point in x/y in cm
 class TrackPointReal : public Vec3F
 {
@@ -139,6 +145,7 @@ public:
     // mControlWidget->getColorPlot()
     // petrack...mImageItem
     int calculate(
+        Petrack   *petrack,
         Tracker   *tracker,
         ImageItem *imageItem,
         ColorPlot *colorPlot,
@@ -171,8 +178,22 @@ public:
         bool         exportAngleOfView,
         bool         exportUseM,
         bool         exportMarkerID);
-    void exportDat(QTextStream &out, bool alternateHeight, bool useTrackpoints); // fuer gnuplot
-    void exportXml(QTextStream &outXml, bool alternateHeight, bool useTrackpoints);
+    void                      exportDat(QTextStream &out, bool alternateHeight, bool useTrackpoints); // fuer gnuplot
+    void                      exportXml(QTextStream &outXml, bool alternateHeight, bool useTrackpoints);
+    std::vector<MissingFrame> computeDroppedFrames(Petrack *petrack);
 };
+
+namespace utils
+{
+std::vector<MissingFrame>
+detectMissingFrames(const std::vector<std::unordered_map<int, double>> &displacementsPerFrame);
+
+std::vector<std::unordered_map<int, double>> computeDisplacement(
+    int                                          minFrameNum,
+    int                                          maxFrameNum,
+    Petrack                                     *petrack,
+    const std::vector<std::vector<cv::Point2f>> &personsInFrame,
+    const std::vector<std::vector<int>>         &idsInFrame);
+} // namespace utils
 
 #endif

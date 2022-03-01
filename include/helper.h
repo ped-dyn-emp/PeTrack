@@ -285,4 +285,23 @@ inline clock_t getElapsedTime()
     return diffTime;
 }
 
+/**
+ * Computes the median of the values in a given vector.
+ * @tparam T any sortable type
+ * @param data vector for which the median should be computed
+ * @return median of all values in data
+ */
+template <typename T>
+T computeMedian(std::vector<T> data)
+{
+    if((data.size() % 2) != 0U)
+    {
+        std::nth_element(data.begin(), data.begin() + data.size() / 2, data.end());
+        return data[data.size() / 2];
+    }
+
+    std::nth_element(data.begin(), data.begin() + data.size() / 2, data.end());
+    std::nth_element(data.begin(), data.begin() + (data.size() - 1) / 2, data.end());
+    return 0.5 * (data[data.size() / 2] + data[(data.size() - 1) / 2]);
+}
 #endif

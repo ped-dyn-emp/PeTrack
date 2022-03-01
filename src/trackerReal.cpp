@@ -20,10 +20,17 @@
 
 #include "trackerReal.h"
 
+#include "animation.h"
+#include "calibFilter.h"
+#include "control.h"
 #include "helper.h"
 #include "personStorage.h"
 #include "petrack.h"
+#include "player.h"
 #include "recognition.h"
+
+#include <fstream>
+#include <opencv2/highgui.hpp>
 
 TrackPointReal::TrackPointReal(const Vec3F &p, int frameNum) : Vec3F(p), mFrameNum(frameNum)
 {
@@ -118,6 +125,7 @@ TrackerReal::TrackerReal(QWidget *wParent, PersonStorage &storage) :
 
 // default: int imageBorderSize = 0, bool missingFramesInserted = true, bool useTrackpoints = false
 int TrackerReal::calculate(
+    Petrack   *petrack,
     Tracker   *tracker,
     ImageItem *imageItem,
     ColorPlot *colorPlot,
@@ -147,57 +155,17 @@ int TrackerReal::calculate(
         QList<int> missingListAnz; // anzahl ausgelassener frames
         if(missingFramesInserted)
         {
-            // finden von nicht aufgenommenen frames
-            int                               largestLastFrame = mPersonStorage.largestLastFrame();
-            QMap<int, double>                 distanceMap;     // map der distanzen zu frame
-            QMap<int, double>                 lastDistanceMap; // map der distanzen zu frame
-            QMap<int, double>::const_iterator iter;
-            int                               anz, skipAnz;
-            double                            dist, sum, lastSum = 0.;
-            // (median neben durchschnittswert als bewertungszahl hinzugenommen,
-            // da sonst bei wenigen personen und langsamen bewegungen nur ein kleiner ausreisser
-            // einen frame hinzufuegt (insb linienexperiment mit vielen personen))
-            for(f = mPersonStorage.smallestFirstFrame(); f <= largestLastFrame; ++f)
-            {
-                distanceMap.clear();
-                skipAnz = anz = 0;
-                sum           = 0.;
-                // erzeugen distanz-map im aktuellen frame
-                for(size_t i = 0; i < mPersonStorage.nbPersons(); ++i)
-                {
-                    if((dist = mPersonStorage.at(i).distanceToNextFrame(f)) > -1)
-                    {
-                        distanceMap[static_cast<int>(i)] = dist;
-                    }
-                }
-                // distanzliste mit vorherigem frame vergleichen
-                iter = distanceMap.constBegin();
-                while(iter != distanceMap.constEnd())
-                {
-                    if(lastDistanceMap.contains(iter.key()) &&
-                       lastDistanceMap[iter.key()] > 1.) // damit bei ganz kleinen bewegungen nicht angeschlagen wird
-                    {
-                        ++anz;
-                        if(distanceMap[iter.key()] > 1.5 * lastDistanceMap[iter.key()])
-                        {
-                            ++skipAnz;
-                        }
-                    }
-                    sum += distanceMap[iter.key()];
-                    ++iter;
-                }
-                sum /= distanceMap.size();
-                // bei sprung in mehreren trackingpfaden als sprung markieren
-                if((anz > 1) && (skipAnz / (double) anz > .5) && myRound(sum / lastSum - 1.) > 0) // 50% (war (anz > 2))
-                {
-                    missingList.append(f);
-                    missingListAnz.append(myRound(sum / lastSum - 1.));
-                    debout << "Warning: potentially missing " << myRound(sum / lastSum - 1.) << " frame(s) between "
-                           << f << " and " << f + 1 << " will be inserted." << std::endl;
-                }
-                lastDistanceMap = distanceMap;
-                lastSum         = sum;
-            }
+            auto missingFrames = computeDroppedFrames(petrack);
+            std::transform(
+                missingFrames.begin(),
+                missingFrames.end(),
+                std::back_inserter(missingList),
+                [](auto const &missingFrame) { return missingFrame.mNumber; });
+            std::transform(
+                missingFrames.begin(),
+                missingFrames.end(),
+                std::back_inserter(missingListAnz),
+                [](auto const &missingFrame) { return missingFrame.mCount; });
         }
 
         // fps ist nicht aussagekraeftig, da sie mgl von ausgelassenen herruehren - besser immer 25,01 fps annehmen
@@ -254,8 +222,8 @@ int TrackerReal::calculate(
                 // ausreisser ausfindig machen (dies geschieht, bevor -1 elemente herausgenommen werden, um die
                 // glaettung beim eliminieren der -1 elemente hier nicht einfluss nehmen zu lassen):
                 if(exportSmooth && (useTrackpoints || alternateHeight) &&
-                   (tsize > 1)) // wenn direkt pointgrey hoehe oder eigene hoehenberechnung aber variierend ueber trj
-                                // genommen werden soll
+                   (tsize > 1)) // wenn direkt pointgrey hoehe oder eigene hoehenberechnung aber variierend ueber
+                                // trj genommen werden soll
                 {
                     // changes Trajectories!
                     mPersonStorage.smoothHeight(i, j);
@@ -279,8 +247,8 @@ int TrackerReal::calculate(
                 }
                 else
                 {
-                    if(alternateHeight) // personenhoehe variiert ueber trajektorie (unebene versuche); berechnung durch
-                                        // mich und nicht pointgrey nutzen, Kamera altitude nutzen
+                    if(alternateHeight) // personenhoehe variiert ueber trajektorie (unebene versuche); berechnung
+                                        // durch mich und nicht pointgrey nutzen, Kamera altitude nutzen
                     {
                         extrapolated = 0; // 0 == false
                         double bestZ =
@@ -293,8 +261,8 @@ int TrackerReal::calculate(
                                 debout << "Warning: no calculated height for trackpoint " << j << " (frame "
                                        << person.firstFrame() + j << ") of person " << i + 1
                                        << ", person is not exported!" << std::endl;
-                                break; // TrackPerson ist angelegt, erhaelt aber keine Points und wird deshalb am ende
-                                       // nicht eingefuegt
+                                break; // TrackPerson ist angelegt, erhaelt aber keine Points und wird deshalb am
+                                       // ende nicht eingefuegt
                             }
                             else
                             {
@@ -362,8 +330,8 @@ int TrackerReal::calculate(
                         pos = imageItem->getPosReal((person[j] + moveDir + br).toQPointF(), height);
                         // die frame nummer der animation wird TrackPoint der PersonReal mitgegeben,
                         // da Index groesser sein kann, da vorher frames hinzugefuegt wurden duch
-                        // trackPersonReal.init(firstFrame+addFrames, height) oder aber innerhalb des trackink path mit
-                        // for schleife ueber f
+                        // trackPersonReal.init(firstFrame+addFrames, height) oder aber innerhalb des trackink path
+                        // mit for schleife ueber f
                         if((exportViewingDirection) &&
                            (person[j].color().isValid())) // wenn blickrichtung mit ausgegeben werden soll
                         {
@@ -764,8 +732,8 @@ void TrackerReal::exportXml(QTextStream &outXml, bool alternateHeight, bool useT
     outXml << "    <shape>" << Qt::endl;
     for(j = 0; j < size(); ++j)
     {
-        if(alternateHeight) // bei variierender groesse wird einfach durchschnittsgroesse genommen, da an treppen gar
-                            // keine vernuempftige Groesse vorliegt
+        if(alternateHeight) // bei variierender groesse wird einfach durchschnittsgroesse genommen, da an treppen
+                            // gar keine vernuempftige Groesse vorliegt
         {
             outXml << "        <agentInfo ID=\"" << j + 1 << "\" color=\"100\" height=\"" << defaultPersonHeight
                    << "\"/>" << Qt::endl;
@@ -790,9 +758,8 @@ void TrackerReal::exportXml(QTextStream &outXml, bool alternateHeight, bool useT
         {
             if(at(j).trackPointExist(i))
             {
-                // z-wert ist hier ausnahmsweise nicht der kopf, sondern der boden, die prsonengroesse wird dem obigem
-                // person-datenentnommen
-                // personID, Frame ID(?) , X , Y , Z
+                // z-wert ist hier ausnahmsweise nicht der kopf, sondern der boden, die prsonengroesse wird dem
+                // obigem person-datenentnommen personID, Frame ID(?) , X , Y , Z
                 if(useTrackpoints)
                 {
                     z = at(j).trackPointAt(i).z() + defaultPersonHeight;
@@ -817,4 +784,243 @@ void TrackerReal::exportXml(QTextStream &outXml, bool alternateHeight, bool useT
         }
         outXml << "    </frame>" << Qt::endl;
     }
+}
+
+/**
+ * @brief Compute the dropped frames
+ *
+ * @note This function needs to "play" the video again to track each pedestrian, hence it is quite expensive!
+ *
+ * @param petrack handler for managing the player and getting the frame
+ * @return vector of all missing frame (frame number and number of frames missing)
+ */
+std::vector<MissingFrame> TrackerReal::computeDroppedFrames(Petrack *petrack)
+{
+    // Save current state
+    auto recognitionState = petrack->getControlWidget()->performRecognition->checkState();
+    petrack->getControlWidget()->performRecognition->setCheckState(Qt::Unchecked);
+
+    auto trackingState = petrack->getControlWidget()->trackOnlineCalc->checkState();
+    petrack->getControlWidget()->trackOnlineCalc->setCheckState(Qt::Unchecked);
+
+    int currentFrameNum = petrack->getPlayer()->getPos();
+
+    auto minFrame = std::max(0, petrack->getPlayer()->getFrameInNum());
+    auto maxFrame = std::min(petrack->getAnimation()->getNumFrames(), petrack->getPlayer()->getFrameOutNum());
+
+
+    std::vector<std::vector<cv::Point2f>> personsInFrame(maxFrame + 1);
+    std::vector<std::vector<int>>         idsInFrame(maxFrame + 1);
+    auto                                  persons = mPersonStorage.getPersons();
+
+    for(size_t i = 0; i < persons.size(); ++i)
+    {
+        auto const &person = persons[i];
+        for(int frame = person.firstFrame(); frame <= std::min(person.lastFrame(), maxFrame); ++frame)
+        {
+            personsInFrame[frame].push_back(person.trackPointAt(frame).toPoint2f());
+            idsInFrame[frame].push_back(i);
+        }
+    }
+
+    auto displacementsPerFrame = utils::computeDisplacement(minFrame, maxFrame, petrack, personsInFrame, idsInFrame);
+
+    // Detect missing frames
+    std::vector<MissingFrame> missingFrames = utils::detectMissingFrames(displacementsPerFrame);
+
+
+    petrack->getPlayer()->skipToFrame(currentFrameNum);
+    petrack->getControlWidget()->performRecognition->setCheckState(recognitionState);
+    petrack->getControlWidget()->trackOnlineCalc->setCheckState(trackingState);
+
+    return missingFrames;
+}
+
+/**
+ * @brief Computes the displacement for each detected pedestrian in each frame
+ *
+ * @param minFrameNum frame to start the computation
+ * @param maxFrameNum frame to end the computation
+ * @param petrack handler for managing the player and getting the frame
+ * @param personsInFrame pixel coordinates where each pedestrian is located in a frame (same order as idsInFrame)
+ * @param idsInFrame ids of pedestrians in a frame (same order as personsInFrame)
+ * @return displacement for each pedestrian in each frame
+ */
+std::vector<std::unordered_map<int, double>> utils::computeDisplacement(
+    int                                          minFrameNum,
+    int                                          maxFrameNum,
+    Petrack                                     *petrack,
+    const std::vector<std::vector<cv::Point2f>> &personsInFrame,
+    const std::vector<std::vector<int>>         &idsInFrame)
+{
+    auto fps = petrack->getAnimation()->getFPS();
+
+    petrack->getPlayer()->skipToFrame(minFrameNum);
+
+    cv::Mat currentFrame;
+    cv::Mat prevFrame;
+
+    cv::Mat prevFrameColor = petrack->getImageFiltered();
+    cv::cvtColor(prevFrameColor, prevFrame, cv::COLOR_BGR2GRAY);
+
+    std::vector<std::unordered_map<int, double>> displacementsPerFrame(maxFrameNum + 1);
+
+    // compute window size
+    auto cmPerPixelXYMiddle = petrack->getImageItem()->getCmPerPixel(
+        static_cast<float>(prevFrame.cols / 2),
+        static_cast<float>(prevFrame.rows / 2),
+        static_cast<float>(petrack->getControlWidget()->mapDefaultHeight->value()));
+    auto             cmPerPixelMiddle = (cmPerPixelXYMiddle.x() + cmPerPixelXYMiddle.y()) / 2.;
+    constexpr double headFactor       = 1.25; //< factor around head size to ensure complete head is in window
+    int              winsize          = static_cast<int>(headFactor * HEAD_SIZE / cmPerPixelMiddle);
+    cv::Size         window{winsize, winsize};
+
+    for(int frame = minFrameNum + 1; frame <= maxFrameNum; frame++)
+    {
+        // get the current frame and convert to gray scale image
+        petrack->getPlayer()->frameForward();
+        cv::Mat currentFrameColor = petrack->getImageFiltered();
+        cv::cvtColor(currentFrameColor, currentFrame, cv::COLOR_BGR2GRAY);
+
+        // track the current points in the image
+        std::vector<cv::Point2f> prevFeaturePoint{personsInFrame[frame - 1]};
+        if(prevFeaturePoint.empty())
+        {
+            cv::swap(prevFrame, currentFrame);
+            continue;
+        }
+
+        std::vector<cv::Point2f> nextFeaturePoint{};
+        std::vector<uchar>       localStatus;
+        std::vector<float>       localTrackError;
+
+        int maxLevel = petrack->getControlWidget()->trackRegionLevels->value();
+
+        cv::calcOpticalFlowPyrLK(
+            prevFrame,
+            currentFrame,
+            prevFeaturePoint,
+            nextFeaturePoint,
+            localStatus,
+            localTrackError,
+            window,
+            maxLevel);
+
+        // compute the displacement for each pedestrian
+        std::unordered_map<int, double> displacementsInFrame(prevFeaturePoint.size());
+        for(size_t i = 0; i < prevFeaturePoint.size(); ++i)
+        {
+            auto displacement = prevFeaturePoint[i] - nextFeaturePoint[i];
+            if(!idsInFrame[frame].empty() && localStatus[i] == 1)
+            {
+                auto id = idsInFrame[frame - 1][i];
+
+                auto cmPerPixelXY = petrack->getImageItem()->getCmPerPixel(
+                    nextFeaturePoint[i].x,
+                    nextFeaturePoint[i].y,
+                    petrack->getControlWidget()->mapDefaultHeight->value());
+
+                auto mPerPixel = (cmPerPixelXY.x() + cmPerPixelXY.y()) / 2. / 100.;
+
+                auto movement = cv::norm(displacement);
+
+                auto speed = movement * mPerPixel * fps;
+
+                constexpr auto minSpeed = 0.25;
+
+                // if small movement, assume the same movement as before
+                if(speed < minSpeed)
+                {
+                    if(displacementsPerFrame[frame - 1].find(id) != displacementsPerFrame[frame - 1].end())
+                    {
+                        movement = displacementsPerFrame[frame - 1][id];
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                displacementsInFrame.emplace(id, movement);
+            }
+        }
+
+        cv::swap(prevFrame, currentFrame);
+        displacementsPerFrame[frame] = displacementsInFrame;
+    }
+
+    return displacementsPerFrame;
+}
+
+/**
+ * @brief Detects the missing frames based on the displacements
+ *
+ * Main idea: The displacement between a small range of frames should be roughly the same. Meaning no large jumps
+ * between two frames.
+ *
+ * @param displacementsPerFrame displacement for each pedestrian per frame
+ * @return vector of all missing frame (frame number and number of frames missing)
+ */
+std::vector<MissingFrame>
+utils::detectMissingFrames(const std::vector<std::unordered_map<int, double>> &displacementsPerFrame)
+{
+    std::vector<MissingFrame> missingFrames;
+
+    constexpr long averageWindow = 3;
+
+    for(size_t frame = 2; frame < displacementsPerFrame.size(); ++frame)
+    {
+        auto begin = displacementsPerFrame.begin() + std::max(static_cast<long>(frame) - averageWindow, 0l);
+        auto end   = displacementsPerFrame.begin() + frame;
+
+        auto referenceDisplacement = std::vector<std::unordered_map<int, double>>(begin, end);
+
+        const auto &displacement = displacementsPerFrame[frame];
+        if(referenceDisplacement.empty() || displacement.empty())
+        {
+            continue;
+        }
+
+        std::vector<double> relationToPrevFrames;
+        for(auto const &[id, norm] : displacement)
+        {
+            std::vector<double> norms;
+            for(auto const &disp : referenceDisplacement)
+            {
+                if(disp.find(id) != disp.end())
+                {
+                    norms.push_back(disp.at(id));
+                }
+            }
+            if(norms.empty())
+            {
+                continue;
+            }
+
+            double averageNorm = std::accumulate(norms.begin(), norms.end(), 0.0) / norms.size();
+
+            double relation = norm / averageNorm;
+
+            relationToPrevFrames.push_back(relation);
+        }
+
+        if(relationToPrevFrames.empty())
+        {
+            continue;
+        }
+        double median = computeMedian(relationToPrevFrames);
+
+        auto medianRounded = std::round(median);
+
+        if(medianRounded > 1.)
+        {
+            int numMissingFrames = static_cast<int>(medianRounded) - 1;
+
+            debout << "Warning: potentially missing " << numMissingFrames << " frame(s) between " << frame - 1
+                   << " and " << frame << " will be inserted." << std::endl;
+
+            missingFrames.push_back({frame - 1, numMissingFrames});
+        }
+    }
+
+    return missingFrames;
 }
