@@ -1426,10 +1426,12 @@ void Petrack::saveView(QString dest) // default = ""
         {
             if(dest.right(4) == ".pdf" || dest.right(3) == ".ps" || dest.right(4) == ".eps")
             {
-                QPrinter printer(QPrinter::ScreenResolution); // HighResolution?
-                printer.setColorMode(QPrinter::Color);
-                printer.setOutputFileName(dest);
-                QPainter painter(&printer);
+                QPdfWriter pdfWriter(dest);
+                pdfWriter.setPageMargins({0, 0, 0, 0});
+                QPageSize pageSize{mImage->size()};
+                pdfWriter.setPageSize(pageSize);
+                QPainter painter(&pdfWriter);
+
                 if(mCropZoomViewAct->isChecked())
                 {
                     mView->render(&painter);
@@ -1505,12 +1507,14 @@ void Petrack::saveImage(QString dest) // default = ""
         {
             if(dest.right(4) == ".pdf" || dest.right(3) == ".ps" || dest.right(4) == ".eps")
             {
-                QPrinter printer(QPrinter::ScreenResolution); // HighResolution?
-                printer.setColorMode(QPrinter::Color);
-                printer.setOutputFileName(dest);
-                QPainter painter(&printer);
-                QRect    rect = painter.viewport();
-                QSize    size = mImage->size();
+                QPdfWriter pdfWriter(dest);
+                pdfWriter.setPageMargins({0, 0, 0, 0});
+                QPageSize pageSize{mImage->size()};
+                pdfWriter.setPageSize(pageSize);
+                QPainter painter(&pdfWriter);
+
+                QRect rect = painter.viewport();
+                QSize size = mImage->size();
                 size.scale(rect.size(), Qt::KeepAspectRatio);
                 painter.setViewport(rect.x(), rect.y(), size.width(), size.height());
                 painter.setWindow(mImage->rect());
