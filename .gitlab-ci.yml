@@ -187,7 +187,13 @@ build_macos:
   script:
     - mkdir build
     - cd build
-    - cmake -G Ninja .. -DBUILD_BUNDLE=ON -DBUILD_UNIT_TESTS=ON -DFAIL_ON_WARNINGS=ON -DCatch2_DIR=$Catch2_DIR -Dtrompeloeil_DIR=$trompeloeil_DIR
+    - cmake -G Ninja .. 
+      -DBUILD_BUNDLE=ON 
+      -DBUILD_UNIT_TESTS=ON 
+      -DFAIL_ON_WARNINGS=ON 
+      -DCatch2_DIR=$Catch2_DIR 
+      -Dtrompeloeil_DIR=$trompeloeil_DIR
+      -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
     - cmake --build .
     - cpack -C Release -G DragNDrop --verbose
     - rm -r petrack.app
@@ -231,14 +237,14 @@ regression_test_macos:
   needs: ["build_macos"]
 
 make_release_macos:
- image: $CI_REGISTRY/ped-dyn-emp/petrack/alpine
- stage: deploy
- rules:
+  image: $CI_REGISTRY/ped-dyn-emp/petrack/alpine
+  stage: deploy
+  rules:
    - if: $CI_PIPELINE_SOURCE == "schedule"
      when: never
    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
- script:
+  script:
    - cd build
    - macosInst=$(echo petrack-installer-*)
    - curl -k -T $macosInst -u "${SCIEBO_MACOS_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$macosInst --fail-with-body
- dependencies: [ "build_macos" ]
+  dependencies: [ "build_macos" ]
