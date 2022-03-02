@@ -91,6 +91,10 @@ public:
     const TrackPoint &operator=(const Vec2F &v);
     const TrackPoint &operator+=(const Vec2F &v);
     const TrackPoint  operator+(const Vec2F &v) const;
+
+    static constexpr int minDetectionQual  = 80;
+    static constexpr int bestDetectionQual = 100;
+    [[nodiscard]] bool   isDetection() const;
 };
 
 
