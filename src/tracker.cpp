@@ -78,6 +78,11 @@ const TrackPoint TrackPoint::operator+(const Vec2F &v) const
     return TrackPoint(*this) += v; // Vec2F(mX + v.mX, mY + v.mY);
 }
 
+bool TrackPoint::isDetection() const
+{
+    return mQual > minDetectionQual;
+}
+
 //--------------------------------------------------------------------------
 
 // the list index is the frame number plus mFirstFrame 0..mLastFrame-mFirstFrame
@@ -342,10 +347,10 @@ double TrackPerson::getNearestZ(int i, int *extrapolated) const
  */
 bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, bool extrapolate)
 {
-    int        i;
     Vec2F      tmp; // ua. zur linearen Interpolation
     TrackPoint tp;  // default: 0 = ist schlechteste qualitaet
     double     distance;
+
 
     if(frame > mLastFrame)
     {
@@ -356,7 +361,7 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
             tmp.setY((point.y() - last().y()) / (frame - mLastFrame));
             tp = last();
             tp.setQual(0);
-            for(i = 0; i < frame - mLastFrame - 1; ++i)
+            for(int i = 0; i < frame - mLastFrame - 1; ++i)
             {
                 tp += tmp;
                 append(tp);
@@ -414,7 +419,7 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
             tmp.setY((point.y() - first().y()) / (mFirstFrame - frame));
             tp = first();
             tp.setQual(0);
-            for(i = 0; i < mFirstFrame - frame - 1; ++i)
+            for(int i = 0; i < mFirstFrame - frame - 1; ++i)
             {
                 tp += tmp;
                 prepend(tp);
@@ -468,7 +473,8 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
         // draufgesetzt wird!!!
 
         tp = point;
-        if(point.qual() < 100 && point.qual() > 80) // erkannte Person aber ohne strukturmarker
+        if(point.qual() < TrackPoint::bestDetectionQual &&
+           point.isDetection()) // erkannte Person aber ohne strukturmarker
         {
             // wenn in angrenzenden Frames qual groesse 90 (100 oder durch vorheriges verschieben entstanden), dann
             // verschieben
@@ -514,21 +520,23 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
                        << persNr + 1 << " in frame " << frame << "!" << std::endl;
                 // qualitaet anpassen, da der weg zum pkt nicht der richtige gewesen sein kann
                 // zurueck
-                for(anz = 1; trackPointExist(frame - anz) && (trackPointAt(frame - anz).qual() < 100); ++anz)
+                anz = 1;
+                while(trackPointExist(frame - anz) && !trackPointAt(frame - anz).isDetection())
                 {
-                    ;
+                    ++anz;
                 }
-                for(i = 1; i < (anz - 1);
+                for(int i = 1; i < (anz - 1);
                     ++i) // anz ist einer zu viel; zudem nur boie anz-1 , da sonst eh nur mit 1 multipliziert wuerde
                 {
                     (*this)[frame - mFirstFrame - i].setQual((i * trackPointAt(frame - i).qual()) / anz);
                 }
                 // vor
-                for(anz = 1; trackPointExist(frame + anz) && (trackPointAt(frame + anz).qual() < 100); ++anz)
+                anz = 1;
+                while(trackPointExist(frame + anz) && !trackPointAt(frame + anz).isDetection())
                 {
-                    ;
+                    ++anz;
                 }
-                for(i = 1; i < (anz - 1);
+                for(int i = 1; i < (anz - 1);
                     ++i) // anz ist einer zu viel; zudem nur boie anz-1 , da sonst eh nur mit 1 multipliziert wuerde
                 {
                     (*this)[frame - mFirstFrame + i].setQual((i * trackPointAt(frame + i).qual()) / anz);
@@ -537,9 +545,9 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
 
             replace(frame - mFirstFrame, tp);
 
-            if(tp.qual() > 100) // manual add // after inserting, because point ist const
+            if(tp.qual() > TrackPoint::bestDetectionQual) // manual add // after inserting, because point ist const
             {
-                (*this)[frame - mFirstFrame].setQual(100); // so moving of a point is possible
+                (*this)[frame - mFirstFrame].setQual(TrackPoint::bestDetectionQual); // so moving of a point is possible
             }
         }
         else
