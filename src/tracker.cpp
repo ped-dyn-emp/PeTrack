@@ -777,7 +777,7 @@ int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int bord
 
     for(size_t i = 0; i < count; ++i)
     {
-        if(mStatus[i])
+        if(mStatus[i] == TrackStatus::Tracked)
         {
             v = Vec2F(mFeaturePoints.at(i).x, mFeaturePoints.at(i).y); // umwandlung nach TrackPoint bei "="
 
@@ -856,7 +856,8 @@ int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int bord
         }
         else
         {
-            if(v.x() >= dist && v.y() >= dist && v.x() <= img.cols - 1 - dist && v.y() <= img.rows - 1 - dist)
+            if(mStatus[i] == TrackStatus::NotTracked && v.x() >= dist && v.y() >= dist &&
+               v.x() <= img.cols - 1 - dist && v.y() <= img.rows - 1 - dist)
             {
                 debout << "Warning: Lost trajectory inside picture of person " << mPrevFeaturePointsIdx[i] + 1
                        << " at frame " << frame << "!" << std::endl;
@@ -877,12 +878,11 @@ int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int bord
  */
 bool Tracker::tryMergeTrajectories(const TrackPoint &v, size_t i, int frame)
 {
-    bool        found = false;
-    int         j;
+    bool        found   = false;
     const auto &persons = mPersonStorage.getPersons();
     const auto &person  = persons[mPrevFeaturePointsIdx[i]];
     // nach trajektorie suchen, mit der eine verschmelzung erfolgen koennte
-    for(j = 0; !found && j < static_cast<int>(mPersonStorage.nbPersons()); ++j) // ueber TrackPerson
+    for(int j = 0; !found && j < static_cast<int>(mPersonStorage.nbPersons()); ++j) // ueber TrackPerson
     {
         const auto &other = persons[j];
         if(j != mPrevFeaturePointsIdx[i] && other.trackPointExist(frame) &&
@@ -899,6 +899,7 @@ bool Tracker::tryMergeTrajectories(const TrackPoint &v, size_t i, int frame)
             {
                 int deleteIndex = mPersonStorage.merge(mPrevFeaturePointsIdx[i], j);
 
+                int idxOtherMerged = -1;
                 // shift index of feature points
                 for(size_t k = 0; k < mPrevFeaturePointsIdx.size(); ++k)
                 {
@@ -906,6 +907,15 @@ bool Tracker::tryMergeTrajectories(const TrackPoint &v, size_t i, int frame)
                     {
                         --mPrevFeaturePointsIdx[k];
                     }
+                    else if(mPrevFeaturePointsIdx[k] == deleteIndex)
+                    {
+                        idxOtherMerged = static_cast<int>(k);
+                    }
+                }
+                if(idxOtherMerged != -1)
+                {
+                    // set status to 2, so the already merged person is ignored/skipped
+                    mStatus[idxOtherMerged] = TrackStatus::Merged;
                 }
                 found = true;
             }
@@ -1142,7 +1152,8 @@ void Tracker::trackFeaturePointsLK(int level, bool adaptive)
             mTrackError[i]    = localTrackError[0] * 10.F / winSize;
 
         } while(adaptive && localStatus[0] == 0 && (l--) > 0);
-        mStatus[i] = localStatus[0];
+        // status from OpenCV: 0 -> not tracked, 1 -> tracked
+        mStatus[i] = localStatus[0] ? TrackStatus::Tracked : TrackStatus::NotTracked;
     }
 }
 
@@ -1230,7 +1241,7 @@ void Tracker::useBackgroundFilter(QList<int> &trjToDel, BackgroundFilter *bgFilt
 
         // Rahmen, in dem nicht vordergrund pflicht, insbesondere am rechten rand!!!! es wird gruenes von hand
         // angelegtes bounding rect roi genutzt
-        if((mStatus[i] == 1) && x >= MAX(margin, rect.x()) &&
+        if((mStatus[i] == TrackStatus::Tracked) && x >= MAX(margin, rect.x()) &&
            x <= MIN(mGrey.cols - 1 - 2 * bS - margin - 50, rect.x() + rect.width()) && y >= MAX(margin, rect.y()) &&
            y <= MIN(mGrey.rows - 1 - 2 * bS - margin, rect.y() + rect.height()))
         {
@@ -1279,8 +1290,8 @@ void Tracker::refineViaNearDarkPoint()
         // da in kontrastarmen regionen der angegebene fehler gering, aber das resultat haeufiger fehlerhaft ist
         // es waere daher schoen, wenn der fehler in abhaengigkeit von kontrast in umgebung skaliert wuerde
         // zb (max 0..255): normal 10..150 -> *1; klein 15..50 -> *3; gross 0..255 -> *.5
-        if((mTrackError[i] > MAX_TRACK_ERROR) && (mStatus[i] == 1) && x >= 0 && x < mGrey.cols && y >= 0 &&
-           y < mGrey.rows)
+        if((mTrackError[i] > MAX_TRACK_ERROR) && (mStatus[i] == TrackStatus::Tracked) && x >= 0 && x < mGrey.cols &&
+           y >= 0 && y < mGrey.rows)
         {
             int regionSize = myRound(
                 mMainWindow->getHeadSize(nullptr, mPrevFeaturePointsIdx[i], mPrevFrame) /

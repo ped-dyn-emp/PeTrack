@@ -209,11 +209,18 @@ std::ostream &operator<<(std::ostream &s, const TrackPerson &tp);
 class Tracker
 {
 private:
+    enum class TrackStatus
+    {
+        Tracked,
+        NotTracked,
+        Merged
+    };
+
     Petrack                 *mMainWindow;
     cv::Mat                  mGrey, mPrevGrey;
     std::vector<cv::Mat>     mPrevPyr, mCurrentPyr;
     std::vector<cv::Point2f> mPrevFeaturePoints, mFeaturePoints;
-    std::vector<uchar>       mStatus;
+    std::vector<TrackStatus> mStatus;
     int                      mPrevFrame;
     std::vector<int>         mPrevFeaturePointsIdx;
     std::vector<float>       mTrackError;
