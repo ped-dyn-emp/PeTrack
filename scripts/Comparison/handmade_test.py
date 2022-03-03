@@ -50,7 +50,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
 EPSILON = (
-    1 if args == None else args.eps
+    1 if args is None else args.eps
 )  # in pixels # default value 1, can be changed in CLI
 error_message = []
 MAX_DIFF = 20  # in pixels
