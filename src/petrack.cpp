@@ -43,13 +43,12 @@
 #include "pMessageBox.h"
 #include "petrack.h"
 #include "player.h"
-#include "recognitionRoiItem.h"
+#include "roiItem.h"
 #include "stereoItem.h"
 #include "stereoWidget.h"
 #include "tracker.h"
 #include "trackerItem.h"
 #include "trackerReal.h"
-#include "trackingRoiItem.h"
 #include "view.h"
 
 #include <QtPrintSupport/QPrintDialog>
@@ -113,7 +112,15 @@ Petrack::Petrack() :
 
     mScene = new QGraphicsScene(this);
 
-    mControlWidget = new Control(*this, *mScene, mReco);
+    mTrackingRoiItem = new RoiItem(this, Qt::blue);
+    connect(mTrackingRoiItem, &RoiItem::changed, this, [=]() { this->setTrackChanged(true); });
+    mTrackingRoiItem->setZValue(4); // groesser heisst weiter oben
+
+    mRecognitionRoiItem = new RoiItem(this, Qt::green);
+    connect(mRecognitionRoiItem, &RoiItem::changed, this, [=]() { this->setRecognitionChanged(true); });
+    mRecognitionRoiItem->setZValue(5); // groesser heisst weiter oben
+
+    mControlWidget = new Control(*this, *mScene, mReco, *mTrackingRoiItem, *mRecognitionRoiItem);
     cw             = mControlWidget; // muss spaeter geloescht werden
 
     mStereoWidget = new StereoWidget(this);
@@ -153,13 +160,6 @@ Petrack::Petrack() :
     mCoordItem = new CoordItem(this);
     mCoordItem->setZValue(3); // groesser heisst weiter oben
     mImageItem->setCoordItem(mCoordItem);
-
-    mTrackingRoiItem = new TrackingRoiItem(this);
-    mTrackingRoiItem->setZValue(4); // groesser heisst weiter oben
-
-    mRecognitionRoiItem = new RecognitionRoiItem(this);
-    mRecognitionRoiItem->setZValue(5); // groesser heisst weiter oben
-
 
     mViewWidget = new ViewWidget(this);
     mView       = mViewWidget->view();
@@ -3671,7 +3671,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                 size.height = mImgFiltered.rows;
                 mTracker->resize(size);
 
-                mTrackingRoiItem->checkRect();
+                mTrackingRoiItem->restoreSize();
             }
 #ifndef STEREO_DISABLED
             // buildt disparity picture if it should be used for height detection
@@ -3727,7 +3727,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 #endif
             if(borderChanged)
             {
-                mRecognitionRoiItem->checkRect();
+                mRecognitionRoiItem->restoreSize();
             }
 
             if(mControlWidget->performRecognition->checkState() == Qt::Checked)

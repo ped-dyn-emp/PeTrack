@@ -24,9 +24,8 @@
 #include "control.h"
 #include "personStorage.h"
 #include "petrack.h"
-#include "recognitionRoiItem.h"
+#include "roiItem.h"
 #include "tracker.h"
-#include "trackingRoiItem.h"
 #include "view.h"
 
 #include <QInputDialog>

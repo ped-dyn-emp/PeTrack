@@ -18,29 +18,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "trackingRoiItem.h"
+#include "roiItem.h"
 
-#include "control.h"
 #include "petrack.h"
-#include "view.h"
 
-#include <QtWidgets>
 
-TrackingRoiItem::TrackingRoiItem(QWidget *wParent, QGraphicsItem *parent) : QGraphicsRectItem(parent)
+RoiItem::RoiItem(QWidget *wParent, const QColor &color) : QObject(wParent)
 {
-    mMainWindow    = (class Petrack *) wParent;
-    mControlWidget = mMainWindow->getControlWidget();
-    setRect(0, 0, 0, 0); // qreal x, qreal y, qreal width, qreal height
-    QPen pen(Qt::blue);
+    mMainWindow = dynamic_cast<class Petrack *>(wParent);
+    setRect(0, 0, 0, 0);
+    QPen pen(color);
     setPen(pen);
     setAcceptHoverEvents(true);
     setFlags(ItemIsMovable); // default in control
     hide();                  // default in control
 }
 
-void TrackingRoiItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void RoiItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(!mControlWidget->getTrackRoiFix())
+    if(!mIsFixed)
     {
         mPressRect =
             QRect(myRound(rect().left()), myRound(rect().top()), myRound(rect().width()), myRound(rect().height()));
@@ -49,17 +45,17 @@ void TrackingRoiItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         {
             if((event->pos()).y() < DISTANCE_TO_BORDER + mPressRect.y())
             {
-                mPressLocation = topLeft;
+                mPressLocation = PressLocation::topLeft;
                 setCursor(Qt::SizeFDiagCursor);
             }
             else if((event->pos()).y() > mPressRect.height() + mPressRect.y() - DISTANCE_TO_BORDER)
             {
-                mPressLocation = bottomLeft;
+                mPressLocation = PressLocation::bottomLeft;
                 setCursor(Qt::SizeBDiagCursor);
             }
             else
             {
-                mPressLocation = left;
+                mPressLocation = PressLocation::left;
                 setCursor(Qt::SizeHorCursor);
             }
         }
@@ -67,33 +63,33 @@ void TrackingRoiItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         {
             if((event->pos()).y() < DISTANCE_TO_BORDER + mPressRect.y())
             {
-                mPressLocation = topRight;
+                mPressLocation = PressLocation::topRight;
                 setCursor(Qt::SizeBDiagCursor);
             }
             else if((event->pos()).y() > mPressRect.height() + mPressRect.y() - DISTANCE_TO_BORDER)
             {
-                mPressLocation = bottomRight;
+                mPressLocation = PressLocation::bottomRight;
                 setCursor(Qt::SizeFDiagCursor);
             }
             else
             {
-                mPressLocation = right;
+                mPressLocation = PressLocation::right;
                 setCursor(Qt::SizeHorCursor);
             }
         }
         else if((event->pos()).y() < DISTANCE_TO_BORDER + mPressRect.y())
         {
-            mPressLocation = top;
+            mPressLocation = PressLocation::top;
             setCursor(Qt::SizeVerCursor);
         }
         else if((event->pos()).y() > mPressRect.height() + mPressRect.y() - DISTANCE_TO_BORDER)
         {
-            mPressLocation = bottom;
+            mPressLocation = PressLocation::bottom;
             setCursor(Qt::SizeVerCursor);
         }
         else
         {
-            mPressLocation = inside;
+            mPressLocation = PressLocation::inside;
             setCursor(Qt::ClosedHandCursor);
         }
     }
@@ -101,10 +97,10 @@ void TrackingRoiItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsRectItem::mousePressEvent(event);
 }
 
-void TrackingRoiItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void RoiItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    mMainWindow->setTrackChanged(true);
-    // mMainWindow->setRecognitionChanged(true);
+    emit changed();
+
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -113,136 +109,131 @@ void TrackingRoiItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsRectItem::mouseReleaseEvent(event);
 }
 
-// event, of moving mouse while mouse button is pressed
-void TrackingRoiItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void RoiItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(!mControlWidget->getTrackRoiFix())
+    // event, of moving mouse while mouse button is pressed
+    if(!mIsFixed)
     {
         QImage *img  = mMainWindow->getImage();
         QPoint  diff = QPoint(myRound((event->pos() - mPressPos).x()), myRound((event->pos() - mPressPos).y()));
-        // raender des bildes nicht ueberscheiten
-        // swappen des rechtecks vermeiden, damit keine negativen width...
+        // do not extend over the border of the image
+        // do not swap the rectangle, to avoid negative width
         if(img != nullptr)
         {
-            if(mPressLocation == inside || mPressLocation == topLeft || mPressLocation == left ||
-               mPressLocation == bottomLeft)
+            if(mPressLocation == PressLocation::inside || mPressLocation == PressLocation::topLeft ||
+               mPressLocation == PressLocation::left || mPressLocation == PressLocation::bottomLeft)
             {
                 if(mPressRect.x() + diff.x() < -mMainWindow->getImageBorderSize())
                 {
                     diff.setX(-mPressRect.x() - mMainWindow->getImageBorderSize());
                 }
-                if(mPressLocation != inside && mPressRect.width() - diff.x() < MIN_SIZE)
+                if(mPressLocation != PressLocation::inside && mPressRect.width() - diff.x() < MIN_SIZE)
                 {
                     diff.setX(mPressRect.width() - MIN_SIZE);
                 }
             }
-            if(mPressLocation == inside || mPressLocation == topLeft || mPressLocation == top ||
-               mPressLocation == topRight)
+            if(mPressLocation == PressLocation::inside || mPressLocation == PressLocation::topLeft ||
+               mPressLocation == PressLocation::top || mPressLocation == PressLocation::topRight)
             {
                 if(mPressRect.y() + diff.y() < -mMainWindow->getImageBorderSize())
                 {
                     diff.setY(-mPressRect.y() - mMainWindow->getImageBorderSize());
                 }
-                if(mPressLocation != inside && mPressRect.height() - diff.y() < MIN_SIZE)
+                if(mPressLocation != PressLocation::inside && mPressRect.height() - diff.y() < MIN_SIZE)
                 {
                     diff.setY(mPressRect.height() - MIN_SIZE);
                 }
             }
-            if(mPressLocation == inside || mPressLocation == topRight || mPressLocation == right ||
-               mPressLocation == bottomRight)
+            if(mPressLocation == PressLocation::inside || mPressLocation == PressLocation::topRight ||
+               mPressLocation == PressLocation::right || mPressLocation == PressLocation::bottomRight)
             {
                 if(mPressRect.x() + diff.x() + mPressRect.width() > img->width() - mMainWindow->getImageBorderSize())
                 {
                     diff.setX(img->width() - mPressRect.x() - mPressRect.width() - mMainWindow->getImageBorderSize());
                 }
-                if(mPressLocation != inside && mPressRect.width() + diff.x() < MIN_SIZE)
+                if(mPressLocation != PressLocation::inside && mPressRect.width() + diff.x() < MIN_SIZE)
                 {
                     diff.setX(-mPressRect.width() + MIN_SIZE);
                 }
             }
-            if(mPressLocation == inside || mPressLocation == bottomLeft || mPressLocation == bottom ||
-               mPressLocation == bottomRight)
+            if(mPressLocation == PressLocation::inside || mPressLocation == PressLocation::bottomLeft ||
+               mPressLocation == PressLocation::bottom || mPressLocation == PressLocation::bottomRight)
             {
                 if(mPressRect.y() + diff.y() + mPressRect.height() > img->height() - mMainWindow->getImageBorderSize())
                 {
                     diff.setY(img->height() - mPressRect.y() - mPressRect.height() - mMainWindow->getImageBorderSize());
                 }
-                if(mPressLocation != inside && mPressRect.height() + diff.y() < MIN_SIZE)
+                if(mPressLocation != PressLocation::inside && mPressRect.height() + diff.y() < MIN_SIZE)
                 {
                     diff.setY(-mPressRect.height() + MIN_SIZE);
                 }
             }
         }
-        if(mPressLocation == topLeft)
+
+        switch(mPressLocation)
         {
-            setRect(
-                mPressRect.x() + diff.x(),
-                mPressRect.y() + diff.y(),
-                mPressRect.width() - diff.x(),
-                mPressRect.height() - diff.y());
+            case PressLocation::topLeft:
+                setRect(
+                    mPressRect.x() + diff.x(),
+                    mPressRect.y() + diff.y(),
+                    mPressRect.width() - diff.x(),
+                    mPressRect.height() - diff.y());
+                break;
+            case PressLocation::topRight:
+                setRect(
+                    mPressRect.x(),
+                    mPressRect.y() + diff.y(),
+                    mPressRect.width() + diff.x(),
+                    mPressRect.height() - diff.y());
+                break;
+            case PressLocation::bottomLeft:
+                setRect(
+                    mPressRect.x() + diff.x(),
+                    mPressRect.y(),
+                    mPressRect.width() - diff.x(),
+                    mPressRect.height() + diff.y());
+                break;
+            case PressLocation::bottomRight:
+                setRect(mPressRect.x(), mPressRect.y(), mPressRect.width() + diff.x(), mPressRect.height() + diff.y());
+                break;
+            case PressLocation::left:
+                setRect(mPressRect.x() + diff.x(), mPressRect.y(), mPressRect.width() - diff.x(), mPressRect.height());
+                break;
+            case PressLocation::right:
+                setRect(mPressRect.x(), mPressRect.y(), mPressRect.width() + diff.x(), mPressRect.height());
+                break;
+            case PressLocation::top:
+                setRect(mPressRect.x(), mPressRect.y() + diff.y(), mPressRect.width(), mPressRect.height() - diff.y());
+                break;
+            case PressLocation::bottom:
+                setRect(mPressRect.x(), mPressRect.y(), mPressRect.width(), mPressRect.height() + diff.y());
+                break;
+            case PressLocation::inside:
+                setRect(mPressRect.x() + diff.x(), mPressRect.y() + diff.y(), mPressRect.width(), mPressRect.height());
+                break;
+                // do not use QGraphicsRectItem::mouseMoveEvent(event) as it also moves the coordinate system
         }
-        else if(mPressLocation == topRight)
-        {
-            setRect(
-                mPressRect.x(),
-                mPressRect.y() + diff.y(),
-                mPressRect.width() + diff.x(),
-                mPressRect.height() - diff.y());
-        }
-        else if(mPressLocation == bottomLeft)
-        {
-            setRect(
-                mPressRect.x() + diff.x(),
-                mPressRect.y(),
-                mPressRect.width() - diff.x(),
-                mPressRect.height() + diff.y());
-        }
-        else if(mPressLocation == bottomRight)
-        {
-            setRect(mPressRect.x(), mPressRect.y(), mPressRect.width() + diff.x(), mPressRect.height() + diff.y());
-        }
-        else if(mPressLocation == left)
-        {
-            setRect(mPressRect.x() + diff.x(), mPressRect.y(), mPressRect.width() - diff.x(), mPressRect.height());
-        }
-        else if(mPressLocation == right)
-        {
-            setRect(mPressRect.x(), mPressRect.y(), mPressRect.width() + diff.x(), mPressRect.height());
-        }
-        else if(mPressLocation == top)
-        {
-            setRect(mPressRect.x(), mPressRect.y() + diff.y(), mPressRect.width(), mPressRect.height() - diff.y());
-        }
-        else if(mPressLocation == bottom)
-        {
-            setRect(mPressRect.x(), mPressRect.y(), mPressRect.width(), mPressRect.height() + diff.y());
-        }
-        else // entspricht: if (mPressLocation == inside)
-        {
-            setRect(mPressRect.x() + diff.x(), mPressRect.y() + diff.y(), mPressRect.width(), mPressRect.height());
-        }
-        // nicht, da sonst koordinatensystem verschoben wird: QGraphicsRectItem::mouseMoveEvent(event); // drag
     }
-    else // drag mach ich selber
+    else
     {
         QGraphicsRectItem::mouseMoveEvent(event);
     }
 }
 
-// event, of moving mouse
-void TrackingRoiItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
+void RoiItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
     QPointF pos = event->scenePos();
     pos.setX(pos.x() + mMainWindow->getImageBorderSize());
     pos.setY(pos.y() + mMainWindow->getImageBorderSize());
-    // abfrage auf width() ..., da durch rectLinie die recoBox etwas groesser ist als das Bild und
-    // es bei mMainWindow->setMousePosOnImage(pos); zum fehler beim bildzugriff kommen kann!!!
-    if(mMainWindow->getImage() && //(pos.x() > 0) && (pos.y() > 0) &&
-       (pos.x() < mMainWindow->getImage()->width()) && (pos.y() < mMainWindow->getImage()->height()))
+
+    // due to the line width of the QRect, the QRect might get slightly larger than the image. To avoid errors then
+    // accessing the image mMainWindow->setMousePosOnImage(pos) also width() is checked here
+    if((mMainWindow->getImage() != nullptr) && (pos.x() < mMainWindow->getImage()->width()) &&
+       (pos.y() < mMainWindow->getImage()->height()))
     {
         mMainWindow->setMousePosOnImage(pos);
 
-        if(!mControlWidget->getTrackRoiFix())
+        if(!mIsFixed)
         {
             QRect r =
                 QRect(myRound(rect().left()), myRound(rect().top()), myRound(rect().width()), myRound(rect().height()));
@@ -287,10 +278,10 @@ void TrackingRoiItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
                 setCursor(Qt::OpenHandCursor);
             }
         }
-        else // wird nur einmal durchaufen - ruecksetzen in control.cpp
+        else // will only be executed once - reset in control.cpp
         {
-            setAcceptHoverEvents(false); // verhoindert nicht, dass wenn objekt darunter liegt, was andereen cursor
-                                         // haette - cursor wird weiterhin beim drueberfahren auf cross gesetzt
+            // if an object underneath would have a different cursor, the cursor will still be set to cross
+            setAcceptHoverEvents(false);
             setCursor(Qt::CrossCursor);
         }
     }
@@ -298,10 +289,11 @@ void TrackingRoiItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
     QGraphicsRectItem::hoverMoveEvent(event);
 }
 
-// check rect because bordersize changes and without mouse event nothing changes the rect
-void TrackingRoiItem::checkRect()
+/**
+ * @brief Restores the size of the ROI if the image size changed
+ */
+void RoiItem::restoreSize()
 {
-    // not QImage *img = mMainWindow->getImage(); as size is not adapted yet
     cv::Mat img = mMainWindow->getImageFiltered();
 
     if(!img.empty())

@@ -46,7 +46,7 @@
 
 class CalibFilter;
 class Animation;
-class TrackingRoiItem;
+class RoiItem;
 class RecognitionRoiItem;
 class GridItem;
 
@@ -240,8 +240,8 @@ public:
     inline MultiColorMarkerItem   *getMultiColorMarkerItem() { return mMultiColorMarkerItem; }
     inline BackgroundItem         *getBackgroundItem() { return mBackgroundItem; }
     inline MoCapItem              *getMoCapItem() { return mMoCapItem; }
-    inline RecognitionRoiItem     *getRecoRoiItem() { return mRecognitionRoiItem; }
-    inline TrackingRoiItem        *getTrackRoiItem() { return mTrackingRoiItem; }
+    inline RoiItem                *getRecoRoiItem() { return mRecognitionRoiItem; }
+    inline RoiItem                *getTrackRoiItem() { return mTrackingRoiItem; }
 
     inline TrackerItem *getTrackerItem() { return mTrackerItem; }
     inline Animation   *getAnimation() { return mAnimation; }
@@ -429,8 +429,8 @@ private:
     LogoItem             *mLogoItem;
     CoordItem            *mCoordItem;
     GridItem             *mGridItem;
-    RecognitionRoiItem   *mRecognitionRoiItem;
-    TrackingRoiItem      *mTrackingRoiItem;
+    RoiItem              *mRecognitionRoiItem;
+    RoiItem              *mTrackingRoiItem;
     TrackerItem          *mTrackerItem;
     StereoItem           *mStereoItem;
     ColorMarkerItem      *mColorMarkerItem;

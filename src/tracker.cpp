@@ -26,7 +26,7 @@
 #include "multiColorMarkerWidget.h"
 #include "pMessageBox.h"
 #include "petrack.h"
-#include "recognitionRoiItem.h"
+#include "roiItem.h"
 #include "stereoWidget.h"
 
 #include <ctime>

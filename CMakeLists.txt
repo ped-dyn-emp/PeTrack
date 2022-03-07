@@ -328,7 +328,6 @@ target_sources(petrack_core PRIVATE
     include/colorMarkerWidget.h
     include/codeMarkerWidget.h
     include/multiColorMarkerWidget.h
-    include/recognitionRoiItem.h
     include/imageItem.h
     include/logoItem.h
     include/gridItem.h
@@ -364,7 +363,7 @@ target_sources(petrack_core PRIVATE
     include/qtColorTriangle.h
     include/swapFilter.h
     include/extrCalibration.h
-    include/trackingRoiItem.h
+    include/roiItem.h
     include/analysePlot.h
     include/IO.h
     include/skeletonTree.h
@@ -389,7 +388,6 @@ target_sources(petrack_core PRIVATE
     src/colorMarkerWidget.cpp
     src/codeMarkerWidget.cpp
     src/multiColorMarkerWidget.cpp
-    src/recognitionRoiItem.cpp
     src/imageItem.cpp
     src/logoItem.cpp
     src/gridItem.cpp
@@ -425,7 +423,7 @@ target_sources(petrack_core PRIVATE
     src/qtColorTriangle.cpp
     src/swapFilter.cpp
     src/extrCalibration.cpp
-    src/trackingRoiItem.cpp
+    src/roiItem.cpp
     src/IO.cpp
     src/skeletonTree.cpp
     src/skeletonTreeFactory.cpp
