@@ -32,7 +32,7 @@
 #include "multiColorMarkerItem.h"
 #include "multiColorMarkerWidget.h"
 #include "pMessageBox.h"
-#include "recognitionRoiItem.h"
+#include "roiItem.h"
 #include "tracker.h"
 
 #include <QPointF>

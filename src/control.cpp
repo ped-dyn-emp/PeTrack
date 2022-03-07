@@ -34,11 +34,10 @@
 #include "pMessageBox.h"
 #include "petrack.h"
 #include "player.h"
-#include "recognitionRoiItem.h"
+#include "roiItem.h"
 #include "stereoWidget.h"
 #include "tracker.h"
 #include "trackerItem.h"
-#include "trackingRoiItem.h"
 #include "view.h"
 
 #include <QDomElement>
@@ -46,7 +45,13 @@
 
 #define DEFAULT_HEIGHT 180.0
 
-Control::Control(QWidget &parent, QGraphicsScene &scene, reco::Recognizer &recognizer) : QWidget(&parent)
+Control::Control(
+    QWidget          &parent,
+    QGraphicsScene   &scene,
+    reco::Recognizer &recognizer,
+    RoiItem          &trackRoiItem,
+    RoiItem          &recoRoiItem) :
+    QWidget(&parent)
 {
     setAccessibleName("Control");
     mMainWindow = (class Petrack *) &parent;
@@ -215,6 +220,9 @@ Control::Control(QWidget &parent, QGraphicsScene &scene, reco::Recognizer &recog
         scrollAreaWidgetContents_4->sizeHint().width() + 2 * scrollArea_4->frameWidth() +
         scrollArea_4->verticalScrollBar()->sizeHint().width() + scrollAreaWidgetContents_4->layout()->margin() * 2 +
         scrollAreaWidgetContents_4->layout()->spacing() * 2);
+
+    connect(trackRoiFix, &QCheckBox::stateChanged, &trackRoiItem, &RoiItem::setFixed);
+    connect(roiFix, &QCheckBox::stateChanged, &recoRoiItem, &RoiItem::setFixed);
 }
 
 void Control::setScene(QGraphicsScene *sc)

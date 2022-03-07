@@ -18,20 +18,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TRACKINGROIITEM_H
-#define TRACKINGROIITEM_H
+#ifndef ROIITEM_H
+#define ROIITEM_H
 
 #include <QGraphicsRectItem>
+#include <QObject>
 
 class Petrack;
-class Control;
 
-class TrackingRoiItem : public QGraphicsRectItem
+class RoiItem : public QObject, public QGraphicsRectItem
 {
+    Q_OBJECT
+
     inline static constexpr int DISTANCE_TO_BORDER = 5;
     inline static constexpr int MIN_SIZE           = 10;
 
-    enum pressLocation
+    enum class PressLocation
     {
         inside,
         top,
@@ -45,19 +47,23 @@ class TrackingRoiItem : public QGraphicsRectItem
     };
 
 private:
-    Petrack           *mMainWindow;
-    Control           *mControlWidget;
-    QRect              mPressRect;
-    QPointF            mPressPos;
-    enum pressLocation mPressLocation;
+    Petrack      *mMainWindow;
+    QRect         mPressRect;
+    QPointF       mPressPos;
+    PressLocation mPressLocation{PressLocation::inside};
+    bool          mIsFixed{false};
 
 public:
-    TrackingRoiItem(QWidget *wParent, QGraphicsItem *parent = nullptr);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
-    void checkRect();
+    RoiItem(QWidget *wParent, const QColor &color);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+    void restoreSize();
+    void setFixed(bool fixed) { mIsFixed = fixed; }
+
+signals:
+    void changed();
 };
 
-#endif // TRACKINGROIITEM_H
+#endif // ROIITEM_H

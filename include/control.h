@@ -36,7 +36,12 @@ class Control : public QWidget, public Ui::Control
     Q_OBJECT
 
 public:
-    Control(QWidget &parent, QGraphicsScene &scene, reco::Recognizer &recognizer);
+    Control(
+        QWidget          &parent,
+        QGraphicsScene   &scene,
+        reco::Recognizer &recognizer,
+        RoiItem          &trackRoiItem,
+        RoiItem          &recoRoiItem);
 
     void setScene(QGraphicsScene *sc);
 
