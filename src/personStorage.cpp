@@ -1010,6 +1010,20 @@ void PersonStorage::setMarkerHeights(const std::unordered_map<int, float> &heigh
     }
 }
 
+/**
+ * Sets/Overwrites the markerID for a specific person and all trackpaints belonging to that person
+ * @param personID internal id of persons (0 based)
+ * @param markerIDs new marker ID
+ */
+void PersonStorage::setMarkerID(int personID, int markerID)
+{
+    auto &person = mPersons.at(personID);
+    person.setMarkerID(markerID);
+    for(auto &trackPoint : person) // over TrackPoints
+    {
+        trackPoint.setMarkerID(markerID);
+    }
+}
 
 /**
  * Sets the marker IDs based on the internal used IDs (personID).
@@ -1024,11 +1038,7 @@ void PersonStorage::setMarkerIDs(const std::unordered_map<int, int> &markerIDs)
         if(markerIDs.find(personID) != std::end(markerIDs))
         {
             int markerID = markerIDs.at(personID);
-            mPersons[i].setMarkerID(markerID);
-            for(int j = 0; j < mPersons[i].size(); ++j) // over TrackPoints
-            {
-                mPersons[i][j].setMarkerID(markerID);
-            }
+            setMarkerID(personID, markerID);
         }
         else
         {
