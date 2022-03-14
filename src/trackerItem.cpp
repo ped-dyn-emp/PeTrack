@@ -118,7 +118,8 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         float       height             = 0.f;
         bool        height_set_by_user = false;
         QAction    *delTrj = nullptr, *delFutureTrj = nullptr, *delPastTrj = nullptr, *creTrj = nullptr,
-                *infoTrj = nullptr, *addComment = nullptr, *setHeight = nullptr, *resetHeight = nullptr;
+                *infoTrj = nullptr, *addComment = nullptr, *setHeight = nullptr, *resetHeight = nullptr,
+                *setMarkerID = nullptr;
 
         if(found)
         {
@@ -147,6 +148,7 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             delFutureTrj = menu.addAction("Delete past part of the trajectory");
             delPastTrj   = menu.addAction("Delete future part of the trajectory");
             setHeight    = menu.addAction("Set person height");
+            setMarkerID  = menu.addAction("Set marker ID");
             if(height_set_by_user)
             {
                 resetHeight = menu.addAction("Reset height");
@@ -186,6 +188,30 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         else if(selectedAction == resetHeight)
         {
             mMainWindow->resetTrackPersonHeight(event->scenePos());
+        }
+        else if(selectedAction == setMarkerID)
+        {
+            int  currentID = mPersonStorage.getPersons()[i].getMarkerID();
+            bool changeID  = true;
+
+            if(currentID != -1)
+            {
+                QMessageBox::StandardButton reply = QMessageBox::question(
+                    mMainWindow,
+                    "Overwrite marker ID",
+                    QString("The person (%1) already has a markerID (%2)- are you sure you want to assign a new one?")
+                        .arg(i + 1)
+                        .arg(currentID),
+                    QMessageBox::Yes | QMessageBox::No);
+
+                changeID = reply == QMessageBox::Yes;
+            }
+
+            if(changeID)
+            {
+                int markerID = QInputDialog::getInt(mMainWindow, "Enter Marker ID", "Marker ID:");
+                mPersonStorage.setMarkerID(i, markerID);
+            }
         }
         else if(selectedAction == infoTrj)
         {

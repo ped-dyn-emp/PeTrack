@@ -113,6 +113,7 @@ public:
     // rueckgabewert false wenn keine hoeheninformationen in tracker datensatz vorliegt
     bool printHeightDistribution();
     void setMarkerHeights(const std::unordered_map<int, float> &heights);
+    void setMarkerID(int person, int markerIDs);
     void setMarkerIDs(const std::unordered_map<int, int> &markerIDs);
     void purge(int frame);
 
