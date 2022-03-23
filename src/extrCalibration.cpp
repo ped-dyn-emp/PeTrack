@@ -861,262 +861,103 @@ cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d)
  * @param h height i.e. distance to xy-plane in cm
  * @return calculated 3D point in cm
  */
-cv::Point3f ExtrCalibration::get3DPoint(cv::Point2f p2d, double h)
+cv::Point3f ExtrCalibration::get3DPoint(const cv::Point2f &p2d, double h) const
 {
-    bool debug = false;
-
-    if(debug)
-    {
-        std::cout << "get3DPoint: Start Point2D: (" << p2d.x << ", " << p2d.y << ") h: " << h << std::endl;
-    }
-
     int bS = mMainWindow->getImage() ? mMainWindow->getImageBorderSize() : 0;
 
-    if(false && bS > 0)
-    {
-        p2d.x += bS;
-        p2d.y += bS;
-    }
-
-    // Ergebnis 3D-Punkt
     cv::Point3f resultPoint, tmpPoint;
 
+    // Transform the rotation vector into a rotation matrix with opencvs rodrigues method
+    cv::Matx<double, 3, 3> rot_inv;
+    cv::Matx<double, 3, 3> rot_mat(3, 3, CV_64F);
+    const cv::Mat          rvec =
+        (cv::Mat_<double>(3, 1) << mControlWidget->getCalibExtrRot1(),
+         mControlWidget->getCalibExtrRot2(),
+         mControlWidget->getCalibExtrRot3());
+    Rodrigues(rvec, rot_mat);
+    rot_inv = rot_mat.inv(cv::DECOMP_LU, nullptr);
 
-    bool newMethod = true;
-    /////////////// Start new method
-    if(newMethod)
-    {
-        double rvec_array[3], translation_vector[3];
-        rvec_array[0] = mControlWidget->getCalibExtrRot1();
-        rvec_array[1] = mControlWidget->getCalibExtrRot2();
-        rvec_array[2] = mControlWidget->getCalibExtrRot3();
+    // Create translation vector
+    cv::Vec3d translation{
+        mControlWidget->getCalibExtrTrans1(),
+        mControlWidget->getCalibExtrTrans2(),
+        mControlWidget->getCalibExtrTrans3()};
 
-        cv::Mat rvec(3, 1, CV_64F, rvec_array), rot_inv;
-        cv::Mat rot_mat(3, 3, CV_64F), e(3, 3, CV_64F);
-        // Transform the rotation vector into a rotation matrix with opencvs rodrigues method
-        Rodrigues(rvec, rot_mat);
-
-        translation_vector[0] = rot_mat.at<double>(0, 0) * mControlWidget->getCalibExtrTrans1() +
-                                rot_mat.at<double>(0, 1) * mControlWidget->getCalibExtrTrans2() +
-                                rot_mat.at<double>(0, 2) * mControlWidget->getCalibExtrTrans3();
-        translation_vector[1] = rot_mat.at<double>(1, 0) * mControlWidget->getCalibExtrTrans1() +
-                                rot_mat.at<double>(1, 1) * mControlWidget->getCalibExtrTrans2() +
-                                rot_mat.at<double>(1, 2) * mControlWidget->getCalibExtrTrans3();
-        translation_vector[2] = rot_mat.at<double>(2, 0) * mControlWidget->getCalibExtrTrans1() +
-                                rot_mat.at<double>(2, 1) * mControlWidget->getCalibExtrTrans2() +
-                                rot_mat.at<double>(2, 2) * mControlWidget->getCalibExtrTrans3();
-
-        // use inverse Matrix
-        rot_inv = rot_mat.inv(cv::DECOMP_LU);
-        e       = rot_inv * rot_mat;
-
-        if(debug)
-        {
-            debout << "\n-.- ESTIMATED ROTATION\n";
-            for(int p = 0; p < 3; p++)
-            {
-                printf(
-                    "%20.18f, %20.18f, %20.18f\n",
-                    rot_mat.at<double>(p, 0),
-                    rot_mat.at<double>(p, 1),
-                    rot_mat.at<double>(p, 2));
-            }
-
-            debout << "\n-.- ESTIMATED ROTATION^-1\n";
-            for(int p = 0; p < 3; p++)
-            {
-                printf(
-                    "%20.18f, %20.18f, %20.18f\n",
-                    rot_inv.at<double>(p, 0),
-                    rot_inv.at<double>(p, 1),
-                    rot_inv.at<double>(p, 2));
-            }
-
-            debout << "\n-.- ESTIMATED R^-1*R\n";
-            for(int p = 0; p < 3; p++)
-            {
-                printf("%20.18f, %20.18f, %20.18f\n", e.at<double>(p, 0), e.at<double>(p, 1), e.at<double>(p, 2));
-            }
-
-            debout << "\n-.- ESTIMATED TRANSLATION\n";
-            debout << mControlWidget->getCalibExtrTrans1() << " , " << mControlWidget->getCalibExtrTrans2() << " , "
-                   << mControlWidget->getCalibExtrTrans3() << "\n";
-            debout << translation_vector[0] << " , " << translation_vector[1] << " , " << translation_vector[2] << "\n";
-
-            debout << "Det(rot_mat): " << determinant(rot_mat) << std::endl;
-            debout << "Det(rot_inv): " << determinant(rot_inv) << std::endl;
-        }
-        double z = h + rot_inv.at<double>(2, 0) * translation_vector[0] +
-                   rot_inv.at<double>(2, 1) * translation_vector[1] + rot_inv.at<double>(2, 2) * translation_vector[2];
-        if(debug)
-        {
-            debout << "##### z: " << h << " + " << rot_inv.at<double>(2, 0) << "*" << translation_vector[0] << " + "
-                   << rot_inv.at<double>(2, 1) << "*" << translation_vector[1] << " + " << rot_inv.at<double>(2, 2)
-                   << "*" << translation_vector[2] << " = " << z << std::endl;
-        }
-        z /=
-            (rot_inv.at<double>(2, 0) * (p2d.x - (mControlWidget->getCalibCxValue() - bS)) /
-                 mControlWidget->getCalibFxValue() +
-             rot_inv.at<double>(2, 1) * (p2d.y - (mControlWidget->getCalibCyValue() - bS)) /
-                 mControlWidget->getCalibFyValue() +
-             rot_inv.at<double>(2, 2));
-        if(debug)
-        {
-            std::cout << "###### z: " << z << std::endl;
-        }
-
-        resultPoint.x = (p2d.x - (mControlWidget->getCalibCxValue() - bS));
-        resultPoint.y = (p2d.y - (mControlWidget->getCalibCyValue() - bS));
-        resultPoint.z = z;
-
-        if(debug)
-        {
-            std::cout << "###### (" << resultPoint.x << ", " << resultPoint.y << ", " << resultPoint.z << ")"
-                      << std::endl;
-        }
-
-        resultPoint.x = resultPoint.x * z / mControlWidget->getCalibFxValue();
-        resultPoint.y = resultPoint.y * z / mControlWidget->getCalibFyValue();
-
-        if(debug)
-        {
-            std::cout << "###### After intern re-calibration: (" << resultPoint.x << ", " << resultPoint.y << ", "
-                      << resultPoint.z << ")" << std::endl;
-        }
-
-        tmpPoint.x = resultPoint.x - translation_vector[0];
-        tmpPoint.y = resultPoint.y - translation_vector[1];
-        tmpPoint.z = resultPoint.z - translation_vector[2];
-
-        if(debug)
-        {
-            std::cout << "###### After translation: (" << tmpPoint.x << ", " << tmpPoint.y << ", " << tmpPoint.z << ")"
-                      << std::endl;
-        }
-
-        resultPoint.x = rot_inv.at<double>(0, 0) * (tmpPoint.x) + rot_inv.at<double>(0, 1) * (tmpPoint.y) +
-                        rot_inv.at<double>(0, 2) * (tmpPoint.z);
-        resultPoint.y = rot_inv.at<double>(1, 0) * (tmpPoint.x) + rot_inv.at<double>(1, 1) * (tmpPoint.y) +
-                        rot_inv.at<double>(1, 2) * (tmpPoint.z);
-        resultPoint.z = rot_inv.at<double>(2, 0) * (tmpPoint.x) + rot_inv.at<double>(2, 1) * (tmpPoint.y) +
-                        rot_inv.at<double>(2, 2) * (tmpPoint.z);
-
-        if(debug)
-        {
-            std::cout << "#resultPoint: (" << resultPoint.x << ", " << resultPoint.y << ", " << resultPoint.z << ")"
-                      << std::endl;
-        }
-        if(debug)
-        {
-            std::cout << "Coord Translation: x: " << mControlWidget->getCalibCoord3DTransX()
-                      << ", y: " << mControlWidget->getCalibCoord3DTransY()
-                      << ", z: " << mControlWidget->getCalibCoord3DTransZ() << std::endl;
-        }
+    // Subtract principal point and border, so we can assume pinhole camera
+    const cv::Vec2d centeredImagePoint{
+        p2d.x - (mControlWidget->getCalibCxValue() - bS), p2d.y - (mControlWidget->getCalibCyValue() - bS)};
 
 
-        // Coordinate Transformations
+    /* Basic Idea:
+     * All points projecting onto a point on the image plane lie on the same
+     * line (cf. pinhole camera model). We can determine this line in the form:
+     *
+     * g: x = lambda * v
+     *
+     * This line exists in camera coordinates. Let v be the projection with
+     * depth 1 (i.e. v_3 = 1). Then lambda is the depth of the resulting point.
+     * We'll continue to call lambda z instead, to show this.
+     * We now want to determine the depth at which the resulting point has height h
+     * in world coordinates. The transformation from cam to world is:
+     *
+     * W = R * C - T
+     * W   := Point in World Coords
+     * C   := Point in Cam Coords
+     * R,T := Rotation and Translation of Cam
+     *
+     * By putting in our x = z * v, we get:
+     *     W          = R * (z * v) - T
+     * <=> W          = z * Rv - T
+     * <=> W + T      = z * Rv
+     * <=> (W + T)/Rv = z
+     * We select the third row of this to solve for z. Finally g(z) is transformed
+     * into World Coords.
+     */
 
-        resultPoint.x -= mControlWidget->getCalibCoord3DTransX();
-        resultPoint.y -= mControlWidget->getCalibCoord3DTransY();
-        resultPoint.z -= mControlWidget->getCalibCoord3DTransZ();
+    // calc Rv, (R = rot_inv)
+    // rotatedProj = Rv
+    const cv::Vec2d focalLength{mControlWidget->getCalibFxValue(), mControlWidget->getCalibFyValue()};
+    const cv::Vec2d pinholeProjectionXY = cv::Mat(centeredImagePoint.div(focalLength));
+    const cv::Vec3d pinholeProjectionXY1{pinholeProjectionXY[0], pinholeProjectionXY[1], 1};
+    const cv::Vec3d rotatedProj = rot_inv * pinholeProjectionXY1;
 
-        resultPoint.x *= mControlWidget->getCalibCoord3DSwapX() ? -1 : 1;
-        resultPoint.y *= mControlWidget->getCalibCoord3DSwapY() ? -1 : 1;
-        resultPoint.z *= mControlWidget->getCalibCoord3DSwapZ() ? -1 : 1;
-    }
-    else //////////////// End new method
-    {
-        //////////////// Start old method
+    // determine z via formula from comment above; using 3rd row
+    double z = (h + translation[2]) / rotatedProj[2];
 
-        cv::Point3f camInWorld = transformRT(cv::Point3f(0, 0, 0));
+    // Evaluate line at depth z; calc point in camera coords
+    // written this way instead of z * pinholeProjectionXY1 (i.e. z * v) to not change test results due to floating
+    // point precision diff
+    resultPoint.x = (p2d.x - (mControlWidget->getCalibCxValue() - bS));
+    resultPoint.y = (p2d.y - (mControlWidget->getCalibCyValue() - bS));
+    resultPoint.z = z;
 
-        // 3D-Punkt vor der Kamera mit Tiefe 5
-        CvPoint3D32f pointBeforeCam;
-        pointBeforeCam.x = (p2d.x - mControlWidget->cx->value()) / mControlWidget->fx->value() * 50;
-        pointBeforeCam.y = (p2d.y - mControlWidget->cy->value()) / mControlWidget->fy->value() * 50;
-        pointBeforeCam.z = 50;
-        if(debug)
-        {
-            std::cout << "Point before Camera: [" << pointBeforeCam.x << ", " << pointBeforeCam.y << ", "
-                      << pointBeforeCam.z << "]" << std::endl;
-        }
-        // 3D-Punkt vor Kamera in Weltkoordinaten
-        cv::Point3f pBCInWorld = transformRT(pointBeforeCam);
-        if(debug)
-        {
-            std::cout << "Point before Camera in World-Coordinatesystem: [" << pBCInWorld.x << ", " << pBCInWorld.y
-                      << ", " << pBCInWorld.z << "]" << std::endl;
-        }
-        if(debug)
-        {
-            std::cout << "Camera in World-Coordinatesystem: [" << camInWorld.x << ", " << camInWorld.y << ", "
-                      << camInWorld.z << "]" << std::endl;
-        }
-        // Berechnung des Richtungsvektors der Gerade von der Kamera durch den Pixel
-        // Als Sttzvektor der Geraden wird die Position der Kamera gewhlt
-        pBCInWorld.x -= camInWorld.x;
-        pBCInWorld.y -= camInWorld.y;
-        pBCInWorld.z -= camInWorld.z;
-        if(debug)
-        {
-            std::cout << "G:x = (" << camInWorld.x << " / " << camInWorld.y << " / " << camInWorld.z << ") + lambda ("
-                      << pBCInWorld.x << " / " << pBCInWorld.y << " / " << pBCInWorld.z << ")" << std::endl;
-        }
+    resultPoint.x = resultPoint.x * z / mControlWidget->getCalibFxValue();
+    resultPoint.y = resultPoint.y * z / mControlWidget->getCalibFyValue();
 
-        // Berechnung des Schnittpunktes: Hier lambda von der Geraden
-        double lambda = (h - camInWorld.z) / (pBCInWorld.z);
-        if(debug)
-        {
-            std::cout << "Lambda: " << lambda << std::endl;
-        }
+    // We transform from cam coords to world coords with W = R * C - T
+    // we now calc: W = R * (C - R^-1*T), which is equivalent
+    translation = rot_mat * translation;
+    tmpPoint.x  = resultPoint.x - translation[0];
+    tmpPoint.y  = resultPoint.y - translation[1];
+    tmpPoint.z  = resultPoint.z - translation[2];
 
-        // Lambda in Gerade einsetzen
-        resultPoint.x = (mControlWidget->getCalibCoord3DSwapX() ? -1 : 1) * (camInWorld.x + lambda * pBCInWorld.x);
-        resultPoint.y = (mControlWidget->getCalibCoord3DSwapY() ? -1 : 1) * (camInWorld.y + lambda * pBCInWorld.y);
-        resultPoint.z = (mControlWidget->getCalibCoord3DSwapZ() ? -1 : 1) * (camInWorld.z + lambda * pBCInWorld.z);
+    resultPoint.x = rot_inv(0, 0) * (tmpPoint.x) + rot_inv(0, 1) * (tmpPoint.y) + rot_inv(0, 2) * (tmpPoint.z);
+    resultPoint.y = rot_inv(1, 0) * (tmpPoint.x) + rot_inv(1, 1) * (tmpPoint.y) + rot_inv(1, 2) * (tmpPoint.z);
+    resultPoint.z = rot_inv(2, 0) * (tmpPoint.x) + rot_inv(2, 1) * (tmpPoint.y) + rot_inv(2, 2) * (tmpPoint.z);
 
-    } //////////////// End old method
+
+    // Coordinate Transformations
+    resultPoint.x -= mControlWidget->getCalibCoord3DTransX();
+    resultPoint.y -= mControlWidget->getCalibCoord3DTransY();
+    resultPoint.z -= mControlWidget->getCalibCoord3DTransZ();
+
+    resultPoint.x *= mControlWidget->getCalibCoord3DSwapX() ? -1 : 1;
+    resultPoint.y *= mControlWidget->getCalibCoord3DSwapY() ? -1 : 1;
+    resultPoint.z *= mControlWidget->getCalibCoord3DSwapZ() ? -1 : 1;
 
     return resultPoint;
 }
-/**
- * Transformiert den angegebenen 3D-Punkt mit der Rotation und Translation
- * um Umrechnungen zwischen verschiedenen Koordinatensystemen zu ermglichen
- */
-cv::Point3f ExtrCalibration::transformRT(cv::Point3f p)
-{
-    // ToDo: use projectPoints();
 
-    double rvec_array[3], rotation_matrix[9];
-    rvec_array[0] = mControlWidget->getCalibExtrRot1();
-    rvec_array[1] = mControlWidget->getCalibExtrRot2();
-    rvec_array[2] = mControlWidget->getCalibExtrRot3();
-
-    cv::Mat rvec(3, 1, CV_64F, rvec_array);
-    cv::Mat rot_mat(3, 3, CV_64F);
-    // Transform the rotation vector into a rotation matrix with opencvs rodrigues method
-    Rodrigues(rvec, rot_mat);
-
-    rotation_matrix[0] = rot_mat.at<double>(0, 0);
-    rotation_matrix[1] = rot_mat.at<double>(0, 1);
-    rotation_matrix[2] = rot_mat.at<double>(0, 2);
-    rotation_matrix[3] = rot_mat.at<double>(1, 0);
-    rotation_matrix[4] = rot_mat.at<double>(1, 1);
-    rotation_matrix[5] = rot_mat.at<double>(1, 2);
-    rotation_matrix[6] = rot_mat.at<double>(2, 0);
-    rotation_matrix[7] = rot_mat.at<double>(2, 1);
-    rotation_matrix[8] = rot_mat.at<double>(2, 2);
-
-    cv::Point3f point3D;
-
-    point3D.x = rotation_matrix[0] * p.x + rotation_matrix[3] * p.y + rotation_matrix[6] * p.z -
-                mControlWidget->trans1->value();
-    point3D.y = rotation_matrix[1] * p.x + rotation_matrix[4] * p.y + rotation_matrix[7] * p.z -
-                mControlWidget->trans2->value();
-    point3D.z = rotation_matrix[2] * p.x + rotation_matrix[5] * p.y + rotation_matrix[8] * p.z -
-                mControlWidget->trans3->value();
-    return point3D;
-}
 bool ExtrCalibration::isOutsideImage(cv::Point2f p2d)
 {
     int bS = mMainWindow->getImage() ? mMainWindow->getImageBorderSize() : 0;
