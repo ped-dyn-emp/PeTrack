@@ -179,7 +179,7 @@ public:
     void                            calibExtrParams();
     bool                            calcReprojectionError();
     virtual cv::Point2f             getImagePoint(cv::Point3f p3d);
-    cv::Point3f                     get3DPoint(cv::Point2f p2d, double h);
+    cv::Point3f                     get3DPoint(const cv::Point2f &p2d, double h) const;
     cv::Point3f                     transformRT(cv::Point3f p);
     bool                            isOutsideImage(cv::Point2f p2d);
     inline bool                     isOutsideImage(cv::Point3f p3d) { return isOutsideImage(getImagePoint(p3d)); }
