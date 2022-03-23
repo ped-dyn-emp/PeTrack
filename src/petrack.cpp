@@ -516,7 +516,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     }
     // open koennte am schluss passieren, dann wuerde nicht erst unveraendertes bild angezeigt,
     // dafuer koennte es aber sein, dass werte zb bei fx nicht einstellbar sind!
-
+    mSeqFileName = seq;
     if(openSeq && (seq != ""))
     {
         openSequence(seq); // wenn leer, dann kommt abfrage hoch, welche datei; abbrechen, wenn aktuelle gewuenscht
@@ -664,11 +664,7 @@ void Petrack::saveXml(QDomDocument &doc)
 
     // main settings (window size, status hight)
     elem        = doc.createElement("MAIN");
-    QString seq = "";
-    if(mImage)
-    {
-        seq = getFileList(mSeqFileName, mProFileName);
-    }
+    QString seq = getFileList(mSeqFileName, mProFileName);
 
     elem.setAttribute("SRC", seq);
     elem.setAttribute("STATUS_HEIGHT", mStatusPosRealHeight->value());

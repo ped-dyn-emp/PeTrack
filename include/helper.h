@@ -235,15 +235,16 @@ inline QString getExistingFile(const QString &fileList, const QString &relToFile
     list = fileList.split(";", Qt::SkipEmptyParts);
     for(int i = 0; i < list.size(); ++i)
     {
-        if(QFile(list.at(i)).exists())
+        if(auto f = QFileInfo(list.at(i)); f.exists() && f.isFile())
         {
             return list.at(i);
         }
-        if(QFile(list.at(i).trimmed()).exists())
+        if(auto f = QFileInfo(list.at(i).trimmed()); f.exists() && f.isFile())
         {
             return list.at(i).trimmed();
         }
-        if(QFile(QFileInfo(relToFileName).absolutePath() + "/" + list.at(i).trimmed()).exists())
+        if(auto f = QFileInfo(QFileInfo(relToFileName).absolutePath() + "/" + list.at(i).trimmed());
+           f.exists() && f.isFile())
         {
             return QFileInfo(relToFileName).absolutePath() + "/" + list.at(i).trimmed();
         }
@@ -253,25 +254,32 @@ inline QString getExistingFile(const QString &fileList, const QString &relToFile
 
 #include <QDir>
 #include <QFileInfo>
-inline QString getFileList(const QString &fileName, const QString &relToFileName = proFileName)
+inline QString getFileList(const QString &file, const QString &originOfRelativePath = proFileName)
 {
-    QString seqAbs      = QFileInfo(fileName).absoluteFilePath();
-    QString seqRelToPro = QDir(QFileInfo(relToFileName).absolutePath()).relativeFilePath(seqAbs);
+    QString absolutePathToFileName = QFileInfo(file).absoluteFilePath();
+    QString relativePathToFileNameFromPet =
+        QDir(QFileInfo(originOfRelativePath).absolutePath()).relativeFilePath(absolutePathToFileName);
 
-    if(QFileInfo(fileName).isRelative())
+    // for a non-existing file we can not create a filelist
+    if(!QFileInfo(file).exists())
     {
-        if(fileName == seqRelToPro)
+        return file;
+    }
+
+    if(QFileInfo(file).isRelative())
+    {
+        if(file == relativePathToFileNameFromPet)
         {
-            return fileName + ";" + seqAbs;
+            return file + ";" + absolutePathToFileName;
         }
-        else
+        else // if file relative to working directory
         {
-            return fileName + ";" + seqAbs + ";" + seqRelToPro;
+            return file + ";" + absolutePathToFileName + ";" + relativePathToFileNameFromPet;
         }
     }
     else
     {
-        return fileName + ";" + seqRelToPro;
+        return file + ";" + relativePathToFileNameFromPet;
     }
 }
 

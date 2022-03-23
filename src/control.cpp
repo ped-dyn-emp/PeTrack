@@ -3010,7 +3010,7 @@ void Control::setXml(QDomElement &elem)
     QStringList fl = mMainWindow->getAutoCalib()->getCalibFiles();
     for(int i = 0; i < fl.size(); ++i)
     {
-        if(QFileInfo(fl.at(i)).isRelative())
+        if(QFileInfo(fl.at(i)).isRelative() && QFileInfo(fl.at(i)).exists())
         {
             fl.replace(i, fl.at(i) + ";" + QFileInfo(fl.at(i)).absoluteFilePath());
         }
