@@ -1555,7 +1555,7 @@ void Petrack::print()
 void Petrack::resetSettings()
 {
     mAnimation->reset();
-    openXml(mDefaultSettings);
+    openXml(mDefaultSettings, false);
 }
 
 void Petrack::about()
