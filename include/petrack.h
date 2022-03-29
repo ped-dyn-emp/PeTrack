@@ -158,6 +158,7 @@ public slots:
     //    void showContextMenu(QPointF pos);
     void updateSourceInOutFrames();
     void skipToFrameWheel(int delta);
+    void skipToFrameFromTrajectory(QPointF pos);
 
 public:
     void      updateControlWidget();

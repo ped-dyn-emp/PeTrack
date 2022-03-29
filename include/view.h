@@ -52,6 +52,7 @@ public:
 
 signals:
     void mouseDoubleClick();
+    void mouseAltDoubleClick(QPointF pos);
     void mouseShiftControlDoubleClick(QPointF pos);
     void mouseShiftDoubleClick(QPointF pos);
     void mouseControlDoubleClick(QPointF pos);

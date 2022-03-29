@@ -87,6 +87,10 @@ void GraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
         {
             emit mouseControlDoubleClick(mapToScene(event->pos())); // const QPoint & //const QPointF &pos
         }
+        else if(event->modifiers() & Qt::AltModifier)
+        {
+            emit mouseAltDoubleClick(mapToScene(event->pos()));
+        }
         else
         {
             emit mouseDoubleClick();
