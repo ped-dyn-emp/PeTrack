@@ -27,6 +27,11 @@
 
 class Petrack;
 
+struct PersonFrame
+{
+    int personID;
+    int frame;
+};
 
 class PersonStorage
 {
@@ -76,6 +81,8 @@ public:
     int  largestFirstFrame() const;
     int  largestLastFrame() const;
     int  smallestFirstFrame() const;
+    std::vector<PersonFrame>
+         getProximalPersons(const QPointF &pos, int frame, QSet<int> selected, int before, int after) const;
     void recalcHeight(float altitude);
 
     void clear() { mPersons.clear(); }

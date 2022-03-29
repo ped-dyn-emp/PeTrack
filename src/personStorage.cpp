@@ -675,6 +675,61 @@ int PersonStorage::smallestFirstFrame() const
     return minElement != mPersons.cend() ? (*minElement).firstFrame() : -1;
 }
 
+/**
+ * @brief Get a list of all people near pos at a frame in the given interval
+ *
+ * This function returns a list of all people, which are near the
+ * position pos at some frame f in the interval
+ * frame - before <= f <= frame + after
+ *
+ * Near is, when the distance is less than half a headsize. When
+ * multiple points for the same person are possible, the point
+ * and frame at which the person is nearest to the pos is returned,
+ * i.e. each persons only occurs once in the resulting list.
+ *
+ * @param pos position near the persons to select
+ * @param frame current frame
+ * @param selected set of ids of selected persons; empty means everyone is selected
+ * @param before frames to include before the current frame
+ * @param after frames to include after the current frame
+ * @return list of the id of all proximal persons with the frame at which they are nearest to pos
+ */
+std::vector<PersonFrame>
+PersonStorage::getProximalPersons(const QPointF &pos, int frame, QSet<int> selected, int before, int after) const
+{
+    std::vector<PersonFrame> result;
+    for(int i = 0; i < static_cast<int>(mPersons.size()); ++i)
+    {
+        if(!selected.empty() && !selected.contains(i))
+        {
+            continue;
+        }
+
+        double minDist  = std::numeric_limits<double>::max();
+        int    minFrame = -1;
+        for(int f = frame - before; f <= frame + after; ++f)
+        {
+            if(!mPersons[i].trackPointExist(f))
+            {
+                continue;
+            }
+            auto dist = mPersons[i].trackPointAt(f).distanceToPoint(pos);
+            if(dist < minDist && dist < (mMainWindow.getHeadSize(nullptr, i, frame) / 2.))
+            {
+                minDist  = dist;
+                minFrame = f;
+            }
+        }
+        if(minFrame == -1)
+        {
+            continue;
+        }
+        result.push_back({i, minFrame});
+    }
+
+    return result;
+}
+
 
 /**
  * @brief Recalcs the height of all persons (used with stereo)

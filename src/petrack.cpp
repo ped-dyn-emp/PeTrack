@@ -171,6 +171,7 @@ Petrack::Petrack() :
     connect(mView, &GraphicsView::mouseRightDoubleClick, this, &Petrack::deleteTrackPoint);
     connect(mView, &GraphicsView::mouseMiddleDoubleClick, this, &Petrack::deleteTrackPointAll);
     connect(mView, &GraphicsView::mouseShiftWheel, this, &Petrack::skipToFrameWheel);
+    connect(mView, &GraphicsView::mouseAltDoubleClick, this, &Petrack::skipToFrameFromTrajectory);
 
     mPlayerWidget = new Player(mAnimation, this);
 
@@ -4192,6 +4193,28 @@ void Petrack::updateSourceInOutFrames()
 void Petrack::skipToFrameWheel(int delta)
 {
     mPlayerWidget->skipToFrame(mPlayerWidget->getPos() + delta);
+}
+
+void Petrack::skipToFrameFromTrajectory(QPointF pos)
+{
+    auto       peds      = getPedestrianUserSelection();
+    const auto before    = mControlWidget->trackShowBefore->value();
+    const auto after     = mControlWidget->trackShowAfter->value();
+    const auto currFrame = mPlayerWidget->getPos();
+
+    auto res = mPersonStorage.getProximalPersons(pos, currFrame, peds, before, after);
+
+    if(res.size() == 1)
+    {
+        mPlayerWidget->skipToFrame(res.front().frame);
+    }
+    else if(res.size() > 1)
+    {
+        PWarning(
+            this,
+            tr("Too many trajectories"),
+            tr("PeTrack can't determine which point you meant. Try selecting fewer trajectories first."));
+    }
 }
 
 void Petrack::setPeTrackVersion(const std::string &petrackVersion)
