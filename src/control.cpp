@@ -223,6 +223,9 @@ Control::Control(
 
     connect(trackRoiFix, &QCheckBox::stateChanged, &trackRoiItem, &RoiItem::setFixed);
     connect(roiFix, &QCheckBox::stateChanged, &recoRoiItem, &RoiItem::setFixed);
+
+    // "Hide" analysis tab until it is fixed
+    tabs->removeTab(3);
 }
 
 void Control::setScene(QGraphicsScene *sc)
