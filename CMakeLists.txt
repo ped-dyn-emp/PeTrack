@@ -155,7 +155,7 @@ message("Building with Qt${QT_DEFAULT_MAJOR_VERSION} (${Qt5Core_VERSION_STRING})
 
 # OpenCV
 find_package(
-        OpenCV 4.2.0 EXACT
+        OpenCV 4.5
         COMPONENTS core calib3d aruco video videoio highgui imgproc
         REQUIRED
 )
