@@ -580,6 +580,8 @@ private slots:
     void setMoCapShow(bool visibility);
     void setMoCapColor(QColor col);
     void setMoCapSize(int size);
+    void toggleRecoROIButtons();
+    void toggleTrackROIButtons();
 signals:
     void userChangedRecoMethod(reco::RecognitionMethod method);
 

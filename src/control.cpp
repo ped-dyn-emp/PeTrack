@@ -222,7 +222,26 @@ Control::Control(
         scrollAreaWidgetContents_4->layout()->spacing() * 2);
 
     connect(trackRoiFix, &QCheckBox::stateChanged, &trackRoiItem, &RoiItem::setFixed);
+    connect(recoRoiToFullImageSize, &QPushButton::clicked, &recoRoiItem, &RoiItem::setToFullImageSize);
+    connect(
+        recoRoiAdjustAutomatically,
+        &QPushButton::clicked,
+        this,
+        [&recoRoiItem, &trackRoiItem]() { recoRoiItem.adjustToOtherROI(trackRoiItem, std::minus<>()); });
+
     connect(roiFix, &QCheckBox::stateChanged, &recoRoiItem, &RoiItem::setFixed);
+    connect(trackRoiToFullImageSize, &QPushButton::clicked, &trackRoiItem, &RoiItem::setToFullImageSize);
+    connect(
+        trackRoiAdjustAutomatically,
+        &QPushButton::clicked,
+        this,
+        [&recoRoiItem, &trackRoiItem]() { trackRoiItem.adjustToOtherROI(recoRoiItem, std::plus<>()); });
+
+    connect(roiFix, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
+    connect(roiShow, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
+
+    connect(trackRoiFix, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
+    connect(trackRoiShow, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
 
     // "Hide" analysis tab until it is fixed
     tabs->removeTab(3);
@@ -2785,8 +2804,9 @@ void Control::on_coordShow_stateChanged(int /*i*/)
     {
         mMainWindow->updateCoord();
         mScene->update();
-        setMeasuredAltitude(); // da measured nicht aktualisiert wird, waehrend scale verschoben und show deaktiviert
-                               // und beim aktivieren sonst ein falscher wert zum angezeigten koord waere
+        setMeasuredAltitude(); // da measured nicht aktualisiert wird, waehrend scale verschoben und show
+                               // deaktiviert und beim aktivieren sonst ein falscher wert zum angezeigten koord
+                               // waere
     }
     // mScene->update(); //mScene->sceneRect() // ging auch, aber dann wurde zu oft matrix berechnet etc
     // mMainWindow->getImageWidget()->update(); // repaint() zeichnet sofort - schneller aber mgl flicker
@@ -4000,8 +4020,8 @@ void Control::getXml(QDomElement &elem)
                     }
 
                     mapNr->setMaximum(colorPlot->getMapItem()->mapNum() - 1);
-                    if(subSubElem.hasAttribute(
-                           "MAP_NUMBER")) // hiermit werden aus map-datenstruktur richtige map angezeigt, daher am ende
+                    if(subSubElem.hasAttribute("MAP_NUMBER")) // hiermit werden aus map-datenstruktur richtige map
+                                                              // angezeigt, daher am ende
                     {
                         mapNr->setValue(subSubElem.attribute("MAP_NUMBER").toInt());
                         on_mapNr_valueChanged(
@@ -4319,8 +4339,8 @@ void Control::getXml(QDomElement &elem)
                             subSubElem.attribute("ONLY_PEOPLE_LIST").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
 
-                    // IMPORTANT: reading ONLY_PEOPLE_NR is done in petrack.cpp, as the trajectories need to be loaded
-                    // before!
+                    // IMPORTANT: reading ONLY_PEOPLE_NR is done in petrack.cpp, as the trajectories need to be
+                    // loaded before!
                     if(subSubElem.hasAttribute("SHOW_CURRENT_POINT"))
                     {
                         trackShowCurrentPoint->setCheckState(
@@ -4795,6 +4815,20 @@ void Control::expandRange(QColor &fromColor, QColor &toColor, const QColor &clic
 
     toColor.setHsv(toColorArr[0], toColorArr[1], toColorArr[2]);
     fromColor.setHsv(fromColorArr[0], fromColorArr[1], fromColorArr[2]);
+}
+
+void Control::toggleRecoROIButtons()
+{
+    bool enabled = (!roiFix->isChecked()) && roiShow->isChecked();
+    recoRoiAdjustAutomatically->setEnabled(enabled);
+    recoRoiToFullImageSize->setEnabled(enabled);
+}
+
+void Control::toggleTrackROIButtons()
+{
+    bool enabled = (!trackRoiFix->isChecked()) && trackRoiShow->isChecked();
+    trackRoiAdjustAutomatically->setEnabled(enabled);
+    trackRoiToFullImageSize->setEnabled(enabled);
 }
 
 #include "moc_control.cpp"

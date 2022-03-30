@@ -340,3 +340,17 @@ void RoiItem::restoreSize()
         setRect(0, 0, 0, 0);
     }
 }
+
+/**
+ * @brief Sets the rect to the top left corner of the image and width/height such that it includes the full image.
+ */
+void RoiItem::setToFullImageSize()
+{
+    setRect(
+        -mMainWindow->getImageBorderSize(),
+        -mMainWindow->getImageBorderSize(),
+        mMainWindow->getImage()->width(),
+        mMainWindow->getImage()->height());
+
+    emit changed();
+}
