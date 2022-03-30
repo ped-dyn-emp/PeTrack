@@ -3675,6 +3675,32 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QPushButton" name="recoRoiToFullImageSize">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>sets the recognition ROI such that it includes the full image</string>
+                </property>
+                <property name="text">
+                 <string>full image</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="recoRoiAdjustAutomatically">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>sets the size of the recognition ROI to: tracking ROI - head size </string>
+                </property>
+                <property name="text">
+                 <string>adjust automatically</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
@@ -5087,6 +5113,32 @@
                <widget class="QCheckBox" name="trackRoiFix">
                 <property name="text">
                  <string>fix</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="trackRoiToFullImageSize">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>sets the tracking ROI such that it includes the full image</string>
+                </property>
+                <property name="text">
+                 <string>full image</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="trackRoiAdjustAutomatically">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>sets the size of the tracking ROI to: recogniton ROI + head size </string>
+                </property>
+                <property name="text">
+                 <string>adjust automatically</string>
                 </property>
                </widget>
               </item>
