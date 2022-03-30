@@ -210,7 +210,7 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             if(changeID)
             {
                 int markerID = QInputDialog::getInt(mMainWindow, "Enter Marker ID", "Marker ID:");
-                mPersonStorage.setMarkerID(i, markerID);
+                mPersonStorage.setMarkerID(i, markerID, true);
             }
         }
         else if(selectedAction == infoTrj)

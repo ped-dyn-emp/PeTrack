@@ -26,6 +26,7 @@
 #include <vector>
 
 class Petrack;
+class Autosave;
 
 struct PersonFrame
 {
@@ -43,7 +44,7 @@ public:
         Whole
     };
 
-    explicit PersonStorage(Petrack &mainWindow) : mMainWindow(mainWindow) {}
+    explicit PersonStorage(Petrack &mainWindow, Autosave &autosave) : mMainWindow(mainWindow), mAutosave(autosave) {}
 
     void splitPerson(size_t pers, int frame);
     bool splitPersonAt(const Vec2F &p, int frame, const QSet<int> &onlyVisible);
@@ -120,7 +121,7 @@ public:
     // rueckgabewert false wenn keine hoeheninformationen in tracker datensatz vorliegt
     bool printHeightDistribution();
     void setMarkerHeights(const std::unordered_map<int, float> &heights);
-    void setMarkerID(int person, int markerIDs);
+    void setMarkerID(int person, int markerIDs, bool manual = false);
     void setMarkerIDs(const std::unordered_map<int, int> &markerIDs);
     void purge(int frame);
 
@@ -129,6 +130,7 @@ public:
 private:
     std::vector<TrackPerson> mPersons;
     Petrack                 &mMainWindow;
+    Autosave                &mAutosave;
 };
 
 #endif // PERSONSTORAGE_H

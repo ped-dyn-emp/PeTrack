@@ -605,6 +605,17 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
             tr("PeTrack project file (*.pet);;All files (*.*)"));
     }
 
+    if(Autosave::autosaveExists(fileName) && fileName != mProFileName)
+    {
+        auto ret = PQuestion(this, "Autosave detected", "An autosave was detected.\nDo you want to load the Autosave?");
+        if(ret == PMessageBox::StandardButton::Yes)
+        {
+            setProFileName(fileName);
+            mAutosave.loadAutosave();
+            return;
+        }
+    }
+
     if(!fileName.isEmpty())
     {
         QFile file(fileName);
@@ -2529,6 +2540,7 @@ void Petrack::closeEvent(QCloseEvent *event)
     if(maybeSave())
     {
         writeSettings();
+        mAutosave.deleteAutosave();
         event->accept();
     }
     else
@@ -3045,6 +3057,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                 progress.setValue(mPersonStorage.nbPersons() + 1);
 
                 std::cout << " finished " << std::endl;
+                mAutosave.resetTrackPersonCounter();
 
 #ifdef TIME_MEASUREMENT
                 time1 += clock() - tstart;
@@ -3972,6 +3985,23 @@ double Petrack::getHeadSize(QPointF *pos, int pers, int frame)
     {
         return mHeadSize;
     }
+}
+
+void Petrack::setProFileName(const QString &fileName)
+{
+    // don't change project Name to an autosave
+    if(mAutosave.isAutosave(fileName) || fileName == mProFileName)
+    {
+        return;
+    }
+
+    // Change project => delete old autosave
+    mAutosave.deleteAutosave();
+    // NOTE: Use only the global variant in future?
+    // global one in helper.h because it is needed to use getFileList and shouldn't depend on Petrack
+    proFileName  = fileName;
+    mProFileName = fileName;
+    updateWindowTitle();
 }
 
 /**

@@ -33,6 +33,7 @@
 #include "stereoContext.h"
 #endif
 #include "autoCalib.h"
+#include "autosave.h"
 #include "backgroundFilter.h"
 #include "borderFilter.h"
 #include "brightContrastFilter.h"
@@ -201,14 +202,7 @@ public:
     inline pet::StereoContext *getStereoContext() { return mStereoContext; }
     inline QString             getProFileName() { return mProFileName; }
 
-private:
-    inline void setProFileName(const QString &fileName)
-    {
-        // NOTE: Use only the global variant in future?
-        // global one in helper.h because it is needed to use getFileList and shouldn't depend on Petrack
-        proFileName  = fileName;
-        mProFileName = fileName;
-    }
+    void setProFileName(const QString &fileName);
 
 public:
     inline QString getTrackFileName() { return mTrcFileName; }
@@ -464,13 +458,14 @@ private:
 
     reco::Recognizer mReco;
 
-    PersonStorage mPersonStorage{*this};
+    QDomDocument mDefaultSettings;
+    Autosave     mAutosave{*this};
+
+    PersonStorage mPersonStorage{*this, mAutosave};
     Tracker      *mTracker;
     TrackerReal  *mTrackerReal;
     double        mHeadSize;
     double        mCmPerPixel;
-
-    QDomDocument mDefaultSettings;
 
     double mShowFPS;
 
@@ -480,7 +475,6 @@ private:
 
     MoCapStorage    mStorage;
     MoCapController mMoCapController{mStorage, mExtrCalibration};
-
 
     QString mPetrackVersion{"Unknown"};  ///< Version of PeTrack used to compile
     QString mGitCommitID{"Unknown"};     ///< Commit hash used to compile

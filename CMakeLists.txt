@@ -376,6 +376,7 @@ target_sources(petrack_core PRIVATE
     include/pMessageBox.h
     include/moCapSelectionWidget.h
     include/personStorage.h
+    include/autosave.h
     )
 
 target_sources(petrack_core PRIVATE
@@ -435,6 +436,7 @@ target_sources(petrack_core PRIVATE
     src/pMessageBox.cpp
     src/moCapSelectionWidget.cpp
     src/personStorage.cpp
+    src/autosave.cpp
     ui/about.ui
     ui/codeMarker.ui
     ui/colorMarker.ui
