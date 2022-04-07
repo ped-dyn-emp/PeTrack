@@ -43,9 +43,9 @@ public:
         const QString                  &compileDate,
         const std::vector<std::string> &authors);
 
-    AboutDialog(const AboutDialog &) = delete;
-    AboutDialog &operator=(AboutDialog) = delete;
-    AboutDialog(const AboutDialog &&)   = delete;
+    AboutDialog(const AboutDialog &)       = delete;
+    AboutDialog &operator=(AboutDialog)    = delete;
+    AboutDialog(const AboutDialog &&)      = delete;
     AboutDialog &operator=(AboutDialog &&) = delete;
 
     ~AboutDialog() override;

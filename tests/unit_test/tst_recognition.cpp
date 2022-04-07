@@ -51,7 +51,10 @@ SCENARIO("I change Aruco parameters (via UI)")
         ArucoCodeParams params;
         params.setAdaptiveThreshConstant(20);
         options.setDetectorParams(params);
-        THEN("A corresponding change signal was emitted") { REQUIRE(spy.count() == 1); }
+        THEN("A corresponding change signal was emitted")
+        {
+            REQUIRE(spy.count() == 1);
+        }
     }
 
     GIVEN("I change the index of the marker dict")
@@ -59,7 +62,10 @@ SCENARIO("I change Aruco parameters (via UI)")
         QSignalSpy spy{&options, &CodeMarkerOptions::indexOfMarkerDictChanged};
         const int  newIndex = options.getIndexOfMarkerDict() + 1;
         options.setIndexOfMarkerDict(newIndex);
-        THEN("A corresponding change signal was emitted") { REQUIRE(spy.count() == 1); }
+        THEN("A corresponding change signal was emitted")
+        {
+            REQUIRE(spy.count() == 1);
+        }
     }
 }
 

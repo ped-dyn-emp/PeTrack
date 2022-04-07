@@ -46,11 +46,11 @@ class OpenMoCapDialog : public QDialog
 
 public:
     explicit OpenMoCapDialog(QWidget *parent, MoCapController &controller);
-    OpenMoCapDialog()                        = delete;
-    OpenMoCapDialog(const OpenMoCapDialog &) = delete;
-    OpenMoCapDialog(OpenMoCapDialog &&)      = delete;
+    OpenMoCapDialog()                                   = delete;
+    OpenMoCapDialog(const OpenMoCapDialog &)            = delete;
+    OpenMoCapDialog(OpenMoCapDialog &&)                 = delete;
     OpenMoCapDialog &operator=(const OpenMoCapDialog &) = delete;
-    OpenMoCapDialog &operator=(OpenMoCapDialog &&) = delete;
+    OpenMoCapDialog &operator=(OpenMoCapDialog &&)      = delete;
     ~OpenMoCapDialog() override;
 
     void clickedOk();

@@ -135,28 +135,40 @@ SCENARIO("Getting the IDs of the pedestrian from user input", "[petrack][util]")
             QString input("-1");
             auto    receivedIDs = util::splitStringToInt(input);
 
-            THEN("std::nullopt should be returned") { REQUIRE_FALSE(receivedIDs.has_value()); }
+            THEN("std::nullopt should be returned")
+            {
+                REQUIRE_FALSE(receivedIDs.has_value());
+            }
         }
         AND_WHEN("invalid range")
         {
             QString input("1-");
             auto    receivedIDs = util::splitStringToInt(input);
 
-            THEN("std::nullopt should be returned") { REQUIRE_FALSE(receivedIDs.has_value()); }
+            THEN("std::nullopt should be returned")
+            {
+                REQUIRE_FALSE(receivedIDs.has_value());
+            }
         }
         AND_WHEN("too many -'s")
         {
             QString input("1-2-");
             auto    receivedIDs = util::splitStringToInt(input);
 
-            THEN("std::nullopt should be returned") { REQUIRE_FALSE(receivedIDs.has_value()); }
+            THEN("std::nullopt should be returned")
+            {
+                REQUIRE_FALSE(receivedIDs.has_value());
+            }
         }
         AND_WHEN("not int values (single values)")
         {
             QString input("1, 5, a, b, 6");
             auto    receivedIDs = util::splitStringToInt(input);
 
-            THEN("std::nullopt should be returned") { REQUIRE_FALSE(receivedIDs.has_value()); }
+            THEN("std::nullopt should be returned")
+            {
+                REQUIRE_FALSE(receivedIDs.has_value());
+            }
         }
     }
 }

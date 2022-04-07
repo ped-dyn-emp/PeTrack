@@ -51,7 +51,7 @@ public:
     ~SkeletonNode() = default;
 
     SkeletonNode &operator=(const SkeletonNode &rhs) = default;
-    SkeletonNode &operator=(SkeletonNode &&rhs) = default;
+    SkeletonNode &operator=(SkeletonNode &&rhs)      = default;
 
     /**
      * @brief Gets the children as a vector.

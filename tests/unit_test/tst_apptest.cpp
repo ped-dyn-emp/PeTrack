@@ -25,5 +25,8 @@
 
 SCENARIO("Application Tests", "[app]")
 {
-    GIVEN("Hello World") { REQUIRE(true); }
+    GIVEN("Hello World")
+    {
+        REQUIRE(true);
+    }
 }

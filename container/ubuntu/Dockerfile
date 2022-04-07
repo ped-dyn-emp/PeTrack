@@ -6,7 +6,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y software-properties-common wget
 
 # Install the needed tools
-RUN echo "deb [trusted=yes] http://apt.llvm.org/jammy/ llvm-toolchain-jammy-13 main" | tee /etc/apt/sources.list.d/clang.list
+RUN echo "deb [trusted=yes] http://apt.llvm.org/jammy/ llvm-toolchain-jammy-14 main" | tee /etc/apt/sources.list.d/clang.list
 
 RUN apt-get update && \
     apt-get install -y \
@@ -18,12 +18,12 @@ RUN apt-get update && \
         parallel \
         mesa-common-dev \
         libglu1-mesa-dev \
-        clang-13 \
-        clang-format-13
+        clang-14 \
+        clang-format-14
 
-# Set clang-13 as default compiler
-RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-13 100 &&\
-    update-alternatives --install /usr/bin/cc cc /usr/bin/clang-13 100
+# Set clang-14 as default compiler
+RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-14 100 &&\
+    update-alternatives --install /usr/bin/cc cc /usr/bin/clang-14 100
 
 # Install python
 RUN apt-get update && apt-get install -y \

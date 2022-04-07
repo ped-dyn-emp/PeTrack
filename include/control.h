@@ -236,10 +236,16 @@ public:
     inline ColorPlot *getColorPlot() const { return colorPlot; }
 
 #ifdef QWT
-    inline AnalysePlot *getAnalysePlot() const { return analysePlot; }
+    inline AnalysePlot *getAnalysePlot() const
+    {
+        return analysePlot;
+    }
 #endif
 
-    inline Petrack *getMainWindow() const { return mMainWindow; }
+    inline Petrack *getMainWindow() const
+    {
+        return mMainWindow;
+    }
 
 private:
     reco::RecognitionMethod getRecoMethod() const;
@@ -419,7 +425,10 @@ private slots:
             mScene->update();
         }
     }
-    void on_trackColorMarkerSize_valueChanged(int /*i*/) { mScene->update(); }
+    void on_trackColorMarkerSize_valueChanged(int /*i*/)
+    {
+        mScene->update();
+    }
     void on_trackNumberSize_valueChanged(int /*i*/)
     {
         if(!isLoading())

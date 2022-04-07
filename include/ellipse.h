@@ -42,11 +42,11 @@ public:
     MyEllipse();
     MyEllipse(double x, double y, double r1, double r2, double angle);
     MyEllipse(QPointF center, QSizeF size, double angle);
-    MyEllipse(const MyEllipse &c) = default;
-    MyEllipse(MyEllipse &&c)      = default;
+    MyEllipse(const MyEllipse &c)            = default;
+    MyEllipse(MyEllipse &&c)                 = default;
     MyEllipse &operator=(const MyEllipse &c) = default;
-    MyEllipse &operator=(MyEllipse &&c) = default;
-    ~MyEllipse()                        = default;
+    MyEllipse &operator=(MyEllipse &&c)      = default;
+    ~MyEllipse()                             = default;
 
     Vec2F  center() const;
     QSizeF size() const;
