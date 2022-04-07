@@ -43,12 +43,12 @@ const std::map<MoCapSystem, std::string> moCapFileExtensions = {{MoCapSystem::XS
 class MoCapPersonMetadata
 {
 public:
-    MoCapPersonMetadata()                            = default;
-    MoCapPersonMetadata(const MoCapPersonMetadata &) = default;
-    MoCapPersonMetadata(MoCapPersonMetadata &&)      = default;
+    MoCapPersonMetadata()                                       = default;
+    MoCapPersonMetadata(const MoCapPersonMetadata &)            = default;
+    MoCapPersonMetadata(MoCapPersonMetadata &&)                 = default;
     MoCapPersonMetadata &operator=(const MoCapPersonMetadata &) = default;
-    MoCapPersonMetadata &operator=(MoCapPersonMetadata &&) = default;
-    ~MoCapPersonMetadata()                                 = default;
+    MoCapPersonMetadata &operator=(MoCapPersonMetadata &&)      = default;
+    ~MoCapPersonMetadata()                                      = default;
     MoCapPersonMetadata(
         std::string filepath,
         MoCapSystem system,

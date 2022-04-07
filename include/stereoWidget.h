@@ -93,7 +93,10 @@ private slots:
             mMainWindow->getScene()->update();
         }
     }
-    void on_opacity_valueChanged(int i) { mMainWindow->getScene()->update(); }
+    void on_opacity_valueChanged(int i)
+    {
+        mMainWindow->getScene()->update();
+    }
     void on_edgeMaskSize_valueChanged(int i)
     {
         if(i % 2 == 0)
@@ -136,7 +139,10 @@ private slots:
         }
     }
 
-    void on_stereoExport_clicked() { mMainWindow->getStereoContext()->exportPointCloud(); }
+    void on_stereoExport_clicked()
+    {
+        mMainWindow->getStereoContext()->exportPointCloud();
+    }
 #endif
 
 private:

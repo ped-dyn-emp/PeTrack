@@ -40,12 +40,12 @@ class Autosave : public QObject
     Q_OBJECT
 public:
     explicit Autosave(Petrack &petrack);
-    Autosave()                       = delete;
-    Autosave(const Autosave &other)  = delete;
-    Autosave(const Autosave &&other) = delete;
+    Autosave()                                 = delete;
+    Autosave(const Autosave &other)            = delete;
+    Autosave(const Autosave &&other)           = delete;
     Autosave &operator=(const Autosave &other) = delete;
-    Autosave &operator=(Autosave &&other) = delete;
-    ~Autosave() override                  = default;
+    Autosave &operator=(Autosave &&other)      = delete;
+    ~Autosave() override                       = default;
 
     void        trackPersonModified();
     void        resetTrackPersonCounter();

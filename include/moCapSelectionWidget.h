@@ -42,10 +42,10 @@ public:
         QWidget                          *parent,
         const QMap<QString, MoCapSystem> &moCapSystems,
         const MoCapPersonMetadata        &metadata);
-    MoCapSelectionWidget(const MoCapSelectionWidget &) = delete;
-    MoCapSelectionWidget(MoCapSelectionWidget &&)      = delete;
+    MoCapSelectionWidget(const MoCapSelectionWidget &)            = delete;
+    MoCapSelectionWidget(MoCapSelectionWidget &&)                 = delete;
     MoCapSelectionWidget &operator=(const MoCapSelectionWidget &) = delete;
-    MoCapSelectionWidget &operator=(MoCapSelectionWidget &&) = delete;
+    MoCapSelectionWidget &operator=(MoCapSelectionWidget &&)      = delete;
     ~MoCapSelectionWidget() override;
 
     void                setFileName();

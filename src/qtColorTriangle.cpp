@@ -103,11 +103,11 @@ struct DoubleColor
 
     DoubleColor() : r(0.0), g(0.0), b(0.0) {}
     DoubleColor(double red, double green, double blue) : r(red), g(green), b(blue) {}
-    DoubleColor(const DoubleColor &c) = default;
-    DoubleColor(DoubleColor &&c)      = default;
+    DoubleColor(const DoubleColor &c)            = default;
+    DoubleColor(DoubleColor &&c)                 = default;
     DoubleColor &operator=(const DoubleColor &c) = default;
-    DoubleColor &operator=(DoubleColor &&c) = default;
-    ~DoubleColor()                          = default;
+    DoubleColor &operator=(DoubleColor &&c)      = default;
+    ~DoubleColor()                               = default;
 };
 
 /*

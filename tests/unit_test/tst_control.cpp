@@ -90,7 +90,10 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
         eventList.addMouseClick(Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier);
         eventList.simulate(colorPickerButton);
 
-        THEN("The Button is checked") { REQUIRE(colorPickerButton->isChecked()); }
+        THEN("The Button is checked")
+        {
+            REQUIRE(colorPickerButton->isChecked());
+        }
 
         AND_GIVEN("I shift+click on one point of the (red) image")
         {

@@ -101,55 +101,82 @@ SCENARIO("The user opens the CodeMarkerWidget", "[ui]")
     GIVEN("A cornerRefinementWinSize less than 1")
     {
         view->cornerRefinementWinSize->setValue(-2);
-        THEN("The value gets set to 1") { REQUIRE(view->cornerRefinementWinSize->value() == 1); }
+        THEN("The value gets set to 1")
+        {
+            REQUIRE(view->cornerRefinementWinSize->value() == 1);
+        }
     }
 
     GIVEN("A cornerRefinementMaxIterations less than 1")
     {
         view->cornerRefinementMaxIterations->setValue(0);
-        THEN("The value gets set to 1") { REQUIRE(view->cornerRefinementMaxIterations->value() == 1); }
+        THEN("The value gets set to 1")
+        {
+            REQUIRE(view->cornerRefinementMaxIterations->value() == 1);
+        }
     }
 
     GIVEN("A cornerRefinementMinAccuracy less than or equal to 0")
     {
         view->cornerRefinementMinAccuracy->setValue(-3);
-        THEN("It is set to 0.01") { REQUIRE(view->cornerRefinementMinAccuracy->value() == Approx(0.01)); }
+        THEN("It is set to 0.01")
+        {
+            REQUIRE(view->cornerRefinementMinAccuracy->value() == Approx(0.01));
+        }
     }
 
     GIVEN("markerBorderBits less than 1")
     {
         view->markerBorderBits->setValue(0);
-        THEN("The value is set to 1") { REQUIRE(view->markerBorderBits->value() == 1); }
+        THEN("The value is set to 1")
+        {
+            REQUIRE(view->markerBorderBits->value() == 1);
+        }
     }
 
     GIVEN("minStdDevOtsu less than or equal to 0")
     {
         view->minOtsuStdDev->setValue(-2);
-        THEN("The value is set to 0.01") { REQUIRE(view->minOtsuStdDev->value() == Approx(0.01)); }
+        THEN("The value is set to 0.01")
+        {
+            REQUIRE(view->minOtsuStdDev->value() == Approx(0.01));
+        }
     }
 
     GIVEN("adaptiveThreshSizeMin less than 3")
     {
         view->adaptiveThreshWinSizeMin->setValue(1);
-        THEN("The value is set to 3") { REQUIRE(view->adaptiveThreshWinSizeMin->value() == 3); }
+        THEN("The value is set to 3")
+        {
+            REQUIRE(view->adaptiveThreshWinSizeMin->value() == 3);
+        }
     }
 
     GIVEN("adaptiveThreshSizeMax less than 3")
     {
         view->adaptiveThreshWinSizeMax->setValue(1);
-        THEN("The value is set to 3") { REQUIRE(view->adaptiveThreshWinSizeMax->value() == 3); }
+        THEN("The value is set to 3")
+        {
+            REQUIRE(view->adaptiveThreshWinSizeMax->value() == 3);
+        }
     }
 
     GIVEN("adaptiveThreshWinSizeStep less than or equal to 0")
     {
         view->adaptiveThreshWinSizeStep->setValue(0);
-        THEN("The value is set to 1") { REQUIRE(view->adaptiveThreshWinSizeStep->value() == 1); }
+        THEN("The value is set to 1")
+        {
+            REQUIRE(view->adaptiveThreshWinSizeStep->value() == 1);
+        }
     }
 
     GIVEN("minMarkerPerimeter less than or equal to 0")
     {
         view->minMarkerPerimeter->setValue(0);
-        THEN("The value is set to 0.1") { REQUIRE(view->minMarkerPerimeter->value() == Approx(0.1)); }
+        THEN("The value is set to 0.1")
+        {
+            REQUIRE(view->minMarkerPerimeter->value() == Approx(0.1));
+        }
     }
 
     GIVEN("maxMarkerPerimeter less than or equal to 0")
@@ -157,24 +184,36 @@ SCENARIO("The user opens the CodeMarkerWidget", "[ui]")
         auto oldVal = view->maxMarkerPerimeter->value();
         view->minMarkerPerimeter->setValue(0); // since max cannot be lower than min
         view->maxMarkerPerimeter->setValue(0);
-        THEN("The value is not changed") { REQUIRE(view->maxMarkerPerimeter->value() == Approx(oldVal)); }
+        THEN("The value is not changed")
+        {
+            REQUIRE(view->maxMarkerPerimeter->value() == Approx(oldVal));
+        }
     }
 
     GIVEN("cornerRefinementMinAccuracy less than or equal to 0")
     {
         view->cornerRefinementMinAccuracy->setValue(0);
-        THEN("The value is set to 0.01") { REQUIRE(view->cornerRefinementMinAccuracy->value() == Approx(0.01)); }
+        THEN("The value is set to 0.01")
+        {
+            REQUIRE(view->cornerRefinementMinAccuracy->value() == Approx(0.01));
+        }
     }
 
     GIVEN("minCornerDistance less than 0")
     {
         view->minCornerDistance->setValue(-1);
-        THEN("The value is set to 1") { REQUIRE(view->minCornerDistance->value() == Approx(0)); }
+        THEN("The value is set to 1")
+        {
+            REQUIRE(view->minCornerDistance->value() == Approx(0));
+        }
     }
 
     GIVEN("minDistanceToBorder less than 0")
     {
         view->minDistanceToBorder->setValue(-2);
-        THEN("The value is set to 0") { REQUIRE(view->minDistanceToBorder->value() == 0); }
+        THEN("The value is set to 0")
+        {
+            REQUIRE(view->minDistanceToBorder->value() == 0);
+        }
     }
 }
