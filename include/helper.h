@@ -292,6 +292,8 @@ inline clock_t getElapsedTime()
     lastTime = clock();
     return diffTime;
 }
+bool lessThanVersion(const QString &q1, const QString &q2);
+
 
 /**
  * Computes the median of the values in a given vector.

@@ -186,3 +186,56 @@ cv::Mat getRoi(cv::Mat &img, const QRect &roi, cv::Rect &rect, bool evenPixelNum
 
     return img(rect);
 }
+#include <iostream>
+#include <vector>
+/**
+ * @brief Compares two PeTrack version strings and returns if the first version string is newer than the second one
+ *
+ * @param q1: first PeTrack version string
+ * @param q2: second PeTrack version string
+ * @throws std::invalid_argument Thrown if one of the input strings is not in the right format
+ * @return boolean, whether the first version is higher than the second one
+ */
+bool lessThanVersion(const QString &q1, const QString &q2)
+{
+    QStringList      version1 = q1.split(QLatin1Char('.'));
+    QStringList      version2 = q2.split(QLatin1Char('.'));
+    std::vector<int> version1_digits;
+    std::vector<int> version2_digits;
+
+    for(int i = 0; i < version1.length(); ++i)
+    {
+        if(version1[i].length() == 1 && version1[i][0].isDigit())
+        {
+            version1_digits.push_back(version1[i].toInt());
+        }
+        else
+        {
+            throw std::invalid_argument("Invalid Input String!");
+        }
+    }
+    for(int i = 0; i < version2.length(); ++i)
+    {
+        if(version2[i].length() == 1 && version2[i][0].isDigit())
+        {
+            version2_digits.push_back(version2[i].toInt());
+        }
+        else
+        {
+            throw std::invalid_argument("Invalid Input String!");
+        }
+    }
+    int length = std::min(version1_digits.size(), version2_digits.size());
+    for(int i = 0; i < length; ++i)
+    {
+        if(version1_digits[i] > version2_digits[i])
+        {
+            return true;
+        }
+        else if(version1_digits[i] < version2_digits[i])
+        {
+            return false;
+        }
+    }
+    return version1_digits.size() > version2_digits.size();
+}

@@ -34,6 +34,7 @@
 #include "colorRangeWidget.h"
 #include "control.h"
 #include "gridItem.h"
+#include "helper.h"
 #include "imageItem.h"
 #include "logoItem.h"
 #include "moCapItem.h"
@@ -652,16 +653,16 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
         openXml(doc, openSeq);
         mLastTrackerExport = mTrcFileName;
 
-        if(mControlWidget->getCalibS1Value() == 0 && mControlWidget->getCalibS2Value() == 0 &&
-           mControlWidget->getCalibS3Value() == 0 && mControlWidget->getCalibS4Value() == 0 &&
-           mControlWidget->getCalibTAUXValue() == 0 && mControlWidget->getCalibTAUYValue() == 0)
+        if(!lessThanVersion(root.attribute("VERSION"), QString("0.9.0")))
         {
             PWarning(
                 this,
                 tr("PeTrack"),
-                tr("You are using an old project! Therefore the old intr. calibration model is set the default"));
+                tr("You are using a project version lower than 0.9: Therefore, the extended intrinsic calibration "
+                   "model is disabled."));
             mControlWidget->setNewModelChecked(false);
         }
+
         updateWindowTitle();
     }
 }
