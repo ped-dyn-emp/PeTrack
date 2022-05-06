@@ -135,9 +135,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-187</y>
-            <width>476</width>
-            <height>1328</height>
+            <y>-411</y>
+            <width>465</width>
+            <height>1363</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1135,6 +1135,77 @@
                </layout>
               </item>
               <item>
+               <layout class="QGridLayout" name="ChessboardPropertiesLayout">
+                <item row="4" column="1">
+                 <widget class="QLabel" name="squareSizeLabel">
+                  <property name="text">
+                   <string>square size [cm]:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="chessboardProperties">
+                  <property name="text">
+                   <string>chessboard properties:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QLabel" name="boardSizeXLabel">
+                  <property name="text">
+                   <string>board size: x:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="2">
+                 <widget class="QDoubleSpinBox" name="squareSize">
+                  <property name="singleStep">
+                   <double>0.100000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>4.600000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="3">
+                 <widget class="QLabel" name="boardSizeYLabel">
+                  <property name="text">
+                   <string>y:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="2">
+                 <widget class="QSpinBox" name="boardSizeX">
+                  <property name="toolTip">
+                   <string>Number of squares in a row</string>
+                  </property>
+                  <property name="value">
+                   <number>6</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="4">
+                 <widget class="QSpinBox" name="boardSizeY">
+                  <property name="toolTip">
+                   <string>Number of squares in a column</string>
+                  </property>
+                  <property name="value">
+                   <number>8</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
                <layout class="QGridLayout">
                 <property name="leftMargin">
                  <number>0</number>
@@ -1151,6 +1222,13 @@
                 <property name="spacing">
                  <number>4</number>
                 </property>
+                <item row="0" column="1">
+                 <widget class="QPushButton" name="calibFiles">
+                  <property name="text">
+                   <string>files</string>
+                  </property>
+                 </widget>
+                </item>
                 <item row="0" column="0">
                  <widget class="QPushButton" name="autoCalib">
                   <property name="enabled">
@@ -1158,13 +1236,6 @@
                   </property>
                   <property name="text">
                    <string>auto</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QPushButton" name="calibFiles">
-                  <property name="text">
-                   <string>files</string>
                   </property>
                  </widget>
                 </item>
@@ -1634,16 +1705,112 @@
                     <property name="spacing">
                      <number>4</number>
                     </property>
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="label_54">
+                    <item row="0" column="2">
+                     <widget class="QSpinBox" name="coord3DTransX_spin">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>17</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>17</height>
+                       </size>
+                      </property>
                       <property name="toolTip">
                        <string>Translate the coordinate system in x-direction.</string>
                       </property>
-                      <property name="text">
-                       <string>translate [cm] x:</string>
+                      <property name="minimum">
+                       <number>-10000</number>
                       </property>
-                      <property name="alignment">
-                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      <property name="maximum">
+                       <number>10000</number>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="2">
+                     <widget class="QSpinBox" name="coord3DTransZ_spin">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>17</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>17</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.</string>
+                      </property>
+                      <property name="minimum">
+                       <number>-10000</number>
+                      </property>
+                      <property name="maximum">
+                       <number>10000</number>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="2">
+                     <widget class="QSpinBox" name="coord3DTransY_spin">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>17</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>17</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Translate the coordinate system in y-direction.</string>
+                      </property>
+                      <property name="minimum">
+                       <number>-10000</number>
+                      </property>
+                      <property name="maximum">
+                       <number>10000</number>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="1">
+                     <widget class="QScrollBar" name="coord3DTransZ">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>17</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>17</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.</string>
+                      </property>
+                      <property name="minimum">
+                       <number>-10000</number>
+                      </property>
+                      <property name="maximum">
+                       <number>10000</number>
+                      </property>
+                      <property name="pageStep">
+                       <number>10</number>
+                      </property>
+                      <property name="sliderPosition">
+                       <number>0</number>
+                      </property>
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
                       </property>
                      </widget>
                     </item>
@@ -1690,44 +1857,6 @@
                       </property>
                      </widget>
                     </item>
-                    <item row="0" column="2">
-                     <widget class="QSpinBox" name="coord3DTransX_spin">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>17</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>17</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Translate the coordinate system in x-direction.</string>
-                      </property>
-                      <property name="minimum">
-                       <number>-10000</number>
-                      </property>
-                      <property name="maximum">
-                       <number>10000</number>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="label_55">
-                      <property name="toolTip">
-                       <string>Translate the coordinate system in y-direction.</string>
-                      </property>
-                      <property name="text">
-                       <string>y:</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                      </property>
-                     </widget>
-                    </item>
                     <item row="1" column="1">
                      <widget class="QScrollBar" name="coord3DTransY">
                       <property name="minimumSize">
@@ -1762,31 +1891,6 @@
                       </property>
                      </widget>
                     </item>
-                    <item row="1" column="2">
-                     <widget class="QSpinBox" name="coord3DTransY_spin">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>17</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>17</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Translate the coordinate system in y-direction.</string>
-                      </property>
-                      <property name="minimum">
-                       <number>-10000</number>
-                      </property>
-                      <property name="maximum">
-                       <number>10000</number>
-                      </property>
-                     </widget>
-                    </item>
                     <item row="2" column="0">
                      <widget class="QLabel" name="label_57">
                       <property name="toolTip">
@@ -1800,65 +1904,6 @@
                       </property>
                      </widget>
                     </item>
-                    <item row="2" column="1">
-                     <widget class="QScrollBar" name="coord3DTransZ">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>17</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>17</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.</string>
-                      </property>
-                      <property name="minimum">
-                       <number>-10000</number>
-                      </property>
-                      <property name="maximum">
-                       <number>10000</number>
-                      </property>
-                      <property name="pageStep">
-                       <number>10</number>
-                      </property>
-                      <property name="sliderPosition">
-                       <number>0</number>
-                      </property>
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="2">
-                     <widget class="QSpinBox" name="coord3DTransZ_spin">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>17</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>17</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>2D: Rotate the coordinate system clockwise. 3D: Translate the coordinate system in z-direction.</string>
-                      </property>
-                      <property name="minimum">
-                       <number>-10000</number>
-                      </property>
-                      <property name="maximum">
-                       <number>10000</number>
-                      </property>
-                     </widget>
-                    </item>
                     <item row="3" column="0">
                      <widget class="QLabel" name="label_56">
                       <property name="toolTip">
@@ -1869,6 +1914,63 @@
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="label_55">
+                      <property name="toolTip">
+                       <string>Translate the coordinate system in y-direction.</string>
+                      </property>
+                      <property name="text">
+                       <string>y:</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="label_54">
+                      <property name="toolTip">
+                       <string>Translate the coordinate system in x-direction.</string>
+                      </property>
+                      <property name="text">
+                       <string>translate [cm] x:</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="2">
+                     <widget class="QSpinBox" name="coord3DAxeLen_spin">
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>17</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>17</height>
+                       </size>
+                      </property>
+                      <property name="toolTip">
+                       <string>Scale the coordinate system.</string>
+                      </property>
+                      <property name="suffix">
+                       <string> cm</string>
+                      </property>
+                      <property name="minimum">
+                       <number>1</number>
+                      </property>
+                      <property name="maximum">
+                       <number>10000</number>
+                      </property>
+                      <property name="value">
+                       <number>200</number>
                       </property>
                      </widget>
                     </item>
@@ -1903,37 +2005,6 @@
                       </property>
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="2">
-                     <widget class="QSpinBox" name="coord3DAxeLen_spin">
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>17</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>16777215</width>
-                        <height>17</height>
-                       </size>
-                      </property>
-                      <property name="toolTip">
-                       <string>Scale the coordinate system.</string>
-                      </property>
-                      <property name="suffix">
-                       <string> cm</string>
-                      </property>
-                      <property name="minimum">
-                       <number>1</number>
-                      </property>
-                      <property name="maximum">
-                       <number>10000</number>
-                      </property>
-                      <property name="value">
-                       <number>200</number>
                       </property>
                      </widget>
                     </item>
@@ -3441,7 +3512,7 @@
             <x>0</x>
             <y>0</y>
             <width>465</width>
-            <height>991</height>
+            <height>974</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -3581,7 +3652,6 @@
                 <widget class="QLabel" name="recoNumberNow">
                  <property name="font">
                   <font>
-                   <weight>75</weight>
                    <bold>true</bold>
                   </font>
                  </property>
@@ -4730,7 +4800,7 @@
             <x>0</x>
             <y>0</y>
             <width>465</width>
-            <height>1203</height>
+            <height>1170</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -4923,7 +4993,6 @@
               <widget class="QLabel" name="trackNumberNow">
                <property name="font">
                 <font>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -4964,7 +5033,6 @@
               <widget class="QLabel" name="trackNumberVisible">
                <property name="font">
                 <font>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -4980,7 +5048,6 @@
               <widget class="QLabel" name="trackNumberAll">
                <property name="font">
                 <font>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -7586,7 +7653,7 @@
             <x>0</x>
             <y>0</y>
             <width>479</width>
-            <height>553</height>
+            <height>554</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -7771,48 +7838,48 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>filterBrightContrast</tabstop>
+  <tabstop>filterBorder</tabstop>
+  <tabstop>filterBorderParamCol</tabstop>
+  <tabstop>filterBgShow</tabstop>
+  <tabstop>filterBgUpdate</tabstop>
+  <tabstop>filterBg</tabstop>
+  <tabstop>filterBgReset</tabstop>
+  <tabstop>filterBgLoad</tabstop>
+  <tabstop>filterBgSave</tabstop>
+  <tabstop>filterBgDeleteTrj</tabstop>
+  <tabstop>filterBgDeleteNumber</tabstop>
+  <tabstop>filterSwap</tabstop>
+  <tabstop>filterSwapH</tabstop>
+  <tabstop>filterSwapV</tabstop>
+  <tabstop>apply</tabstop>
   <tabstop>fx</tabstop>
   <tabstop>fy</tabstop>
   <tabstop>cx</tabstop>
   <tabstop>cy</tabstop>
   <tabstop>r2</tabstop>
   <tabstop>r4</tabstop>
+  <tabstop>r6</tabstop>
   <tabstop>tx</tabstop>
   <tabstop>ty</tabstop>
-  <tabstop>gridTransY_spin</tabstop>
-  <tabstop>gridScale_spin</tabstop>
-  <tabstop>gridTransX_spin</tabstop>
-  <tabstop>gridRot_spin</tabstop>
-  <tabstop>coordTransY_spin</tabstop>
-  <tabstop>coordScale_spin</tabstop>
-  <tabstop>coordTransX_spin</tabstop>
-  <tabstop>coordRotate_spin</tabstop>
-  <tabstop>coordAltitude</tabstop>
-  <tabstop>coordUnit</tabstop>
-  <tabstop>coordUseIntrinsic</tabstop>
-  <tabstop>filterBrightContrast</tabstop>
-  <tabstop>filterBorder</tabstop>
-  <tabstop>filterBorderParamCol</tabstop>
-  <tabstop>filterBg</tabstop>
-  <tabstop>filterBgReset</tabstop>
-  <tabstop>filterBgLoad</tabstop>
-  <tabstop>filterBgSave</tabstop>
-  <tabstop>filterSwap</tabstop>
-  <tabstop>filterSwapH</tabstop>
-  <tabstop>filterSwapV</tabstop>
+  <tabstop>k4</tabstop>
+  <tabstop>k5</tabstop>
+  <tabstop>k6</tabstop>
+  <tabstop>s1</tabstop>
+  <tabstop>s2</tabstop>
+  <tabstop>s3</tabstop>
+  <tabstop>s4</tabstop>
+  <tabstop>taux</tabstop>
+  <tabstop>tauy</tabstop>
+  <tabstop>quadAspectRatio</tabstop>
+  <tabstop>fixCenter</tabstop>
+  <tabstop>tangDist</tabstop>
+  <tabstop>newModelCheckBox</tabstop>
+  <tabstop>boardSizeX</tabstop>
+  <tabstop>boardSizeY</tabstop>
+  <tabstop>squareSize</tabstop>
   <tabstop>autoCalib</tabstop>
   <tabstop>calibFiles</tabstop>
-  <tabstop>fixCenter</tabstop>
-  <tabstop>quadAspectRatio</tabstop>
-  <tabstop>tangDist</tabstop>
-  <tabstop>markerIgnoreWithout</tabstop>
-  <tabstop>roiShow</tabstop>
-  <tabstop>roiFix</tabstop>
-  <tabstop>recoShowColor</tabstop>
-  <tabstop>recoOptimizeColor</tabstop>
-  <tabstop>recoColorModel</tabstop>
-  <tabstop>recoAutoWB</tabstop>
-  <tabstop>recoColorX</tabstop>
   <tabstop>recoColorY</tabstop>
   <tabstop>mapNr</tabstop>
   <tabstop>mapColor</tabstop>
@@ -7879,6 +7946,93 @@
   <tabstop>anaConsiderY</tabstop>
   <tabstop>anaConsiderAbs</tabstop>
   <tabstop>anaConsiderRev</tabstop>
+  <tabstop>tabs</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>coordUseIntrinsic</tabstop>
+  <tabstop>coordRotate_spin</tabstop>
+  <tabstop>gridScale_spin</tabstop>
+  <tabstop>gridTransX_spin</tabstop>
+  <tabstop>coordTransX_spin</tabstop>
+  <tabstop>recoColorX</tabstop>
+  <tabstop>coordScale_spin</tabstop>
+  <tabstop>recoAutoWB</tabstop>
+  <tabstop>gridRot_spin</tabstop>
+  <tabstop>coordTransY_spin</tabstop>
+  <tabstop>gridTransY_spin</tabstop>
+  <tabstop>coordAltitude</tabstop>
+  <tabstop>coordUnit</tabstop>
+  <tabstop>markerIgnoreWithout</tabstop>
+  <tabstop>roiShow</tabstop>
+  <tabstop>roiFix</tabstop>
+  <tabstop>recoColorModel</tabstop>
+  <tabstop>recoShowColor</tabstop>
+  <tabstop>recoOptimizeColor</tabstop>
+  <tabstop>trans1</tabstop>
+  <tabstop>rot1</tabstop>
+  <tabstop>trans2</tabstop>
+  <tabstop>trans3</tabstop>
+  <tabstop>rot3</tabstop>
+  <tabstop>rot2</tabstop>
+  <tabstop>coordLoad3DCalibPoints</tabstop>
+  <tabstop>extrCalibFetch</tabstop>
+  <tabstop>extrCalibSave</tabstop>
+  <tabstop>extrCalibShowPoints</tabstop>
+  <tabstop>extrCalibShowError</tabstop>
+  <tabstop>coordShow</tabstop>
+  <tabstop>coordFix</tabstop>
+  <tabstop>coordTab</tabstop>
+  <tabstop>coord3DTransX_spin</tabstop>
+  <tabstop>coord3DTransZ_spin</tabstop>
+  <tabstop>coord3DTransY_spin</tabstop>
+  <tabstop>coord3DAxeLen_spin</tabstop>
+  <tabstop>coord3DSwapX</tabstop>
+  <tabstop>coord3DSwapY</tabstop>
+  <tabstop>coord3DSwapZ</tabstop>
+  <tabstop>extCalibPointsShow</tabstop>
+  <tabstop>extVanishPointsShow</tabstop>
+  <tabstop>gridShow</tabstop>
+  <tabstop>gridFix</tabstop>
+  <tabstop>gridTab</tabstop>
+  <tabstop>grid3DTransX_spin</tabstop>
+  <tabstop>grid3DTransY_spin</tabstop>
+  <tabstop>grid3DTransZ_spin</tabstop>
+  <tabstop>grid3DResolution_spin</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>recoRoiToFullImageSize</tabstop>
+  <tabstop>recoRoiAdjustAutomatically</tabstop>
+  <tabstop>mapColorRange</tabstop>
+  <tabstop>colorPickerButton</tabstop>
+  <tabstop>mapReadHeights</tabstop>
+  <tabstop>mapReadMarkerID</tabstop>
+  <tabstop>scrollArea_3</tabstop>
+  <tabstop>trackRoiShow</tabstop>
+  <tabstop>trackRoiFix</tabstop>
+  <tabstop>trackRoiToFullImageSize</tabstop>
+  <tabstop>trackRoiAdjustAutomatically</tabstop>
+  <tabstop>exportViewDir</tabstop>
+  <tabstop>exportAngleOfView</tabstop>
+  <tabstop>exportUseM</tabstop>
+  <tabstop>exportComment</tabstop>
+  <tabstop>exportMarkerID</tabstop>
+  <tabstop>trackShowSearchSize</tabstop>
+  <tabstop>adaptiveLevel</tabstop>
+  <tabstop>trackShowOnlyNr</tabstop>
+  <tabstop>trackGotoStartNr</tabstop>
+  <tabstop>trackGotoEndNr</tabstop>
+  <tabstop>trackShowOnlyList</tabstop>
+  <tabstop>trackShowOnlyNrList</tabstop>
+  <tabstop>trackShowOnlyListButton</tabstop>
+  <tabstop>trackPathColorButton</tabstop>
+  <tabstop>trackShowGroundPosition</tabstop>
+  <tabstop>trackGroundPositionSize</tabstop>
+  <tabstop>trackShowGroundPath</tabstop>
+  <tabstop>trackGroundPathSize</tabstop>
+  <tabstop>trackGroundPathColorButton</tabstop>
+  <tabstop>showMoCap</tabstop>
+  <tabstop>moCapSize</tabstop>
+  <tabstop>moCapColorButton</tabstop>
+  <tabstop>scrollArea_4</tabstop>
+  <tabstop>showVoronoiCells</tabstop>
  </tabstops>
  <resources/>
  <connections>
