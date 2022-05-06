@@ -2504,6 +2504,22 @@ void Control::on_newModelCheckBox_stateChanged(int i)
     }
     intrError->setText(QString("invalid"));
 }
+
+void Control::on_boardSizeX_valueChanged(int x)
+{
+    mMainWindow->getAutoCalib()->setBoardSizeX(x);
+}
+
+void Control::on_boardSizeY_valueChanged(int y)
+{
+    mMainWindow->getAutoCalib()->setBoardSizeY(y);
+}
+
+void Control::on_squareSize_valueChanged(double s)
+{
+    mMainWindow->getAutoCalib()->setSquareSize(s);
+}
+
 void Control::on_autoCalib_clicked()
 {
     mMainWindow->getAutoCalib()->autoCalib();
@@ -3470,17 +3486,15 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("BOARD_SIZE_X"))
                     {
-                        mMainWindow->getAutoCalib()->setBoardSizeX(subSubElem.attribute("BOARD_SIZE_X").toInt()); // 6
+                        boardSizeX->setValue(subSubElem.attribute("BOARD_SIZE_X").toInt());
                     }
                     if(subSubElem.hasAttribute("BOARD_SIZE_Y"))
                     {
-                        mMainWindow->getAutoCalib()->setBoardSizeY(
-                            subSubElem.attribute("BOARD_SIZE_Y").toInt()); // 8 oder 9
+                        boardSizeY->setValue(subSubElem.attribute("BOARD_SIZE_Y").toInt());
                     }
                     if(subSubElem.hasAttribute("SQUARE_SIZE"))
                     {
-                        mMainWindow->getAutoCalib()->setSquareSize(
-                            subSubElem.attribute("SQUARE_SIZE").toDouble()); // in cm
+                        squareSize->setValue(subSubElem.attribute("SQUARE_SIZE").toDouble());
                     }
                 }
                 else if(subSubElem.tagName() == "INTRINSIC_PARAMETERS")

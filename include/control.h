@@ -591,6 +591,12 @@ private slots:
     void setMoCapSize(int size);
     void toggleRecoROIButtons();
     void toggleTrackROIButtons();
+    void on_boardSizeX_valueChanged(int arg1);
+
+    void on_boardSizeY_valueChanged(int arg1);
+
+    void on_squareSize_valueChanged(double arg1);
+
 signals:
     void userChangedRecoMethod(reco::RecognitionMethod method);
 
