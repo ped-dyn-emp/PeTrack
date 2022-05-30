@@ -65,7 +65,7 @@ QRectF GridItem::boundingRect() const
 // event, of moving mouse while pressing a mouse button
 void GridItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(!mControlWidget->getCalibGridFix())
+    if(!mControlWidget->getCalibGridFix() && mControlWidget->getCalibGridShow())
     {
         setCursor(Qt::SizeBDiagCursor);
         QPointF diff = event->scenePos() -
@@ -118,7 +118,7 @@ void GridItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void GridItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(!mControlWidget->getCalibGridFix())
+    if(!mControlWidget->getCalibGridFix() && mControlWidget->getCalibGridShow())
     {
         if(event->button() == Qt::LeftButton)
         {
