@@ -173,6 +173,11 @@ Petrack::Petrack() :
     connect(mView, &GraphicsView::mouseMiddleDoubleClick, this, &Petrack::deleteTrackPointAll);
     connect(mView, &GraphicsView::mouseShiftWheel, this, &Petrack::skipToFrameWheel);
     connect(mView, &GraphicsView::mouseAltDoubleClick, this, &Petrack::skipToFrameFromTrajectory);
+    connect(mView, &GraphicsView::mouseAltMoved, this, &Petrack::moveTrackPoint);
+    connect(mView, &GraphicsView::mouseAltPressed, this, &Petrack::selectPersonForMoveTrackPoint);
+    connect(mView, &GraphicsView::altReleased, this, &Petrack::releaseTrackPoint);
+    connect(mView, &GraphicsView::mouseAltReleased, this, &Petrack::releaseTrackPoint);
+
 
     mPlayerWidget = new Player(mAnimation, this);
 
@@ -1619,7 +1624,9 @@ void Petrack::keyBindings()
         "<dt><kbd>Alt + double-click middle mouse button</kbd></dt><dd>deletes the future part of all trajectories</dd>"
         "<dt><kbd>Shift + t</kbd></dt><dd>toggles tracking online calculation</dd>"
         "<dt><kbd>Shift + double-click left mouse button</kbd></dt><dd>inserts new or moves near trackpoint and "
-        "enables showing only the modified trajectory</dd></dl>"
+        "enables showing only the modified trajectory</dd>"
+        "<dt><kbd>Alt + double-click left mouse button</kbd></dt><dd>jumps to frame of trackpoint under cursor</dd>"
+        "<dt><kbd>Alt + holding left mouse button</kbd></dt><dd>moves trackpoint under cursor</dd></dl>"
         "<p>Further key bindings you will find next to the entries of the menus.</p>");
 
     PMessageBox *mb = new PMessageBox(this, tr("Key Bindings"), out, QIcon());
@@ -4214,6 +4221,35 @@ void Petrack::deleteTrackPointInsideROI()
     updateControlWidget();
     mScene->update();
 }
+
+void Petrack::moveTrackPoint(QPointF pos)
+{
+    mManualTrackPointMover.moveTrackPoint(pos, mPersonStorage);
+    mScene->update();
+}
+
+void Petrack::selectPersonForMoveTrackPoint(QPointF pos)
+{
+    FrameRange range;
+    range.before  = mControlWidget->trackShowBefore->value();
+    range.after   = mControlWidget->trackShowAfter->value();
+    range.current = mPlayerWidget->getPos();
+    auto successfullySelected =
+        mManualTrackPointMover.selectTrackPoint(pos, mPersonStorage, getPedestrianUserSelection(), range);
+
+    if(successfullySelected)
+    {
+        setCursor(QCursor{Qt::CursorShape::DragMoveCursor});
+    }
+}
+
+void Petrack::releaseTrackPoint()
+{
+    mManualTrackPointMover.setTrackPoint();
+    mAutosave.trackPersonModified();
+    setCursor(QCursor{});
+}
+
 void Petrack::updateSourceInOutFrames()
 {
     mPlayerWidget->setFrameInNum(mAnimation->getSourceInFrameNum());
@@ -4232,8 +4268,9 @@ void Petrack::skipToFrameFromTrajectory(QPointF pos)
     const auto before    = mControlWidget->trackShowBefore->value();
     const auto after     = mControlWidget->trackShowAfter->value();
     const auto currFrame = mPlayerWidget->getPos();
+    FrameRange frameRange{before, after, currFrame};
 
-    auto res = mPersonStorage.getProximalPersons(pos, currFrame, peds, before, after);
+    auto res = mPersonStorage.getProximalPersons(pos, peds, frameRange);
 
     if(res.size() == 1)
     {
