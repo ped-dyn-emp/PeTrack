@@ -154,6 +154,16 @@ void GraphicsView::keyPressEvent(QKeyEvent *event)
     }
 }
 
+void GraphicsView::keyReleaseEvent(QKeyEvent *event)
+{
+    switch(event->key())
+    {
+        case Qt::Key_Alt:
+            emit altReleased();
+            break;
+    }
+}
+
 void GraphicsView::mousePressEvent(QMouseEvent *event)
 {
     if(event->modifiers() & Qt::ShiftModifier)
@@ -164,7 +174,33 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
     {
         emit colorSelected();
     }
+
+    if(event->modifiers().testFlag(Qt::AltModifier) && event->button() == Qt::LeftButton)
+    {
+        emit mouseAltPressed(mapToScene(event->pos()));
+    }
     QGraphicsView::mousePressEvent(event);
+}
+
+void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
+{
+    if(event->modifiers().testFlag(Qt::AltModifier))
+    {
+        emit mouseAltReleased(mapToScene(event->pos()));
+    }
+    QGraphicsView::mouseReleaseEvent(event);
+}
+
+void GraphicsView::mouseMoveEvent(QMouseEvent *event)
+{
+    if(event->modifiers().testFlag(Qt::AltModifier))
+    {
+        emit mouseAltMoved(mapToScene(event->pos()));
+    }
+    else
+    {
+        QGraphicsView::mouseMoveEvent(event);
+    }
 }
 
 //---------------------------------------------------------------------

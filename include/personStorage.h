@@ -21,6 +21,7 @@
 #ifndef PERSONSTORAGE_H
 #define PERSONSTORAGE_H
 
+#include "frameRange.h"
 #include "tracker.h"
 
 #include <vector>
@@ -56,6 +57,7 @@ public:
     bool editTrackPersonComment(const Vec2F &p, int frame, const QSet<int> &onlyVisible);
     bool setTrackPersonHeight(const Vec2F &p, int frame, const QSet<int> &onlyVisible);
     bool resetTrackPersonHeight(const Vec2F &p, int frame, QSet<int> onlyVisible);
+    void moveTrackPoint(int personID, int frame, const Vec2F &newPosition);
 
     size_t                          nbPersons() const { return mPersons.size(); }
     const TrackPerson              &at(size_t i) const { return mPersons.at(i); }
@@ -82,8 +84,8 @@ public:
     int  largestFirstFrame() const;
     int  largestLastFrame() const;
     int  smallestFirstFrame() const;
-    std::vector<PersonFrame>
-         getProximalPersons(const QPointF &pos, int frame, QSet<int> selected, int before, int after) const;
+    [[nodiscard]] std::vector<PersonFrame>
+         getProximalPersons(const QPointF &pos, QSet<int> selected, const FrameRange &frameRange) const;
     void recalcHeight(float altitude);
 
     void clear() { mPersons.clear(); }

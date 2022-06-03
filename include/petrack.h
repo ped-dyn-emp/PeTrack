@@ -39,6 +39,7 @@
 #include "brightContrastFilter.h"
 #include "coordItem.h"
 #include "extrCalibration.h"
+#include "manualTrackpointMover.h"
 #include "moCapController.h"
 #include "moCapPerson.h"
 #include "personStorage.h"
@@ -156,6 +157,9 @@ public slots:
     void deleteTrackPointAll(PersonStorage::Direction direction);
     void deleteTrackPointROI();
     void deleteTrackPointInsideROI();
+    void moveTrackPoint(QPointF pos);
+    void selectPersonForMoveTrackPoint(QPointF pos);
+    void releaseTrackPoint();
     //    void showContextMenu(QPointF pos);
     void updateSourceInOutFrames();
     void skipToFrameWheel(int delta);
@@ -496,6 +500,8 @@ private:
     TrackerReal  *mTrackerReal;
     double        mHeadSize;
     double        mCmPerPixel;
+
+    ManualTrackpointMover mManualTrackPointMover;
 
     double mShowFPS;
 

@@ -404,6 +404,25 @@ bool PersonStorage::resetTrackPersonHeight(const Vec2F &point, int frame, QSet<i
     return false;
 }
 
+void PersonStorage::moveTrackPoint(int personID, int frame, const Vec2F &newPosition)
+{
+    auto      &person = mPersons.at(personID);
+    TrackPoint newPoint;
+    newPoint = newPosition;
+    newPoint.setQual(100);
+    if(person.trackPointExist(frame))
+    {
+        int idx     = frame - person.firstFrame();
+        person[idx] = newPoint;
+    }
+    else
+    {
+        // only logging since this is a software bug, not a user bug; precondition of function not fulfilled
+        debout << "Warning: Trying to move nonexisting trackpoint of person " << personID << " at frame " << frame
+               << std::endl;
+    }
+}
+
 // used for calculation of 3D point for all points in frame
 // returns number of found points or -1 if no stereoContext available (also points without disp found are counted)
 int PersonStorage::calcPosition(int /*frame*/)
@@ -711,7 +730,7 @@ int PersonStorage::smallestFirstFrame() const
  * @return list of the id of all proximal persons with the frame at which they are nearest to pos
  */
 std::vector<PersonFrame>
-PersonStorage::getProximalPersons(const QPointF &pos, int frame, QSet<int> selected, int before, int after) const
+PersonStorage::getProximalPersons(const QPointF &pos, QSet<int> selected, const FrameRange &frameRange) const
 {
     std::vector<PersonFrame> result;
     for(int i = 0; i < static_cast<int>(mPersons.size()); ++i)
@@ -723,14 +742,14 @@ PersonStorage::getProximalPersons(const QPointF &pos, int frame, QSet<int> selec
 
         double minDist  = std::numeric_limits<double>::max();
         int    minFrame = -1;
-        for(int f = frame - before; f <= frame + after; ++f)
+        for(int f = frameRange.current - frameRange.before; f <= frameRange.current + frameRange.after; ++f)
         {
             if(!mPersons[i].trackPointExist(f))
             {
                 continue;
             }
             auto dist = mPersons[i].trackPointAt(f).distanceToPoint(pos);
-            if(dist < minDist && dist < (mMainWindow.getHeadSize(nullptr, i, frame) / 2.))
+            if(dist < minDist && dist < (mMainWindow.getHeadSize(nullptr, i, frameRange.current) / 2.))
             {
                 minDist  = dist;
                 minFrame = f;

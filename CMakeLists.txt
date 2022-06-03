@@ -377,6 +377,8 @@ target_sources(petrack_core PRIVATE
     include/moCapSelectionWidget.h
     include/personStorage.h
     include/autosave.h
+    include/manualTrackpointMover.h
+    include/frameRange.h
     )
 
 target_sources(petrack_core PRIVATE
@@ -437,6 +439,7 @@ target_sources(petrack_core PRIVATE
     src/moCapSelectionWidget.cpp
     src/personStorage.cpp
     src/autosave.cpp
+    src/manualTrackpointMover.cpp
     ui/about.ui
     ui/codeMarker.ui
     ui/colorMarker.ui
