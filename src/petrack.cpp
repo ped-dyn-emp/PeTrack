@@ -4288,6 +4288,7 @@ void Petrack::skipToFrameFromTrajectory(QPointF pos)
 void Petrack::setPeTrackVersion(const std::string &petrackVersion)
 {
     mPetrackVersion = QString::fromStdString(petrackVersion);
+    updateWindowTitle();
 }
 
 void Petrack::setGitInformation(
