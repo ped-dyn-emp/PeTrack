@@ -5103,33 +5103,7 @@
              <property name="spacing">
               <number>2</number>
              </property>
-             <item row="1" column="0">
-              <widget class="QPushButton" name="trackExport">
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>export</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QPushButton" name="trackCalc">
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>calculate all</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
+             <item row="2" column="1">
               <widget class="QPushButton" name="trackImport">
                <property name="maximumSize">
                 <size>
@@ -5154,6 +5128,45 @@
                 <string>reset</string>
                </property>
               </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QPushButton" name="trackCalc">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>calculate all</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QPushButton" name="trackExport">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>export</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <spacer name="verticalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
            </item>
@@ -7880,99 +7893,12 @@
   <tabstop>squareSize</tabstop>
   <tabstop>autoCalib</tabstop>
   <tabstop>calibFiles</tabstop>
-  <tabstop>recoColorY</tabstop>
-  <tabstop>mapNr</tabstop>
-  <tabstop>mapColor</tabstop>
-  <tabstop>mapHeight</tabstop>
-  <tabstop>mapAdd</tabstop>
-  <tabstop>mapDel</tabstop>
-  <tabstop>mapDefaultHeight</tabstop>
-  <tabstop>mapDistribution</tabstop>
-  <tabstop>mapResetHeight</tabstop>
-  <tabstop>mapResetPos</tabstop>
-  <tabstop>performRecognition</tabstop>
-  <tabstop>recoStep</tabstop>
-  <tabstop>recoMethod</tabstop>
-  <tabstop>recoStereoShow</tabstop>
-  <tabstop>trackOnlineCalc</tabstop>
-  <tabstop>trackRepeat</tabstop>
-  <tabstop>trackRepeatQual</tabstop>
-  <tabstop>trackExtrapolation</tabstop>
-  <tabstop>trackMerge</tabstop>
-  <tabstop>trackOnlySelected</tabstop>
-  <tabstop>trackExport</tabstop>
-  <tabstop>trackCalc</tabstop>
-  <tabstop>trackImport</tabstop>
-  <tabstop>trackReset</tabstop>
-  <tabstop>trackMissingFrames</tabstop>
-  <tabstop>trackRecalcHeight</tabstop>
-  <tabstop>trackAlternateHeight</tabstop>
-  <tabstop>exportElimTp</tabstop>
-  <tabstop>exportElimTrj</tabstop>
-  <tabstop>exportSmooth</tabstop>
-  <tabstop>trackTest</tabstop>
-  <tabstop>testEqual</tabstop>
-  <tabstop>testVelocity</tabstop>
-  <tabstop>testInside</tabstop>
-  <tabstop>testLength</tabstop>
-  <tabstop>trackShow</tabstop>
-  <tabstop>trackFix</tabstop>
-  <tabstop>trackShowOnlyVisible</tabstop>
-  <tabstop>trackShowOnly</tabstop>
-  <tabstop>trackGotoNr</tabstop>
-  <tabstop>trackPathWidth</tabstop>
-  <tabstop>trackShowPoints</tabstop>
-  <tabstop>trackShowPointsColored</tabstop>
-  <tabstop>trackColorMarkerSize</tabstop>
-  <tabstop>trackPointSize</tabstop>
-  <tabstop>trackShowPath</tabstop>
-  <tabstop>trackCurrentPointSize</tabstop>
-  <tabstop>trackColColorSize</tabstop>
-  <tabstop>trackShowCurrentPoint</tabstop>
-  <tabstop>trackShowColColor</tabstop>
-  <tabstop>trackShowColorMarker</tabstop>
-  <tabstop>trackShowNumber</tabstop>
-  <tabstop>trackNumberSize</tabstop>
-  <tabstop>trackNumberBold</tabstop>
-  <tabstop>trackHeadSized</tabstop>
-  <tabstop>trackShowHeightIndividual</tabstop>
-  <tabstop>trackShowAfter</tabstop>
-  <tabstop>trackShowBefore</tabstop>
-  <tabstop>anaStep</tabstop>
-  <tabstop>anaMarkAct</tabstop>
-  <tabstop>anaCalculate</tabstop>
-  <tabstop>anaMissingFrames</tabstop>
-  <tabstop>anaConsiderX</tabstop>
-  <tabstop>anaConsiderY</tabstop>
-  <tabstop>anaConsiderAbs</tabstop>
-  <tabstop>anaConsiderRev</tabstop>
-  <tabstop>tabs</tabstop>
-  <tabstop>scrollArea</tabstop>
-  <tabstop>coordUseIntrinsic</tabstop>
-  <tabstop>coordRotate_spin</tabstop>
-  <tabstop>gridScale_spin</tabstop>
-  <tabstop>gridTransX_spin</tabstop>
-  <tabstop>coordTransX_spin</tabstop>
-  <tabstop>recoColorX</tabstop>
-  <tabstop>coordScale_spin</tabstop>
-  <tabstop>recoAutoWB</tabstop>
-  <tabstop>gridRot_spin</tabstop>
-  <tabstop>coordTransY_spin</tabstop>
-  <tabstop>gridTransY_spin</tabstop>
-  <tabstop>coordAltitude</tabstop>
-  <tabstop>coordUnit</tabstop>
-  <tabstop>markerIgnoreWithout</tabstop>
-  <tabstop>roiShow</tabstop>
-  <tabstop>roiFix</tabstop>
-  <tabstop>recoColorModel</tabstop>
-  <tabstop>recoShowColor</tabstop>
-  <tabstop>recoOptimizeColor</tabstop>
-  <tabstop>trans1</tabstop>
   <tabstop>rot1</tabstop>
+  <tabstop>rot2</tabstop>
+  <tabstop>rot3</tabstop>
+  <tabstop>trans1</tabstop>
   <tabstop>trans2</tabstop>
   <tabstop>trans3</tabstop>
-  <tabstop>rot3</tabstop>
-  <tabstop>rot2</tabstop>
   <tabstop>coordLoad3DCalibPoints</tabstop>
   <tabstop>extrCalibFetch</tabstop>
   <tabstop>extrCalibSave</tabstop>
@@ -7982,8 +7908,8 @@
   <tabstop>coordFix</tabstop>
   <tabstop>coordTab</tabstop>
   <tabstop>coord3DTransX_spin</tabstop>
-  <tabstop>coord3DTransZ_spin</tabstop>
   <tabstop>coord3DTransY_spin</tabstop>
+  <tabstop>coord3DTransZ_spin</tabstop>
   <tabstop>coord3DAxeLen_spin</tabstop>
   <tabstop>coord3DSwapX</tabstop>
   <tabstop>coord3DSwapY</tabstop>
@@ -7997,42 +7923,129 @@
   <tabstop>grid3DTransY_spin</tabstop>
   <tabstop>grid3DTransZ_spin</tabstop>
   <tabstop>grid3DResolution_spin</tabstop>
-  <tabstop>scrollArea_2</tabstop>
+  <tabstop>performRecognition</tabstop>
+  <tabstop>recoStep</tabstop>
+  <tabstop>recoMethod</tabstop>
+  <tabstop>recoStereoShow</tabstop>
+  <tabstop>roiShow</tabstop>
+  <tabstop>roiFix</tabstop>
   <tabstop>recoRoiToFullImageSize</tabstop>
   <tabstop>recoRoiAdjustAutomatically</tabstop>
+  <tabstop>markerIgnoreWithout</tabstop>
+  <tabstop>recoShowColor</tabstop>
+  <tabstop>recoOptimizeColor</tabstop>
+  <tabstop>recoColorModel</tabstop>
+  <tabstop>recoAutoWB</tabstop>
+  <tabstop>recoColorX</tabstop>
+  <tabstop>recoColorY</tabstop>
+  <tabstop>mapNr</tabstop>
+  <tabstop>mapColor</tabstop>
+  <tabstop>mapHeight</tabstop>
+  <tabstop>mapAdd</tabstop>
+  <tabstop>mapDel</tabstop>
   <tabstop>mapColorRange</tabstop>
   <tabstop>colorPickerButton</tabstop>
+  <tabstop>mapDefaultHeight</tabstop>
+  <tabstop>mapDistribution</tabstop>
+  <tabstop>mapResetHeight</tabstop>
+  <tabstop>mapResetPos</tabstop>
   <tabstop>mapReadHeights</tabstop>
   <tabstop>mapReadMarkerID</tabstop>
-  <tabstop>scrollArea_3</tabstop>
+  <tabstop>trackOnlineCalc</tabstop>
+  <tabstop>trackRepeat</tabstop>
+  <tabstop>trackRepeatQual</tabstop>
+  <tabstop>trackExtrapolation</tabstop>
+  <tabstop>trackMerge</tabstop>
+  <tabstop>trackOnlySelected</tabstop>
+  <tabstop>trackCalc</tabstop>
+  <tabstop>trackReset</tabstop>
+  <tabstop>trackExport</tabstop>
+  <tabstop>trackImport</tabstop>
   <tabstop>trackRoiShow</tabstop>
   <tabstop>trackRoiFix</tabstop>
   <tabstop>trackRoiToFullImageSize</tabstop>
   <tabstop>trackRoiAdjustAutomatically</tabstop>
+  <tabstop>trackMissingFrames</tabstop>
+  <tabstop>trackRecalcHeight</tabstop>
+  <tabstop>trackAlternateHeight</tabstop>
+  <tabstop>exportElimTp</tabstop>
+  <tabstop>exportElimTrj</tabstop>
+  <tabstop>exportSmooth</tabstop>
   <tabstop>exportViewDir</tabstop>
   <tabstop>exportAngleOfView</tabstop>
   <tabstop>exportUseM</tabstop>
   <tabstop>exportComment</tabstop>
   <tabstop>exportMarkerID</tabstop>
+  <tabstop>trackTest</tabstop>
+  <tabstop>testEqual</tabstop>
+  <tabstop>testVelocity</tabstop>
+  <tabstop>testInside</tabstop>
+  <tabstop>testLength</tabstop>
   <tabstop>trackShowSearchSize</tabstop>
   <tabstop>adaptiveLevel</tabstop>
+  <tabstop>trackShow</tabstop>
+  <tabstop>trackFix</tabstop>
+  <tabstop>trackShowOnlyVisible</tabstop>
+  <tabstop>trackShowOnly</tabstop>
   <tabstop>trackShowOnlyNr</tabstop>
+  <tabstop>trackGotoNr</tabstop>
   <tabstop>trackGotoStartNr</tabstop>
   <tabstop>trackGotoEndNr</tabstop>
   <tabstop>trackShowOnlyList</tabstop>
   <tabstop>trackShowOnlyNrList</tabstop>
   <tabstop>trackShowOnlyListButton</tabstop>
+  <tabstop>trackShowCurrentPoint</tabstop>
+  <tabstop>trackCurrentPointSize</tabstop>
+  <tabstop>trackHeadSized</tabstop>
+  <tabstop>trackShowPoints</tabstop>
+  <tabstop>trackPointSize</tabstop>
+  <tabstop>trackShowPointsColored</tabstop>
+  <tabstop>trackShowPath</tabstop>
+  <tabstop>trackPathWidth</tabstop>
   <tabstop>trackPathColorButton</tabstop>
+  <tabstop>trackShowColColor</tabstop>
+  <tabstop>trackColColorSize</tabstop>
+  <tabstop>trackShowHeightIndividual</tabstop>
+  <tabstop>trackShowColorMarker</tabstop>
+  <tabstop>trackColorMarkerSize</tabstop>
+  <tabstop>trackShowNumber</tabstop>
+  <tabstop>trackNumberSize</tabstop>
+  <tabstop>trackNumberBold</tabstop>
   <tabstop>trackShowGroundPosition</tabstop>
   <tabstop>trackGroundPositionSize</tabstop>
   <tabstop>trackShowGroundPath</tabstop>
   <tabstop>trackGroundPathSize</tabstop>
   <tabstop>trackGroundPathColorButton</tabstop>
+  <tabstop>trackShowBefore</tabstop>
+  <tabstop>trackShowAfter</tabstop>
   <tabstop>showMoCap</tabstop>
   <tabstop>moCapSize</tabstop>
   <tabstop>moCapColorButton</tabstop>
-  <tabstop>scrollArea_4</tabstop>
+  <tabstop>anaCalculate</tabstop>
+  <tabstop>anaMissingFrames</tabstop>
+  <tabstop>anaStep</tabstop>
+  <tabstop>anaMarkAct</tabstop>
+  <tabstop>anaConsiderX</tabstop>
+  <tabstop>anaConsiderY</tabstop>
+  <tabstop>anaConsiderAbs</tabstop>
+  <tabstop>anaConsiderRev</tabstop>
   <tabstop>showVoronoiCells</tabstop>
+  <tabstop>scrollArea_3</tabstop>
+  <tabstop>tabs</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>coordScale_spin</tabstop>
+  <tabstop>coordUnit</tabstop>
+  <tabstop>coordTransX_spin</tabstop>
+  <tabstop>gridTransY_spin</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>coordTransY_spin</tabstop>
+  <tabstop>gridRot_spin</tabstop>
+  <tabstop>coordAltitude</tabstop>
+  <tabstop>coordUseIntrinsic</tabstop>
+  <tabstop>coordRotate_spin</tabstop>
+  <tabstop>gridScale_spin</tabstop>
+  <tabstop>scrollArea_4</tabstop>
+  <tabstop>gridTransX_spin</tabstop>
  </tabstops>
  <resources/>
  <connections>

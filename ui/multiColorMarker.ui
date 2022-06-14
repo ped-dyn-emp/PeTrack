@@ -392,6 +392,28 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>useDot</tabstop>
+  <tabstop>dotSize</tabstop>
+  <tabstop>useCodeMarker</tabstop>
+  <tabstop>CodeMarkerParameter</tabstop>
+  <tabstop>ignoreWithoutDot</tabstop>
+  <tabstop>useColor</tabstop>
+  <tabstop>restrictPosition</tabstop>
+  <tabstop>autoCorrect</tabstop>
+  <tabstop>autoCorrectOnlyExport</tabstop>
+  <tabstop>showMask</tabstop>
+  <tabstop>closeRadius</tabstop>
+  <tabstop>useClose</tabstop>
+  <tabstop>openRadius</tabstop>
+  <tabstop>useOpen</tabstop>
+  <tabstop>minArea</tabstop>
+  <tabstop>maxArea</tabstop>
+  <tabstop>useHeadSize</tabstop>
+  <tabstop>maxRatio</tabstop>
+  <tabstop>opacity</tabstop>
+  <tabstop>maskMask</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -482,6 +482,31 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>dictList</tabstop>
+  <tabstop>showDetectedCandidates</tabstop>
+  <tabstop>adaptiveThreshWinSizeMin</tabstop>
+  <tabstop>adaptiveThreshWinSizeMax</tabstop>
+  <tabstop>adaptiveThreshWinSizeStep</tabstop>
+  <tabstop>adaptiveThreshConstant</tabstop>
+  <tabstop>minMarkerPerimeter</tabstop>
+  <tabstop>maxMarkerPerimeter</tabstop>
+  <tabstop>polygonalApproxAccuracyRate</tabstop>
+  <tabstop>minCornerDistance</tabstop>
+  <tabstop>minDistanceToBorder</tabstop>
+  <tabstop>minMarkerDistance</tabstop>
+  <tabstop>doCornerRefinement</tabstop>
+  <tabstop>cornerRefinementWinSize</tabstop>
+  <tabstop>cornerRefinementMaxIterations</tabstop>
+  <tabstop>cornerRefinementMinAccuracy</tabstop>
+  <tabstop>markerBorderBits</tabstop>
+  <tabstop>perspectiveRemovePixelPerCell</tabstop>
+  <tabstop>perspectiveRemoveIgnoredMarginPerCell</tabstop>
+  <tabstop>maxErroneousBitsInBorderRate</tabstop>
+  <tabstop>minOtsuStdDev</tabstop>
+  <tabstop>errorCorrectionRate</tabstop>
+  <tabstop>moreInfosButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
