@@ -233,6 +233,21 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>fromColor</tabstop>
+  <tabstop>toColor</tabstop>
+  <tabstop>inversHue</tabstop>
+  <tabstop>showMask</tabstop>
+  <tabstop>closeRadius</tabstop>
+  <tabstop>useClose</tabstop>
+  <tabstop>openRadius</tabstop>
+  <tabstop>useOpen</tabstop>
+  <tabstop>minArea</tabstop>
+  <tabstop>maxArea</tabstop>
+  <tabstop>maxRatio</tabstop>
+  <tabstop>opacity</tabstop>
+  <tabstop>maskMask</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

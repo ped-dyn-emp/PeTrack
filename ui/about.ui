@@ -296,9 +296,7 @@
            </sizepolicy>
           </property>
           <property name="font">
-           <font>
-            <family>Monospace</family>
-           </font>
+           <font/>
           </property>
           <property name="readOnly">
            <bool>true</bool>
@@ -339,9 +337,7 @@
            </sizepolicy>
           </property>
           <property name="font">
-           <font>
-            <family>Monospace</family>
-           </font>
+           <font/>
           </property>
           <property name="readOnly">
            <bool>true</bool>
@@ -382,6 +378,10 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>plainTextEdit</tabstop>
+  <tabstop>plainTextEdit_2</tabstop>
+ </tabstops>
  <resources>
   <include location="../icons/icons.qrc"/>
  </resources>

@@ -241,6 +241,24 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>stereoShowDisparity</tabstop>
+  <tabstop>stereoColor</tabstop>
+  <tabstop>stereoUseForReco</tabstop>
+  <tabstop>stereoDispAlgo</tabstop>
+  <tabstop>stereoUseForHeight</tabstop>
+  <tabstop>stereoUseForHeightEver</tabstop>
+  <tabstop>stereoUseForExport</tabstop>
+  <tabstop>stereoUseCalibrationCenter</tabstop>
+  <tabstop>stereoMaskSize</tabstop>
+  <tabstop>edgeMaskSize</tabstop>
+  <tabstop>useEdge</tabstop>
+  <tabstop>maxDisparity</tabstop>
+  <tabstop>minDisparity</tabstop>
+  <tabstop>opacity</tabstop>
+  <tabstop>hideWrong</tabstop>
+  <tabstop>stereoExport</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
