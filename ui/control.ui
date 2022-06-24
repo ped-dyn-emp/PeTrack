@@ -135,9 +135,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-411</y>
-            <width>465</width>
-            <height>1363</height>
+            <y>-414</y>
+            <width>476</width>
+            <height>1394</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1186,7 +1186,7 @@
                 <item row="3" column="2">
                  <widget class="QSpinBox" name="boardSizeX">
                   <property name="toolTip">
-                   <string>Number of squares in a row</string>
+                   <string>Number of inner corners in a row</string>
                   </property>
                   <property name="value">
                    <number>6</number>
@@ -1196,7 +1196,7 @@
                 <item row="3" column="4">
                  <widget class="QSpinBox" name="boardSizeY">
                   <property name="toolTip">
-                   <string>Number of squares in a column</string>
+                   <string>Number of inner corners in a column</string>
                   </property>
                   <property name="value">
                    <number>8</number>
@@ -3512,7 +3512,7 @@
             <x>0</x>
             <y>0</y>
             <width>465</width>
-            <height>974</height>
+            <height>993</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -3652,6 +3652,7 @@
                 <widget class="QLabel" name="recoNumberNow">
                  <property name="font">
                   <font>
+                   <weight>75</weight>
                    <bold>true</bold>
                   </font>
                  </property>
@@ -4800,7 +4801,7 @@
             <x>0</x>
             <y>0</y>
             <width>465</width>
-            <height>1170</height>
+            <height>1247</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -4993,6 +4994,7 @@
               <widget class="QLabel" name="trackNumberNow">
                <property name="font">
                 <font>
+                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -5033,6 +5035,7 @@
               <widget class="QLabel" name="trackNumberVisible">
                <property name="font">
                 <font>
+                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -5048,6 +5051,7 @@
               <widget class="QLabel" name="trackNumberAll">
                <property name="font">
                 <font>
+                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -7666,7 +7670,7 @@
             <x>0</x>
             <y>0</y>
             <width>479</width>
-            <height>554</height>
+            <height>553</height>
            </rect>
           </property>
           <property name="sizePolicy">
