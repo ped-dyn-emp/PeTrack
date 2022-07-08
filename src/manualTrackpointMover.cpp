@@ -25,7 +25,7 @@
 bool ManualTrackpointMover::selectTrackPoint(
     const QPointF       &pos,
     const PersonStorage &personStore,
-    const QSet<int>     &peds,
+    const QSet<size_t>  &peds,
     const FrameRange    &range)
 {
     auto res = personStore.getProximalPersons(pos, peds, range);

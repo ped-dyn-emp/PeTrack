@@ -160,7 +160,7 @@ int TrackerReal::calculate(
                 missingFrames.begin(),
                 missingFrames.end(),
                 std::back_inserter(missingList),
-                [](auto const &missingFrame) { return missingFrame.mNumber; });
+                [](auto const &missingFrame) { return static_cast<int>(missingFrame.mNumber); });
             std::transform(
                 missingFrames.begin(),
                 missingFrames.end(),
@@ -819,7 +819,7 @@ std::vector<MissingFrame> TrackerReal::computeDroppedFrames(Petrack *petrack)
         for(int frame = person.firstFrame(); frame <= std::min(person.lastFrame(), maxFrame); ++frame)
         {
             personsInFrame[frame].push_back(person.trackPointAt(frame).toPoint2f());
-            idsInFrame[frame].push_back(i);
+            idsInFrame[frame].push_back(static_cast<int>(i));
         }
     }
 

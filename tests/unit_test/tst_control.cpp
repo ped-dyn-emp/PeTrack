@@ -314,15 +314,15 @@ SCENARIO("Change the show only people list", "[ui][config][tracking][path]")
 
         WHEN("Enter valid filter (single values)")
         {
-            QSet<int> enteredIDs{1, 4, 6, 7};
-            QSet<int> expectedIDs;
+            QSet<size_t> enteredIDs{1, 4, 6, 7};
+            QSet<size_t> expectedIDs;
             for(auto id : enteredIDs)
             {
                 expectedIDs.insert(id - 1);
             }
 
             std::stringstream input;
-            std::copy(enteredIDs.begin(), enteredIDs.end(), std::ostream_iterator<int>(input, ","));
+            std::copy(enteredIDs.begin(), enteredIDs.end(), std::ostream_iterator<size_t>(input, ","));
 
             QTest::keyClicks(control->trackShowOnlyNrList, input.str().c_str(), Qt::NoModifier, 50);
             auto receivedIDs = pet.getPedestrianUserSelection();
@@ -336,8 +336,8 @@ SCENARIO("Change the show only people list", "[ui][config][tracking][path]")
 
         WHEN("Enter valid filter (range)")
         {
-            QSet<int> enteredIDs{1, 2, 3, 4};
-            QSet<int> expectedIDs;
+            QSet<size_t> enteredIDs{1, 2, 3, 4};
+            QSet<size_t> expectedIDs;
             for(auto id : enteredIDs)
             {
                 expectedIDs.insert(id - 1);
@@ -345,7 +345,7 @@ SCENARIO("Change the show only people list", "[ui][config][tracking][path]")
 
             QString input("1-4");
 
-            QSet<int> receivedIDs;
+            QSet<size_t> receivedIDs;
             QTest::keyClicks(control->trackShowOnlyNrList, input, Qt::NoModifier, 50);
             receivedIDs = pet.getPedestrianUserSelection();
 
@@ -378,7 +378,7 @@ SCENARIO("Change the show only people list", "[ui][config][tracking][path]")
                 {
                     QTest::keyClick(control->trackShowOnlyNrList, character, Qt::NoModifier, 10);
 
-                    QSet<int> receivedIDs = pet.getPedestrianUserSelection();
+                    QSet<size_t> receivedIDs = pet.getPedestrianUserSelection();
                     if(receivedIDs.isEmpty())
                     {
                         REQUIRE(control->trackShowOnlyNrList->styleSheet().contains("border: 1px solid red"));

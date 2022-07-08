@@ -242,13 +242,13 @@ public:
     void resize(cv::Size size);
 
     size_t calcPrevFeaturePoints(
-        int       prevFrame,
-        cv::Rect &rect,
-        int       frame,
-        bool      reTrack,
-        int       reQual,
-        int       borderSize,
-        QSet<int> onlyVisible);
+        int          prevFrame,
+        cv::Rect    &rect,
+        int          frame,
+        bool         reTrack,
+        int          reQual,
+        int          borderSize,
+        QSet<size_t> onlyVisible);
 
     int insertFeaturePoints(int frame, size_t count, cv::Mat &img, int borderSize, float errorScale);
 
@@ -262,7 +262,7 @@ public:
         int                     borderSize,
         reco::RecognitionMethod recoMethod,
         int                     level              = 3,
-        QSet<int>               onlyVisible        = QSet<int>(),
+        QSet<size_t>            onlyVisible        = QSet<size_t>(),
         int                     errorScaleExponent = 0);
 
 private:

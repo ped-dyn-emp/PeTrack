@@ -48,15 +48,15 @@ public:
     explicit PersonStorage(Petrack &mainWindow, Autosave &autosave) : mMainWindow(mainWindow), mAutosave(autosave) {}
 
     void splitPerson(size_t pers, int frame);
-    bool splitPersonAt(const Vec2F &p, int frame, const QSet<int> &onlyVisible);
+    bool splitPersonAt(const Vec2F &p, int frame, const QSet<size_t> &onlyVisible);
     bool delPointOf(int pers, int direction, int frame);
-    bool delPoint(const Vec2F &p, int direction, int frame, const QSet<int> &onlyVisible);
+    bool delPoint(const Vec2F &p, int direction, int frame, const QSet<size_t> &onlyVisible);
     void delPointAll(Direction direction, int frame);
     void delPointROI();
     void delPointInsideROI();
-    bool editTrackPersonComment(const Vec2F &p, int frame, const QSet<int> &onlyVisible);
-    bool setTrackPersonHeight(const Vec2F &p, int frame, const QSet<int> &onlyVisible);
-    bool resetTrackPersonHeight(const Vec2F &p, int frame, QSet<int> onlyVisible);
+    bool editTrackPersonComment(const Vec2F &p, int frame, const QSet<size_t> &onlyVisible);
+    bool setTrackPersonHeight(const Vec2F &p, int frame, const QSet<size_t> &onlyVisible);
+    bool resetTrackPersonHeight(const Vec2F &p, int frame, const QSet<size_t> &onlyVisible);
     void moveTrackPoint(int personID, int frame, const Vec2F &newPosition);
 
     size_t                          nbPersons() const { return mPersons.size(); }
@@ -74,7 +74,7 @@ public:
     bool addPoint(
         TrackPoint             &p,
         int                     frame,
-        const QSet<int>        &onlyVisible,
+        const QSet<size_t>     &onlyVisible,
         reco::RecognitionMethod method,
         int                    *pers = nullptr);
 
@@ -84,8 +84,9 @@ public:
     int  largestFirstFrame() const;
     int  largestLastFrame() const;
     int  smallestFirstFrame() const;
-    [[nodiscard]] std::vector<PersonFrame>
-         getProximalPersons(const QPointF &pos, QSet<int> selected, const FrameRange &frameRange) const;
+    std::vector<PersonFrame>
+    getProximalPersons(const QPointF &pos, QSet<size_t> selected, const FrameRange &frameRange) const;
+
     void recalcHeight(float altitude);
 
     void clear() { mPersons.clear(); }
@@ -123,7 +124,7 @@ public:
     // rueckgabewert false wenn keine hoeheninformationen in tracker datensatz vorliegt
     bool printHeightDistribution();
     void setMarkerHeights(const std::unordered_map<int, float> &heights);
-    void setMarkerID(int personIndex, int markerIDs, bool manual = false);
+    void setMarkerID(size_t personIndex, int markerIDs, bool manual = false);
     void setMarkerIDs(const std::unordered_map<int, int> &markerIDs);
     void purge(int frame);
 

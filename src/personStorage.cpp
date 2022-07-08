@@ -66,14 +66,15 @@ void PersonStorage::splitPerson(size_t pers, int frame)
  * @param onlyVisible set of people for whom to do it (empty means everyone)
  * @return true if a trajectory was split
  */
-bool PersonStorage::splitPersonAt(const Vec2F &point, int frame, const QSet<int> &onlyVisible)
+bool PersonStorage::splitPersonAt(const Vec2F &point, int frame, const QSet<size_t> &onlyVisible)
 {
     mAutosave.trackPersonModified();
     for(size_t i = 0; i < mPersons.size(); ++i)
     { // ueber TrackPerson
         if(((onlyVisible.empty()) || (onlyVisible.contains(i))) &&
-           (mPersons.at(i).trackPointExist(frame) && (mPersons.at(i).trackPointAt(frame).distanceToPoint(point) <
-                                                      mMainWindow.getHeadSize(nullptr, i, frame) / 2.)))
+           (mPersons.at(i).trackPointExist(frame) &&
+            (mPersons.at(i).trackPointAt(frame).distanceToPoint(point) <
+             mMainWindow.getHeadSize(nullptr, static_cast<int>(i), frame) / 2.)))
         {
             splitPerson(i, frame);
 
@@ -127,7 +128,7 @@ bool PersonStorage::delPointOf(int pers, int direction, int frame)
  * @param onlyVisible set of people whose points could be deleted; empty means everyone
  * @return true if deletion occured
  */
-bool PersonStorage::delPoint(const Vec2F &point, int direction, int frame, const QSet<int> &onlyVisible)
+bool PersonStorage::delPoint(const Vec2F &point, int direction, int frame, const QSet<size_t> &onlyVisible)
 {
     mAutosave.trackPersonModified();
     for(int i = 0; i < static_cast<int>(mPersons.size()); ++i)
@@ -264,7 +265,7 @@ void PersonStorage::delPointROI()
  * @param onlyVisible list of visible persons
  * @return if a comment has been saved
  */
-bool PersonStorage::editTrackPersonComment(const Vec2F &point, int frame, const QSet<int> &onlyVisible)
+bool PersonStorage::editTrackPersonComment(const Vec2F &point, int frame, const QSet<size_t> &onlyVisible)
 {
     mAutosave.trackPersonModified();
     for(int i = 0; i < static_cast<int>(mPersons.size()); ++i) // ueber TrackPerson
@@ -319,7 +320,7 @@ bool PersonStorage::editTrackPersonComment(const Vec2F &point, int frame, const 
  * @param onlyVisible Set of people which could be selected (empty means everyone can be selected)
  * @return whether the height of a TrackPerson was successfully changed
  */
-bool PersonStorage::setTrackPersonHeight(const Vec2F &point, int frame, const QSet<int> &onlyVisible)
+bool PersonStorage::setTrackPersonHeight(const Vec2F &point, int frame, const QSet<size_t> &onlyVisible)
 {
     mAutosave.trackPersonModified();
     for(int i = 0; i < static_cast<int>(mPersons.size()); ++i) // ueber TrackPerson
@@ -387,7 +388,7 @@ bool PersonStorage::setTrackPersonHeight(const Vec2F &point, int frame, const QS
  * @param onlyVisible Set of people which could be selected (empty means everyone can be selected)
  * @return true if height was successfully reset
  */
-bool PersonStorage::resetTrackPersonHeight(const Vec2F &point, int frame, QSet<int> onlyVisible)
+bool PersonStorage::resetTrackPersonHeight(const Vec2F &point, int frame, const QSet<size_t> &onlyVisible)
 {
     mAutosave.trackPersonModified();
     for(int i = 0; i < static_cast<int>(mPersons.size()); ++i) // ueber TrackPerson
@@ -498,7 +499,7 @@ int PersonStorage::calcPosition(int /*frame*/)
 bool PersonStorage::addPoint(
     TrackPoint             &point,
     int                     frame,
-    const QSet<int>        &onlyVisible,
+    const QSet<size_t>     &onlyVisible,
     reco::RecognitionMethod method,
     int                    *pers)
 {
@@ -667,7 +668,7 @@ void PersonStorage::addPoints(QList<TrackPoint> &pL, int frame, reco::Recognitio
     // ueberprufen ob identisch mit einem Punkt in liste
     for(auto &point : pL) // ueber PointList
     {
-        addPoint(point, frame, QSet<int>(), method);
+        addPoint(point, frame, QSet<size_t>(), method);
     }
 }
 
@@ -730,7 +731,7 @@ int PersonStorage::smallestFirstFrame() const
  * @return list of the id of all proximal persons with the frame at which they are nearest to pos
  */
 std::vector<PersonFrame>
-PersonStorage::getProximalPersons(const QPointF &pos, QSet<int> selected, const FrameRange &frameRange) const
+PersonStorage::getProximalPersons(const QPointF &pos, QSet<size_t> selected, const FrameRange &frameRange) const
 {
     std::vector<PersonFrame> result;
     for(int i = 0; i < static_cast<int>(mPersons.size()); ++i)
@@ -1110,7 +1111,7 @@ void PersonStorage::setMarkerHeights(const std::unordered_map<int, float> &heigh
  * @param personIndex internal id of persons (0 based)
  * @param markerIDs new marker ID
  */
-void PersonStorage::setMarkerID(int personIndex, int markerID, bool manual)
+void PersonStorage::setMarkerID(size_t personIndex, int markerID, bool manual)
 {
     if(manual)
     {

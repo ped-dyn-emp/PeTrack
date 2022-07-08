@@ -47,8 +47,8 @@ AboutDialog::AboutDialog(
 
     for(std::size_t i = 0; i < authors.size(); ++i)
     {
-        int   row   = i / 2ul;
-        int   col   = i % 2ul;
+        int   row   = static_cast<int>(i / 2ul);
+        int   col   = static_cast<int>(i % 2ul);
         auto *label = new QLabel();
         label->setText(QString::fromStdString(authors[i]));
         mUi->lytAuthors->addWidget(label, row, col, 1, 1);
