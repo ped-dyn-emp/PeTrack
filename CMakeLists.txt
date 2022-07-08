@@ -132,6 +132,8 @@ endif()
 set(DUMMY ${BUILD_SHARED_LIBS})
 set(BUILD_SHARED_LIBS FALSE CACHE BOOL "Choose if build should be a dynamic or static library")
 add_subdirectory(ezc3d/ EXCLUDE_FROM_ALL)
+# disbale warnings for ezc3d on MSVC
+target_compile_options(ezc3d PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/w>)
 set(BUILD_SHARED_LIBS ${DUMMY})
 
 # if win32 and mingw use in 3rd party

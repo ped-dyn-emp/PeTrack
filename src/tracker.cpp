@@ -669,13 +669,13 @@ void Tracker::resize(cv::Size size)
  * @return number of feature points
  */
 size_t Tracker::calcPrevFeaturePoints(
-    int       prevFrame,
-    cv::Rect &rect,
-    int       frame,
-    bool      reTrack,
-    int       reQual,
-    int       borderSize,
-    QSet<int> onlyVisible)
+    int          prevFrame,
+    cv::Rect    &rect,
+    int          frame,
+    bool         reTrack,
+    int          reQual,
+    int          borderSize,
+    QSet<size_t> onlyVisible)
 {
     int j = -1;
 
@@ -960,7 +960,7 @@ int Tracker::track(
     int                     borderSize,
     reco::RecognitionMethod recoMethod,
     int                     level,
-    QSet<int>               onlyVisible,
+    QSet<size_t>            onlyVisible,
     int                     errorScaleExponent)
 {
     QList<int> trjToDel;

@@ -30,7 +30,7 @@ public:
     bool selectTrackPoint(
         const QPointF       &pos,
         const PersonStorage &personStore,
-        const QSet<int>     &peds,
+        const QSet<size_t>  &peds,
         const FrameRange    &range);
     void moveTrackPoint(const QPointF &pos, PersonStorage &personStore) const;
     void setTrackPoint();

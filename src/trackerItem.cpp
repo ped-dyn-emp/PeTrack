@@ -76,8 +76,8 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         int   iNearest = -1;
         float dist, minDist = 1000000.;
 
-        QSet<int> onlyVisible = mMainWindow->getPedestrianUserSelection();
-        int       frame       = mMainWindow->getAnimation()->getCurrentFrameNum();
+        QSet<size_t> onlyVisible = mMainWindow->getPedestrianUserSelection();
+        int          frame       = mMainWindow->getAnimation()->getCurrentFrameNum();
 
         const auto &persons = mPersonStorage.getPersons();
         size_t      i;
@@ -87,9 +87,9 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             if(((onlyVisible.empty()) || (onlyVisible.contains(i))) && person.trackPointExist(frame))
             {
                 dist = person.trackPointAt(frame).distanceToPoint(p);
-                if((dist < mMainWindow->getHeadSize(nullptr, i, frame) / 2.) ||
+                if((dist < mMainWindow->getHeadSize(nullptr, static_cast<int>(i), frame) / 2.) ||
                    ((person.trackPointAt(frame).distanceToPoint(p.colPoint()) <
-                     mMainWindow->getHeadSize(nullptr, i, frame) / 2.)))
+                     mMainWindow->getHeadSize(nullptr, static_cast<int>(i), frame) / 2.)))
                 {
                     if(found)
                     {
@@ -100,13 +100,13 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
                         if(minDist > dist)
                         {
                             minDist  = dist;
-                            iNearest = i;
+                            iNearest = static_cast<int>(i);
                         }
                     }
                     else
                     {
                         minDist  = dist;
-                        iNearest = i;
+                        iNearest = static_cast<int>(i);
                         // WAR: break inner loop
                         found = true;
                     }
@@ -396,7 +396,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
             {
                 if(mControlWidget->trackHeadSized->checkState() == Qt::Checked)
                 {
-                    pSP = mMainWindow->getHeadSize(nullptr, i, curFrame); // headSize;
+                    pSP = mMainWindow->getHeadSize(nullptr, static_cast<int>(i), curFrame); // headSize;
                 }
                 const TrackPoint &tp = person[curFrame - person.firstFrame()];
                 if(mControlWidget->trackShowCurrentPoint->checkState() ==
@@ -419,7 +419,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 {
                     painter->setBrush(Qt::NoBrush);
                     painter->setPen(Qt::yellow);
-                    hS = mMainWindow->winSize(nullptr, i, curFrame);
+                    hS = mMainWindow->winSize(nullptr, static_cast<int>(i), curFrame);
                     if(hS < 2)
                     {
                         hS = 2; // entspricht Vorgehen in tracker.cpp

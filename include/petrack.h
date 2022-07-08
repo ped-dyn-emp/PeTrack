@@ -166,37 +166,37 @@ public slots:
     void skipToFrameFromTrajectory(QPointF pos);
 
 public:
-    void      updateControlWidget();
-    void      dragEnterEvent(QDragEnterEvent *event);
-    void      dropEvent(QDropEvent *event);
-    void      updateSceneRect();
-    double    getStatusPosRealHeight();
-    void      setStatusStereo(float x, float y, float z);
-    void      setStatusTime();
-    void      setStatusFPS();
-    void      setShowFPS(double fps);
-    void      updateShowFPS(bool skipped = false);
-    void      setStatusPosReal(const QPointF &pos);
-    void      setStatusPos(const QPoint &pos);
-    void      setStatusColor(const QRgb &col);
-    void      setStatusColor();
-    void      setMousePosOnImage(QPointF pos);
-    void      updateControlImage(cv::Mat &img);
-    int       calculateRealTracker();
-    void      exportTracker(QString dest = "");
-    void      importTracker(QString dest = "");
-    void      testTracker();
-    void      trackAll();
-    void      playAll();
-    int       winSize(QPointF *pos = nullptr, int pers = -1, int frame = -1, int level = -1);
-    void      updateImage(bool imageChanged = false);
-    void      updateImage(const cv::Mat &img);
-    void      updateSequence();
-    QSet<int> getPedestrianUserSelection();
-    QSet<int> getPedestriansToTrack();
-    double    getCmPerPixel() const;
-    void      setHeadSize(double hS = -1);
-    double    getHeadSize(QPointF *pos = nullptr, int pers = -1, int frame = -1);
+    void         updateControlWidget();
+    void         dragEnterEvent(QDragEnterEvent *event);
+    void         dropEvent(QDropEvent *event);
+    void         updateSceneRect();
+    double       getStatusPosRealHeight();
+    void         setStatusStereo(float x, float y, float z);
+    void         setStatusTime();
+    void         setStatusFPS();
+    void         setShowFPS(double fps);
+    void         updateShowFPS(bool skipped = false);
+    void         setStatusPosReal(const QPointF &pos);
+    void         setStatusPos(const QPoint &pos);
+    void         setStatusColor(const QRgb &col);
+    void         setStatusColor();
+    void         setMousePosOnImage(QPointF pos);
+    void         updateControlImage(cv::Mat &img);
+    int          calculateRealTracker();
+    void         exportTracker(QString dest = "");
+    void         importTracker(QString dest = "");
+    void         testTracker();
+    void         trackAll();
+    void         playAll();
+    int          winSize(QPointF *pos = nullptr, int pers = -1, int frame = -1, int level = -1);
+    void         updateImage(bool imageChanged = false);
+    void         updateImage(const cv::Mat &img);
+    void         updateSequence();
+    QSet<size_t> getPedestrianUserSelection();
+    QSet<size_t> getPedestriansToTrack();
+    double       getCmPerPixel() const;
+    void         setHeadSize(double hS = -1);
+    double       getHeadSize(QPointF *pos = nullptr, int pers = -1, int frame = -1);
 
     //------------------------------
     // inline function

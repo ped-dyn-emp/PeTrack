@@ -2762,7 +2762,7 @@ void Petrack::importTracker(QString dest) // default = ""
             }
 
             mControlWidget->trackNumberAll->setText(QString("%1").arg(mPersonStorage.nbPersons()));
-            mControlWidget->trackShowOnlyNr->setMaximum(MAX(mPersonStorage.nbPersons(), 1));
+            mControlWidget->trackShowOnlyNr->setMaximum(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
             mControlWidget->trackNumberVisible->setText(
                 QString("%1").arg(mPersonStorage.visible(mAnimation->getCurrentFrameNum())));
             mControlWidget->colorPlot->replot();
@@ -2892,7 +2892,7 @@ void Petrack::importTracker(QString dest) // default = ""
             }
 
             mControlWidget->trackNumberAll->setText(QString("%1").arg(mPersonStorage.nbPersons()));
-            mControlWidget->trackShowOnlyNr->setMaximum(MAX(mPersonStorage.nbPersons(), 1));
+            mControlWidget->trackShowOnlyNr->setMaximum(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
             mControlWidget->trackNumberVisible->setText(
                 QString("%1").arg(mPersonStorage.visible(mAnimation->getCurrentFrameNum())));
             mControlWidget->colorPlot->replot();
@@ -3005,7 +3005,8 @@ void Petrack::exportTracker(QString dest) // default = ""
                     PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(file.errorString()));
                     return;
                 }
-                QProgressDialog progress("Export TRC-File", nullptr, 0, mPersonStorage.nbPersons() + 1, this->window());
+                QProgressDialog progress(
+                    "Export TRC-File", nullptr, 0, static_cast<int>(mPersonStorage.nbPersons() + 1), this->window());
                 progress.setWindowTitle("Export .trc-File");
                 progress.setWindowModality(Qt::WindowModal);
                 progress.setVisible(true);
@@ -3028,7 +3029,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     qApp->processEvents();
                     progress.setLabelText(
                         QString("Export person %1 of %2 ...").arg(i + 1).arg(mPersonStorage.nbPersons()));
-                    progress.setValue(i + 1);
+                    progress.setValue(static_cast<int>(i + 1));
                     out << persons[i] << Qt::endl;
                 }
                 file.flush();
@@ -3062,7 +3063,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
                 }
 
-                progress.setValue(mPersonStorage.nbPersons() + 1);
+                progress.setValue(static_cast<int>(mPersonStorage.nbPersons() + 1));
 
                 std::cout << " finished " << std::endl;
                 mAutosave.resetTrackPersonCounter();
@@ -3811,7 +3812,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         mControlWidget->trackNumberAll->setText(
             QString("%1").arg(mPersonStorage.nbPersons())); // kann sich durch reco und tracker aendern
         mControlWidget->trackShowOnlyNr->setMaximum(
-            MAX(mPersonStorage.nbPersons(), 1)); // kann sich durch reco und tracker aendern
+            static_cast<int>(MAX(mPersonStorage.nbPersons(), 1))); // kann sich durch reco und tracker aendern
         mControlWidget->trackNumberVisible->setText(
             QString("%1").arg(mPersonStorage.visible(frameNum))); // kann sich durch reco und tracker aendern
 
@@ -4020,11 +4021,11 @@ void Petrack::setProFileName(const QString &fileName)
  *
  * @return All user selected pedestrian (empty for all pedestrians)
  */
-QSet<int> Petrack::getPedestrianUserSelection()
+QSet<size_t> Petrack::getPedestrianUserSelection()
 {
     if(mControlWidget->trackShowOnly->checkState() == Qt::Checked)
     {
-        QSet<int> onlyVisible;
+        QSet<size_t> onlyVisible;
         // subtraction needed as in UI ID start at 1 and internally at 0
         onlyVisible.insert(mControlWidget->trackShowOnlyNr->value() - 1);
         return onlyVisible;
@@ -4034,7 +4035,7 @@ QSet<int> Petrack::getPedestrianUserSelection()
         auto enteredIDs = util::splitStringToInt(mControlWidget->trackShowOnlyNrList->text());
         if(enteredIDs.has_value())
         {
-            QSet<int> selectedIDs;
+            QSet<size_t> selectedIDs;
             for(auto id : enteredIDs.value())
             {
                 // subtraction needed as in UI ID start at 1 and internally at 0
@@ -4048,7 +4049,7 @@ QSet<int> Petrack::getPedestrianUserSelection()
             mControlWidget->trackShowOnlyNrList->setStyleSheet("border: 1px solid red");
         }
     }
-    return QSet<int>();
+    return QSet<size_t>();
 }
 
 /**
@@ -4119,14 +4120,14 @@ std::optional<QSet<int>> util::splitStringToInt(const QString &input)
  *
  * @return all trajectories which should be evaluated; empty when all should be evaluated
  */
-QSet<int> Petrack::getPedestriansToTrack()
+QSet<size_t> Petrack::getPedestriansToTrack()
 {
     if(mControlWidget->trackOnlySelected->checkState() == Qt::Checked)
     {
         return getPedestrianUserSelection();
     }
 
-    return QSet<int>();
+    return QSet<size_t>();
 }
 
 void Petrack::addManualTrackPointOnlyVisible(const QPointF &pos)
@@ -4143,7 +4144,7 @@ void Petrack::addManualTrackPointOnlyVisible(const QPointF &pos)
 void Petrack::updateControlWidget()
 {
     mControlWidget->trackNumberAll->setText(QString("%1").arg(mPersonStorage.nbPersons()));
-    mControlWidget->trackShowOnlyNr->setMaximum(MAX(mPersonStorage.nbPersons(), 1));
+    mControlWidget->trackShowOnlyNr->setMaximum(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
     mControlWidget->trackNumberVisible->setText(
         QString("%1").arg(mPersonStorage.visible(mAnimation->getCurrentFrameNum())));
 }
