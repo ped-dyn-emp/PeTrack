@@ -200,42 +200,50 @@ bool lessThanVersion(const QString &q1, const QString &q2)
 {
     QStringList      version1 = q1.split(QLatin1Char('.'));
     QStringList      version2 = q2.split(QLatin1Char('.'));
-    std::vector<int> version1_digits;
-    std::vector<int> version2_digits;
+    std::vector<int> version1_parts;
+    std::vector<int> version2_parts;
+    constexpr int    amountOfVersionParts = 3;
 
-    for(int i = 0; i < version1.length(); ++i)
+    for(const auto &versionPart : version1)
     {
-        if(version1[i].length() == 1 && version1[i][0].isDigit())
+        bool ok;
+        int  part = versionPart.toInt(&ok, 10);
+        if(ok)
         {
-            version1_digits.push_back(version1[i].toInt());
+            version1_parts.push_back(part);
         }
         else
         {
-            throw std::invalid_argument("Invalid Input String!");
+            throw std::invalid_argument("Invalid PeTrack version string: Version is non-numeric!");
         }
     }
-    for(int i = 0; i < version2.length(); ++i)
+    for(const auto &versionPart : version2)
     {
-        if(version2[i].length() == 1 && version2[i][0].isDigit())
+        bool ok;
+        int  part = versionPart.toInt(&ok, 10);
+        if(ok)
         {
-            version2_digits.push_back(version2[i].toInt());
+            version2_parts.push_back(part);
         }
         else
         {
-            throw std::invalid_argument("Invalid Input String!");
+            throw std::invalid_argument("Invalid PeTrack version string: Version is non-numeric!");
         }
     }
-    int length = std::min(version1_digits.size(), version2_digits.size());
-    for(int i = 0; i < length; ++i)
+    if(!(version1_parts.size() == amountOfVersionParts && version2_parts.size() == amountOfVersionParts))
     {
-        if(version1_digits[i] > version2_digits[i])
+        throw std::invalid_argument("Invalid PeTrack version string: Amount of version parts is wrong!");
+    }
+    for(int i = 0; i < amountOfVersionParts; ++i)
+    {
+        if(version1_parts[i] > version2_parts[i])
         {
             return true;
         }
-        else if(version1_digits[i] < version2_digits[i])
+        else if(version1_parts[i] < version2_parts[i])
         {
             return false;
         }
     }
-    return version1_digits.size() > version2_digits.size();
+    return false;
 }
