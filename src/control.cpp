@@ -164,7 +164,7 @@ Control::Control(
 
     // will be done by designer: colorPlot->setParent(colorBox); //because it is just integrated via frame in designer
 
-    connect(newModelCheckBox, &QCheckBox::stateChanged, this, &Control::on_newModelCheckBox_stateChanged);
+    connect(extModelCheckBox, &QCheckBox::stateChanged, this, &Control::on_extModelCheckBox_stateChanged);
     colorPlot->setControlWidget(this);
 
     mIndexChanging = false;
@@ -639,15 +639,15 @@ void Control::setCalibReprErrorValue(double d)
 {
     intrError->setText(QString("%1").arg(d));
 }
-void Control::setNewModelChecked(bool b)
+void Control::setExtModelChecked(bool b)
 {
     if(b)
     {
-        newModelCheckBox->setChecked(true);
+        extModelCheckBox->setChecked(true);
     }
     else
     {
-        newModelCheckBox->setChecked(false);
+        extModelCheckBox->setChecked(false);
     }
 }
 
@@ -2476,7 +2476,7 @@ void Control::on_tangDist_stateChanged(int i)
     intrError->setText(QString("invalid"));
 }
 
-void Control::on_newModelCheckBox_stateChanged(int i)
+void Control::on_extModelCheckBox_stateChanged(int i)
 {
     if(i == Qt::Checked)
     {
@@ -3044,6 +3044,7 @@ void Control::setXml(QDomElement &elem)
     subSubElem.setAttribute("QUAD_ASPECT_RATIO", quadAspectRatio->isChecked());
     subSubElem.setAttribute("FIX_CENTER", fixCenter->isChecked());
     subSubElem.setAttribute("TANG_DIST", tangDist->isChecked());
+    subSubElem.setAttribute("EXT_MODEL_ENABLED", extModelCheckBox->isChecked());
     // in dateiname darf kein , vorkommen - das blank ", " zur uebersich - beim einlesen wird nur ","
     // genommen und blanks rundherum abgeschnitten, falls von hand editiert wurde
     QStringList fl = mMainWindow->getAutoCalib()->getCalibFiles();
@@ -3611,6 +3612,11 @@ void Control::getXml(QDomElement &elem)
                     {
                         tangDist->setCheckState(
                             subSubElem.attribute("TANG_DIST").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
+                    if(subSubElem.hasAttribute("EXT_MODEL_ENABLED"))
+                    {
+                        extModelCheckBox->setCheckState(
+                            subSubElem.attribute("EXT_MODEL_ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("CALIB_FILES"))
                     {

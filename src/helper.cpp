@@ -196,7 +196,7 @@ cv::Mat getRoi(cv::Mat &img, const QRect &roi, cv::Rect &rect, bool evenPixelNum
  * @throws std::invalid_argument Thrown if one of the input strings is not in the right format
  * @return boolean, whether the first version is higher than the second one
  */
-bool lessThanVersion(const QString &q1, const QString &q2)
+bool newerThanVersion(const QString &q1, const QString &q2)
 {
     QStringList      version1 = q1.split(QLatin1Char('.'));
     QStringList      version2 = q2.split(QLatin1Char('.'));

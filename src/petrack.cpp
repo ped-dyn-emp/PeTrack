@@ -658,14 +658,26 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
         openXml(doc, openSeq);
         mLastTrackerExport = mTrcFileName;
 
-        if(!lessThanVersion(root.attribute("VERSION"), QString("0.9.0")))
+        if(newerThanVersion(QString("0.9.0"), root.attribute("VERSION")))
         {
             PWarning(
                 this,
                 tr("PeTrack"),
                 tr("You are using a project version lower than 0.9: Therefore, the extended intrinsic calibration "
                    "model is disabled."));
-            mControlWidget->setNewModelChecked(false);
+            mControlWidget->setExtModelChecked(false);
+        }
+        else if(newerThanVersion(QString("0.9.2"), root.attribute("VERSION")))
+        {
+            // only checking one parameter because if the ext. model is used all parameters are not equal to zero
+            if(mControlWidget->getCalibS1Value() == 0.)
+            {
+                mControlWidget->setExtModelChecked(false);
+            }
+            else
+            {
+                mControlWidget->setExtModelChecked(true);
+            }
         }
 
         updateWindowTitle();
