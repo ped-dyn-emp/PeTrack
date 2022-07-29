@@ -1120,7 +1120,7 @@
                  </widget>
                 </item>
                 <item row="0" column="3">
-                 <widget class="QCheckBox" name="newModelCheckBox">
+                 <widget class="QCheckBox" name="extModelCheckBox">
                   <property name="toolTip">
                    <string>Perform calibration with extended parameter set (14 instead of 5)</string>
                   </property>
@@ -7891,7 +7891,7 @@
   <tabstop>quadAspectRatio</tabstop>
   <tabstop>fixCenter</tabstop>
   <tabstop>tangDist</tabstop>
-  <tabstop>newModelCheckBox</tabstop>
+  <tabstop>extModelCheckBox</tabstop>
   <tabstop>boardSizeX</tabstop>
   <tabstop>boardSizeY</tabstop>
   <tabstop>squareSize</tabstop>

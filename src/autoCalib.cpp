@@ -256,7 +256,7 @@ void AutoCalib::autoCalib()
         {
             flags |= CV_CALIB_ZERO_TANGENT_DIST;
         }
-        if(mControlWidget->newModelCheckBox->isChecked())
+        if(mControlWidget->extModelCheckBox->isChecked())
         {
             flags |= CV_CALIB_RATIONAL_MODEL + CV_CALIB_THIN_PRISM_MODEL + CV_CALIB_TILTED_MODEL;
         }

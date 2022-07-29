@@ -292,7 +292,7 @@ inline clock_t getElapsedTime()
     lastTime = clock();
     return diffTime;
 }
-bool lessThanVersion(const QString &q1, const QString &q2);
+bool newerThanVersion(const QString &q1, const QString &q2);
 
 
 /**

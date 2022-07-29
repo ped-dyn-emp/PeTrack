@@ -143,7 +143,7 @@ public:
     void   setCalibTAUYMax(double d);
     double getCalibReprErrorValue() const;
     void   setCalibReprErrorValue(double d);
-    void   setNewModelChecked(bool b);
+    void   setExtModelChecked(bool b);
 
     double getCalibExtrRot1();
     void   setCalibExtrRot1(double d);
@@ -513,7 +513,7 @@ private slots:
     void on_quadAspectRatio_stateChanged(int i);
     void on_fixCenter_stateChanged(int i);
     void on_tangDist_stateChanged(int i);
-    void on_newModelCheckBox_stateChanged(int i);
+    void on_extModelCheckBox_stateChanged(int i);
     void on_autoCalib_clicked();
     void on_calibFiles_clicked();
 
