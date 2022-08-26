@@ -278,6 +278,12 @@ Petrack::Petrack() :
     createMenus();
     createStatusBar();
 
+    auto *exportShortCut = new QShortcut{QKeySequence("Ctrl+e"), this};
+    connect(exportShortCut, &QShortcut::activated, this, [=]() { exportTracker(); });
+
+    auto *toggleOnlineTracking = new QShortcut{QKeySequence("Shift+t"), this};
+    connect(toggleOnlineTracking, &QShortcut::activated, this, [=]() { mControlWidget->trackOnlineCalc->toggle(); });
+
     // TODO delete once we get Options to be value only (i.e. no Pointer/Ref anymore)
     mReco.getCodeMarkerOptions().setControlWidget(mControlWidget);
     mReco.getCodeMarkerOptions().setCodeMarkerItem(mCodeMarkerItem);
@@ -1638,7 +1644,8 @@ void Petrack::keyBindings()
         "<dt><kbd>Shift + double-click left mouse button</kbd></dt><dd>inserts new or moves near trackpoint and "
         "enables showing only the modified trajectory</dd>"
         "<dt><kbd>Alt + double-click left mouse button</kbd></dt><dd>jumps to frame of trackpoint under cursor</dd>"
-        "<dt><kbd>Alt + holding left mouse button</kbd></dt><dd>moves trackpoint under cursor</dd></dl>"
+        "<dt><kbd>Alt + holding left mouse button</kbd></dt><dd>moves trackpoint under cursor</dd>"
+        "<dt><kbd>Ctrl + E</kbd></dt><dd>export trajectories</dd></dl>"
         "<p>Further key bindings you will find next to the entries of the menus.</p>");
 
     PMessageBox *mb = new PMessageBox(this, tr("Key Bindings"), out, QIcon());
@@ -1754,12 +1761,10 @@ void Petrack::createActions()
     connect(mOpenMoCapAct, &QAction::triggered, this, &Petrack::openMoCapFile);
 
     mSaveSeqVidAct = new QAction(tr("Save Video"), this);
-    // mSaveSeqVidAct->setShortcut(tr("Ctrl+E"));
     mSaveSeqVidAct->setEnabled(false);
     connect(mSaveSeqVidAct, SIGNAL(triggered()), this, SLOT(saveVideo()));
 
     mSaveSeqVidViewAct = new QAction(tr("Save Video View"), this);
-    mSaveSeqVidViewAct->setShortcut(tr("Ctrl+E"));
     mSaveSeqVidViewAct->setEnabled(false);
     connect(mSaveSeqVidViewAct, SIGNAL(triggered()), this, SLOT(saveVideoView()));
 
