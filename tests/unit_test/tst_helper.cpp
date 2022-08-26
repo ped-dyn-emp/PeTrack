@@ -31,6 +31,7 @@ TEST_CASE("Petrack version strings are compared", "[newerThanVersion]")
     CHECK(newerThanVersion(QString("0.9.15"), QString("0.9.3")));
     CHECK(newerThanVersion(QString("0.130.1"), QString("0.9.3")));
     CHECK(newerThanVersion(QString("15.9.16"), QString("0.9.3")));
+    CHECK(newerThanVersion(QString("0.9.1"), QString("0.9")));
 
     CHECK_FALSE(newerThanVersion(QString("0.9.0"), QString("0.9.1")));
     CHECK_FALSE(newerThanVersion(QString("0.8.0"), QString("0.9.0")));
@@ -39,6 +40,7 @@ TEST_CASE("Petrack version strings are compared", "[newerThanVersion]")
     CHECK_FALSE(newerThanVersion(QString("0.9.1"), QString("0.9.13")));
     CHECK_FALSE(newerThanVersion(QString("0.9.1"), QString("0.967.13")));
     CHECK_FALSE(newerThanVersion(QString("0.9.1"), QString("19.9.13")));
+    CHECK_FALSE(newerThanVersion(QString("0.9.0"), QString("0.9")));
 
     CHECK_THROWS(newerThanVersion(QString("0.8.k"), QString("0.9.0")));
     CHECK_THROWS(newerThanVersion(QString("0.8.9"), QString("0.9.k")));
@@ -50,4 +52,6 @@ TEST_CASE("Petrack version strings are compared", "[newerThanVersion]")
     CHECK_THROWS(newerThanVersion(QString("0.8.9"), QString("k.15.0")));
     CHECK_THROWS(newerThanVersion(QString("0.8k.9"), QString("0.15.0")));
     CHECK_THROWS(newerThanVersion(QString("0.9.0.1"), QString("0.9.1")));
+    CHECK_THROWS(newerThanVersion(QString("1."), QString("0.9.5")));
+    CHECK_THROWS(newerThanVersion(QString("0.9."), QString("0.8.15")));
 }

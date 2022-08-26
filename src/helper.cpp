@@ -232,7 +232,21 @@ bool newerThanVersion(const QString &q1, const QString &q2)
     }
     if(!(version1_parts.size() == amountOfVersionParts && version2_parts.size() == amountOfVersionParts))
     {
-        throw std::invalid_argument("Invalid PeTrack version string: Amount of version parts is wrong!");
+        // special case: PATCH can be omissed; is then assumed to be zero
+        if(version1_parts.size() == 2)
+        {
+            version1_parts.push_back(0);
+        }
+        if(version2_parts.size() == 2)
+        {
+            version2_parts.push_back(0);
+        }
+
+        // check if after addition of patch it is valid
+        if(!(version1_parts.size() == amountOfVersionParts && version2_parts.size() == amountOfVersionParts))
+        {
+            throw std::invalid_argument("Invalid PeTrack version string: Amount of version parts is wrong!");
+        }
     }
     for(int i = 0; i < amountOfVersionParts; ++i)
     {
