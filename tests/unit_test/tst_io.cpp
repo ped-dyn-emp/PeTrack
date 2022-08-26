@@ -216,6 +216,41 @@ TEST_CASE("src/IO", "[tracking][io]")
                 CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
             }
 
+            SECTION("empty line at end of file")
+            {
+                std::for_each(
+                    std::begin(referenceValuesMap),
+                    std::end(referenceValuesMap),
+                    [&heightFile](const std::pair<int, float> &element)
+                    { heightFile << element.first << " " << element.second << std::endl; });
+                heightFile << std::endl;
+                heightFile.close();
+
+                auto ret = IO::readHeightFile(QString::fromStdString(heigtFileName));
+                REQUIRE(std::holds_alternative<std::unordered_map<int, float>>(ret));
+                std::unordered_map<int, float>     markerHeights = std::get<std::unordered_map<int, float>>(ret);
+                std::vector<std::pair<int, float>> markerHeightsVec;
+                markerHeightsVec.assign(std::begin(markerHeights), std::end(markerHeights));
+                CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
+            }
+
+            SECTION("empty lines throughout the file")
+            {
+                std::for_each(
+                    std::begin(referenceValuesMap),
+                    std::end(referenceValuesMap),
+                    [&heightFile](const std::pair<int, float> &element)
+                    { heightFile << element.first << " " << element.second << "\n\n"; });
+                heightFile.close();
+
+                auto ret = IO::readHeightFile(QString::fromStdString(heigtFileName));
+                REQUIRE(std::holds_alternative<std::unordered_map<int, float>>(ret));
+                std::unordered_map<int, float>     markerHeights = std::get<std::unordered_map<int, float>>(ret);
+                std::vector<std::pair<int, float>> markerHeightsVec;
+                markerHeightsVec.assign(std::begin(markerHeights), std::end(markerHeights));
+                CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
+            }
+
 
             SECTION("z-coordinate in cm")
             {
@@ -452,6 +487,39 @@ TEST_CASE("src/IO", "[tracking][io]")
                 for(const auto &[personID, markerID] : referenceValuesMap)
                 {
                     markerFile << personID << " " << markerID << std::endl;
+                }
+                markerFile.close();
+
+                auto ret = IO::readMarkerIDFile(QString::fromStdString(markerFileName));
+                REQUIRE(std::holds_alternative<std::unordered_map<int, int>>(ret));
+                auto                             markerIDs = std::get<std::unordered_map<int, int>>(ret);
+                std::vector<std::pair<int, int>> markerHeightsVec;
+                markerHeightsVec.assign(std::begin(markerIDs), std::end(markerIDs));
+                CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
+            }
+
+            SECTION("empty line at end of file")
+            {
+                for(const auto &[personID, markerID] : referenceValuesMap)
+                {
+                    markerFile << personID << " " << markerID << std::endl;
+                }
+                markerFile << std::endl;
+                markerFile.close();
+
+                auto ret = IO::readMarkerIDFile(QString::fromStdString(markerFileName));
+                REQUIRE(std::holds_alternative<std::unordered_map<int, int>>(ret));
+                auto                             markerIDs = std::get<std::unordered_map<int, int>>(ret);
+                std::vector<std::pair<int, int>> markerHeightsVec;
+                markerHeightsVec.assign(std::begin(markerIDs), std::end(markerIDs));
+                CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
+            }
+
+            SECTION("empty lines throughout the file")
+            {
+                for(const auto &[personID, markerID] : referenceValuesMap)
+                {
+                    markerFile << personID << " " << markerID << "\n\n";
                 }
                 markerFile.close();
 

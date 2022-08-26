@@ -114,6 +114,11 @@ std::variant<std::unordered_map<int, float>, std::string> IO::readHeightFile(con
                         return "Duplicate entry for markerID = " + std::to_string(markerID) + ".";
                     }
                 }
+                else if(splitLine.empty())
+                {
+                    // just ignore empty lines
+                    continue;
+                }
                 else
                 {
                     return "Line should contain exactly 2 values: id height. But it contains " +
@@ -319,6 +324,11 @@ std::variant<std::unordered_map<int, int>, std::string> IO::readMarkerIDFile(con
                     {
                         return "Duplicate entry for personID = " + std::to_string(personID) + ".";
                     }
+                }
+                else if(splitLine.empty())
+                {
+                    // ignore empty lines
+                    continue;
                 }
                 else
                 {
