@@ -22,6 +22,14 @@
 
 #include <catch2/catch.hpp>
 
+TEST_CASE("Petrack version format")
+{
+    QString versionString{PETRACK_VERSION};
+    // Major.Minor.Patch => 3 version parts
+    constexpr int numberVersionParts = 3;
+    CHECK(versionString.split(".").size() == numberVersionParts);
+}
+
 SCENARIO("Getting the IDs of the pedestrian from user input", "[petrack][util]")
 {
     WHEN("Enter valid pedestrian ID filter")
