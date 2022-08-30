@@ -101,6 +101,36 @@ bool ExtrCalibration::openExtrCalibFile()
     return false;
 }
 
+// following function copied from OpenCV
+static bool isPlanarObjectPoints(cv::InputArray _objectPoints, double threshold = 1e-3)
+{
+    CV_CheckType(
+        _objectPoints.type(),
+        _objectPoints.type() == CV_32FC3 || _objectPoints.type() == CV_64FC3,
+        "Type of _objectPoints must be CV_32FC3 or CV_64FC3");
+    cv::Mat objectPoints;
+    if(_objectPoints.type() == CV_32FC3)
+    {
+        _objectPoints.getMat().convertTo(objectPoints, CV_64F);
+    }
+    else
+    {
+        objectPoints = _objectPoints.getMat();
+    }
+
+    cv::Scalar meanValues          = mean(objectPoints);
+    int        nbPts               = objectPoints.checkVector(3, CV_64F);
+    cv::Mat    objectPointsCentred = objectPoints - meanValues;
+    objectPointsCentred            = objectPointsCentred.reshape(1, nbPts);
+
+    cv::Mat w, u, vt;
+    cv::Mat MM = objectPointsCentred.t() * objectPointsCentred;
+    SVDecomp(MM, w, u, vt);
+
+    return (w.at<double>(2) < w.at<double>(1) * threshold);
+}
+
+
 /**
  * @brief Loads the extrinsic calibration from mExtrCalibFile
  *
@@ -237,12 +267,24 @@ bool ExtrCalibration::loadExtrCalibFile()
                 PCritical(
                     mMainWindow,
                     QObject::tr("PeTrack"),
-                    QObject::tr("Error: Not enough points given: %1 (minimum 4 needed!). Please check your extrinsic "
+                    QObject::tr("Error: Not enough points given: %1 (minimum 4 (coplanar) or 6 (not coplanar) "
+                                "needed!). Please check your extrinsic "
                                 "calibration file!")
                         .arg(points3D_tmp.size()));
                 all_ok = false;
             }
-
+            else if(!isPlanarObjectPoints(points3D_tmp) && points3D_tmp.size() < 6)
+            {
+                // Non-planar points use DLT - we need at least 6 points; not only 4
+                PCritical(
+                    mMainWindow,
+                    QObject::tr("PeTrack"),
+                    QObject::tr("Error: Not enough points given: %1 (minimum 4 (coplanar) or 6 (not coplanar) "
+                                "needed!). Please check your extrinsic "
+                                "calibration file!")
+                        .arg(points3D_tmp.size()));
+                all_ok = false;
+            }
             // Check if 2D points delivered and if the number of 2D and 3D points agree
             else if(points2D_tmp.size() > 0 && points2D_tmp.size() != points3D_tmp.size())
             {
