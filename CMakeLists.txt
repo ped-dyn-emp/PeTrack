@@ -381,6 +381,8 @@ target_sources(petrack_core PRIVATE
     include/autosave.h
     include/manualTrackpointMover.h
     include/frameRange.h
+    include/pdoublespinbox.h
+    include/pspinbox.h
     )
 
 target_sources(petrack_core PRIVATE
@@ -442,6 +444,8 @@ target_sources(petrack_core PRIVATE
     src/personStorage.cpp
     src/autosave.cpp
     src/manualTrackpointMover.cpp
+    src/pdoublespinbox.cpp
+    src/pspinbox.cpp
     ui/about.ui
     ui/codeMarker.ui
     ui/colorMarker.ui
