@@ -25,11 +25,9 @@
 // nur temporaer fuer anzeige
 #include "helper.h"
 
+#include <QFileDialog>
 #include <opencv2/highgui.hpp>
 
-// TODO spaeter entfernen naechsten beiden zeilen
-#include "control.h"
-extern Control *cw;
 
 /// Entfernung zum Hintergrund, um als Vordergrund angesehen zu werden
 /// darf nicht zu gross werden, da sonst an waenden problem
