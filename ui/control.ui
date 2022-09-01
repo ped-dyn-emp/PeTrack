@@ -135,9 +135,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-414</y>
-            <width>476</width>
-            <height>1394</height>
+            <y>-713</y>
+            <width>460</width>
+            <height>1268</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -367,7 +367,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QSpinBox" name="filterBgDeleteNumber">
+                   <widget class="PSpinBox" name="filterBgDeleteNumber">
                     <property name="minimum">
                      <number>1</number>
                     </property>
@@ -603,7 +603,7 @@
                  <number>4</number>
                 </property>
                 <item row="0" column="1">
-                 <widget class="QDoubleSpinBox" name="fx">
+                 <widget class="PDoubleSpinBox" name="fx">
                   <property name="alignment">
                    <set>Qt::AlignRight</set>
                   </property>
@@ -642,21 +642,21 @@
                  </widget>
                 </item>
                 <item row="8" column="3">
-                 <widget class="QDoubleSpinBox" name="s4">
+                 <widget class="PDoubleSpinBox" name="s4">
                   <property name="decimals">
                    <number>6</number>
                   </property>
                  </widget>
                 </item>
                 <item row="7" column="3">
-                 <widget class="QDoubleSpinBox" name="s2">
+                 <widget class="PDoubleSpinBox" name="s2">
                   <property name="decimals">
                    <number>6</number>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="3">
-                 <widget class="QDoubleSpinBox" name="cy">
+                 <widget class="PDoubleSpinBox" name="cy">
                   <property name="alignment">
                    <set>Qt::AlignRight</set>
                   </property>
@@ -675,7 +675,7 @@
                  </widget>
                 </item>
                 <item row="4" column="1">
-                 <widget class="QDoubleSpinBox" name="tx">
+                 <widget class="PDoubleSpinBox" name="tx">
                   <property name="alignment">
                    <set>Qt::AlignRight</set>
                   </property>
@@ -710,7 +710,7 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QDoubleSpinBox" name="r2">
+                 <widget class="PDoubleSpinBox" name="r2">
                   <property name="alignment">
                    <set>Qt::AlignRight</set>
                   </property>
@@ -729,7 +729,7 @@
                  </widget>
                 </item>
                 <item row="4" column="3">
-                 <widget class="QDoubleSpinBox" name="ty">
+                 <widget class="PDoubleSpinBox" name="ty">
                   <property name="alignment">
                    <set>Qt::AlignRight</set>
                   </property>
@@ -782,14 +782,14 @@
                  </widget>
                 </item>
                 <item row="8" column="1">
-                 <widget class="QDoubleSpinBox" name="s3">
+                 <widget class="PDoubleSpinBox" name="s3">
                   <property name="decimals">
                    <number>6</number>
                   </property>
                  </widget>
                 </item>
                 <item row="2" column="3">
-                 <widget class="QDoubleSpinBox" name="r4">
+                 <widget class="PDoubleSpinBox" name="r4">
                   <property name="alignment">
                    <set>Qt::AlignRight</set>
                   </property>
@@ -831,14 +831,14 @@
                  </widget>
                 </item>
                 <item row="6" column="1">
-                 <widget class="QDoubleSpinBox" name="k6">
+                 <widget class="PDoubleSpinBox" name="k6">
                   <property name="decimals">
                    <number>6</number>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QDoubleSpinBox" name="cx">
+                 <widget class="PDoubleSpinBox" name="cx">
                   <property name="alignment">
                    <set>Qt::AlignRight</set>
                   </property>
@@ -894,7 +894,7 @@
                  </widget>
                 </item>
                 <item row="0" column="3">
-                 <widget class="QDoubleSpinBox" name="fy">
+                 <widget class="PDoubleSpinBox" name="fy">
                   <property name="alignment">
                    <set>Qt::AlignRight</set>
                   </property>
@@ -913,7 +913,7 @@
                  </widget>
                 </item>
                 <item row="7" column="1">
-                 <widget class="QDoubleSpinBox" name="s1">
+                 <widget class="PDoubleSpinBox" name="s1">
                   <property name="decimals">
                    <number>6</number>
                   </property>
@@ -997,21 +997,21 @@
                  </widget>
                 </item>
                 <item row="5" column="3">
-                 <widget class="QDoubleSpinBox" name="k5">
+                 <widget class="PDoubleSpinBox" name="k5">
                   <property name="decimals">
                    <number>6</number>
                   </property>
                  </widget>
                 </item>
                 <item row="5" column="1">
-                 <widget class="QDoubleSpinBox" name="k4">
+                 <widget class="PDoubleSpinBox" name="k4">
                   <property name="decimals">
                    <number>6</number>
                   </property>
                  </widget>
                 </item>
                 <item row="3" column="1">
-                 <widget class="QDoubleSpinBox" name="r6">
+                 <widget class="PDoubleSpinBox" name="r6">
                   <property name="alignment">
                    <set>Qt::AlignRight</set>
                   </property>
@@ -1063,14 +1063,14 @@
                  </widget>
                 </item>
                 <item row="9" column="1">
-                 <widget class="QDoubleSpinBox" name="taux">
+                 <widget class="PDoubleSpinBox" name="taux">
                   <property name="decimals">
                    <number>6</number>
                   </property>
                  </widget>
                 </item>
                 <item row="9" column="3">
-                 <widget class="QDoubleSpinBox" name="tauy">
+                 <widget class="PDoubleSpinBox" name="tauy">
                   <property name="decimals">
                    <number>6</number>
                   </property>
@@ -1164,7 +1164,7 @@
                  </widget>
                 </item>
                 <item row="4" column="2">
-                 <widget class="QDoubleSpinBox" name="squareSize">
+                 <widget class="PDoubleSpinBox" name="squareSize">
                   <property name="singleStep">
                    <double>0.100000000000000</double>
                   </property>
@@ -1184,7 +1184,7 @@
                  </widget>
                 </item>
                 <item row="3" column="2">
-                 <widget class="QSpinBox" name="boardSizeX">
+                 <widget class="PSpinBox" name="boardSizeX">
                   <property name="toolTip">
                    <string>Number of inner corners in a row</string>
                   </property>
@@ -1194,7 +1194,7 @@
                  </widget>
                 </item>
                 <item row="3" column="4">
-                 <widget class="QSpinBox" name="boardSizeY">
+                 <widget class="PSpinBox" name="boardSizeY">
                   <property name="toolTip">
                    <string>Number of inner corners in a column</string>
                   </property>
@@ -1309,7 +1309,7 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QDoubleSpinBox" name="trans1">
+                 <widget class="PDoubleSpinBox" name="trans1">
                   <property name="decimals">
                    <number>3</number>
                   </property>
@@ -1325,7 +1325,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QDoubleSpinBox" name="rot1">
+                 <widget class="PDoubleSpinBox" name="rot1">
                   <property name="decimals">
                    <number>3</number>
                   </property>
@@ -1338,7 +1338,7 @@
                  </widget>
                 </item>
                 <item row="1" column="2">
-                 <widget class="QDoubleSpinBox" name="trans2">
+                 <widget class="PDoubleSpinBox" name="trans2">
                   <property name="decimals">
                    <number>3</number>
                   </property>
@@ -1354,7 +1354,7 @@
                  </widget>
                 </item>
                 <item row="1" column="3">
-                 <widget class="QDoubleSpinBox" name="trans3">
+                 <widget class="PDoubleSpinBox" name="trans3">
                   <property name="decimals">
                    <number>3</number>
                   </property>
@@ -1373,7 +1373,7 @@
                  </widget>
                 </item>
                 <item row="0" column="3">
-                 <widget class="QDoubleSpinBox" name="rot3">
+                 <widget class="PDoubleSpinBox" name="rot3">
                   <property name="decimals">
                    <number>3</number>
                   </property>
@@ -1386,7 +1386,7 @@
                  </widget>
                 </item>
                 <item row="0" column="2">
-                 <widget class="QDoubleSpinBox" name="rot2">
+                 <widget class="PDoubleSpinBox" name="rot2">
                   <property name="decimals">
                    <number>3</number>
                   </property>
@@ -1706,7 +1706,7 @@
                      <number>4</number>
                     </property>
                     <item row="0" column="2">
-                     <widget class="QSpinBox" name="coord3DTransX_spin">
+                     <widget class="PSpinBox" name="coord3DTransX_spin">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -1731,7 +1731,7 @@
                      </widget>
                     </item>
                     <item row="2" column="2">
-                     <widget class="QSpinBox" name="coord3DTransZ_spin">
+                     <widget class="PSpinBox" name="coord3DTransZ_spin">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -1756,7 +1756,7 @@
                      </widget>
                     </item>
                     <item row="1" column="2">
-                     <widget class="QSpinBox" name="coord3DTransY_spin">
+                     <widget class="PSpinBox" name="coord3DTransY_spin">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -1944,7 +1944,7 @@
                      </widget>
                     </item>
                     <item row="3" column="2">
-                     <widget class="QSpinBox" name="coord3DAxeLen_spin">
+                     <widget class="PSpinBox" name="coord3DAxeLen_spin">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -2193,7 +2193,7 @@
                      <number>4</number>
                     </property>
                     <item row="1" column="2">
-                     <widget class="QSpinBox" name="coordTransX_spin">
+                     <widget class="PSpinBox" name="coordTransX_spin">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -2362,7 +2362,7 @@
                      </widget>
                     </item>
                     <item row="2" column="2">
-                     <widget class="QSpinBox" name="coordTransY_spin">
+                     <widget class="PSpinBox" name="coordTransY_spin">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -2387,7 +2387,7 @@
                      </widget>
                     </item>
                     <item row="4" column="2">
-                     <widget class="QSpinBox" name="coordScale_spin">
+                     <widget class="PSpinBox" name="coordScale_spin">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -2465,7 +2465,7 @@
                      </widget>
                     </item>
                     <item row="3" column="2">
-                     <widget class="QSpinBox" name="coordRotate_spin">
+                     <widget class="PSpinBox" name="coordRotate_spin">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -2516,7 +2516,7 @@
                      </widget>
                     </item>
                     <item row="0" column="1">
-                     <widget class="QDoubleSpinBox" name="coordAltitude">
+                     <widget class="PDoubleSpinBox" name="coordAltitude">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -2614,7 +2614,7 @@
                      </widget>
                     </item>
                     <item row="0" column="1">
-                     <widget class="QDoubleSpinBox" name="coordUnit">
+                     <widget class="PDoubleSpinBox" name="coordUnit">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -2884,7 +2884,7 @@
                      </widget>
                     </item>
                     <item row="0" column="2">
-                     <widget class="QSpinBox" name="grid3DTransX_spin">
+                     <widget class="PSpinBox" name="grid3DTransX_spin">
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
@@ -2944,7 +2944,7 @@
                      </widget>
                     </item>
                     <item row="1" column="2">
-                     <widget class="QSpinBox" name="grid3DTransY_spin">
+                     <widget class="PSpinBox" name="grid3DTransY_spin">
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
@@ -3010,7 +3010,7 @@
                      </widget>
                     </item>
                     <item row="2" column="2">
-                     <widget class="QSpinBox" name="grid3DTransZ_spin">
+                     <widget class="PSpinBox" name="grid3DTransZ_spin">
                       <property name="enabled">
                        <bool>true</bool>
                       </property>
@@ -3097,7 +3097,7 @@
                      </widget>
                     </item>
                     <item row="3" column="2">
-                     <widget class="QSpinBox" name="grid3DResolution_spin">
+                     <widget class="PSpinBox" name="grid3DResolution_spin">
                       <property name="maximumSize">
                        <size>
                         <width>16777215</width>
@@ -3195,7 +3195,7 @@
                      </widget>
                     </item>
                     <item row="0" column="2">
-                     <widget class="QSpinBox" name="gridTransX_spin">
+                     <widget class="PSpinBox" name="gridTransX_spin">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -3261,7 +3261,7 @@
                      </widget>
                     </item>
                     <item row="1" column="2">
-                     <widget class="QSpinBox" name="gridTransY_spin">
+                     <widget class="PSpinBox" name="gridTransY_spin">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -3333,7 +3333,7 @@
                      </widget>
                     </item>
                     <item row="2" column="2">
-                     <widget class="QSpinBox" name="gridRot_spin">
+                     <widget class="PSpinBox" name="gridRot_spin">
                       <property name="enabled">
                        <bool>true</bool>
                       </property>
@@ -3423,7 +3423,7 @@
                      </widget>
                     </item>
                     <item row="3" column="2">
-                     <widget class="QSpinBox" name="gridScale_spin">
+                     <widget class="PSpinBox" name="gridScale_spin">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
@@ -3511,8 +3511,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>465</width>
-            <height>993</height>
+            <width>460</width>
+            <height>934</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -3575,7 +3575,7 @@
                   <number>6</number>
                  </property>
                  <item row="0" column="2">
-                  <widget class="QSpinBox" name="recoStep">
+                  <widget class="PSpinBox" name="recoStep">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -3652,7 +3652,6 @@
                 <widget class="QLabel" name="recoNumberNow">
                  <property name="font">
                   <font>
-                   <weight>75</weight>
                    <bold>true</bold>
                   </font>
                  </property>
@@ -4347,7 +4346,7 @@
                         </widget>
                        </item>
                        <item row="0" column="0">
-                        <widget class="QSpinBox" name="mapNr">
+                        <widget class="PSpinBox" name="mapNr">
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                            <horstretch>0</horstretch>
@@ -4492,7 +4491,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="QDoubleSpinBox" name="mapHeight">
+                        <widget class="PDoubleSpinBox" name="mapHeight">
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                            <horstretch>0</horstretch>
@@ -4637,7 +4636,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QDoubleSpinBox" name="mapDefaultHeight">
+                   <widget class="PDoubleSpinBox" name="mapDefaultHeight">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -4799,9 +4798,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
-            <width>465</width>
-            <height>1247</height>
+            <y>-570</y>
+            <width>460</width>
+            <height>1138</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -4864,7 +4863,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="trackRepeatQual">
+              <widget class="PSpinBox" name="trackRepeatQual">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -4991,7 +4990,6 @@
               <widget class="QLabel" name="trackNumberNow">
                <property name="font">
                 <font>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -5032,7 +5030,6 @@
               <widget class="QLabel" name="trackNumberVisible">
                <property name="font">
                 <font>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -5048,7 +5045,6 @@
               <widget class="QLabel" name="trackNumberAll">
                <property name="font">
                 <font>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -5886,7 +5882,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QSpinBox" name="trackShowOnlyNr">
+                   <widget class="PSpinBox" name="trackShowOnlyNr">
                     <property name="minimum">
                      <number>1</number>
                     </property>
@@ -6020,7 +6016,7 @@
                    </widget>
                   </item>
                   <item row="0" column="2">
-                   <widget class="QSpinBox" name="trackCurrentPointSize">
+                   <widget class="PSpinBox" name="trackCurrentPointSize">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -6042,7 +6038,7 @@
                    </widget>
                   </item>
                   <item row="3" column="2">
-                   <widget class="QSpinBox" name="trackColColorSize">
+                   <widget class="PSpinBox" name="trackColColorSize">
                     <property name="alignment">
                      <set>Qt::AlignRight</set>
                     </property>
@@ -6164,7 +6160,7 @@
                    </widget>
                   </item>
                   <item row="5" column="2">
-                   <widget class="QSpinBox" name="trackNumberSize">
+                   <widget class="PSpinBox" name="trackNumberSize">
                     <property name="alignment">
                      <set>Qt::AlignRight</set>
                     </property>
@@ -6503,7 +6499,7 @@
                    </widget>
                   </item>
                   <item row="2" column="2">
-                   <widget class="QSpinBox" name="trackPathWidth">
+                   <widget class="PSpinBox" name="trackPathWidth">
                     <property name="alignment">
                      <set>Qt::AlignRight</set>
                     </property>
@@ -6583,7 +6579,7 @@
                    </widget>
                   </item>
                   <item row="4" column="2">
-                   <widget class="QSpinBox" name="trackColorMarkerSize">
+                   <widget class="PSpinBox" name="trackColorMarkerSize">
                     <property name="alignment">
                      <set>Qt::AlignRight</set>
                     </property>
@@ -6596,7 +6592,7 @@
                    </widget>
                   </item>
                   <item row="1" column="2">
-                   <widget class="QSpinBox" name="trackPointSize">
+                   <widget class="PSpinBox" name="trackPointSize">
                     <property name="alignment">
                      <set>Qt::AlignRight</set>
                     </property>
@@ -6651,7 +6647,7 @@
                    </widget>
                   </item>
                   <item row="6" column="2">
-                   <widget class="QSpinBox" name="trackGroundPositionSize">
+                   <widget class="PSpinBox" name="trackGroundPositionSize">
                     <property name="alignment">
                      <set>Qt::AlignRight</set>
                     </property>
@@ -6693,7 +6689,7 @@
                    </widget>
                   </item>
                   <item row="7" column="2">
-                   <widget class="QSpinBox" name="trackGroundPathSize">
+                   <widget class="PSpinBox" name="trackGroundPathSize">
                     <property name="alignment">
                      <set>Qt::AlignRight</set>
                     </property>
@@ -7041,7 +7037,7 @@
                    </widget>
                   </item>
                   <item row="0" column="1">
-                   <widget class="QSpinBox" name="trackShowBefore">
+                   <widget class="PSpinBox" name="trackShowBefore">
                     <property name="maximumSize">
                      <size>
                       <width>80</width>
@@ -7076,7 +7072,7 @@
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="QSpinBox" name="trackShowAfter">
+                   <widget class="PSpinBox" name="trackShowAfter">
                     <property name="maximumSize">
                      <size>
                       <width>80</width>
@@ -7172,7 +7168,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QSpinBox" name="moCapSize">
+                 <widget class="PSpinBox" name="moCapSize">
                   <property name="minimumSize">
                    <size>
                     <width>100</width>
@@ -7288,8 +7284,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>479</width>
-            <height>553</height>
+            <width>477</width>
+            <height>555</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -7354,7 +7350,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QSpinBox" name="anaStep">
+                <widget class="PSpinBox" name="anaStep">
                  <property name="minimum">
                   <number>1</number>
                  </property>
@@ -7471,6 +7467,16 @@
    <extends>QFrame</extends>
    <header>colorPlot.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>pdoublespinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>pspinbox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
