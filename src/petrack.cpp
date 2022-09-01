@@ -68,10 +68,6 @@
 #include <iomanip>
 #include <opencv2/opencv.hpp>
 
-// temp muss spaeter herausgenommen werden,
-//  dient dazu, in anderen dateien um schnell ueber cw->temp1->value() an einstellbare daten zu kommen
-Control *cw;
-
 int Petrack::trcVersion = 0;
 
 // Reihenfolge des anlegens der objekte ist sehr wichtig
@@ -122,7 +118,6 @@ Petrack::Petrack() :
     mRecognitionRoiItem->setZValue(5); // groesser heisst weiter oben
 
     mControlWidget = new Control(*this, *mScene, mReco, *mTrackingRoiItem, *mRecognitionRoiItem);
-    cw             = mControlWidget; // muss spaeter geloescht werden
 
     mStereoWidget = new StereoWidget(this);
     mStereoWidget->setWindowFlags(Qt::Window);
@@ -311,7 +306,6 @@ Petrack::Petrack() :
 Petrack::~Petrack()
 {
     delete mImage;
-    delete cw;
     // hier muessten weitere stehen insb die im konstruktor erzeugt werden
     // aber da petrack nur vernichtet wird, wenn programm beendet wird, kann man sich das auch schenken
 }
