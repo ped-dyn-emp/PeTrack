@@ -15,6 +15,7 @@ if (WIN32)
         message(\"\${CMAKE_INSTALL_PREFIX}/petrack.exe\")
         execute_process(COMMAND ${WINDEPLOYQT_APP} \"\${CMAKE_INSTALL_PREFIX}/bin/petrack.exe\")
     ")
+    set(OFFSCREEN_PLUGIN "${Qt5Core_DIR}/../../../plugins/platforms/qoffscreen.dll")
 
     install(FILES "${OpenCV_LIB_PATH}/../bin/opencv_videoio_ffmpeg${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}_64.dll" DESTINATION ${CMAKE_INSTALL_BINDIR})
 
@@ -24,6 +25,7 @@ if (WIN32)
     install(FILES "${OpenCV_DIR}/LICENSE/" DESTINATION "Licenses/OpenCV_Licenses")
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/ezc3d/LICENSE" DESTINATION "Licenses/ezc3d_license/")
     install(FILES "${CMAKE_SOURCE_DIR}/.zenodo.json" DESTINATION "bin")
+    install(FILES "${OFFSCREEN_PLUGIN}" DESTINATION "bin/platforms")
 
     # install Qwt and OpenCV
     install(CODE "
