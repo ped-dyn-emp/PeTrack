@@ -181,6 +181,7 @@ public:
     virtual cv::Point2f             getImagePoint(cv::Point3f p3d);
     cv::Point3f                     get3DPoint(const cv::Point2f &p2d, double h) const;
     cv::Point3f                     transformRT(cv::Point3f p);
+    cv::Vec3d                       camToWorldRotation(const cv::Vec3d &vec) const;
     bool                            isOutsideImage(cv::Point2f p2d);
     inline bool                     isOutsideImage(cv::Point3f p3d) { return isOutsideImage(getImagePoint(p3d)); }
     inline std::vector<cv::Point3f> get3DList() { return points3D; }

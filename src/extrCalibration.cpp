@@ -895,6 +895,27 @@ cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d)
     return point2D;
 }
 
+/**
+ * @brief Rotate a given vector from camera coordinate system to world coordinate system
+ *
+ * When the world coordinate system is not aligned to the camera-system,
+ * some direction dependent calculations (like head orientation) have to be rotated to be correctly exported.
+ *
+ * @param camVec the Vector to be rotated matching the camera coordinate system.
+ * @return the rotated vector.
+ */
+cv::Vec3d ExtrCalibration::camToWorldRotation(const cv::Vec3d &camVec) const
+{
+    // Transform the rotation vector into a rotation matrix with opencvs rodrigues method
+    cv::Matx<double, 3, 3> rotMat(3, 3, CV_64F);
+    const auto             rvec = cv::Vec3d(
+        mControlWidget->getCalibExtrRot1(), mControlWidget->getCalibExtrRot2(), mControlWidget->getCalibExtrRot3());
+    Rodrigues(rvec, rotMat);
+
+    auto      rotInv   = rotMat.inv(cv::DECOMP_LU);
+    cv::Vec3d worldVec = rotInv * camVec;
+    return worldVec;
+}
 
 /**
  * @brief Tranforms a 2D point into a 3D point with given height.
