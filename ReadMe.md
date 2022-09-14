@@ -4,7 +4,7 @@ Software for tracking pedestrians.
 
 
 ## Installation, Uninstallation:
-To obtain the installer of the latest stable Windows version, follow the steps at https://www.fz-juelich.de/ias/ias-7/EN/Expertise/Software/PeTrack/petrackDownload.html.
+To obtain the installer of the latest stable Windows version, follow the steps in our [registration form](https://go.fzj.de/petrack-download).
 Afterwards just execute `petrack-installer_<version>.exe` and follow the instructions.
 To uninstall PeTrack execute `Uninstall.exe` in the PeTrack application folder.
 
@@ -17,7 +17,7 @@ petrack -help
 
 Key bindings can be found in the help menu of the program.
 
-For more information see https://jugit.fz-juelich.de/ped-dyn-emp/petrack/-/wikis/home.
+For more information see https://go.fzj.de/petrack-wiki.
 
 For setting up an extraction process PeTrack is used interactively. 
 To perform the extraction for multiple experiments the command line functionality is useful.
