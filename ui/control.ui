@@ -135,7 +135,7 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-713</y>
+            <y>0</y>
             <width>460</width>
             <height>1268</height>
            </rect>
@@ -3510,7 +3510,7 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-379</y>
             <width>460</width>
             <height>934</height>
            </rect>
@@ -4485,6 +4485,9 @@
                            <verstretch>0</verstretch>
                           </sizepolicy>
                          </property>
+                         <property name="toolTip">
+                          <string>person height mapped to the selected color</string>
+                         </property>
                          <property name="text">
                           <string>height:</string>
                          </property>
@@ -4497,6 +4500,9 @@
                            <horstretch>0</horstretch>
                            <verstretch>0</verstretch>
                           </sizepolicy>
+                         </property>
+                         <property name="toolTip">
+                          <string>person height mapped to the selected color</string>
                          </property>
                          <property name="alignment">
                           <set>Qt::AlignRight</set>
@@ -4628,7 +4634,7 @@
                      </sizepolicy>
                     </property>
                     <property name="toolTip">
-                     <string>default height, if no height is measured through color marker or disparity</string>
+                     <string>default person height, if no height is measured through color marker or disparity</string>
                     </property>
                     <property name="text">
                      <string>def. height:</string>
@@ -4642,6 +4648,9 @@
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
+                    </property>
+                    <property name="toolTip">
+                     <string>default person height, if no height is measured through color marker or disparity</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignRight</set>
@@ -4798,7 +4807,7 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-570</y>
+            <y>0</y>
             <width>460</width>
             <height>1138</height>
            </rect>
