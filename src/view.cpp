@@ -40,7 +40,7 @@ void GraphicsView::wheelEvent(QWheelEvent *event)
 {
     QPoint numDegrees = event->angleDelta() / 8;
 
-    if(event->modifiers() == Qt::ShiftModifier) // nur shift zugelassen ...
+    if(event->modifiers() == Qt::ShiftModifier)
     {
         // Check if horizontal scroll
         if(event->angleDelta().x() != 0) // warum orienttion?
@@ -50,6 +50,17 @@ void GraphicsView::wheelEvent(QWheelEvent *event)
         else
         {
             emit mouseShiftWheel(-numDegrees.y() / 15);
+        }
+    }
+    else if(event->modifiers() == Qt::ControlModifier)
+    {
+        if(event->angleDelta().x() != 0)
+        {
+            emit mouseCtrlWheel(numDegrees.x() / 15);
+        }
+        else
+        {
+            emit mouseCtrlWheel(numDegrees.y() / 15);
         }
     }
     else

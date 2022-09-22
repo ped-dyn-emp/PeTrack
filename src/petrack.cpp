@@ -172,7 +172,7 @@ Petrack::Petrack() :
     connect(mView, &GraphicsView::mouseAltPressed, this, &Petrack::selectPersonForMoveTrackPoint);
     connect(mView, &GraphicsView::altReleased, this, &Petrack::releaseTrackPoint);
     connect(mView, &GraphicsView::mouseAltReleased, this, &Petrack::releaseTrackPoint);
-
+    connect(mView, &GraphicsView::mouseCtrlWheel, this, &Petrack::scrollShowOnly);
 
     mPlayerWidget = new Player(mAnimation, this);
 
@@ -1639,7 +1639,9 @@ void Petrack::keyBindings()
         "enables showing only the modified trajectory</dd>"
         "<dt><kbd>Alt + double-click left mouse button</kbd></dt><dd>jumps to frame of trackpoint under cursor</dd>"
         "<dt><kbd>Alt + holding left mouse button</kbd></dt><dd>moves trackpoint under cursor</dd>"
-        "<dt><kbd>Ctrl + E</kbd></dt><dd>export trajectories</dd></dl>"
+        "<dt><kbd>Ctrl + E</kbd></dt><dd>export trajectories</dd>"
+        "<dt><kbd>Ctrl + mouse scroll wheel</kbd></dt><dd>change the displayed person (if show only people "
+        "enabled)</dd></dl>"
         "<p>Further key bindings you will find next to the entries of the menus.</p>");
 
     PMessageBox *mb = new PMessageBox(this, tr("Key Bindings"), out, QIcon());
@@ -4260,6 +4262,18 @@ void Petrack::releaseTrackPoint()
     mManualTrackPointMover.setTrackPoint();
     mAutosave.trackPersonModified();
     setCursor(QCursor{});
+}
+
+void Petrack::scrollShowOnly(int delta)
+{
+    if(delta < 0)
+    {
+        mControlWidget->trackShowOnlyNr->stepDown();
+    }
+    else
+    {
+        mControlWidget->trackShowOnlyNr->stepUp();
+    }
 }
 
 void Petrack::updateSourceInOutFrames()
