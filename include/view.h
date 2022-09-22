@@ -62,6 +62,7 @@ signals:
     void mouseRightDoubleClick(QPointF pos, int direction);
     void mouseMiddleDoubleClick(PersonStorage::Direction direction);
     void mouseShiftWheel(int delta);
+    void mouseCtrlWheel(int delta);
     void mouseAltPressed(QPointF pos);
     void mouseAltReleased(QPointF pos);
     void altReleased();

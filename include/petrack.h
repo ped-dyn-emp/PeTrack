@@ -160,10 +160,10 @@ public slots:
     void moveTrackPoint(QPointF pos);
     void selectPersonForMoveTrackPoint(QPointF pos);
     void releaseTrackPoint();
-    //    void showContextMenu(QPointF pos);
     void updateSourceInOutFrames();
     void skipToFrameWheel(int delta);
     void skipToFrameFromTrajectory(QPointF pos);
+    void scrollShowOnly(int delta);
 
 public:
     void         updateControlWidget();
