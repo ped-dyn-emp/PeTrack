@@ -88,18 +88,13 @@ void copyToQImage(QImage &qImg, cv::Mat &img) // war static functin in animatiol
     }
     else if(channels == 1)
     {
-        // This loop is optimized so it has to calculate the least amount of indexes
-        // Optimizing the access to the pointer data is useless (no difference in performance when tested)
-        for(int y = 0; y < img.rows; y++)
-        {
-            // Pointer to the data information in the QImage for just one column
-            // set pointer to value before, because ++p is faster than p++
-            for(int x = 0; x < img.cols; x++)
-            {
-                cv::Scalar colour = img.at<uchar>(cv::Point(x, y));
-                qImg.setPixel(x, y, colour.val[0]);
-            }
-        }
+        qImg = QImage(
+                   static_cast<const uchar *>(img.data),
+                   img.cols,
+                   img.rows,
+                   static_cast<int>(img.step),
+                   QImage::Format_Grayscale8)
+                   .copy();
     }
     else
     {
