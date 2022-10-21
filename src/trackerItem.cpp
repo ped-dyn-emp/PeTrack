@@ -317,13 +317,13 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     QPen         numberPen;
     QPen         groundPositionPen;
     QPen         groundPathPen;
-    double       pSP  = (double) mControlWidget->trackCurrentPointSize->value();
-    double       pS   = (double) mControlWidget->trackPointSize->value();
-    double       pSC  = (double) mControlWidget->trackColColorSize->value();
-    double       pSM  = (double) mControlWidget->trackColorMarkerSize->value();
-    double       pSN  = (double) mControlWidget->trackNumberSize->value();
-    double       pSG  = (double) mControlWidget->trackGroundPositionSize->value();
-    double       pSGP = (double) mControlWidget->trackGroundPathSize->value();
+    double       pSP  = (double) mControlWidget->getTrackCurrentPointSize();
+    double       pS   = (double) mControlWidget->getTrackPointSize();
+    double       pSC  = (double) mControlWidget->getTrackColColorSize();
+    double       pSM  = (double) mControlWidget->getTrackColorMarkerSize();
+    double       pSN  = (double) mControlWidget->getTrackNumberSize();
+    double       pSG  = (double) mControlWidget->getTrackGroundPositionSize();
+    double       pSGP = (double) mControlWidget->getTrackGroundPathSize();
 
     QColor pGPC = mControlWidget->getTrackGroundPathColor();
     QColor pTPC = mControlWidget->getTrackPathColor();
@@ -335,11 +335,11 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     painter->drawRect(boundingRect());
 
     linePen.setColor(pTPC);
-    linePen.setWidth(mControlWidget->trackPathWidth->value());
+    linePen.setWidth(mControlWidget->getTrackPathWidth());
 
     ellipsePen.setWidth(3);
 
-    if(mControlWidget->trackNumberBold->checkState() == Qt::Checked)
+    if(mControlWidget->isTrackNumberBoldChecked())
     {
         font.setBold(true);
     }
@@ -347,8 +347,8 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     {
         font.setBold(false);
     }
-    font.setPixelSize(mControlWidget->trackNumberSize->value());
-    heightFont.setPixelSize(mControlWidget->trackColColorSize->value());
+    font.setPixelSize(mControlWidget->getTrackNumberSize());
+    heightFont.setPixelSize(mControlWidget->getTrackColColorSize());
     painter->setFont(font);
     numberPen.setColor(Qt::red);
     groundPositionPen.setColor(Qt::green);
@@ -357,7 +357,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     groundPathPen.setWidth(pSGP);
 
 
-    if(mControlWidget->showVoronoiCells->isChecked() && mPersonStorage.nbPersons() != 0)
+    if(mControlWidget->isShowVoronoiCellsChecked() && mPersonStorage.nbPersons() != 0)
     {
         // ToDo: adjust subdiv rect to correct area
         QRectF qrect = mMainWindow->getRecoRoiItem()->rect();
@@ -394,13 +394,13 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
         {
             if(person.trackPointExist(curFrame))
             {
-                if(mControlWidget->trackHeadSized->checkState() == Qt::Checked)
+                if(mControlWidget->isTrackHeadSizedChecked())
                 {
                     pSP = mMainWindow->getHeadSize(nullptr, static_cast<int>(i), curFrame); // headSize;
                 }
                 const TrackPoint &tp = person[curFrame - person.firstFrame()];
-                if(mControlWidget->trackShowCurrentPoint->checkState() ==
-                   Qt::Checked) //(mControlWidget->recoShowColor->checkState() == Qt::Checked)
+                if(mControlWidget->isTrackShowCurrentPointChecked()) //(mControlWidget->recoShowColor->checkState() ==
+                                                                     // Qt::Checked)
                 {
                     painter->setBrush(Qt::NoBrush);
                     if(person.newReco())
@@ -415,7 +415,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     painter->drawEllipse(rect); // direkt waere nur int erlaubt tp.x()-5., tp.y()-5., 10., 10.
                 }
 
-                if(mControlWidget->trackShowSearchSize->checkState() == Qt::Checked)
+                if(mControlWidget->isTrackShowSearchSizeChecked())
                 {
                     painter->setBrush(Qt::NoBrush);
                     painter->setPen(Qt::yellow);
@@ -424,7 +424,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     {
                         hS = 2; // entspricht Vorgehen in tracker.cpp
                     }
-                    for(int j = 0; j <= mControlWidget->trackRegionLevels->value(); ++j)
+                    for(int j = 0; j <= mControlWidget->getTrackRegionLevels(); ++j)
                     {
                         rect.setRect(tp.x() - hS / 2., tp.y() - hS / 2., hS, hS);
                         painter->drawRect(rect);
@@ -432,7 +432,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     }
                 }
 
-                if(mControlWidget->trackShowColorMarker->checkState() == Qt::Checked)
+                if(mControlWidget->isTrackShowColorMarkerChecked())
                 {
                     // farbe des trackpoints
                     if(tp.color().isValid())
@@ -446,13 +446,14 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 }
 
                 // berechnung der normalen, die zur positionierung der nummerieung und der gesamtfarbe dient
-                if(((mControlWidget->trackShowColColor->checkState() == Qt::Checked) && (person.color().isValid())) ||
-                   (mControlWidget->trackShowNumber->checkState() == Qt::Checked) ||
-                   ((mControlWidget->trackShowColColor->checkState() == Qt::Checked) &&
+                if(((mControlWidget->isTrackShowColColorChecked()) && (person.color().isValid())) ||
+                   (mControlWidget->isTrackShowNumberChecked()) ||
+                   ((mControlWidget->isTrackShowColColorChecked()) &&
                     ((person.height() > MIN_HEIGHT) ||
-                     ((tp.sp().z() > 0.) && (mControlWidget->trackShowHeightIndividual->checkState() ==
-                                             Qt::Checked))))) //  Hoehe kann auf Treppen auch negativ werden, wenn koord
-                                                              //  weiter oben angesetzt wird
+                     ((tp.sp().z() > 0.) &&
+                      (mControlWidget
+                           ->isTrackShowHeightIndividualChecked()))))) //  Hoehe kann auf Treppen auch negativ werden,
+                                                                       //  wenn koord weiter oben angesetzt wird
                 {
                     if(tp.color().isValid())
                     {
@@ -496,7 +497,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
 
                 // farbe der gesamten trackperson
                 double height = person.height();
-                if(mControlWidget->trackShowColColor->checkState() == Qt::Checked)
+                if(mControlWidget->isTrackShowColColorChecked())
                 {
                     painter->setPen(numberPen);
                     painter->setBrush(Qt::NoBrush);
@@ -509,7 +510,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     }
                 }
 
-                if((mControlWidget->trackShowColColor->checkState() == Qt::Checked) && (person.color().isValid()))
+                if((mControlWidget->isTrackShowColColorChecked()) && (person.color().isValid()))
                 {
                     painter->setPen(Qt::NoPen);
                     painter->setBrush(QBrush(person.color()));
@@ -521,15 +522,16 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     painter->drawEllipse(rect);
                 }
                 else if(
-                    (mControlWidget->trackShowColColor->checkState() == Qt::Checked) &&
+                    (mControlWidget->isTrackShowColColorChecked()) &&
                     ((height > MIN_HEIGHT) ||
                      ((tp.sp().z() > 0.) &&
-                      (mControlWidget->trackShowHeightIndividual->checkState() ==
-                       Qt::Checked)))) // Hoehe  && (person.height() > 0.) Hoehe kann auf Treppen auch negativ
-                                       // werden, wenn koord weiter oben angesetzt wird
+                      (mControlWidget
+                           ->isTrackShowHeightIndividualChecked())))) // Hoehe  && (person.height() > 0.) Hoehe
+                                                                      // kann auf Treppen auch negativ werden,
+                                                                      // wenn koord weiter oben angesetzt wird
                 {
                     painter->setFont(heightFont);
-                    if((mControlWidget->trackShowHeightIndividual->checkState() == Qt::Checked) &&
+                    if((mControlWidget->isTrackShowHeightIndividualChecked()) &&
                        (tp.sp().z() > 0.)) // Hoehe incl individual fuer jeden trackpoint
                     {
                         painter->setPen(numberPen);
@@ -554,8 +556,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                 painter->drawText(
                                     rect,
                                     Qt::AlignHCenter,
-                                    QString("-\n%2").arg(
-                                        mControlWidget->coordAltitude->value() - tp.sp().z(), 6, 'f', 1));
+                                    QString("-\n%2").arg(mControlWidget->getCameraAltitude() - tp.sp().z(), 6, 'f', 1));
                             }
                         }
                         else
@@ -576,7 +577,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                     Qt::AlignHCenter,
                                     QString("%1\n%2")
                                         .arg(height, 6, 'f', 1)
-                                        .arg(mControlWidget->coordAltitude->value() - tp.sp().z(), 6, 'f', 1));
+                                        .arg(mControlWidget->getCameraAltitude() - tp.sp().z(), 6, 'f', 1));
                             }
                         }
                     }
@@ -593,7 +594,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     }
                     painter->setFont(font);
                 }
-                if(mControlWidget->trackShowNumber->checkState() == Qt::Checked)
+                if(mControlWidget->isTrackShowNumberChecked())
                 {
                     // listennummer
                     painter->setPen(numberPen);
@@ -605,7 +606,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         pSN); // 11
                     painter->drawText(rect, Qt::AlignHCenter, QString("%1").arg(i + 1));
                 }
-                if(mControlWidget->trackShowGroundPosition->checkState() == Qt::Checked)
+                if(mControlWidget->isTrackShowGroundPositionChecked())
                 {
                     // ground position
                     painter->setPen(groundPositionPen);
@@ -651,7 +652,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     {
                     }
                 }
-                if(mControlWidget->showVoronoiCells->checkState() == Qt::Checked)
+                if(mControlWidget->isShowVoronoiCellsChecked())
                 {
                     if(mControlWidget->getCalibCoordDimension() == 0) // 3D
                     {
@@ -686,31 +687,29 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 }
             }
 
-            if(((mControlWidget->trackShowPoints->checkState() == Qt::Checked) ||
-                (mControlWidget->trackShowPath->checkState() == Qt::Checked) ||
-                (mControlWidget->trackShowGroundPath->checkState() == Qt::Checked)) &&
-               ((person.trackPointExist(curFrame)) ||
-                (mControlWidget->trackShowOnlyVisible->checkState() == Qt::Unchecked)))
+            if(((mControlWidget->isTrackShowPointsChecked()) || (mControlWidget->isTrackShowPathChecked()) ||
+                (mControlWidget->isTrackShowGroundPathChecked())) &&
+               ((person.trackPointExist(curFrame)) || (mControlWidget->isTrackShowOnlyVisibleChecked())))
             {
-                if(mControlWidget->trackShowBefore->value() == -1)
+                if(mControlWidget->getTrackShowBefore() == -1)
                 {
                     from = 0;
                 }
                 else
                 {
-                    from = curFrame - person.firstFrame() - mControlWidget->trackShowBefore->value();
+                    from = curFrame - person.firstFrame() - mControlWidget->getTrackShowBefore();
                     if(from < 0)
                     {
                         from = 0;
                     }
                 }
-                if(mControlWidget->trackShowAfter->value() == -1)
+                if(mControlWidget->getTrackShowAfter() == -1)
                 {
                     to = person.size();
                 }
                 else
                 {
-                    to = curFrame - person.firstFrame() + mControlWidget->trackShowAfter->value() + 1;
+                    to = curFrame - person.firstFrame() + mControlWidget->getTrackShowAfter() + 1;
                     if(to > person.size())
                     {
                         to = person.size();
@@ -719,7 +718,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 for(int j = from; j < to; ++j) // ueber TrackPoint
                 {
                     // path
-                    if(mControlWidget->trackShowPath->checkState() == Qt::Checked)
+                    if(mControlWidget->isTrackShowPathChecked())
                     {
                         if(j != from) // autom. > 0
                         {
@@ -740,7 +739,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         }
                     }
                     // path on ground
-                    if(mControlWidget->trackShowGroundPath->checkState() == Qt::Checked)
+                    if(mControlWidget->isTrackShowGroundPathChecked())
                     {
                         if(j != from)
                         {
@@ -803,12 +802,11 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     }
 
                     // points before and after
-                    if(mControlWidget->trackShowPoints->checkState() == Qt::Checked)
+                    if(mControlWidget->isTrackShowPointsChecked())
                     {
                         if(person.firstFrame() + j != curFrame)
                         {
-                            if((mControlWidget->trackShowPointsColored->checkState() == Qt::Checked) &&
-                               (person.at(j).color().isValid()))
+                            if((mControlWidget->isTrackShowPointsColoredChecked()) && (person.at(j).color().isValid()))
                             {
                                 painter->setPen(Qt::NoPen);
                                 painter->setBrush(QBrush(person.at(j).color()));
@@ -830,7 +828,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     }
 
     // Mat& img, Subdiv2D& subdiv )
-    if(mControlWidget->showVoronoiCells->checkState() == Qt::Checked && !mPersonStorage.getPersons().empty())
+    if(mControlWidget->isShowVoronoiCellsChecked() && !mPersonStorage.getPersons().empty())
     {
         std::vector<std::vector<cv::Point2f>> facets3D;
         std::vector<cv::Point2f>              centers3D;

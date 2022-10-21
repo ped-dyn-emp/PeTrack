@@ -797,11 +797,11 @@ void TrackerReal::exportXml(QTextStream &outXml, bool alternateHeight, bool useT
 std::vector<MissingFrame> TrackerReal::computeDroppedFrames(Petrack *petrack)
 {
     // Save current state
-    auto recognitionState = petrack->getControlWidget()->performRecognition->checkState();
-    petrack->getControlWidget()->performRecognition->setCheckState(Qt::Unchecked);
+    auto recognitionState = petrack->getControlWidget()->isPerformRecognitionChecked();
+    petrack->getControlWidget()->setPerformRecognitionChecked(false);
 
-    auto trackingState = petrack->getControlWidget()->trackOnlineCalc->checkState();
-    petrack->getControlWidget()->trackOnlineCalc->setCheckState(Qt::Unchecked);
+    auto trackingState = petrack->getControlWidget()->isOnlineTrackingChecked();
+    petrack->getControlWidget()->setOnlineTrackingChecked(false);
 
     int currentFrameNum = petrack->getPlayer()->getPos();
 
@@ -830,8 +830,8 @@ std::vector<MissingFrame> TrackerReal::computeDroppedFrames(Petrack *petrack)
 
 
     petrack->getPlayer()->skipToFrame(currentFrameNum);
-    petrack->getControlWidget()->performRecognition->setCheckState(recognitionState);
-    petrack->getControlWidget()->trackOnlineCalc->setCheckState(trackingState);
+    petrack->getControlWidget()->setPerformRecognitionChecked(recognitionState);
+    petrack->getControlWidget()->setOnlineTrackingChecked(trackingState);
 
     return missingFrames;
 }
@@ -869,7 +869,7 @@ std::vector<std::unordered_map<int, double>> utils::computeDisplacement(
     auto cmPerPixelXYMiddle = petrack->getImageItem()->getCmPerPixel(
         static_cast<float>(prevFrame.cols / 2),
         static_cast<float>(prevFrame.rows / 2),
-        static_cast<float>(petrack->getControlWidget()->mapDefaultHeight->value()));
+        static_cast<float>(petrack->getControlWidget()->getDefaultHeight()));
     auto             cmPerPixelMiddle = (cmPerPixelXYMiddle.x() + cmPerPixelXYMiddle.y()) / 2.;
     constexpr double headFactor       = 1.25; //< factor around head size to ensure complete head is in window
     int              winsize          = static_cast<int>(headFactor * HEAD_SIZE / cmPerPixelMiddle);
@@ -894,7 +894,7 @@ std::vector<std::unordered_map<int, double>> utils::computeDisplacement(
         std::vector<uchar>       localStatus;
         std::vector<float>       localTrackError;
 
-        int maxLevel = petrack->getControlWidget()->trackRegionLevels->value();
+        int maxLevel = petrack->getControlWidget()->getTrackRegionLevels();
 
         cv::calcOpticalFlowPyrLK(
             prevFrame,
@@ -916,9 +916,7 @@ std::vector<std::unordered_map<int, double>> utils::computeDisplacement(
                 auto id = idsInFrame[frame - 1][i];
 
                 auto cmPerPixelXY = petrack->getImageItem()->getCmPerPixel(
-                    nextFeaturePoint[i].x,
-                    nextFeaturePoint[i].y,
-                    petrack->getControlWidget()->mapDefaultHeight->value());
+                    nextFeaturePoint[i].x, nextFeaturePoint[i].y, petrack->getControlWidget()->getDefaultHeight());
 
                 auto mPerPixel = (cmPerPixelXY.x() + cmPerPixelXY.y()) / 2. / 100.;
 

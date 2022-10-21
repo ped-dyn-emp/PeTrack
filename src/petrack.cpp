@@ -277,7 +277,7 @@ Petrack::Petrack() :
     connect(exportShortCut, &QShortcut::activated, this, [=]() { exportTracker(); });
 
     auto *toggleOnlineTracking = new QShortcut{QKeySequence("Shift+t"), this};
-    connect(toggleOnlineTracking, &QShortcut::activated, this, [=]() { mControlWidget->trackOnlineCalc->toggle(); });
+    connect(toggleOnlineTracking, &QShortcut::activated, this, [=]() { mControlWidget->toggleOnlineTracking(); });
 
     // TODO delete once we get Options to be value only (i.e. no Pointer/Ref anymore)
     mReco.getCodeMarkerOptions().setControlWidget(mControlWidget);
@@ -549,7 +549,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
 
     if(frame != -1)
     {
-        if(mControlWidget->filterBg->isChecked() &&
+        if(mControlWidget->isFilterBgChecked() &&
            !loaded) // mit dem anfangs geladenen bild wurde bereits faelschlicherweise bg bestimmt
         {
             mBackgroundFilter.reset(); // erst nach dem springen zu einem frame background bestimmen
@@ -576,8 +576,8 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
         importTracker(mTrcFileName);
     }
 
-    mControlWidget->trackShowOnlyNr->setValue(onlyPeopleNr);
-    mControlWidget->trackShowOnlyNrList->setText(onlyPeopleNrList);
+    mControlWidget->setTrackShowOnlyNr(onlyPeopleNr);
+    mControlWidget->trackShowOnlyNrList()->setText(onlyPeopleNrList);
 
     if(cam == cameraLeft)
     {
@@ -670,7 +670,7 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
         else if(newerThanVersion(QString("0.9.2"), root.attribute("VERSION")))
         {
             // only checking one parameter because if the ext. model is used all parameters are not equal to zero
-            if(mControlWidget->getCalibS1Value() == 0.)
+            if(mControlWidget->getCalibS1() == 0.)
             {
                 mControlWidget->setExtModelChecked(false);
             }
@@ -2050,243 +2050,6 @@ void Petrack::resetUI()
     ///  einem Programmabsturz
     ///
     return;
-
-    mSeqFileName = "";
-    mAnimation->free();
-    if(mImage)
-    {
-        mImage->fill(QColor::fromRgb(255, 255, 255));
-        mImageItem->setImage(mImage);
-        mLogoItem->show();
-    }
-    mStatusPosRealHeight->setValue(180.0);
-    /// calibration params
-    /// image filters
-    mControlWidget->filterBrightContrast->setCheckState(Qt::Unchecked);
-    mControlWidget->filterBrightParam->setValue(0);
-    mControlWidget->filterContrastParam->setValue(0);
-
-    mControlWidget->filterBorder->setCheckState(Qt::Unchecked);
-    mControlWidget->filterBorderParamSize->setValue(0);
-    QColor defaultBorder = Qt::black;
-    getBorderFilter()->getBorderColR()->setValue(defaultBorder.red());
-    getBorderFilter()->getBorderColG()->setValue(defaultBorder.green());
-    getBorderFilter()->getBorderColB()->setValue(defaultBorder.blue());
-
-    mControlWidget->filterBg->setCheckState(Qt::Unchecked);
-    mControlWidget->filterBgDeleteNumber->setValue(3);
-    mControlWidget->filterBgDeleteTrj->setCheckState(Qt::Checked);
-    mControlWidget->filterBgShow->setCheckState(Qt::Unchecked);
-    mControlWidget->filterBgUpdate->setCheckState(Qt::Unchecked);
-    getBackgroundFilter()->setFilename(nullptr);
-    getBackgroundFilter()->reset();
-
-    mControlWidget->filterSwap->setCheckState(Qt::Unchecked);
-    mControlWidget->filterSwapH->setCheckState(Qt::Unchecked);
-    mControlWidget->filterSwapV->setCheckState(Qt::Unchecked);
-
-    /// intrinsic params
-    mControlWidget->apply->setCheckState(Qt::Unchecked);
-    mControlWidget->fx->setValue(1000);
-    mControlWidget->fy->setValue(1000);
-    mControlWidget->cx->setValue(960);
-    mControlWidget->cx->setMinimum(0);
-    mControlWidget->cx->setMaximum(mControlWidget->cx->value() * 2);
-    mControlWidget->cy->setValue(540);
-    mControlWidget->cx->setMinimum(0);
-    mControlWidget->cy->setMaximum(mControlWidget->cy->value() * 2);
-    mControlWidget->r2->setValue(0);
-    mControlWidget->r4->setValue(0);
-    mControlWidget->r6->setValue(0);
-    mControlWidget->tx->setValue(0);
-    mControlWidget->ty->setValue(0);
-    mControlWidget->k4->setValue(0);
-    mControlWidget->k5->setValue(0);
-    mControlWidget->k6->setValue(0);
-    mControlWidget->s1->setValue(0);
-    mControlWidget->s2->setValue(0);
-    mControlWidget->s3->setValue(0);
-    mControlWidget->s4->setValue(0);
-    mControlWidget->taux->setValue(0);
-    mControlWidget->tauy->setValue(0);
-    mControlWidget->quadAspectRatio->setCheckState(Qt::Unchecked);
-    mControlWidget->fixCenter->setCheckState(Qt::Unchecked);
-    mControlWidget->tangDist->setCheckState(Qt::Checked);
-    getAutoCalib()->setBoardSizeX(6);
-    getAutoCalib()->setBoardSizeY(8);
-    getAutoCalib()->setSquareSize(5.0);
-    getAutoCalib()->setCalibFiles(QStringList());
-
-    /// extrinsic params
-    mControlWidget->trans1->setValue(0);
-    mControlWidget->trans2->setValue(0);
-    mControlWidget->trans3->setValue(-500);
-    mControlWidget->rot1->setValue(0);
-    mControlWidget->rot2->setValue(0);
-    mControlWidget->rot3->setValue(0);
-    getExtrCalibration()->setExtrCalibFile(nullptr);
-
-    /// coord system
-    mControlWidget->coordShow->setCheckState(Qt::Unchecked);
-    mControlWidget->coordFix->setCheckState(Qt::Unchecked);
-    mControlWidget->coordTab->setCurrentIndex(0);
-    // 3D
-    mControlWidget->coord3DTransX->setValue(0);
-    mControlWidget->coord3DTransY->setValue(0);
-    mControlWidget->coord3DTransZ->setValue(0);
-    mControlWidget->coord3DAxeLen->setValue(200);
-    mControlWidget->coord3DSwapX->setCheckState(Qt::Unchecked);
-    mControlWidget->coord3DSwapY->setCheckState(Qt::Unchecked);
-    mControlWidget->coord3DSwapZ->setCheckState(Qt::Unchecked);
-    mControlWidget->extCalibPointsShow->setCheckState(Qt::Unchecked);
-    mControlWidget->extVanishPointsShow->setCheckState(Qt::Unchecked);
-    // 2D
-    mControlWidget->coordTransX->setValue(0);
-    mControlWidget->coordTransY->setValue(0);
-    mControlWidget->coordRotate->setValue(0);
-    mControlWidget->coordScale->setValue(100);
-    mControlWidget->coordAltitude->setValue(535);
-    mControlWidget->coordUnit->setValue(100);
-    mControlWidget->coordUseIntrinsic->setCheckState(Qt::Unchecked);
-
-    /// alignment grid
-    mControlWidget->gridShow->setCheckState(Qt::Unchecked);
-    mControlWidget->gridFix->setCheckState(Qt::Unchecked);
-    mControlWidget->gridTab->setCurrentIndex(0);
-    // 3D
-    mControlWidget->grid3DTransX->setValue(0);
-    mControlWidget->grid3DTransY->setValue(0);
-    mControlWidget->grid3DTransZ->setValue(0);
-    mControlWidget->grid3DResolution->setValue(100);
-    // 2D
-    mControlWidget->gridTransX->setValue(0);
-    mControlWidget->gridTransY->setValue(0);
-    mControlWidget->gridRotate->setValue(0);
-    mControlWidget->gridScale->setValue(100);
-
-    ///
-    /// recognition params
-    ///
-    mControlWidget->performRecognition->setCheckState(Qt::Unchecked);
-    mControlWidget->recoStep->setValue(1);
-
-    // region of interest
-    mControlWidget->roiFix->setCheckState(Qt::Unchecked);
-    mControlWidget->roiShow->setCheckState(Qt::Unchecked);
-    getRecoRoiItem()->setRect(0, 0, 0, 0);
-
-    // marker, default multicolor marker (until 11/2016 hermes marker)
-    mControlWidget->recoMethod->setCurrentIndex(
-        mControlWidget->recoMethod->findData(QVariant::fromValue(reco::RecognitionMethod::MultiColor)));
-    mControlWidget->markerBrightness->setValue(100);
-    mControlWidget->markerIgnoreWithout->setCheckState(Qt::Checked);
-
-    // size and color
-    mControlWidget->recoShowColor->setCheckState(Qt::Checked);
-    mControlWidget->recoAutoWB->setCheckState(Qt::Checked);
-    mControlWidget->recoColorX->setCurrentIndex(0);
-    mControlWidget->recoColorY->setCurrentIndex(1);
-    mControlWidget->recoColorZ->setValue(255);
-    mControlWidget->recoGreyLevel->setValue(50);
-    mControlWidget->recoSymbolSize->setValue(10);
-
-    // map
-    mControlWidget->recoColorModel->setCurrentIndex(0);
-    mControlWidget->colorPlot->getMapItem()->delMaps();
-    mControlWidget->mapNr->setValue(0);
-    mControlWidget->mapNr->setMinimum(0);
-    mControlWidget->mapNr->setMaximum(0);
-    mControlWidget->mapX->setValue(0);
-    mControlWidget->mapY->setValue(0);
-    mControlWidget->mapW->setValue(0);
-    mControlWidget->mapH->setValue(0);
-    mControlWidget->mapColor->setCheckState(Qt::Checked);
-    mControlWidget->mapHeight->setValue(180);
-    mControlWidget->mapDefaultHeight->setValue(180);
-
-    ///
-    /// tracking params
-    ///
-    mControlWidget->trackOnlineCalc->setCheckState(Qt::Checked);
-    mControlWidget->trackRepeat->setCheckState(Qt::Checked);
-    mControlWidget->trackRepeatQual->setValue(50);
-    mControlWidget->trackExtrapolation->setCheckState(Qt::Checked);
-    mControlWidget->trackMerge->setCheckState(Qt::Unchecked);
-    mControlWidget->trackOnlySelected->setCheckState(Qt::Checked);
-    getTrackRoiItem()->setRect(0, 0, 0, 0);
-
-    // export options
-    mControlWidget->trackMissingFrames->setCheckState(Qt::Checked);
-    mControlWidget->trackRecalcHeight->setCheckState(Qt::Checked);
-    mControlWidget->trackAlternateHeight->setCheckState(Qt::Unchecked);
-    mControlWidget->exportElimTp->setCheckState(Qt::Unchecked);
-    mControlWidget->exportElimTrj->setCheckState(Qt::Unchecked);
-    mControlWidget->exportSmooth->setCheckState(Qt::Checked);
-    mControlWidget->exportViewDir->setCheckState(Qt::Unchecked);
-    mControlWidget->exportAngleOfView->setCheckState(Qt::Unchecked);
-    mControlWidget->exportUseM->setCheckState(Qt::Unchecked);
-    mControlWidget->exportComment->setCheckState(Qt::Unchecked);
-    mControlWidget->exportMarkerID->setCheckState(Qt::Unchecked);
-
-    // test options
-    mControlWidget->testEqual->setCheckState(Qt::Checked);
-    mControlWidget->testVelocity->setCheckState(Qt::Checked);
-    mControlWidget->testInside->setCheckState(Qt::Checked);
-    mControlWidget->testLength->setCheckState(Qt::Checked);
-    setTrackFileName(nullptr);
-
-    // search region
-    mControlWidget->trackRegionScale->setValue(16);
-    mControlWidget->trackRegionLevels->setValue(3);
-    mControlWidget->trackErrorExponent->setValue(0);
-    mControlWidget->trackShowSearchSize->setCheckState(Qt::Unchecked);
-
-    // path params
-    mControlWidget->trackShow->setCheckState(Qt::Checked);
-    mControlWidget->trackFix->setCheckState(Qt::Unchecked);
-
-    mControlWidget->trackShowOnlyVisible->setCheckState(Qt::Unchecked);
-    mControlWidget->trackShowOnly->setCheckState(Qt::Unchecked);
-    mControlWidget->trackShowOnlyNr->setValue(1);
-    mControlWidget->trackShowOnlyList->setCheckState(Qt::Unchecked);
-    mControlWidget->trackShowOnlyNrList->setEnabled(false);
-    mControlWidget->trackShowOnlyListButton->setEnabled(false);
-
-    mControlWidget->trackShowCurrentPoint->setCheckState(Qt::Checked);
-    mControlWidget->trackShowPoints->setCheckState(Qt::Unchecked);
-    mControlWidget->trackShowPath->setCheckState(Qt::Checked);
-    mControlWidget->trackShowColColor->setCheckState(Qt::Checked);
-    mControlWidget->trackShowColorMarker->setCheckState(Qt::Checked);
-    mControlWidget->trackShowNumber->setCheckState(Qt::Checked);
-    mControlWidget->trackShowGroundPosition->setCheckState(Qt::Unchecked);
-    mControlWidget->trackShowGroundPath->setCheckState(Qt::Unchecked);
-
-    mControlWidget->setTrackPathColor(Qt::red);
-    mControlWidget->setTrackGroundPathColor(Qt::green);
-    mControlWidget->trackHeadSized->setCheckState(Qt::Checked);
-    mControlWidget->trackCurrentPointSize->setValue(60);
-    mControlWidget->trackPointSize->setValue(7);
-    mControlWidget->trackPathWidth->setValue(2);
-    mControlWidget->trackColColorSize->setValue(11);
-    mControlWidget->trackColorMarkerSize->setValue(14);
-    mControlWidget->trackNumberSize->setValue(14);
-    mControlWidget->trackGroundPositionSize->setValue(1);
-    mControlWidget->trackGroundPathSize->setValue(1);
-
-    mControlWidget->trackShowPointsColored->setCheckState(Qt::Checked);
-    mControlWidget->trackNumberBold->setCheckState(Qt::Checked);
-    mControlWidget->trackShowBefore->setValue(15);
-    mControlWidget->trackShowAfter->setValue(15);
-
-    /// analysis params
-    mControlWidget->anaMissingFrames->setCheckState(Qt::Checked);
-    mControlWidget->anaMarkAct->setCheckState(Qt::Unchecked);
-    mControlWidget->anaStep->setValue(25);
-    mControlWidget->anaConsiderX->setCheckState(Qt::Unchecked);
-    mControlWidget->anaConsiderY->setCheckState(Qt::Checked);
-    mControlWidget->anaConsiderAbs->setCheckState(Qt::Unchecked);
-    mControlWidget->anaConsiderRev->setCheckState(Qt::Unchecked);
-    mControlWidget->showVoronoiCells->setCheckState(Qt::Unchecked);
 }
 
 void Petrack::setStatusStereo(float x, float y, float z)
@@ -2656,18 +2419,18 @@ void Petrack::updateControlImage(cv::Mat &img)
     int iH             = img.rows;
 
     // wird auch nochmal in ImageWidget gemacht, aber ist hier frueher noetig
-    double cX = mControlWidget->getCalibCxValue(); // merken, da min/max value verandernkann wenn aus dem rahmen
-    double cY = mControlWidget->getCalibCyValue();
+    double cX = mControlWidget->getCalibCx(); // merken, da min/max value verandernkann wenn aus dem rahmen
+    double cY = mControlWidget->getCalibCy();
 
     mControlWidget->setCalibCxMin(0 /*iW/2.-50.*/);
     mControlWidget->setCalibCxMax(iW /*iW/2.+50.*/);
     mControlWidget->setCalibCyMin(0 /*iH/2.-50.*/);
     mControlWidget->setCalibCyMax(iH /*iH/2.+50.*/);
 
-    if(mControlWidget->fixCenter->checkState() == Qt::Checked)
+    if(mControlWidget->isFixCenterChecked())
     {
-        mControlWidget->setCalibCxValue((iW - 1) / 2.);
-        mControlWidget->setCalibCyValue((iH - 1) / 2.);
+        mControlWidget->setCalibCx((iW - 1) / 2.);
+        mControlWidget->setCalibCy((iH - 1) / 2.);
     }
     else
     {
@@ -2677,8 +2440,8 @@ void Petrack::updateControlImage(cv::Mat &img)
         }
         lastBorderSize = getImageBorderSize();
 
-        mControlWidget->setCalibCxValue(cX + diffBorderSize);
-        mControlWidget->setCalibCyValue(cY + diffBorderSize);
+        mControlWidget->setCalibCx(cX + diffBorderSize);
+        mControlWidget->setCalibCy(cY + diffBorderSize);
     }
 }
 
@@ -2774,11 +2537,11 @@ void Petrack::importTracker(QString dest) // default = ""
                 tp.clear(); // loeschen, sonst immer weitere pfade angehangen werden
             }
 
-            mControlWidget->trackNumberAll->setText(QString("%1").arg(mPersonStorage.nbPersons()));
-            mControlWidget->trackShowOnlyNr->setMaximum(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
-            mControlWidget->trackNumberVisible->setText(
+            mControlWidget->setTrackNumberAll(QString("%1").arg(mPersonStorage.nbPersons()));
+            mControlWidget->setTrackShowOnlyNr(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
+            mControlWidget->setTrackNumberVisible(
                 QString("%1").arg(mPersonStorage.visible(mAnimation->getCurrentFrameNum())));
-            mControlWidget->colorPlot->replot();
+            mControlWidget->replotColorplot();
             file.close();
             debout << "import " << dest << " (" << sz << " person(s), file version " << trcVersion << ")" << std::endl;
             mTrcFileName =
@@ -2904,11 +2667,11 @@ void Petrack::importTracker(QString dest) // default = ""
                 }
             }
 
-            mControlWidget->trackNumberAll->setText(QString("%1").arg(mPersonStorage.nbPersons()));
-            mControlWidget->trackShowOnlyNr->setMaximum(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
-            mControlWidget->trackNumberVisible->setText(
+            mControlWidget->setTrackNumberAll(QString("%1").arg(mPersonStorage.nbPersons()));
+            mControlWidget->setTrackShowOnlyNr(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
+            mControlWidget->setTrackNumberVisible(
                 QString("%1").arg(mPersonStorage.visible(mAnimation->getCurrentFrameNum())));
-            mControlWidget->colorPlot->replot();
+            mControlWidget->replotColorplot();
             file.close();
             debout << "import " << dest << " (" << sz << " person(s) )" << std::endl;
             mTrcFileName =
@@ -2930,18 +2693,18 @@ void Petrack::testTracker()
     mPersonStorage.checkPlausibility(
         pers,
         frame,
-        mControlWidget->testEqual->isChecked(),
-        mControlWidget->testVelocity->isChecked(),
-        mControlWidget->testInside->isChecked(),
-        mControlWidget->testLength->isChecked());
+        mControlWidget->isTestEqualChecked(),
+        mControlWidget->isTestVelocityChecked(),
+        mControlWidget->isTestInsideChecked(),
+        mControlWidget->isTestLengthChecked());
     if(pers.length() <= idx)
     {
         idx = 0;
     }
     if(pers.length() > idx)
     {
-        mControlWidget->trackShowOnly->setCheckState(Qt::Checked);
-        mControlWidget->trackShowOnlyNr->setValue(pers[idx]);
+        mControlWidget->setTrackShowOnly(Qt::Checked);
+        mControlWidget->setTrackShowOnlyNr(pers[idx]);
         mPlayerWidget->skipToFrame(frame[idx]);
         ++idx;
     }
@@ -2958,17 +2721,17 @@ int Petrack::calculateRealTracker()
         mImageItem,
         mControlWidget->getColorPlot(),
         getImageBorderSize(),
-        mControlWidget->anaMissingFrames->checkState(),
+        mControlWidget->getAnaMissingFrames(),
         mStereoWidget->stereoUseForExport->isChecked(),
-        mControlWidget->trackAlternateHeight->checkState(),
-        mControlWidget->coordAltitude->value(),
+        mControlWidget->getTrackAlternateHeight(),
+        mControlWidget->getCameraAltitude(),
         mStereoWidget->stereoUseCalibrationCenter->isChecked(),
-        mControlWidget->exportElimTp->isChecked(),
-        mControlWidget->exportElimTrj->isChecked(),
-        mControlWidget->exportSmooth->isChecked(),
-        mControlWidget->exportViewDir->isChecked(),
-        mControlWidget->exportAngleOfView->isChecked(),
-        mControlWidget->exportMarkerID->isChecked(),
+        mControlWidget->isExportElimTpChecked(),
+        mControlWidget->isExportElimTrjChecked(),
+        mControlWidget->isExportSmoothChecked(),
+        mControlWidget->isExportViewDirChecked(),
+        mControlWidget->isExportAngleOfViewChecked(),
+        mControlWidget->isExportMarkerIDChecked(),
         autoCorrectOnlyExport);
 
     mTrackerReal->calcMinMax();
@@ -3118,7 +2881,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                 // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um waehrend
                 // play mehrfachberuecksichtigung von punkten auszuschliessen, aenderungen in altitude neu in berechnung
                 // einfliessen zu lassen)
-                if(mControlWidget->trackRecalcHeight->checkState())
+                if(mControlWidget->isTrackRecalcHeightChecked())
                 {
                     if(mControlWidget->getCalibCoordDimension() == 0) // 3D
                     {
@@ -3126,7 +2889,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     }
                     else // 2D
                     {
-                        mPersonStorage.recalcHeight(mControlWidget->coordAltitude->value());
+                        mPersonStorage.recalcHeight(mControlWidget->getCameraAltitude());
                     }
                 }
 #ifdef TIME_MEASUREMENT
@@ -3143,17 +2906,17 @@ void Petrack::exportTracker(QString dest) // default = ""
                     mImageItem,
                     mControlWidget->getColorPlot(),
                     getImageBorderSize(),
-                    mControlWidget->trackMissingFrames->checkState(),
+                    mControlWidget->isTrackMissingFramesChecked(),
                     mStereoWidget->stereoUseForExport->isChecked(),
-                    mControlWidget->trackAlternateHeight->checkState(),
-                    mControlWidget->coordAltitude->value(),
+                    mControlWidget->getTrackAlternateHeight(),
+                    mControlWidget->getCameraAltitude(),
                     mStereoWidget->stereoUseCalibrationCenter->isChecked(),
-                    mControlWidget->exportElimTp->isChecked(),
-                    mControlWidget->exportElimTrj->isChecked(),
-                    mControlWidget->exportSmooth->isChecked(),
-                    mControlWidget->exportViewDir->isChecked(),
-                    mControlWidget->exportAngleOfView->isChecked(),
-                    mControlWidget->exportMarkerID->isChecked(),
+                    mControlWidget->isExportElimTpChecked(),
+                    mControlWidget->isExportElimTrjChecked(),
+                    mControlWidget->isExportSmoothChecked(),
+                    mControlWidget->isExportViewDirChecked(),
+                    mControlWidget->isExportAngleOfViewChecked(),
+                    mControlWidget->isExportMarkerIDChecked(),
                     autoCorrectOnlyExport);
 #ifdef TIME_MEASUREMENT
                 time1 += clock() - tstart;
@@ -3170,7 +2933,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                 out << "# raw trajectory file: " << QFileInfo(getTrackFileName()).fileName() << Qt::endl;
                 out << "# framerate: " << mAnimation->getFPS() << " fps" << Qt::endl;
 
-                if(mControlWidget->exportComment->isChecked())
+                if(mControlWidget->isExportCommentChecked())
                 {
                     out << "# personal information:" << Qt::endl;
                     out << "# ID| Comment" << Qt::endl;
@@ -3197,12 +2960,12 @@ void Petrack::exportTracker(QString dest) // default = ""
                 }
                 mTrackerReal->exportTxt(
                     out,
-                    mControlWidget->trackAlternateHeight->checkState(),
+                    mControlWidget->getTrackAlternateHeight(),
                     mStereoWidget->stereoUseForExport->isChecked(),
-                    mControlWidget->exportViewDir->isChecked(),
-                    mControlWidget->exportAngleOfView->isChecked(),
-                    mControlWidget->exportUseM->isChecked(),
-                    mControlWidget->exportMarkerID->isChecked());
+                    mControlWidget->isExportViewDirChecked(),
+                    mControlWidget->isExportAngleOfViewChecked(),
+                    mControlWidget->isExportUseMeterChecked(),
+                    mControlWidget->isExportMarkerIDChecked());
                 // out << *mTrackerReal;
                 file.flush();
                 file.close();
@@ -3254,9 +3017,9 @@ void Petrack::exportTracker(QString dest) // default = ""
                 // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um waehrend
                 // play mehrfachberuecksichtigung von punkten auszuschliessen, aenderungen in altitude neu in berechnung
                 // einfliessen zu lassen)
-                if(mControlWidget->trackRecalcHeight->checkState())
+                if(mControlWidget->isTrackRecalcHeightChecked())
                 {
-                    mPersonStorage.recalcHeight(mControlWidget->coordAltitude->value());
+                    mPersonStorage.recalcHeight(mControlWidget->getCameraAltitude());
                 }
                 mTrackerReal->calculate(
                     this,
@@ -3264,26 +3027,24 @@ void Petrack::exportTracker(QString dest) // default = ""
                     mImageItem,
                     mControlWidget->getColorPlot(),
                     getImageBorderSize(),
-                    mControlWidget->trackMissingFrames->checkState(),
+                    mControlWidget->isTrackMissingFramesChecked(),
                     mStereoWidget->stereoUseForExport->isChecked(),
-                    mControlWidget->trackAlternateHeight->checkState(),
-                    mControlWidget->coordAltitude->value(),
+                    mControlWidget->getTrackAlternateHeight(),
+                    mControlWidget->getCameraAltitude(),
                     mStereoWidget->stereoUseCalibrationCenter->isChecked(),
-                    mControlWidget->exportElimTp->isChecked(),
-                    mControlWidget->exportElimTrj->isChecked(),
-                    mControlWidget->exportSmooth->isChecked(),
-                    mControlWidget->exportViewDir->isChecked(),
-                    mControlWidget->exportAngleOfView->isChecked(),
-                    mControlWidget->exportMarkerID->isChecked(),
+                    mControlWidget->isExportElimTpChecked(),
+                    mControlWidget->isExportElimTrjChecked(),
+                    mControlWidget->isExportSmoothChecked(),
+                    mControlWidget->isExportViewDirChecked(),
+                    mControlWidget->isExportAngleOfViewChecked(),
+                    mControlWidget->isExportMarkerIDChecked(),
                     autoCorrectOnlyExport);
 
                 debout << "export tracking data to " << dest << " (" << mPersonStorage.nbPersons() << " person(s))..."
                        << std::endl;
                 QTextStream outDat(&fileDat);
                 mTrackerReal->exportDat(
-                    outDat,
-                    mControlWidget->trackAlternateHeight->checkState(),
-                    mStereoWidget->stereoUseForExport->isChecked());
+                    outDat, mControlWidget->getTrackAlternateHeight(), mStereoWidget->stereoUseForExport->isChecked());
                 fileDat.flush();
                 fileDat.close();
 
@@ -3312,9 +3073,9 @@ void Petrack::exportTracker(QString dest) // default = ""
                 // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um waehrend
                 // play mehrfachberuecksichtigung von punkten auszuschliessen, aenderungen in altitude neu in berechnung
                 // einfliessen zu lassen)
-                if(mControlWidget->trackRecalcHeight->checkState())
+                if(mControlWidget->isTrackRecalcHeightChecked())
                 {
-                    mPersonStorage.recalcHeight(mControlWidget->coordAltitude->value());
+                    mPersonStorage.recalcHeight(mControlWidget->getCameraAltitude());
                 }
 
                 mTrackerReal->calculate(
@@ -3323,17 +3084,17 @@ void Petrack::exportTracker(QString dest) // default = ""
                     mImageItem,
                     mControlWidget->getColorPlot(),
                     getImageBorderSize(),
-                    mControlWidget->trackMissingFrames->checkState(),
+                    mControlWidget->isTrackMissingFramesChecked(),
                     mStereoWidget->stereoUseForExport->isChecked(),
-                    mControlWidget->trackAlternateHeight->checkState(),
-                    mControlWidget->coordAltitude->value(),
+                    mControlWidget->getTrackAlternateHeight(),
+                    mControlWidget->getCameraAltitude(),
                     mStereoWidget->stereoUseCalibrationCenter->isChecked(),
-                    mControlWidget->exportElimTp->isChecked(),
-                    mControlWidget->exportElimTrj->isChecked(),
-                    mControlWidget->exportSmooth->isChecked(),
-                    mControlWidget->exportViewDir->isChecked(),
-                    mControlWidget->exportAngleOfView->isChecked(),
-                    mControlWidget->exportMarkerID->isChecked(),
+                    mControlWidget->isExportElimTpChecked(),
+                    mControlWidget->isExportElimTrjChecked(),
+                    mControlWidget->isExportSmoothChecked(),
+                    mControlWidget->isExportViewDirChecked(),
+                    mControlWidget->isExportAngleOfViewChecked(),
+                    mControlWidget->isExportMarkerIDChecked(),
                     autoCorrectOnlyExport);
 
                 QTemporaryFile fileXml;
@@ -3345,7 +3106,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                 debout << "export tracking data to " << dest << " (" << mPersonStorage.nbPersons() << " person(s))..."
                        << std::endl;
                 // already done: mTrackerReal->calculate(mTracker, mImageItem, mControlWidget->getColorPlot(),
-                // getImageBorderSize(), mControlWidget->trackMissingFrames->checkState());
+                // getImageBorderSize(), mControlWidget->isTrackMissingFramesChecked());
                 QTextStream outXml(&fileXml);
                 outXml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << Qt::endl;
                 outXml << "<trajectoriesDataset>" << Qt::endl;
@@ -3362,9 +3123,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                 outXml << "    </header>" << Qt::endl << Qt::endl;
 
                 mTrackerReal->exportXml(
-                    outXml,
-                    mControlWidget->trackAlternateHeight->checkState(),
-                    mStereoWidget->stereoUseForExport->isChecked());
+                    outXml, mControlWidget->getTrackAlternateHeight(), mStereoWidget->stereoUseForExport->isChecked());
 
                 outXml << "</trajectoriesDataset>" << Qt::endl;
                 fileXml.flush();
@@ -3436,13 +3195,13 @@ void Petrack::playAll()
  */
 void Petrack::trackAll()
 {
-    int                 memPos        = mPlayerWidget->getPos();
-    int                 progVal       = 0;
-    enum Qt::CheckState memCheckState = mControlWidget->trackOnlineCalc->checkState();
-    enum Qt::CheckState memRecoState  = mControlWidget->performRecognition->checkState();
+    int  memPos        = mPlayerWidget->getPos();
+    int  progVal       = 0;
+    bool memCheckState = mControlWidget->isOnlineTrackingChecked();
+    bool memRecoState  = mControlWidget->isPerformRecognitionChecked();
 
-    mControlWidget->trackOnlineCalc->setCheckState(Qt::Checked);
-    mControlWidget->performRecognition->setCheckState(Qt::Checked);
+    mControlWidget->setOnlineTrackingChecked(true);
+    mControlWidget->setPerformRecognitionChecked(true);
 
     QProgressDialog progress(
         "Tracking pedestrians through all frames...",
@@ -3467,9 +3226,9 @@ void Petrack::trackAll()
     {
         // zuruecksprinegn an die stelle, wo der letzte trackPath nicht vollstaendig
         // etwas spaeter, da erste punkte in reco path meist nur ellipse ohne markererkennung
-        mControlWidget->trackOnlineCalc->setCheckState(Qt::Unchecked);
+        mControlWidget->setOnlineTrackingChecked(false);
         mPlayerWidget->skipToFrame(mPersonStorage.largestFirstFrame() + 5);
-        mControlWidget->trackOnlineCalc->setCheckState(Qt::Checked);
+        mControlWidget->setOnlineTrackingChecked(true);
         // progVal = 2*mAnimation->getNumFrames()-memPos-mPlayerWidget->getPos();
         progVal += mAnimation->getNumFrames() - mPlayerWidget->getPos();
         progress.setValue(progVal); // mPlayerWidget->getPos()
@@ -3477,7 +3236,7 @@ void Petrack::trackAll()
         // recognition abstellen, bis an die stelle, wo trackAll begann
         // UEBERPRUEFEN, OB TRACKPATH NICHT RECOGNITION PUNKTE UEBERSCHREIBT!!!!!!!!!!
         // repeate und repaetQual koennte temporaer umgestellt werden
-        mControlWidget->performRecognition->setCheckState(Qt::Unchecked);
+        mControlWidget->setPerformRecognitionChecked(false);
 
         // rueckwaertslaufen
         do
@@ -3493,7 +3252,7 @@ void Petrack::trackAll()
             }
             if(mPlayerWidget->getPos() == memPos + 1)
             {
-                mControlWidget->performRecognition->setCheckState(Qt::Checked);
+                mControlWidget->setPerformRecognitionChecked(true);
             }
         } while(mPlayerWidget->frameBackward());
 
@@ -3506,10 +3265,10 @@ void Petrack::trackAll()
         mPersonStorage.optimizeColor();
     }
 
-    mControlWidget->performRecognition->setCheckState(memRecoState);
-    mControlWidget->trackOnlineCalc->setCheckState(Qt::Unchecked);
+    mControlWidget->setPerformRecognitionChecked(memRecoState);
+    mControlWidget->setOnlineTrackingChecked(false);
     mPlayerWidget->skipToFrame(memPos);
-    mControlWidget->trackOnlineCalc->setCheckState(memCheckState);
+    mControlWidget->setOnlineTrackingChecked(memCheckState);
 }
 
 // default: (QPointF *pos=NULL, int pers=-1, int frame=-1);
@@ -3519,9 +3278,9 @@ int Petrack::winSize(QPointF *pos, int pers, int frame, int level)
     // a factor of 1.6 of the headsize is used
     if(level == -1)
     {
-        level = mControlWidget->trackRegionLevels->value();
+        level = mControlWidget->getTrackRegionLevels();
     }
-    return (int) ((getHeadSize(pos, pers, frame) / pow(2., level)) * (mControlWidget->trackRegionScale->value() / 10.));
+    return (int) ((getHeadSize(pos, pers, frame) / pow(2., level)) * (mControlWidget->getTrackRegionScale() / 10.));
 }
 
 void Petrack::updateImage(bool imageChanged) // default = false (only true for new animation frame)
@@ -3686,8 +3445,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             borderChangedForTracking = true;
         }
         // tracking vor recognition, da dann neu gefundene punkte mit getrackten bereits ueberprueft werden koennen
-        if((trackChanged() || imageChanged) &&
-           (mControlWidget->trackOnlineCalc->checkState() == Qt::Checked)) // borderChanged ???
+        if((trackChanged() || imageChanged) && (mControlWidget->isOnlineTrackingChecked())) // borderChanged ???
         {
             // Rect for tracking area
             QRect roi(
@@ -3726,27 +3484,27 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                 mImgFiltered,
                 rect,
                 frameNum,
-                mControlWidget->trackRepeat->isChecked(),
-                mControlWidget->trackRepeatQual->value(),
+                mControlWidget->isTrackRepeatChecked(),
+                mControlWidget->getTrackRepeatQual(),
                 getImageBorderSize(),
                 mReco.getRecoMethod(),
-                mControlWidget->trackRegionLevels->value(),
+                mControlWidget->getTrackRegionLevels(),
                 getPedestriansToTrack());
 #ifdef TIME_MEASUREMENT
             debout << "nach track: " << getElapsedTime() << endl;
 #endif
-            mControlWidget->trackNumberNow->setText(QString("%1").arg(anz));
+            mControlWidget->setTrackNumberNow(QString("%1").arg(anz));
             mTrackChanged            = false;
             borderChangedForTracking = false;
         }
         else
         {
-            mControlWidget->trackNumberNow->setText(QString("0"));
+            mControlWidget->setTrackNumberNow(QString("0"));
         }
         // hier muesste fuer ameisen etc allgemeinABC.getPosList(...)
 
-        if(((((lastRecoFrame + mControlWidget->recoStep->value()) <= frameNum) ||
-             ((lastRecoFrame - mControlWidget->recoStep->value()) >= frameNum)) &&
+        if(((((lastRecoFrame + mControlWidget->getRecoStep()) <= frameNum) ||
+             ((lastRecoFrame - mControlWidget->getRecoStep()) >= frameNum)) &&
             imageChanged) ||
            mAnimation->isCameraLiveStream() || swapChanged || brightContrastChanged || borderChanged || calibChanged ||
            recognitionChanged())
@@ -3762,7 +3520,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                 mRecognitionRoiItem->restoreSize();
             }
 
-            if(mControlWidget->performRecognition->checkState() == Qt::Checked)
+            if(mControlWidget->isPerformRecognitionChecked())
             {
                 QRect rect(
                     myRound(mRecognitionRoiItem->rect().x() + getImageBorderSize()),
@@ -3802,7 +3560,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                     mPersonStorage.purge(frameNum); // bereinigen wenn weniger als 0.2 recognition und nur getrackt
                 }
 
-                mControlWidget->recoNumberNow->setText(QString("%1").arg(persList.size()));
+                mControlWidget->setRecoNumberNow(QString("%1").arg(persList.size()));
                 mRecognitionChanged = false;
 
                 if(false) // hier muss Abfage hin ob kasernen marker genutzt wird
@@ -3813,20 +3571,20 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             }
             else
             {
-                mControlWidget->recoNumberNow->setText(QString("0"));
+                mControlWidget->setRecoNumberNow(QString("0"));
             }
             lastRecoFrame = frameNum;
         }
         else
         {
-            mControlWidget->recoNumberNow->setText(QString("0"));
+            mControlWidget->setRecoNumberNow(QString("0"));
         }
 
-        mControlWidget->trackNumberAll->setText(
+        mControlWidget->setTrackNumberAll(
             QString("%1").arg(mPersonStorage.nbPersons())); // kann sich durch reco und tracker aendern
-        mControlWidget->trackShowOnlyNr->setMaximum(
+        mControlWidget->setTrackShowOnlyNrMaximum(
             static_cast<int>(MAX(mPersonStorage.nbPersons(), 1))); // kann sich durch reco und tracker aendern
-        mControlWidget->trackNumberVisible->setText(
+        mControlWidget->setTrackNumberVisible(
             QString("%1").arg(mPersonStorage.visible(frameNum))); // kann sich durch reco und tracker aendern
 
         // in anzuzeigendes Bild kopieren
@@ -3847,7 +3605,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
 #ifdef QWT
         mControlWidget->getAnalysePlot()->setActFrame(frameNum);
-        if(mControlWidget->anaMarkAct->isChecked())
+        if(mControlWidget->isAnaMarkActChecked())
         {
             mControlWidget->getAnalysePlot()->replot();
         }
@@ -3938,8 +3696,8 @@ void Petrack::setHeadSize(double hS)
     {
         mCmPerPixel = getImageItem()->getCmPerPixel();
         // debout << mCmPerPixel <<endl;
-        mHeadSize = (HEAD_SIZE * mControlWidget->coordAltitude->value() /
-                     (mControlWidget->coordAltitude->value() - mControlWidget->mapDefaultHeight->value())) /
+        mHeadSize = (HEAD_SIZE * mControlWidget->getCameraAltitude() /
+                     (mControlWidget->getCameraAltitude() - mControlWidget->getDefaultHeight())) /
                     mCmPerPixel;
     }
     else
@@ -3962,7 +3720,7 @@ double Petrack::getHeadSize(QPointF *pos, int pers, int frame)
             cv::Point3f p3d = getExtrCalibration()->get3DPoint(
                 cv::Point2f(
                     mPersonStorage.at(pers).trackPointAt(frame).x(), mPersonStorage.at(pers).trackPointAt(frame).y()),
-                mControlWidget->mapDefaultHeight->value());
+                mControlWidget->getDefaultHeight());
 
             cv::Point2f p3d_x1 =
                 getExtrCalibration()->getImagePoint(cv::Point3f(p3d.x + HEAD_SIZE * 0.5, p3d.y, p3d.z));
@@ -3984,12 +3742,11 @@ double Petrack::getHeadSize(QPointF *pos, int pers, int frame)
             h = mPersonStorage.at(pers).height();
             if(z > 0)
             {
-                return (HEAD_SIZE * mControlWidget->coordAltitude->value() / z) / getImageItem()->getCmPerPixel();
+                return (HEAD_SIZE * mControlWidget->getCameraAltitude() / z) / getImageItem()->getCmPerPixel();
             }
             else if(h > MIN_HEIGHT)
             {
-                return (HEAD_SIZE * mControlWidget->coordAltitude->value() /
-                        (mControlWidget->coordAltitude->value() - h)) /
+                return (HEAD_SIZE * mControlWidget->getCameraAltitude() / (mControlWidget->getCameraAltitude() - h)) /
                        getImageItem()->getCmPerPixel();
             }
             else
@@ -4036,16 +3793,16 @@ void Petrack::setProFileName(const QString &fileName)
  */
 QSet<size_t> Petrack::getPedestrianUserSelection()
 {
-    if(mControlWidget->trackShowOnly->checkState() == Qt::Checked)
+    if(mControlWidget->isTrackShowOnlyChecked())
     {
         QSet<size_t> onlyVisible;
         // subtraction needed as in UI ID start at 1 and internally at 0
-        onlyVisible.insert(mControlWidget->trackShowOnlyNr->value() - 1);
+        onlyVisible.insert(mControlWidget->getTrackShowOnlyNr() - 1);
         return onlyVisible;
     }
-    if(mControlWidget->trackShowOnlyList->checkState() == Qt::Checked)
+    if(mControlWidget->isTrackShowOnlyListChecked())
     {
-        auto enteredIDs = util::splitStringToInt(mControlWidget->trackShowOnlyNrList->text());
+        auto enteredIDs = util::splitStringToInt(mControlWidget->trackShowOnlyNrList()->text());
         if(enteredIDs.has_value())
         {
             QSet<size_t> selectedIDs;
@@ -4054,12 +3811,12 @@ QSet<size_t> Petrack::getPedestrianUserSelection()
                 // subtraction needed as in UI ID start at 1 and internally at 0
                 selectedIDs.insert(id - 1);
             }
-            mControlWidget->trackShowOnlyNrList->setStyleSheet("");
+            mControlWidget->trackShowOnlyNrList()->setStyleSheet("");
             return selectedIDs;
         }
         else
         {
-            mControlWidget->trackShowOnlyNrList->setStyleSheet("border: 1px solid red");
+            mControlWidget->trackShowOnlyNrList()->setStyleSheet("border: 1px solid red");
         }
     }
     return QSet<size_t>();
@@ -4135,7 +3892,7 @@ std::optional<QSet<int>> util::splitStringToInt(const QString &input)
  */
 QSet<size_t> Petrack::getPedestriansToTrack()
 {
-    if(mControlWidget->trackOnlySelected->checkState() == Qt::Checked)
+    if(mControlWidget->isTrackOnlySelectedChecked())
     {
         return getPedestrianUserSelection();
     }
@@ -4150,16 +3907,15 @@ void Petrack::addManualTrackPointOnlyVisible(const QPointF &pos)
     {
         pers = static_cast<int>(mPersonStorage.nbPersons()) + 1;
     }
-    mControlWidget->trackShowOnlyNr->setValue(pers);
-    mControlWidget->trackShowOnly->setChecked(true);
+    mControlWidget->setTrackShowOnlyNr(pers);
+    mControlWidget->setTrackShowOnly(Qt::Checked);
 }
 
 void Petrack::updateControlWidget()
 {
-    mControlWidget->trackNumberAll->setText(QString("%1").arg(mPersonStorage.nbPersons()));
-    mControlWidget->trackShowOnlyNr->setMaximum(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
-    mControlWidget->trackNumberVisible->setText(
-        QString("%1").arg(mPersonStorage.visible(mAnimation->getCurrentFrameNum())));
+    mControlWidget->setTrackNumberAll(QString("%1").arg(mPersonStorage.nbPersons()));
+    mControlWidget->setTrackShowOnlyNr(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
+    mControlWidget->setTrackNumberVisible(QString("%1").arg(mPersonStorage.visible(mAnimation->getCurrentFrameNum())));
 }
 
 void Petrack::splitTrackPerson(QPointF pos)
@@ -4245,8 +4001,8 @@ void Petrack::moveTrackPoint(QPointF pos)
 void Petrack::selectPersonForMoveTrackPoint(QPointF pos)
 {
     FrameRange range;
-    range.before  = mControlWidget->trackShowBefore->value();
-    range.after   = mControlWidget->trackShowAfter->value();
+    range.before  = mControlWidget->getTrackShowBefore();
+    range.after   = mControlWidget->getTrackShowAfter();
     range.current = mPlayerWidget->getPos();
     auto successfullySelected =
         mManualTrackPointMover.selectTrackPoint(pos, mPersonStorage, getPedestrianUserSelection(), range);
@@ -4268,11 +4024,11 @@ void Petrack::scrollShowOnly(int delta)
 {
     if(delta < 0)
     {
-        mControlWidget->trackShowOnlyNr->stepDown();
+        mControlWidget->setTrackShowOnlyNr(mControlWidget->getTrackShowOnlyNr() - 1);
     }
     else
     {
-        mControlWidget->trackShowOnlyNr->stepUp();
+        mControlWidget->setTrackShowOnlyNr(mControlWidget->getTrackShowOnlyNr() + 1);
     }
 }
 
@@ -4291,8 +4047,8 @@ void Petrack::skipToFrameWheel(int delta)
 void Petrack::skipToFrameFromTrajectory(QPointF pos)
 {
     auto       peds      = getPedestrianUserSelection();
-    const auto before    = mControlWidget->trackShowBefore->value();
-    const auto after     = mControlWidget->trackShowAfter->value();
+    const auto before    = mControlWidget->getTrackShowBefore();
+    const auto after     = mControlWidget->getTrackShowAfter();
     const auto currFrame = mPlayerWidget->getPos();
     FrameRange frameRange{before, after, currFrame};
 

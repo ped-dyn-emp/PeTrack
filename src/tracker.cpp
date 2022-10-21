@@ -815,7 +815,7 @@ int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int bord
                         {
                             v.setSp(x, y, z); // v.setZdistanceToCam(z);
                         }
-                        //(*this)[i].setHeight(z, mMainWindow->getControlWidget()->coordAltitude->value(), frame);
+                        //(*this)[i].setHeight(z, mMainWindow->getControlWidget()->getCameraAltitude(), frame);
                     }
 #endif
 
@@ -831,8 +831,8 @@ int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int bord
                     // ueberpruefen, ob tracking ziel auf anderem tracking path landet, dann beide trackpaths
                     // verschmelzen lassen
                     found = false;
-                    if(mMainWindow->getControlWidget()->trackMerge->checkState() ==
-                       Qt::Checked) // wenn zusammengefuehrt=merge=verschmolzen werden soll
+                    if(mMainWindow->getControlWidget()
+                           ->isTrackMergeChecked()) // wenn zusammengefuehrt=merge=verschmolzen werden soll
                     {
                         found = tryMergeTrajectories(v, i, frame);
                     }
@@ -853,9 +853,9 @@ int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int bord
                             frame,
                             v,
                             mPrevFeaturePointsIdx[i],
-                            (mMainWindow->getControlWidget()->trackExtrapolation->checkState() == Qt::Checked),
+                            (mMainWindow->getControlWidget()->isTrackExtrapolationChecked()),
                             z,
-                            mMainWindow->getControlWidget()->coordAltitude->value());
+                            mMainWindow->getControlWidget()->getCameraAltitude());
                     }
 
                     ++inserted;
@@ -1255,14 +1255,14 @@ void Tracker::useBackgroundFilter(QList<int> &trjToDel, BackgroundFilter *bgFilt
         {
             if(!bgFilter->isForeground(x, y) && person.trackPointAt(mPrevFrame).qual() < 100)
             {
-                if((mMainWindow->getControlWidget()->filterBgDeleteTrj->checkState() == Qt::Checked) &&
-                   (person.nrInBg() >= mMainWindow->getControlWidget()->filterBgDeleteNumber->value()))
+                if((mMainWindow->getControlWidget()->isFilterBgDeleteTrjChecked()) &&
+                   (person.nrInBg() >= mMainWindow->getControlWidget()->getFilterBgDeleteNumber()))
                 {
                     // nur zum loeschen vormerken und am ende der fkt loeschen, da sonst Seiteneffekte komplex
                     trjToDel += mPrevFeaturePointsIdx[i];
                     debout << "Warning: Delete trajectory " << mPrevFeaturePointsIdx[i] + 1
                            << " inside region of interest, because it laid outside foreground for "
-                           << mMainWindow->getControlWidget()->filterBgDeleteNumber->value() << " successive frames!"
+                           << mMainWindow->getControlWidget()->getFilterBgDeleteNumber() << " successive frames!"
                            << std::endl;
                 }
                 else

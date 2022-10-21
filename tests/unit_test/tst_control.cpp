@@ -20,6 +20,7 @@
 
 #include "control.h"
 #include "imageItem.h"
+#include "ui_control.h"
 #include "view.h"
 
 #include <QGraphicsScene>
@@ -27,6 +28,7 @@
 #include <QTestEventList>
 #include <catch2/catch.hpp>
 #include <iostream>
+#include <memory>
 
 
 // TODO Connect und Disconnect vom Event (lässt sich an und abschalten)
@@ -64,10 +66,10 @@ void checkSelectedColor(
     REQUIRE(fromColor.value() == Approx(fromVal).margin(1));
 
     // Sliders
-    REQUIRE(con->mapX->value() == Approx(mapX).margin(2));
-    REQUIRE(con->mapW->value() == Approx(mapW).margin(2));
-    REQUIRE(con->mapY->value() == Approx(mapY).margin(2));
-    REQUIRE(con->mapH->value() == Approx(mapH).margin(2));
+    REQUIRE(con->getMapX() == Approx(mapX).margin(2));
+    REQUIRE(con->getMapW() == Approx(mapW).margin(2));
+    REQUIRE(con->getMapY() == Approx(mapY).margin(2));
+    REQUIRE(con->getMapH() == Approx(mapH).margin(2));
 }
 
 
@@ -296,21 +298,21 @@ TEST_CASE("Loading from and saving to XML node", "[config]")
             const QString testValue{"101-987"};
             doc.elementsByTagName("PATH").at(0).toElement().setAttribute("ONLY_PEOPLE_NR_LIST", testValue);
             pet.openXml(doc, false);
-            REQUIRE(control->trackShowOnlyNrList->text() == testValue);
+            REQUIRE(control->trackShowOnlyNrList()->text() == testValue);
         }
     }
 }
 
 SCENARIO("Change the show only people list", "[ui][config][tracking][path]")
 {
-    Petrack           pet{};
-    QPointer<Control> control = pet.getControlWidget();
-    control->trackShowOnlyList->setCheckState(Qt::Checked);
+    Petrack  pet{};
+    Control *control = pet.getControlWidget();
+    control->setTrackShowOnlyListChecked(true);
 
     GIVEN("No filter given")
     {
-        REQUIRE(control->trackShowOnlyList->isChecked());
-        REQUIRE(control->trackShowOnlyNrList->text().isEmpty());
+        REQUIRE(control->isTrackShowOnlyListChecked());
+        REQUIRE(control->trackShowOnlyNrList()->text().isEmpty());
 
         WHEN("Enter valid filter (single values)")
         {
@@ -324,13 +326,13 @@ SCENARIO("Change the show only people list", "[ui][config][tracking][path]")
             std::stringstream input;
             std::copy(enteredIDs.begin(), enteredIDs.end(), std::ostream_iterator<size_t>(input, ","));
 
-            QTest::keyClicks(control->trackShowOnlyNrList, input.str().c_str(), Qt::NoModifier, 50);
+            QTest::keyClicks(control->trackShowOnlyNrList(), input.str().c_str(), Qt::NoModifier, 50);
             auto receivedIDs = pet.getPedestrianUserSelection();
 
             THEN("the entered ids should be returned")
             {
                 REQUIRE(expectedIDs == receivedIDs);
-                REQUIRE(control->trackShowOnlyNrList->styleSheet().isEmpty());
+                REQUIRE(control->trackShowOnlyNrList()->styleSheet().isEmpty());
             }
         }
 
@@ -346,13 +348,13 @@ SCENARIO("Change the show only people list", "[ui][config][tracking][path]")
             QString input("1-4");
 
             QSet<size_t> receivedIDs;
-            QTest::keyClicks(control->trackShowOnlyNrList, input, Qt::NoModifier, 50);
+            QTest::keyClicks(control->trackShowOnlyNrList(), input, Qt::NoModifier, 50);
             receivedIDs = pet.getPedestrianUserSelection();
 
             THEN("the entered ids should be returned")
             {
                 REQUIRE(expectedIDs == receivedIDs);
-                REQUIRE(control->trackShowOnlyNrList->styleSheet().isEmpty());
+                REQUIRE(control->trackShowOnlyNrList()->styleSheet().isEmpty());
             }
         }
 
@@ -362,10 +364,10 @@ SCENARIO("Change the show only people list", "[ui][config][tracking][path]")
 
             THEN("the border should be red")
             {
-                QTest::keyClicks(control->trackShowOnlyNrList, input, Qt::NoModifier, 50);
+                QTest::keyClicks(control->trackShowOnlyNrList(), input, Qt::NoModifier, 50);
                 auto receivedIDs = pet.getPedestrianUserSelection();
                 REQUIRE(receivedIDs.isEmpty());
-                REQUIRE(control->trackShowOnlyNrList->styleSheet().contains("border: 1px solid red"));
+                REQUIRE(control->trackShowOnlyNrList()->styleSheet().contains("border: 1px solid red"));
             }
         }
 
@@ -376,16 +378,16 @@ SCENARIO("Change the show only people list", "[ui][config][tracking][path]")
             {
                 for(auto character : input.toStdString())
                 {
-                    QTest::keyClick(control->trackShowOnlyNrList, character, Qt::NoModifier, 10);
+                    QTest::keyClick(control->trackShowOnlyNrList(), character, Qt::NoModifier, 10);
 
                     QSet<size_t> receivedIDs = pet.getPedestrianUserSelection();
                     if(receivedIDs.isEmpty())
                     {
-                        REQUIRE(control->trackShowOnlyNrList->styleSheet().contains("border: 1px solid red"));
+                        REQUIRE(control->trackShowOnlyNrList()->styleSheet().contains("border: 1px solid red"));
                     }
                     else
                     {
-                        REQUIRE(control->trackShowOnlyNrList->styleSheet().isEmpty());
+                        REQUIRE(control->trackShowOnlyNrList()->styleSheet().isEmpty());
                     }
                 }
             }

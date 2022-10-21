@@ -243,20 +243,20 @@ void AutoCalib::autoCalib()
             return;
         }
         // set flags for calibration
-        if(mControlWidget->quadAspectRatio->isChecked())
+        if(mControlWidget->isQuadAspectRatioChecked())
         {
             flags |= CV_CALIB_FIX_ASPECT_RATIO; // durch setzen von aspect_ratio kann fix ascpect anders als 1:1
                                                 // eingestellt werden
         }
-        if(mControlWidget->fixCenter->isChecked())
+        if(mControlWidget->isFixCenterChecked())
         {
             flags |= CV_CALIB_FIX_PRINCIPAL_POINT;
         }
-        if(!mControlWidget->tangDist->isChecked())
+        if(!mControlWidget->isTangDistChecked())
         {
             flags |= CV_CALIB_ZERO_TANGENT_DIST;
         }
-        if(mControlWidget->extModelCheckBox->isChecked())
+        if(mControlWidget->isExtModelChecked())
         {
             flags |= CV_CALIB_RATIONAL_MODEL + CV_CALIB_THIN_PRISM_MODEL + CV_CALIB_TILTED_MODEL;
         }
@@ -296,25 +296,25 @@ void AutoCalib::autoCalib()
         debout << "taux: " << dist_coeffs.at<double>(0, 12) << " tauy: " << dist_coeffs.at<double>(0, 13) << std::endl;
 
         // set calibration values
-        mControlWidget->setCalibFxValue(camera_matrix.at<double>(0, 0));
-        mControlWidget->setCalibFyValue(camera_matrix.at<double>(1, 1));
-        mControlWidget->setCalibCxValue(camera_matrix.at<double>(0, 2) + mMainWindow->getImageBorderSize());
-        mControlWidget->setCalibCyValue(camera_matrix.at<double>(1, 2) + mMainWindow->getImageBorderSize());
-        mControlWidget->setCalibR2Value(dist_coeffs.at<double>(0, 0));
-        mControlWidget->setCalibR4Value(dist_coeffs.at<double>(0, 1));
-        mControlWidget->setCalibTxValue(dist_coeffs.at<double>(0, 2));
-        mControlWidget->setCalibTyValue(dist_coeffs.at<double>(0, 3));
-        mControlWidget->setCalibR6Value(dist_coeffs.at<double>(0, 4));
-        mControlWidget->setCalibK4Value(dist_coeffs.at<double>(0, 5));
-        mControlWidget->setCalibK5Value(dist_coeffs.at<double>(0, 6));
-        mControlWidget->setCalibK6Value(dist_coeffs.at<double>(0, 7));
-        mControlWidget->setCalibS1Value(dist_coeffs.at<double>(0, 8));
-        mControlWidget->setCalibS2Value(dist_coeffs.at<double>(0, 9));
-        mControlWidget->setCalibS3Value(dist_coeffs.at<double>(0, 10));
-        mControlWidget->setCalibS4Value(dist_coeffs.at<double>(0, 11));
-        mControlWidget->setCalibTAUXValue(dist_coeffs.at<double>(0, 12));
-        mControlWidget->setCalibTAUYValue(dist_coeffs.at<double>(0, 13));
-        mControlWidget->setCalibReprErrorValue(reproj_errs);
+        mControlWidget->setCalibFx(camera_matrix.at<double>(0, 0));
+        mControlWidget->setCalibFy(camera_matrix.at<double>(1, 1));
+        mControlWidget->setCalibCx(camera_matrix.at<double>(0, 2) + mMainWindow->getImageBorderSize());
+        mControlWidget->setCalibCy(camera_matrix.at<double>(1, 2) + mMainWindow->getImageBorderSize());
+        mControlWidget->setCalibR2(dist_coeffs.at<double>(0, 0));
+        mControlWidget->setCalibR4(dist_coeffs.at<double>(0, 1));
+        mControlWidget->setCalibTx(dist_coeffs.at<double>(0, 2));
+        mControlWidget->setCalibTy(dist_coeffs.at<double>(0, 3));
+        mControlWidget->setCalibR6(dist_coeffs.at<double>(0, 4));
+        mControlWidget->setCalibK4(dist_coeffs.at<double>(0, 5));
+        mControlWidget->setCalibK5(dist_coeffs.at<double>(0, 6));
+        mControlWidget->setCalibK6(dist_coeffs.at<double>(0, 7));
+        mControlWidget->setCalibS1(dist_coeffs.at<double>(0, 8));
+        mControlWidget->setCalibS2(dist_coeffs.at<double>(0, 9));
+        mControlWidget->setCalibS3(dist_coeffs.at<double>(0, 10));
+        mControlWidget->setCalibS4(dist_coeffs.at<double>(0, 11));
+        mControlWidget->setCalibTAUX(dist_coeffs.at<double>(0, 12));
+        mControlWidget->setCalibTAUY(dist_coeffs.at<double>(0, 13));
+        mControlWidget->setCalibReprError(reproj_errs);
 
 
 #ifdef SHOW_CALIB_MAINWINDOW

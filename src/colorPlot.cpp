@@ -641,7 +641,7 @@ double ColorPlot::map(const QColor &col) const
     double height = mRectItem->map(col);
     if(height < 0)
     {
-        return mControlWidget->mapDefaultHeight->value();
+        return mControlWidget->getDefaultHeight();
     }
     else
     {
@@ -721,11 +721,11 @@ QPoint ColorPlot::getPos(const QColor &col, int *z) const
 
     if(mControlWidget)
     {
-        int x    = mControlWidget->recoColorX->currentIndex();
-        int y    = mControlWidget->recoColorY->currentIndex();
+        int x    = mControlWidget->getRecoColorX();
+        int y    = mControlWidget->getRecoColorY();
         int ymax = (int) yMax();
 
-        if(mControlWidget->recoColorModel->currentIndex() == 0) // HSV
+        if(mControlWidget->getRecoColorModel() == 0) // HSV
         {
             if(x == 0) // nicht setX und setY, weil das width und height anpasst
             {
@@ -829,9 +829,9 @@ void ColorPlot::setScale()
 {
     if(mControlWidget)
     {
-        int model = mControlWidget->recoColorModel->currentIndex();
-        int x     = mControlWidget->recoColorX->currentIndex();
-        int y     = mControlWidget->recoColorY->currentIndex();
+        int model = mControlWidget->getRecoColorModel();
+        int x     = mControlWidget->getRecoColorX();
+        int y     = mControlWidget->getRecoColorY();
 
         QwtDoubleRect base(0., 0., 255., 255.);
 
@@ -865,10 +865,10 @@ void ColorPlot::generateImage()
 {
     if(mControlWidget)
     {
-        int model = mControlWidget->recoColorModel->currentIndex();
-        int x     = mControlWidget->recoColorX->currentIndex();
-        int y     = mControlWidget->recoColorY->currentIndex();
-        int z     = mControlWidget->recoColorZ->value();
+        int model = mControlWidget->getRecoColorModel();
+        int x     = mControlWidget->getRecoColorX();
+        int y     = mControlWidget->getRecoColorY();
+        int z     = mControlWidget->getRecoColorZ();
 
         mImageItem->generateImage(model, x, y, z);
 
@@ -900,7 +900,7 @@ int ColorPlot::zValue() const
 {
     if(mControlWidget)
     {
-        return mControlWidget->recoColorZ->value();
+        return mControlWidget->getRecoColorZ();
     }
     else
     {

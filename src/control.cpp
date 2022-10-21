@@ -38,6 +38,7 @@
 #include "stereoWidget.h"
 #include "tracker.h"
 #include "trackerItem.h"
+#include "ui_control.h"
 #include "view.h"
 
 #include <QDomElement>
@@ -51,14 +52,25 @@ Control::Control(
     reco::Recognizer &recognizer,
     RoiItem          &trackRoiItem,
     RoiItem          &recoRoiItem) :
-    QWidget(&parent)
+    Control(parent, scene, recognizer, trackRoiItem, recoRoiItem, new Ui::Control())
+{
+}
+
+Control::Control(
+    QWidget          &parent,
+    QGraphicsScene   &scene,
+    reco::Recognizer &recognizer,
+    RoiItem          &trackRoiItem,
+    RoiItem          &recoRoiItem,
+    Ui::Control      *ui) :
+    QWidget(&parent), mUi(ui)
 {
     setAccessibleName("Control");
     mMainWindow = (class Petrack *) &parent;
     mScene      = &scene;
     mLoading    = false;
     // beim erzeugen von new colorplot absturz!!!!
-    setupUi(this);
+    mUi->setupUi(this);
 
     // Observers for moCapShow, moCapSize and moCapColor in moCapController;
     // updates UI value when changed.
@@ -77,174 +89,178 @@ Control::Control(
     // der entsprechende Aufruf in AutoCalib müsste angepasst werden
 
 
-    filterBrightContrast->setCheckState(
+    mUi->filterBrightContrast->setCheckState(
         mMainWindow->getBrightContrastFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
-    filterBorder->setCheckState(mMainWindow->getBorderFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
-    filterBg->setCheckState(mMainWindow->getBackgroundFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
-    apply->setCheckState(mMainWindow->getCalibFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
+    mUi->filterBorder->setCheckState(mMainWindow->getBorderFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
+    mUi->filterBg->setCheckState(mMainWindow->getBackgroundFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
+    mUi->apply->setCheckState(mMainWindow->getCalibFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
 
-    filterSwap->setCheckState(mMainWindow->getSwapFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
-    filterSwapH->setCheckState(
+    mUi->filterSwap->setCheckState(mMainWindow->getSwapFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
+    mUi->filterSwapH->setCheckState(
         (bool) mMainWindow->getSwapFilter()->getSwapHorizontally()->getValue() ? Qt::Checked : Qt::Unchecked);
-    filterSwapV->setCheckState(
+    mUi->filterSwapV->setCheckState(
         (bool) mMainWindow->getSwapFilter()->getSwapVertically()->getValue() ? Qt::Checked : Qt::Unchecked);
 
     setCalibFxMin(mMainWindow->getCalibFilter()->getFx()->getMinimum());
     setCalibFxMax(mMainWindow->getCalibFilter()->getFx()->getMaximum());
-    setCalibFxValue(mMainWindow->getCalibFilter()->getFx()->getValue());
+    setCalibFx(mMainWindow->getCalibFilter()->getFx()->getValue());
 
     setCalibFyMin(mMainWindow->getCalibFilter()->getFy()->getMinimum());
     setCalibFyMax(mMainWindow->getCalibFilter()->getFy()->getMaximum());
-    setCalibFyValue(mMainWindow->getCalibFilter()->getFy()->getValue());
+    setCalibFy(mMainWindow->getCalibFilter()->getFy()->getValue());
 
-    setCalibCxValue(mMainWindow->getCalibFilter()->getCx()->getValue());
+    setCalibCx(mMainWindow->getCalibFilter()->getCx()->getValue());
 
-    setCalibCyValue(mMainWindow->getCalibFilter()->getCy()->getValue());
+    setCalibCy(mMainWindow->getCalibFilter()->getCy()->getValue());
 
     setCalibR2Min(mMainWindow->getCalibFilter()->getR2()->getMinimum());
     setCalibR2Max(mMainWindow->getCalibFilter()->getR2()->getMaximum());
-    setCalibR2Value(mMainWindow->getCalibFilter()->getR2()->getValue());
+    setCalibR2(mMainWindow->getCalibFilter()->getR2()->getValue());
 
     setCalibR4Min(mMainWindow->getCalibFilter()->getR4()->getMinimum());
     setCalibR4Max(mMainWindow->getCalibFilter()->getR4()->getMaximum());
-    setCalibR4Value(mMainWindow->getCalibFilter()->getR4()->getValue());
+    setCalibR4(mMainWindow->getCalibFilter()->getR4()->getValue());
 
     setCalibR6Min(mMainWindow->getCalibFilter()->getR6()->getMinimum());
     setCalibR6Max(mMainWindow->getCalibFilter()->getR6()->getMaximum());
-    setCalibR6Value(mMainWindow->getCalibFilter()->getR6()->getValue());
+    setCalibR6(mMainWindow->getCalibFilter()->getR6()->getValue());
 
     setCalibTxMin(mMainWindow->getCalibFilter()->getTx()->getMinimum());
     setCalibTxMax(mMainWindow->getCalibFilter()->getTx()->getMaximum());
-    setCalibTxValue(mMainWindow->getCalibFilter()->getTx()->getValue());
+    setCalibTx(mMainWindow->getCalibFilter()->getTx()->getValue());
 
     setCalibTyMin(mMainWindow->getCalibFilter()->getTy()->getMinimum());
     setCalibTyMax(mMainWindow->getCalibFilter()->getTy()->getMaximum());
-    setCalibTyValue(mMainWindow->getCalibFilter()->getTy()->getValue());
+    setCalibTy(mMainWindow->getCalibFilter()->getTy()->getValue());
 
     setCalibK4Min(mMainWindow->getCalibFilter()->getK4()->getMinimum());
     setCalibK4Max(mMainWindow->getCalibFilter()->getK4()->getMaximum());
-    setCalibK4Value(mMainWindow->getCalibFilter()->getK4()->getValue());
+    setCalibK4(mMainWindow->getCalibFilter()->getK4()->getValue());
 
     setCalibK5Min(mMainWindow->getCalibFilter()->getK5()->getMinimum());
     setCalibK5Max(mMainWindow->getCalibFilter()->getK5()->getMaximum());
-    setCalibK5Value(mMainWindow->getCalibFilter()->getK5()->getValue());
+    setCalibK5(mMainWindow->getCalibFilter()->getK5()->getValue());
 
     setCalibK6Min(mMainWindow->getCalibFilter()->getK6()->getMinimum());
     setCalibK6Max(mMainWindow->getCalibFilter()->getK6()->getMaximum());
-    setCalibK6Value(mMainWindow->getCalibFilter()->getK6()->getValue());
+    setCalibK6(mMainWindow->getCalibFilter()->getK6()->getValue());
 
     setCalibS1Min(mMainWindow->getCalibFilter()->getS1()->getMinimum());
     setCalibS1Max(mMainWindow->getCalibFilter()->getS1()->getMaximum());
-    setCalibS1Value(mMainWindow->getCalibFilter()->getS1()->getValue());
+    setCalibS1(mMainWindow->getCalibFilter()->getS1()->getValue());
 
     setCalibS2Min(mMainWindow->getCalibFilter()->getS2()->getMinimum());
     setCalibS2Max(mMainWindow->getCalibFilter()->getS2()->getMaximum());
-    setCalibS2Value(mMainWindow->getCalibFilter()->getS2()->getValue());
+    setCalibS2(mMainWindow->getCalibFilter()->getS2()->getValue());
 
     setCalibS3Min(mMainWindow->getCalibFilter()->getS3()->getMinimum());
     setCalibS3Max(mMainWindow->getCalibFilter()->getS3()->getMaximum());
-    setCalibS3Value(mMainWindow->getCalibFilter()->getS3()->getValue());
+    setCalibS3(mMainWindow->getCalibFilter()->getS3()->getValue());
 
     setCalibS4Min(mMainWindow->getCalibFilter()->getS4()->getMinimum());
     setCalibS4Max(mMainWindow->getCalibFilter()->getS4()->getMaximum());
-    setCalibS4Value(mMainWindow->getCalibFilter()->getS4()->getValue());
+    setCalibS4(mMainWindow->getCalibFilter()->getS4()->getValue());
 
     setCalibTAUXMin(mMainWindow->getCalibFilter()->getTAUX()->getMinimum());
     setCalibTAUXMax(mMainWindow->getCalibFilter()->getTAUX()->getMaximum());
-    setCalibTAUXValue(mMainWindow->getCalibFilter()->getTAUX()->getValue());
+    setCalibTAUX(mMainWindow->getCalibFilter()->getTAUX()->getValue());
 
     setCalibTAUYMin(mMainWindow->getCalibFilter()->getTAUY()->getMinimum());
     setCalibTAUYMax(mMainWindow->getCalibFilter()->getTAUY()->getMaximum());
-    setCalibTAUYValue(mMainWindow->getCalibFilter()->getTAUY()->getValue());
-    setCalibReprErrorValue(mMainWindow->getCalibFilter()->getReprojectionError());
+    setCalibTAUY(mMainWindow->getCalibFilter()->getTAUY()->getValue());
+    setCalibReprError(mMainWindow->getCalibFilter()->getReprojectionError());
 
 
     // statt folgender Zeile kann zB on_cx_valueChanged einfach kodiert werden (su)
-    //  connect(cx, SIGNAL(valueChanged(double cx)), this, SLOT(on_cx_valueChanged));
+    //  connect(mUi->cx, SIGNAL(valueChanged(double mUi->cx)), this, SLOT(on_cx_valueChanged));
 
-    // will be done by designer: colorPlot->setParent(colorBox); //because it is just integrated via frame in designer
+    // will be done by designer: mUi->colorPlot->setParent(colorBox); //because it is just integrated via frame in
+    // designer
 
-    connect(extModelCheckBox, &QCheckBox::stateChanged, this, &Control::on_extModelCheckBox_stateChanged);
-    colorPlot->setControlWidget(this);
+    connect(mUi->extModelCheckBox, &QCheckBox::stateChanged, this, &Control::on_extModelCheckBox_stateChanged);
+    mUi->colorPlot->setControlWidget(this);
 
     mIndexChanging = false;
     mColorChanging = true;
-    recoColorModel->addItem("HSV");
-    recoColorModel->addItem("RGB");
+    mUi->recoColorModel->addItem("HSV");
+    mUi->recoColorModel->addItem("RGB");
 
-    recoColorX->addItem("H");
-    recoColorX->addItem("S");
-    recoColorX->addItem("V");
+    mUi->recoColorX->addItem("H");
+    mUi->recoColorX->addItem("S");
+    mUi->recoColorX->addItem("V");
 
-    recoColorY->addItem("H");
-    recoColorY->addItem("S");
-    recoColorY->addItem("V");
-    recoColorY->setCurrentIndex(1); // default
+    mUi->recoColorY->addItem("H");
+    mUi->recoColorY->addItem("S");
+    mUi->recoColorY->addItem("V");
+    mUi->recoColorY->setCurrentIndex(1); // default
 
     mColorChanging = false;
 
     on_recoColorModel_currentIndexChanged(0);
 
     // damit eine rectMap vorliegt, die angezeigt werden kann
-    colorPlot->getMapItem()->addMap();
+    mUi->colorPlot->getMapItem()->addMap();
 
-    analysePlot->setControlWidget(this);
+    mUi->analysePlot->setControlWidget(this);
 
     mIndexChanging = true;
 
-    recoMethod->addItem("marker casern", QVariant::fromValue(reco::RecognitionMethod::Casern));
-    recoMethod->addItem("marker hermes", QVariant::fromValue(reco::RecognitionMethod::Hermes));
-    recoMethod->addItem("stereo", QVariant::fromValue(reco::RecognitionMethod::Stereo));
-    recoMethod->addItem("color marker", QVariant::fromValue(reco::RecognitionMethod::Color));
-    recoMethod->addItem("marker Japan", QVariant::fromValue(reco::RecognitionMethod::Japan));
-    recoMethod->addItem("multicolor marker", QVariant::fromValue(reco::RecognitionMethod::MultiColor));
-    recoMethod->addItem("code marker", QVariant::fromValue(reco::RecognitionMethod::Code));
+    mUi->recoMethod->addItem("marker casern", QVariant::fromValue(reco::RecognitionMethod::Casern));
+    mUi->recoMethod->addItem("marker hermes", QVariant::fromValue(reco::RecognitionMethod::Hermes));
+    mUi->recoMethod->addItem("stereo", QVariant::fromValue(reco::RecognitionMethod::Stereo));
+    mUi->recoMethod->addItem("color marker", QVariant::fromValue(reco::RecognitionMethod::Color));
+    mUi->recoMethod->addItem("marker Japan", QVariant::fromValue(reco::RecognitionMethod::Japan));
+    mUi->recoMethod->addItem("multicolor marker", QVariant::fromValue(reco::RecognitionMethod::MultiColor));
+    mUi->recoMethod->addItem("code marker", QVariant::fromValue(reco::RecognitionMethod::Code));
 
     connect(&recognizer, &reco::Recognizer::recoMethodChanged, this, &Control::onRecoMethodChanged);
     connect(this, &Control::userChangedRecoMethod, &recognizer, &reco::Recognizer::userChangedRecoMethod);
-    recoMethod->setCurrentIndex(recoMethod->findData(QVariant::fromValue(recognizer.getRecoMethod())));
+    mUi->recoMethod->setCurrentIndex(mUi->recoMethod->findData(QVariant::fromValue(recognizer.getRecoMethod())));
 
-    scrollArea->setMinimumWidth(
-        scrollAreaWidgetContents->sizeHint().width() + 2 * scrollArea->frameWidth() +
-        scrollArea->verticalScrollBar()->sizeHint().width() + scrollAreaWidgetContents->layout()->margin() * 2 +
-        scrollAreaWidgetContents->layout()->spacing() * 2);
-    scrollArea_2->setMinimumWidth(
-        scrollAreaWidgetContents_2->sizeHint().width() + 2 * scrollArea_2->frameWidth() +
-        scrollArea_2->verticalScrollBar()->sizeHint().width() + scrollAreaWidgetContents_2->layout()->margin() * 2 +
-        scrollAreaWidgetContents_2->layout()->spacing() * 2);
-    scrollArea_3->setMinimumWidth(
-        scrollAreaWidgetContents_3->sizeHint().width() + 2 * scrollArea_3->frameWidth() +
-        scrollArea_3->verticalScrollBar()->sizeHint().width() + scrollAreaWidgetContents_3->layout()->margin() * 2 +
-        scrollAreaWidgetContents_3->layout()->spacing() * 2);
-    scrollArea_4->setMinimumWidth(
-        scrollAreaWidgetContents_4->sizeHint().width() + 2 * scrollArea_4->frameWidth() +
-        scrollArea_4->verticalScrollBar()->sizeHint().width() + scrollAreaWidgetContents_4->layout()->margin() * 2 +
-        scrollAreaWidgetContents_4->layout()->spacing() * 2);
+    mUi->scrollArea->setMinimumWidth(
+        mUi->scrollAreaWidgetContents->sizeHint().width() + 2 * mUi->scrollArea->frameWidth() +
+        mUi->scrollArea->verticalScrollBar()->sizeHint().width() +
+        mUi->scrollAreaWidgetContents->layout()->margin() * 2 + mUi->scrollAreaWidgetContents->layout()->spacing() * 2);
+    mUi->scrollArea_2->setMinimumWidth(
+        mUi->scrollAreaWidgetContents_2->sizeHint().width() + 2 * mUi->scrollArea_2->frameWidth() +
+        mUi->scrollArea_2->verticalScrollBar()->sizeHint().width() +
+        mUi->scrollAreaWidgetContents_2->layout()->margin() * 2 +
+        mUi->scrollAreaWidgetContents_2->layout()->spacing() * 2);
+    mUi->scrollArea_3->setMinimumWidth(
+        mUi->scrollAreaWidgetContents_3->sizeHint().width() + 2 * mUi->scrollArea_3->frameWidth() +
+        mUi->scrollArea_3->verticalScrollBar()->sizeHint().width() +
+        mUi->scrollAreaWidgetContents_3->layout()->margin() * 2 +
+        mUi->scrollAreaWidgetContents_3->layout()->spacing() * 2);
+    mUi->scrollArea_4->setMinimumWidth(
+        mUi->scrollAreaWidgetContents_4->sizeHint().width() + 2 * mUi->scrollArea_4->frameWidth() +
+        mUi->scrollArea_4->verticalScrollBar()->sizeHint().width() +
+        mUi->scrollAreaWidgetContents_4->layout()->margin() * 2 +
+        mUi->scrollAreaWidgetContents_4->layout()->spacing() * 2);
 
-    connect(trackRoiFix, &QCheckBox::stateChanged, &trackRoiItem, &RoiItem::setFixed);
-    connect(recoRoiToFullImageSize, &QPushButton::clicked, &recoRoiItem, &RoiItem::setToFullImageSize);
+    connect(mUi->trackRoiFix, &QCheckBox::stateChanged, &trackRoiItem, &RoiItem::setFixed);
+    connect(mUi->recoRoiToFullImageSize, &QPushButton::clicked, &recoRoiItem, &RoiItem::setToFullImageSize);
     connect(
-        recoRoiAdjustAutomatically,
+        mUi->recoRoiAdjustAutomatically,
         &QPushButton::clicked,
         this,
         [&recoRoiItem, &trackRoiItem]() { recoRoiItem.adjustToOtherROI(trackRoiItem, std::minus<>()); });
 
-    connect(roiFix, &QCheckBox::stateChanged, &recoRoiItem, &RoiItem::setFixed);
-    connect(trackRoiToFullImageSize, &QPushButton::clicked, &trackRoiItem, &RoiItem::setToFullImageSize);
+    connect(mUi->roiFix, &QCheckBox::stateChanged, &recoRoiItem, &RoiItem::setFixed);
+    connect(mUi->trackRoiToFullImageSize, &QPushButton::clicked, &trackRoiItem, &RoiItem::setToFullImageSize);
     connect(
-        trackRoiAdjustAutomatically,
+        mUi->trackRoiAdjustAutomatically,
         &QPushButton::clicked,
         this,
         [&recoRoiItem, &trackRoiItem]() { trackRoiItem.adjustToOtherROI(recoRoiItem, std::plus<>()); });
 
-    connect(roiFix, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
-    connect(roiShow, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
+    connect(mUi->roiFix, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
+    connect(mUi->roiShow, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
 
-    connect(trackRoiFix, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
-    connect(trackRoiShow, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
+    connect(mUi->trackRoiFix, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
+    connect(mUi->trackRoiShow, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
 
     // "Hide" analysis tab until it is fixed
-    tabs->removeTab(3);
+    mUi->tabs->removeTab(3);
 }
 
 void Control::setScene(QGraphicsScene *sc)
@@ -252,55 +268,305 @@ void Control::setScene(QGraphicsScene *sc)
     mScene = sc;
 }
 
-bool Control::getTrackShow()
+void Control::toggleOnlineTracking()
 {
-    return trackShow->isChecked();
+    mUi->trackOnlineCalc->toggle();
+}
+
+bool Control::isOnlineTrackingChecked() const
+{
+    return mUi->trackOnlineCalc->isChecked();
+}
+
+void Control::setOnlineTrackingChecked(bool checked)
+{
+    mUi->trackOnlineCalc->setChecked(checked);
+}
+
+int Control::getTrackRegionLevels() const
+{
+    return mUi->trackRegionLevels->value();
+}
+
+bool Control::isTrackRepeatChecked() const
+{
+    return mUi->trackRepeat->isChecked();
+}
+
+int Control::getTrackRepeatQual() const
+{
+    return mUi->trackRepeatQual->value();
+}
+
+int Control::getTrackRegionScale() const
+{
+    return mUi->trackRegionScale->value();
+}
+
+bool Control::isTrackMergeChecked() const
+{
+    return mUi->trackMerge->isChecked();
+}
+
+bool Control::isTrackExtrapolationChecked() const
+{
+    return mUi->trackExtrapolation->isChecked();
+}
+
+QLineEdit *Control::trackShowOnlyNrList()
+{
+    return mUi->trackShowOnlyNrList;
+}
+
+void Control::setTrackNumberNow(const QString &val)
+{
+    mUi->trackNumberNow->setText(val);
+}
+
+void Control::setTrackShowOnlyNr(int val)
+{
+    mUi->trackShowOnlyNr->setValue(val);
+}
+
+int Control::getTrackShowOnlyNr() const
+{
+    return mUi->trackShowOnlyNr->value();
+}
+
+void Control::setTrackNumberAll(const QString &number)
+{
+    mUi->trackNumberAll->setText(number);
+}
+
+void Control::setTrackShowOnlyNrMaximum(int max)
+{
+    mUi->trackShowOnlyNr->setMaximum(max);
+}
+
+void Control::setTrackShowOnly(Qt::CheckState state)
+{
+    mUi->trackShowOnly->setCheckState(state);
+}
+
+bool Control::isTrackShowOnlyChecked() const
+{
+    return mUi->trackShowOnly->isChecked();
+}
+
+bool Control::isTrackShowOnlyListChecked() const
+{
+    return mUi->trackShowOnlyList->isChecked();
+}
+
+void Control::setTrackShowOnlyListChecked(bool checked)
+{
+    mUi->trackShowOnlyList->setChecked(checked);
+}
+
+void Control::setTrackNumberVisible(const QString &value)
+{
+    mUi->trackNumberVisible->setText(value);
+}
+
+bool Control::isTrackOnlySelectedChecked() const
+{
+    return mUi->trackOnlySelected->isChecked();
+}
+
+int Control::getTrackShowBefore() const
+{
+    return mUi->trackShowBefore->value();
+}
+
+int Control::getTrackShowAfter() const
+{
+    return mUi->trackShowAfter->value();
+}
+
+bool Control::getTrackShow() const
+{
+    return mUi->trackShow->isChecked();
 }
 void Control::setTrackShow(bool b)
 {
-    trackShow->setChecked(b);
+    mUi->trackShow->setChecked(b);
 }
 
-bool Control::getTrackFix()
+bool Control::getTrackFix() const
 {
-    return trackFix->isChecked();
+    return mUi->trackFix->isChecked();
 }
 void Control::setTrackFix(bool b)
 {
-    trackFix->setChecked(b);
+    mUi->trackFix->setChecked(b);
 }
 
-QColor Control::getTrackPathColor()
+QColor Control::getTrackPathColor() const
 {
-    return trackPathColorButton->palette().color(QPalette::Button);
+    return mUi->trackPathColorButton->palette().color(QPalette::Button);
 }
 
 void Control::setTrackPathColor(QColor col)
 {
-    QPalette pal = trackPathColorButton->palette();
+    QPalette pal = mUi->trackPathColorButton->palette();
     pal.setColor(QPalette::Button, col);
-    trackPathColorButton->setPalette(pal);
+    mUi->trackPathColorButton->setPalette(pal);
 }
 
-QColor Control::getTrackGroundPathColor()
+QColor Control::getTrackGroundPathColor() const
 {
-    return trackGroundPathColorButton->palette().color(QPalette::Button);
+    return mUi->trackGroundPathColorButton->palette().color(QPalette::Button);
 }
 
 void Control::setTrackGroundPathColor(QColor col)
 {
-    QPalette pal = trackGroundPathColorButton->palette();
+    QPalette pal = mUi->trackGroundPathColorButton->palette();
     pal.setColor(QPalette::Button, col);
-    trackGroundPathColorButton->setPalette(pal);
+    mUi->trackGroundPathColorButton->setPalette(pal);
+}
+
+int Control::getTrackCurrentPointSize() const
+{
+    return mUi->trackCurrentPointSize->value();
+}
+
+int Control::getTrackPointSize() const
+{
+    return mUi->trackPointSize->value();
+}
+
+int Control::getTrackColColorSize() const
+{
+    return mUi->trackColColorSize->value();
+}
+
+int Control::getTrackColorMarkerSize() const
+{
+    return mUi->trackColorMarkerSize->value();
+}
+
+int Control::getTrackNumberSize() const
+{
+    return mUi->trackNumberSize->value();
+}
+
+int Control::getTrackGroundPositionSize() const
+{
+    return mUi->trackGroundPositionSize->value();
+}
+
+int Control::getTrackGroundPathSize() const
+{
+    return mUi->trackGroundPathSize->value();
+}
+
+int Control::getTrackPathWidth() const
+{
+    return mUi->trackPathWidth->value();
+}
+
+bool Control::isTrackNumberBoldChecked() const
+{
+    return mUi->trackNumberBold->isChecked();
+}
+
+bool Control::isShowVoronoiCellsChecked() const
+{
+    return mUi->showVoronoiCells->isChecked();
+}
+
+bool Control::isTrackHeadSizedChecked() const
+{
+    return mUi->trackHeadSized->isChecked();
+}
+
+bool Control::isTrackShowCurrentPointChecked() const
+{
+    return mUi->trackShowCurrentPoint->isChecked();
+}
+
+bool Control::isTrackShowSearchSizeChecked() const
+{
+    return mUi->trackShowSearchSize->isChecked();
+}
+
+bool Control::isTrackShowColorMarkerChecked() const
+{
+    return mUi->trackShowColorMarker->isChecked();
+}
+
+bool Control::isTrackShowColColorChecked() const
+{
+    return mUi->trackShowColColor->isChecked();
+}
+
+bool Control::isTrackShowNumberChecked() const
+{
+    return mUi->trackShowNumber->isChecked();
+}
+
+bool Control::isTrackShowHeightIndividualChecked() const
+{
+    return mUi->trackShowHeightIndividual->isChecked();
+}
+
+bool Control::isTrackShowPointsChecked() const
+{
+    return mUi->trackShowPoints->isChecked();
+}
+
+bool Control::isTrackShowPathChecked() const
+{
+    return mUi->trackShowPath->isChecked();
+}
+
+bool Control::isTrackShowGroundPathChecked() const
+{
+    return mUi->trackShowGroundPath->isChecked();
+}
+
+bool Control::isTrackShowOnlyVisibleChecked() const
+{
+    return mUi->trackShowOnlyVisible->isChecked();
+}
+
+bool Control::isTrackShowPointsColoredChecked() const
+{
+    return mUi->trackShowPointsColored->isChecked();
+}
+
+bool Control::isTrackShowGroundPositionChecked() const
+{
+    return mUi->trackShowGroundPosition->isChecked();
 }
 
 /**
  * @brief Getter for MoCapColor selection
  * @return the current selected color
  * */
-QColor Control::getMoCapColor()
+QColor Control::getMoCapColor() const
 {
-    return moCapColorButton->palette().color(QPalette::Button);
+    return mUi->moCapColorButton->palette().color(QPalette::Button);
+}
+
+bool Control::isPerformRecognitionChecked() const
+{
+    return mUi->performRecognition->isChecked();
+}
+
+void Control::setPerformRecognitionChecked(bool checked)
+{
+    mUi->performRecognition->setChecked(checked);
+}
+
+void Control::setRecoNumberNow(const QString &val)
+{
+    mUi->recoNumberNow->setText(val);
+}
+
+int Control::getRecoStep() const
+{
+    return mUi->recoStep->value();
 }
 
 /**
@@ -310,9 +576,9 @@ QColor Control::getMoCapColor()
  * */
 void Control::setMoCapShow(bool visibility)
 {
-    if(showMoCap->isChecked() != visibility)
+    if(mUi->showMoCap->isChecked() != visibility)
     {
-        showMoCap->toggle();
+        mUi->showMoCap->toggle();
     }
 }
 
@@ -325,9 +591,9 @@ void Control::setMoCapColor(QColor col)
 {
     if(getMoCapColor() != col)
     {
-        QPalette pal = moCapColorButton->palette();
+        QPalette pal = mUi->moCapColorButton->palette();
         pal.setColor(QPalette::Button, col);
-        moCapColorButton->setPalette(pal);
+        mUi->moCapColorButton->setPalette(pal);
     }
 }
 
@@ -338,818 +604,858 @@ void Control::setMoCapColor(QColor col)
  * */
 void Control::setMoCapSize(int size)
 {
-    if(moCapSize->value() != size)
+    if(mUi->moCapSize->value() != size)
     {
-        moCapSize->setValue(size);
+        mUi->moCapSize->setValue(size);
     }
 }
 
-bool Control::getRecoRoiShow()
+bool Control::getRecoRoiShow() const
 {
-    return roiShow->isChecked();
+    return mUi->roiShow->isChecked();
 }
 
 void Control::setRecoRoiShow(bool b)
 {
-    roiShow->setChecked(b);
+    mUi->roiShow->setChecked(b);
 }
 
-bool Control::getRecoRoiFix()
+bool Control::getRecoRoiFix() const
 {
-    return roiFix->isChecked();
+    return mUi->roiFix->isChecked();
 }
 
 void Control::setRecoRoiFix(bool b)
 {
-    roiFix->setChecked(b);
+    mUi->roiFix->setChecked(b);
 }
 
-bool Control::getTrackRoiShow()
+bool Control::getTrackRoiShow() const
 {
-    return trackRoiShow->isChecked();
+    return mUi->trackRoiShow->isChecked();
 }
 
 void Control::setTrackRoiShow(bool b)
 {
-    trackRoiShow->setChecked(b);
+    mUi->trackRoiShow->setChecked(b);
 }
 
-bool Control::getTrackRoiFix()
+bool Control::getTrackRoiFix() const
 {
-    return trackRoiFix->isChecked();
+    return mUi->trackRoiFix->isChecked();
 }
 
 void Control::setTrackRoiFix(bool b)
 {
-    trackRoiFix->setChecked(b);
+    mUi->trackRoiFix->setChecked(b);
 }
 
-bool Control::getAdaptiveLevel()
+bool Control::getAdaptiveLevel() const
 {
-    return adaptiveLevel->isChecked();
+    return mUi->adaptiveLevel->isChecked();
 }
 
-int Control::getFilterBorderSize()
+int Control::getFilterBorderSize() const
 {
-    return filterBorderParamSize->value();
+    return mUi->filterBorderParamSize->value();
 }
 
-double Control::getCalibFxValue() const
+bool Control::isFilterBgChecked() const
 {
-    return fx->value();
+    return mUi->filterBg->isChecked();
 }
 
-void Control::setCalibFxValue(double d)
+bool Control::isFilterBgDeleteTrjChecked() const
 {
-    fx->setValue(d);
+    return mUi->filterBgDeleteTrj->isChecked();
+}
+
+int Control::getFilterBgDeleteNumber() const
+{
+    return mUi->filterBgDeleteNumber->value();
+}
+
+double Control::getCalibFx() const
+{
+    return mUi->fx->value();
+}
+
+void Control::setCalibFx(double d)
+{
+    mUi->fx->setValue(d);
 }
 
 void Control::setCalibFxMin(double d)
 {
-    fx->setMinimum(d);
+    mUi->fx->setMinimum(d);
 }
 
 void Control::setCalibFxMax(double d)
 {
-    fx->setMaximum(d);
+    mUi->fx->setMaximum(d);
 }
 
-double Control::getCalibFyValue() const
+double Control::getCalibFy() const
 {
-    return fy->value();
+    return mUi->fy->value();
 }
 
-void Control::setCalibFyValue(double d)
+void Control::setCalibFy(double d)
 {
-    fy->setValue(d);
+    mUi->fy->setValue(d);
 }
 
 void Control::setCalibFyMin(double d)
 {
-    fy->setMinimum(d);
+    mUi->fy->setMinimum(d);
 }
 
 void Control::setCalibFyMax(double d)
 {
-    fy->setMaximum(d);
+    mUi->fy->setMaximum(d);
 }
 
-double Control::getCalibCxValue() const
+double Control::getCalibCx() const
 {
-    return cx->value();
+    return mUi->cx->value();
 }
 
-void Control::setCalibCxValue(double d)
+void Control::setCalibCx(double d)
 {
-    cx->setValue(d);
+    mUi->cx->setValue(d);
 }
 
 void Control::setCalibCxMin(double d)
 {
-    cx->setMinimum(d);
+    mUi->cx->setMinimum(d);
 }
 
 void Control::setCalibCxMax(double d)
 {
-    cx->setMaximum(d);
+    mUi->cx->setMaximum(d);
 }
 
-double Control::getCalibCyValue() const
+double Control::getCalibCy() const
 {
-    return cy->value();
+    return mUi->cy->value();
 }
 
-void Control::setCalibCyValue(double d)
+void Control::setCalibCy(double d)
 {
-    cy->setValue(d);
+    mUi->cy->setValue(d);
 }
 
 void Control::setCalibCyMin(double d)
 {
-    cy->setMinimum(d);
+    mUi->cy->setMinimum(d);
 }
 
 void Control::setCalibCyMax(double d)
 {
-    cy->setMaximum(d);
+    mUi->cy->setMaximum(d);
 }
 
-double Control::getCalibR2Value() const
+double Control::getCalibR2() const
 {
-    return r2->value();
+    return mUi->r2->value();
 }
 
-void Control::setCalibR2Value(double d)
+void Control::setCalibR2(double d)
 {
-    r2->setValue(d);
+    mUi->r2->setValue(d);
 }
 
 void Control::setCalibR2Min(double d)
 {
-    r2->setMinimum(d);
+    mUi->r2->setMinimum(d);
 }
 
 void Control::setCalibR2Max(double d)
 {
-    r2->setMaximum(d);
+    mUi->r2->setMaximum(d);
 }
 
-double Control::getCalibR4Value() const
+double Control::getCalibR4() const
 {
-    return r4->value();
+    return mUi->r4->value();
 }
 
-void Control::setCalibR4Value(double d)
+void Control::setCalibR4(double d)
 {
-    r4->setValue(d);
+    mUi->r4->setValue(d);
 }
 
 void Control::setCalibR4Min(double d)
 {
-    r4->setMinimum(d);
+    mUi->r4->setMinimum(d);
 }
 
 void Control::setCalibR4Max(double d)
 {
-    r4->setMaximum(d);
+    mUi->r4->setMaximum(d);
 }
 
-double Control::getCalibR6Value() const
+double Control::getCalibR6() const
 {
-    return r6->value();
+    return mUi->r6->value();
 }
 
-void Control::setCalibR6Value(double d)
+void Control::setCalibR6(double d)
 {
-    r6->setValue(d);
+    mUi->r6->setValue(d);
 }
 
 void Control::setCalibR6Min(double d)
 {
-    r6->setMinimum(d);
+    mUi->r6->setMinimum(d);
 }
 void Control::setCalibR6Max(double d)
 {
-    r6->setMaximum(d);
+    mUi->r6->setMaximum(d);
 }
 
-double Control::getCalibS1Value() const
+double Control::getCalibS1() const
 {
-    return s1->value();
+    return mUi->s1->value();
 }
-void Control::setCalibS1Value(double d)
+void Control::setCalibS1(double d)
 {
-    s1->setValue(d);
+    mUi->s1->setValue(d);
 }
 void Control::setCalibS1Min(double d)
 {
-    s1->setMinimum(d);
+    mUi->s1->setMinimum(d);
 }
 void Control::setCalibS1Max(double d)
 {
-    s1->setMaximum(d);
+    mUi->s1->setMaximum(d);
 }
 
-double Control::getCalibS2Value() const
+double Control::getCalibS2() const
 {
-    return s2->value();
+    return mUi->s2->value();
 }
-void Control::setCalibS2Value(double d)
+void Control::setCalibS2(double d)
 {
-    s2->setValue(d);
+    mUi->s2->setValue(d);
 }
 void Control::setCalibS2Min(double d)
 {
-    s2->setMinimum(d);
+    mUi->s2->setMinimum(d);
 }
 void Control::setCalibS2Max(double d)
 {
-    s2->setMaximum(d);
+    mUi->s2->setMaximum(d);
 }
 
-double Control::getCalibS3Value() const
+double Control::getCalibS3() const
 {
-    return s3->value();
+    return mUi->s3->value();
 }
-void Control::setCalibS3Value(double d)
+void Control::setCalibS3(double d)
 {
-    s3->setValue(d);
+    mUi->s3->setValue(d);
 }
 void Control::setCalibS3Min(double d)
 {
-    s3->setMinimum(d);
+    mUi->s3->setMinimum(d);
 }
 void Control::setCalibS3Max(double d)
 {
-    s3->setMaximum(d);
+    mUi->s3->setMaximum(d);
 }
 
-double Control::getCalibS4Value() const
+double Control::getCalibS4() const
 {
-    return s4->value();
+    return mUi->s4->value();
 }
-void Control::setCalibS4Value(double d)
+void Control::setCalibS4(double d)
 {
-    s4->setValue(d);
+    mUi->s4->setValue(d);
 }
 void Control::setCalibS4Min(double d)
 {
-    s4->setMinimum(d);
+    mUi->s4->setMinimum(d);
 }
 void Control::setCalibS4Max(double d)
 {
-    s4->setMaximum(d);
+    mUi->s4->setMaximum(d);
 }
 
-double Control::getCalibTAUXValue() const
+double Control::getCalibTAUX() const
 {
-    return taux->value();
+    return mUi->taux->value();
 }
-void Control::setCalibTAUXValue(double d)
+void Control::setCalibTAUX(double d)
 {
-    taux->setValue(d);
+    mUi->taux->setValue(d);
 }
 void Control::setCalibTAUXMin(double d)
 {
-    taux->setMinimum(d);
+    mUi->taux->setMinimum(d);
 }
 void Control::setCalibTAUXMax(double d)
 {
-    taux->setMaximum(d);
+    mUi->taux->setMaximum(d);
 }
 
-double Control::getCalibTAUYValue() const
+double Control::getCalibTAUY() const
 {
-    return tauy->value();
+    return mUi->tauy->value();
 }
-void Control::setCalibTAUYValue(double d)
+void Control::setCalibTAUY(double d)
 {
-    tauy->setValue(d);
+    mUi->tauy->setValue(d);
 }
 void Control::setCalibTAUYMin(double d)
 {
-    tauy->setMinimum(d);
+    mUi->tauy->setMinimum(d);
 }
 void Control::setCalibTAUYMax(double d)
 {
-    tauy->setMaximum(d);
+    mUi->tauy->setMaximum(d);
 }
 
-void Control::setCalibReprErrorValue(double d)
+void Control::setCalibReprError(double d)
 {
-    intrError->setText(QString("%1").arg(d));
+    mUi->intrError->setText(QString("%1").arg(d));
 }
 void Control::setExtModelChecked(bool b)
 {
     if(b)
     {
-        extModelCheckBox->setChecked(true);
+        mUi->extModelCheckBox->setChecked(true);
     }
     else
     {
-        extModelCheckBox->setChecked(false);
+        mUi->extModelCheckBox->setChecked(false);
     }
+}
+
+bool Control::isFixCenterChecked() const
+{
+    return mUi->fixCenter->isChecked();
+}
+
+bool Control::isQuadAspectRatioChecked() const
+{
+    return mUi->quadAspectRatio->isChecked();
+}
+
+bool Control::isTangDistChecked() const
+{
+    return mUi->tangDist->isChecked();
+}
+
+bool Control::isExtModelChecked() const
+{
+    return mUi->extModelCheckBox->isChecked();
 }
 
 
 double Control::getCalibExtrRot1()
 {
-    return rot1->value();
+    return mUi->rot1->value();
 }
 
 void Control::setCalibExtrRot1(double d)
 {
-    rot1->setValue(d);
+    mUi->rot1->setValue(d);
 }
 
 double Control::getCalibExtrRot2()
 {
-    return rot2->value();
+    return mUi->rot2->value();
 }
 
 void Control::setCalibExtrRot2(double d)
 {
-    rot2->setValue(d);
+    mUi->rot2->setValue(d);
 }
 
 double Control::getCalibExtrRot3()
 {
-    return rot3->value();
+    return mUi->rot3->value();
 }
 
 void Control::setCalibExtrRot3(double d)
 {
-    rot3->setValue(d);
+    mUi->rot3->setValue(d);
 }
 
 double Control::getCalibExtrTrans1()
 {
-    return trans1->value();
+    return mUi->trans1->value();
 }
 
 void Control::setCalibExtrTrans1(double d)
 {
-    trans1->setValue(d);
+    mUi->trans1->setValue(d);
 }
 
 double Control::getCalibExtrTrans2()
 {
-    return trans2->value();
+    return mUi->trans2->value();
 }
 
 void Control::setCalibExtrTrans2(double d)
 {
-    trans2->setValue(d);
+    mUi->trans2->setValue(d);
 }
 
 double Control::getCalibExtrTrans3()
 {
-    return trans3->value();
+    return mUi->trans3->value();
 }
 
 void Control::setCalibExtrTrans3(double d)
 {
-    trans3->setValue(d);
+    mUi->trans3->setValue(d);
 }
 
-double Control::getCalibTxValue() const
+double Control::getCalibTx() const
 {
-    return tx->value();
+    return mUi->tx->value();
 }
 
-void Control::setCalibTxValue(double d)
+void Control::setCalibTx(double d)
 {
-    tx->setValue(d);
+    mUi->tx->setValue(d);
 }
 
 void Control::setCalibTxMin(double d)
 {
-    tx->setMinimum(d);
+    mUi->tx->setMinimum(d);
 }
 
 void Control::setCalibTxMax(double d)
 {
-    tx->setMaximum(d);
+    mUi->tx->setMaximum(d);
 }
 
-double Control::getCalibTyValue() const
+double Control::getCalibTy() const
 {
-    return ty->value();
+    return mUi->ty->value();
 }
 
-void Control::setCalibTyValue(double d)
+void Control::setCalibTy(double d)
 {
-    ty->setValue(d);
+    mUi->ty->setValue(d);
 }
 
 void Control::setCalibTyMin(double d)
 {
-    ty->setMinimum(d);
+    mUi->ty->setMinimum(d);
 }
 
 void Control::setCalibTyMax(double d)
 {
-    ty->setMaximum(d);
+    mUi->ty->setMaximum(d);
 }
 
-double Control::getCalibK4Value() const
+double Control::getCalibK4() const
 {
-    return k4->value();
+    return mUi->k4->value();
 }
 
-void Control::setCalibK4Value(double d)
+void Control::setCalibK4(double d)
 {
-    k4->setValue(d);
+    mUi->k4->setValue(d);
 }
 
 void Control::setCalibK4Min(double d)
 {
-    k4->setMinimum(d);
+    mUi->k4->setMinimum(d);
 }
 
 void Control::setCalibK4Max(double d)
 {
-    k4->setMaximum(d);
+    mUi->k4->setMaximum(d);
 }
 
-double Control::getCalibK5Value() const
+double Control::getCalibK5() const
 {
-    return k5->value();
+    return mUi->k5->value();
 }
 
-void Control::setCalibK5Value(double d)
+void Control::setCalibK5(double d)
 {
-    k5->setValue(d);
+    mUi->k5->setValue(d);
 }
 
 void Control::setCalibK5Min(double d)
 {
-    k5->setMinimum(d);
+    mUi->k5->setMinimum(d);
 }
 
 void Control::setCalibK5Max(double d)
 {
-    k5->setMaximum(d);
+    mUi->k5->setMaximum(d);
 }
 
-double Control::getCalibK6Value() const
+double Control::getCalibK6() const
 {
-    return k6->value();
+    return mUi->k6->value();
 }
 
-void Control::setCalibK6Value(double d)
+void Control::setCalibK6(double d)
 {
-    k6->setValue(d);
+    mUi->k6->setValue(d);
 }
 
 void Control::setCalibK6Min(double d)
 {
-    k6->setMinimum(d);
+    mUi->k6->setMinimum(d);
 }
 
 void Control::setCalibK6Max(double d)
 {
-    k6->setMaximum(d);
+    mUi->k6->setMaximum(d);
 }
 
 int Control::getCalibGridDimension()
 {
-    return gridTab->currentIndex();
+    return mUi->gridTab->currentIndex();
 }
 
 bool Control::getCalibGridShow()
 {
-    return gridShow->isChecked();
+    return mUi->gridShow->isChecked();
 }
 
 void Control::setCalibGridShow(bool b)
 {
-    gridShow->setChecked(b);
+    mUi->gridShow->setChecked(b);
 }
 
 bool Control::getCalibGridFix()
 {
-    return gridFix->isChecked();
+    return mUi->gridFix->isChecked();
 }
 
 void Control::setCalibGridFix(bool b)
 {
-    gridFix->setChecked(b);
+    mUi->gridFix->setChecked(b);
 }
 
 int Control::getCalibGridRotate()
 {
-    return gridRotate->value();
+    return mUi->gridRotate->value();
 }
 
 void Control::setCalibGridRotate(int i)
 {
-    gridRotate->setValue(i);
+    mUi->gridRotate->setValue(i);
 }
 
 int Control::getCalibGridTransX()
 {
-    return gridTransX->value();
+    return mUi->gridTransX->value();
 }
 
 void Control::setCalibGridTransX(int i)
 {
-    gridTransX->setValue(i);
+    mUi->gridTransX->setValue(i);
 }
 
 int Control::getCalibGridTransY()
 {
-    return gridTransY->value();
+    return mUi->gridTransY->value();
 }
 
 void Control::setCalibGridTransY(int i)
 {
-    gridTransY->setValue(i);
+    mUi->gridTransY->setValue(i);
 }
 
 int Control::getCalibGridScale()
 {
-    return gridScale->value();
+    return mUi->gridScale->value();
 }
 
 void Control::setCalibGridScale(int i)
 {
-    gridScale->setValue(i);
+    mUi->gridScale->setValue(i);
 }
 
 void Control::setEnabledExtrParams(bool enable)
 {
-    rot1->setEnabled(enable);
-    rot2->setEnabled(enable);
-    rot3->setEnabled(enable);
-    trans1->setEnabled(enable);
-    trans2->setEnabled(enable);
-    trans3->setEnabled(enable);
+    mUi->rot1->setEnabled(enable);
+    mUi->rot2->setEnabled(enable);
+    mUi->rot3->setEnabled(enable);
+    mUi->trans1->setEnabled(enable);
+    mUi->trans2->setEnabled(enable);
+    mUi->trans3->setEnabled(enable);
 }
 
 void Control::setGridMinMaxTranslation(int minx, int maxx, int miny, int maxy)
 {
-    grid3DTransX->setMinimum(minx);
-    grid3DTransX_spin->setMinimum(minx);
-    grid3DTransX->setMaximum(maxx);
-    grid3DTransX_spin->setMaximum(maxx);
-    grid3DTransY->setMinimum(miny);
-    grid3DTransY_spin->setMinimum(miny);
-    grid3DTransY->setMaximum(maxy);
-    grid3DTransY_spin->setMaximum(maxy);
-    grid3DTransZ->setMinimum(-200);
-    grid3DTransZ_spin->setMinimum(-200);
-    grid3DTransZ->setMaximum(500);
-    grid3DTransZ_spin->setMaximum(500);
+    mUi->grid3DTransX->setMinimum(minx);
+    mUi->grid3DTransX_spin->setMinimum(minx);
+    mUi->grid3DTransX->setMaximum(maxx);
+    mUi->grid3DTransX_spin->setMaximum(maxx);
+    mUi->grid3DTransY->setMinimum(miny);
+    mUi->grid3DTransY_spin->setMinimum(miny);
+    mUi->grid3DTransY->setMaximum(maxy);
+    mUi->grid3DTransY_spin->setMaximum(maxy);
+    mUi->grid3DTransZ->setMinimum(-200);
+    mUi->grid3DTransZ_spin->setMinimum(-200);
+    mUi->grid3DTransZ->setMaximum(500);
+    mUi->grid3DTransZ_spin->setMaximum(500);
 }
 
 int Control::getCalibGrid3DTransX()
 {
-    return grid3DTransX->value();
+    return mUi->grid3DTransX->value();
 }
 
 void Control::setCalibGrid3DTransX(int i)
 {
-    grid3DTransX->setValue(i);
+    mUi->grid3DTransX->setValue(i);
 }
 
 int Control::getCalibGrid3DTransY()
 {
-    return grid3DTransY->value();
+    return mUi->grid3DTransY->value();
 }
 
 void Control::setCalibGrid3DTransY(int i)
 {
-    grid3DTransY->setValue(i);
+    mUi->grid3DTransY->setValue(i);
 }
 
 int Control::getCalibGrid3DTransZ()
 {
-    return grid3DTransZ->value();
+    return mUi->grid3DTransZ->value();
 }
 
 void Control::setCalibGrid3DTransZ(int i)
 {
-    grid3DTransZ->setValue(i);
+    mUi->grid3DTransZ->setValue(i);
 }
 
 int Control::getCalibGrid3DResolution()
 {
-    return grid3DResolution->value();
+    return mUi->grid3DResolution->value();
 }
 
 void Control::setCalibGrid3DResolution(int i)
 {
-    grid3DResolution->setValue(i);
+    mUi->grid3DResolution->setValue(i);
 }
 
 int Control::getCalibCoordDimension()
 {
-    return coordTab->currentIndex();
+    return mUi->coordTab->currentIndex();
 }
 
 bool Control::getCalibExtrCalibPointsShow()
 {
-    return extCalibPointsShow->isChecked();
+    return mUi->extCalibPointsShow->isChecked();
 }
 
 bool Control::getCalibExtrVanishPointsShow()
 {
-    return extVanishPointsShow->isChecked();
+    return mUi->extVanishPointsShow->isChecked();
 }
 
 bool Control::getCalibCoordShow()
 {
-    return coordShow->isChecked();
+    return mUi->coordShow->isChecked();
 }
 
 void Control::setCalibCoordShow(bool b)
 {
-    coordShow->setChecked(b);
+    mUi->coordShow->setChecked(b);
 }
 
 bool Control::getCalibCoordFix()
 {
-    return coordFix->isChecked();
+    return mUi->coordFix->isChecked();
 }
 
 void Control::setCalibCoordFix(bool b)
 {
-    coordFix->setChecked(b);
+    mUi->coordFix->setChecked(b);
 }
 
 int Control::getCalibCoordRotate()
 {
-    return coordRotate->value();
+    return mUi->coordRotate->value();
 }
 
 void Control::setCalibCoordRotate(int i)
 {
-    coordRotate->setValue(i);
+    mUi->coordRotate->setValue(i);
 }
 
 int Control::getCalibCoordTransX()
 {
-    return coordTransX->value();
+    return mUi->coordTransX->value();
 }
 
 void Control::setCalibCoordTransX(int i)
 {
-    coordTransX->setValue(i);
+    mUi->coordTransX->setValue(i);
 }
 
 int Control::getCalibCoordTransXMax()
 {
-    return coordTransX->maximum();
+    return mUi->coordTransX->maximum();
 }
 
 void Control::setCalibCoordTransXMax(int i)
 {
-    coordTransX->setMaximum(i);
-    coordTransX_spin->setMaximum(i);
+    mUi->coordTransX->setMaximum(i);
+    mUi->coordTransX_spin->setMaximum(i);
 }
 
 int Control::getCalibCoordTransXMin()
 {
-    return coordTransX->minimum();
+    return mUi->coordTransX->minimum();
 }
 
 void Control::setCalibCoordTransXMin(int i)
 {
-    coordTransX->setMinimum(i);
-    coordTransX_spin->setMinimum(i);
+    mUi->coordTransX->setMinimum(i);
+    mUi->coordTransX_spin->setMinimum(i);
 }
 
 int Control::getCalibCoordTransY()
 {
-    return coordTransY->value();
+    return mUi->coordTransY->value();
 }
 
 void Control::setCalibCoordTransY(int i)
 {
-    coordTransY->setValue(i);
+    mUi->coordTransY->setValue(i);
 }
 
 int Control::getCalibCoordTransYMax()
 {
-    return coordTransY->maximum();
+    return mUi->coordTransY->maximum();
 }
 
 void Control::setCalibCoordTransYMax(int i)
 {
-    coordTransY->setMaximum(i);
-    coordTransY_spin->setMaximum(i);
+    mUi->coordTransY->setMaximum(i);
+    mUi->coordTransY_spin->setMaximum(i);
 }
 
 int Control::getCalibCoordTransYMin()
 {
-    return coordTransY->minimum();
+    return mUi->coordTransY->minimum();
 }
 
 void Control::setCalibCoordTransYMin(int i)
 {
-    coordTransY->setMinimum(i);
-    coordTransY_spin->setMinimum(i);
+    mUi->coordTransY->setMinimum(i);
+    mUi->coordTransY_spin->setMinimum(i);
 }
 
 int Control::getCalibCoordScale()
 {
-    return coordScale->value();
+    return mUi->coordScale->value();
 }
 
 void Control::setCalibCoordScale(int i)
 {
-    coordScale->setValue(i);
+    mUi->coordScale->setValue(i);
 }
 
 double Control::getCalibCoordUnit()
 {
-    return coordUnit->value();
+    return mUi->coordUnit->value();
 }
 
 void Control::setCalibCoordUnit(double d)
 {
-    coordUnit->setValue(d);
+    mUi->coordUnit->setValue(d);
+}
+
+bool Control::isCoordUseIntrinsicChecked() const
+{
+    return mUi->coordUseIntrinsic->isChecked();
 }
 
 int Control::getCalibCoord3DTransX()
 {
-    return coord3DTransX->value();
+    return mUi->coord3DTransX->value();
 }
 
 void Control::setCalibCoord3DTransX(int i)
 {
-    coord3DTransX->setValue(i);
+    mUi->coord3DTransX->setValue(i);
 }
 
 int Control::getCalibCoord3DTransY()
 {
-    return coord3DTransY->value();
+    return mUi->coord3DTransY->value();
 }
 
 void Control::setCalibCoord3DTransY(int i)
 {
-    coord3DTransY->setValue(i);
+    mUi->coord3DTransY->setValue(i);
 }
 
 int Control::getCalibCoord3DTransZ()
 {
-    return coord3DTransZ->value();
+    return mUi->coord3DTransZ->value();
 }
 
 void Control::setCalibCoord3DTransZ(int i)
 {
-    coord3DTransZ->setValue(i);
+    mUi->coord3DTransZ->setValue(i);
 }
 
 int Control::getCalibCoord3DAxeLen()
 {
-    return coord3DAxeLen->value();
+    return mUi->coord3DAxeLen->value();
 }
 
 void Control::setCalibCoord3DAxeLen(int i)
 {
-    coord3DAxeLen->setValue(i);
+    mUi->coord3DAxeLen->setValue(i);
 }
 
 bool Control::getCalibCoord3DSwapX()
 {
-    return coord3DSwapX->isChecked();
+    return mUi->coord3DSwapX->isChecked();
 }
 
 void Control::setCalibCoord3DSwapX(bool b)
 {
-    coord3DSwapX->setChecked(b);
+    mUi->coord3DSwapX->setChecked(b);
 }
 
 bool Control::getCalibCoord3DSwapY()
 {
-    return coord3DSwapY->isChecked();
+    return mUi->coord3DSwapY->isChecked();
 }
 
 void Control::setCalibCoord3DSwapY(bool b)
 {
-    coord3DSwapY->setChecked(b);
+    mUi->coord3DSwapY->setChecked(b);
 }
 
 bool Control::getCalibCoord3DSwapZ()
 {
-    return coord3DSwapZ->isChecked();
+    return mUi->coord3DSwapZ->isChecked();
 }
 
 void Control::setCalibCoord3DSwapZ(bool b)
 {
-    coord3DSwapZ->setChecked(b);
+    mUi->coord3DSwapZ->setChecked(b);
 }
 
 //-------------------- analysis
 void Control::on_anaCalculate_clicked()
 {
     mMainWindow->calculateRealTracker();
-    analysePlot->setScale();
+    mUi->analysePlot->setScale();
     if(!isLoading())
     {
-        analysePlot->replot();
+        mUi->analysePlot->replot();
     }
 }
 
@@ -1157,7 +1463,7 @@ void Control::on_anaStep_valueChanged(int /*i*/)
 {
     if(!isLoading())
     {
-        analysePlot->replot();
+        mUi->analysePlot->replot();
     }
 }
 
@@ -1165,56 +1471,56 @@ void Control::on_anaMarkAct_stateChanged(int /*i*/)
 {
     if(!isLoading())
     {
-        analysePlot->replot();
+        mUi->analysePlot->replot();
     }
 }
 
 void Control::on_anaConsiderX_stateChanged(int i)
 {
-    if((i == Qt::Checked) && (anaConsiderY->isChecked()))
+    if((i == Qt::Checked) && (mUi->anaConsiderY->isChecked()))
     {
-        anaConsiderAbs->setEnabled(false);
-        anaConsiderRev->setEnabled(false);
+        mUi->anaConsiderAbs->setEnabled(false);
+        mUi->anaConsiderRev->setEnabled(false);
     }
     else
     {
-        anaConsiderAbs->setEnabled(true);
-        anaConsiderRev->setEnabled(true);
+        mUi->anaConsiderAbs->setEnabled(true);
+        mUi->anaConsiderRev->setEnabled(true);
     }
-    if((i == Qt::Unchecked) && (!anaConsiderY->isChecked()))
+    if((i == Qt::Unchecked) && (!mUi->anaConsiderY->isChecked()))
     {
-        anaConsiderX->setCheckState(Qt::Checked);
+        mUi->anaConsiderX->setCheckState(Qt::Checked);
     }
     else
     {
         if(!isLoading())
         {
-            analysePlot->replot();
+            mUi->analysePlot->replot();
         }
     }
 }
 
 void Control::on_anaConsiderY_stateChanged(int i)
 {
-    if((i == Qt::Checked) && (anaConsiderX->isChecked()))
+    if((i == Qt::Checked) && (mUi->anaConsiderX->isChecked()))
     {
-        anaConsiderAbs->setEnabled(false);
-        anaConsiderRev->setEnabled(false);
+        mUi->anaConsiderAbs->setEnabled(false);
+        mUi->anaConsiderRev->setEnabled(false);
     }
     else
     {
-        anaConsiderAbs->setEnabled(true);
-        anaConsiderRev->setEnabled(true);
+        mUi->anaConsiderAbs->setEnabled(true);
+        mUi->anaConsiderRev->setEnabled(true);
     }
-    if((i == Qt::Unchecked) && (!anaConsiderX->isChecked()))
+    if((i == Qt::Unchecked) && (!mUi->anaConsiderX->isChecked()))
     {
-        anaConsiderY->setCheckState(Qt::Checked);
+        mUi->anaConsiderY->setCheckState(Qt::Checked);
     }
     else
     {
         if(!isLoading())
         {
-            analysePlot->replot();
+            mUi->analysePlot->replot();
         }
     }
 }
@@ -1223,7 +1529,7 @@ void Control::on_anaConsiderAbs_stateChanged(int /*i*/)
 {
     if(!isLoading())
     {
-        analysePlot->replot();
+        mUi->analysePlot->replot();
     }
 }
 
@@ -1231,7 +1537,7 @@ void Control::on_anaConsiderRev_stateChanged(int /*i*/)
 {
     if(!isLoading())
     {
-        analysePlot->replot();
+        mUi->analysePlot->replot();
     }
 }
 
@@ -1378,9 +1684,9 @@ void Control::on_trackShowSearchSize_stateChanged(int /*i*/)
 
 void Control::on_trackShowOnly_stateChanged(int i)
 {
-    if(i > 0 && trackShowOnlyList->checkState() == Qt::Checked)
+    if(i > 0 && mUi->trackShowOnlyList->checkState() == Qt::Checked)
     {
-        trackShowOnlyList->setChecked(false);
+        mUi->trackShowOnlyList->setChecked(false);
     }
 
     if(!isLoading())
@@ -1391,13 +1697,13 @@ void Control::on_trackShowOnly_stateChanged(int i)
 
 void Control::on_trackShowOnlyList_stateChanged(int i)
 {
-    if(i > 0 && trackShowOnly->checkState() == Qt::Checked)
+    if(i > 0 && mUi->trackShowOnly->checkState() == Qt::Checked)
     {
-        trackShowOnly->setChecked(false);
+        mUi->trackShowOnly->setChecked(false);
     }
 
-    trackShowOnlyListButton->setEnabled(i);
-    trackShowOnlyNrList->setEnabled(i);
+    mUi->trackShowOnlyListButton->setEnabled(i);
+    mUi->trackShowOnlyNrList->setEnabled(i);
 
     if(!isLoading())
     {
@@ -1423,9 +1729,9 @@ void Control::on_trackShowOnlyNrList_textChanged(const QString & /*arg1*/)
 
 void Control::on_trackGotoNr_clicked()
 {
-    if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= trackShowOnlyNr->value())
+    if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= mUi->trackShowOnlyNr->value())
     {
-        int idx        = trackShowOnlyNr->value() - 1;
+        int idx        = mUi->trackShowOnlyNr->value() - 1;
         int firstFrame = mMainWindow->getPersonStorage().at(idx).firstFrame();
         int lastFrame  = mMainWindow->getPersonStorage().at(idx).lastFrame();
         mMainWindow->getPlayer()->skipToFrame((lastFrame + firstFrame) / 2);
@@ -1434,18 +1740,18 @@ void Control::on_trackGotoNr_clicked()
 
 void Control::on_trackGotoStartNr_clicked()
 {
-    if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= trackShowOnlyNr->value())
+    if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= mUi->trackShowOnlyNr->value())
     {
-        int idx = trackShowOnlyNr->value() - 1;
+        int idx = mUi->trackShowOnlyNr->value() - 1;
         mMainWindow->getPlayer()->skipToFrame(mMainWindow->getPersonStorage().at(idx).firstFrame());
     }
 }
 
 void Control::on_trackGotoEndNr_clicked()
 {
-    if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= trackShowOnlyNr->value())
+    if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= mUi->trackShowOnlyNr->value())
     {
-        int idx = trackShowOnlyNr->value() - 1;
+        int idx = mUi->trackShowOnlyNr->value() - 1;
         mMainWindow->getPlayer()->skipToFrame(mMainWindow->getPersonStorage().at(idx).lastFrame());
     }
 }
@@ -1509,7 +1815,7 @@ void Control::on_trackShowOnlyListButton_clicked()
             }
             /// ToDo: lists
         }
-        trackShowOnlyNrList->setText(list.join(","));
+        mUi->trackShowOnlyNrList->setText(list.join(","));
     }
 }
 
@@ -1518,14 +1824,14 @@ void Control::on_trackHeadSized_stateChanged(int i)
     static int oldHeadSize = 60;
     if(i == Qt::Checked)
     {
-        oldHeadSize = trackCurrentPointSize->value();
-        trackCurrentPointSize->setValue((int) mMainWindow->getHeadSize());
-        trackCurrentPointSize->setDisabled(true);
+        oldHeadSize = mUi->trackCurrentPointSize->value();
+        mUi->trackCurrentPointSize->setValue((int) mMainWindow->getHeadSize());
+        mUi->trackCurrentPointSize->setDisabled(true);
     }
     else
     {
-        trackCurrentPointSize->setValue(oldHeadSize);
-        trackCurrentPointSize->setEnabled(true);
+        mUi->trackCurrentPointSize->setValue(oldHeadSize);
+        mUi->trackCurrentPointSize->setEnabled(true);
     }
     mScene->update();
 }
@@ -1545,17 +1851,17 @@ void Control::on_moCapSize_valueChanged(int i)
 //------------------- recognition
 void Control::on_recoShowColor_stateChanged(int i)
 {
-    colorPlot->getTrackerItem()->setVisible(i == Qt::Checked);
+    mUi->colorPlot->getTrackerItem()->setVisible(i == Qt::Checked);
     if(!isLoading())
     {
-        colorPlot->replot();
+        replotColorplot();
     }
 }
 
 void Control::on_recoOptimizeColor_clicked()
 {
     mMainWindow->getPersonStorage().optimizeColor();
-    colorPlot->replot();
+    replotColorplot();
     mScene->update(); // damit mgl angezeige farbpunkte geaendert/weggenommen werden
 }
 
@@ -1571,48 +1877,48 @@ void Control::on_recoColorModel_currentIndexChanged(int index)
         mColorChanging = true;
         if(index == 0) // HSV
         {
-            recoColorX->setItemText(0, "H");
-            recoColorX->setItemText(1, "S");
-            recoColorX->setItemText(2, "V");
+            mUi->recoColorX->setItemText(0, "H");
+            mUi->recoColorX->setItemText(1, "S");
+            mUi->recoColorX->setItemText(2, "V");
 
-            recoColorY->setItemText(0, "H");
-            recoColorY->setItemText(1, "S");
-            recoColorY->setItemText(2, "V");
+            mUi->recoColorY->setItemText(0, "H");
+            mUi->recoColorY->setItemText(1, "S");
+            mUi->recoColorY->setItemText(2, "V");
 
             if(mIndexChanging)
             {
-                xRgbIndex = recoColorX->currentIndex();
-                yRgbIndex = recoColorY->currentIndex();
-                recoColorX->setCurrentIndex(xHsvIndex);
-                recoColorY->setCurrentIndex(yHsvIndex);
+                xRgbIndex = mUi->recoColorX->currentIndex();
+                yRgbIndex = mUi->recoColorY->currentIndex();
+                mUi->recoColorX->setCurrentIndex(xHsvIndex);
+                mUi->recoColorY->setCurrentIndex(yHsvIndex);
             }
         }
         else // index == 1 == RGB
         {
-            recoColorX->setItemText(0, "R");
-            recoColorX->setItemText(1, "G");
-            recoColorX->setItemText(2, "B");
+            mUi->recoColorX->setItemText(0, "R");
+            mUi->recoColorX->setItemText(1, "G");
+            mUi->recoColorX->setItemText(2, "B");
 
-            recoColorY->setItemText(0, "R");
-            recoColorY->setItemText(1, "G");
-            recoColorY->setItemText(2, "B");
+            mUi->recoColorY->setItemText(0, "R");
+            mUi->recoColorY->setItemText(1, "G");
+            mUi->recoColorY->setItemText(2, "B");
 
             if(mIndexChanging)
             {
-                xHsvIndex = recoColorX->currentIndex();
-                yHsvIndex = recoColorY->currentIndex();
-                recoColorX->setCurrentIndex(xRgbIndex);
-                recoColorY->setCurrentIndex(yRgbIndex);
+                xHsvIndex = mUi->recoColorX->currentIndex();
+                yHsvIndex = mUi->recoColorY->currentIndex();
+                mUi->recoColorX->setCurrentIndex(xRgbIndex);
+                mUi->recoColorY->setCurrentIndex(yRgbIndex);
             }
         }
         mIndexChanging = true; // firstTime = false
         mColorChanging = false;
 
-        colorPlot->setScale();
-        colorPlot->generateImage();
+        mUi->colorPlot->setScale();
+        mUi->colorPlot->generateImage();
         if(!isLoading())
         {
-            colorPlot->replot();
+            replotColorplot();
         }
     }
 }
@@ -1621,11 +1927,11 @@ void Control::on_recoColorX_currentIndexChanged(int /*index*/)
 {
     if(mColorChanging == false)
     {
-        colorPlot->setScale();
-        colorPlot->generateImage();
+        mUi->colorPlot->setScale();
+        mUi->colorPlot->generateImage();
         if(!isLoading())
         {
-            colorPlot->replot();
+            replotColorplot();
         }
     }
     // TODO schoen waere hier das gegenstueck bei y zu disablen, aber combobox bietet dies nicht auf einfachem weg
@@ -1635,11 +1941,11 @@ void Control::on_recoColorY_currentIndexChanged(int /*index*/)
 {
     if(mColorChanging == false)
     {
-        colorPlot->setScale();
-        colorPlot->generateImage();
+        mUi->colorPlot->setScale();
+        mUi->colorPlot->generateImage();
         if(!isLoading())
         {
-            colorPlot->replot();
+            replotColorplot();
         }
     }
 }
@@ -1648,29 +1954,29 @@ void Control::on_recoColorZ_valueChanged(int /*index*/)
 {
     if(mColorChanging == false)
     {
-        colorPlot->generateImage();
+        mUi->colorPlot->generateImage();
         if(!isLoading())
         {
-            colorPlot->replot();
+            replotColorplot();
         }
     }
 }
 
 void Control::on_recoGreyLevel_valueChanged(int index)
 {
-    colorPlot->setGreyDiff(index);
+    mUi->colorPlot->setGreyDiff(index);
     if(!isLoading())
     {
-        colorPlot->replot();
+        replotColorplot();
     }
 }
 
 void Control::on_recoSymbolSize_valueChanged(int index)
 {
-    colorPlot->setSymbolSize(index);
+    mUi->colorPlot->setSymbolSize(index);
     if(!isLoading())
     {
-        colorPlot->replot();
+        replotColorplot();
     }
 }
 void Control::on_recoStereoShow_clicked()
@@ -1701,123 +2007,123 @@ void Control::on_mapColorRange_clicked()
 
 void Control::on_mapNr_valueChanged(int i)
 {
-    RectMap map = colorPlot->getMapItem()->getMap(i);
+    RectMap map = mUi->colorPlot->getMapItem()->getMap(i);
 
-    mapX->setValue(myRound(2. * map.x()));
-    mapY->setValue(myRound(2. * map.y()));
-    mapW->setValue(myRound(map.width()));
-    mapH->setValue(myRound(map.height()));
-    mapColor->setCheckState(map.colored() ? Qt::Checked : Qt::Unchecked);
-    mapHeight->setValue(map.mapHeight());
-    colorPlot->getMapItem()->changeMap(
-        mapNr->value(),
-        mapX->value() / 2.,
-        mapY->value() / 2.,
-        mapW->value(),
-        mapH->value(),
-        mapColor->isChecked(),
-        mapHeight->value()); // nur, um aktivenindex anzugeben
+    mUi->mapX->setValue(myRound(2. * map.x()));
+    mUi->mapY->setValue(myRound(2. * map.y()));
+    mUi->mapW->setValue(myRound(map.width()));
+    mUi->mapH->setValue(myRound(map.height()));
+    mUi->mapColor->setCheckState(map.colored() ? Qt::Checked : Qt::Unchecked);
+    mUi->mapHeight->setValue(map.mapHeight());
+    mUi->colorPlot->getMapItem()->changeMap(
+        mUi->mapNr->value(),
+        mUi->mapX->value() / 2.,
+        mUi->mapY->value() / 2.,
+        mUi->mapW->value(),
+        mUi->mapH->value(),
+        mUi->mapColor->isChecked(),
+        mUi->mapHeight->value()); // nur, um aktivenindex anzugeben
     mMainWindow->getColorRangeWidget()->setToColor(map.toColor());
     mMainWindow->getColorRangeWidget()->setFromColor(map.fromColor());
     mMainWindow->getColorRangeWidget()->setInvHue(map.invHue());
 
     if(!isLoading())
     {
-        colorPlot->replot(); // um aktiven gruen anzuzeigen
+        replotColorplot(); // um aktiven gruen anzuzeigen
         mMainWindow->updateImage();
     }
 }
 
 void Control::on_mapX_valueChanged(int /*i*/)
 {
-    colorPlot->getMapItem()->changeMap(
-        mapNr->value(),
-        mapX->value() / 2.,
-        mapY->value() / 2.,
-        mapW->value(),
-        mapH->value(),
-        mapColor->isChecked(),
-        mapHeight->value());
+    mUi->colorPlot->getMapItem()->changeMap(
+        mUi->mapNr->value(),
+        mUi->mapX->value() / 2.,
+        mUi->mapY->value() / 2.,
+        mUi->mapW->value(),
+        mUi->mapH->value(),
+        mUi->mapColor->isChecked(),
+        mUi->mapHeight->value());
     if(!isLoading())
     {
-        colorPlot->replot();
+        replotColorplot();
     }
 }
 void Control::on_mapY_valueChanged(int /*i*/)
 {
-    colorPlot->getMapItem()->changeMap(
-        mapNr->value(),
-        mapX->value() / 2.,
-        mapY->value() / 2.,
-        mapW->value(),
-        mapH->value(),
-        mapColor->isChecked(),
-        mapHeight->value());
+    mUi->colorPlot->getMapItem()->changeMap(
+        mUi->mapNr->value(),
+        mUi->mapX->value() / 2.,
+        mUi->mapY->value() / 2.,
+        mUi->mapW->value(),
+        mUi->mapH->value(),
+        mUi->mapColor->isChecked(),
+        mUi->mapHeight->value());
     if(!isLoading())
     {
-        colorPlot->replot();
+        replotColorplot();
     }
 }
 void Control::on_mapW_valueChanged(int /*i*/)
 {
-    colorPlot->getMapItem()->changeMap(
-        mapNr->value(),
-        mapX->value() / 2.,
-        mapY->value() / 2.,
-        mapW->value(),
-        mapH->value(),
-        mapColor->isChecked(),
-        mapHeight->value());
+    mUi->colorPlot->getMapItem()->changeMap(
+        mUi->mapNr->value(),
+        mUi->mapX->value() / 2.,
+        mUi->mapY->value() / 2.,
+        mUi->mapW->value(),
+        mUi->mapH->value(),
+        mUi->mapColor->isChecked(),
+        mUi->mapHeight->value());
     if(!isLoading())
     {
-        colorPlot->replot();
+        replotColorplot();
     }
 }
 void Control::on_mapH_valueChanged(int /*i*/)
 {
-    colorPlot->getMapItem()->changeMap(
-        mapNr->value(),
-        mapX->value() / 2.,
-        mapY->value() / 2.,
-        mapW->value(),
-        mapH->value(),
-        mapColor->isChecked(),
-        mapHeight->value());
+    mUi->colorPlot->getMapItem()->changeMap(
+        mUi->mapNr->value(),
+        mUi->mapX->value() / 2.,
+        mUi->mapY->value() / 2.,
+        mUi->mapW->value(),
+        mUi->mapH->value(),
+        mUi->mapColor->isChecked(),
+        mUi->mapHeight->value());
     if(!isLoading())
     {
-        colorPlot->replot();
+        replotColorplot();
     }
 }
 void Control::on_mapColor_stateChanged(int /*i*/)
 {
-    colorPlot->getMapItem()->changeMap(
-        mapNr->value(),
-        mapX->value() / 2.,
-        mapY->value() / 2.,
-        mapW->value(),
-        mapH->value(),
-        mapColor->isChecked(),
-        mapHeight->value());
+    mUi->colorPlot->getMapItem()->changeMap(
+        mUi->mapNr->value(),
+        mUi->mapX->value() / 2.,
+        mUi->mapY->value() / 2.,
+        mUi->mapW->value(),
+        mUi->mapH->value(),
+        mUi->mapColor->isChecked(),
+        mUi->mapHeight->value());
     if(!isLoading())
     {
-        colorPlot->replot();
+        replotColorplot();
     }
 }
 void Control::on_mapHeight_valueChanged(double /*d*/)
 {
-    colorPlot->getMapItem()->changeMap(
-        mapNr->value(),
-        mapX->value() / 2.,
-        mapY->value() / 2.,
-        mapW->value(),
-        mapH->value(),
-        mapColor->isChecked(),
-        mapHeight->value());
+    mUi->colorPlot->getMapItem()->changeMap(
+        mUi->mapNr->value(),
+        mUi->mapX->value() / 2.,
+        mUi->mapY->value() / 2.,
+        mUi->mapW->value(),
+        mUi->mapH->value(),
+        mUi->mapColor->isChecked(),
+        mUi->mapHeight->value());
 }
 
 void Control::on_mapHeight_editingFinished()
 {
-    if(mapHeight->value() < 100)
+    if(mUi->mapHeight->value() < 100)
     {
         PInformation(
             this,
@@ -1828,28 +2134,28 @@ void Control::on_mapHeight_editingFinished()
 
 void Control::on_mapAdd_clicked()
 {
-    mapNr->setMaximum(mapNr->maximum() + 1);
-    colorPlot->getMapItem()->addMap();
-    mapNr->setValue(mapNr->maximum());
+    mUi->mapNr->setMaximum(mUi->mapNr->maximum() + 1);
+    mUi->colorPlot->getMapItem()->addMap();
+    mUi->mapNr->setValue(mUi->mapNr->maximum());
 }
 void Control::on_mapDel_clicked()
 {
-    colorPlot->getMapItem()->delMap(mapNr->value());
-    if(mapNr->value() == mapNr->maximum())
+    mUi->colorPlot->getMapItem()->delMap(mUi->mapNr->value());
+    if(mUi->mapNr->value() == mUi->mapNr->maximum())
     {
-        mapNr->setValue(mapNr->value() > 0 ? mapNr->maximum() - 1 : 0);
+        mUi->mapNr->setValue(mUi->mapNr->value() > 0 ? mUi->mapNr->maximum() - 1 : 0);
     }
 
-    mapNr->setMaximum(mapNr->maximum() > 0 ? mapNr->maximum() - 1 : 0);
+    mUi->mapNr->setMaximum(mUi->mapNr->maximum() > 0 ? mUi->mapNr->maximum() - 1 : 0);
 
     if(!isLoading())
     {
-        colorPlot->replot();
+        replotColorplot();
     }
 }
 void Control::on_mapDistribution_clicked()
 {
-    if(!colorPlot->printDistribution())
+    if(!mUi->colorPlot->printDistribution())
     {
         mMainWindow->getPersonStorage().printHeightDistribution();
     }
@@ -1931,13 +2237,13 @@ void Control::on_performRecognition_stateChanged(int /*i*/)
 
 void Control::on_recoMethod_currentIndexChanged(int /*index*/)
 {
-    auto method = recoMethod->itemData(recoMethod->currentIndex());
+    auto method = mUi->recoMethod->itemData(mUi->recoMethod->currentIndex());
     emit userChangedRecoMethod(method.value<reco::RecognitionMethod>());
 }
 
 void Control::onRecoMethodChanged(reco::RecognitionMethod method)
 {
-    recoMethod->setCurrentIndex(recoMethod->findData(QVariant::fromValue(method)));
+    mUi->recoMethod->setCurrentIndex(mUi->recoMethod->findData(QVariant::fromValue(method)));
 }
 
 void Control::on_markerBrightness_valueChanged(int /*i*/)
@@ -2134,34 +2440,34 @@ void Control::on_filterSwapV_stateChanged(int i)
 
 void Control::on_filterBg_stateChanged(int i)
 {
-    static int showCheckState = filterBgShow->checkState();
+    static int showCheckState = mUi->filterBgShow->checkState();
 
     if(i == Qt::Checked)
     {
-        filterBgShow->setEnabled(true);
-        filterBgUpdate->setEnabled(true);
-        filterBgReset->setEnabled(true);
-        filterBgSave->setEnabled(true);
-        filterBgLoad->setEnabled(true);
+        mUi->filterBgShow->setEnabled(true);
+        mUi->filterBgUpdate->setEnabled(true);
+        mUi->filterBgReset->setEnabled(true);
+        mUi->filterBgSave->setEnabled(true);
+        mUi->filterBgLoad->setEnabled(true);
         if(showCheckState == Qt::Checked)
         {
-            filterBgShow->setCheckState(Qt::Checked);
+            mUi->filterBgShow->setCheckState(Qt::Checked);
         }
-        filterBgDeleteNumber->setEnabled(true);
-        filterBgDeleteTrj->setEnabled(true);
+        mUi->filterBgDeleteNumber->setEnabled(true);
+        mUi->filterBgDeleteTrj->setEnabled(true);
         mMainWindow->getBackgroundFilter()->enable();
     }
     else if(i == Qt::Unchecked)
     {
-        filterBgShow->setEnabled(false);
-        filterBgUpdate->setEnabled(false);
-        filterBgReset->setEnabled(false);
-        filterBgSave->setEnabled(false);
-        filterBgLoad->setEnabled(false);
-        showCheckState = filterBgShow->checkState();
-        filterBgShow->setCheckState(Qt::Unchecked);
-        filterBgDeleteNumber->setEnabled(false);
-        filterBgDeleteTrj->setEnabled(false);
+        mUi->filterBgShow->setEnabled(false);
+        mUi->filterBgUpdate->setEnabled(false);
+        mUi->filterBgReset->setEnabled(false);
+        mUi->filterBgSave->setEnabled(false);
+        mUi->filterBgLoad->setEnabled(false);
+        showCheckState = mUi->filterBgShow->checkState();
+        mUi->filterBgShow->setCheckState(Qt::Unchecked);
+        mUi->filterBgDeleteNumber->setEnabled(false);
+        mUi->filterBgDeleteTrj->setEnabled(false);
         mMainWindow->getBackgroundFilter()->disable();
     }
     if(!mMainWindow->isLoading())
@@ -2231,16 +2537,16 @@ void Control::on_apply_stateChanged(int i)
 void Control::on_fx_valueChanged(double d)
 {
     mMainWindow->getCalibFilter()->getFx()->setValue(d);
-    if(quadAspectRatio->isChecked())
+    if(mUi->quadAspectRatio->isChecked())
     {
-        fy->setValue(d);
+        mUi->fy->setValue(d);
     }
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
     }
     setMeasuredAltitude();
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 
 void Control::on_fy_valueChanged(double d)
@@ -2251,7 +2557,7 @@ void Control::on_fy_valueChanged(double d)
         mMainWindow->updateImage();
     }
     setMeasuredAltitude();
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 
 void Control::on_cx_valueChanged(double d)
@@ -2262,7 +2568,7 @@ void Control::on_cx_valueChanged(double d)
     {
         mMainWindow->updateCoord();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 
 void Control::on_cy_valueChanged(double d)
@@ -2273,7 +2579,7 @@ void Control::on_cy_valueChanged(double d)
     {
         mMainWindow->updateCoord();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 
 void Control::on_r2_valueChanged(double d)
@@ -2283,7 +2589,7 @@ void Control::on_r2_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 
 void Control::on_r4_valueChanged(double d)
@@ -2293,7 +2599,7 @@ void Control::on_r4_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 
 void Control::on_r6_valueChanged(double d)
@@ -2303,7 +2609,7 @@ void Control::on_r6_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 void Control::on_s1_valueChanged(double d)
 {
@@ -2312,7 +2618,7 @@ void Control::on_s1_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 void Control::on_s2_valueChanged(double d)
 {
@@ -2321,7 +2627,7 @@ void Control::on_s2_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 void Control::on_s3_valueChanged(double d)
 {
@@ -2330,7 +2636,7 @@ void Control::on_s3_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 void Control::on_s4_valueChanged(double d)
 {
@@ -2339,7 +2645,7 @@ void Control::on_s4_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 void Control::on_taux_valueChanged(double d)
 {
@@ -2348,7 +2654,7 @@ void Control::on_taux_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 void Control::on_tauy_valueChanged(double d)
 {
@@ -2357,7 +2663,7 @@ void Control::on_tauy_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 
 
@@ -2368,7 +2674,7 @@ void Control::on_tx_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 
 void Control::on_ty_valueChanged(double d)
@@ -2378,7 +2684,7 @@ void Control::on_ty_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 void Control::on_k4_valueChanged(double d)
 {
@@ -2387,7 +2693,7 @@ void Control::on_k4_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 void Control::on_k5_valueChanged(double d)
 {
@@ -2396,7 +2702,7 @@ void Control::on_k5_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 void Control::on_k6_valueChanged(double d)
 {
@@ -2405,7 +2711,7 @@ void Control::on_k6_valueChanged(double d)
     {
         mMainWindow->updateImage();
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 void Control::on_quadAspectRatio_stateChanged(int i)
 {
@@ -2413,16 +2719,16 @@ void Control::on_quadAspectRatio_stateChanged(int i)
 
     if(i == Qt::Checked)
     {
-        oldFyValue = fy->value();
-        fy->setValue(fx->value());
-        fy->setDisabled(true);
+        oldFyValue = mUi->fy->value();
+        mUi->fy->setValue(mUi->fx->value());
+        mUi->fy->setDisabled(true);
     }
     else if(i == Qt::Unchecked)
     {
-        fy->setEnabled(true);
-        fy->setValue(oldFyValue);
+        mUi->fy->setEnabled(true);
+        mUi->fy->setValue(oldFyValue);
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 
 void Control::on_fixCenter_stateChanged(int i)
@@ -2432,24 +2738,25 @@ void Control::on_fixCenter_stateChanged(int i)
 
     if(i == Qt::Checked)
     {
-        oldCxValue = cx->value();
-        oldCyValue = cy->value();
+        oldCxValue = mUi->cx->value();
+        oldCyValue = mUi->cy->value();
         if(mMainWindow->getImage())
         {
-            cx->setValue((mMainWindow->getImage()->width() - 1) / 2.); // mgl auch iplimg,wenn bild vergroessert wird
-            cy->setValue((mMainWindow->getImage()->height() - 1) / 2.);
+            mUi->cx->setValue(
+                (mMainWindow->getImage()->width() - 1) / 2.); // mgl auch iplimg,wenn bild vergroessert wird
+            mUi->cy->setValue((mMainWindow->getImage()->height() - 1) / 2.);
         }
-        cx->setDisabled(true);
-        cy->setDisabled(true);
+        mUi->cx->setDisabled(true);
+        mUi->cy->setDisabled(true);
     }
     else if(i == Qt::Unchecked)
     {
-        cx->setEnabled(true);
-        cy->setEnabled(true);
-        cx->setValue(oldCxValue);
-        cy->setValue(oldCyValue);
+        mUi->cx->setEnabled(true);
+        mUi->cy->setEnabled(true);
+        mUi->cx->setValue(oldCxValue);
+        mUi->cy->setValue(oldCyValue);
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 
 void Control::on_tangDist_stateChanged(int i)
@@ -2459,50 +2766,50 @@ void Control::on_tangDist_stateChanged(int i)
 
     if(i == Qt::Checked)
     {
-        tx->setEnabled(true);
-        ty->setEnabled(true);
-        tx->setValue(oldTxValue);
-        ty->setValue(oldTyValue);
+        mUi->tx->setEnabled(true);
+        mUi->ty->setEnabled(true);
+        mUi->tx->setValue(oldTxValue);
+        mUi->ty->setValue(oldTyValue);
     }
     else if(i == Qt::Unchecked)
     {
-        oldTxValue = tx->value();
-        oldTyValue = ty->value();
-        tx->setValue(0.);
-        ty->setValue(0.);
-        tx->setDisabled(true);
-        ty->setDisabled(true);
+        oldTxValue = mUi->tx->value();
+        oldTyValue = mUi->ty->value();
+        mUi->tx->setValue(0.);
+        mUi->ty->setValue(0.);
+        mUi->tx->setDisabled(true);
+        mUi->ty->setDisabled(true);
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 
 void Control::on_extModelCheckBox_stateChanged(int i)
 {
     if(i == Qt::Checked)
     {
-        k4->setEnabled(true);
-        k5->setEnabled(true);
-        k6->setEnabled(true);
-        s1->setEnabled(true);
-        s2->setEnabled(true);
-        s3->setEnabled(true);
-        s4->setEnabled(true);
-        taux->setEnabled(true);
-        tauy->setEnabled(true);
+        mUi->k4->setEnabled(true);
+        mUi->k5->setEnabled(true);
+        mUi->k6->setEnabled(true);
+        mUi->s1->setEnabled(true);
+        mUi->s2->setEnabled(true);
+        mUi->s3->setEnabled(true);
+        mUi->s4->setEnabled(true);
+        mUi->taux->setEnabled(true);
+        mUi->tauy->setEnabled(true);
     }
     else if(i == Qt::Unchecked)
     {
-        k4->setDisabled(true);
-        k5->setDisabled(true);
-        k6->setDisabled(true);
-        s1->setDisabled(true);
-        s2->setDisabled(true);
-        s3->setDisabled(true);
-        s4->setDisabled(true);
-        taux->setDisabled(true);
-        tauy->setDisabled(true);
+        mUi->k4->setDisabled(true);
+        mUi->k5->setDisabled(true);
+        mUi->k6->setDisabled(true);
+        mUi->s1->setDisabled(true);
+        mUi->s2->setDisabled(true);
+        mUi->s3->setDisabled(true);
+        mUi->s4->setDisabled(true);
+        mUi->taux->setDisabled(true);
+        mUi->tauy->setDisabled(true);
     }
-    intrError->setText(QString("invalid"));
+    mUi->intrError->setText(QString("invalid"));
 }
 
 void Control::on_boardSizeX_valueChanged(int x)
@@ -2528,7 +2835,7 @@ void Control::on_calibFiles_clicked()
 {
     if(mMainWindow->getAutoCalib()->openCalibFiles())
     {
-        autoCalib->setEnabled(true);
+        mUi->autoCalib->setEnabled(true);
     }
 }
 
@@ -2798,14 +3105,14 @@ void Control::on_coordTab_currentChanged(int index)
     if(index == 1)
     {
         setEnabledExtrParams(false);
-        trackShowGroundPosition->setEnabled(false);
-        trackShowGroundPath->setEnabled(false);
+        mUi->trackShowGroundPosition->setEnabled(false);
+        mUi->trackShowGroundPath->setEnabled(false);
     }
     else
     {
         setEnabledExtrParams(true);
-        trackShowGroundPosition->setEnabled(true);
-        trackShowGroundPath->setEnabled(true);
+        mUi->trackShowGroundPosition->setEnabled(true);
+        mUi->trackShowGroundPath->setEnabled(true);
     }
     if(!isLoading())
     {
@@ -2945,13 +3252,9 @@ void Control::setMeasuredAltitude()
 {
     if(mMainWindow->getImageItem())
     {
-        coordAltitudeMeasured->setText(
+        mUi->coordAltitudeMeasured->setText(
             QString("(measured: %1)")
-                .arg(
-                    (getCalibFxValue() + getCalibFyValue()) / 2. * mMainWindow->getImageItem()->getCmPerPixel(),
-                    6,
-                    'f',
-                    1));
+                .arg((getCalibFx() + getCalibFy()) / 2. * mMainWindow->getImageItem()->getCmPerPixel(), 6, 'f', 1));
     }
 }
 
@@ -2966,20 +3269,20 @@ void Control::setXml(QDomElement &elem)
     QString     heightFile;
     QString     markerFile;
 
-    elem.setAttribute("TAB", tabs->currentIndex());
+    elem.setAttribute("TAB", mUi->tabs->currentIndex());
 
     // - - - - - - - - - - - - - - - - - - -
     subElem = (elem.ownerDocument()).createElement("CALIBRATION");
     elem.appendChild(subElem);
 
     subSubElem = (elem.ownerDocument()).createElement("BRIGHTNESS");
-    subSubElem.setAttribute("ENABLED", filterBrightContrast->isChecked());
-    subSubElem.setAttribute("VALUE", filterBrightParam->value());
+    subSubElem.setAttribute("ENABLED", mUi->filterBrightContrast->isChecked());
+    subSubElem.setAttribute("VALUE", mUi->filterBrightParam->value());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("CONTRAST");
-    subSubElem.setAttribute("ENABLED", filterBrightContrast->isChecked());
-    subSubElem.setAttribute("VALUE", filterContrastParam->value());
+    subSubElem.setAttribute("ENABLED", mUi->filterBrightContrast->isChecked());
+    subSubElem.setAttribute("VALUE", mUi->filterContrastParam->value());
     subElem.appendChild(subSubElem);
 
     BorderFilter *bf = mMainWindow->getBorderFilter();
@@ -2988,29 +3291,29 @@ void Control::setXml(QDomElement &elem)
         (int) bf->getBorderColG()->getValue(),
         (int) bf->getBorderColB()->getValue());
     subSubElem = (elem.ownerDocument()).createElement("BORDER");
-    subSubElem.setAttribute("ENABLED", filterBorder->isChecked());
-    subSubElem.setAttribute("VALUE", filterBorderParamSize->value());
+    subSubElem.setAttribute("ENABLED", mUi->filterBorder->isChecked());
+    subSubElem.setAttribute("VALUE", mUi->filterBorderParamSize->value());
     subSubElem.setAttribute("COLOR", col.name());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("SWAP");
-    subSubElem.setAttribute("ENABLED", filterSwap->isChecked());
-    subSubElem.setAttribute("HORIZONTALLY", filterSwapH->isChecked());
-    subSubElem.setAttribute("VERTICALLY", filterSwapV->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->filterSwap->isChecked());
+    subSubElem.setAttribute("HORIZONTALLY", mUi->filterSwapH->isChecked());
+    subSubElem.setAttribute("VERTICALLY", mUi->filterSwapV->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("BG_SUB");
-    subSubElem.setAttribute("ENABLED", filterBg->isChecked());
-    subSubElem.setAttribute("UPDATE", filterBgUpdate->isChecked());
-    subSubElem.setAttribute("SHOW", filterBgShow->isChecked());
+    subSubElem.setAttribute("ENABLED", isFilterBgChecked());
+    subSubElem.setAttribute("UPDATE", mUi->filterBgUpdate->isChecked());
+    subSubElem.setAttribute("SHOW", mUi->filterBgShow->isChecked());
     fn = mMainWindow->getBackgroundFilter()->getFilename();
     if(fn != "")
     {
         fn = getFileList(fn, mMainWindow->getProFileName());
     }
     subSubElem.setAttribute("FILE", fn);
-    subSubElem.setAttribute("DELETE", filterBgDeleteTrj->isChecked());
-    subSubElem.setAttribute("DELETE_NUMBER", filterBgDeleteNumber->value());
+    subSubElem.setAttribute("DELETE", mUi->filterBgDeleteTrj->isChecked());
+    subSubElem.setAttribute("DELETE_NUMBER", mUi->filterBgDeleteNumber->value());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("PATTERN");
@@ -3020,31 +3323,31 @@ void Control::setXml(QDomElement &elem)
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("INTRINSIC_PARAMETERS");
-    subSubElem.setAttribute("ENABLED", apply->isChecked());
-    subSubElem.setAttribute("FX", fx->value());
-    subSubElem.setAttribute("FY", fy->value());
-    subSubElem.setAttribute("CX", cx->value());
-    subSubElem.setAttribute("CY", cy->value());
-    subSubElem.setAttribute("R2", r2->value());
-    subSubElem.setAttribute("R4", r4->value());
-    subSubElem.setAttribute("R6", r6->value());
-    subSubElem.setAttribute("TX", tx->value());
-    subSubElem.setAttribute("TY", ty->value());
-    subSubElem.setAttribute("K4", k4->value());
-    subSubElem.setAttribute("K5", k5->value());
-    subSubElem.setAttribute("K6", k6->value());
-    subSubElem.setAttribute("S1", s1->value());
-    subSubElem.setAttribute("S2", s2->value());
-    subSubElem.setAttribute("S3", s3->value());
-    subSubElem.setAttribute("S4", s4->value());
-    subSubElem.setAttribute("TAUX", taux->value());
-    subSubElem.setAttribute("TAUY", tauy->value());
+    subSubElem.setAttribute("ENABLED", mUi->apply->isChecked());
+    subSubElem.setAttribute("FX", mUi->fx->value());
+    subSubElem.setAttribute("FY", mUi->fy->value());
+    subSubElem.setAttribute("CX", mUi->cx->value());
+    subSubElem.setAttribute("CY", mUi->cy->value());
+    subSubElem.setAttribute("R2", mUi->r2->value());
+    subSubElem.setAttribute("R4", mUi->r4->value());
+    subSubElem.setAttribute("R6", mUi->r6->value());
+    subSubElem.setAttribute("TX", mUi->tx->value());
+    subSubElem.setAttribute("TY", mUi->ty->value());
+    subSubElem.setAttribute("K4", mUi->k4->value());
+    subSubElem.setAttribute("K5", mUi->k5->value());
+    subSubElem.setAttribute("K6", mUi->k6->value());
+    subSubElem.setAttribute("S1", mUi->s1->value());
+    subSubElem.setAttribute("S2", mUi->s2->value());
+    subSubElem.setAttribute("S3", mUi->s3->value());
+    subSubElem.setAttribute("S4", mUi->s4->value());
+    subSubElem.setAttribute("TAUX", mUi->taux->value());
+    subSubElem.setAttribute("TAUY", mUi->tauy->value());
     subSubElem.setAttribute("ReprError", mMainWindow->getCalibFilter()->getReprojectionError());
 
-    subSubElem.setAttribute("QUAD_ASPECT_RATIO", quadAspectRatio->isChecked());
-    subSubElem.setAttribute("FIX_CENTER", fixCenter->isChecked());
-    subSubElem.setAttribute("TANG_DIST", tangDist->isChecked());
-    subSubElem.setAttribute("EXT_MODEL_ENABLED", extModelCheckBox->isChecked());
+    subSubElem.setAttribute("QUAD_ASPECT_RATIO", mUi->quadAspectRatio->isChecked());
+    subSubElem.setAttribute("FIX_CENTER", mUi->fixCenter->isChecked());
+    subSubElem.setAttribute("TANG_DIST", mUi->tangDist->isChecked());
+    subSubElem.setAttribute("EXT_MODEL_ENABLED", mUi->extModelCheckBox->isChecked());
     // in dateiname darf kein , vorkommen - das blank ", " zur uebersich - beim einlesen wird nur ","
     // genommen und blanks rundherum abgeschnitten, falls von hand editiert wurde
     QStringList fl = mMainWindow->getAutoCalib()->getCalibFiles();
@@ -3061,14 +3364,14 @@ void Control::setXml(QDomElement &elem)
 
     subSubElem = (elem.ownerDocument()).createElement("EXTRINSIC_PARAMETERS");
 
-    subSubElem.setAttribute("EXTR_ROT_1", rot1->value());
-    subSubElem.setAttribute("EXTR_ROT_2", rot2->value());
-    subSubElem.setAttribute("EXTR_ROT_3", rot3->value());
-    subSubElem.setAttribute("EXTR_TRANS_1", trans1->value());
-    subSubElem.setAttribute("EXTR_TRANS_2", trans2->value());
-    subSubElem.setAttribute("EXTR_TRANS_3", trans3->value());
+    subSubElem.setAttribute("EXTR_ROT_1", mUi->rot1->value());
+    subSubElem.setAttribute("EXTR_ROT_2", mUi->rot2->value());
+    subSubElem.setAttribute("EXTR_ROT_3", mUi->rot3->value());
+    subSubElem.setAttribute("EXTR_TRANS_1", mUi->trans1->value());
+    subSubElem.setAttribute("EXTR_TRANS_2", mUi->trans2->value());
+    subSubElem.setAttribute("EXTR_TRANS_3", mUi->trans3->value());
 
-    subSubElem.setAttribute("SHOW_CALIB_POINTS", extCalibPointsShow->isChecked());
+    subSubElem.setAttribute("SHOW_CALIB_POINTS", mUi->extCalibPointsShow->isChecked());
 
     QString ef = mMainWindow->getExtrCalibration()->getExtrCalibFile();
     if(ef != "")
@@ -3077,38 +3380,38 @@ void Control::setXml(QDomElement &elem)
     }
     subSubElem.setAttribute("EXTERNAL_CALIB_FILE", ef);
 
-    subSubElem.setAttribute("COORD_DIMENSION", coordTab->currentIndex());
+    subSubElem.setAttribute("COORD_DIMENSION", mUi->coordTab->currentIndex());
 
-    subSubElem.setAttribute("SHOW", coordShow->isChecked());
-    subSubElem.setAttribute("FIX", coordFix->isChecked());
-    subSubElem.setAttribute("ROTATE", coordRotate->value());
-    subSubElem.setAttribute("TRANS_X", coordTransX->value());
-    subSubElem.setAttribute("TRANS_Y", coordTransY->value());
-    subSubElem.setAttribute("SCALE", coordScale->value());
-    subSubElem.setAttribute("ALTITUDE", coordAltitude->value());
-    subSubElem.setAttribute("UNIT", coordUnit->value());
-    subSubElem.setAttribute("USE_INTRINSIC_CENTER", coordUseIntrinsic->isChecked());
-    subSubElem.setAttribute("COORD3D_TRANS_X", coord3DTransX->value());
-    subSubElem.setAttribute("COORD3D_TRANS_Y", coord3DTransY->value());
-    subSubElem.setAttribute("COORD3D_TRANS_Z", coord3DTransZ->value());
-    subSubElem.setAttribute("COORD3D_AXIS_LEN", coord3DAxeLen->value());
-    subSubElem.setAttribute("COORD3D_SWAP_X", coord3DSwapX->isChecked());
-    subSubElem.setAttribute("COORD3D_SWAP_Y", coord3DSwapY->isChecked());
-    subSubElem.setAttribute("COORD3D_SWAP_Z", coord3DSwapZ->isChecked());
+    subSubElem.setAttribute("SHOW", mUi->coordShow->isChecked());
+    subSubElem.setAttribute("FIX", mUi->coordFix->isChecked());
+    subSubElem.setAttribute("ROTATE", mUi->coordRotate->value());
+    subSubElem.setAttribute("TRANS_X", mUi->coordTransX->value());
+    subSubElem.setAttribute("TRANS_Y", mUi->coordTransY->value());
+    subSubElem.setAttribute("SCALE", mUi->coordScale->value());
+    subSubElem.setAttribute("ALTITUDE", mUi->coordAltitude->value());
+    subSubElem.setAttribute("UNIT", mUi->coordUnit->value());
+    subSubElem.setAttribute("USE_INTRINSIC_CENTER", mUi->coordUseIntrinsic->isChecked());
+    subSubElem.setAttribute("COORD3D_TRANS_X", mUi->coord3DTransX->value());
+    subSubElem.setAttribute("COORD3D_TRANS_Y", mUi->coord3DTransY->value());
+    subSubElem.setAttribute("COORD3D_TRANS_Z", mUi->coord3DTransZ->value());
+    subSubElem.setAttribute("COORD3D_AXIS_LEN", mUi->coord3DAxeLen->value());
+    subSubElem.setAttribute("COORD3D_SWAP_X", mUi->coord3DSwapX->isChecked());
+    subSubElem.setAttribute("COORD3D_SWAP_Y", mUi->coord3DSwapY->isChecked());
+    subSubElem.setAttribute("COORD3D_SWAP_Z", mUi->coord3DSwapZ->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("ALIGNMENT_GRID");
-    subSubElem.setAttribute("GRID_DIMENSION", gridTab->currentIndex());
-    subSubElem.setAttribute("SHOW", gridShow->isChecked());
-    subSubElem.setAttribute("FIX", gridFix->isChecked());
-    subSubElem.setAttribute("ROTATE", gridRotate->value());
-    subSubElem.setAttribute("TRANS_X", gridTransX->value());
-    subSubElem.setAttribute("TRANS_Y", gridTransY->value());
-    subSubElem.setAttribute("SCALE", gridScale->value());
-    subSubElem.setAttribute("GRID3D_TRANS_X", grid3DTransX->value());
-    subSubElem.setAttribute("GRID3D_TRANS_Y", grid3DTransY->value());
-    subSubElem.setAttribute("GRID3D_TRANS_Z", grid3DTransZ->value());
-    subSubElem.setAttribute("GRID3D_RESOLUTION", grid3DResolution->value());
+    subSubElem.setAttribute("GRID_DIMENSION", mUi->gridTab->currentIndex());
+    subSubElem.setAttribute("SHOW", mUi->gridShow->isChecked());
+    subSubElem.setAttribute("FIX", mUi->gridFix->isChecked());
+    subSubElem.setAttribute("ROTATE", mUi->gridRotate->value());
+    subSubElem.setAttribute("TRANS_X", mUi->gridTransX->value());
+    subSubElem.setAttribute("TRANS_Y", mUi->gridTransY->value());
+    subSubElem.setAttribute("SCALE", mUi->gridScale->value());
+    subSubElem.setAttribute("GRID3D_TRANS_X", mUi->grid3DTransX->value());
+    subSubElem.setAttribute("GRID3D_TRANS_Y", mUi->grid3DTransY->value());
+    subSubElem.setAttribute("GRID3D_TRANS_Z", mUi->grid3DTransZ->value());
+    subSubElem.setAttribute("GRID3D_RESOLUTION", mUi->grid3DResolution->value());
     subElem.appendChild(subSubElem);
 
     // - - - - - - - - - - - - - - - - - - -
@@ -3116,15 +3419,16 @@ void Control::setXml(QDomElement &elem)
     elem.appendChild(subElem);
 
     subSubElem = (elem.ownerDocument()).createElement("PERFORM");
-    subSubElem.setAttribute("ENABLED", performRecognition->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->performRecognition->isChecked());
     subSubElem.setAttribute(
-        "METHOD", static_cast<int>(recoMethod->itemData(recoMethod->currentIndex()).value<reco::RecognitionMethod>()));
-    subSubElem.setAttribute("STEP", recoStep->value());
+        "METHOD",
+        static_cast<int>(mUi->recoMethod->itemData(mUi->recoMethod->currentIndex()).value<reco::RecognitionMethod>()));
+    subSubElem.setAttribute("STEP", getRecoStep());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("REGION_OF_INTEREST");
-    subSubElem.setAttribute("SHOW", roiShow->isChecked());
-    subSubElem.setAttribute("FIX", roiFix->isChecked());
+    subSubElem.setAttribute("SHOW", mUi->roiShow->isChecked());
+    subSubElem.setAttribute("FIX", mUi->roiFix->isChecked());
     subSubElem.setAttribute("X", mMainWindow->getRecoRoiItem()->rect().x());
     subSubElem.setAttribute("Y", mMainWindow->getRecoRoiItem()->rect().y());
     subSubElem.setAttribute("WIDTH", mMainWindow->getRecoRoiItem()->rect().width());
@@ -3132,25 +3436,25 @@ void Control::setXml(QDomElement &elem)
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("MARKER");
-    subSubElem.setAttribute("BRIGHTNESS", markerBrightness->value());
-    subSubElem.setAttribute("IGNORE_WITHOUT", markerIgnoreWithout->isChecked());
+    subSubElem.setAttribute("BRIGHTNESS", mUi->markerBrightness->value());
+    subSubElem.setAttribute("IGNORE_WITHOUT", mUi->markerIgnoreWithout->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("SIZE_COLOR");
-    subSubElem.setAttribute("SHOW", recoShowColor->isChecked());
-    subSubElem.setAttribute("MODEL", recoColorModel->currentIndex());
-    subSubElem.setAttribute("AUTO_WB", recoAutoWB->isChecked());
-    subSubElem.setAttribute("X", recoColorX->currentIndex());
-    subSubElem.setAttribute("Y", recoColorY->currentIndex());
-    subSubElem.setAttribute("Z", recoColorZ->value());
-    subSubElem.setAttribute("GREY_LEVEL", recoGreyLevel->value());
-    subSubElem.setAttribute("SYMBOL_SIZE", recoSymbolSize->value());
+    subSubElem.setAttribute("SHOW", mUi->recoShowColor->isChecked());
+    subSubElem.setAttribute("MODEL", mUi->recoColorModel->currentIndex());
+    subSubElem.setAttribute("AUTO_WB", mUi->recoAutoWB->isChecked());
+    subSubElem.setAttribute("X", mUi->recoColorX->currentIndex());
+    subSubElem.setAttribute("Y", mUi->recoColorY->currentIndex());
+    subSubElem.setAttribute("Z", mUi->recoColorZ->value());
+    subSubElem.setAttribute("GREY_LEVEL", mUi->recoGreyLevel->value());
+    subSubElem.setAttribute("SYMBOL_SIZE", mUi->recoSymbolSize->value());
 
-    subSubElem.setAttribute("MAP_NUMBER", mapNr->value()); // MAP_MAX noetig ?: mapNr->maximum()+1
-    for(int i = 0; i <= mapNr->maximum(); ++i)
+    subSubElem.setAttribute("MAP_NUMBER", mUi->mapNr->value()); // MAP_MAX noetig ?: mapNr->maximum()+1
+    for(int i = 0; i <= mUi->mapNr->maximum(); ++i)
     {
         subSubSubElem = (elem.ownerDocument()).createElement("MAP"); // QString("MAP %1").arg(i)
-        RectMap map   = colorPlot->getMapItem()->getMap(i);
+        RectMap map   = mUi->colorPlot->getMapItem()->getMap(i);
         subSubSubElem.setAttribute("X", map.x());
         subSubSubElem.setAttribute("Y", map.y());
         subSubSubElem.setAttribute("WIDTH", map.width());
@@ -3166,7 +3470,7 @@ void Control::setXml(QDomElement &elem)
         subSubSubElem.setAttribute("INV_HUE", map.invHue());
         subSubElem.appendChild(subSubSubElem);
     }
-    subSubElem.setAttribute("DEFAULT_HEIGHT", mapDefaultHeight->value());
+    subSubElem.setAttribute("DEFAULT_HEIGHT", mUi->mapDefaultHeight->value());
 
     subElem.appendChild(subSubElem);
 
@@ -3194,29 +3498,29 @@ void Control::setXml(QDomElement &elem)
     elem.appendChild(subElem);
 
     subSubElem = (elem.ownerDocument()).createElement("ONLINE_CALCULATION");
-    subSubElem.setAttribute("ENABLED", trackOnlineCalc->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->trackOnlineCalc->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("REPEAT_BELOW");
-    subSubElem.setAttribute("ENABLED", trackRepeat->isChecked());
-    subSubElem.setAttribute("QUALITY", trackRepeatQual->value());
+    subSubElem.setAttribute("ENABLED", isTrackRepeatChecked());
+    subSubElem.setAttribute("QUALITY", getTrackRepeatQual());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("EXTRAPOLATION");
-    subSubElem.setAttribute("ENABLED", trackExtrapolation->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->trackExtrapolation->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("MERGE");
-    subSubElem.setAttribute("ENABLED", trackMerge->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->trackMerge->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("ONLY_VISIBLE");
-    subSubElem.setAttribute("ENABLED", trackOnlySelected->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->trackOnlySelected->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("REGION_OF_INTEREST");
-    subSubElem.setAttribute("SHOW", trackRoiShow->isChecked());
-    subSubElem.setAttribute("FIX", trackRoiFix->isChecked());
+    subSubElem.setAttribute("SHOW", mUi->trackRoiShow->isChecked());
+    subSubElem.setAttribute("FIX", mUi->trackRoiFix->isChecked());
     subSubElem.setAttribute("X", mMainWindow->getTrackRoiItem()->rect().x());
     subSubElem.setAttribute("Y", mMainWindow->getTrackRoiItem()->rect().y());
     subSubElem.setAttribute("WIDTH", mMainWindow->getTrackRoiItem()->rect().width());
@@ -3225,64 +3529,64 @@ void Control::setXml(QDomElement &elem)
 
     // export options
     subSubElem = (elem.ownerDocument()).createElement("SEARCH_MISSING_FRAMES");
-    subSubElem.setAttribute("ENABLED", trackMissingFrames->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->trackMissingFrames->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("RECALCULATE_MEDIAN_HEIGHT");
-    subSubElem.setAttribute("ENABLED", trackRecalcHeight->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->trackRecalcHeight->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("ALLOW_ALTERNATE_HEIGHT");
-    subSubElem.setAttribute("ENABLED", trackAlternateHeight->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->trackAlternateHeight->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("EXPORT_ELIMINATE_TRACKPOINT_WITHOUT_HEIGHT");
-    subSubElem.setAttribute("ENABLED", exportElimTp->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->exportElimTp->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("EXPORT_ELIMINATE_TRAJECTORY_WITHOUT_HEIGHT");
-    subSubElem.setAttribute("ENABLED", exportElimTrj->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->exportElimTrj->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("EXPORT_SMOOTH");
-    subSubElem.setAttribute("ENABLED", exportSmooth->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->exportSmooth->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("EXPORT_VIEWING_DIRECTION");
-    subSubElem.setAttribute("ENABLED", exportViewDir->isChecked());
+    subSubElem.setAttribute("ENABLED", isExportViewDirChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("EXPORT_ANGLE_OF_VIEW");
-    subSubElem.setAttribute("ENABLED", exportAngleOfView->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->exportAngleOfView->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("EXPORT_USE_METER");
-    subSubElem.setAttribute("ENABLED", exportUseM->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->exportUseM->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("EXPORT_COMMENT");
-    subSubElem.setAttribute("ENABLED", exportComment->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->exportComment->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("EXPORT_MARKERID");
-    subSubElem.setAttribute("ENABLED", exportMarkerID->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->exportMarkerID->isChecked());
     subElem.appendChild(subSubElem);
 
 
     subSubElem = (elem.ownerDocument()).createElement("TEST_EQUAL");
-    subSubElem.setAttribute("ENABLED", testEqual->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->testEqual->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("TEST_VELOCITY");
-    subSubElem.setAttribute("ENABLED", testVelocity->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->testVelocity->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("TEST_INSIDE");
-    subSubElem.setAttribute("ENABLED", testInside->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->testInside->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("TEST_LENGTH");
-    subSubElem.setAttribute("ENABLED", testLength->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->testLength->isChecked());
     subElem.appendChild(subSubElem);
 
 
@@ -3296,49 +3600,49 @@ void Control::setXml(QDomElement &elem)
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("SEARCH_REGION");
-    subSubElem.setAttribute("SCALE", trackRegionScale->value());
-    subSubElem.setAttribute("LEVELS", trackRegionLevels->value());
-    subSubElem.setAttribute("MAX_ERROR", trackErrorExponent->value());
-    subSubElem.setAttribute("SHOW", trackShowSearchSize->isChecked());
-    subSubElem.setAttribute("ADAPTIVE", adaptiveLevel->isChecked());
+    subSubElem.setAttribute("SCALE", mUi->trackRegionScale->value());
+    subSubElem.setAttribute("LEVELS", getTrackRegionLevels());
+    subSubElem.setAttribute("MAX_ERROR", mUi->trackErrorExponent->value());
+    subSubElem.setAttribute("SHOW", mUi->trackShowSearchSize->isChecked());
+    subSubElem.setAttribute("ADAPTIVE", mUi->adaptiveLevel->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("PATH");
-    subSubElem.setAttribute("SHOW", trackShow->isChecked());
-    subSubElem.setAttribute("FIX", trackFix->isChecked());
+    subSubElem.setAttribute("SHOW", mUi->trackShow->isChecked());
+    subSubElem.setAttribute("FIX", mUi->trackFix->isChecked());
 
-    subSubElem.setAttribute("ONLY_VISIBLE", trackShowOnlyVisible->isChecked());
-    subSubElem.setAttribute("ONLY_PEOPLE", trackShowOnly->isChecked());
-    subSubElem.setAttribute("ONLY_PEOPLE_LIST", trackShowOnlyList->isChecked());
-    subSubElem.setAttribute("ONLY_PEOPLE_NR", trackShowOnlyNr->value());
-    subSubElem.setAttribute("ONLY_PEOPLE_NR_LIST", trackShowOnlyNrList->text());
+    subSubElem.setAttribute("ONLY_VISIBLE", mUi->trackShowOnlyVisible->isChecked());
+    subSubElem.setAttribute("ONLY_PEOPLE", mUi->trackShowOnly->isChecked());
+    subSubElem.setAttribute("ONLY_PEOPLE_LIST", mUi->trackShowOnlyList->isChecked());
+    subSubElem.setAttribute("ONLY_PEOPLE_NR", mUi->trackShowOnlyNr->value());
+    subSubElem.setAttribute("ONLY_PEOPLE_NR_LIST", mUi->trackShowOnlyNrList->text());
 
-    subSubElem.setAttribute("SHOW_CURRENT_POINT", trackShowCurrentPoint->isChecked());
-    subSubElem.setAttribute("SHOW_POINTS", trackShowPoints->isChecked());
-    subSubElem.setAttribute("SHOW_PATH", trackShowPath->isChecked());
-    subSubElem.setAttribute("SHOW_COLLECTIVE_COLOR", trackShowColColor->isChecked());
-    subSubElem.setAttribute("SHOW_COLOR_MARKER", trackShowColorMarker->isChecked());
-    subSubElem.setAttribute("SHOW_NUMBER", trackShowNumber->isChecked());
-    subSubElem.setAttribute("SHOW_GROUND_POSITION", trackShowGroundPosition->isChecked());
-    subSubElem.setAttribute("SHOW_GROUND_PATH", trackShowGroundPath->isChecked());
+    subSubElem.setAttribute("SHOW_CURRENT_POINT", mUi->trackShowCurrentPoint->isChecked());
+    subSubElem.setAttribute("SHOW_POINTS", mUi->trackShowPoints->isChecked());
+    subSubElem.setAttribute("SHOW_PATH", mUi->trackShowPath->isChecked());
+    subSubElem.setAttribute("SHOW_COLLECTIVE_COLOR", mUi->trackShowColColor->isChecked());
+    subSubElem.setAttribute("SHOW_COLOR_MARKER", mUi->trackShowColorMarker->isChecked());
+    subSubElem.setAttribute("SHOW_NUMBER", mUi->trackShowNumber->isChecked());
+    subSubElem.setAttribute("SHOW_GROUND_POSITION", mUi->trackShowGroundPosition->isChecked());
+    subSubElem.setAttribute("SHOW_GROUND_PATH", mUi->trackShowGroundPath->isChecked());
 
     subSubElem.setAttribute("TRACK_GROUND_PATH_COLOR", getTrackGroundPathColor().name());
     subSubElem.setAttribute("TRACK_PATH_COLOR", getTrackPathColor().name());
-    subSubElem.setAttribute("CURRENT_POINT_SIZE", trackCurrentPointSize->value());
-    subSubElem.setAttribute("POINTS_SIZE", trackPointSize->value());
-    subSubElem.setAttribute("PATH_SIZE", trackPathWidth->value());
-    subSubElem.setAttribute("COLLECTIVE_COLOR_SIZE", trackColColorSize->value());
-    subSubElem.setAttribute("COLOR_MARKER_SIZE", trackColorMarkerSize->value());
-    subSubElem.setAttribute("NUMBER_SIZE", trackNumberSize->value());
-    subSubElem.setAttribute("GROUND_POSITION_SIZE", trackGroundPositionSize->value());
-    subSubElem.setAttribute("GROUND_PATH_SIZE", trackGroundPathSize->value());
+    subSubElem.setAttribute("CURRENT_POINT_SIZE", mUi->trackCurrentPointSize->value());
+    subSubElem.setAttribute("POINTS_SIZE", mUi->trackPointSize->value());
+    subSubElem.setAttribute("PATH_SIZE", mUi->trackPathWidth->value());
+    subSubElem.setAttribute("COLLECTIVE_COLOR_SIZE", mUi->trackColColorSize->value());
+    subSubElem.setAttribute("COLOR_MARKER_SIZE", mUi->trackColorMarkerSize->value());
+    subSubElem.setAttribute("NUMBER_SIZE", mUi->trackNumberSize->value());
+    subSubElem.setAttribute("GROUND_POSITION_SIZE", mUi->trackGroundPositionSize->value());
+    subSubElem.setAttribute("GROUND_PATH_SIZE", mUi->trackGroundPathSize->value());
 
-    subSubElem.setAttribute("HEAD_SIZE", trackHeadSized->isChecked());
-    subSubElem.setAttribute("POINTS_COLORED", trackShowPointsColored->isChecked());
-    subSubElem.setAttribute("NUMBER_BOLD", trackNumberBold->isChecked());
+    subSubElem.setAttribute("HEAD_SIZE", mUi->trackHeadSized->isChecked());
+    subSubElem.setAttribute("POINTS_COLORED", mUi->trackShowPointsColored->isChecked());
+    subSubElem.setAttribute("NUMBER_BOLD", mUi->trackNumberBold->isChecked());
 
-    subSubElem.setAttribute("BEFORE", trackShowBefore->value());
-    subSubElem.setAttribute("AFTER", trackShowAfter->value());
+    subSubElem.setAttribute("BEFORE", mUi->trackShowBefore->value());
+    subSubElem.setAttribute("AFTER", mUi->trackShowAfter->value());
 
     subElem.appendChild(subSubElem);
 
@@ -3347,20 +3651,20 @@ void Control::setXml(QDomElement &elem)
     elem.appendChild(subElem);
 
     subSubElem = (elem.ownerDocument()).createElement("SEARCH_MISSING_FRAMES");
-    subSubElem.setAttribute("ENABLED", anaMissingFrames->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->anaMissingFrames->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("MARK_ACTUAL");
-    subSubElem.setAttribute("ENABLED", anaMarkAct->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->anaMarkAct->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("CALCULATION");
-    subSubElem.setAttribute("STEP_SIZE", anaStep->value());
-    subSubElem.setAttribute("CONSIDER_X", anaConsiderX->isChecked());
-    subSubElem.setAttribute("CONSIDER_Y", anaConsiderY->isChecked());
-    subSubElem.setAttribute("ABSOLUTE", anaConsiderAbs->isChecked());
-    subSubElem.setAttribute("REVERSE", anaConsiderRev->isChecked());
-    subSubElem.setAttribute("SHOW_VORONOI", showVoronoiCells->isChecked());
+    subSubElem.setAttribute("STEP_SIZE", mUi->anaStep->value());
+    subSubElem.setAttribute("CONSIDER_X", mUi->anaConsiderX->isChecked());
+    subSubElem.setAttribute("CONSIDER_Y", mUi->anaConsiderY->isChecked());
+    subSubElem.setAttribute("ABSOLUTE", mUi->anaConsiderAbs->isChecked());
+    subSubElem.setAttribute("REVERSE", mUi->anaConsiderRev->isChecked());
+    subSubElem.setAttribute("SHOW_VORONOI", mUi->showVoronoiCells->isChecked());
     subElem.appendChild(subSubElem);
 }
 
@@ -3371,7 +3675,7 @@ void Control::getXml(QDomElement &elem)
 
     if(elem.hasAttribute("TAB"))
     {
-        tabs->setCurrentIndex(elem.attribute("TAB").toInt());
+        mUi->tabs->setCurrentIndex(elem.attribute("TAB").toInt());
     }
     for(subElem = elem.firstChildElement(); !subElem.isNull(); subElem = subElem.nextSiblingElement())
     {
@@ -3384,37 +3688,37 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        filterBrightContrast->setCheckState(
+                        mUi->filterBrightContrast->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("VALUE"))
                     {
-                        filterBrightParam->setValue(subSubElem.attribute("VALUE").toInt());
+                        mUi->filterBrightParam->setValue(subSubElem.attribute("VALUE").toInt());
                     }
                 }
                 else if(subSubElem.tagName() == "CONTRAST")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        filterBrightContrast->setCheckState(
+                        mUi->filterBrightContrast->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     //,mMainWindow->getContrastFilter()->getEnabled() ? "1" : "0" //Qt::Unchecked
                     if(subSubElem.hasAttribute("VALUE"))
                     {
-                        filterContrastParam->setValue(subSubElem.attribute("VALUE").toInt());
+                        mUi->filterContrastParam->setValue(subSubElem.attribute("VALUE").toInt());
                     }
                 }
                 else if(subSubElem.tagName() == "BORDER")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        filterBorder->setCheckState(
+                        mUi->filterBorder->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("VALUE"))
                     {
-                        filterBorderParamSize->setValue(subSubElem.attribute("VALUE").toInt());
+                        mUi->filterBorderParamSize->setValue(subSubElem.attribute("VALUE").toInt());
                     }
                     if(subSubElem.hasAttribute("COLOR"))
                     {
@@ -3428,17 +3732,17 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        filterSwap->setCheckState(
+                        mUi->filterSwap->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("HORIZONTALLY"))
                     {
-                        filterSwapH->setCheckState(
+                        mUi->filterSwapH->setCheckState(
                             subSubElem.attribute("HORIZONTALLY").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("VERTICALLY"))
                     {
-                        filterSwapV->setCheckState(
+                        mUi->filterSwapV->setCheckState(
                             subSubElem.attribute("VERTICALLY").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -3446,16 +3750,18 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        filterBg->setCheckState(subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                        mUi->filterBg->setCheckState(
+                            subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("UPDATE"))
                     {
-                        filterBgUpdate->setCheckState(
+                        mUi->filterBgUpdate->setCheckState(
                             subSubElem.attribute("UPDATE").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("SHOW"))
                     {
-                        filterBgShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                        mUi->filterBgShow->setCheckState(
+                            subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("FILE"))
                     {
@@ -3475,147 +3781,148 @@ void Control::getXml(QDomElement &elem)
                     }
                     if(subSubElem.hasAttribute("DELETE"))
                     {
-                        filterBgDeleteTrj->setCheckState(
+                        mUi->filterBgDeleteTrj->setCheckState(
                             subSubElem.attribute("DELETE").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("DELETE_NUMBER"))
                     {
-                        filterBgDeleteNumber->setValue(subSubElem.attribute("DELETE_NUMBER").toInt());
+                        mUi->filterBgDeleteNumber->setValue(subSubElem.attribute("DELETE_NUMBER").toInt());
                     }
                 }
                 else if(subSubElem.tagName() == "PATTERN")
                 {
                     if(subSubElem.hasAttribute("BOARD_SIZE_X"))
                     {
-                        boardSizeX->setValue(subSubElem.attribute("BOARD_SIZE_X").toInt());
+                        mUi->boardSizeX->setValue(subSubElem.attribute("BOARD_SIZE_X").toInt());
                     }
                     if(subSubElem.hasAttribute("BOARD_SIZE_Y"))
                     {
-                        boardSizeY->setValue(subSubElem.attribute("BOARD_SIZE_Y").toInt());
+                        mUi->boardSizeY->setValue(subSubElem.attribute("BOARD_SIZE_Y").toInt());
                     }
                     if(subSubElem.hasAttribute("SQUARE_SIZE"))
                     {
-                        squareSize->setValue(subSubElem.attribute("SQUARE_SIZE").toDouble());
+                        mUi->squareSize->setValue(subSubElem.attribute("SQUARE_SIZE").toDouble());
                     }
                 }
                 else if(subSubElem.tagName() == "INTRINSIC_PARAMETERS")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        apply->setCheckState(subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                        mUi->apply->setCheckState(
+                            subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("FX"))
                     {
-                        fx->setValue(subSubElem.attribute("FX").toDouble());
+                        mUi->fx->setValue(subSubElem.attribute("FX").toDouble());
                     }
                     if(subSubElem.hasAttribute("FY"))
                     {
-                        fy->setValue(subSubElem.attribute("FY").toDouble());
+                        mUi->fy->setValue(subSubElem.attribute("FY").toDouble());
                     }
                     if(subSubElem.hasAttribute("CX"))
                     {
                         double cx_val = subSubElem.attribute("CX").toDouble();
-                        if(cx_val < cx->minimum())
+                        if(cx_val < mUi->cx->minimum())
                         {
-                            cx->setMinimum(cx_val - 50);
+                            mUi->cx->setMinimum(cx_val - 50);
                         }
-                        if(cx_val > cx->maximum())
+                        if(cx_val > mUi->cx->maximum())
                         {
-                            cx->setMaximum(cx_val + 50);
+                            mUi->cx->setMaximum(cx_val + 50);
                         }
-                        cx->setValue(cx_val);
+                        mUi->cx->setValue(cx_val);
                     }
                     if(subSubElem.hasAttribute("CY"))
                     {
                         double cy_val = subSubElem.attribute("CY").toDouble();
-                        if(cy_val < cy->minimum())
+                        if(cy_val < mUi->cy->minimum())
                         {
-                            cy->setMinimum(cy_val - 50);
+                            mUi->cy->setMinimum(cy_val - 50);
                         }
-                        if(cy_val > cy->maximum())
+                        if(cy_val > mUi->cy->maximum())
                         {
-                            cy->setMaximum(cy_val + 50);
+                            mUi->cy->setMaximum(cy_val + 50);
                         }
-                        cy->setValue(cy_val);
+                        mUi->cy->setValue(cy_val);
                     }
                     if(subSubElem.hasAttribute("R2"))
                     {
-                        r2->setValue(subSubElem.attribute("R2").toDouble());
+                        mUi->r2->setValue(subSubElem.attribute("R2").toDouble());
                     }
                     if(subSubElem.hasAttribute("R4"))
                     {
-                        r4->setValue(subSubElem.attribute("R4").toDouble());
+                        mUi->r4->setValue(subSubElem.attribute("R4").toDouble());
                     }
                     if(subSubElem.hasAttribute("R6"))
                     {
-                        r6->setValue(subSubElem.attribute("R6").toDouble());
+                        mUi->r6->setValue(subSubElem.attribute("R6").toDouble());
                     }
                     if(subSubElem.hasAttribute("TX"))
                     {
-                        tx->setValue(subSubElem.attribute("TX").toDouble());
+                        mUi->tx->setValue(subSubElem.attribute("TX").toDouble());
                     }
                     if(subSubElem.hasAttribute("TY"))
                     {
-                        ty->setValue(subSubElem.attribute("TY").toDouble());
+                        mUi->ty->setValue(subSubElem.attribute("TY").toDouble());
                     }
                     if(subSubElem.hasAttribute("K4"))
                     {
-                        k4->setValue(subSubElem.attribute("K4").toDouble());
+                        mUi->k4->setValue(subSubElem.attribute("K4").toDouble());
                     }
                     if(subSubElem.hasAttribute("K5"))
                     {
-                        k5->setValue(subSubElem.attribute("K5").toDouble());
+                        mUi->k5->setValue(subSubElem.attribute("K5").toDouble());
                     }
                     if(subSubElem.hasAttribute("K6"))
                     {
-                        k6->setValue(subSubElem.attribute("K6").toDouble());
+                        mUi->k6->setValue(subSubElem.attribute("K6").toDouble());
                     }
                     if(subSubElem.hasAttribute("S1"))
                     {
-                        s1->setValue(subSubElem.attribute("S1").toDouble());
+                        mUi->s1->setValue(subSubElem.attribute("S1").toDouble());
                     }
                     if(subSubElem.hasAttribute("S2"))
                     {
-                        s2->setValue(subSubElem.attribute("S2").toDouble());
+                        mUi->s2->setValue(subSubElem.attribute("S2").toDouble());
                     }
                     if(subSubElem.hasAttribute("S3"))
                     {
-                        s3->setValue(subSubElem.attribute("S3").toDouble());
+                        mUi->s3->setValue(subSubElem.attribute("S3").toDouble());
                     }
                     if(subSubElem.hasAttribute("S4"))
                     {
-                        s4->setValue(subSubElem.attribute("S4").toDouble());
+                        mUi->s4->setValue(subSubElem.attribute("S4").toDouble());
                     }
                     if(subSubElem.hasAttribute("TAUX"))
                     {
-                        taux->setValue(subSubElem.attribute("TAUX").toDouble());
+                        mUi->taux->setValue(subSubElem.attribute("TAUX").toDouble());
                     }
                     if(subSubElem.hasAttribute("TAUY"))
                     {
-                        tauy->setValue(subSubElem.attribute("TAUY").toDouble());
+                        mUi->tauy->setValue(subSubElem.attribute("TAUY").toDouble());
                     }
                     if(subSubElem.hasAttribute("ReprError"))
                     {
-                        intrError->setText(QString("%1").arg(subSubElem.attribute("ReprError").toDouble()));
+                        mUi->intrError->setText(QString("%1").arg(subSubElem.attribute("ReprError").toDouble()));
                     }
                     if(subSubElem.hasAttribute("QUAD_ASPECT_RATIO"))
                     {
-                        quadAspectRatio->setCheckState(
+                        mUi->quadAspectRatio->setCheckState(
                             subSubElem.attribute("QUAD_ASPECT_RATIO").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("FIX_CENTER"))
                     {
-                        fixCenter->setCheckState(
+                        mUi->fixCenter->setCheckState(
                             subSubElem.attribute("FIX_CENTER").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("TANG_DIST"))
                     {
-                        tangDist->setCheckState(
+                        mUi->tangDist->setCheckState(
                             subSubElem.attribute("TANG_DIST").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("EXT_MODEL_ENABLED"))
                     {
-                        extModelCheckBox->setCheckState(
+                        mUi->extModelCheckBox->setCheckState(
                             subSubElem.attribute("EXT_MODEL_ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("CALIB_FILES"))
@@ -3641,7 +3948,7 @@ void Control::getXml(QDomElement &elem)
                         mMainWindow->getAutoCalib()->setCalibFiles(fl);
                         if(!fl.isEmpty())
                         {
-                            autoCalib->setEnabled(true);
+                            mUi->autoCalib->setEnabled(true);
                         }
                     }
                 }
@@ -3649,41 +3956,41 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("EXTR_ROT_1"))
                     {
-                        rot1->setValue(subSubElem.attribute("EXTR_ROT_1").toDouble());
+                        mUi->rot1->setValue(subSubElem.attribute("EXTR_ROT_1").toDouble());
                     }
                     if(subSubElem.hasAttribute("EXTR_ROT_2"))
                     {
-                        rot2->setValue(subSubElem.attribute("EXTR_ROT_2").toDouble());
+                        mUi->rot2->setValue(subSubElem.attribute("EXTR_ROT_2").toDouble());
                     }
                     if(subSubElem.hasAttribute("EXTR_ROT_3"))
                     {
-                        rot3->setValue(subSubElem.attribute("EXTR_ROT_3").toDouble());
+                        mUi->rot3->setValue(subSubElem.attribute("EXTR_ROT_3").toDouble());
                     }
                     if(subSubElem.hasAttribute("EXTR_TRANS_1"))
                     {
-                        trans1->setValue(subSubElem.attribute("EXTR_TRANS_1").toDouble());
+                        mUi->trans1->setValue(subSubElem.attribute("EXTR_TRANS_1").toDouble());
                     }
                     if(subSubElem.hasAttribute("EXTR_TRANS_2"))
                     {
-                        trans2->setValue(subSubElem.attribute("EXTR_TRANS_2").toDouble());
+                        mUi->trans2->setValue(subSubElem.attribute("EXTR_TRANS_2").toDouble());
                     }
                     if(subSubElem.hasAttribute("EXTR_TRANS_3"))
                     {
-                        trans3->setValue(subSubElem.attribute("EXTR_TRANS_3").toDouble());
+                        mUi->trans3->setValue(subSubElem.attribute("EXTR_TRANS_3").toDouble());
                     }
                     if(subSubElem.hasAttribute("SHOW_CALIB_POINTS"))
                     {
-                        extCalibPointsShow->setCheckState(
+                        mUi->extCalibPointsShow->setCheckState(
                             subSubElem.attribute("SHOW_CALIB_POINTS").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
 
                     if(subSubElem.hasAttribute("COORD_DIMENSION"))
                     {
-                        coordTab->setCurrentIndex(subSubElem.attribute("COORD_DIMENSION").toInt());
+                        mUi->coordTab->setCurrentIndex(subSubElem.attribute("COORD_DIMENSION").toInt());
                     }
                     else
                     {
-                        coordTab->setCurrentIndex(1); //  = 2D
+                        mUi->coordTab->setCurrentIndex(1); //  = 2D
                         setEnabledExtrParams(false);
                     }
                     if(subSubElem.hasAttribute("EXTERNAL_CALIB_FILE"))
@@ -3701,81 +4008,82 @@ void Control::getXml(QDomElement &elem)
 
                     if(subSubElem.hasAttribute("SHOW"))
                     {
-                        coordShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                        mUi->coordShow->setCheckState(
+                            subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("FIX"))
                     {
-                        coordFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
+                        mUi->coordFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("ROTATE"))
                     {
-                        coordRotate->setValue(subSubElem.attribute("ROTATE").toInt());
+                        mUi->coordRotate->setValue(subSubElem.attribute("ROTATE").toInt());
                     }
                     if(subSubElem.hasAttribute("TRANS_X"))
                     {
                         int trans_x = subSubElem.attribute("TRANS_X").toInt();
-                        if(trans_x > coordTransX->maximum())
+                        if(trans_x > mUi->coordTransX->maximum())
                         {
                             setCalibCoordTransXMax(trans_x);
                         }
-                        coordTransX->setValue(trans_x);
+                        mUi->coordTransX->setValue(trans_x);
                     }
                     if(subSubElem.hasAttribute("TRANS_Y"))
                     {
                         int trans_y = subSubElem.attribute("TRANS_Y").toInt();
-                        if(trans_y > coord3DTransY->maximum())
+                        if(trans_y > mUi->coord3DTransY->maximum())
                         {
                             setCalibCoordTransYMax(trans_y);
                         }
-                        coordTransY->setValue(trans_y);
+                        mUi->coordTransY->setValue(trans_y);
                     }
-                    coordTransY->setValue(subSubElem.attribute("TRANS_Y").toInt());
+                    mUi->coordTransY->setValue(subSubElem.attribute("TRANS_Y").toInt());
                     if(subSubElem.hasAttribute("SCALE"))
                     {
-                        coordScale->setValue(subSubElem.attribute("SCALE").toInt());
+                        mUi->coordScale->setValue(subSubElem.attribute("SCALE").toInt());
                     }
                     if(subSubElem.hasAttribute("ALTITUDE"))
                     {
-                        coordAltitude->setValue(subSubElem.attribute("ALTITUDE").toDouble());
+                        mUi->coordAltitude->setValue(subSubElem.attribute("ALTITUDE").toDouble());
                     }
                     if(subSubElem.hasAttribute("UNIT"))
                     {
-                        coordUnit->setValue(subSubElem.attribute("UNIT").toDouble());
+                        mUi->coordUnit->setValue(subSubElem.attribute("UNIT").toDouble());
                     }
                     if(subSubElem.hasAttribute("USE_INTRINSIC_CENTER"))
                     {
-                        coordUseIntrinsic->setCheckState(
+                        mUi->coordUseIntrinsic->setCheckState(
                             subSubElem.attribute("USE_INTRINSIC_CENTER").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("COORD3D_TRANS_X"))
                     {
-                        coord3DTransX->setValue(subSubElem.attribute("COORD3D_TRANS_X").toInt());
+                        mUi->coord3DTransX->setValue(subSubElem.attribute("COORD3D_TRANS_X").toInt());
                     }
                     if(subSubElem.hasAttribute("COORD3D_TRANS_Y"))
                     {
-                        coord3DTransY->setValue(subSubElem.attribute("COORD3D_TRANS_Y").toInt());
+                        mUi->coord3DTransY->setValue(subSubElem.attribute("COORD3D_TRANS_Y").toInt());
                     }
                     if(subSubElem.hasAttribute("COORD3D_TRANS_Z"))
                     {
-                        coord3DTransZ->setValue(subSubElem.attribute("COORD3D_TRANS_Z").toInt());
+                        mUi->coord3DTransZ->setValue(subSubElem.attribute("COORD3D_TRANS_Z").toInt());
                     }
                     if(subSubElem.hasAttribute("COORD3D_AXIS_LEN"))
                     {
-                        coord3DAxeLen->setValue(subSubElem.attribute("COORD3D_AXIS_LEN").toInt());
+                        mUi->coord3DAxeLen->setValue(subSubElem.attribute("COORD3D_AXIS_LEN").toInt());
                     }
                     if(subSubElem.hasAttribute("COORD3D_SWAP_X"))
                     {
-                        coord3DSwapX->setCheckState(
+                        mUi->coord3DSwapX->setCheckState(
                             subSubElem.attribute("COORD3D_SWAP_X").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("COORD3D_SWAP_Y"))
                     {
-                        coord3DSwapY->setCheckState(
+                        mUi->coord3DSwapY->setCheckState(
                             subSubElem.attribute("COORD3D_SWAP_Y").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("COORD3D_SWAP_Z"))
                     {
-                        coord3DSwapZ->setCheckState(
+                        mUi->coord3DSwapZ->setCheckState(
                             subSubElem.attribute("COORD3D_SWAP_Z").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -3783,51 +4091,52 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("GRID_DIMENSION"))
                     {
-                        gridTab->setCurrentIndex(subSubElem.attribute("GRID_DIMENSION").toInt());
+                        mUi->gridTab->setCurrentIndex(subSubElem.attribute("GRID_DIMENSION").toInt());
                     }
                     else
                     {
-                        gridTab->setCurrentIndex(1); //  = 2D
+                        mUi->gridTab->setCurrentIndex(1); //  = 2D
                     }
                     if(subSubElem.hasAttribute("SHOW"))
                     {
-                        gridShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                        mUi->gridShow->setCheckState(
+                            subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("FIX"))
                     {
-                        gridFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
+                        mUi->gridFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("ROTATE"))
                     {
-                        gridRotate->setValue(subSubElem.attribute("ROTATE").toInt());
+                        mUi->gridRotate->setValue(subSubElem.attribute("ROTATE").toInt());
                     }
                     if(subSubElem.hasAttribute("TRANS_X"))
                     {
-                        gridTransX->setValue(subSubElem.attribute("TRANS_X").toInt());
+                        mUi->gridTransX->setValue(subSubElem.attribute("TRANS_X").toInt());
                     }
                     if(subSubElem.hasAttribute("TRANS_Y"))
                     {
-                        gridTransY->setValue(subSubElem.attribute("TRANS_Y").toInt());
+                        mUi->gridTransY->setValue(subSubElem.attribute("TRANS_Y").toInt());
                     }
                     if(subSubElem.hasAttribute("SCALE"))
                     {
-                        gridScale->setValue(subSubElem.attribute("SCALE").toInt());
+                        mUi->gridScale->setValue(subSubElem.attribute("SCALE").toInt());
                     }
                     if(subSubElem.hasAttribute("GRID3D_TRANS_X"))
                     {
-                        grid3DTransX->setValue(subSubElem.attribute("GRID3D_TRANS_X").toInt());
+                        mUi->grid3DTransX->setValue(subSubElem.attribute("GRID3D_TRANS_X").toInt());
                     }
                     if(subSubElem.hasAttribute("GRID3D_TRANS_Y"))
                     {
-                        grid3DTransY->setValue(subSubElem.attribute("GRID3D_TRANS_Y").toInt());
+                        mUi->grid3DTransY->setValue(subSubElem.attribute("GRID3D_TRANS_Y").toInt());
                     }
                     if(subSubElem.hasAttribute("GRID3D_TRANS_Z"))
                     {
-                        grid3DTransZ->setValue(subSubElem.attribute("GRID3D_TRANS_Z").toInt());
+                        mUi->grid3DTransZ->setValue(subSubElem.attribute("GRID3D_TRANS_Z").toInt());
                     }
                     if(subSubElem.hasAttribute("GRID3D_RESOLUTION"))
                     {
-                        grid3DResolution->setValue(subSubElem.attribute("GRID3D_RESOLUTION").toInt());
+                        mUi->grid3DResolution->setValue(subSubElem.attribute("GRID3D_RESOLUTION").toInt());
                     }
                 }
                 else
@@ -3845,24 +4154,24 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        performRecognition->setCheckState(
+                        mUi->performRecognition->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("METHOD"))
                     {
                         auto recognitionMethod =
                             static_cast<reco::RecognitionMethod>(subSubElem.attribute("METHOD").toInt());
-                        auto foundIndex = recoMethod->findData(QVariant::fromValue(recognitionMethod));
+                        auto foundIndex = mUi->recoMethod->findData(QVariant::fromValue(recognitionMethod));
                         if(foundIndex == -1)
                         {
                             throw std::invalid_argument(
                                 "Recognition Method could not be found, please check your input");
                         }
-                        recoMethod->setCurrentIndex(foundIndex);
+                        mUi->recoMethod->setCurrentIndex(foundIndex);
                     }
                     if(subSubElem.hasAttribute("STEP"))
                     {
-                        recoStep->setValue(subSubElem.attribute("STEP").toInt());
+                        mUi->recoStep->setValue(subSubElem.attribute("STEP").toInt());
                     }
                 }
                 else if(subSubElem.tagName() == "REGION_OF_INTEREST")
@@ -3870,11 +4179,11 @@ void Control::getXml(QDomElement &elem)
                     double x = 0, y = 0, w = 0, h = 0;
                     if(subSubElem.hasAttribute("SHOW"))
                     {
-                        roiShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                        mUi->roiShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("FIX"))
                     {
-                        roiFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
+                        mUi->roiFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("X"))
                     {
@@ -3898,11 +4207,11 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("BRIGHTNESS"))
                     {
-                        markerBrightness->setValue(subSubElem.attribute("BRIGHTNESS").toInt());
+                        mUi->markerBrightness->setValue(subSubElem.attribute("BRIGHTNESS").toInt());
                     }
                     if(subSubElem.hasAttribute("IGNORE_WITHOUT"))
                     {
-                        markerIgnoreWithout->setCheckState(
+                        mUi->markerIgnoreWithout->setCheckState(
                             subSubElem.attribute("IGNORE_WITHOUT").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -3911,46 +4220,46 @@ void Control::getXml(QDomElement &elem)
                     mColorChanging = true; // damit bei Anpassungen Farbbild nicht immer wieder neu bestimmt wird
                     if(subSubElem.hasAttribute("SHOW"))
                     {
-                        recoShowColor->setCheckState(
+                        mUi->recoShowColor->setCheckState(
                             subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("AUTO_WB"))
                     {
-                        recoAutoWB->setCheckState(
+                        mUi->recoAutoWB->setCheckState(
                             subSubElem.attribute("AUTO_WB").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("X"))
                     {
-                        recoColorX->setCurrentIndex(subSubElem.attribute("X").toInt());
+                        mUi->recoColorX->setCurrentIndex(subSubElem.attribute("X").toInt());
                     }
                     if(subSubElem.hasAttribute("Y"))
                     {
-                        recoColorY->setCurrentIndex(subSubElem.attribute("Y").toInt());
+                        mUi->recoColorY->setCurrentIndex(subSubElem.attribute("Y").toInt());
                     }
                     if(subSubElem.hasAttribute("Z"))
                     {
-                        recoColorZ->setValue(subSubElem.attribute("Z").toInt());
+                        mUi->recoColorZ->setValue(subSubElem.attribute("Z").toInt());
                     }
                     if(subSubElem.hasAttribute("GREY_LEVEL"))
                     {
-                        recoGreyLevel->setValue(subSubElem.attribute("GREY_LEVEL").toInt());
+                        mUi->recoGreyLevel->setValue(subSubElem.attribute("GREY_LEVEL").toInt());
                     }
                     if(subSubElem.hasAttribute("SYMBOL_SIZE"))
                     {
-                        recoSymbolSize->setValue(subSubElem.attribute("SYMBOL_SIZE").toInt());
+                        mUi->recoSymbolSize->setValue(subSubElem.attribute("SYMBOL_SIZE").toInt());
                     }
                     mColorChanging = false; // MODEL setzen erzeugt Bild neu
                     if(subSubElem.hasAttribute("MODEL"))
                     {
                         // damit auch bild neu erzeugt wird, wenn sich index nicht aendert:
-                        if(recoColorModel->currentIndex() == subSubElem.attribute("MODEL").toInt())
+                        if(mUi->recoColorModel->currentIndex() == subSubElem.attribute("MODEL").toInt())
                         {
                             mIndexChanging = false;
-                            on_recoColorModel_currentIndexChanged(recoColorModel->currentIndex());
+                            on_recoColorModel_currentIndexChanged(mUi->recoColorModel->currentIndex());
                         }
                         else
                         {
-                            recoColorModel->setCurrentIndex(subSubElem.attribute("MODEL").toInt());
+                            mUi->recoColorModel->setCurrentIndex(subSubElem.attribute("MODEL").toInt());
                         }
                     }
 
@@ -3961,7 +4270,7 @@ void Control::getXml(QDomElement &elem)
 
                     fromCol = fromCol.toHsv();
                     toCol   = toCol.toHsv();
-                    colorPlot->getMapItem()->delMaps();
+                    mUi->colorPlot->getMapItem()->delMaps();
                     for(subSubSubElem = subSubElem.firstChildElement(); !subSubSubElem.isNull();
                         subSubSubElem = subSubSubElem.nextSiblingElement())
                     {
@@ -4029,7 +4338,7 @@ void Control::getXml(QDomElement &elem)
                                 invHue = subSubSubElem.attribute("INV_HUE").toInt();
                             }
 
-                            colorPlot->getMapItem()->addMap(
+                            mUi->colorPlot->getMapItem()->addMap(
                                 x, y, width, height, colored, mapHeightValue, fromCol, toCol, invHue);
                         }
 
@@ -4039,18 +4348,18 @@ void Control::getXml(QDomElement &elem)
                         }
                     }
 
-                    mapNr->setMaximum(colorPlot->getMapItem()->mapNum() - 1);
+                    mUi->mapNr->setMaximum(mUi->colorPlot->getMapItem()->mapNum() - 1);
                     if(subSubElem.hasAttribute("MAP_NUMBER")) // hiermit werden aus map-datenstruktur richtige map
                                                               // angezeigt, daher am ende
                     {
-                        mapNr->setValue(subSubElem.attribute("MAP_NUMBER").toInt());
+                        mUi->mapNr->setValue(subSubElem.attribute("MAP_NUMBER").toInt());
                         on_mapNr_valueChanged(
                             subSubElem.attribute("MAP_NUMBER").toInt()); // nochmal explizit aufrufen, falls 0, dann
                                                                          // wuerde valueChanged nicht on_... durchlaufen
                     }
                     if(subSubElem.hasAttribute("DEFAULT_HEIGHT"))
                     {
-                        mapDefaultHeight->setValue(subSubElem.attribute("DEFAULT_HEIGHT").toDouble());
+                        mUi->mapDefaultHeight->setValue(subSubElem.attribute("DEFAULT_HEIGHT").toDouble());
                     }
                 }
 
@@ -4102,7 +4411,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        trackOnlineCalc->setCheckState(
+                        mUi->trackOnlineCalc->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4110,19 +4419,19 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        trackRepeat->setCheckState(
+                        mUi->trackRepeat->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("QUALITY"))
                     {
-                        trackRepeatQual->setValue(subSubElem.attribute("QUALITY").toInt());
+                        mUi->trackRepeatQual->setValue(subSubElem.attribute("QUALITY").toInt());
                     }
                 }
                 else if(subSubElem.tagName() == "EXTRAPOLATION")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        trackExtrapolation->setCheckState(
+                        mUi->trackExtrapolation->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4130,7 +4439,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        trackMerge->setCheckState(
+                        mUi->trackMerge->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4138,7 +4447,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        trackOnlySelected->setCheckState(
+                        mUi->trackOnlySelected->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4146,7 +4455,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        trackMissingFrames->setCheckState(
+                        mUi->trackMissingFrames->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4154,7 +4463,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        trackRecalcHeight->setCheckState(
+                        mUi->trackRecalcHeight->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4163,11 +4472,13 @@ void Control::getXml(QDomElement &elem)
                     double x = 0, y = 0, w = 0, h = 0;
                     if(subSubElem.hasAttribute("SHOW"))
                     {
-                        trackRoiShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                        mUi->trackRoiShow->setCheckState(
+                            subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("FIX"))
                     {
-                        trackRoiFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
+                        mUi->trackRoiFix->setCheckState(
+                            subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("X"))
                     {
@@ -4191,7 +4502,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        trackAlternateHeight->setCheckState(
+                        mUi->trackAlternateHeight->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4199,7 +4510,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        exportElimTp->setCheckState(
+                        mUi->exportElimTp->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4207,7 +4518,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        exportElimTrj->setCheckState(
+                        mUi->exportElimTrj->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4215,7 +4526,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        exportSmooth->setCheckState(
+                        mUi->exportSmooth->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4223,7 +4534,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        exportViewDir->setCheckState(
+                        mUi->exportViewDir->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4231,7 +4542,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        exportAngleOfView->setCheckState(
+                        mUi->exportAngleOfView->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4239,7 +4550,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        exportUseM->setCheckState(
+                        mUi->exportUseM->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4247,7 +4558,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        exportComment->setCheckState(
+                        mUi->exportComment->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4255,7 +4566,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        exportMarkerID->setCheckState(
+                        mUi->exportMarkerID->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4263,14 +4574,15 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        testEqual->setCheckState(subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+                        mUi->testEqual->setCheckState(
+                            subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
                 else if(subSubElem.tagName() == "TEST_VELOCITY")
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        testVelocity->setCheckState(
+                        mUi->testVelocity->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4278,7 +4590,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        testInside->setCheckState(
+                        mUi->testInside->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4286,7 +4598,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        testLength->setCheckState(
+                        mUi->testLength->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4310,24 +4622,24 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("SCALE"))
                     {
-                        trackRegionScale->setValue(subSubElem.attribute("SCALE").toInt());
+                        mUi->trackRegionScale->setValue(subSubElem.attribute("SCALE").toInt());
                     }
                     if(subSubElem.hasAttribute("LEVELS"))
                     {
-                        trackRegionLevels->setValue(subSubElem.attribute("LEVELS").toInt());
+                        mUi->trackRegionLevels->setValue(subSubElem.attribute("LEVELS").toInt());
                     }
                     if(subSubElem.hasAttribute("MAX_ERROR"))
                     {
-                        trackErrorExponent->setValue(subSubElem.attribute("MAX_ERROR").toInt());
+                        mUi->trackErrorExponent->setValue(subSubElem.attribute("MAX_ERROR").toInt());
                     }
                     if(subSubElem.hasAttribute("SHOW"))
                     {
-                        trackShowSearchSize->setCheckState(
+                        mUi->trackShowSearchSize->setCheckState(
                             subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("ADAPTIVE"))
                     {
-                        adaptiveLevel->setCheckState(
+                        mUi->adaptiveLevel->setCheckState(
                             subSubElem.attribute("ADAPTIVE").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4335,27 +4647,28 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("SHOW"))
                     {
-                        trackShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                        mUi->trackShow->setCheckState(
+                            subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("FIX"))
                     {
-                        trackFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
+                        mUi->trackFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
 
                     if(subSubElem.hasAttribute("ONLY_VISIBLE"))
                     {
-                        trackShowOnlyVisible->setCheckState(
+                        mUi->trackShowOnlyVisible->setCheckState(
                             subSubElem.attribute("ONLY_VISIBLE").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("ONLY_PEOPLE"))
                     {
-                        trackShowOnly->setCheckState(
+                        mUi->trackShowOnly->setCheckState(
                             subSubElem.attribute("ONLY_PEOPLE").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
 
                     if(subSubElem.hasAttribute("ONLY_PEOPLE_LIST"))
                     {
-                        trackShowOnlyList->setCheckState(
+                        mUi->trackShowOnlyList->setCheckState(
                             subSubElem.attribute("ONLY_PEOPLE_LIST").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
 
@@ -4363,42 +4676,42 @@ void Control::getXml(QDomElement &elem)
                     // loaded before!
                     if(subSubElem.hasAttribute("SHOW_CURRENT_POINT"))
                     {
-                        trackShowCurrentPoint->setCheckState(
+                        mUi->trackShowCurrentPoint->setCheckState(
                             subSubElem.attribute("SHOW_CURRENT_POINT").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("SHOW_POINTS"))
                     {
-                        trackShowPoints->setCheckState(
+                        mUi->trackShowPoints->setCheckState(
                             subSubElem.attribute("SHOW_POINTS").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("SHOW_PATH"))
                     {
-                        trackShowPath->setCheckState(
+                        mUi->trackShowPath->setCheckState(
                             subSubElem.attribute("SHOW_PATH").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("SHOW_COLLECTIVE_COLOR"))
                     {
-                        trackShowColColor->setCheckState(
+                        mUi->trackShowColColor->setCheckState(
                             subSubElem.attribute("SHOW_COLLECTIVE_COLOR").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("SHOW_COLOR_MARKER"))
                     {
-                        trackShowColorMarker->setCheckState(
+                        mUi->trackShowColorMarker->setCheckState(
                             subSubElem.attribute("SHOW_COLOR_MARKER").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("SHOW_NUMBER"))
                     {
-                        trackShowNumber->setCheckState(
+                        mUi->trackShowNumber->setCheckState(
                             subSubElem.attribute("SHOW_NUMBER").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("SHOW_GROUND_POSITION"))
                     {
-                        trackShowGroundPosition->setCheckState(
+                        mUi->trackShowGroundPosition->setCheckState(
                             subSubElem.attribute("SHOW_GROUND_POSITION").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("SHOW_GROUND_PATH"))
                     {
-                        trackShowGroundPath->setCheckState(
+                        mUi->trackShowGroundPath->setCheckState(
                             subSubElem.attribute("SHOW_GROUND_PATH").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("TRACK_PATH_COLOR"))
@@ -4413,58 +4726,58 @@ void Control::getXml(QDomElement &elem)
                     }
                     if(subSubElem.hasAttribute("HEAD_SIZE"))
                     {
-                        trackHeadSized->setCheckState(
+                        mUi->trackHeadSized->setCheckState(
                             subSubElem.attribute("HEAD_SIZE").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("CURRENT_POINT_SIZE"))
                     {
-                        trackCurrentPointSize->setValue(subSubElem.attribute("CURRENT_POINT_SIZE").toInt());
+                        mUi->trackCurrentPointSize->setValue(subSubElem.attribute("CURRENT_POINT_SIZE").toInt());
                     }
                     if(subSubElem.hasAttribute("POINTS_SIZE"))
                     {
-                        trackPointSize->setValue(subSubElem.attribute("POINTS_SIZE").toInt());
+                        mUi->trackPointSize->setValue(subSubElem.attribute("POINTS_SIZE").toInt());
                     }
                     if(subSubElem.hasAttribute("PATH_SIZE"))
                     {
-                        trackPathWidth->setValue(subSubElem.attribute("PATH_SIZE").toInt());
+                        mUi->trackPathWidth->setValue(subSubElem.attribute("PATH_SIZE").toInt());
                     }
                     if(subSubElem.hasAttribute("COLLECTIVE_COLOR_SIZE"))
                     {
-                        trackColColorSize->setValue(subSubElem.attribute("COLLECTIVE_COLOR_SIZE").toInt());
+                        mUi->trackColColorSize->setValue(subSubElem.attribute("COLLECTIVE_COLOR_SIZE").toInt());
                     }
                     if(subSubElem.hasAttribute("COLOR_MARKER_SIZE"))
                     {
-                        trackColorMarkerSize->setValue(subSubElem.attribute("COLOR_MARKER_SIZE").toInt());
+                        mUi->trackColorMarkerSize->setValue(subSubElem.attribute("COLOR_MARKER_SIZE").toInt());
                     }
                     if(subSubElem.hasAttribute("NUMBER_SIZE"))
                     {
-                        trackNumberSize->setValue(subSubElem.attribute("NUMBER_SIZE").toInt());
+                        mUi->trackNumberSize->setValue(subSubElem.attribute("NUMBER_SIZE").toInt());
                     }
                     if(subSubElem.hasAttribute("GROUND_POSITION_SIZE"))
                     {
-                        trackGroundPositionSize->setValue(subSubElem.attribute("GROUND_POSITION_SIZE").toInt());
+                        mUi->trackGroundPositionSize->setValue(subSubElem.attribute("GROUND_POSITION_SIZE").toInt());
                     }
                     if(subSubElem.hasAttribute("GROUND_PATH_SIZE"))
                     {
-                        trackGroundPathSize->setValue(subSubElem.attribute("GROUND_PATH_SIZE").toInt());
+                        mUi->trackGroundPathSize->setValue(subSubElem.attribute("GROUND_PATH_SIZE").toInt());
                     }
                     if(subSubElem.hasAttribute("POINTS_COLORED"))
                     {
-                        trackShowPointsColored->setCheckState(
+                        mUi->trackShowPointsColored->setCheckState(
                             subSubElem.attribute("POINTS_COLORED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("NUMBER_BOLD"))
                     {
-                        trackNumberBold->setCheckState(
+                        mUi->trackNumberBold->setCheckState(
                             subSubElem.attribute("NUMBER_BOLD").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("BEFORE"))
                     {
-                        trackShowBefore->setValue(subSubElem.attribute("BEFORE").toInt());
+                        mUi->trackShowBefore->setValue(subSubElem.attribute("BEFORE").toInt());
                     }
                     if(subSubElem.hasAttribute("AFTER"))
                     {
-                        trackShowAfter->setValue(subSubElem.attribute("AFTER").toInt());
+                        mUi->trackShowAfter->setValue(subSubElem.attribute("AFTER").toInt());
                     }
                 }
                 else
@@ -4482,7 +4795,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        anaMissingFrames->setCheckState(
+                        mUi->anaMissingFrames->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4490,7 +4803,7 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        anaMarkAct->setCheckState(
+                        mUi->anaMarkAct->setCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4498,31 +4811,31 @@ void Control::getXml(QDomElement &elem)
                 {
                     if(subSubElem.hasAttribute("STEP_SIZE"))
                     {
-                        anaStep->setValue(subSubElem.attribute("STEP_SIZE").toInt());
+                        mUi->anaStep->setValue(subSubElem.attribute("STEP_SIZE").toInt());
                     }
                     if(subSubElem.hasAttribute("CONSIDER_X"))
                     {
-                        anaConsiderX->setCheckState(
+                        mUi->anaConsiderX->setCheckState(
                             subSubElem.attribute("CONSIDER_X").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("CONSIDER_Y"))
                     {
-                        anaConsiderY->setCheckState(
+                        mUi->anaConsiderY->setCheckState(
                             subSubElem.attribute("CONSIDER_Y").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("ABSOLUTE"))
                     {
-                        anaConsiderAbs->setCheckState(
+                        mUi->anaConsiderAbs->setCheckState(
                             subSubElem.attribute("ABSOLUTE").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("REVERSE"))
                     {
-                        anaConsiderRev->setCheckState(
+                        mUi->anaConsiderRev->setCheckState(
                             subSubElem.attribute("REVERSE").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("SHOW_VORONOI"))
                     {
-                        showVoronoiCells->setCheckState(
+                        mUi->showVoronoiCells->setCheckState(
                             subSubElem.attribute("SHOW_VORONOI").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -4541,9 +4854,51 @@ void Control::getXml(QDomElement &elem)
     mMainWindow->updateCoord();
 }
 
+ColorPlot *Control::getColorPlot() const
+{
+    return mUi->colorPlot;
+}
+
+#ifdef QWT
+AnalysePlot *Control::getAnalysePlot() const
+{
+    return mUi->analysePlot;
+}
+#endif
+
+bool Control::isAnaConsiderXChecked() const
+{
+    return mUi->anaConsiderX->isChecked();
+}
+
+bool Control::isAnaConsiderYChecked() const
+{
+    return mUi->anaConsiderY->isChecked();
+}
+
+bool Control::isAnaConsiderAbsChecked() const
+{
+    return mUi->anaConsiderAbs->isChecked();
+}
+
+bool Control::isAnaConsiderRevChecked() const
+{
+    return mUi->anaConsiderRev->isChecked();
+}
+
+bool Control::isAnaMarkActChecked() const
+{
+    return mUi->anaMarkAct->isChecked();
+}
+
+int Control::getAnaStep() const
+{
+    return mUi->anaStep->value();
+}
+
 reco::RecognitionMethod Control::getRecoMethod() const
 {
-    auto method = recoMethod->itemData(recoMethod->currentIndex());
+    auto method = mUi->recoMethod->itemData(mUi->recoMethod->currentIndex());
     return method.value<reco::RecognitionMethod>();
 }
 
@@ -4600,6 +4955,181 @@ bool Control::getColors(QColor &clickedColor, QColor &toColor, QColor &fromColor
         return false;
     }
     return true;
+}
+
+void Control::replotColorplot()
+{
+    mUi->colorPlot->replot();
+}
+
+bool Control::isTestEqualChecked() const
+{
+    return mUi->testEqual->isChecked();
+}
+
+bool Control::isTestVelocityChecked() const
+{
+    return mUi->testVelocity->isChecked();
+}
+
+bool Control::isTestInsideChecked() const
+{
+    return mUi->testInside->isChecked();
+}
+
+bool Control::isTestLengthChecked() const
+{
+    return mUi->testLength->isChecked();
+}
+
+void Control::setMapX(int val)
+{
+    mUi->mapX->setValue(val);
+}
+
+int Control::getMapX() const
+{
+    return mUi->mapX->value();
+}
+
+void Control::setMapY(int val)
+{
+    mUi->mapY->setValue(val);
+}
+
+int Control::getMapY() const
+{
+    return mUi->mapY->value();
+}
+
+void Control::setMapW(int val)
+{
+    mUi->mapW->setValue(val);
+}
+
+int Control::getMapW() const
+{
+    return mUi->mapW->value();
+}
+
+void Control::setMapH(int val)
+{
+    mUi->mapH->setValue(val);
+}
+
+int Control::getMapH() const
+{
+    return mUi->mapH->value();
+}
+
+int Control::getRecoColorX() const
+{
+    return mUi->recoColorX->currentIndex();
+}
+
+int Control::getRecoColorY() const
+{
+    return mUi->recoColorY->currentIndex();
+}
+
+int Control::getRecoColorZ() const
+{
+    return mUi->recoColorZ->value();
+}
+
+int Control::getRecoColorModel() const
+{
+    return mUi->recoColorModel->currentIndex();
+}
+
+int Control::getMapNr() const
+{
+    return mUi->mapNr->value();
+}
+
+int Control::getMarkerBrightness() const
+{
+    return mUi->markerBrightness->value();
+}
+
+bool Control::isMarkerIgnoreWithoutChecked() const
+{
+    return mUi->markerIgnoreWithout->isChecked();
+}
+
+bool Control::isRecoAutoWBChecked() const
+{
+    return mUi->recoAutoWB->isChecked();
+}
+
+Qt::CheckState Control::getAnaMissingFrames() const
+{
+    return mUi->anaMissingFrames->checkState();
+}
+
+Qt::CheckState Control::getTrackAlternateHeight() const
+{
+    return mUi->trackAlternateHeight->checkState();
+}
+
+bool Control::isExportElimTpChecked() const
+{
+    return mUi->exportElimTp->isChecked();
+}
+
+bool Control::isExportElimTrjChecked() const
+{
+    return mUi->exportElimTrj->isChecked();
+}
+
+bool Control::isExportSmoothChecked() const
+{
+    return mUi->exportSmooth->isChecked();
+}
+
+bool Control::isExportViewDirChecked() const
+{
+    return mUi->exportViewDir->isChecked();
+}
+
+bool Control::isExportAngleOfViewChecked() const
+{
+    return mUi->exportAngleOfView->isChecked();
+}
+
+bool Control::isExportMarkerIDChecked() const
+{
+    return mUi->exportMarkerID->isChecked();
+}
+
+bool Control::isTrackRecalcHeightChecked() const
+{
+    return mUi->trackRecalcHeight->isChecked();
+}
+
+bool Control::isTrackMissingFramesChecked() const
+{
+    return mUi->trackMissingFrames->checkState();
+}
+
+bool Control::isExportUseMeterChecked() const
+{
+    return mUi->exportUseM->isChecked();
+}
+
+bool Control::isExportCommentChecked() const
+{
+    return mUi->exportComment->isChecked();
+}
+
+double Control::getDefaultHeight() const
+{
+    return mUi->mapDefaultHeight->value();
+}
+
+double Control::getCameraAltitude() const
+{
+    return mUi->coordAltitude->value();
 }
 
 /**
@@ -4839,16 +5369,16 @@ void Control::expandRange(QColor &fromColor, QColor &toColor, const QColor &clic
 
 void Control::toggleRecoROIButtons()
 {
-    bool enabled = (!roiFix->isChecked()) && roiShow->isChecked();
-    recoRoiAdjustAutomatically->setEnabled(enabled);
-    recoRoiToFullImageSize->setEnabled(enabled);
+    bool enabled = (!mUi->roiFix->isChecked()) && mUi->roiShow->isChecked();
+    mUi->recoRoiAdjustAutomatically->setEnabled(enabled);
+    mUi->recoRoiToFullImageSize->setEnabled(enabled);
 }
 
 void Control::toggleTrackROIButtons()
 {
-    bool enabled = (!trackRoiFix->isChecked()) && trackRoiShow->isChecked();
-    trackRoiAdjustAutomatically->setEnabled(enabled);
-    trackRoiToFullImageSize->setEnabled(enabled);
+    bool enabled = (!mUi->trackRoiFix->isChecked()) && mUi->trackRoiShow->isChecked();
+    mUi->trackRoiAdjustAutomatically->setEnabled(enabled);
+    mUi->trackRoiToFullImageSize->setEnabled(enabled);
 }
 
 #include "moc_control.cpp"

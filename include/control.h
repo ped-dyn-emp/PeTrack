@@ -21,17 +21,22 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#include "analysePlot.h"
+#include "colorPlot.h"
 #include "petrack.h"
 #include "recognition.h"
-#include "ui_control.h"
 
 #include <Qt>
 #include <QtWidgets>
 
 class QGraphicsScene;
 class QDomElement;
+namespace Ui
+{
+class Control;
+}
 
-class Control : public QWidget, public Ui::Control
+class Control : public QWidget
 {
     Q_OBJECT
 
@@ -42,108 +47,174 @@ public:
         reco::Recognizer &recognizer,
         RoiItem          &trackRoiItem,
         RoiItem          &recoRoiItem);
+    Control(
+        QWidget          &parent,
+        QGraphicsScene   &scene,
+        reco::Recognizer &recognizer,
+        RoiItem          &trackRoiItem,
+        RoiItem          &recoRoiItem,
+        Ui::Control      *ui);
 
     void setScene(QGraphicsScene *sc);
 
-    bool   getTrackShow();
-    void   setTrackShow(bool b);
-    bool   getTrackFix();
-    void   setTrackFix(bool b);
-    QColor getTrackPathColor();
-    void   setTrackPathColor(QColor col);
-    QColor getTrackGroundPathColor();
-    void   setTrackGroundPathColor(QColor col);
-    QColor getMoCapColor();
+    void toggleOnlineTracking();
+    bool isOnlineTrackingChecked() const;
+    void setOnlineTrackingChecked(bool checked);
+    int  getTrackRegionLevels() const;
+    bool isTrackRepeatChecked() const;
+    int  getTrackRepeatQual() const;
+    int  getTrackRegionScale() const;
+    bool isTrackMergeChecked() const;
+    bool isTrackExtrapolationChecked() const;
 
-    bool getRecoRoiShow();
+    QLineEdit *trackShowOnlyNrList();
+    void       setTrackNumberNow(const QString &val);
+    void       setTrackShowOnlyNr(int val);
+    int        getTrackShowOnlyNr() const;
+    void       setTrackNumberAll(const QString &number);
+    void       setTrackShowOnlyNrMaximum(int max);
+    void       setTrackShowOnly(Qt::CheckState state);
+    bool       isTrackShowOnlyChecked() const;
+    bool       isTrackShowOnlyListChecked() const;
+    void       setTrackShowOnlyListChecked(bool checked);
+    void       setTrackNumberVisible(const QString &value);
+    bool       isTrackOnlySelectedChecked() const;
+    int        getTrackShowBefore() const;
+    int        getTrackShowAfter() const;
+    bool       getTrackShow() const;
+    void       setTrackShow(bool b);
+    bool       getTrackFix() const;
+    void       setTrackFix(bool b);
+    QColor     getTrackPathColor() const;
+    void       setTrackPathColor(QColor col);
+    QColor     getTrackGroundPathColor() const;
+    void       setTrackGroundPathColor(QColor col);
+    int        getTrackCurrentPointSize() const;
+    int        getTrackPointSize() const;
+    int        getTrackColColorSize() const;
+    int        getTrackColorMarkerSize() const;
+    int        getTrackNumberSize() const;
+    int        getTrackGroundPositionSize() const;
+    int        getTrackGroundPathSize() const;
+    int        getTrackPathWidth() const;
+    bool       isTrackNumberBoldChecked() const;
+    bool       isShowVoronoiCellsChecked() const;
+    bool       isTrackHeadSizedChecked() const;
+    bool       isTrackShowCurrentPointChecked() const;
+    bool       isTrackShowSearchSizeChecked() const;
+    bool       isTrackShowColorMarkerChecked() const;
+    bool       isTrackShowColColorChecked() const;
+    bool       isTrackShowNumberChecked() const;
+    bool       isTrackShowHeightIndividualChecked() const;
+    bool       isTrackShowPointsChecked() const;
+    bool       isTrackShowPathChecked() const;
+    bool       isTrackShowGroundPathChecked() const;
+    bool       isTrackShowOnlyVisibleChecked() const;
+    bool       isTrackShowPointsColoredChecked() const;
+    bool       isTrackShowGroundPositionChecked() const;
+
+    QColor getMoCapColor() const;
+
+    bool isPerformRecognitionChecked() const;
+    void setPerformRecognitionChecked(bool checked);
+    void setRecoNumberNow(const QString &val);
+    int  getRecoStep() const;
+    bool getRecoRoiShow() const;
     void setRecoRoiShow(bool b);
-    bool getRecoRoiFix();
+    bool getRecoRoiFix() const;
     void setRecoRoiFix(bool b);
 
-    bool getTrackRoiShow();
+    bool getTrackRoiShow() const;
     void setTrackRoiShow(bool b);
-    bool getTrackRoiFix();
+    bool getTrackRoiFix() const;
     void setTrackRoiFix(bool b);
 
-    bool getAdaptiveLevel();
+    bool getAdaptiveLevel() const;
 
-    int getFilterBorderSize();
+    int  getFilterBorderSize() const;
+    bool isFilterBgChecked() const;
+    bool isFilterBgDeleteTrjChecked() const;
+    int  getFilterBgDeleteNumber() const;
 
-    double getCalibFxValue() const;
-    void   setCalibFxValue(double d);
+    double getCalibFx() const;
+    void   setCalibFx(double d);
     void   setCalibFxMin(double d);
     void   setCalibFxMax(double d);
-    double getCalibFyValue() const;
-    void   setCalibFyValue(double d);
+    double getCalibFy() const;
+    void   setCalibFy(double d);
     void   setCalibFyMin(double d);
     void   setCalibFyMax(double d);
-    double getCalibCxValue() const;
-    void   setCalibCxValue(double d);
+    double getCalibCx() const;
+    void   setCalibCx(double d);
     void   setCalibCxMin(double d);
     void   setCalibCxMax(double d);
-    double getCalibCyValue() const;
-    void   setCalibCyValue(double d);
+    double getCalibCy() const;
+    void   setCalibCy(double d);
     void   setCalibCyMin(double d);
     void   setCalibCyMax(double d);
-    double getCalibR2Value() const;
-    void   setCalibR2Value(double d);
+    double getCalibR2() const;
+    void   setCalibR2(double d);
     void   setCalibR2Min(double d);
     void   setCalibR2Max(double d);
-    double getCalibR4Value() const;
-    void   setCalibR4Value(double d);
+    double getCalibR4() const;
+    void   setCalibR4(double d);
     void   setCalibR4Min(double d);
     void   setCalibR4Max(double d);
-    double getCalibTxValue() const;
-    void   setCalibTxValue(double d);
+    double getCalibTx() const;
+    void   setCalibTx(double d);
     void   setCalibTxMin(double d);
     void   setCalibTxMax(double d);
-    double getCalibTyValue() const;
-    void   setCalibTyValue(double d);
+    double getCalibTy() const;
+    void   setCalibTy(double d);
     void   setCalibTyMin(double d);
     void   setCalibTyMax(double d);
-    double getCalibR6Value() const;
-    void   setCalibR6Value(double d);
+    double getCalibR6() const;
+    void   setCalibR6(double d);
     void   setCalibR6Min(double d);
     void   setCalibR6Max(double d);
-    double getCalibK4Value() const;
-    void   setCalibK4Value(double d);
+    double getCalibK4() const;
+    void   setCalibK4(double d);
     void   setCalibK4Min(double d);
     void   setCalibK4Max(double d);
-    double getCalibK5Value() const;
-    void   setCalibK5Value(double d);
+    double getCalibK5() const;
+    void   setCalibK5(double d);
     void   setCalibK5Min(double d);
     void   setCalibK5Max(double d);
-    double getCalibK6Value() const;
-    void   setCalibK6Value(double d);
+    double getCalibK6() const;
+    void   setCalibK6(double d);
     void   setCalibK6Min(double d);
     void   setCalibK6Max(double d);
-    double getCalibS1Value() const;
-    void   setCalibS1Value(double d);
+    double getCalibS1() const;
+    void   setCalibS1(double d);
     void   setCalibS1Min(double d);
     void   setCalibS1Max(double d);
-    double getCalibS2Value() const;
-    void   setCalibS2Value(double d);
+    double getCalibS2() const;
+    void   setCalibS2(double d);
     void   setCalibS2Min(double d);
     void   setCalibS2Max(double d);
-    double getCalibS3Value() const;
-    void   setCalibS3Value(double d);
+    double getCalibS3() const;
+    void   setCalibS3(double d);
     void   setCalibS3Min(double d);
     void   setCalibS3Max(double d);
-    double getCalibS4Value() const;
-    void   setCalibS4Value(double d);
+    double getCalibS4() const;
+    void   setCalibS4(double d);
     void   setCalibS4Min(double d);
     void   setCalibS4Max(double d);
-    double getCalibTAUXValue() const;
-    void   setCalibTAUXValue(double d);
+    double getCalibTAUX() const;
+    void   setCalibTAUX(double d);
     void   setCalibTAUXMin(double d);
     void   setCalibTAUXMax(double d);
-    double getCalibTAUYValue() const;
-    void   setCalibTAUYValue(double d);
+    double getCalibTAUY() const;
+    void   setCalibTAUY(double d);
     void   setCalibTAUYMin(double d);
     void   setCalibTAUYMax(double d);
-    double getCalibReprErrorValue() const;
-    void   setCalibReprErrorValue(double d);
+    double getCalibReprError() const;
+    void   setCalibReprError(double d);
     void   setExtModelChecked(bool b);
+    bool   isFixCenterChecked() const;
+    bool   isQuadAspectRatioChecked() const;
+    bool   isTangDistChecked() const;
+    bool   isExtModelChecked() const;
 
     double getCalibExtrRot1();
     void   setCalibExtrRot1(double d);
@@ -186,6 +257,7 @@ public:
     void   setCalibCoordScale(int i);
     double getCalibCoordUnit();
     void   setCalibCoordUnit(double d);
+    bool   isCoordUseIntrinsicChecked() const;
 
     int  getCalibCoord3DTransX();
     void setCalibCoord3DTransX(int i);
@@ -230,17 +302,61 @@ public:
     void saveChange(const QColor &fromColor, const QColor &toColor, RectPlotItem *map);
     bool getColors(QColor &clickedColor, QColor &toColor, QColor &fromColor, RectPlotItem *&map);
 
-    void              setXml(QDomElement &elem);
-    void              getXml(QDomElement &elem);
-    bool              isLoading() { return mMainWindow->isLoading(); }
-    inline ColorPlot *getColorPlot() const { return colorPlot; }
+    double getDefaultHeight() const;
+    double getCameraAltitude() const;
+
+    void       setXml(QDomElement &elem);
+    void       getXml(QDomElement &elem);
+    bool       isLoading() const { return mMainWindow->isLoading(); }
+    ColorPlot *getColorPlot() const;
+    void       replotColorplot();
+
+    bool isTestEqualChecked() const;
+    bool isTestVelocityChecked() const;
+    bool isTestInsideChecked() const;
+    bool isTestLengthChecked() const;
+
+    void setMapX(int val);
+    int  getMapX() const;
+    void setMapY(int val);
+    int  getMapY() const;
+    void setMapW(int val);
+    int  getMapW() const;
+    void setMapH(int val);
+    int  getMapH() const;
+    int  getRecoColorX() const;
+    int  getRecoColorY() const;
+    int  getRecoColorZ() const;
+    int  getRecoColorModel() const;
+    int  getMapNr() const;
+
+    int  getMarkerBrightness() const;
+    bool isMarkerIgnoreWithoutChecked() const;
+    bool isRecoAutoWBChecked() const;
+
+    Qt::CheckState getAnaMissingFrames() const;
+    Qt::CheckState getTrackAlternateHeight() const;
+    bool           isExportElimTpChecked() const;
+    bool           isExportElimTrjChecked() const;
+    bool           isExportSmoothChecked() const;
+    bool           isExportViewDirChecked() const;
+    bool           isExportAngleOfViewChecked() const;
+    bool           isExportMarkerIDChecked() const;
+    bool           isTrackRecalcHeightChecked() const;
+    bool           isTrackMissingFramesChecked() const;
+    bool           isExportUseMeterChecked() const;
+    bool           isExportCommentChecked() const;
+
 
 #ifdef QWT
-    inline AnalysePlot *getAnalysePlot() const
-    {
-        return analysePlot;
-    }
+    AnalysePlot *getAnalysePlot() const;
 #endif
+    bool isAnaConsiderXChecked() const;
+    bool isAnaConsiderYChecked() const;
+    bool isAnaConsiderAbsChecked() const;
+    bool isAnaConsiderRevChecked() const;
+    bool isAnaMarkActChecked() const;
+    int  getAnaStep() const;
 
     inline Petrack *getMainWindow() const
     {
@@ -602,6 +718,7 @@ signals:
 
 private:
     Petrack        *mMainWindow;
+    Ui::Control    *mUi;
     QGraphicsScene *mScene;
     bool            mColorChanging;
     bool mIndexChanging; // shows, if the index of the color model is really changing; nor while constructor (initialer

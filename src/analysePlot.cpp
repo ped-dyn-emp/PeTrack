@@ -151,10 +151,10 @@ void TrackerRealPlotItem::draw(QPainter *p, const QwtScaleMap &mapX, const QwtSc
         sx = circleSize / (2. * sx);
         sy = circleSize / (2. * sy);
 
-        bool anaConsiderX   = controlWidget->anaConsiderX->isChecked();
-        bool anaConsiderY   = controlWidget->anaConsiderY->isChecked();
-        bool anaConsiderAbs = controlWidget->anaConsiderAbs->isChecked();
-        bool anaConsiderRev = controlWidget->anaConsiderRev->isChecked();
+        bool anaConsiderX   = controlWidget->isAnaConsiderXChecked();
+        bool anaConsiderY   = controlWidget->isAnaConsiderYChecked();
+        bool anaConsiderAbs = controlWidget->isAnaConsiderAbsChecked();
+        bool anaConsiderRev = controlWidget->isAnaConsiderRevChecked();
 
         // Beschriftung
         static QFont f("Courier", 10, QFont::Normal);        // Times Helvetica, Normal Bold
@@ -199,14 +199,14 @@ void TrackerRealPlotItem::draw(QPainter *p, const QwtScaleMap &mapX, const QwtSc
         ((AnalysePlot *) plot())->setAxisTitle(QwtPlot::xBottom, titleX); //"x"
         ((AnalysePlot *) plot())->setAxisTitle(QwtPlot::yLeft, titleY);   //"y"
 
-        int             step = controlWidget->anaStep->value(); // 1
+        int             step = controlWidget->getAnaStep(); // 1
         int             frame, animFrame, velVecActIdx = -1;
         double          vel; // geschwindigkeit
         int             largestLastFrame = mTrackerReal->largestLastFrame();
         QVector<int>    velAnzVec(largestLastFrame, 0);
         QVector<double> velVec(largestLastFrame, 0.);
         int             actFrame = ((AnalysePlot *) plot())->getActFrame();
-        bool            markAct  = controlWidget->anaMarkAct->isChecked();
+        bool            markAct  = controlWidget->isAnaMarkActChecked();
         double          fps      = controlWidget->getMainWindow()->getAnimation()->getFPS();
         if(fps < 0)
         {
@@ -373,11 +373,11 @@ QPoint AnalysePlot::getPos(const QColor &col) const
 
     if(mControlWidget)
     {
-        int x    = mControlWidget->recoColorX->currentIndex();
-        int y    = mControlWidget->recoColorY->currentIndex();
+        int x    = mControlWidget->getRecoColorX();
+        int y    = mControlWidget->getRecoColorY();
         int ymax = (int) yMax();
 
-        if(mControlWidget->recoColorModel->currentIndex() == 0) // HSV
+        if(mControlWidget->getRecoColorModel() == 0) // HSV
         {
             if(x == 0) // nicht setX und setY, weil das width und height anpasst
             {
