@@ -338,7 +338,7 @@ bool PersonStorage::setTrackPersonHeight(const Vec2F &point, int frame, const QS
             {
                 col_height = mPersons.at(i).color().isValid() ?
                                  -mMainWindow.getControlWidget()->getColorPlot()->map(mPersons.at(i).color()) :
-                                 -mMainWindow.getControlWidget()->mapDefaultHeight->value();
+                                 -mMainWindow.getControlWidget()->getDefaultHeight();
             }
             else
             {
@@ -455,7 +455,7 @@ int PersonStorage::calcPosition(int /*frame*/)
                     // hier kommt man nur hinein, wenn x, y, z Wert berechnet werden konnten
                     // statt altitude koennte hier irgendwann die berechnete Bodenhoehe einfliessen
                     mPersons[i][frame - at(i).firstFrame()].setSp(x, y, z); // setZdistanceToCam(z);
-                    mPersons[i].setHeight(z, mMainWindow.getControlWidget()->coordAltitude->value());
+                    mPersons[i].setHeight(z, mMainWindow.getControlWidget()->getCameraAltitude());
                 }
                 else
                     ++notFoundDisp;
@@ -529,7 +529,7 @@ bool PersonStorage::addPoint(
         }
         // cout << " " << point.x()<< " " << point.y() << " " << x << " " << y << " " << z <<endl;
         // if (i == 10)
-        //     debout << i << " " << mMainWindow.getControlWidget()->coordAltitude->value() - z << " " << z << " " <<
+        //     debout << i << " " << mMainWindow.getControlWidget()->getCameraAltitude() - z << " " << z << " " <<
         //     mPersons[i].height() << endl;
     }
 #endif
@@ -590,8 +590,8 @@ bool PersonStorage::addPoint(
                frame,
                point,
                iNearest,
-               (mMainWindow.getControlWidget()->trackExtrapolation->checkState() ==
-                Qt::Checked))) // wenn eingefuegt wurde (bessere qualitaet)
+               (mMainWindow.getControlWidget()
+                    ->isTrackExtrapolationChecked()))) // wenn eingefuegt wurde (bessere qualitaet)
         //|| !at(i).trackPointAt(frame).color().isValid() moeglich, um auch bei schlechterer
         // qualitaet aber aktuell nicht
         // vorliegender farbe die ermittelte farbe einzutragen - kommt nicht vor!
@@ -629,7 +629,7 @@ bool PersonStorage::addPoint(
     }
     if((z > 0) && ((onlyVisible.empty()) || found))
     {
-        mPersons[iNearest].setHeight(z, mMainWindow.getControlWidget()->coordAltitude->value()); // , frame
+        mPersons[iNearest].setHeight(z, mMainWindow.getControlWidget()->getCameraAltitude()); // , frame
     }
     if((!onlyVisible.empty()) && !found)
     {
@@ -1292,7 +1292,7 @@ int PersonStorage::merge(int pers1, int pers2)
     mAutosave.trackPersonModified();
     auto      &person      = mPersons.at(pers1);
     auto      &other       = mPersons.at(pers2);
-    const bool extrapolate = mMainWindow.getControlWidget()->trackExtrapolation->checkState() == Qt::Checked;
+    const bool extrapolate = mMainWindow.getControlWidget()->isTrackExtrapolationChecked();
     int        deleteIndex;
     if(other.firstFrame() < person.firstFrame() && other.lastFrame() > person.lastFrame())
     {

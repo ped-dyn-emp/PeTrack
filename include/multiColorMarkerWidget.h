@@ -154,11 +154,11 @@ private slots:
             if(mMainWindow->getImageItem() && mMainWindow->getImage() && mMainWindow->getControlWidget())
             {
                 QPointF cmPerPixel1 = mMainWindow->getImageItem()->getCmPerPixel(
-                    0, 0, mMainWindow->getControlWidget()->mapDefaultHeight->value());
+                    0, 0, mMainWindow->getControlWidget()->getDefaultHeight());
                 QPointF cmPerPixel2 = mMainWindow->getImageItem()->getCmPerPixel(
                     mMainWindow->getImage()->width() - 1,
                     mMainWindow->getImage()->height() - 1,
-                    mMainWindow->getControlWidget()->mapDefaultHeight->value());
+                    mMainWindow->getControlWidget()->getDefaultHeight());
                 double cmPerPixelAvg = (cmPerPixel1.x() + cmPerPixel1.y() + cmPerPixel2.x() + cmPerPixel2.y()) / 4.;
                 if(cmPerPixelAvg > 0)
                 {

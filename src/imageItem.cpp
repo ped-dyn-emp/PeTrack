@@ -243,10 +243,10 @@ QPointF ImageItem::getPosImage(QPointF pos, float height)
             }
 
             pos = mapFromItem(mCoordItem, pos); // Einheit anpassen...
-            if(mControlWidget->coordUseIntrinsic->checkState() == Qt::Checked)
+            if(mControlWidget->isCoordUseIntrinsicChecked())
             {
-                pos.rx() -= mControlWidget->getCalibCxValue();
-                pos.ry() -= mControlWidget->getCalibCyValue();
+                pos.rx() -= mControlWidget->getCalibCx();
+                pos.ry() -= mControlWidget->getCalibCy();
             }
             else
             {
@@ -257,16 +257,16 @@ QPointF ImageItem::getPosImage(QPointF pos, float height)
             {
                 debout << "x: " << pos.x() << " y: " << pos.y() << std::endl;
             }
-            pos = (mControlWidget->coordAltitude->value() / (mControlWidget->coordAltitude->value() - height)) *
+            pos = (mControlWidget->getCameraAltitude() / (mControlWidget->getCameraAltitude() - height)) *
                   pos; //((a-height)/a)*pos;
             if(debug)
             {
                 debout << "x: " << pos.x() << " y: " << pos.y() << std::endl;
             }
-            if(mControlWidget->coordUseIntrinsic->checkState() == Qt::Checked)
+            if(mControlWidget->isCoordUseIntrinsicChecked())
             {
-                pos.rx() += mControlWidget->getCalibCxValue();
-                pos.ry() += mControlWidget->getCalibCyValue();
+                pos.rx() += mControlWidget->getCalibCx();
+                pos.ry() += mControlWidget->getCalibCy();
             }
             else
             {
@@ -342,13 +342,13 @@ QPointF ImageItem::getPosReal(QPointF pos, double height)
                 debout << "Org. 2D Point: (" << pos.x() << ", " << pos.y() << ") Hoehe: " << height << std::endl;
             }
             // statt mControlWidget->getCalibFx() muesste spaeter wert stehen, der im verzerrten Bild fX=fY angibt
-            // a = mControlWidget->getCalibFxValue()*getMeterPerPixel();
-            // a = mControlWidget->coordAltitude->value();
+            // a = mControlWidget->getCalibFx()*getMeterPerPixel();
+            // a = mControlWidget->getCameraAltitude();
             // -.5 da pixel von 0..1023 (in skala bis 1024 anfaengt) laufen
-            if(mControlWidget->coordUseIntrinsic->checkState() == Qt::Checked)
+            if(mControlWidget->isCoordUseIntrinsicChecked())
             {
-                pos.rx() -= mControlWidget->getCalibCxValue();
-                pos.ry() -= mControlWidget->getCalibCyValue();
+                pos.rx() -= mControlWidget->getCalibCx();
+                pos.ry() -= mControlWidget->getCalibCy();
             }
             else
             {
@@ -357,22 +357,22 @@ QPointF ImageItem::getPosReal(QPointF pos, double height)
             }
             if(debug)
             {
-                debout << "CoordAltitude: " << mControlWidget->coordAltitude->value() << std::endl;
+                debout << "CoordAltitude: " << mControlWidget->getCameraAltitude() << std::endl;
             }
             if(debug)
             {
                 debout << "x: " << pos.x() << " y: " << pos.y() << std::endl;
             }
-            pos = ((mControlWidget->coordAltitude->value() - height) / mControlWidget->coordAltitude->value()) *
+            pos = ((mControlWidget->getCameraAltitude() - height) / mControlWidget->getCameraAltitude()) *
                   pos; //((a-height)/a)*pos;
             if(debug)
             {
                 debout << "x: " << pos.x() << " y: " << pos.y() << std::endl;
             }
-            if(mControlWidget->coordUseIntrinsic->checkState() == Qt::Checked)
+            if(mControlWidget->isCoordUseIntrinsicChecked())
             {
-                pos.rx() += mControlWidget->getCalibCxValue();
-                pos.ry() += mControlWidget->getCalibCyValue();
+                pos.rx() += mControlWidget->getCalibCx();
+                pos.ry() += mControlWidget->getCalibCy();
             }
             else
             {

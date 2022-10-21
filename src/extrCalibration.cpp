@@ -496,8 +496,8 @@ void ExtrCalibration::calibExtrParams()
         /* Create Camera-Matrix form Camera-Params in the Petrack-GUI */
         // clang-format off
         cv::Mat camMat = (cv::Mat_<double>(3,3) <<
-                      mControlWidget->fx->value(), 0, mControlWidget->cx->value()-bS,
-                      0, mControlWidget->fy->value(), mControlWidget->cy->value()-bS,
+                      mControlWidget->getCalibFx(), 0, mControlWidget->getCalibCx()-bS,
+                      0, mControlWidget->getCalibFy(), mControlWidget->getCalibCy()-bS,
                       0, 0, 1);
         // clang-format on
         cv::Mat distMat =
@@ -664,9 +664,9 @@ bool ExtrCalibration::calcReprojectionError()
         // Error measurements metric (cm)
         cv::Point3f p2dTo3d = get3DPoint(p2d, p3d.z);
 
-        cv::Point3f p2dTo3dMapDefaultHeight = get3DPoint(p2d, mControlWidget->mapDefaultHeight->value());
+        cv::Point3f p2dTo3dMapDefaultHeight = get3DPoint(p2d, mControlWidget->getDefaultHeight());
 
-        cv::Point3f p3dTo2dTo3dMapDefaultHeight = get3DPoint(p3dTo2d, mControlWidget->mapDefaultHeight->value());
+        cv::Point3f p3dTo2dTo3dMapDefaultHeight = get3DPoint(p3dTo2d, mControlWidget->getDefaultHeight());
 
         val = sqrt(pow(p3d.x - p2dTo3d.x, 2) + pow(p3d.y - p2dTo3d.y, 2));
         if(val > max_pH)
@@ -718,9 +718,9 @@ bool ExtrCalibration::calcReprojectionError()
         cv::Point3f p2d_to_3d = get3DPoint(p2d, p3d.z);
 
         cv::Point3f p2d_to_3d_mapDefaultHeight =
-            get3DPoint(p2d, mControlWidget->mapDefaultHeight->value()); // mStatusPosRealHeight->value()); ?
+            get3DPoint(p2d, mControlWidget->getDefaultHeight()); // mStatusPosRealHeight->value()); ?
 
-        cv::Point3f p3d_to2d_to3d_mapDefaultHeight = get3DPoint(p3d_to_2d, mControlWidget->mapDefaultHeight->value());
+        cv::Point3f p3d_to2d_to3d_mapDefaultHeight = get3DPoint(p3d_to_2d, mControlWidget->getDefaultHeight());
 
         val = pow(sqrt(pow(p3d.x - p2d_to_3d.x, 2) + pow(p3d.y - p2d_to_3d.y, 2)) - (sum_pH / num_points), 2);
         var_pH += val;
@@ -748,9 +748,9 @@ bool ExtrCalibration::calcReprojectionError()
     sum_dH /= num_points;
     var_dH /= num_points;
     sd_dH = sqrt(var_dH);
-    debout << "Reprojection error (defaultHeight=" << mControlWidget->mapDefaultHeight->value()
-           << ") average: " << sum_dH << "cm (standard deviation: " << sd_dH << " variance: " << var_dH
-           << " Max error: " << max_dH << "cm)" << std::endl;
+    debout << "Reprojection error (defaultHeight=" << mControlWidget->getDefaultHeight() << ") average: " << sum_dH
+           << "cm (standard deviation: " << sd_dH << " variance: " << var_dH << " Max error: " << max_dH << "cm)"
+           << std::endl;
 
     // average
     sum_px /= num_points;
@@ -772,7 +772,7 @@ bool ExtrCalibration::calcReprojectionError()
         sd_px,
         var_px,
         max_px,
-        mControlWidget->mapDefaultHeight->value()};
+        mControlWidget->getDefaultHeight()};
 
     return reprojectionError.pointHeightAvg() > MAX_AV_ERROR ?
                false :
@@ -884,8 +884,8 @@ cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d)
     cv::Point2f point2D = cv::Point2f(0.0, 0.0);
     if(point3D.z != 0)
     {
-        point2D.x = (mControlWidget->fx->value() * point3D.x) / point3D.z + (mControlWidget->cx->value() - bS);
-        point2D.y = (mControlWidget->fy->value() * point3D.y) / point3D.z + (mControlWidget->cy->value() - bS);
+        point2D.x = (mControlWidget->getCalibFx() * point3D.x) / point3D.z + (mControlWidget->getCalibCx() - bS);
+        point2D.y = (mControlWidget->getCalibFy() * point3D.y) / point3D.z + (mControlWidget->getCalibCy() - bS);
     }
     if(false && bS > 0)
     {
@@ -948,7 +948,7 @@ cv::Point3f ExtrCalibration::get3DPoint(const cv::Point2f &p2d, double h) const
 
     // Subtract principal point and border, so we can assume pinhole camera
     const cv::Vec2d centeredImagePoint{
-        p2d.x - (mControlWidget->getCalibCxValue() - bS), p2d.y - (mControlWidget->getCalibCyValue() - bS)};
+        p2d.x - (mControlWidget->getCalibCx() - bS), p2d.y - (mControlWidget->getCalibCy() - bS)};
 
 
     /* Basic Idea:
@@ -979,7 +979,7 @@ cv::Point3f ExtrCalibration::get3DPoint(const cv::Point2f &p2d, double h) const
 
     // calc Rv, (R = rot_inv)
     // rotatedProj = Rv
-    const cv::Vec2d focalLength{mControlWidget->getCalibFxValue(), mControlWidget->getCalibFyValue()};
+    const cv::Vec2d focalLength{mControlWidget->getCalibFx(), mControlWidget->getCalibFy()};
     const cv::Vec2d pinholeProjectionXY = cv::Mat(centeredImagePoint.div(focalLength));
     const cv::Vec3d pinholeProjectionXY1{pinholeProjectionXY[0], pinholeProjectionXY[1], 1};
     const cv::Vec3d rotatedProj = rot_inv * pinholeProjectionXY1;
@@ -990,12 +990,12 @@ cv::Point3f ExtrCalibration::get3DPoint(const cv::Point2f &p2d, double h) const
     // Evaluate line at depth z; calc point in camera coords
     // written this way instead of z * pinholeProjectionXY1 (i.e. z * v) to not change test results due to floating
     // point precision diff
-    resultPoint.x = (p2d.x - (mControlWidget->getCalibCxValue() - bS));
-    resultPoint.y = (p2d.y - (mControlWidget->getCalibCyValue() - bS));
+    resultPoint.x = (p2d.x - (mControlWidget->getCalibCx() - bS));
+    resultPoint.y = (p2d.y - (mControlWidget->getCalibCy() - bS));
     resultPoint.z = z;
 
-    resultPoint.x = resultPoint.x * z / mControlWidget->getCalibFxValue();
-    resultPoint.y = resultPoint.y * z / mControlWidget->getCalibFyValue();
+    resultPoint.x = resultPoint.x * z / mControlWidget->getCalibFx();
+    resultPoint.y = resultPoint.y * z / mControlWidget->getCalibFy();
 
     // We transform from cam coords to world coords with W = R * C - T
     // we now calc: W = R * (C - R^-1*T), which is equivalent

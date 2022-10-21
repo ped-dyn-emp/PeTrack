@@ -289,8 +289,8 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
         if(extCalib->isSetExtrCalib())
         {
             QFont font;
-            font.setBold(mControlWidget->trackNumberBold->checkState() == Qt::Checked);
-            font.setPixelSize(mControlWidget->trackNumberSize->value());
+            font.setBold(mControlWidget->isTrackNumberBoldChecked());
+            font.setPixelSize(mControlWidget->getTrackNumberSize());
 
             painter->setFont(font);
 

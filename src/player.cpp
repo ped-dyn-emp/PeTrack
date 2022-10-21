@@ -413,7 +413,7 @@ void Player::playVideo()
         }
         else
         {
-            if(mLooping && mMainWindow->getControlWidget()->trackOnlineCalc->checkState() == Qt::Checked)
+            if(mLooping && mMainWindow->getControlWidget()->isOnlineTrackingChecked())
             {
                 PWarning(
                     this,

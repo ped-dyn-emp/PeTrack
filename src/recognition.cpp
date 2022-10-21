@@ -528,9 +528,7 @@ void detail::refineWithBlackDot(
                     }
 
                     QPointF cmPerPixel = imageItem->getCmPerPixel(
-                        cropRect.x + subBox.center.x,
-                        cropRect.y + subBox.center.y,
-                        controlWidget->mapDefaultHeight->value());
+                        cropRect.x + subBox.center.x, cropRect.y + subBox.center.y, controlWidget->getDefaultHeight());
                     double cmPerPixelAvg = (cmPerPixel.x() + cmPerPixel.y()) / 2.;
                     double markerSize =
                         dotSize / cmPerPixelAvg; // war: 5cm// war WDG: = 16; war GymBay: = headSize / 4.5;
@@ -808,13 +806,13 @@ void findMultiColorMarker(
     for(int j = 0; j < rectPlotItem->mapNum(); j++)
     {
         int nr;
-        if(j == controlWidget->mapNr->value())
+        if(j == controlWidget->getMapNr())
         {
             nr = rectPlotItem->mapNum() - 1;
         }
         else if(j == rectPlotItem->mapNum() - 1)
         {
-            nr = controlWidget->mapNr->value();
+            nr = controlWidget->getMapNr();
         }
         else
         {
@@ -1058,14 +1056,13 @@ void detail::findCodeMarker(
             myRound(mainWindow->getRecoRoiItem()->rect().y()),
             myRound(mainWindow->getRecoRoiItem()->rect().width()),
             myRound(mainWindow->getRecoRoiItem()->rect().height()));
-        QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(
-                    rect.x(), rect.y(), controlWidget->mapDefaultHeight->value()),
+        QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(), rect.y(), controlWidget->getDefaultHeight()),
                 p2 = mainWindow->getImageItem()->getCmPerPixel(
-                    rect.x() + rect.width(), rect.y(), controlWidget->mapDefaultHeight->value()),
+                    rect.x() + rect.width(), rect.y(), controlWidget->getDefaultHeight()),
                 p3 = mainWindow->getImageItem()->getCmPerPixel(
-                    rect.x(), rect.y() + rect.height(), controlWidget->mapDefaultHeight->value()),
+                    rect.x(), rect.y() + rect.height(), controlWidget->getDefaultHeight()),
                 p4 = mainWindow->getImageItem()->getCmPerPixel(
-                    rect.x() + rect.width(), rect.y() + rect.height(), controlWidget->mapDefaultHeight->value());
+                    rect.x() + rect.width(), rect.y() + rect.height(), controlWidget->getDefaultHeight());
 
         double cmPerPixel_min = std::min(
             std::min(std::min(p1.x(), p1.y()), std::min(p2.x(), p2.y())),
@@ -1299,9 +1296,9 @@ void findContourMarker(
 QList<TrackPoint>
 Recognizer::getMarkerPos(cv::Mat &img, QRect &roi, Control *controlWidget, int borderSize, BackgroundFilter *bgFilter)
 {
-    int  markerBrightness    = controlWidget->markerBrightness->value();
-    bool ignoreWithoutMarker = (controlWidget->markerIgnoreWithout->checkState() == Qt::Checked);
-    bool autoWB              = (controlWidget->recoAutoWB->checkState() == Qt::Checked);
+    int  markerBrightness    = controlWidget->getMarkerBrightness();
+    bool ignoreWithoutMarker = controlWidget->isMarkerIgnoreWithoutChecked();
+    bool autoWB              = controlWidget->isRecoAutoWBChecked();
 
     cv::Mat  tImg;
     cv::Rect rect;

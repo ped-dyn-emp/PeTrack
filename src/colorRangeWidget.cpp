@@ -89,10 +89,10 @@ void ColorRangeWidget::setControlWidget(int toHue, int fromHue, int toSat, int f
         tS = toSat;
         fS = fromSat;
     }
-    mMainWindow->getControlWidget()->mapX->setValue(fH * 2);
-    mMainWindow->getControlWidget()->mapW->setValue((tH - fH));
-    mMainWindow->getControlWidget()->mapY->setValue(fS * 2);
-    mMainWindow->getControlWidget()->mapH->setValue((tS - fS));
+    mMainWindow->getControlWidget()->setMapX(fH * 2);
+    mMainWindow->getControlWidget()->setMapW((tH - fH));
+    mMainWindow->getControlWidget()->setMapY(fS * 2);
+    mMainWindow->getControlWidget()->setMapH((tS - fS));
 }
 
 void ColorRangeWidget::on_fromTriangle_colorChanged(const QColor &col)
