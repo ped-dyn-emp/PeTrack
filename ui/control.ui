@@ -5427,7 +5427,7 @@
                    </size>
                   </property>
                   <property name="toolTip">
-                   <string>add direction of head (corresponding to view direction; possible with Japan and casern marker)</string>
+                   <string>add direction of head (corresponding to view direction; possible with Japan, casern and code marker)</string>
                   </property>
                   <property name="text">
                    <string>add head direction</string>

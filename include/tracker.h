@@ -59,6 +59,8 @@ private:
     int    mMarkerID; // ID of detected Marker
     Vec3F mSp; // measured 3d point with stereo // mZdistanceToCam; // distance in z direction to camera - measured with
                // stereo
+    cv::Vec3d
+        mOrientation; // orientation of marker i. e. head direction if the marker is placed facing that way (aruco)
 
 public:
     TrackPoint();
@@ -68,16 +70,18 @@ public:
     TrackPoint(const Vec2F &p, int qual, const QColor &col);
     TrackPoint(const Vec2F &p, int qual, const Vec2F &colPoint, const QColor &col);
 
-    inline const Vec2F  &colPoint() const { return mColPoint; }
-    inline void          setColPoint(Vec2F &cp) { mColPoint = cp; }
-    inline const QColor &color() const { return mCol; }
-    inline void          setColor(QColor &col) { mCol = col; }
-    inline void          setColPoint(const Vec2F &colPoint) { mColPoint = colPoint; }
-    inline void          setCol(const QColor &col) { mCol = col; }
-    inline int           qual() const { return mQual; }
-    inline void          setQual(int qual) { mQual = qual; }
-    inline int           getMarkerID() const { return mMarkerID; }
-    inline void          setMarkerID(int markerID) { mMarkerID = markerID; }
+    inline const Vec2F     &colPoint() const { return mColPoint; }
+    inline void             setColPoint(Vec2F &cp) { mColPoint = cp; }
+    inline const QColor    &color() const { return mCol; }
+    inline void             setColor(QColor &col) { mCol = col; }
+    inline void             setColPoint(const Vec2F &colPoint) { mColPoint = colPoint; }
+    inline void             setCol(const QColor &col) { mCol = col; }
+    inline int              qual() const { return mQual; }
+    inline void             setQual(int qual) { mQual = qual; }
+    inline int              getMarkerID() const { return mMarkerID; }
+    inline void             setMarkerID(int markerID) { mMarkerID = markerID; }
+    inline const cv::Vec3d &getOrientation() const { return mOrientation; }
+    inline void             setOrientation(const cv::Vec3d &orientation) { mOrientation = orientation; }
 
     inline const Vec3F &sp() const { return mSp; }
     inline void         setSp(const Vec3F &sp) { mSp = sp; }

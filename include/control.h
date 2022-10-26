@@ -36,6 +36,16 @@ namespace Ui
 class Control;
 }
 
+/**
+ * @brief struct used for storing intrinsic camera params.
+ *
+ * Central place to store this information and easier passing in methods
+ */
+using IntrinsicCameraParams = struct IntrinsicCameraParams
+{
+    cv::Mat cameraMatrix = cv::Mat::eye(cv::Size(3, 3), CV_64F);
+};
+
 class Control : public QWidget
 {
     Q_OBJECT
@@ -123,6 +133,8 @@ public:
     void setRecoRoiShow(bool b);
     bool getRecoRoiFix() const;
     void setRecoRoiFix(bool b);
+
+    reco::RecognitionMethod getRecoMethod() const;
 
     bool getTrackRoiShow() const;
     void setTrackRoiShow(bool b);
@@ -348,6 +360,13 @@ public:
     bool           isExportCommentChecked() const;
 
 
+    /**
+     * @brief Get read-only IntrinsicCameraParams.
+     *
+     * The params can be changed by setting its content e.g. camera params (fx, fy, cx, cy) directly
+     */
+    inline IntrinsicCameraParams getIntrinsicCameraParams() const { return mIntrinsicCameraParams; }
+
 #ifdef QWT
     AnalysePlot *getAnalysePlot() const;
 #endif
@@ -362,9 +381,6 @@ public:
     {
         return mMainWindow;
     }
-
-private:
-    reco::RecognitionMethod getRecoMethod() const;
 
 
 private slots:
@@ -717,10 +733,11 @@ signals:
     void userChangedRecoMethod(reco::RecognitionMethod method);
 
 private:
-    Petrack        *mMainWindow;
-    Ui::Control    *mUi;
-    QGraphicsScene *mScene;
-    bool            mColorChanging;
+    Petrack              *mMainWindow;
+    Ui::Control          *mUi;
+    IntrinsicCameraParams mIntrinsicCameraParams;
+    QGraphicsScene       *mScene;
+    bool                  mColorChanging;
     bool mIndexChanging; // shows, if the index of the color model is really changing; nor while constructor (initialer
                          // durchlauf) and may be while loading xml file
     bool mLoading;       // shows, if new project is just loading

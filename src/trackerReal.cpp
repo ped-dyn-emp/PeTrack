@@ -191,6 +191,7 @@ int TrackerReal::calculate(
             const auto &person = persons[i];
             addFrames          = 0;
             firstFrame         = person.firstFrame();
+            Vec2F moveDir(0, 0); // used for head direction
 
             if(person.height() < MIN_HEIGHT + 1)
             {
@@ -297,51 +298,24 @@ int TrackerReal::calculate(
                                        << person.firstFrame() + j << ") of person " << i + 1
                                        << ", extrapolated height is used!" << std::endl;
                             }
-
-                            Vec2F moveDir(0, 0);
                             if(exportAutoCorrect)
                             {
                                 moveDir += reco::autoCorrectColorMarker(person[j], mMainWindow->getControlWidget());
                             }
 
                             pos = imageItem->getPosReal((person[j] + moveDir + br).toQPointF(), bestZ);
-
-                            if((exportViewingDirection) &&
-                               (person[j].color().isValid())) // wenn blickrichtung mit ausgegeben werden soll
-                            {
-                                colPos =
-                                    imageItem->getPosReal((person[j].colPoint() + moveDir + br).toQPointF(), bestZ);
-                                trackPersonReal.addEnd(pos, firstFrame + j, colPos - pos);
-                            }
-                            else
-                            {
-                                trackPersonReal.addEnd(Vec3F(pos.x(), pos.y(), bestZ), firstFrame + j);
-                            }
+                            trackPersonReal.addEnd(Vec3F(pos.x(), pos.y(), bestZ), firstFrame + j);
                         }
                     }
                     else
                     {
-                        Vec2F moveDir(0, 0);
                         if(exportAutoCorrect)
                         {
                             moveDir += reco::autoCorrectColorMarker(person[j], mMainWindow->getControlWidget());
                         }
 
                         pos = imageItem->getPosReal((person[j] + moveDir + br).toQPointF(), height);
-                        // die frame nummer der animation wird TrackPoint der PersonReal mitgegeben,
-                        // da Index groesser sein kann, da vorher frames hinzugefuegt wurden duch
-                        // trackPersonReal.init(firstFrame+addFrames, height) oder aber innerhalb des trackink path
-                        // mit for schleife ueber f
-                        if((exportViewingDirection) &&
-                           (person[j].color().isValid())) // wenn blickrichtung mit ausgegeben werden soll
-                        {
-                            colPos = imageItem->getPosReal((person[j].colPoint() + moveDir + br).toQPointF(), height);
-                            trackPersonReal.addEnd(pos, firstFrame + j, colPos - pos);
-                        }
-                        else
-                        {
-                            trackPersonReal.addEnd(pos, firstFrame + j);
-                        }
+                        trackPersonReal.addEnd(pos, firstFrame + j);
                         if(exportAngleOfView)
                         {
                             angle = (90. -
@@ -352,6 +326,34 @@ int TrackerReal::calculate(
                         if(exportMarkerID)
                         {
                             trackPersonReal.last().setMarkerID(person[j].getMarkerID());
+                        }
+                    }
+                }
+
+                if(exportViewingDirection)
+                {
+                    auto method = petrack->getControlWidget()->getRecoMethod();
+
+                    // multicolor markers can also be used together with code markers
+                    if(method == reco::RecognitionMethod::Code || method == reco::RecognitionMethod::MultiColor)
+                    {
+                        auto orientation = person[j].getOrientation();
+                        orientation      = petrack->getExtrCalibration()->camToWorldRotation(orientation);
+                        trackPersonReal.last().setViewDirection(Vec2F(orientation[0], orientation[1]).unit());
+                    }
+                    else
+                    {
+                        // old implementation for expeortViewingDirection did not check for specific marker, so just use
+                        // the else
+                        // die frame nummer der animation wird TrackPoint der PersonReal mitgegeben,
+                        // da Index groesser sein kann, da vorher frames hinzugefuegt wurden duch
+                        // trackPersonReal.init(firstFrame+addFrames, height) oder aber innerhalb des trackink path
+                        // mit for schleife ueber f
+                        if((exportViewingDirection) &&
+                           (person[j].color().isValid())) // wenn blickrichtung mit ausgegeben werden soll
+                        {
+                            colPos = imageItem->getPosReal((person[j].colPoint() + moveDir + br).toQPointF(), height);
+                            trackPersonReal.last().setViewDirection(colPos - pos);
                         }
                     }
                 }
@@ -391,7 +393,8 @@ int TrackerReal::calculate(
                             }
                             else
                             {
-                                Vec2F moveDir(0, 0);
+                                // use local variable an just reset the value
+                                moveDir.set(0, 0);
                                 if(exportAutoCorrect)
                                 {
                                     moveDir += reco::autoCorrectColorMarker(person[j], mMainWindow->getControlWidget());
