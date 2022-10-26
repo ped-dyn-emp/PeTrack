@@ -604,12 +604,14 @@ void detail::refineWithBlackDot(
  * @param img img in which the color blobs were detected
  * @param crossList list of all detected people
  * @param options all options, mostly forwarded from the GUI
+ * @param intrinsicCameraParams camera parameters needed to estimate arucomarker orientation
  */
 void detail::refineWithAruco(
-    std::vector<ColorBlob> &blobs,
-    const cv::Mat          &img,
-    QList<TrackPoint>      &crossList,
-    ArucoOptions           &options)
+    std::vector<ColorBlob>      &blobs,
+    const cv::Mat               &img,
+    QList<TrackPoint>           &crossList,
+    ArucoOptions                &options,
+    const IntrinsicCameraParams &intrinsicCameraParams)
 {
     constexpr int border = 4; // zusaetzlicher rand um subrects
 
@@ -660,7 +662,7 @@ void detail::refineWithAruco(
         // TODO: Use Reference to actual codeMarkerOptions in MulticolorMarkerOptions
         // NOTE: For now, add as parameter of findMulticolorMarker
         codeOpt.setOffsetCropRect2Roi(offsetCropRect2Roi);
-        findCodeMarker(subImg, crossList, options.method, codeOpt);
+        findCodeMarker(subImg, crossList, options.method, codeOpt, intrinsicCameraParams);
 
         resolveMoreThanOneCode(lengthini, crossList, blob, offsetCropRect2Roi);
 
@@ -772,15 +774,17 @@ void detail::resolveMoreThanOneCode(
  * @param controlWidget
  * @param ignoreWithoutMarker (is ignored->overwritten by cmWidget->ignoreWithoutDot->isChecked())
  * @param offset
+ * @param intrinsicCameraParams needed for aruco-refinement
  */
 void findMultiColorMarker(
-    cv::Mat           &img,
-    QList<TrackPoint> &crossList,
-    Control           *controlWidget,
-    bool               ignoreWithoutMarker,
-    Vec2F             &offset,
-    RecognitionMethod  method,
-    CodeMarkerOptions &codeOpt)
+    cv::Mat                     &img,
+    QList<TrackPoint>           &crossList,
+    Control                     *controlWidget,
+    bool                         ignoreWithoutMarker,
+    Vec2F                       &offset,
+    RecognitionMethod            method,
+    CodeMarkerOptions           &codeOpt,
+    const IntrinsicCameraParams &intrinsicCameraParams)
 {
     Petrack                *mainWindow = controlWidget->getMainWindow();
     MultiColorMarkerItem   *cmItem     = mainWindow->getMultiColorMarkerItem();
@@ -876,7 +880,7 @@ void findMultiColorMarker(
                 controlWidget, ignoreWithoutMarker, autoCorrect, autoCorrectOnlyExport, method, codeOpt};
 
             // adds to crosslist
-            refineWithAruco(blobs, img, crossList, options);
+            refineWithAruco(blobs, img, crossList, options, intrinsicCameraParams);
         }
         else
         {
@@ -1021,12 +1025,15 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *contro
  * @param img
  * @param crossList[out] list of detected TrackPoints
  * @param controlWidget
+ * @param opt arucomarker parameters used for detection
+ * @param intrinsicCameraParams used for estimating arucomarker orientation
  */
 void detail::findCodeMarker(
-    cv::Mat                 &img,
-    QList<TrackPoint>       &crossList,
-    RecognitionMethod        recoMethod,
-    const CodeMarkerOptions &opt)
+    cv::Mat                     &img,
+    QList<TrackPoint>           &crossList,
+    RecognitionMethod            recoMethod,
+    const CodeMarkerOptions     &opt,
+    const IntrinsicCameraParams &intrinsicCameraParams)
 {
     CodeMarkerItem *codeMarkerItem = opt.getCodeMarkerItem();
     Control        *controlWidget  = opt.getControlWidget();
@@ -1137,6 +1144,19 @@ void detail::findCodeMarker(
     codeMarkerItem->addDetectedMarkers(corners, ids, opt.getOffsetCropRect2Roi());
     codeMarkerItem->addRejectedMarkers(rejected, opt.getOffsetCropRect2Roi());
 
+    if(ids.empty())
+    {
+        // if no markers are found return to prevent opencv errors because of empty corners and thus empty rvecs vectors
+        return;
+    }
+
+    // value only relevant for axis length when drawing axes
+    float                  markerLength = (float) opt.getDetectorParams().getMinCornerDistance();
+    std::vector<cv::Vec3d> rvecs, tvecs;
+    cv::Mat                cameraMatrix = intrinsicCameraParams.cameraMatrix;
+    cv::Mat                distCoeff    = cv::Mat::zeros(cv::Size(1, 5), CV_32F);
+    cv::aruco::estimatePoseSingleMarkers(corners, markerLength, cameraMatrix, distCoeff, rvecs, tvecs);
+
     // detected code markers
     for(size_t i = 0; i < ids.size(); i++)
     {
@@ -1145,7 +1165,14 @@ void detail::findCodeMarker(
         double y =
             (corners.at(i).at(0).y + corners.at(i).at(1).y + corners.at(i).at(2).y + corners.at(i).at(3).y) * 0.25;
 
-        crossList.append(TrackPoint(Vec2F(x, y), 100, ids.at(i))); // 100 beste qualitaet
+        cv::Matx<double, 3, 3> rotMat;
+        cv::Rodrigues(rvecs[i], rotMat);
+
+        cv::Vec3d orientation = cv::normalize(rotMat * cv::Vec3d(0, 1, 0));
+
+        TrackPoint trackPoint(Vec2F(x, y), 100, ids.at(i)); // 100 beste qualitaet
+        trackPoint.setOrientation(orientation);
+        crossList.append(std::move(trackPoint));
     }
 }
 
@@ -1290,11 +1317,17 @@ void findContourMarker(
  * @param controlWidget
  * @param borderSize
  * @param bgFilter
+ * @param intrinsicCameraParams intrinsic parameters of the camera. Used for e.g. estimation of arucomarkers
  *
  * @return List of detected TrackPoints
  */
-QList<TrackPoint>
-Recognizer::getMarkerPos(cv::Mat &img, QRect &roi, Control *controlWidget, int borderSize, BackgroundFilter *bgFilter)
+QList<TrackPoint> Recognizer::getMarkerPos(
+    cv::Mat                     &img,
+    QRect                       &roi,
+    Control                     *controlWidget,
+    int                          borderSize,
+    BackgroundFilter            *bgFilter,
+    const IntrinsicCameraParams &intrinsicCameraParams)
 {
     int  markerBrightness    = controlWidget->getMarkerBrightness();
     bool ignoreWithoutMarker = controlWidget->isMarkerIgnoreWithoutChecked();
@@ -1322,13 +1355,20 @@ Recognizer::getMarkerPos(cv::Mat &img, QRect &roi, Control *controlWidget, int b
     {
         case RecognitionMethod::MultiColor:
             findMultiColorMarker(
-                tImg, crossList, controlWidget, ignoreWithoutMarker, v, mRecoMethod, mCodeMarkerOptions);
+                tImg,
+                crossList,
+                controlWidget,
+                ignoreWithoutMarker,
+                v,
+                mRecoMethod,
+                mCodeMarkerOptions,
+                intrinsicCameraParams);
             break;
         case RecognitionMethod::Color:
             findColorMarker(tImg, crossList, controlWidget);
             break;
         case RecognitionMethod::Code:
-            findCodeMarker(tImg, crossList, mRecoMethod, mCodeMarkerOptions);
+            findCodeMarker(tImg, crossList, mRecoMethod, mCodeMarkerOptions, intrinsicCameraParams);
             break;
         case RecognitionMethod::Casern:
             [[fallthrough]];

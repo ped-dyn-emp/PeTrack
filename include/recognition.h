@@ -27,12 +27,14 @@
 #include <QObject>
 #include <opencv2/aruco.hpp>
 
+
 class TrackPoint;
 class QRect;
 class BackgroundFilter;
 class Control;
 class ImageItem;
 class CodeMarkerItem;
+struct IntrinsicCameraParams;
 
 namespace reco
 {
@@ -183,6 +185,7 @@ signals:
     void indexOfMarkerDictChanged();
 };
 
+
 class Recognizer : public QObject
 {
     Q_OBJECT
@@ -195,8 +198,13 @@ private:
     RecognitionMethod mRecoMethod = RecognitionMethod::MultiColor;
 
 public:
-    QList<TrackPoint>
-    getMarkerPos(cv::Mat &img, QRect &roi, Control *controlWidget, int borderSize, BackgroundFilter *bgFilter);
+    QList<TrackPoint> getMarkerPos(
+        cv::Mat                     &img,
+        QRect                       &roi,
+        Control                     *controlWidget,
+        int                          borderSize,
+        BackgroundFilter            *bgFilter,
+        const IntrinsicCameraParams &intrinsicCameraParams);
 
     RecognitionMethod  getRecoMethod() const { return mRecoMethod; }
     CodeMarkerOptions &getCodeMarkerOptions() { return mCodeMarkerOptions; }
@@ -285,10 +293,11 @@ namespace detail
                           QList<TrackPoint>      &crossList,
                           const BlackDotOptions  &options);
     void refineWithAruco(
-        std::vector<ColorBlob> &blobs,
-        const cv::Mat          &img,
-        QList<TrackPoint>      &crossList,
-        ArucoOptions           &options);
+        std::vector<ColorBlob>      &blobs,
+        const cv::Mat               &img,
+        QList<TrackPoint>           &crossList,
+        ArucoOptions                &options,
+        const IntrinsicCameraParams &intrinsicCameraParams);
 
     void resolveMoreThanOneCode(
         const int          lengthini,
@@ -297,10 +306,11 @@ namespace detail
         const Vec2F        offset);
 
     void findCodeMarker(
-        cv::Mat                 &img,
-        QList<TrackPoint>       &crossList,
-        RecognitionMethod        recoMethod,
-        const CodeMarkerOptions &opt);
+        cv::Mat                     &img,
+        QList<TrackPoint>           &crossList,
+        RecognitionMethod            recoMethod,
+        const CodeMarkerOptions     &opt,
+        const IntrinsicCameraParams &intrinsicCameraParams);
     cv::Ptr<cv::aruco::Dictionary> getDictMip36h12();
 } // namespace detail
 } // namespace reco

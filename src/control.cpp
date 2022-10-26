@@ -2536,6 +2536,7 @@ void Control::on_apply_stateChanged(int i)
 
 void Control::on_fx_valueChanged(double d)
 {
+    mIntrinsicCameraParams.cameraMatrix.at<double>(0, 0) = d;
     mMainWindow->getCalibFilter()->getFx()->setValue(d);
     if(mUi->quadAspectRatio->isChecked())
     {
@@ -2551,6 +2552,7 @@ void Control::on_fx_valueChanged(double d)
 
 void Control::on_fy_valueChanged(double d)
 {
+    mIntrinsicCameraParams.cameraMatrix.at<double>(1, 1) = d;
     mMainWindow->getCalibFilter()->getFy()->setValue(d);
     if(!mMainWindow->isLoading())
     {
@@ -2562,6 +2564,7 @@ void Control::on_fy_valueChanged(double d)
 
 void Control::on_cx_valueChanged(double d)
 {
+    mIntrinsicCameraParams.cameraMatrix.at<double>(0, 2) = d;
     mMainWindow->setStatusPosReal();
     mMainWindow->getCalibFilter()->getCx()->setValue(d);
     if(!mMainWindow->isLoading())
@@ -2573,6 +2576,7 @@ void Control::on_cx_valueChanged(double d)
 
 void Control::on_cy_valueChanged(double d)
 {
+    mIntrinsicCameraParams.cameraMatrix.at<double>(1, 2) = d;
     mMainWindow->setStatusPosReal();
     mMainWindow->getCalibFilter()->getCy()->setValue(d);
     if(!mMainWindow->isLoading())

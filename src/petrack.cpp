@@ -3359,6 +3359,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         {
             updateControlImage(mImgFiltered);
         }
+
 #ifndef STEREO_DISABLED
         if(imageChanged || swapChanged || brightContrastChanged || borderChanged || calibChanged)
         {
@@ -3539,7 +3540,12 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                    (recoMethod == reco::RecognitionMethod::Code)) // else
                 {
                     persList = mReco.getMarkerPos(
-                        mImgFiltered, rect, mControlWidget, getImageBorderSize(), getBackgroundFilter());
+                        mImgFiltered,
+                        rect,
+                        mControlWidget,
+                        getImageBorderSize(),
+                        getBackgroundFilter(),
+                        mControlWidget->getIntrinsicCameraParams());
                 }
 #ifndef STEREO_DISABLED
                 if(mStereoContext && mStereoWidget->stereoUseForReco->isChecked())

@@ -109,6 +109,7 @@ public:
     ~Petrack();
     static int trcVersion; // version numbr for writing TRC-Trajectorie files
 
+
 protected:
     void closeEvent(QCloseEvent *event);
 

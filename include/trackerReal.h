@@ -56,6 +56,7 @@ public:
     inline void  setAngleOfView(float a) { mAngleOfView = a; }
     inline int   getMarkerID() const { return mMarkerID; }
     inline void  setMarkerID(int markerID) { mMarkerID = markerID; }
+    inline void  setViewDirection(const Vec2F &dir) { mViewDir = dir; }
 };
 
 inline QTextStream &operator<<(QTextStream &s, const TrackPointReal &tp)
