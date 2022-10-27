@@ -101,6 +101,9 @@ Control::Control(
     mUi->filterSwapV->setCheckState(
         (bool) mMainWindow->getSwapFilter()->getSwapVertically()->getValue() ? Qt::Checked : Qt::Unchecked);
 
+    setFilterBorderSizeMin(mMainWindow->getBorderFilter()->getBorderSize()->getMinimum());
+    setFilterBorderSizeMax(mMainWindow->getBorderFilter()->getBorderSize()->getMaximum());
+
     setCalibFxMin(mMainWindow->getCalibFilter()->getFx()->getMinimum());
     setCalibFxMax(mMainWindow->getCalibFilter()->getFx()->getMaximum());
     setCalibFx(mMainWindow->getCalibFilter()->getFx()->getValue());
@@ -658,6 +661,16 @@ bool Control::getAdaptiveLevel() const
 int Control::getFilterBorderSize() const
 {
     return mUi->filterBorderParamSize->value();
+}
+void Control::setFilterBorderSizeMin(int i)
+{
+    mUi->filterBorderParamSize->setMinimum(i);
+    mUi->filterBorderParamSize_spin->setMinimum(i);
+}
+void Control::setFilterBorderSizeMax(int i)
+{
+    mUi->filterBorderParamSize->setMaximum(i);
+    mUi->filterBorderParamSize_spin->setMaximum(i);
 }
 
 bool Control::isFilterBgChecked() const

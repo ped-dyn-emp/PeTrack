@@ -135,9 +135,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
-            <width>460</width>
-            <height>1268</height>
+            <y>-673</y>
+            <width>476</width>
+            <height>1399</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -199,22 +199,13 @@
                <layout class="QHBoxLayout" name="horizontalLayout_8">
                 <item>
                  <widget class="QScrollBar" name="filterBorderParamSize">
-                  <property name="minimumSize">
-                   <size>
-                    <width>100</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="maximum">
-                   <number>500</number>
-                  </property>
-                  <property name="singleStep">
-                   <number>1</number>
-                  </property>
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
                  </widget>
+                </item>
+                <item>
+                 <widget class="PSpinBox" name="filterBorderParamSize_spin"/>
                 </item>
                 <item>
                  <widget class="QPushButton" name="filterBorderParamCol">
@@ -437,7 +428,7 @@
               <item row="2" column="0">
                <widget class="QCheckBox" name="filterBorder">
                 <property name="text">
-                 <string>border:</string>
+                 <string>border [2px]:</string>
                 </property>
                </widget>
               </item>
@@ -3510,9 +3501,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-379</y>
-            <width>460</width>
-            <height>934</height>
+            <y>0</y>
+            <width>465</width>
+            <height>993</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -3652,6 +3643,7 @@
                 <widget class="QLabel" name="recoNumberNow">
                  <property name="font">
                   <font>
+                   <weight>75</weight>
                    <bold>true</bold>
                   </font>
                  </property>
@@ -4808,8 +4800,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>460</width>
-            <height>1138</height>
+            <width>465</width>
+            <height>1205</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -4999,6 +4991,7 @@
               <widget class="QLabel" name="trackNumberNow">
                <property name="font">
                 <font>
+                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -5039,6 +5032,7 @@
               <widget class="QLabel" name="trackNumberVisible">
                <property name="font">
                 <font>
+                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -5054,6 +5048,7 @@
               <widget class="QLabel" name="trackNumberAll">
                <property name="font">
                 <font>
+                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -7280,8 +7275,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>477</width>
-            <height>555</height>
+            <width>479</width>
+            <height>553</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -8183,6 +8178,38 @@
     <hint type="destinationlabel">
      <x>351</x>
      <y>713</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>filterBorderParamSize</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>filterBorderParamSize_spin</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>214</x>
+     <y>-535</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>356</x>
+     <y>-535</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>filterBorderParamSize_spin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>filterBorderParamSize</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>356</x>
+     <y>-535</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>214</x>
+     <y>-535</y>
     </hint>
    </hints>
   </connection>
