@@ -24,7 +24,7 @@
 BorderFilter::BorderFilter() : Filter()
 {
     mS.setMinimum(0.);
-    mS.setMaximum(200.);
+    mS.setMaximum(300);
     mS.setValue(0.);
     mS.setFilter(this);
 

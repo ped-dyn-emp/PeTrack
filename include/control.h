@@ -144,6 +144,8 @@ public:
     bool getAdaptiveLevel() const;
 
     int  getFilterBorderSize() const;
+    void setFilterBorderSizeMin(int i);
+    void setFilterBorderSizeMax(int i);
     bool isFilterBgChecked() const;
     bool isFilterBgDeleteTrjChecked() const;
     int  getFilterBgDeleteNumber() const;
