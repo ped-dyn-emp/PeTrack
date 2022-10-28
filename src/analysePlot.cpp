@@ -26,12 +26,13 @@
 
 #include <QMouseEvent>
 #include <QPainter>
-#include <qwt_compat.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_layout.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_scale_engine.h>
+#include <qwt_scale_map.h>
 #include <qwt_symbol.h>
+#include <qwt_text.h>
 
 //-----------------------------------------------------------------
 class AnalyseZoomer : public QwtPlotZoomer
@@ -455,9 +456,8 @@ void AnalysePlot::setScale()
 
         setAxisScale(QwtPlot::xBottom, mXMin, mXMax);
         setAxisScale(QwtPlot::yLeft, mYMin, mYMax);
-        replot(); // why, see:
-                  // file:///C:/Programme/qwt-5.0.2/doc/html/class_qwt_plot_zoomer.html#7a1711597f441223efdb7d9931fe19b9
-        mZoomer->setZoomBase(QwtDoubleRect(mXMin, mYMin, mXMax - mXMin, mYMax - mYMin));
+        replot();
+        mZoomer->setZoomBase(QRectF(mXMin, mYMin, mXMax - mXMin, mYMax - mYMin));
     }
 }
 

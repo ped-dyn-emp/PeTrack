@@ -26,12 +26,12 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <iomanip>
-#include <qwt_compat.h>
 #include <qwt_plot_layout.h>
 #include <qwt_plot_zoomer.h>
 #include <qwt_scale_engine.h>
+#include <qwt_scale_map.h>
 #include <qwt_symbol.h>
-
+#include <qwt_text.h>
 
 class ImagePlotItem : public QwtPlotItem
 {
@@ -459,7 +459,7 @@ public:
     }
 
     // ueberschrieben, da so kommazahlen unterdrueckt werden, da intervall mindestens 5 umfasst
-    QSizeF minZoomSize() const override { return QwtDoubleSize(5., 5.); }
+    QSizeF minZoomSize() const override { return QSizeF(5., 5.); }
 
     /**
      * @brief Allows movement in the zoomed in color plot via dragging with a pressed down middle mouse button.
@@ -833,7 +833,7 @@ void ColorPlot::setScale()
         int x     = mControlWidget->getRecoColorX();
         int y     = mControlWidget->getRecoColorY();
 
-        QwtDoubleRect base(0., 0., 255., 255.);
+        QRectF base(0., 0., 255., 255.);
 
         mXMax = 255.;
         mYMax = 255.;
