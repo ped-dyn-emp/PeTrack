@@ -240,6 +240,7 @@ Control::Control(
         mUi->scrollAreaWidgetContents_4->layout()->margin() * 2 +
         mUi->scrollAreaWidgetContents_4->layout()->spacing() * 2);
 
+
     connect(mUi->trackRoiFix, &QCheckBox::stateChanged, &trackRoiItem, &RoiItem::setFixed);
     connect(mUi->recoRoiToFullImageSize, &QPushButton::clicked, &recoRoiItem, &RoiItem::setToFullImageSize);
     connect(
@@ -432,22 +433,30 @@ int Control::getTrackCurrentPointSize() const
 {
     return mUi->trackCurrentPointSize->value();
 }
-
+int Control::getTrackCurrentPointLineWidth() const
+{
+    return mUi->trackCurrentPointLineWidth->value();
+}
 int Control::getTrackPointSize() const
 {
     return mUi->trackPointSize->value();
 }
-
+int Control::getTrackShowPointsLineWidth() const
+{
+    return mUi->trackShowPointsLineWidth->value();
+}
 int Control::getTrackColColorSize() const
 {
     return mUi->trackColColorSize->value();
 }
-
 int Control::getTrackColorMarkerSize() const
 {
     return mUi->trackColorMarkerSize->value();
 }
-
+int Control::getTrackColorMarkerLineWidth() const
+{
+    return mUi->trackColorMarkerLineWidth->value();
+}
 int Control::getTrackNumberSize() const
 {
     return mUi->trackNumberSize->value();
@@ -3646,10 +3655,13 @@ void Control::setXml(QDomElement &elem)
     subSubElem.setAttribute("TRACK_GROUND_PATH_COLOR", getTrackGroundPathColor().name());
     subSubElem.setAttribute("TRACK_PATH_COLOR", getTrackPathColor().name());
     subSubElem.setAttribute("CURRENT_POINT_SIZE", mUi->trackCurrentPointSize->value());
+    subSubElem.setAttribute("CURRENT_POINT_LINE_WIDTH", mUi->trackCurrentPointLineWidth->value());
     subSubElem.setAttribute("POINTS_SIZE", mUi->trackPointSize->value());
+    subSubElem.setAttribute("SHOW_POINTS_LINE_WIDTH", mUi->trackShowPointsLineWidth->value());
     subSubElem.setAttribute("PATH_SIZE", mUi->trackPathWidth->value());
     subSubElem.setAttribute("COLLECTIVE_COLOR_SIZE", mUi->trackColColorSize->value());
     subSubElem.setAttribute("COLOR_MARKER_SIZE", mUi->trackColorMarkerSize->value());
+    subSubElem.setAttribute("COLOR_MARKER_LINE_WIDTH", mUi->trackColorMarkerLineWidth->value());
     subSubElem.setAttribute("NUMBER_SIZE", mUi->trackNumberSize->value());
     subSubElem.setAttribute("GROUND_POSITION_SIZE", mUi->trackGroundPositionSize->value());
     subSubElem.setAttribute("GROUND_PATH_SIZE", mUi->trackGroundPathSize->value());
@@ -4750,9 +4762,18 @@ void Control::getXml(QDomElement &elem)
                     {
                         mUi->trackCurrentPointSize->setValue(subSubElem.attribute("CURRENT_POINT_SIZE").toInt());
                     }
+                    if(subSubElem.hasAttribute("CURRENT_POINT_LINE_WIDTH"))
+                    {
+                        mUi->trackCurrentPointLineWidth->setValue(
+                            subSubElem.attribute("CURRENT_POINT_LINE_WIDTH").toInt());
+                    }
                     if(subSubElem.hasAttribute("POINTS_SIZE"))
                     {
                         mUi->trackPointSize->setValue(subSubElem.attribute("POINTS_SIZE").toInt());
+                    }
+                    if(subSubElem.hasAttribute("SHOW_POINTS_LINE_WIDTH"))
+                    {
+                        mUi->trackShowPointsLineWidth->setValue(subSubElem.attribute("SHOW_POINTS_LINE_WIDTH").toInt());
                     }
                     if(subSubElem.hasAttribute("PATH_SIZE"))
                     {
@@ -4765,6 +4786,11 @@ void Control::getXml(QDomElement &elem)
                     if(subSubElem.hasAttribute("COLOR_MARKER_SIZE"))
                     {
                         mUi->trackColorMarkerSize->setValue(subSubElem.attribute("COLOR_MARKER_SIZE").toInt());
+                    }
+                    if(subSubElem.hasAttribute("COLOR_MARKER_LINE_WIDTH"))
+                    {
+                        mUi->trackColorMarkerLineWidth->setValue(
+                            subSubElem.attribute("COLOR_MARKER_LINE_WIDTH").toInt());
                     }
                     if(subSubElem.hasAttribute("NUMBER_SIZE"))
                     {

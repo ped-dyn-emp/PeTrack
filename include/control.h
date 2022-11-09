@@ -100,9 +100,12 @@ public:
     QColor     getTrackGroundPathColor() const;
     void       setTrackGroundPathColor(QColor col);
     int        getTrackCurrentPointSize() const;
+    int        getTrackCurrentPointLineWidth() const;
     int        getTrackPointSize() const;
+    int        getTrackShowPointsLineWidth() const;
     int        getTrackColColorSize() const;
     int        getTrackColorMarkerSize() const;
+    int        getTrackColorMarkerLineWidth() const;
     int        getTrackNumberSize() const;
     int        getTrackGroundPositionSize() const;
     int        getTrackGroundPathSize() const;
@@ -459,6 +462,7 @@ private slots:
 
     void on_trackHeadSized_stateChanged(int i);
 
+
     void on_trackShowPoints_stateChanged(int /*i*/)
     {
         if(!isLoading())
@@ -538,6 +542,14 @@ private slots:
             mScene->update();
         }
     }
+    void on_trackCurrentPointLineWidth_valueChanged(int /*i*/)
+    {
+        if(!isLoading())
+        {
+            mScene->update();
+        }
+    }
+
     void on_trackPointSize_valueChanged(int /*i*/)
     {
         if(!isLoading())
@@ -545,6 +557,14 @@ private slots:
             mScene->update();
         }
     }
+    void on_trackShowPointsLineWidth_valueChanged(int /*i*/)
+    {
+        if(!isLoading())
+        {
+            mScene->update();
+        }
+    }
+
     void on_trackPathWidth_valueChanged(int /*i*/)
     {
         if(!isLoading())
@@ -562,6 +582,13 @@ private slots:
     void on_trackColorMarkerSize_valueChanged(int /*i*/)
     {
         mScene->update();
+    }
+    void on_trackColorMarkerLineWidth_valueChanged(int /*i*/)
+    {
+        if(!isLoading())
+        {
+            mScene->update();
+        }
     }
     void on_trackNumberSize_valueChanged(int /*i*/)
     {
