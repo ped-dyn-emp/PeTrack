@@ -317,6 +317,8 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     QPen         numberPen;
     QPen         groundPositionPen;
     QPen         groundPathPen;
+    QPen         currentPointLineWidthPen;
+    QPen         trackPointLineWidthPen;
     double       pSP  = (double) mControlWidget->getTrackCurrentPointSize();
     double       pS   = (double) mControlWidget->getTrackPointSize();
     double       pSC  = (double) mControlWidget->getTrackColColorSize();
@@ -338,7 +340,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     linePen.setWidth(mControlWidget->getTrackPathWidth());
 
     ellipsePen.setWidth(3);
-
+    currentPointLineWidthPen.setWidth(mControlWidget->getTrackCurrentPointLineWidth());
     if(mControlWidget->isTrackNumberBoldChecked())
     {
         font.setBold(true);
@@ -403,13 +405,14 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                                                      // Qt::Checked)
                 {
                     painter->setBrush(Qt::NoBrush);
+                    painter->setPen(currentPointLineWidthPen);
                     if(person.newReco())
                     {
-                        painter->setPen(Qt::green);
+                        currentPointLineWidthPen.setColor(Qt::green);
                     }
                     else
                     {
-                        painter->setPen(Qt::blue);
+                        currentPointLineWidthPen.setColor(Qt::blue);
                     }
                     rect.setRect(tp.x() - pSP / 2., tp.y() - pSP / 2., pSP, pSP);
                     painter->drawEllipse(rect); // direkt waere nur int erlaubt tp.x()-5., tp.y()-5., 10., 10.
@@ -439,6 +442,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     {
                         painter->setBrush(Qt::NoBrush);
                         ellipsePen.setColor(tp.color());
+                        ellipsePen.setWidth(mControlWidget->getTrackColorMarkerLineWidth());
                         painter->setPen(ellipsePen);
                         rect.setRect(tp.colPoint().x() - pSM / 2., tp.colPoint().y() - pSM / 2., pSM, pSM);
                         painter->drawEllipse(rect);
@@ -815,7 +819,10 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                             }
                             else
                             {
-                                painter->setPen(Qt::red);
+                                trackPointLineWidthPen.setColor(Qt::red);
+                                trackPointLineWidthPen.setWidth(mControlWidget->getTrackShowPointsLineWidth());
+                                painter->setPen(trackPointLineWidthPen);
+
                                 painter->setBrush(Qt::NoBrush);
                                 rect.setRect(person.at(j).x() - pS / 2., person.at(j).y() - pS / 2., pS, pS);
                             }
