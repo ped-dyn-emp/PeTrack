@@ -167,7 +167,7 @@ Petrack::Petrack() :
     connect(mView, &GraphicsView::mouseRightDoubleClick, this, &Petrack::deleteTrackPoint);
     connect(mView, &GraphicsView::mouseMiddleDoubleClick, this, &Petrack::deleteTrackPointAll);
     connect(mView, &GraphicsView::mouseShiftWheel, this, &Petrack::skipToFrameWheel);
-    connect(mView, &GraphicsView::mouseAltDoubleClick, this, &Petrack::skipToFrameFromTrajectory);
+    connect(mView, &GraphicsView::mouseCtrlAltDoubleClick, this, &Petrack::skipToFrameFromTrajectory);
     connect(mView, &GraphicsView::mouseAltMoved, this, &Petrack::moveTrackPoint);
     connect(mView, &GraphicsView::mouseAltPressed, this, &Petrack::selectPersonForMoveTrackPoint);
     connect(mView, &GraphicsView::altReleased, this, &Petrack::releaseTrackPoint);
@@ -1637,7 +1637,8 @@ void Petrack::keyBindings()
         "<dt><kbd>Shift + t</kbd></dt><dd>toggles tracking online calculation</dd>"
         "<dt><kbd>Shift + double-click left mouse button</kbd></dt><dd>inserts new or moves near trackpoint and "
         "enables showing only the modified trajectory</dd>"
-        "<dt><kbd>Alt + double-click left mouse button</kbd></dt><dd>jumps to frame of trackpoint under cursor</dd>"
+        "<dt><kbd>Ctrl + Alt + double-click left mouse button</kbd></dt><dd>jumps to frame of trackpoint under "
+        "cursor</dd>"
         "<dt><kbd>Alt + holding left mouse button</kbd></dt><dd>moves trackpoint under cursor</dd>"
         "<dt><kbd>Ctrl + E</kbd></dt><dd>export trajectories</dd>"
         "<dt><kbd>Ctrl + mouse scroll wheel</kbd></dt><dd>change the displayed person (if show only people "
