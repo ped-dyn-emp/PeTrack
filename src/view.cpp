@@ -96,11 +96,14 @@ void GraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
         else if(event->modifiers() & Qt::ControlModifier) // mit & genuegt, dass unter anderem control gedrueckt wird
                                                           // (zb mit shift)
         {
-            emit mouseControlDoubleClick(mapToScene(event->pos())); // const QPoint & //const QPointF &pos
-        }
-        else if(event->modifiers() & Qt::AltModifier)
-        {
-            emit mouseAltDoubleClick(mapToScene(event->pos()));
+            if(event->modifiers().testFlag(Qt::AltModifier))
+            {
+                emit mouseCtrlAltDoubleClick(mapToScene(event->pos()));
+            }
+            else
+            {
+                emit mouseControlDoubleClick(mapToScene(event->pos()));
+            }
         }
         else
         {
@@ -186,7 +189,8 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
         emit colorSelected();
     }
 
-    if(event->modifiers().testFlag(Qt::AltModifier) && event->button() == Qt::LeftButton)
+    if(event->modifiers().testFlag(Qt::AltModifier) && !event->modifiers().testFlag(Qt::ControlModifier) &&
+       event->button() == Qt::LeftButton)
     {
         emit mouseAltPressed(mapToScene(event->pos()));
     }
@@ -195,7 +199,7 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
 
 void GraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if(event->modifiers().testFlag(Qt::AltModifier))
+    if(event->modifiers().testFlag(Qt::AltModifier) && !event->modifiers().testFlag(Qt::ControlModifier))
     {
         emit mouseAltReleased(mapToScene(event->pos()));
     }
