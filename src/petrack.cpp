@@ -21,6 +21,7 @@
 #include <QtWidgets>
 
 // Added for Qt5 support
+#include "IO.h"
 #include "aboutDialog.h"
 #include "animation.h"
 #include "autoCalib.h"
@@ -40,6 +41,7 @@
 #include "multiColorMarkerWidget.h"
 #include "openMoCapDialog.h"
 #include "pMessageBox.h"
+#include "person.h"
 #include "petrack.h"
 #include "player.h"
 #include "roiItem.h"
@@ -52,15 +54,6 @@
 
 #include <QtPrintSupport/QPrintDialog>
 #include <QtPrintSupport/QPrinter>
-
-#ifdef AVI
-#include "aviFile.h"
-#else
-#include "aviFileWriter.h"
-#endif
-#include "IO.h"
-#include "person.h"
-
 #include <cmath>
 #include <ctime>
 #include <iomanip>
@@ -1046,7 +1039,6 @@ void Petrack::saveViewSequence()
 void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // default saveView= false, dest=""
 {
     static QString lastDir;
-    //    bool autoSave = false;
 
     // if no destination file or folder is given
     if(dest.isEmpty())
@@ -1062,7 +1054,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 this,
                 tr("Select video file"),
                 lastDir,
-                tr("Video (*.avi);;All files (*.*)")); //? *.mpg *.mpeg
+                tr("Video (*.mp4 *.avi);;All files (*.*)")); //? *.mpg *.mpeg
         }
         else
         {
@@ -1084,41 +1076,40 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
             }
         }
     }
-    else // uebergabe von saveVideo spielt keine roll mehr, sondern wird hier analysiert anhand von Dateiendung
+    auto extension = dest.right(4);
+
+    int fourcc = -1;
+    if(extension == ".mp4")
     {
-        //        autoSave = true; // command line option
-        if(dest.right(4) == ".avi")
-        {
-            saveVideo = true;
-        }
-        else
-        {
-            saveVideo = false;
-        }
+        fourcc    = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
+        saveVideo = true;
     }
+    else if(extension == ".avi")
+    {
+        fourcc    = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
+        saveVideo = true;
+    }
+    else
+    {
+        saveVideo = false;
+    }
+
 
     if(!dest.isEmpty() && mImage)
     {
-        int     rest      = mAnimation->getNumFrames() - 1;
-        int     numLength = 1;
-        int     memPos    = mPlayerWidget->getPos();
-        QString fileName  = "";
-#ifdef AVI
-        AviFile aviFile;
-#else
-        AviFileWriter aviFile;
-#endif
+        int       rest             = mAnimation->getNumFrames() - 1;
+        int       numLength        = 1;
+        int       memPos           = mPlayerWidget->getPos();
+        QString   fileName         = "";
         bool      formatIsSaveAble = false;
         bool      saveRet;
         QImage   *viewImage = nullptr;
         QPainter *painter   = nullptr;
         int       progEnd   = mAnimation->getSourceOutFrameNum() -
                       mPlayerWidget->getPos(); // nur wenn nicht an anfang gesprungen wird:-mPlayerWidget->getPos()
-        cv::Mat iplImgFilteredBGR;
-        bool    writeFrameRet   = false;
-        bool    convert8To24bit = false;
-        int     mult;
-
+        cv::Mat         iplImgFilteredBGR;
+        bool            writeFrameRet = false;
+        cv::VideoWriter outputVideo;
 
         if(saveVideo)
         {
@@ -1135,36 +1126,20 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 }
                 painter = new QPainter();
             }
-            if(convert8To24bit)
-            {
-                mult = 3;
-            }
-            else
-            {
-                mult = 1;
-            }
-
-            bool ok = false;
 
             if(saveView)
             {
-                ok = aviFile.open(
-                    dest.toStdString().c_str(),
-                    viewImage->width(),
-                    viewImage->height(),
-                    viewImage->depth(),
-                    mAnimation->getFPS());
+                outputVideo = cv::VideoWriter(
+                    dest.toStdString(),
+                    fourcc,
+                    mAnimation->getFPS(),
+                    cv::Size(viewImage->width(), viewImage->height()));
             }
             else
             {
-                ok = aviFile.open(
-                    dest.toStdString().c_str(), mImg.cols, mImg.rows, mult * 8 * mImg.channels(), mAnimation->getFPS());
-            }
-
-            if(!ok)
-            {
-                debout << "Error: opening AVI file: " << dest.toStdString().c_str() << std::endl;
-                return;
+                bool colored = (mImg.channels() > 1);
+                outputVideo  = cv::VideoWriter(
+                    dest.toStdString(), fourcc, mAnimation->getFPS(), cv::Size(mImg.cols, mImg.rows), colored);
             }
         }
 
@@ -1261,7 +1236,6 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
             }
         }
 
-
         do
         {
             progress.setValue(
@@ -1288,36 +1262,24 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                     }
                     painter->end();
                 }
-                if((mImgFiltered.channels() == 1) /* && convert8To24bit*/)
+
+                if(saveView)
                 {
-                    cv::cvtColor(mImg, iplImgFilteredBGR, cv::COLOR_GRAY2BGR);
-                    if(saveView)
-                    {
-                        writeFrameRet = aviFile.appendFrame(
-                            (const unsigned char *) viewImage->bits(),
-                            true); // 2. param besagt, ob vertikal gespiegel werden soll
-                    }
-                    else
-                    {
-                        writeFrameRet = aviFile.appendFrame(
-                            (const unsigned char *) iplImgFilteredBGR.data,
-                            true); // 2. param besagt, ob vertikal gespiegel werden soll
-                    }
+                    cv::Mat frame(
+                        viewImage->height(),
+                        viewImage->width(),
+                        CV_8UC4,
+                        (unsigned char *) viewImage->bits(),
+                        viewImage->bytesPerLine());
+                    cv::cvtColor(frame, frame, cv::COLOR_RGBA2RGB); // need for right image interpretation
+                    outputVideo.write(frame);
+                    writeFrameRet = true;
                 }
                 else
                 {
-                    if(saveView)
-                    {
-                        writeFrameRet = aviFile.appendFrame(
-                            (const unsigned char *) viewImage->bits(),
-                            true); // 2. param besagt, ob vertikal gespiegel werden soll
-                    }
-                    else
-                    {
-                        writeFrameRet = aviFile.appendFrame(
-                            (const unsigned char *) mImg.data,
-                            true); // 2. param besagt, ob vertikal gespiegel werden soll
-                    }
+                    cv::Mat frame = mImg.clone();
+                    outputVideo.write(frame);
+                    writeFrameRet = true;
                 }
 
                 if(!writeFrameRet)
@@ -1406,7 +1368,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
 
         if(saveVideo)
         {
-            aviFile.close();
+            outputVideo.release();
         }
 
         mPlayerWidget->skipToFrame(memPos);
