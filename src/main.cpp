@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
     Petrack petrack;
     petrack.setPeTrackVersion(PETRACK_VERSION);
     petrack.setGitInformation(GIT_COMMIT_HASH, GIT_COMMIT_DATE, GIT_BRANCH);
-    petrack.setCompileInformation(COMPILE_TIMESTAMP, COMPILER_ID, COMPILER_VERSION);
+    petrack.setCompileInformation(COMPILE_OS, COMPILE_TIMESTAMP, COMPILER_ID, COMPILER_VERSION);
 
     petrack.show(); // damit bei reiner Hilfe nicht angezeigt wird, erst hier der aufruf
 

@@ -349,6 +349,7 @@ public:
      * @param compilerVersion version of the used compiler
      */
     void setCompileInformation(
+        const std::string &compileOS,
         const std::string &compileTimeStamp,
         const std::string &compilerID,
         const std::string &compilerVersion);
@@ -516,6 +517,7 @@ private:
     QString mGitCommitDate{"Unknown"};   ///< Commit date used to compile
     QString mGitCommitBranch{"Unknown"}; ///< Branch used to compile
 
+    QString mCompileOS{"Unknown"};       ///< Compile OS
     QString mCompileDate{"Unknown"};     ///< Compile date
     QString mCompilerID{"Unknown"};      ///< Used compiler
     QString mCompilerVersion{"Unknown"}; ///< Used compiler version

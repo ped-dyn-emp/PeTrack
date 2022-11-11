@@ -1611,37 +1611,54 @@ void Petrack::commandLineOptions()
 
 void Petrack::keyBindings()
 {
-    const QString out = tr(
-        "<p>Beside the space bar all bindings only affect inside the image.</p>"
-        "<dl><dt><kbd>Space bar</kbd></dt><dd>toggles between pause and last play direction</dd>"
-        "<dt><kbd>Mouse scroll wheel</kbd></dt><dd>zooms in and out to or from the pixel of the image at the position "
-        "of the mouse pointer</dd>"
-        "<dt><kbd>Shift + mouse scroll wheel</kbd></dt><dd>plays forwards or backwards frame by frame</dd>"
-        "<dt><kbd>Holding left mouse button</kbd></dt><dd>moves image</dd>"
-        "<dt><kbd>Arrows up/down</kbd></dt><dd>zoom in/out</dd>"
-        "<dt><kbd>Arrows left/right</kbd></dt><dd>frame back/forward</dd>"
-        "<dt><kbd>Double-click left mouse button</kbd></dt><dd>opens video or image sequence</dd>"
-        "<dt><kbd>Ctrl + double-click left mouse button</kbd></dt><dd>inserts new or moves near trackpoint</dd>"
-        "<dt><kbd>Ctrl + Shift + double-click left mouse button</kbd></dt><dd>splits near trackpoint before actual "
-        "frame</dd>"
-        "<dt><kbd>Ctrl + double-click right mouse button</kbd></dt><dd>deletes a trajectory of a near trackpoint</dd>"
-        "<dt><kbd>Shift + double-click right mouse button</kbd></dt><dd>deletes the past part of a trajectory of a "
-        "near trackpoint</dd>"
-        "<dt><kbd>Alt + double-click right mouse button</kbd></dt><dd>deletes the future part of a trajectory of a "
-        "near trackpoint</dd>"
-        "<dt><kbd>Ctrl + double-click middle mouse button</kbd></dt><dd>deletes all trajectories</dd>"
-        "<dt><kbd>Shift + double-click middle mouse button</kbd></dt><dd>deletes the past part of all trajectories</dd>"
-        "<dt><kbd>Alt + double-click middle mouse button</kbd></dt><dd>deletes the future part of all trajectories</dd>"
-        "<dt><kbd>Shift + t</kbd></dt><dd>toggles tracking online calculation</dd>"
-        "<dt><kbd>Shift + double-click left mouse button</kbd></dt><dd>inserts new or moves near trackpoint and "
-        "enables showing only the modified trajectory</dd>"
-        "<dt><kbd>Ctrl + Alt + double-click left mouse button</kbd></dt><dd>jumps to frame of trackpoint under "
-        "cursor</dd>"
-        "<dt><kbd>Alt + holding left mouse button</kbd></dt><dd>moves trackpoint under cursor</dd>"
-        "<dt><kbd>Ctrl + E</kbd></dt><dd>export trajectories</dd>"
-        "<dt><kbd>Ctrl + mouse scroll wheel</kbd></dt><dd>change the displayed person (if show only people "
-        "enabled)</dd></dl>"
-        "<p>Further key bindings you will find next to the entries of the menus.</p>");
+    QString ctrlSign   = (mCompileOS != "Darwin") ? "⌃ Ctrl" : "⌘ Cmd";
+    QString shiftSign  = "⇧ Shift";
+    QString altSign    = (mCompileOS != "Darwin") ? "⎇ Alt" : "⌥ Option";
+    QString arrowUp    = "Arrow up ↑";
+    QString arrowDown  = "Arrow down ↓";
+    QString arrowLeft  = "Arrow left ←";
+    QString arrowRight = "Arrow right →";
+
+    const QString out =
+        tr("<p>Beside the space bar all bindings only affect inside the image.</p>"
+           "<dl><dt><kbd>Space bar</kbd></dt><dd>toggles between pause and last play direction</dd>"
+           "<dt><kbd>Mouse scroll wheel</kbd></dt><dd>zooms in and out to or from the pixel of the image at the "
+           "position "
+           "of the mouse pointer</dd>"
+           "<dt><kbd>%2 + mouse scroll wheel</kbd></dt><dd>plays forwards or backwards frame by frame</dd>"
+           "<dt><kbd>Holding left mouse button</kbd></dt><dd>moves image</dd>"
+           "<dt><kbd>%4/%5</kbd></dt><dd>zoom in/out</dd>"
+           "<dt><kbd>%6/%7</kbd></dt><dd>frame back/forward</dd>"
+           "<dt><kbd>Double-click left mouse button</kbd></dt><dd>opens video or image sequence</dd>"
+           "<dt><kbd>%1 + double-click left mouse button</kbd></dt><dd>inserts new or moves near trackpoint</dd>"
+           "<dt><kbd>%1 + %2 + double-click left mouse button</kbd></dt><dd>splits near trackpoint before current "
+           "frame</dd>"
+           "<dt><kbd>%1 + double-click right mouse button</kbd></dt><dd>deletes a trajectory of a near trackpoint</dd>"
+           "<dt><kbd>%2 + double-click right mouse button</kbd></dt><dd>deletes the past part of a trajectory of a "
+           "near trackpoint</dd>"
+           "<dt><kbd>%3 + double-click right mouse button</kbd></dt><dd>deletes the future part of a trajectory of a "
+           "near trackpoint</dd>"
+           "<dt><kbd>%1 + double-click middle mouse button</kbd></dt><dd>deletes all trajectories</dd>"
+           "<dt><kbd>%2 + double-click middle mouse button</kbd></dt><dd>deletes the past part of all trajectories</dd>"
+           "<dt><kbd>%3 + double-click middle mouse button</kbd></dt><dd>deletes the future part of all "
+           "trajectories</dd>"
+           "<dt><kbd>%2 + t</kbd></dt><dd>toggles tracking online calculation</dd>"
+           "<dt><kbd>%2 + double-click left mouse button</kbd></dt><dd>inserts new or moves near trackpoint and "
+           "enables showing only the modified trajectory</dd>"
+           "<dt><kbd>%1 + %3 + double-click left mouse button</kbd></dt><dd>jumps to frame of trackpoint under "
+           "cursor</dd>"
+           "<dt><kbd>%3 + holding left mouse button</kbd></dt><dd>moves trackpoint under cursor</dd>"
+           "<dt><kbd>%1 + e</kbd></dt><dd>export trajectories</dd>"
+           "<dt><kbd>%1 + mouse scroll wheel</kbd></dt><dd>change the displayed person (if show only people "
+           "enabled)</dd></dl>"
+           "<p>Further key bindings you will find next to the entries of the menus.</p>")
+            .arg(ctrlSign)
+            .arg(shiftSign)
+            .arg(altSign)
+            .arg(arrowUp)
+            .arg(arrowDown)
+            .arg(arrowLeft)
+            .arg(arrowRight);
 
     PMessageBox *mb = new PMessageBox(this, tr("Key Bindings"), out, QIcon());
     mb->setAttribute(Qt::WA_DeleteOnClose);
@@ -4089,10 +4106,12 @@ void Petrack::setGitInformation(
 }
 
 void Petrack::setCompileInformation(
+    const std::string &compileOS,
     const std::string &compileTimeStamp,
     const std::string &compilerID,
     const std::string &compilerVersion)
 {
+    mCompileOS       = QString::fromStdString(compileOS);
     mCompileDate     = QString::fromStdString(compileTimeStamp);
     mCompilerID      = QString::fromStdString(compilerID);
     mCompilerVersion = QString::fromStdString(compilerVersion);
