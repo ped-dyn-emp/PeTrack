@@ -215,6 +215,7 @@ endif()
 
 target_link_libraries(petrack PRIVATE petrack_core git-info)
 target_compile_definitions(petrack PUBLIC PETRACK_VERSION="${PROJECT_VERSION}")
+target_compile_definitions(petrack PUBLIC COMPILE_OS="${CMAKE_SYSTEM_NAME}")
 
 target_compile_options(petrack_core PRIVATE ${COMMON_COMPILE_OPTIONS})
 target_compile_definitions(petrack_core PUBLIC STEREO_DISABLED)
