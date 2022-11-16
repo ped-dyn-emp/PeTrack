@@ -54,14 +54,16 @@ public:
         QGraphicsScene   &scene,
         reco::Recognizer &recognizer,
         RoiItem          &trackRoiItem,
-        RoiItem          &recoRoiItem);
+        RoiItem          &recoRoiItem,
+        MissingFrames    &missingFrames);
     Control(
         QWidget          &parent,
         QGraphicsScene   &scene,
         reco::Recognizer &recognizer,
         RoiItem          &trackRoiItem,
         RoiItem          &recoRoiItem,
-        Ui::Control      *ui);
+        Ui::Control      *ui,
+        MissingFrames    &missingFrames);
 
     void setScene(QGraphicsScene *sc);
 

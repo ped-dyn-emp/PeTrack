@@ -43,6 +43,7 @@
 #include "personStorage.h"
 #include "recognition.h"
 #include "swapFilter.h"
+#include "trackerReal.h"
 
 class CalibFilter;
 class Animation;
@@ -523,6 +524,8 @@ private:
     QString mCompilerVersion{"Unknown"}; ///< Used compiler version
 
     std::vector<std::string> mAuthors;
+
+    MissingFrames mMissingFrames{false, {}}; ///< Missing frame information
 };
 
 namespace util

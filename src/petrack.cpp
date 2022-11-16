@@ -108,7 +108,7 @@ Petrack::Petrack() :
     connect(mRecognitionRoiItem, &RoiItem::changed, this, [=]() { this->setRecognitionChanged(true); });
     mRecognitionRoiItem->setZValue(5); // groesser heisst weiter oben
 
-    mControlWidget = new Control(*this, *mScene, mReco, *mTrackingRoiItem, *mRecognitionRoiItem);
+    mControlWidget = new Control(*this, *mScene, mReco, *mTrackingRoiItem, *mRecognitionRoiItem, mMissingFrames);
 
     mStereoWidget = new StereoWidget(this);
     mStereoWidget->setWindowFlags(Qt::Window);
@@ -376,6 +376,10 @@ void Petrack::updateSceneRect()
  */
 void Petrack::openXml(QDomDocument &doc, bool openSeq)
 {
+    mMissingFrames.reset();
+    bool                      missingFramesExecuted = false;
+    std::vector<MissingFrame> missingFrames{};
+
     QDomElement root = doc.firstChildElement("PETRACK");
     QString     seq;
     int         frame = -1, sourceFrameIn = -1, sourceFrameOut = -1;
@@ -507,6 +511,20 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
                 mAutoTrackOptimizeColor = elem.attribute("OPTIMZE_COLOR").toInt();
             }
         }
+        else if(elem.tagName() == "MISSING_FRAMES")
+        {
+            if((elem.hasAttribute("executed")) && (elem.attribute("executed").toInt() == 1))
+            {
+                missingFramesExecuted = true;
+                auto node             = elem.firstChildElement("FRAME");
+                for(; !node.isNull(); node = node.nextSiblingElement("FRAME"))
+                {
+                    size_t num   = node.attribute("NUM_FRAME").toUInt();
+                    int    count = node.attribute("NUM_MISSING").toInt();
+                    missingFrames.push_back(MissingFrame{num, count});
+                }
+            }
+        }
         else
         {
             debout << "Unknown PETRACK tag " << elem.tagName() << std::endl;
@@ -519,6 +537,9 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     {
         openSequence(seq); // wenn leer, dann kommt abfrage hoch, welche datei; abbrechen, wenn aktuelle gewuenscht
     }
+
+    mMissingFrames.setExecuted(missingFramesExecuted);
+    mMissingFrames.setMissingFrames(missingFrames);
 
     mViewWidget->setZoomLevel(zoom);
     mViewWidget->setRotateLevel(rotate);
@@ -761,6 +782,17 @@ void Petrack::saveXml(QDomDocument &doc)
     elem.setAttribute("BACK_TRACK", mAutoBackTrack);
     elem.setAttribute("OPTIMZE_COLOR", mAutoTrackOptimizeColor);
     root.appendChild(elem);
+
+    elem = doc.createElement("MISSING_FRAMES");
+    elem.setAttribute("executed", mMissingFrames.isExecuted());
+    for(const auto &missingFrame : mMissingFrames.getMissingFrames())
+    {
+        auto frame = doc.createElement("FRAME");
+        frame.setAttribute("NUM_FRAME", static_cast<int>(missingFrame.mNumber));
+        frame.setAttribute("NUM_MISSING", missingFrame.mCount);
+        elem.appendChild(frame);
+    }
+    root.appendChild(elem);
 }
 
 /// rueckgabewert zeigt an, ob gesichert werden konnte
@@ -969,6 +1001,7 @@ void Petrack::openSequence(QString fileName) // default fileName = ""
             mLogoItem->fadeOut(50);
         }
         updateCoord();
+        mMissingFrames.reset();
     }
 }
 
@@ -2698,6 +2731,7 @@ int Petrack::calculateRealTracker()
         mTracker,
         mImageItem,
         mControlWidget->getColorPlot(),
+        mMissingFrames,
         getImageBorderSize(),
         mControlWidget->getAnaMissingFrames(),
         mStereoWidget->stereoUseForExport->isChecked(),
@@ -2715,6 +2749,7 @@ int Petrack::calculateRealTracker()
     mTrackerReal->calcMinMax();
     return anz;
 }
+
 
 void Petrack::exportTracker(QString dest) // default = ""
 {
@@ -2883,6 +2918,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     mTracker,
                     mImageItem,
                     mControlWidget->getColorPlot(),
+                    mMissingFrames,
                     getImageBorderSize(),
                     mControlWidget->isTrackMissingFramesChecked(),
                     mStereoWidget->stereoUseForExport->isChecked(),
@@ -3004,6 +3040,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     mTracker,
                     mImageItem,
                     mControlWidget->getColorPlot(),
+                    mMissingFrames,
                     getImageBorderSize(),
                     mControlWidget->isTrackMissingFramesChecked(),
                     mStereoWidget->stereoUseForExport->isChecked(),
@@ -3061,6 +3098,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     mTracker,
                     mImageItem,
                     mControlWidget->getColorPlot(),
+                    mMissingFrames,
                     getImageBorderSize(),
                     mControlWidget->isTrackMissingFramesChecked(),
                     mStereoWidget->stereoUseForExport->isChecked(),

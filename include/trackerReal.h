@@ -25,13 +25,49 @@
 #include "vector.h"
 
 #include <QList>
+#include <utility>
 
 class PersonStorage;
 
 struct MissingFrame
 {
-    size_t mNumber; //< frame number, where mCount of frames are missing
-    int    mCount;  //< count of frames missing between frame mNumber and mNumber+1
+    size_t mNumber; ///< frame number, where mCount of frames are missing
+    int    mCount;  ///< count of frames missing between frame mNumber and mNumber+1
+};
+
+class MissingFrames : public QObject
+{
+    Q_OBJECT
+
+private:
+    bool                      mExecuted{false}; ///< already computed missing frames
+    std::vector<MissingFrame> mMissingFrames{}; ///< vector of missing frames
+
+public:
+    MissingFrames(bool executed, std::vector<MissingFrame> &&missingFrames) :
+        mExecuted(executed), mMissingFrames(std::move(missingFrames))
+    {
+    }
+
+    bool                       isExecuted() const { return mExecuted; }
+    std::vector<MissingFrame> &getMissingFrames() { return mMissingFrames; }
+
+public slots: // NOLINT (Qt needs the public slots, so the keyword public repeats)
+    void reset()
+    {
+        setExecuted(false);
+        mMissingFrames.clear();
+    }
+
+    void setExecuted(bool executed)
+    {
+        mExecuted = executed;
+        emit executeChanged(executed);
+    }
+    void setMissingFrames(std::vector<MissingFrame> missingFrames) { mMissingFrames = std::move(missingFrames); }
+
+signals:
+    void executeChanged(bool); // NOLINT (Qt signals don't need an implementation)
 };
 
 // point in x/y in cm
@@ -144,23 +180,24 @@ public:
     // mControlWidget->getColorPlot()
     // petrack...mImageItem
     int calculate(
-        Petrack   *petrack,
-        Tracker   *tracker,
-        ImageItem *imageItem,
-        ColorPlot *colorPlot,
-        int        imageBorderSize        = 0,
-        bool       missingFramesInserted  = true,
-        bool       useTrackpoints         = false,
-        bool       alternateHeight        = false,
-        double     altitude               = 0,
-        bool       useCalibrationCenter   = true,
-        bool       exportElimTp           = false,
-        bool       exportElimTrj          = false,
-        bool       exportSmooth           = true,
-        bool       exportViewingDirection = false,
-        bool       exportAngleOfView      = false,
-        bool       exportMarkerID         = false,
-        bool       exportAutoCorrect      = false);
+        Petrack       *petrack,
+        Tracker       *tracker,
+        ImageItem     *imageItem,
+        ColorPlot     *colorPlot,
+        MissingFrames &missing,
+        int            imageBorderSize        = 0,
+        bool           missingFramesInserted  = true,
+        bool           useTrackpoints         = false,
+        bool           alternateHeight        = false,
+        double         altitude               = 0,
+        bool           useCalibrationCenter   = true,
+        bool           exportElimTp           = false,
+        bool           exportElimTrj          = false,
+        bool           exportSmooth           = true,
+        bool           exportViewingDirection = false,
+        bool           exportAngleOfView      = false,
+        bool           exportMarkerID         = false,
+        bool           exportAutoCorrect      = false);
 
     void calcMinMax();
     int  largestFirstFrame();
