@@ -123,23 +123,24 @@ TrackerReal::TrackerReal(QWidget *wParent, PersonStorage &storage) :
 
 // default: int imageBorderSize = 0, bool missingFramesInserted = true, bool useTrackpoints = false
 int TrackerReal::calculate(
-    Petrack   *petrack,
-    Tracker   *tracker,
-    ImageItem *imageItem,
-    ColorPlot *colorPlot,
-    int        imageBorderSize,
-    bool       missingFramesInserted,
-    bool       useTrackpoints,
-    bool       alternateHeight,
-    double     altitude,
-    bool       useCalibrationCenter,
-    bool       exportElimTp,
-    bool       exportElimTrj,
-    bool       exportSmooth,
-    bool       exportViewingDirection,
-    bool       exportAngleOfView,
-    bool       exportMarkerID,
-    bool       exportAutoCorrect)
+    Petrack       *petrack,
+    Tracker       *tracker,
+    ImageItem     *imageItem,
+    ColorPlot     *colorPlot,
+    MissingFrames &missingFrames,
+    int            imageBorderSize,
+    bool           missingFramesInserted,
+    bool           useTrackpoints,
+    bool           alternateHeight,
+    double         altitude,
+    bool           useCalibrationCenter,
+    bool           exportElimTp,
+    bool           exportElimTrj,
+    bool           exportSmooth,
+    bool           exportViewingDirection,
+    bool           exportAngleOfView,
+    bool           exportMarkerID,
+    bool           exportAutoCorrect)
 {
     if(tracker || imageItem || colorPlot)
     {
@@ -153,15 +154,20 @@ int TrackerReal::calculate(
         QList<int> missingListAnz; // anzahl ausgelassener frames
         if(missingFramesInserted)
         {
-            auto missingFrames = computeDroppedFrames(petrack);
+            if(!missingFrames.isExecuted())
+            {
+                missingFrames.setMissingFrames(computeDroppedFrames(petrack));
+                missingFrames.setExecuted(true);
+            }
+
             std::transform(
-                missingFrames.begin(),
-                missingFrames.end(),
+                missingFrames.getMissingFrames().begin(),
+                missingFrames.getMissingFrames().end(),
                 std::back_inserter(missingList),
                 [](auto const &missingFrame) { return static_cast<int>(missingFrame.mNumber); });
             std::transform(
-                missingFrames.begin(),
-                missingFrames.end(),
+                missingFrames.getMissingFrames().begin(),
+                missingFrames.getMissingFrames().end(),
                 std::back_inserter(missingListAnz),
                 [](auto const &missingFrame) { return missingFrame.mCount; });
         }

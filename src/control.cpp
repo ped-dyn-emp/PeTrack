@@ -49,8 +49,9 @@ Control::Control(
     QGraphicsScene   &scene,
     reco::Recognizer &recognizer,
     RoiItem          &trackRoiItem,
-    RoiItem          &recoRoiItem) :
-    Control(parent, scene, recognizer, trackRoiItem, recoRoiItem, new Ui::Control())
+    RoiItem          &recoRoiItem,
+    MissingFrames    &missingFrames) :
+    Control(parent, scene, recognizer, trackRoiItem, recoRoiItem, new Ui::Control(), missingFrames)
 {
 }
 
@@ -60,7 +61,8 @@ Control::Control(
     reco::Recognizer &recognizer,
     RoiItem          &trackRoiItem,
     RoiItem          &recoRoiItem,
-    Ui::Control      *ui) :
+    Ui::Control      *ui,
+    MissingFrames    &missingFrames) :
     QWidget(&parent), mUi(ui)
 {
     setAccessibleName("Control");
@@ -79,6 +81,13 @@ Control::Control(
     QObject::connect(&mMainWindow->getMoCapController(), &MoCapController::colorChanged, this, &Control::setMoCapColor);
     // Pulls all observable attributes
     mMainWindow->getMoCapController().notifyAllObserver();
+
+    mUi->missingFramesCalculated->setAttribute(Qt::WA_TransparentForMouseEvents);
+    mUi->missingFramesCalculated->setFocusPolicy(Qt::NoFocus);
+
+    QObject::connect(mUi->missingFramesReset, &QPushButton::clicked, &missingFrames, &MissingFrames::reset);
+    QObject::connect(
+        &missingFrames, &MissingFrames::executeChanged, mUi->missingFramesCalculated, &QCheckBox::setChecked);
 
     // Weitere Verzerrungsparameter werden vllt. spaeter mal gebraucht bisher von OpenCV nicht beruecksichtig. Muessen
     // dann noch in die Oberflaeche eingebaut werden Deniz: OpenCV kann Sie mittlerweile benutzen, wenn man

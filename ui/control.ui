@@ -4800,7 +4800,7 @@
             <x>0</x>
             <y>0</y>
             <width>482</width>
-            <height>1283</height>
+            <height>1358</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -5496,6 +5496,38 @@
                  </widget>
                 </item>
                </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="horizontalGroupBox">
+             <property name="title">
+              <string>missing frames</string>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_27">
+              <item>
+               <widget class="QCheckBox" name="missingFramesCalculated">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::NoFocus</enum>
+                </property>
+                <property name="text">
+                 <string>calculated</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="missingFramesReset">
+                <property name="text">
+                 <string>reset</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -7643,6 +7675,7 @@
   <tabstop>exportUseM</tabstop>
   <tabstop>exportComment</tabstop>
   <tabstop>exportMarkerID</tabstop>
+  <tabstop>missingFramesReset</tabstop>
   <tabstop>trackTest</tabstop>
   <tabstop>testEqual</tabstop>
   <tabstop>testVelocity</tabstop>
