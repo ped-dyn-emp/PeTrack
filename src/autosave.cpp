@@ -203,7 +203,7 @@ void Autosave::savePet()
     const auto projectName = mPetrack.getProFileName();
     // only save if there is a project name; Means there needs to be an .pet file already for autosave to work. With our
     // workflow usually the case
-    if(projectName.isEmpty() || QFileInfo(projectName).isDir())
+    if(projectName.isEmpty() || !QFileInfo::exists(projectName) || QFileInfo(projectName).isDir())
     {
         return;
     }
