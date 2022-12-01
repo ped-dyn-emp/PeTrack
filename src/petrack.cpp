@@ -3977,7 +3977,6 @@ void Petrack::deleteTrackPoint(QPointF pos, int direction) // const QPoint &pos
 void Petrack::editTrackPersonComment(QPointF pos)
 {
     mPersonStorage.editTrackPersonComment((Vec2F) pos, mAnimation->getCurrentFrameNum(), getPedestrianUserSelection());
-    updateControlWidget();
 }
 void Petrack::setTrackPersonHeight(QPointF pos)
 {
