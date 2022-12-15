@@ -597,16 +597,15 @@ void TrackerReal::exportTxt(
     }
     if(exportAngleOfView)
     {
-        out << " viewAngle" << Qt::endl;
+        out << " viewAngle";
     }
     if(exportMarkerID)
     {
-        out << " markerID" << Qt::endl;
+        out << " markerID";
     }
-    else
-    {
-        out << Qt::endl;
-    }
+
+    out << Qt::endl;
+
 
     if(exportUseM)
     {
@@ -653,17 +652,15 @@ void TrackerReal::exportTxt(
 
             if(exportAngleOfView)
             {
-                out << " " << at(i).at(j).angleOfView() << Qt::endl;
+                out << " " << at(i).at(j).angleOfView();
             }
 
             if(exportMarkerID)
             {
-                out << " " << at(i).getMarkerID() << Qt::endl;
+                out << " " << at(i).getMarkerID();
             }
-            else
-            {
-                out << Qt::endl;
-            }
+
+            out << Qt::endl;
         }
     }
 }
