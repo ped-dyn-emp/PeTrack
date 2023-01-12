@@ -19,76 +19,6 @@
 #include "filter.h"
 
 
-// // muesste fuer double und int existieren
-Parameter::Parameter()
-{
-    mValue = mMinimum = mMaximum = 0;
-    mChg                         = false;
-    mFilter                      = nullptr;
-}
-
-void Parameter::setFilter(Filter *filter)
-{
-    mFilter = filter;
-}
-Filter *Parameter::getFilter()
-{
-    return mFilter;
-}
-
-double Parameter::value() const
-{
-    return mValue;
-}
-double Parameter::getValue() const
-{
-    return mValue;
-}
-void Parameter::setValue(double d)
-{
-    if(d != mValue)
-    {
-        mValue = d;
-        setChanged(true);
-    }
-}
-
-double Parameter::getMinimum() const
-{
-    return mMinimum;
-}
-void Parameter::setMinimum(double d)
-{
-    mMinimum = d;
-}
-double Parameter::getMaximum() const
-{
-    return mMaximum;
-}
-void Parameter::setMaximum(double d)
-{
-    mMaximum = d;
-}
-
-bool Parameter::changed() const
-{
-    return mChg;
-}
-bool Parameter::getChanged() const
-{
-    return mChg;
-}
-void Parameter::setChanged(bool b)
-{
-    mChg = b;
-    if(mFilter)
-    {
-        mFilter->setChanged(true);
-    }
-}
-
-//------------------------------------------------------------
-
 Filter::Filter()
 {
     mEnable = true;
@@ -160,11 +90,6 @@ cv::Mat Filter::apply(cv::Mat &img)
 cv::Mat Filter::getLastResult()
 {
     return mRes;
-}
-
-void Filter::freeLastResult()
-{
-    // free oder delete? - beides falsch
 }
 
 void Filter::enable()

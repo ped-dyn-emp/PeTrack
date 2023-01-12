@@ -23,95 +23,77 @@
 
 CalibFilter::CalibFilter() : Filter()
 {
-    getFx()->setMinimum(500.);
-    getFx()->setMaximum(5000.);
-    getFx()->setValue(881.);
-    getFx()->setFilter(this);
+    getFx().setMinimum(500.);
+    getFx().setMaximum(5000.);
+    getFx().setValue(881.);
 
-    getFy()->setMinimum(500.);
-    getFy()->setMaximum(5000.);
-    getFy()->setValue(881.);
-    getFy()->setFilter(this);
+    getFy().setMinimum(500.);
+    getFy().setMaximum(5000.);
+    getFy().setValue(881.);
 
-    getCx()->setMinimum(0.);
-    getCx()->setMaximum(4096 /*1023.*/);
-    getCx()->setValue(511.5);
-    getCx()->setFilter(this);
+    getCx().setMinimum(0.);
+    getCx().setMaximum(4096 /*1023.*/);
+    getCx().setValue(511.5);
 
-    getCy()->setMinimum(0.);
-    getCy()->setMaximum(2160 /*767.*/);
-    getCy()->setValue(383.5);
-    getCy()->setFilter(this);
+    getCy().setMinimum(0.);
+    getCy().setMaximum(2160 /*767.*/);
+    getCy().setValue(383.5);
 
-    getR2()->setMinimum(-5.);
-    getR2()->setMaximum(5.);
-    getR2()->setValue(0.);
-    getR2()->setFilter(this);
+    getR2().setMinimum(-5.);
+    getR2().setMaximum(5.);
+    getR2().setValue(0.);
 
-    getR4()->setMinimum(-5.);
-    getR4()->setMaximum(5.);
-    getR4()->setValue(0.);
-    getR4()->setFilter(this);
+    getR4().setMinimum(-5.);
+    getR4().setMaximum(5.);
+    getR4().setValue(0.);
 
-    getTx()->setMinimum(-5.);
-    getTx()->setMaximum(5.);
-    getTx()->setValue(0.);
-    getTx()->setFilter(this);
+    getTx().setMinimum(-5.);
+    getTx().setMaximum(5.);
+    getTx().setValue(0.);
 
-    getTy()->setMinimum(-5.);
-    getTy()->setMaximum(5.);
-    getTy()->setValue(0.);
-    getTy()->setFilter(this);
+    getTy().setMinimum(-5.);
+    getTy().setMaximum(5.);
+    getTy().setValue(0.);
 
-    getR6()->setMinimum(-5.);
-    getR6()->setMaximum(5.);
-    getR6()->setValue(0.);
-    getR6()->setFilter(this);
+    getR6().setMinimum(-5.);
+    getR6().setMaximum(5.);
+    getR6().setValue(0.);
 
-    getK4()->setMinimum(-5.);
-    getK4()->setMaximum(5.);
-    getK4()->setValue(0.);
-    getK4()->setFilter(this);
+    getK4().setMinimum(-5.);
+    getK4().setMaximum(5.);
+    getK4().setValue(0.);
 
-    getK5()->setMinimum(-5.);
-    getK5()->setMaximum(5.);
-    getK5()->setValue(0.);
-    getK5()->setFilter(this);
+    getK5().setMinimum(-5.);
+    getK5().setMaximum(5.);
+    getK5().setValue(0.);
 
-    getK6()->setMinimum(-5.);
-    getK6()->setMaximum(5.);
-    getK6()->setValue(0.);
-    getK6()->setFilter(this);
+    getK6().setMinimum(-5.);
+    getK6().setMaximum(5.);
+    getK6().setValue(0.);
 
-    getS1()->setMinimum(-5.);
-    getS1()->setMaximum(5.);
-    getS1()->setValue(0.);
-    getS1()->setFilter(this);
+    getS1().setMinimum(-5.);
+    getS1().setMaximum(5.);
+    getS1().setValue(0.);
 
-    getS2()->setMinimum(-5.);
-    getS2()->setMaximum(5.);
-    getS2()->setValue(0.);
-    getS2()->setFilter(this);
+    getS2().setMinimum(-5.);
+    getS2().setMaximum(5.);
+    getS2().setValue(0.);
 
-    getS3()->setMinimum(-5.);
-    getS3()->setMaximum(5.);
-    getS3()->setValue(0.);
-    getS3()->setFilter(this);
+    getS3().setMinimum(-5.);
+    getS3().setMaximum(5.);
+    getS3().setValue(0.);
 
-    getS4()->setMinimum(-5.);
-    getS4()->setMaximum(5.);
-    getS4()->setValue(0.);
-    getS4()->setFilter(this);
+    getS4().setMinimum(-5.);
+    getS4().setMaximum(5.);
+    getS4().setValue(0.);
 
-    getTAUX()->setMinimum(-5.);
-    getTAUX()->setMaximum(5.);
-    getTAUX()->setValue(0.);
-    getTAUX()->setFilter(this);
+    getTAUX().setMinimum(-5.);
+    getTAUX().setMaximum(5.);
+    getTAUX().setValue(0.);
 
-    getTAUY()->setMinimum(-5.);
-    getTAUY()->setMaximum(5.);
-    getTAUY()->setValue(0.);
-    getTAUY()->setFilter(this);
+    getTAUY().setMinimum(-5.);
+    getTAUY().setMaximum(5.);
+    getTAUY().setValue(0.);
 
     mReprojectionError = std::numeric_limits<double>::quiet_NaN();
 }
@@ -131,30 +113,30 @@ cv::Mat CalibFilter::act(cv::Mat &img, cv::Mat &res)
     if(this->changed() || map1.size() != img.size())
     {
         cv::Mat camera =
-            (cv::Mat_<float>(3, 3) << getFx()->getValue(),
+            (cv::Mat_<float>(3, 3) << getFx().getValue(),
              0,
-             getCx()->getValue(),
+             getCx().getValue(),
              0,
-             getFy()->getValue(),
-             getCy()->getValue(),
+             getFy().getValue(),
+             getCy().getValue(),
              0,
              0,
              1);
         cv::Mat dist =
-            (cv::Mat_<float>(1, 14) << getR2()->getValue(),
-             getR4()->getValue(),
-             getTx()->getValue(),
-             getTy()->getValue(),
-             getR6()->getValue(),
-             getK4()->getValue(),
-             getK5()->getValue(),
-             getK6()->getValue(),
-             getS1()->getValue(),
-             getS2()->getValue(),
-             getS3()->getValue(),
-             getS4()->getValue(),
-             getTAUX()->getValue(),
-             getTAUY()->getValue());
+            (cv::Mat_<float>(1, 14) << getR2().getValue(),
+             getR4().getValue(),
+             getTx().getValue(),
+             getTy().getValue(),
+             getR6().getValue(),
+             getK4().getValue(),
+             getK5().getValue(),
+             getK6().getValue(),
+             getS1().getValue(),
+             getS2().getValue(),
+             getS3().getValue(),
+             getS4().getValue(),
+             getTAUX().getValue(),
+             getTAUY().getValue());
 
 
         initUndistortRectifyMap(camera, dist, cv::Mat_<double>::eye(3, 3), camera, img.size(), CV_16SC2, map1, map2);
@@ -164,77 +146,77 @@ cv::Mat CalibFilter::act(cv::Mat &img, cv::Mat &res)
     return res;
 }
 
-Parameter *CalibFilter::getFx()
+Parameter<double> &CalibFilter::getFx()
 {
-    return &mFx;
+    return mFx;
 }
-Parameter *CalibFilter::getFy()
+Parameter<double> &CalibFilter::getFy()
 {
-    return &mFy;
+    return mFy;
 }
-Parameter *CalibFilter::getCx()
+Parameter<double> &CalibFilter::getCx()
 {
-    return &mCx;
+    return mCx;
 }
-Parameter *CalibFilter::getCy()
+Parameter<double> &CalibFilter::getCy()
 {
-    return &mCy;
+    return mCy;
 }
-Parameter *CalibFilter::getR2()
+Parameter<double> &CalibFilter::getR2()
 {
-    return &mR2;
+    return mR2;
 }
-Parameter *CalibFilter::getR4()
+Parameter<double> &CalibFilter::getR4()
 {
-    return &mR4;
+    return mR4;
 }
-Parameter *CalibFilter::getTx()
+Parameter<double> &CalibFilter::getTx()
 {
-    return &mTx;
+    return mTx;
 }
-Parameter *CalibFilter::getTy()
+Parameter<double> &CalibFilter::getTy()
 {
-    return &mTy;
+    return mTy;
 }
-Parameter *CalibFilter::getR6()
+Parameter<double> &CalibFilter::getR6()
 {
-    return &mR6;
+    return mR6;
 }
-Parameter *CalibFilter::getK4()
+Parameter<double> &CalibFilter::getK4()
 {
-    return &mK4;
+    return mK4;
 }
-Parameter *CalibFilter::getK5()
+Parameter<double> &CalibFilter::getK5()
 {
-    return &mK5;
+    return mK5;
 }
-Parameter *CalibFilter::getK6()
+Parameter<double> &CalibFilter::getK6()
 {
-    return &mK6;
+    return mK6;
 }
-Parameter *CalibFilter::getS1()
+Parameter<double> &CalibFilter::getS1()
 {
-    return &mS1;
+    return mS1;
 }
-Parameter *CalibFilter::getS2()
+Parameter<double> &CalibFilter::getS2()
 {
-    return &mS2;
+    return mS2;
 }
-Parameter *CalibFilter::getS3()
+Parameter<double> &CalibFilter::getS3()
 {
-    return &mS3;
+    return mS3;
 }
-Parameter *CalibFilter::getS4()
+Parameter<double> &CalibFilter::getS4()
 {
-    return &mS4;
+    return mS4;
 }
-Parameter *CalibFilter::getTAUX()
+Parameter<double> &CalibFilter::getTAUX()
 {
-    return &mTAUX;
+    return mTAUX;
 }
-Parameter *CalibFilter::getTAUY()
+Parameter<double> &CalibFilter::getTAUY()
 {
-    return &mTAUY;
+    return mTAUY;
 }
 double CalibFilter::getReprojectionError() const
 {

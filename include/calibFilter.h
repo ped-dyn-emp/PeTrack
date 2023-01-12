@@ -30,53 +30,53 @@
 class CalibFilter : public Filter
 {
 private:
-    Parameter mFx;
-    Parameter mFy;
-    Parameter mCx;
-    Parameter mCy;
-    Parameter mR2; // mK1
-    Parameter mR4; // mK2
-    Parameter mTx;
-    Parameter mTy;
-    Parameter mR6; // mK3
-    Parameter mK4;
-    Parameter mK5;
-    Parameter mK6;
-    Parameter mS1;
-    Parameter mS2;
-    Parameter mS3;
-    Parameter mS4;
-    Parameter mTAUX;
-    Parameter mTAUY;
-    double    mReprojectionError;
-    cv::Mat   map1;
-    cv::Mat   map2;
+    Parameter<double> mFx{this};
+    Parameter<double> mFy{this};
+    Parameter<double> mCx{this};
+    Parameter<double> mCy{this};
+    Parameter<double> mR2{this}; // mK1
+    Parameter<double> mR4{this}; // mK2
+    Parameter<double> mTx{this};
+    Parameter<double> mTy{this};
+    Parameter<double> mR6{this}; // mK3
+    Parameter<double> mK4{this};
+    Parameter<double> mK5{this};
+    Parameter<double> mK6{this};
+    Parameter<double> mS1{this};
+    Parameter<double> mS2{this};
+    Parameter<double> mS3{this};
+    Parameter<double> mS4{this};
+    Parameter<double> mTAUX{this};
+    Parameter<double> mTAUY{this};
+    double            mReprojectionError;
+    cv::Mat           map1;
+    cv::Mat           map2;
 
 public:
     CalibFilter();
 
     cv::Mat act(cv::Mat &img, cv::Mat &res);
 
-    Parameter *getFx();
-    Parameter *getFy();
-    Parameter *getCx();
-    Parameter *getCy();
-    Parameter *getR2();
-    Parameter *getR4();
-    Parameter *getTx();
-    Parameter *getTy();
-    Parameter *getR6();
-    Parameter *getK4();
-    Parameter *getK5();
-    Parameter *getK6();
-    Parameter *getS1();
-    Parameter *getS2();
-    Parameter *getS3();
-    Parameter *getS4();
-    Parameter *getTAUX();
-    Parameter *getTAUY();
-    double     getReprojectionError() const;
-    void       setReprojectionError(double d);
+    Parameter<double> &getFx();
+    Parameter<double> &getFy();
+    Parameter<double> &getCx();
+    Parameter<double> &getCy();
+    Parameter<double> &getR2();
+    Parameter<double> &getR4();
+    Parameter<double> &getTx();
+    Parameter<double> &getTy();
+    Parameter<double> &getR6();
+    Parameter<double> &getK4();
+    Parameter<double> &getK5();
+    Parameter<double> &getK6();
+    Parameter<double> &getS1();
+    Parameter<double> &getS2();
+    Parameter<double> &getS3();
+    Parameter<double> &getS4();
+    Parameter<double> &getTAUX();
+    Parameter<double> &getTAUY();
+    double             getReprojectionError() const;
+    void               setReprojectionError(double d);
 };
 
 #endif

@@ -26,16 +26,16 @@
 class BrightContrastFilter : public Filter
 {
 private:
-    Parameter mB;
-    Parameter mC;
+    Parameter<double> mBrightness{this};
+    Parameter<double> mContrast{this};
 
 public:
     BrightContrastFilter();
 
     cv::Mat act(cv::Mat &img, cv::Mat &res);
 
-    Parameter *getBrightness();
-    Parameter *getContrast();
+    Parameter<double> &getBrightness();
+    Parameter<double> &getContrast();
 };
 
 #endif

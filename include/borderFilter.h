@@ -24,20 +24,20 @@
 class BorderFilter : public Filter
 {
 private:
-    Parameter mR; // red
-    Parameter mG; // green
-    Parameter mB; // blue
-    Parameter mS; // size
+    Parameter<int> mRed{this};
+    Parameter<int> mGreen{this};
+    Parameter<int> mBlue{this};
+    Parameter<int> mSize{this};
 
 public:
     BorderFilter();
 
     cv::Mat act(cv::Mat &img, cv::Mat &res);
 
-    Parameter *getBorderSize();
-    Parameter *getBorderColR();
-    Parameter *getBorderColG();
-    Parameter *getBorderColB();
+    Parameter<int> &getBorderSize();
+    Parameter<int> &getBorderColR();
+    Parameter<int> &getBorderColG();
+    Parameter<int> &getBorderColB();
 };
 
 #endif

@@ -104,80 +104,80 @@ Control::Control(
 
     mUi->filterSwap->setCheckState(mMainWindow->getSwapFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
     mUi->filterSwapH->setCheckState(
-        (bool) mMainWindow->getSwapFilter()->getSwapHorizontally()->getValue() ? Qt::Checked : Qt::Unchecked);
+        mMainWindow->getSwapFilter()->getSwapHorizontally().getValue() ? Qt::Checked : Qt::Unchecked);
     mUi->filterSwapV->setCheckState(
-        (bool) mMainWindow->getSwapFilter()->getSwapVertically()->getValue() ? Qt::Checked : Qt::Unchecked);
+        mMainWindow->getSwapFilter()->getSwapVertically().getValue() ? Qt::Checked : Qt::Unchecked);
 
-    setFilterBorderSizeMin(mMainWindow->getBorderFilter()->getBorderSize()->getMinimum());
-    setFilterBorderSizeMax(mMainWindow->getBorderFilter()->getBorderSize()->getMaximum());
+    setFilterBorderSizeMin(mMainWindow->getBorderFilter()->getBorderSize().getMinimum());
+    setFilterBorderSizeMax(mMainWindow->getBorderFilter()->getBorderSize().getMaximum());
 
-    setCalibFxMin(mMainWindow->getCalibFilter()->getFx()->getMinimum());
-    setCalibFxMax(mMainWindow->getCalibFilter()->getFx()->getMaximum());
-    setCalibFx(mMainWindow->getCalibFilter()->getFx()->getValue());
+    setCalibFxMin(mMainWindow->getCalibFilter()->getFx().getMinimum());
+    setCalibFxMax(mMainWindow->getCalibFilter()->getFx().getMaximum());
+    setCalibFx(mMainWindow->getCalibFilter()->getFx().getValue());
 
-    setCalibFyMin(mMainWindow->getCalibFilter()->getFy()->getMinimum());
-    setCalibFyMax(mMainWindow->getCalibFilter()->getFy()->getMaximum());
-    setCalibFy(mMainWindow->getCalibFilter()->getFy()->getValue());
+    setCalibFyMin(mMainWindow->getCalibFilter()->getFy().getMinimum());
+    setCalibFyMax(mMainWindow->getCalibFilter()->getFy().getMaximum());
+    setCalibFy(mMainWindow->getCalibFilter()->getFy().getValue());
 
-    setCalibCx(mMainWindow->getCalibFilter()->getCx()->getValue());
+    setCalibCx(mMainWindow->getCalibFilter()->getCx().getValue());
 
-    setCalibCy(mMainWindow->getCalibFilter()->getCy()->getValue());
+    setCalibCy(mMainWindow->getCalibFilter()->getCy().getValue());
 
-    setCalibR2Min(mMainWindow->getCalibFilter()->getR2()->getMinimum());
-    setCalibR2Max(mMainWindow->getCalibFilter()->getR2()->getMaximum());
-    setCalibR2(mMainWindow->getCalibFilter()->getR2()->getValue());
+    setCalibR2Min(mMainWindow->getCalibFilter()->getR2().getMinimum());
+    setCalibR2Max(mMainWindow->getCalibFilter()->getR2().getMaximum());
+    setCalibR2(mMainWindow->getCalibFilter()->getR2().getValue());
 
-    setCalibR4Min(mMainWindow->getCalibFilter()->getR4()->getMinimum());
-    setCalibR4Max(mMainWindow->getCalibFilter()->getR4()->getMaximum());
-    setCalibR4(mMainWindow->getCalibFilter()->getR4()->getValue());
+    setCalibR4Min(mMainWindow->getCalibFilter()->getR4().getMinimum());
+    setCalibR4Max(mMainWindow->getCalibFilter()->getR4().getMaximum());
+    setCalibR4(mMainWindow->getCalibFilter()->getR4().getValue());
 
-    setCalibR6Min(mMainWindow->getCalibFilter()->getR6()->getMinimum());
-    setCalibR6Max(mMainWindow->getCalibFilter()->getR6()->getMaximum());
-    setCalibR6(mMainWindow->getCalibFilter()->getR6()->getValue());
+    setCalibR6Min(mMainWindow->getCalibFilter()->getR6().getMinimum());
+    setCalibR6Max(mMainWindow->getCalibFilter()->getR6().getMaximum());
+    setCalibR6(mMainWindow->getCalibFilter()->getR6().getValue());
 
-    setCalibTxMin(mMainWindow->getCalibFilter()->getTx()->getMinimum());
-    setCalibTxMax(mMainWindow->getCalibFilter()->getTx()->getMaximum());
-    setCalibTx(mMainWindow->getCalibFilter()->getTx()->getValue());
+    setCalibTxMin(mMainWindow->getCalibFilter()->getTx().getMinimum());
+    setCalibTxMax(mMainWindow->getCalibFilter()->getTx().getMaximum());
+    setCalibTx(mMainWindow->getCalibFilter()->getTx().getValue());
 
-    setCalibTyMin(mMainWindow->getCalibFilter()->getTy()->getMinimum());
-    setCalibTyMax(mMainWindow->getCalibFilter()->getTy()->getMaximum());
-    setCalibTy(mMainWindow->getCalibFilter()->getTy()->getValue());
+    setCalibTyMin(mMainWindow->getCalibFilter()->getTy().getMinimum());
+    setCalibTyMax(mMainWindow->getCalibFilter()->getTy().getMaximum());
+    setCalibTy(mMainWindow->getCalibFilter()->getTy().getValue());
 
-    setCalibK4Min(mMainWindow->getCalibFilter()->getK4()->getMinimum());
-    setCalibK4Max(mMainWindow->getCalibFilter()->getK4()->getMaximum());
-    setCalibK4(mMainWindow->getCalibFilter()->getK4()->getValue());
+    setCalibK4Min(mMainWindow->getCalibFilter()->getK4().getMinimum());
+    setCalibK4Max(mMainWindow->getCalibFilter()->getK4().getMaximum());
+    setCalibK4(mMainWindow->getCalibFilter()->getK4().getValue());
 
-    setCalibK5Min(mMainWindow->getCalibFilter()->getK5()->getMinimum());
-    setCalibK5Max(mMainWindow->getCalibFilter()->getK5()->getMaximum());
-    setCalibK5(mMainWindow->getCalibFilter()->getK5()->getValue());
+    setCalibK5Min(mMainWindow->getCalibFilter()->getK5().getMinimum());
+    setCalibK5Max(mMainWindow->getCalibFilter()->getK5().getMaximum());
+    setCalibK5(mMainWindow->getCalibFilter()->getK5().getValue());
 
-    setCalibK6Min(mMainWindow->getCalibFilter()->getK6()->getMinimum());
-    setCalibK6Max(mMainWindow->getCalibFilter()->getK6()->getMaximum());
-    setCalibK6(mMainWindow->getCalibFilter()->getK6()->getValue());
+    setCalibK6Min(mMainWindow->getCalibFilter()->getK6().getMinimum());
+    setCalibK6Max(mMainWindow->getCalibFilter()->getK6().getMaximum());
+    setCalibK6(mMainWindow->getCalibFilter()->getK6().getValue());
 
-    setCalibS1Min(mMainWindow->getCalibFilter()->getS1()->getMinimum());
-    setCalibS1Max(mMainWindow->getCalibFilter()->getS1()->getMaximum());
-    setCalibS1(mMainWindow->getCalibFilter()->getS1()->getValue());
+    setCalibS1Min(mMainWindow->getCalibFilter()->getS1().getMinimum());
+    setCalibS1Max(mMainWindow->getCalibFilter()->getS1().getMaximum());
+    setCalibS1(mMainWindow->getCalibFilter()->getS1().getValue());
 
-    setCalibS2Min(mMainWindow->getCalibFilter()->getS2()->getMinimum());
-    setCalibS2Max(mMainWindow->getCalibFilter()->getS2()->getMaximum());
-    setCalibS2(mMainWindow->getCalibFilter()->getS2()->getValue());
+    setCalibS2Min(mMainWindow->getCalibFilter()->getS2().getMinimum());
+    setCalibS2Max(mMainWindow->getCalibFilter()->getS2().getMaximum());
+    setCalibS2(mMainWindow->getCalibFilter()->getS2().getValue());
 
-    setCalibS3Min(mMainWindow->getCalibFilter()->getS3()->getMinimum());
-    setCalibS3Max(mMainWindow->getCalibFilter()->getS3()->getMaximum());
-    setCalibS3(mMainWindow->getCalibFilter()->getS3()->getValue());
+    setCalibS3Min(mMainWindow->getCalibFilter()->getS3().getMinimum());
+    setCalibS3Max(mMainWindow->getCalibFilter()->getS3().getMaximum());
+    setCalibS3(mMainWindow->getCalibFilter()->getS3().getValue());
 
-    setCalibS4Min(mMainWindow->getCalibFilter()->getS4()->getMinimum());
-    setCalibS4Max(mMainWindow->getCalibFilter()->getS4()->getMaximum());
-    setCalibS4(mMainWindow->getCalibFilter()->getS4()->getValue());
+    setCalibS4Min(mMainWindow->getCalibFilter()->getS4().getMinimum());
+    setCalibS4Max(mMainWindow->getCalibFilter()->getS4().getMaximum());
+    setCalibS4(mMainWindow->getCalibFilter()->getS4().getValue());
 
-    setCalibTAUXMin(mMainWindow->getCalibFilter()->getTAUX()->getMinimum());
-    setCalibTAUXMax(mMainWindow->getCalibFilter()->getTAUX()->getMaximum());
-    setCalibTAUX(mMainWindow->getCalibFilter()->getTAUX()->getValue());
+    setCalibTAUXMin(mMainWindow->getCalibFilter()->getTAUX().getMinimum());
+    setCalibTAUXMax(mMainWindow->getCalibFilter()->getTAUX().getMaximum());
+    setCalibTAUX(mMainWindow->getCalibFilter()->getTAUX().getValue());
 
-    setCalibTAUYMin(mMainWindow->getCalibFilter()->getTAUY()->getMinimum());
-    setCalibTAUYMax(mMainWindow->getCalibFilter()->getTAUY()->getMaximum());
-    setCalibTAUY(mMainWindow->getCalibFilter()->getTAUY()->getValue());
+    setCalibTAUYMin(mMainWindow->getCalibFilter()->getTAUY().getMinimum());
+    setCalibTAUYMax(mMainWindow->getCalibFilter()->getTAUY().getMaximum());
+    setCalibTAUY(mMainWindow->getCalibFilter()->getTAUY().getValue());
     setCalibReprError(mMainWindow->getCalibFilter()->getReprojectionError());
 
 
@@ -2360,7 +2360,7 @@ void Control::on_filterBrightContrast_stateChanged(int i)
 
 void Control::on_filterContrastParam_valueChanged(int i)
 {
-    mMainWindow->getBrightContrastFilter()->getContrast()->setValue(i);
+    mMainWindow->getBrightContrastFilter()->getContrast().setValue(i);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2369,7 +2369,7 @@ void Control::on_filterContrastParam_valueChanged(int i)
 
 void Control::on_filterBrightParam_valueChanged(int i)
 {
-    mMainWindow->getBrightContrastFilter()->getBrightness()->setValue(i);
+    mMainWindow->getBrightContrastFilter()->getBrightness().setValue(i);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2405,14 +2405,10 @@ void Control::on_filterBorderParamCol_clicked()
 {
     BorderFilter *bf    = mMainWindow->getBorderFilter();
     QColor        color = QColorDialog::getColor(
-        QColor(
-            (int) bf->getBorderColR()->getValue(),
-            (int) bf->getBorderColG()->getValue(),
-            (int) bf->getBorderColB()->getValue()),
-        this);
-    bf->getBorderColR()->setValue(color.red());
-    bf->getBorderColG()->setValue(color.green());
-    bf->getBorderColB()->setValue(color.blue());
+        QColor(bf->getBorderColR().getValue(), bf->getBorderColG().getValue(), bf->getBorderColB().getValue()), this);
+    bf->getBorderColR().setValue(color.red());
+    bf->getBorderColG().setValue(color.green());
+    bf->getBorderColB().setValue(color.blue());
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2437,14 +2433,8 @@ void Control::on_filterSwap_stateChanged(int i)
 
 void Control::on_filterSwapH_stateChanged(int i)
 {
-    if(i == Qt::Checked)
-    {
-        mMainWindow->getSwapFilter()->getSwapHorizontally()->setValue(1);
-    }
-    else if(i == Qt::Unchecked)
-    {
-        mMainWindow->getSwapFilter()->getSwapHorizontally()->setValue(0);
-    }
+    mMainWindow->getSwapFilter()->getSwapHorizontally().setValue(i == Qt::Checked);
+
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2453,14 +2443,8 @@ void Control::on_filterSwapH_stateChanged(int i)
 
 void Control::on_filterSwapV_stateChanged(int i)
 {
-    if(i == Qt::Checked)
-    {
-        mMainWindow->getSwapFilter()->getSwapVertically()->setValue(1);
-    }
-    else if(i == Qt::Unchecked)
-    {
-        mMainWindow->getSwapFilter()->getSwapVertically()->setValue(0);
-    }
+    mMainWindow->getSwapFilter()->getSwapVertically().setValue(i == Qt::Checked);
+
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2566,7 +2550,7 @@ void Control::on_apply_stateChanged(int i)
 void Control::on_fx_valueChanged(double d)
 {
     mIntrinsicCameraParams.cameraMatrix.at<double>(0, 0) = d;
-    mMainWindow->getCalibFilter()->getFx()->setValue(d);
+    mMainWindow->getCalibFilter()->getFx().setValue(d);
     if(mUi->quadAspectRatio->isChecked())
     {
         mUi->fy->setValue(d);
@@ -2582,7 +2566,7 @@ void Control::on_fx_valueChanged(double d)
 void Control::on_fy_valueChanged(double d)
 {
     mIntrinsicCameraParams.cameraMatrix.at<double>(1, 1) = d;
-    mMainWindow->getCalibFilter()->getFy()->setValue(d);
+    mMainWindow->getCalibFilter()->getFy().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2595,7 +2579,7 @@ void Control::on_cx_valueChanged(double d)
 {
     mIntrinsicCameraParams.cameraMatrix.at<double>(0, 2) = d;
     mMainWindow->setStatusPosReal();
-    mMainWindow->getCalibFilter()->getCx()->setValue(d);
+    mMainWindow->getCalibFilter()->getCx().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateCoord();
@@ -2607,7 +2591,7 @@ void Control::on_cy_valueChanged(double d)
 {
     mIntrinsicCameraParams.cameraMatrix.at<double>(1, 2) = d;
     mMainWindow->setStatusPosReal();
-    mMainWindow->getCalibFilter()->getCy()->setValue(d);
+    mMainWindow->getCalibFilter()->getCy().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateCoord();
@@ -2617,7 +2601,7 @@ void Control::on_cy_valueChanged(double d)
 
 void Control::on_r2_valueChanged(double d)
 {
-    mMainWindow->getCalibFilter()->getR2()->setValue(d);
+    mMainWindow->getCalibFilter()->getR2().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2627,7 +2611,7 @@ void Control::on_r2_valueChanged(double d)
 
 void Control::on_r4_valueChanged(double d)
 {
-    mMainWindow->getCalibFilter()->getR4()->setValue(d);
+    mMainWindow->getCalibFilter()->getR4().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2637,7 +2621,7 @@ void Control::on_r4_valueChanged(double d)
 
 void Control::on_r6_valueChanged(double d)
 {
-    mMainWindow->getCalibFilter()->getR6()->setValue(d);
+    mMainWindow->getCalibFilter()->getR6().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2646,7 +2630,7 @@ void Control::on_r6_valueChanged(double d)
 }
 void Control::on_s1_valueChanged(double d)
 {
-    mMainWindow->getCalibFilter()->getS1()->setValue(d);
+    mMainWindow->getCalibFilter()->getS1().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2655,7 +2639,7 @@ void Control::on_s1_valueChanged(double d)
 }
 void Control::on_s2_valueChanged(double d)
 {
-    mMainWindow->getCalibFilter()->getS2()->setValue(d);
+    mMainWindow->getCalibFilter()->getS2().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2664,7 +2648,7 @@ void Control::on_s2_valueChanged(double d)
 }
 void Control::on_s3_valueChanged(double d)
 {
-    mMainWindow->getCalibFilter()->getS3()->setValue(d);
+    mMainWindow->getCalibFilter()->getS3().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2673,7 +2657,7 @@ void Control::on_s3_valueChanged(double d)
 }
 void Control::on_s4_valueChanged(double d)
 {
-    mMainWindow->getCalibFilter()->getS4()->setValue(d);
+    mMainWindow->getCalibFilter()->getS4().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2682,7 +2666,7 @@ void Control::on_s4_valueChanged(double d)
 }
 void Control::on_taux_valueChanged(double d)
 {
-    mMainWindow->getCalibFilter()->getTAUX()->setValue(d);
+    mMainWindow->getCalibFilter()->getTAUX().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2691,7 +2675,7 @@ void Control::on_taux_valueChanged(double d)
 }
 void Control::on_tauy_valueChanged(double d)
 {
-    mMainWindow->getCalibFilter()->getTAUY()->setValue(d);
+    mMainWindow->getCalibFilter()->getTAUY().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2702,7 +2686,7 @@ void Control::on_tauy_valueChanged(double d)
 
 void Control::on_tx_valueChanged(double d)
 {
-    mMainWindow->getCalibFilter()->getTx()->setValue(d);
+    mMainWindow->getCalibFilter()->getTx().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2712,7 +2696,7 @@ void Control::on_tx_valueChanged(double d)
 
 void Control::on_ty_valueChanged(double d)
 {
-    mMainWindow->getCalibFilter()->getTy()->setValue(d);
+    mMainWindow->getCalibFilter()->getTy().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2721,7 +2705,7 @@ void Control::on_ty_valueChanged(double d)
 }
 void Control::on_k4_valueChanged(double d)
 {
-    mMainWindow->getCalibFilter()->getK4()->setValue(d);
+    mMainWindow->getCalibFilter()->getK4().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2730,7 +2714,7 @@ void Control::on_k4_valueChanged(double d)
 }
 void Control::on_k5_valueChanged(double d)
 {
-    mMainWindow->getCalibFilter()->getK5()->setValue(d);
+    mMainWindow->getCalibFilter()->getK5().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -2739,7 +2723,7 @@ void Control::on_k5_valueChanged(double d)
 }
 void Control::on_k6_valueChanged(double d)
 {
-    mMainWindow->getCalibFilter()->getK6()->setValue(d);
+    mMainWindow->getCalibFilter()->getK6().setValue(d);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -3319,10 +3303,7 @@ void Control::setXml(QDomElement &elem)
     subElem.appendChild(subSubElem);
 
     BorderFilter *bf = mMainWindow->getBorderFilter();
-    QColor        col(
-        (int) bf->getBorderColR()->getValue(),
-        (int) bf->getBorderColG()->getValue(),
-        (int) bf->getBorderColB()->getValue());
+    QColor        col(bf->getBorderColR().getValue(), bf->getBorderColG().getValue(), bf->getBorderColB().getValue());
     subSubElem = (elem.ownerDocument()).createElement("BORDER");
     subSubElem.setAttribute("ENABLED", mUi->filterBorder->isChecked());
     subSubElem.setAttribute("VALUE", mUi->filterBorderParamSize->value());
@@ -3759,9 +3740,9 @@ void Control::getXml(QDomElement &elem)
                     if(subSubElem.hasAttribute("COLOR"))
                     {
                         QColor color(subSubElem.attribute("COLOR"));
-                        mMainWindow->getBorderFilter()->getBorderColR()->setValue(color.red());
-                        mMainWindow->getBorderFilter()->getBorderColG()->setValue(color.green());
-                        mMainWindow->getBorderFilter()->getBorderColB()->setValue(color.blue());
+                        mMainWindow->getBorderFilter()->getBorderColR().setValue(color.red());
+                        mMainWindow->getBorderFilter()->getBorderColG().setValue(color.green());
+                        mMainWindow->getBorderFilter()->getBorderColB().setValue(color.blue());
                     }
                 }
                 else if(subSubElem.tagName() == "SWAP")
