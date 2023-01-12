@@ -98,7 +98,6 @@ class TrackerReal;
 class MoCapStorage;
 class MoCapItem;
 
-
 class Petrack : public QMainWindow
 {
     Q_OBJECT
@@ -107,7 +106,6 @@ public:
     Petrack();
     ~Petrack();
     static int trcVersion; // version numbr for writing TRC-Trajectorie files
-
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -293,7 +291,7 @@ public:
     {
         if(getBorderFilter()->getEnabled())
         {
-            return (int) getBorderFilter()->getBorderSize()->getValue();
+            return getBorderFilter()->getBorderSize().getValue();
         }
         else
         {
@@ -302,7 +300,7 @@ public:
     }
     inline void setImageBorderSize(int sz)
     {
-        getBorderFilter()->getBorderSize()->setValue(sz);
+        getBorderFilter()->getBorderSize().setValue(sz);
     }
 
     inline AutoCalib *getAutoCalib()
@@ -322,7 +320,6 @@ public:
         return mMoCapController;
     }
 
-
     void updateWindowTitle();
 
     /**
@@ -332,8 +329,8 @@ public:
     void setPeTrackVersion(const std::string &petrackVersion);
 
     /**
-     * @brief Sets the information about the compiled git commit hash, commit date,
-     * and commit branch
+     * @brief Sets the information about the compiled git commit hash, commit
+     * date, and commit branch
      * @param gitCommitID commit hash of current version
      * @param gitCommitDate commit date of current version
      * @param gitCommitBranch commit branch of current version
@@ -367,7 +364,6 @@ private:
     void resetUI();
 
     bool maybeSave();
-
 
     void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -532,6 +528,5 @@ namespace util
 {
 std::optional<QSet<int>> splitStringToInt(const QString &input);
 }
-
 
 #endif

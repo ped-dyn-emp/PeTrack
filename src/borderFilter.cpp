@@ -21,25 +21,21 @@
 
 BorderFilter::BorderFilter() : Filter()
 {
-    mS.setMinimum(0.);
-    mS.setMaximum(300);
-    mS.setValue(0.);
-    mS.setFilter(this);
+    mSize.setMinimum(0.);
+    mSize.setMaximum(300);
+    mSize.setValue(0.);
 
-    mR.setMinimum(0.);
-    mR.setMaximum(200.);
-    mR.setValue(0.);
-    mR.setFilter(this);
+    mRed.setMinimum(0.);
+    mRed.setMaximum(200.);
+    mRed.setValue(0.);
 
-    mG.setMinimum(0.);
-    mG.setMaximum(200.);
-    mG.setValue(0.);
-    mG.setFilter(this);
+    mGreen.setMinimum(0.);
+    mGreen.setMaximum(200.);
+    mGreen.setValue(0.);
 
-    mB.setMinimum(0.);
-    mB.setMaximum(200.);
-    mB.setValue(0.);
-    mB.setFilter(this);
+    mBlue.setMinimum(0.);
+    mBlue.setMaximum(200.);
+    mBlue.setValue(0.);
 
     setOnCopy(false);
 }
@@ -47,30 +43,30 @@ BorderFilter::BorderFilter() : Filter()
 cv::Mat BorderFilter::act(cv::Mat &img, cv::Mat &res)
 {
     // border size
-    int s = (int) mS.getValue(); // schon beim zuweisen auf param gemacht (2*, da undistord filter anscheinend sonst
-                                 // probleme hat)
-    int r = (int) mR.getValue();
-    int g = (int) mG.getValue();
-    int b = (int) mB.getValue();
+    int s =
+        mSize.getValue(); // param is 2x user-defined border-size, because border needs to be even (for undistortion)
+    int r = mRed.getValue();
+    int g = mGreen.getValue();
+    int b = mBlue.getValue();
 
     cv::copyMakeBorder(img, res, s, s, s, s, cv::BORDER_CONSTANT, cv::Scalar(b, g, r));
 
     return res;
 }
 
-Parameter *BorderFilter::getBorderSize()
+Parameter<int> &BorderFilter::getBorderSize()
 {
-    return &mS;
+    return mSize;
 }
-Parameter *BorderFilter::getBorderColR()
+Parameter<int> &BorderFilter::getBorderColR()
 {
-    return &mR;
+    return mRed;
 }
-Parameter *BorderFilter::getBorderColG()
+Parameter<int> &BorderFilter::getBorderColG()
 {
-    return &mG;
+    return mGreen;
 }
-Parameter *BorderFilter::getBorderColB()
+Parameter<int> &BorderFilter::getBorderColB()
 {
-    return &mB;
+    return mBlue;
 }

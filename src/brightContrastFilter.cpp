@@ -21,15 +21,13 @@
 
 BrightContrastFilter::BrightContrastFilter() : Filter()
 {
-    mB.setMinimum(-100.);
-    mB.setMaximum(100.);
-    mB.setValue(0.);
-    mB.setFilter(this);
+    mBrightness.setMinimum(-100.);
+    mBrightness.setMaximum(100.);
+    mBrightness.setValue(0.);
 
-    mC.setMinimum(-100.);
-    mC.setMaximum(100.);
-    mC.setValue(0.);
-    mC.setFilter(this);
+    mContrast.setMinimum(-100.);
+    mContrast.setMaximum(100.);
+    mContrast.setValue(0.);
 }
 
 cv::Mat BrightContrastFilter::act(cv::Mat &img, cv::Mat &res)
@@ -39,29 +37,29 @@ cv::Mat BrightContrastFilter::act(cv::Mat &img, cv::Mat &res)
      * The algorithm is by Werner D. Streidt
      * (http://visca.com/ffactory/archives/5-99/msg00021.html)
      */
-    if(mC.getValue() > 0)
+    if(mContrast.getValue() > 0)
     {
-        delta = 127. * mC.getValue() / 100.;
+        delta = 127. * mContrast.getValue() / 100.;
         a     = 255. / (255. - delta * 2.);
-        b     = a * (mB.getValue() - delta);
+        b     = a * (mBrightness.getValue() - delta);
     }
     else
     {
-        delta = -128. * mC.getValue() / 100.;
+        delta = -128. * mContrast.getValue() / 100.;
         a     = (256. - delta * 2.) / 255.;
-        b     = a * mB.getValue() + delta;
+        b     = a * mBrightness.getValue() + delta;
     }
 
     img.convertTo(res, -1, a, b);
     return res;
 }
 
-Parameter *BrightContrastFilter::getBrightness()
+Parameter<double> &BrightContrastFilter::getBrightness()
 {
-    return &mB;
+    return mBrightness;
 }
 
-Parameter *BrightContrastFilter::getContrast()
+Parameter<double> &BrightContrastFilter::getContrast()
 {
-    return &mC;
+    return mContrast;
 }

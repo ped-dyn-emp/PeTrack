@@ -22,23 +22,16 @@
 
 SwapFilter::SwapFilter() : Filter()
 {
-    mSwapVertically.setMinimum(0.);
-    mSwapVertically.setMaximum(1.);
-    mSwapVertically.setValue(0.);
-    mSwapVertically.setFilter(this);
-
-    mSwapHorizontally.setMinimum(0.);
-    mSwapHorizontally.setMaximum(1.);
-    mSwapHorizontally.setValue(0.);
-    mSwapHorizontally.setFilter(this);
+    mSwapVertically.setValue(false);
+    mSwapHorizontally.setValue(false);
 
     setOnCopy(true);
 }
 
 cv::Mat SwapFilter::act(cv::Mat &img, cv::Mat &res)
 {
-    bool sV = (bool) mSwapVertically.getValue();
-    bool sH = (bool) mSwapHorizontally.getValue();
+    bool sV = mSwapVertically.getValue();
+    bool sH = mSwapHorizontally.getValue();
 
     if(sV && sH)
     {
@@ -61,11 +54,11 @@ cv::Mat SwapFilter::act(cv::Mat &img, cv::Mat &res)
     return res;
 }
 
-Parameter *SwapFilter::getSwapHorizontally()
+Parameter<bool> &SwapFilter::getSwapHorizontally()
 {
-    return &mSwapHorizontally;
+    return mSwapHorizontally;
 }
-Parameter *SwapFilter::getSwapVertically()
+Parameter<bool> &SwapFilter::getSwapVertically()
 {
-    return &mSwapVertically;
+    return mSwapVertically;
 }

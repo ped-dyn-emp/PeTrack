@@ -25,16 +25,16 @@
 class SwapFilter : public Filter
 {
 private:
-    Parameter mSwapHorizontally; // 0.0 false; 1.0 true
-    Parameter mSwapVertically;   // 0.0 false; 1.0 true
+    Parameter<bool> mSwapHorizontally{this};
+    Parameter<bool> mSwapVertically{this};
 
 public:
     SwapFilter();
 
     cv::Mat act(cv::Mat &img, cv::Mat &res);
 
-    Parameter *getSwapHorizontally();
-    Parameter *getSwapVertically();
+    Parameter<bool> &getSwapHorizontally();
+    Parameter<bool> &getSwapVertically();
 };
 
 #endif

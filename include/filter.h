@@ -19,49 +19,8 @@
 #ifndef FILTER_H
 #define FILTER_H
 
-#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
 
-class Filter;
-
-/**
- * @brief Class for Filter-parameters
- *
- * This class is made to hold parameters for filters.
- * It has a minimum and maximum value and notifies the
- * associated filter of changes.
- *
- * @todo make a template out of it, so different types are supported
- */
-class Parameter
-{
-private:
-    double  mValue;
-    double  mMinimum;
-    double  mMaximum;
-    bool    mChg;
-    Filter *mFilter; // Filter where parameter is for
-
-public:
-    Parameter();
-
-    void    setFilter(Filter *filter);
-    Filter *getFilter();
-
-    double value() const;
-    double getValue() const;
-    void   setValue(double d);
-
-    double getMinimum() const;
-    void   setMinimum(double d);
-    double getMaximum() const;
-    void   setMaximum(double d);
-
-    bool changed() const;
-    bool getChanged() const;
-    void setChanged(bool b);
-};
-
-//------------------------------------------------------------
 
 /**
  * @brief Base class for every image filter
@@ -87,7 +46,7 @@ private:
 
 public:
     Filter();
-    virtual ~Filter(){};
+    virtual ~Filter() = default;
 
     bool changed() const;
     bool getChanged();
@@ -98,7 +57,6 @@ public:
     cv::Mat apply(cv::Mat &img);
 
     cv::Mat getLastResult();
-    void    freeLastResult();
 
     void enable();
     void disable();
@@ -108,5 +66,63 @@ public:
     void setOnCopy(bool b);
     bool getOnCopy() const;
 };
+
+//----------------------
+
+/**
+ * @brief Class for Filter-parameters
+ *
+ * This class is made to hold parameters for filters.
+ * It has a minimum and maximum value and notifies the
+ * associated filter of changes.
+ *
+ */
+template <typename T>
+class Parameter
+{
+private:
+    T       mValue;
+    T       mMinimum;
+    T       mMaximum;
+    bool    mChanged;
+    Filter *mFilter; // Filter where parameter is for
+
+public:
+    explicit Parameter(Filter *filter)
+    {
+        if constexpr(std::is_arithmetic<T>::value)
+        {
+            mValue = mMinimum = mMaximum = 0;
+        }
+        mChanged = false;
+        mFilter  = filter;
+    }
+
+    T    getValue() const { return mValue; }
+    void setValue(T d)
+    {
+        if(d != mValue)
+        {
+            mValue = d;
+            setChanged(true);
+        }
+    }
+
+    T    getMinimum() const { return mMinimum; }
+    void setMinimum(T d) { mMinimum = d; }
+    T    getMaximum() const { return mMaximum; }
+    void setMaximum(T d) { mMaximum = d; }
+
+    bool getChanged() const { return mChanged; }
+    void setChanged(bool b)
+    {
+        mChanged = b;
+        if(mFilter != nullptr)
+        {
+            mFilter->setChanged(true);
+        }
+    }
+};
+
 
 #endif
