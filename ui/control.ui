@@ -7012,7 +7012,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>show height/col. color</string>
+                     <string>show height/col. color/marker ID</string>
                     </property>
                     <property name="checked">
                      <bool>true</bool>
