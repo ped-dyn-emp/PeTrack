@@ -18,6 +18,7 @@
 
 #include "IO.h"
 
+#include "logger.h"
 #include "moCapPerson.h"
 #include "pMessageBox.h"
 #include "skeletonTree.h"
@@ -373,7 +374,7 @@ std::vector<std::string> IO::readAuthors(const QString &authorsFile)
     }
     else
     {
-        debout << "Error while parsing author file: " << parseError.errorString() << "\n";
+        SPDLOG_ERROR("Could not parse author file: {}", parseError.errorString());
     }
 
     return authors;

@@ -19,6 +19,7 @@
 #include "pMessageBox.h"
 
 #include "helper.h"
+#include "logger.h"
 
 #include <QApplication>
 #include <QDialogButtonBox>
@@ -92,7 +93,7 @@ PMessageBox::PMessageBox(
         }
         else
         {
-            debout << "Warning: Given default button does is non-specified button" << std::endl;
+            SPDLOG_WARN("Given default button does is non-specified button");
         }
     }
 
@@ -147,7 +148,8 @@ int PMessageBox::information(
     PMessageBox::StandardButtons buttons,
     PMessageBox::StandardButton  defaultButton)
 {
-    std::cout << func << " in " << file_name(file) << " line " << line << ": Info: " << text << std::endl;
+    auto logger = spdlog::get(logger::messageBoxLoggerName);
+    SPDLOG_LOGGER_INFO(logger, logger::messageBoxLogFormat, file_name(file), line, func, "info", text);
 
     // if no GUI gets displayed and no button except OK is used (no return Value used)
     // Then only log it
@@ -192,7 +194,8 @@ int PMessageBox::warning(
     PMessageBox::StandardButtons buttons,
     PMessageBox::StandardButton  defaultButton)
 {
-    std::cout << func << " in " << file_name(file) << " line " << line << ": Warning: " << text << std::endl;
+    auto logger = spdlog::get(logger::messageBoxLoggerName);
+    SPDLOG_LOGGER_WARN(logger, logger::messageBoxLogFormat, file_name(file), line, func, "warning", text);
 
     // if no GUI gets displayed and no button except OK is used (no return Value used)
     // Then only log it
@@ -237,7 +240,8 @@ int PMessageBox::critical(
     PMessageBox::StandardButtons buttons,
     PMessageBox::StandardButton  defaultButton)
 {
-    std::cout << func << " in " << file_name(file) << " line " << line << ": Critical: " << text << std::endl;
+    auto logger = spdlog::get(logger::messageBoxLoggerName);
+    SPDLOG_LOGGER_ERROR(logger, logger::messageBoxLogFormat, file_name(file), line, func, "error", text);
 
     // if no GUI gets displayed and no button except OK is used (no return Value used)
     // Then only log it

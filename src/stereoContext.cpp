@@ -22,6 +22,7 @@
 #include "control.h"
 #include "ellipse.h"
 #include "helper.h"
+#include "logger.h"
 #include "person.h"
 #include "petrack.h"
 #include "stereoWidget.h"
@@ -89,7 +90,7 @@ pet::StereoContext::StereoContext(Petrack *main)
     }
     else
     {
-        debout << "Error: No cam1 or cam2 string in video filename to detect used camera!" << std::endl;
+        SPDLOG_ERROR("no cam1 or cam2 string in video filename to detect used camera!");
         return;
     }
     QFile calFpInt(calFileInt);
@@ -101,10 +102,10 @@ pet::StereoContext::StereoContext(Petrack *main)
     calFp.close();
     if(!QFile::exists(calFile))
     {
-        debout << "Error: Calibration file " << calFile << " could not be created!" << std::endl;
+        SPDLOG_ERROR("calibration file {} could not be created!", calFile);
         return;
     }
-    debout << "Using " << calFile << " (" << version << ") for calibration." << std::endl;
+    SPDLOG_INFO("Using {} ({}) for calibration.", calFile, version);
 #ifdef STEREO
     TriclopsError triclopsError;
     triclopsError = triclopsGetDefaultContextFromFile(&mTriclopsContext, (char *) calFile.toLatin1().data());

@@ -19,6 +19,7 @@
 #include "extrCalibration.h"
 
 #include "control.h"
+#include "logger.h"
 #include "pMessageBox.h"
 #include "petrack.h"
 
@@ -169,8 +170,7 @@ bool ExtrCalibration::loadExtrCalibFile()
                 return false;
             }
 
-            debout << "Reading 3D calibration data from " << mExtrCalibFile << "..." << std::endl;
-
+            SPDLOG_INFO("Reading 3D calibration data from {} ...", mExtrCalibFile);
 
             std::vector<cv::Point3f> points3D_tmp;
             std::vector<cv::Point2f> points2D_tmp;
@@ -238,24 +238,21 @@ bool ExtrCalibration::loadExtrCalibFile()
                 }
                 if(counter == 1)
                 {
-                    debout << "Optional number of points in line " << line_counter << " ignored." << std::endl;
+                    SPDLOG_INFO("Optional number of points in line {} ignored.", line_counter);
                 }
                 else if(counter != 3 && counter != 5)
                 {
-                    debout << "Something wrong in line " << line_counter << "( " << line
-                           << " )! Ignored. (counter=" << counter << ")" << std::endl;
+                    SPDLOG_INFO("Something wrong in line {} ({})! Ignored. (counter={})", line_counter, line, counter);
                 }
 
                 // 3D daten abspeichern
                 if(with_3D_data && (counter == 3 || counter == 5))
                 {
-                    // debout << "x: " << x << " y: " << y << " z: " << z << endl;
                     points3D_tmp.push_back(cv::Point3f(x, y, z));
                 }
                 // 2D daten abspeichern
                 if(with_2D_data && counter == 5)
                 {
-                    // debout << " px: " << px << " py: " << py << endl;
                     points2D_tmp.push_back(cv::Point2f(px, py));
                 }
             }
@@ -331,7 +328,7 @@ bool ExtrCalibration::loadExtrCalibFile()
         }
         else
         {
-            debout << "unsupported file extension (supported: .3dc,.txt)" << std::endl;
+            SPDLOG_WARN("unsupported file extension (supported: .3dc, .txt)");
         }
     }
     else
@@ -548,24 +545,19 @@ void ExtrCalibration::calibExtrParams()
                                  rotation_matrix[5] * translation_vector[1] +
                                  rotation_matrix[8] * translation_vector[2];
 
-        debout << "-.- ESTIMATED ROTATION -.-" << std::endl;
+        SPDLOG_INFO("-.- ESTIMATED ROTATION -.-");
         for(size_t p = 0; p < 3; p++)
         {
-            debout << rotation_matrix[p * 3] << " , " << rotation_matrix[p * 3 + 1] << " , "
-                   << rotation_matrix[p * 3 + 2] << std::endl;
+            SPDLOG_INFO("{}, {}, {}", rotation_matrix[p * 3], rotation_matrix[p * 3 + 1], rotation_matrix[p * 3] + 2);
         }
+        SPDLOG_INFO("-.- ESTIMATED TRANSLATION -.-");
+        SPDLOG_INFO("{}, {}, {}", translation_vector[0], translation_vector[1], translation_vector[2]);
 
-        debout << "-.- ESTIMATED TRANSLATION -.-" << std::endl;
-        debout << translation_vector[0] << " , " << translation_vector[1] << " , " << translation_vector[2]
-               << std::endl;
+        SPDLOG_INFO("-.- Translation vector -.-");
+        SPDLOG_INFO("{}, {}, {}", translation_vector2[0], translation_vector2[1], translation_vector2[2]);
 
-        debout << "-.- Translation vector -.-" << std::endl;
-        debout << translation_vector2[0] << " , " << translation_vector2[1] << " , " << translation_vector2[2]
-               << std::endl;
-
-        debout << "-.- Rotation vector -.-" << std::endl;
-        debout << rvec.at<double>(0, 0) << " , " << rvec.at<double>(1, 0) << " , " << rvec.at<double>(2, 0)
-               << std::endl;
+        SPDLOG_INFO("-.- Rotation vector -.-");
+        SPDLOG_INFO("{}, {}, {}", rvec.at<double>(0, 0), rvec.at<double>(1, 0), rvec.at<double>(2, 0));
 
         camHeight = translation_vector2[2] < 0 ? -translation_vector2[2] : translation_vector2[2];
 
@@ -579,9 +571,7 @@ void ExtrCalibration::calibExtrParams()
 
         if(!calcReprojectionError())
         {
-            std::cout << "# Warning: extrinsic calibration not possible! Please select other 2D/3D points!"
-                      << std::endl;
-
+            SPDLOG_WARN("Extrinsic calibration not possible! Please select other 2D/3D points!");
             mControlWidget->setCalibExtrRot1(0);
             mControlWidget->setCalibExtrRot2(0);
             mControlWidget->setCalibExtrRot3(0);
@@ -613,7 +603,7 @@ void ExtrCalibration::calibExtrParams()
 
         isExtCalib = true;
 
-        std::cout << "End of extern calibration!" << std::endl;
+        SPDLOG_INFO("End of extern calibration!");
     }
     else
     {
@@ -649,7 +639,6 @@ bool ExtrCalibration::calcReprojectionError()
         return false;
     }
 
-    bool debug = false;
     for(size_t i = 0; i < num_points; i++)
     {
         cv::Point2f p2d = get2DList().at(i);
@@ -672,10 +661,6 @@ bool ExtrCalibration::calcReprojectionError()
             max_pH = val;
         }
         sum_pH += val;
-        if(debug)
-        {
-            debout << "Error point[" << i << "]: " << val << std::endl;
-        }
 
         val = sqrt(
             pow(p3dTo2dTo3dMapDefaultHeight.x - p2dTo3dMapDefaultHeight.x, 2) +
@@ -685,10 +670,6 @@ bool ExtrCalibration::calcReprojectionError()
             max_dH = val;
         }
         sum_dH += val;
-        if(debug)
-        {
-            debout << "Error point[" << i << "]: " << val << std::endl;
-        }
 
         // Error measurements pixel
         val = sqrt(pow(p3dTo2d.x - p2d.x, 2) + pow(p3dTo2d.y - p2d.y, 2));
@@ -698,10 +679,6 @@ bool ExtrCalibration::calcReprojectionError()
             max_px = val;
         }
         sum_px += val;
-        if(debug)
-        {
-            debout << "Error point[" << i << "]: " << val << std::endl;
-        }
     }
     for(size_t i = 0; i < num_points; i++)
     {
@@ -739,23 +716,35 @@ bool ExtrCalibration::calcReprojectionError()
     sum_pH /= num_points;
     var_pH /= num_points;
     sd_pH = sqrt(var_pH);
-    debout << "Reprojection error (pointHeight) average: " << sum_pH << "cm (standard deviation: " << sd_pH
-           << " variance: " << var_pH << " Max error: " << max_pH << "cm)" << std::endl;
+    SPDLOG_INFO(
+        "Reprojection error (pointHeight) average: {}cm (standard deviation: {}, variance: {}, max error: {}cm)",
+        sum_pH,
+        sd_pH,
+        var_pH,
+        max_pH);
 
     // average
     sum_dH /= num_points;
     var_dH /= num_points;
     sd_dH = sqrt(var_dH);
-    debout << "Reprojection error (defaultHeight=" << mControlWidget->getDefaultHeight() << ") average: " << sum_dH
-           << "cm (standard deviation: " << sd_dH << " variance: " << var_dH << " Max error: " << max_dH << "cm)"
-           << std::endl;
+    SPDLOG_INFO(
+        "Reprojection error (defaultHeight={}) average: {}cm (standard deviation: {}, variance: {}, max error: {}cm)",
+        mControlWidget->getDefaultHeight(),
+        sum_dH,
+        sd_dH,
+        var_dH,
+        max_dH);
 
     // average
     sum_px /= num_points;
     var_px /= num_points;
     sd_px = sqrt(var_px);
-    debout << "Reprojection error (Pixel) average: " << sum_px << "px (standard deviation: " << sd_px
-           << " variance: " << var_px << " Max error: " << max_px << "px)" << std::endl;
+    SPDLOG_INFO(
+        "Reprojection error (Pixel) average: {}px (standard deviation: {}, variance: {}, max error: {}px)",
+        sum_px,
+        sd_px,
+        var_px,
+        max_px);
 
     reprojectionError = ReprojectionError{
         sum_pH,
@@ -789,8 +778,6 @@ bool ExtrCalibration::calcReprojectionError()
  */
 cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d)
 {
-    bool debug = false;
-
     p3d.x *= mControlWidget->getCalibCoord3DSwapX() ? -1 : 1;
     p3d.y *= mControlWidget->getCalibCoord3DSwapY() ? -1 : 1;
     p3d.z *= mControlWidget->getCalibCoord3DSwapZ() ? -1 : 1;
@@ -800,10 +787,6 @@ cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d)
     p3d.y += mControlWidget->getCalibCoord3DTransY();
     p3d.z += mControlWidget->getCalibCoord3DTransZ();
 
-    if(debug)
-    {
-        std::cout << "getImagePoint: Start Point3D: (" << p3d.x << ", " << p3d.y << ", " << p3d.z << ")" << std::endl;
-    }
     // ToDo: use projectPoints();
     int bS = mMainWindow->getImage() ? mMainWindow->getImageBorderSize() : 0;
 
@@ -833,37 +816,6 @@ cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d)
                             rot_mat.at<double>(2, 1) * mControlWidget->getCalibExtrTrans2() +
                             rot_mat.at<double>(2, 2) * mControlWidget->getCalibExtrTrans3();
 
-    if(debug)
-    {
-        std::cout << "\n-.- ESTIMATED ROTATION\n";
-        for(int p = 0; p < 3; p++)
-        {
-            printf(
-                "%20.18f, %20.18f, %20.18f\n",
-                rot_mat.at<double>(p, 0),
-                rot_mat.at<double>(p, 1),
-                rot_mat.at<double>(p, 2));
-        }
-
-        std::cout << "\n-.- ESTIMATED ROTATION^-1\n";
-        for(int p = 0; p < 3; p++)
-        {
-            printf(
-                "%20.18f, %20.18f, %20.18f\n",
-                rot_inv.at<double>(p, 0),
-                rot_inv.at<double>(p, 1),
-                rot_inv.at<double>(p, 2));
-        }
-
-        std::cout << "\n-.- ESTIMATED R^-1*R\n";
-        for(int p = 0; p < 3; p++)
-        {
-            printf("%20.18f, %20.18f, %20.18f\n", e.at<double>(p, 0), e.at<double>(p, 1), e.at<double>(p, 2));
-        }
-
-        std::cout << "\n-.- ESTIMATED TRANSLATION\n";
-        printf("%20.15f, %20.15f, %20.15f\n", translation_vector[0], translation_vector[1], translation_vector[2]);
-    }
     cv::Point3f point3D;
 
     point3D.x = rot_mat.at<double>(0, 0) * p3d.x + rot_mat.at<double>(0, 1) * p3d.y + rot_mat.at<double>(0, 2) * p3d.z +
@@ -872,12 +824,6 @@ cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d)
                 translation_vector[1];
     point3D.z = rot_mat.at<double>(2, 0) * p3d.x + rot_mat.at<double>(2, 1) * p3d.y + rot_mat.at<double>(2, 2) * p3d.z +
                 translation_vector[2];
-
-    if(debug)
-    {
-        std::cout << "###### After extern calibration: (" << point3D.x << ", " << point3D.y << ", " << point3D.z << ")"
-                  << std::endl;
-    }
 
     cv::Point2f point2D = cv::Point2f(0.0, 0.0);
     if(point3D.z != 0)

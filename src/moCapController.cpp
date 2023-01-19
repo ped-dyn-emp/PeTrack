@@ -20,6 +20,7 @@
 
 #include "IO.h"
 #include "helper.h"
+#include "logger.h"
 #include "moCapPerson.h"
 
 #include <QDomElement>
@@ -65,12 +66,13 @@ void MoCapController::transformPersonSkeleton(
     }
     else if(!hasPre)
     {
-        debout << "Start of XSens recording reached for file '" << person.getFilename() << "'" << std::endl;
+        SPDLOG_INFO("Start of XSens recording reached for file '{}'", person.getFilename());
         return;
     }
     else if(!hasPost)
     {
-        debout << "End of XSens recording reached for file '" << person.getFilename() << "'" << std::endl;
+        SPDLOG_INFO("End of XSens recording reached for file '{}'", person.getFilename());
+
         return;
     }
 
@@ -391,7 +393,7 @@ void MoCapController::getXml(const QDomElement &elem)
     {
         std::stringstream ss;
         ss << "Problem reading the C3D-file(s): " << e.what();
-        debout << ss.str() << std::endl;
+        SPDLOG_ERROR("{}", ss.str());
         QMessageBox::critical(nullptr, tr("Error"), QString::fromStdString(ss.str()));
     }
 }

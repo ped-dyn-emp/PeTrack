@@ -32,6 +32,7 @@
 #define SPOT_SIZE_MAX 9
 
 #include "helper.h"
+#include "logger.h"
 #include "markerCasern.h"
 #include "tracker.h"
 
@@ -486,7 +487,7 @@ void MarkerCasern::organize(const cv::Mat &img, bool autoWB)
         }
         else
         {
-            debout << "weiss ist zu dunkel!!!!!!!!!!!!!!" << std::endl;
+            SPDLOG_INFO("white is too dark.");
         }
 
         // eigentlich muesset saettigung ueber histogramm angepasst werden!!

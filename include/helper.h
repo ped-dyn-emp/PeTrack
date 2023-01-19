@@ -41,21 +41,6 @@ constexpr const char *file_name(const char *path)
     return file;
 }
 
-// gleiche Variable wie QT benutzt, es gibt auch noch QT_NO_DEBUG and QT_NO_WARNING_OUTPUT
-#ifdef QT_NO_DEBUG_OUTPUT
-#define debout //
-#else
-#define debout std::cout << __func__ << " in " << file_name(__FILE__) << " line " << __LINE__ << ": "
-#endif
-
-#include <QString>
-#include <iostream>
-inline std::ostream &operator<<(std::ostream &s, const QString &t)
-{
-    s << t.toStdString();
-    return s;
-}
-
 
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))

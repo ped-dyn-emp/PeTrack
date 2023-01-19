@@ -20,6 +20,7 @@
 
 #include "control.h"
 #include "extrCalibration.h"
+#include "logger.h"
 #include "petrack.h"
 #include "view.h"
 
@@ -270,15 +271,6 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 {
     bool debug = false;
 
-
-    if(debug)
-    {
-        debout << "**************** CoordItem:paint() aufgerufen" << std::endl;
-    }
-    if(debug)
-    {
-        debout << "show coord: " << mControlWidget->getCalibCoordShow() << std::endl;
-    }
     ////////////////////////////////
     // Drawing Calibration Points //
     ////////////////////////////////
@@ -437,13 +429,9 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
         }
         else
         {
-            double tX3D   = mControlWidget->getCalibCoord3DTransX();
-            double tY3D   = mControlWidget->getCalibCoord3DTransY();
-            double tZ3D   = mControlWidget->getCalibCoord3DTransZ();
             double axeLen = mControlWidget->getCalibCoord3DAxeLen();
 
             qreal coordLineWidth = 2.0;
-
 
             if(extCalib->isSetExtrCalib())
             {
@@ -580,21 +568,6 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 painter->drawText(QPointF(p[0].x - 5, p[0].y + 5), QString("Y"));
                 p[0] = extCalib->getImagePoint(cv::Point3f(z3D.x, z3D.y, z3D.z + 10));
                 painter->drawText(QPointF(p[0].x - 5, p[0].y + 5), QString("Z"));
-
-
-                if(debug)
-                {
-                    debout << "Ursprungskoordinaten: " << ursprung.x << ", " << ursprung.y << std::endl;
-                }
-                if(debug)
-                {
-                    debout << "Bildsize: " << mMainWindow->getImage()->width() << "x"
-                           << mMainWindow->getImage()->height() << std::endl;
-                }
-                if(debug)
-                {
-                    coordinaten = QString::asprintf("(%f  %f %f)", tX3D, tY3D, tZ3D);
-                }
 
                 //////////////////////////////
                 // Drawing the tick-markers //

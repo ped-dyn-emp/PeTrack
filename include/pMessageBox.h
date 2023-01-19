@@ -21,6 +21,7 @@
 
 #include <QDialog>
 #include <QDialogButtonBox>
+#include <spdlog/spdlog.h>
 
 class QLabel;
 

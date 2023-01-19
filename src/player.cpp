@@ -20,8 +20,8 @@
 
 #include "animation.h"
 #include "control.h"
+#include "logger.h"
 #include "pMessageBox.h"
-#include "petrack.h"
 
 #include <QApplication>
 #include <QIntValidator>
@@ -33,7 +33,6 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 #include <QtConcurrent>
-
 
 Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
 {
@@ -289,7 +288,7 @@ bool Player::forward()
     {
         if(!should_be_last_frame)
         {
-            debout << "Warning: video unexpected finished." << std::endl;
+            SPDLOG_WARN("video unexpected finished.");
         }
     }
 #ifdef TIME_MEASUREMENT
@@ -406,7 +405,7 @@ void Player::playVideo()
             if(mAnimation->getCurrentFrameNum() != 0 &&
                mAnimation->getCurrentFrameNum() != mAnimation->getSourceOutFrameNum())
             {
-                debout << "Warning: video unexpectedly finished." << std::endl;
+                SPDLOG_WARN("video unexpectedly finished.");
             }
         }
         else
@@ -542,7 +541,7 @@ void Player::recStream()
                 mMainWindow->statusBar()->showMessage(tr("Saved video file to %1.").arg(dest), 5000);
                 if(!QFile(videoTmp).remove())
                 {
-                    debout << "Could not remove tmp-file: " << videoTmp << std::endl;
+                    SPDLOG_WARN("Could not remove tmp-file: {}", videoTmp);
                 }
 
                 progress.setValue(2);
@@ -558,7 +557,7 @@ void Player::recStream()
             }
             else
             {
-                debout << "error: could not open video output file!" << std::endl;
+                SPDLOG_ERROR("could not open video output file!");
             }
         }
     }

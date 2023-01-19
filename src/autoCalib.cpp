@@ -19,6 +19,7 @@
 #include "autoCalib.h"
 
 #include "control.h"
+#include "logger.h"
 #include "pMessageBox.h"
 #include "petrack.h"
 
@@ -156,8 +157,11 @@ void AutoCalib::autoCalib()
             "Calculating intrinsic camera parameters...", "Abort calculation", 0, mCalibFiles.size(), mMainWindow);
         progress.setWindowModality(Qt::WindowModal); // blocks main window
 
-        debout << "Search for cheesboard pattern (" << board_size.width << "x" << board_size.height
-               << ") with square size: " << square_size << "cm..." << std::endl;
+        SPDLOG_INFO(
+            "Search for chessboard pattern ({} x {}) with square size: {} cm...",
+            board_size.width,
+            board_size.height,
+            square_size);
         bool min_one_pattern_found = false;
         // search for chessbord corners in every image
         for(int i = 0; i < mCalibFiles.size(); ++i)
@@ -225,13 +229,12 @@ void AutoCalib::autoCalib()
             }
             else
             {
-                debout << "Calibration pattern not found in: " << mCalibFiles.at(i).toStdString() << std::endl;
+                SPDLOG_WARN("Calibration pattern not found in: {}", mCalibFiles.at(i));
             }
         }
 
         if(!min_one_pattern_found)
         {
-            debout << "Calibration failed. No patterns found!" << std::endl;
             PWarning(
                 mMainWindow,
                 QString("Calibration failed"),
@@ -269,29 +272,34 @@ void AutoCalib::autoCalib()
             camera_matrix,
             dist_coeffs,
             &reproj_errs);
-        debout << (ok ? "Calibration succeeded." : "Calibration failed.")
-               << std::endl; //  "Avgage reprojection error is "  << avg_reproj_err << endl;
-        debout << "Intrinsic reprojection error is: " << reproj_errs << std::endl;
+
+        SPDLOG_INFO("{}", ok ? "Calibration succeeded." : "Calibration failed.");
+        SPDLOG_INFO("Intrinsic reprojection error is: {:f}", reproj_errs);
 
         progress.setValue(mCalibFiles.size());
 
-        debout << "Cameramatrix: " << std::endl;
-        debout << "( " << camera_matrix.at<double>(0, 0) << " " << camera_matrix.at<double>(0, 1) << " "
-               << camera_matrix.at<double>(0, 2) << ")" << std::endl;
-        debout << "( " << camera_matrix.at<double>(1, 0) << " " << camera_matrix.at<double>(1, 1) << " "
-               << camera_matrix.at<double>(1, 2) << ")" << std::endl;
-        debout << "( " << camera_matrix.at<double>(2, 0) << " " << camera_matrix.at<double>(2, 1) << " "
-               << camera_matrix.at<double>(2, 2) << ")" << std::endl;
+        SPDLOG_INFO("camera matrix:\n{}", camera_matrix);
 
-        debout << "Distortioncoefficients: " << std::endl;
-        debout << "r2: " << dist_coeffs.at<double>(0, 0) << " r4: " << dist_coeffs.at<double>(0, 1)
-               << " r6: " << dist_coeffs.at<double>(0, 4) << std::endl;
-        debout << "tx: " << dist_coeffs.at<double>(0, 2) << " ty: " << dist_coeffs.at<double>(0, 3) << std::endl;
-        debout << "k4: " << dist_coeffs.at<double>(0, 5) << " k5: " << dist_coeffs.at<double>(0, 6)
-               << " k6: " << dist_coeffs.at<double>(0, 7) << std::endl;
-        debout << "s1: " << dist_coeffs.at<double>(0, 8) << " s2: " << dist_coeffs.at<double>(0, 9)
-               << " s3: " << dist_coeffs.at<double>(0, 10) << " s4: " << dist_coeffs.at<double>(0, 11) << std::endl;
-        debout << "taux: " << dist_coeffs.at<double>(0, 12) << " tauy: " << dist_coeffs.at<double>(0, 13) << std::endl;
+        SPDLOG_INFO("distortion coefficients:");
+        SPDLOG_INFO(
+            "r2: {} r4: {} r6: {}",
+            dist_coeffs.at<double>(0, 0),
+            dist_coeffs.at<double>(0, 1),
+            dist_coeffs.at<double>(0, 4));
+        SPDLOG_INFO("tx: {} ty: {}", dist_coeffs.at<double>(0, 2), dist_coeffs.at<double>(0, 3));
+        SPDLOG_INFO(
+            "k4: {} k5: {} k6: {}",
+            dist_coeffs.at<double>(0, 5),
+            dist_coeffs.at<double>(0, 6),
+            dist_coeffs.at<double>(0, 7));
+
+        SPDLOG_INFO(
+            "s1: {} s2: {} s3: {} s4: {}",
+            dist_coeffs.at<double>(0, 8),
+            dist_coeffs.at<double>(0, 9),
+            dist_coeffs.at<double>(0, 10),
+            dist_coeffs.at<double>(0, 11));
+        SPDLOG_INFO("taux: {} tauy: {}", dist_coeffs.at<double>(0, 12), dist_coeffs.at<double>(0, 13));
 
         // set calibration values
         mControlWidget->setCalibFx(camera_matrix.at<double>(0, 0));

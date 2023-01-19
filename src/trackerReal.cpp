@@ -22,6 +22,7 @@
 #include "calibFilter.h"
 #include "control.h"
 #include "helper.h"
+#include "logger.h"
 #include "personStorage.h"
 #include "petrack.h"
 #include "player.h"
@@ -263,19 +264,25 @@ int TrackerReal::calculate(
                         {
                             if(exportElimTrj)
                             {
-                                debout << "Warning: no calculated height for trackpoint " << j << " (frame "
-                                       << person.firstFrame() + j << ") of person " << i + 1
-                                       << ", person is not exported!" << std::endl;
-                                break; // TrackPerson ist angelegt, erhaelt aber keine Points und wird deshalb am
-                                       // ende nicht eingefuegt
+                                SPDLOG_WARN(
+                                    "no calculated height for TrackPoint {} (frame {}) of person {}, person is not "
+                                    "exported!",
+                                    j,
+                                    person.firstFrame() + j,
+                                    i + 1);
+                                break; // TrackPerson ist angelegt, erhaelt aber keine Points und wird deshalb am ende
+                                       // nicht eingefuegt
                             }
                             else
                             {
                                 bestZ = height; // wenn gar kein trackpoint ungleich -1 gefunden wird, dann wird zu
                                                 // allerletzt Hoehe genommen
-                                debout << "Warning: no calculated height for trackpoint " << j << " (frame "
-                                       << person.firstFrame() + j << ") of person " << i + 1
-                                       << ", default height is used!" << std::endl;
+                                SPDLOG_WARN(
+                                    "no calculated height for TrackPoint {} (frame {}) of person {}, default height is "
+                                    "used!",
+                                    j,
+                                    person.firstFrame() + j,
+                                    i + 1);
                             }
                         }
                         else
@@ -290,17 +297,23 @@ int TrackerReal::calculate(
                             {
                                 trackPersonReal.setFirstFrame(trackPersonReal.firstFrame() + 1);
                             }
-                            debout << "Warning: no calculated height for trackpoint " << j << " (frame "
-                                   << person.firstFrame() + j << ") of person " << i + 1
-                                   << ", extrapolated height not used, trackpoint not inserted!" << std::endl;
+                            SPDLOG_WARN(
+                                "no calculated height for TrackPoint {} (frame {}) of person {}, extrapolated height "
+                                "not used, TrackPoint not inserted!",
+                                j,
+                                person.firstFrame() + j,
+                                i + 1);
                         }
                         else
                         {
                             if(extrapolated)
                             {
-                                debout << "Warning: no calculated height for trackpoint " << j << " (frame "
-                                       << person.firstFrame() + j << ") of person " << i + 1
-                                       << ", extrapolated height is used!" << std::endl;
+                                SPDLOG_WARN(
+                                    "no calculated height for TrackPoint {} (frame {}) of person {}, extrapolated "
+                                    "height is used!",
+                                    j,
+                                    person.firstFrame() + j,
+                                    i + 1);
                             }
                             if(exportAutoCorrect)
                             {
@@ -391,13 +404,12 @@ int TrackerReal::calculate(
                             if(alternateHeight) // personenhoehe variiert ueber trajektorie (unebene versuche);
                                                 // berechnung durch mich und nicht pointgrey nutzen
                             {
-                                debout << "Warning: No interpolation is done, because alternate height is enabled - "
-                                          "has to be implemented!"
-                                       << std::endl;
+                                SPDLOG_WARN("no interpolation is done, because alternate height is enabled - has to be "
+                                            "implemented!");
                             }
                             else
                             {
-                                // use local variable an just reset the value
+                                // use local variable and just reset the value
                                 moveDir.set(0, 0);
                                 if(exportAutoCorrect)
                                 {
@@ -445,16 +457,15 @@ int TrackerReal::calculate(
                         trackPersonReal.setLastFrame(trackPersonReal.lastFrame() - 1);
                         trackPersonReal.removeLast();
                     }
-                    debout << "Warning: delete last " << tsize - j << " frames of person " << i + 1
-                           << " because of height jump!" << std::endl;
+                    SPDLOG_WARN("delete last {} frames of person {} because of height jump!", tsize - j, i + 1);
                     break;
                 }
             }
             tsize = trackPersonReal.size();
             if(delNumFront > 0)
             {
-                debout << "Warning: delete first " << delNumFront << " frames of person " << i + 1
-                       << " because of height jump!" << std::endl;
+                SPDLOG_WARN("delete first {} frames of person {} because of height jump!", delNumFront, i + 1);
+
                 for(k = 0; (k < delNumFront) && (k < tsize); k++)
                 {
                     trackPersonReal.setFirstFrame(trackPersonReal.firstFrame() + 1);
@@ -463,8 +474,7 @@ int TrackerReal::calculate(
             }
             if(trackPersonReal.size() < 20)
             {
-                debout << "Warning: Person " << i + 1 << " has only " << trackPersonReal.size() << " trackpoints!"
-                       << std::endl;
+                SPDLOG_WARN("person {} has only {} TrackPoints!", i + 1, trackPersonReal.size());
             }
             if(trackPersonReal.size() > 0)
             {
@@ -472,16 +482,15 @@ int TrackerReal::calculate(
             }
             else // ggf weil keine calculated height vorlag (siehe exportElimTrj)
             {
-                debout << "Warning: Person " << i + 1 << " is not inserted, because of no trackpoints!" << std::endl;
+                SPDLOG_WARN("person {} is not inserted, because of no TrackPoints!", i + 1);
             }
         }
         return size();
     }
     else
     {
-        debout << "Warning: no real tracking data calculated, because of missing tracking data, image reference or "
-                  "color map!"
-               << std::endl;
+        SPDLOG_WARN("no real tracking data calculated, because of missing tracking data, image reference or "
+                    "color map!");
         return -1;
     }
 }
@@ -674,7 +683,7 @@ void TrackerReal::exportDat(QTextStream &out, bool alternateHeight, bool useTrac
     progress.setVisible(true);
     progress.setValue(0);
     progress.setLabelText(QString("Export tracking data ..."));
-    debout << "size:" << size() << std::endl;
+    SPDLOG_INFO("size: {}", size());
     if(useTrackpoints)
     {
         for(int i = 0; i < size(); ++i)
@@ -699,7 +708,7 @@ void TrackerReal::exportDat(QTextStream &out, bool alternateHeight, bool useTrac
             progress.setLabelText(QString("Export person %1 of %2 ...").arg(i + 1).arg(size()));
             qApp->processEvents();
             progress.setValue(i + 1);
-            debout << "person: " << i << std::endl;
+            SPDLOG_INFO("person: {}", i);
 
             for(int j = 0; j < at(i).size(); ++j)
             {
@@ -1017,8 +1026,11 @@ utils::detectMissingFrames(const std::vector<std::unordered_map<int, double>> &d
         {
             int numMissingFrames = static_cast<int>(medianRounded) - 1;
 
-            debout << "Warning: potentially missing " << numMissingFrames << " frame(s) between " << frame - 1
-                   << " and " << frame << " will be inserted." << std::endl;
+            SPDLOG_WARN(
+                "potentially missing {} frame(s) between {} and {} will be inserted",
+                numMissingFrames,
+                frame - 1,
+                frame);
 
             missingFrames.push_back({frame - 1, numMissingFrames});
         }

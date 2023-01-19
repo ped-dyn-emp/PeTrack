@@ -35,6 +35,7 @@
 #include "gridItem.h"
 #include "helper.h"
 #include "imageItem.h"
+#include "logger.h"
 #include "logoItem.h"
 #include "moCapItem.h"
 #include "multiColorMarkerItem.h"
@@ -527,7 +528,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
         }
         else
         {
-            debout << "Unknown PETRACK tag " << elem.tagName() << std::endl;
+            SPDLOG_ERROR("Unknown PETRACK tag {}", elem.tagName());
         }
     }
     // open koennte am schluss passieren, dann wuerde nicht erst unveraendertes bild angezeigt,
@@ -551,7 +552,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     {
         if(!(loaded = mBackgroundFilter.load(mBackgroundFilter.getFilename())))
         {
-            debout << "Error: loading background file " << mBackgroundFilter.getFilename() << "!" << std::endl;
+            SPDLOG_ERROR("Error: loading background file {}!", mBackgroundFilter.getFilename());
         }
     }
 
@@ -651,7 +652,7 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
             return;
         }
 
-        debout << "open " << fileName << std::endl;
+        SPDLOG_INFO("open: {}", fileName);
         file.close();
         setProFileName(fileName);
 
@@ -849,7 +850,7 @@ bool Petrack::saveProject(QString fileName) // default fileName=""
         file.close(); // also flushes the file
 
         statusBar()->showMessage(tr("Saved project to %1.").arg(fileName), 5000);
-        debout << "save project to " << fileName << std::endl;
+        SPDLOG_INFO("save project to {}", fileName);
 
         updateWindowTitle();
         return true;
@@ -904,7 +905,7 @@ void Petrack::openCameraLiveStream(int camID /* =-1*/)
     {
         // if more than one camera connected show to choose
         // camID = selectedID;
-        debout << "No camera ID delivered: Set CameraID to 0 (default Camera)" << std::endl;
+        SPDLOG_INFO("No camera ID delivered: Set CameraID to 0 (default Camera)");
         camID = 0; // default
     }
     if(!mAnimation->openCameraStream(camID))
@@ -913,9 +914,13 @@ void Petrack::openCameraLiveStream(int camID /* =-1*/)
         return;
     }
     mSeqFileName = "camera live stream";
-    debout << "open " << mSeqFileName << " (" << mAnimation->getNumFrames() << " frames; " << mAnimation->getFPS()
-           << " fps; " << mAnimation->getSize().width() << "x" << mAnimation->getSize().height() << " pixel)"
-           << std::endl; // size
+    SPDLOG_INFO(
+        "open {} ({} frames; {} fps; {} x {} pixel)",
+        mSeqFileName,
+        mAnimation->getNumFrames(),
+        mAnimation->getFPS(),
+        mAnimation->getSize().width(),
+        mAnimation->getSize().height());
     updateSequence();
     updateWindowTitle();
     mPlayerWidget->setFPS(mAnimation->getFPS());
@@ -986,9 +991,13 @@ void Petrack::openSequence(QString fileName) // default fileName = ""
         }
 #endif
         mSeqFileName = fileName;
-        debout << "open " << mSeqFileName << " (" << mAnimation->getNumFrames() << " frames; " << mAnimation->getFPS()
-               << " fps; " << mAnimation->getSize().width() << "x" << mAnimation->getSize().height() << " pixel)"
-               << std::endl; // size
+        SPDLOG_INFO(
+            "open {} ({} frames; {} fps; {} x {} pixel)",
+            mSeqFileName,
+            mAnimation->getNumFrames(),
+            mAnimation->getFPS(),
+            mAnimation->getSize().width(),
+            mAnimation->getSize().height());
         updateSequence();
         updateWindowTitle();
         mPlayerWidget->setFPS(mAnimation->getFPS());
@@ -1395,8 +1404,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
 
         // bei abbruch koennen es auch mPlayerWidget->getPos() frames sein, die bisher geschrieben wurden
         //-memPos nur, wenn nicht an den anfang gesprungen wird
-        debout << "wrote " << mPlayerWidget->getPos() + 1 - memPos << " of " << mAnimation->getNumFrames() << " frames."
-               << std::endl;
+        SPDLOG_INFO("wrote {} of {} frames.", mPlayerWidget->getPos() + 1 - memPos, mAnimation->getNumFrames());
         progress.setValue(progEnd);
 
         if(saveVideo)
@@ -2515,7 +2523,7 @@ void Petrack::importTracker(QString dest) // default = ""
                 }
                 else
                 {
-                    debout << "Error: wrong header while reading TRC file." << std::endl;
+                    SPDLOG_ERROR("wrong header while reading TRC file.");
                     QMessageBox::critical(
                         this,
                         tr("PeTrack"),
@@ -2531,8 +2539,7 @@ void Petrack::importTracker(QString dest) // default = ""
 
             if((sz > 0) && (mPersonStorage.nbPersons() != 0))
             {
-                debout << "Warning: Overlapping trajectories will be joined not until tracking adds new trackpoints."
-                       << std::endl;
+                SPDLOG_WARN("overlapping trajectories will be joined not until tracking adds new TrackPoints.");
             }
             for(i = 0; i < sz; ++i)
             {
@@ -2554,7 +2561,7 @@ void Petrack::importTracker(QString dest) // default = ""
                 QString("%1").arg(mPersonStorage.visible(mAnimation->getCurrentFrameNum())));
             mControlWidget->replotColorplot();
             file.close();
-            debout << "import " << dest << " (" << sz << " person(s), file version " << trcVersion << ")" << std::endl;
+            SPDLOG_INFO("import {} ({} person(s), file version {})", dest, sz, trcVersion);
             mTrcFileName =
                 dest; // fuer Project-File, dann koennte track path direkt mitgeladen werden, wenn er noch da ist
         }
@@ -2684,7 +2691,7 @@ void Petrack::importTracker(QString dest) // default = ""
                 QString("%1").arg(mPersonStorage.visible(mAnimation->getCurrentFrameNum())));
             mControlWidget->replotColorplot();
             file.close();
-            debout << "import " << dest << " (" << sz << " person(s) )" << std::endl;
+            SPDLOG_INFO("import {} ({} person(s))", dest, sz);
             mTrcFileName =
                 dest; // fuer Project-File, dann koennte track path direkt mitgeladen werden, wenn er noch da ist
         }
@@ -2806,8 +2813,11 @@ void Petrack::exportTracker(QString dest) // default = ""
 
                 trcVersion = 4;
 
-                debout << "export tracking data to " << dest << " (" << mPersonStorage.nbPersons()
-                       << " person(s), file version " << trcVersion << ")..." << std::endl;
+                SPDLOG_INFO(
+                    "export tracking data to {} ({} person(s), file version {})",
+                    dest,
+                    mPersonStorage.nbPersons(),
+                    trcVersion);
                 QTextStream out(&file);
 
                 out << "version " << trcVersion << Qt::endl;
@@ -2854,7 +2864,7 @@ void Petrack::exportTracker(QString dest) // default = ""
 
                 progress.setValue(static_cast<int>(mPersonStorage.nbPersons() + 1));
 
-                std::cout << " finished " << std::endl;
+                SPDLOG_INFO("finished.");
                 mAutosave.resetTrackPersonCounter();
 
 #ifdef TIME_MEASUREMENT
@@ -2884,8 +2894,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     return;
                 }
 
-                debout << "export tracking data to " << dest << " (" << mPersonStorage.nbPersons() << " person(s))..."
-                       << std::endl;
+                SPDLOG_INFO("export tracking data to {} ({} person(s))...", dest, mPersonStorage.nbPersons());
 
 #ifdef TIME_MEASUREMENT
                 double time1 = 0.0, tstart;
@@ -2953,22 +2962,21 @@ void Petrack::exportTracker(QString dest) // default = ""
                     out << "# ID| Comment" << Qt::endl;
 
                     // std out
-                    std::cout << std::endl << "Printing comment table..." << std::endl << std::endl;
-                    std::cout << "ID  | Comment" << std::endl;
-                    std::cout << "----|----------------" << std::endl;
+                    SPDLOG_INFO("Printing comment table...");
+                    SPDLOG_INFO("ID  | Comment");
+                    SPDLOG_INFO("----|----------------");
 
                     for(int i = 0; i < static_cast<int>(mPersonStorage.nbPersons()); ++i)
                     {
                         auto commentSplit = mPersonStorage.at(i).comment().split("\n", Qt::KeepEmptyParts);
                         out << "#" << qSetFieldWidth(3) << (i + 1) << qSetFieldWidth(0) << "|" << commentSplit.at(0)
                             << Qt::endl;
-                        std::cout << std::setw(4) << (i + 1) << "|" << commentSplit.at(0) << std::endl;
-
+                        SPDLOG_INFO("{:04d}|{}", (i + 1), commentSplit.at(0));
                         commentSplit.pop_front();
                         for(const QString &line : commentSplit)
                         {
                             out << "#" << qSetFieldWidth(3) << " " << qSetFieldWidth(0) << "|" << line << Qt::endl;
-                            std::cout << "    |" << line << std::endl;
+                            SPDLOG_INFO("    |{}", line);
                         }
                     }
                 }
@@ -3002,7 +3010,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
                 }
 
-                std::cout << " finished" << std::endl;
+                SPDLOG_INFO("finished");
 
 #ifdef TIME_MEASUREMENT
                 time1 += clock() - tstart;
@@ -3055,8 +3063,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     mControlWidget->isExportMarkerIDChecked(),
                     autoCorrectOnlyExport);
 
-                debout << "export tracking data to " << dest << " (" << mPersonStorage.nbPersons() << " person(s))..."
-                       << std::endl;
+                SPDLOG_INFO("export tracking data to {} ({} person(s))...", dest, mPersonStorage.nbPersons());
                 QTextStream outDat(&fileDat);
                 mTrackerReal->exportDat(
                     outDat, mControlWidget->getTrackAlternateHeight(), mStereoWidget->stereoUseForExport->isChecked());
@@ -3081,7 +3088,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
                 }
 
-                std::cout << " finished" << std::endl;
+                SPDLOG_INFO("finished");
             }
             else if(dest.right(5) == ".trav")
             {
@@ -3119,10 +3126,9 @@ void Petrack::exportTracker(QString dest) // default = ""
                     PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(fileXml.errorString()));
                     return;
                 }
-                debout << "export tracking data to " << dest << " (" << mPersonStorage.nbPersons() << " person(s))..."
-                       << std::endl;
+                SPDLOG_INFO("export tracking data to {} ({} person(s))...", dest, mPersonStorage.nbPersons());
                 // already done: mTrackerReal->calculate(mTracker, mImageItem, mControlWidget->getColorPlot(),
-                // getImageBorderSize(), mControlWidget->isTrackMissingFramesChecked());
+                // getImageBorderSize(), mControlWidget->trackMissingFrames->checkState());
                 QTextStream outXml(&fileXml);
                 outXml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << Qt::endl;
                 outXml << "<trajectoriesDataset>" << Qt::endl;
@@ -3163,7 +3169,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                     statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
                 }
 
-                std::cout << " finished" << std::endl;
+                SPDLOG_INFO("finished");
             }
             else
             { // wenn keine Dateiendung, dann wird trc und txt herausgeschrieben
@@ -3408,7 +3414,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             // beim nachladen von versuch nicht bg geloescht wird
             if(mBackgroundFilter.getFilename() != "")
             {
-                debout << "Warning: No background reset, because of explicit loaded background image!" << std::endl;
+                SPDLOG_WARN("no background reset, because of explicit loaded background image!");
             }
             else
             {
@@ -3439,8 +3445,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             mTracker->reset();
             if(!isLoading())
             {
-                debout << "Warning: deleted all tracking pathes because intrinsic parameters have changed."
-                       << std::endl;
+                SPDLOG_WARN("deleted all tracking pathes because intrinsic parameters have changed.");
             }
         }
         else
