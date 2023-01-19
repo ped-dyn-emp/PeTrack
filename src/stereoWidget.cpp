@@ -18,6 +18,8 @@
 
 #include "stereoWidget.h"
 
+#include "logger.h"
+
 StereoWidget::StereoWidget(QWidget *parent) : QWidget(parent)
 {
     mMainWindow = (class Petrack *) parent;
@@ -164,7 +166,7 @@ void StereoWidget::getXml(QDomElement &elem)
                 }
                 else
                 {
-                    debout << "Unknown STEREO tag " << subSubElem.tagName() << std::endl;
+                    SPDLOG_ERROR("Unknown STEREO tag: {}", subSubElem.tagName());
                 }
             }
         }

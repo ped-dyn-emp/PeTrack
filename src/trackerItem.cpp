@@ -20,6 +20,7 @@
 
 #include "animation.h"
 #include "control.h"
+#include "logger.h"
 #include "personStorage.h"
 #include "petrack.h"
 #include "roiItem.h"
@@ -91,10 +92,10 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
                 {
                     if(found)
                     {
-                        debout << "Warning: more possible trackpoints for point" << std::endl;
-                        debout << "         " << p << " in frame " << frame << " with low distance:" << std::endl;
-                        debout << "         person " << i + 1 << " (distance: " << dist << "), " << std::endl;
-                        debout << "         person " << iNearest + 1 << " (distance: " << minDist << "), " << std::endl;
+                        SPDLOG_WARN("more possible TrackPoints for point");
+                        SPDLOG_WARN("         {} in frame {} with low distance:", p, frame);
+                        SPDLOG_WARN("         person {} (distance {}),", i + 1, dist);
+                        SPDLOG_WARN("         person {} (distance {})", iNearest + 1, minDist);
                         if(minDist > dist)
                         {
                             minDist  = dist;
@@ -370,16 +371,19 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
         y_offset = -std::min(leftTop.y, rightBottom.y);
         x_switch = rightBottom.x < leftTop.x ? abs(rightBottom.x - leftTop.x) : 0;
         y_switch = rightBottom.y < leftTop.y ? abs(leftTop.y - rightBottom.y) : 0;
-        debout << "x_offset: " << x_offset << ", y_offset: " << y_offset << ", x_switch: " << x_switch
-               << ", y_switch: " << y_switch << std::endl;
+        SPDLOG_INFO("x_offset: {}, y_offset: {}, x_switch: {}, y_switch: {}", x_offset, y_offset, x_switch, y_switch);
 
-        cv::Rect delaunyROI(cv::Rect(
+        cv::Rect delaunyROI(
             leftTop.x + x_offset,
             leftTop.y + y_offset,
             x_switch > 0 ? x_switch : (rightBottom.x - leftTop.x),
-            y_switch > 0 ? y_switch : (rightBottom.y - leftTop.y)));
-        debout << "Rect size: P(" << delaunyROI.x << ", " << delaunyROI.y << "), width: " << delaunyROI.width
-               << ", height: " << delaunyROI.height << std::endl;
+            y_switch > 0 ? y_switch : (rightBottom.y - leftTop.y));
+        SPDLOG_INFO(
+            "Rect size: P({}, {}), width: {}, height: {}",
+            delaunyROI.x,
+            delaunyROI.y,
+            delaunyROI.width,
+            delaunyROI.height);
 
         subdiv.initDelaunay(delaunyROI);
     }
@@ -681,8 +685,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                             }
                         }
 
-                        debout << "insert P(" << p3d_height.x + x_offset << ", " << p3d_height.y + y_offset
-                               << ") to subdiv" << std::endl;
+                        SPDLOG_INFO("insert P({}, {}) to subdiv", p3d_height.x + x_offset, p3d_height.y + y_offset);
 
                         subdiv.insert(cv::Point2f(
                             x_switch > 0 ? x_switch - p3d_height.x + x_offset : p3d_height.x + x_offset,
@@ -871,9 +874,9 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 cv::Point2f point2D = mMainWindow->getExtrCalibration()->getImagePoint(
                     cv::Point3f(facets3D.at(i).at(j).x, facets3D.at(i).at(j).y, 0));
 
-                debout << "facets3D.at(" << i << ").at(" << j << ").x = " << facets3D.at(i).at(j).x
-                       << ", .y = " << facets3D.at(i).at(j).y << std::endl;
-                debout << "point2D.x = " << point2D.x << " , .y = " << point2D.y << std::endl;
+                SPDLOG_INFO(
+                    "facets3D.at({}).at({}).x = {}, .y = {}", i, j, facets3D.at(i).at(j).x, facets3D.at(i).at(j).y);
+                SPDLOG_INFO("point2D.x = {}, .y = {}", point2D.x, point2D.y);
 
                 if constexpr(
                     false && sqrt(
@@ -913,7 +916,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         ifacet2D.push_back(QPointF(center2D.x, center2D.y));
                         ifacet2D.push_back(QPointF(point2D.x, point2D.y));
 
-                        debout << "End point: (" << s1_x << ", " << s1_y << ")" << std::endl;
+                        SPDLOG_INFO("End point: ({}, {})", s1_x, s1_y);
                     }
                     else
                     {
@@ -938,12 +941,18 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         s2_x = p - q;
                         s2_y = m * s2_x + n;
 
-                        debout << "x=" << s1_x << " G(x)=" << (m * s1_x + n)
-                               << " K(x)=" << pow(s1_x - centers3D.at(i).x, 2) + pow(s1_y - centers3D.at(i).y, 2)
-                               << " = " << pow(r, 2) << std::endl;
-                        debout << "x=" << s2_x << " G(x)=" << (m * s2_x + n)
-                               << " K(x)=" << pow(s2_x - centers3D.at(i).x, 2) + pow(s2_y - centers3D.at(i).y, 2)
-                               << " = " << pow(r, 2) << std::endl;
+                        SPDLOG_INFO(
+                            "x={} G(x)={} K(x)={} = {}",
+                            s1_x,
+                            (m * s1_x + n),
+                            pow(s1_x - centers3D.at(i).x, 2) + pow(s1_y - centers3D.at(i).y, 2),
+                            pow(r, 2));
+                        SPDLOG_INFO(
+                            "x={} G(x)={} K(x)={} = {}",
+                            s2_x,
+                            (m * s2_x + n),
+                            pow(s2_x - centers3D.at(i).x, 2) + pow(s2_y - centers3D.at(i).y, 2),
+                            pow(r, 2));
 
                         facets3D[i][j] = cv::Point2f(s1_x, s1_y);
 
@@ -952,7 +961,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         circleStart   = QPointF(point2D.x, point2D.y);
                         circleStarted = true;
 
-                        debout << "Start point: (" << s1_x << ", " << s1_y << ")" << std::endl;
+                        SPDLOG_INFO("Start point: ({}, {})", s1_x, s1_y);
                     }
                 }
                 else

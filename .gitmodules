@@ -5,3 +5,6 @@
 [submodule "ezc3d"]
 	path = ezc3d
 	url = https://github.com/pyomeca/ezc3d.git
+[submodule "spdlog"]
+	path = spdlog
+	url = https://github.com/gabime/spdlog.git

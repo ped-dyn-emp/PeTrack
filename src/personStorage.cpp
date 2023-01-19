@@ -21,6 +21,7 @@
 #include "animation.h"
 #include "autosave.h"
 #include "control.h"
+#include "logger.h"
 #include "multiColorMarkerWidget.h"
 #include "pMessageBox.h"
 #include "petrack.h"
@@ -248,7 +249,7 @@ void PersonStorage::delPointROI()
             }
         }
     }
-    debout << "deleted " << anz << " trajectories!" << std::endl;
+    SPDLOG_INFO("deleted {} trajectories!", anz);
 }
 
 
@@ -357,8 +358,7 @@ bool PersonStorage::setTrackPersonHeight(const Vec2F &point, int frame, const QS
             {
                 if(height < 0)
                 {
-                    debout << "Warning: you entered a negative height!" << std::endl; // is not supported!" << endl;
-                    // return false;
+                    SPDLOG_WARN("you entered a negative height!");
                 }
                 // if previous value (col_height) is negative, height was determined thru color. If manually set value
                 // is the color-map value, we do not change anything
@@ -370,8 +370,7 @@ bool PersonStorage::setTrackPersonHeight(const Vec2F &point, int frame, const QS
                 }
                 else
                 {
-                    debout << std::endl
-                           << "No height change detected. Color-mapped height will remain set." << std::endl;
+                    SPDLOG_INFO("No height change detected. Color-mapped height will remain set.");
                 }
             }
         }
@@ -417,8 +416,7 @@ void PersonStorage::moveTrackPoint(int personID, int frame, const Vec2F &newPosi
     else
     {
         // only logging since this is a software bug, not a user bug; precondition of function not fulfilled
-        debout << "Warning: Trying to move nonexisting trackpoint of person " << personID << " at frame " << frame
-               << std::endl;
+        SPDLOG_WARN("Trying to move nonexistent TrackPoint of person {} at frame {}", personID, frame);
     }
 }
 
@@ -562,10 +560,10 @@ bool PersonStorage::addPoint(
             {
                 if(found)
                 {
-                    debout << "Warning: more possible trackpoints for point" << std::endl;
-                    debout << "         " << point << " in frame " << frame << " with low distance:" << std::endl;
-                    debout << "         person " << i + 1 << " (distance: " << dist << "), " << std::endl;
-                    debout << "         person " << iNearest + 1 << " (distance: " << minDist << "), " << std::endl;
+                    SPDLOG_WARN("multiple possible TrackPoints for point");
+                    SPDLOG_WARN("         {} in frame {} with low distance:", point, frame);
+                    SPDLOG_WARN("         person {} (distance: {})", i + 1, dist);
+                    SPDLOG_WARN("         person {} (distance: {})", iNearest + 1, minDist);
                     if(minDist > dist)
                     {
                         minDist  = dist;
@@ -637,7 +635,7 @@ bool PersonStorage::addPoint(
             "Adding a manual TrackPoint is only possible, when \"show only people\" and \"show only people list\" are "
             "disabled!\n"
             "You would not see the newly created TrackPoint otherwise.");
-        debout << "Warning: No manual insertion, because not all trajectories are visible!" << std::endl;
+        SPDLOG_WARN("No manual insertion, because not all trajectories are visible!");
         return false;
     }
 
@@ -834,7 +832,7 @@ void PersonStorage::checkPlausibility(
             qApp->processEvents();
             if(mPersons.at(i).size() < 10)
             {
-                debout << "Warning: Trajectory of person " << i + 1 << " has less than 10 trackpoints!" << std::endl;
+                SPDLOG_WARN("Trajectory of person {} has less than 10 TrackPoints!", i + 1);
                 pers.append(i + 1);
                 frame.append(mPersons[i].firstFrame());
             }
@@ -868,8 +866,7 @@ void PersonStorage::checkPlausibility(
                                            // x <= MIN(mGrey.cols - 1 - 2 * bS - margin, rect.x() + rect.width()) &&
                                            // y <= MIN(mGrey.rows - 1 - 2 * bS - margin, rect.y() + rect.height()))
             {
-                debout << "Warning: Start of trajectory inside picture and recognition area of person " << i + 1 << "!"
-                       << std::endl;
+                SPDLOG_WARN("Start of trajectory inside picture and recognition area of person {}", i + 1);
                 pers.append(i + 1);
                 frame.append(mPersons[i].firstFrame());
             }
@@ -882,8 +879,8 @@ void PersonStorage::checkPlausibility(
                                            // x <= MIN(mGrey.cols - 1 - 2 * bS - margin, rect.x() + rect.width()) &&
                                            // y <= MIN(mGrey.rows - 1 - 2 * bS - margin, rect.y() + rect.height()))
             {
-                debout << "Warning: End of trajectory inside picture and recognition area of person " << i + 1 << "!"
-                       << std::endl;
+                SPDLOG_WARN("End of trajectory inside picture and recognition area of person {}", i + 1);
+
                 pers.append(i + 1);
                 frame.append(mPersons[i].lastFrame());
             }
@@ -920,9 +917,11 @@ void PersonStorage::checkPlausibility(
                    ((d12 > 6.) ||
                     ((d01 + d23) / 2. > 3.))) // geschwindigkeit 1,8-fach && mindestpixelbewegung im schnitt von 3
                 {
-                    debout << "Warning: Fast variation of velocity of person " << i + 1 << " between frame "
-                           << j + mPersons.at(i).firstFrame() << " and " << j + 1 + mPersons.at(i).firstFrame() << "!"
-                           << std::endl;
+                    SPDLOG_WARN(
+                        "Fast variation of velocity of person {} between frame {} and {}!",
+                        i + 1,
+                        j + mPersons.at(i).firstFrame(),
+                        j + 1 + mPersons.at(i).firstFrame());
                     pers.append(i + 1);
                     frame.append(j + mPersons.at(i).firstFrame());
                 }
@@ -964,8 +963,7 @@ void PersonStorage::checkPlausibility(
                         if(mPersons.at(i).trackPointAt(f).distanceToPoint(mPersons.at(j).trackPointAt(f)) <
                            mMainWindow.getHeadSize(nullptr, i, f) / 2.)
                         {
-                            debout << "Warning: Person " << i + 1 << " and " << j + 1
-                                   << " are very close to each other at frame " << f << "!" << std::endl;
+                            SPDLOG_WARN("Person {} and {} are very close to each other at frame {}!", i + 1, j + 1, f);
                             pers.append(i + 1);
                             frame.append(f);
                         }
@@ -1024,7 +1022,6 @@ void PersonStorage::resetPos()
  */
 bool PersonStorage::printHeightDistribution()
 {
-    debout << std::endl;
     QMap<double, int>                 dict;
     QMap<double, int>::const_iterator j;
     int                               anz        = 0;
@@ -1048,9 +1045,10 @@ bool PersonStorage::printHeightDistribution()
 
     anz = std::accumulate(dict.cbegin(), dict.cend(), 0);
 
-    debout << "number of persons with measured height                            : " << anz << std::endl;
-    debout << "person without measured height (not included in calculated values): " << noHeight
-           << " (using default height for export)" << std::endl;
+    SPDLOG_INFO("number of persons with measured height                            : {}", anz);
+    SPDLOG_INFO(
+        "person without measured height (not included in calculated values): {} (using default height for export)",
+        noHeight);
     if(anz == 0)
     {
         return false;
@@ -1058,16 +1056,17 @@ bool PersonStorage::printHeightDistribution()
 
     for(j = dict.constBegin(); j != dict.constEnd(); ++j)
     {
-        debout << "height " << std::fixed << std::setprecision(1) << std::setw(5) << j.key() << " - "
-               << j.key() + heightStep << " : number " << std::setw(3) << j.value() << " (" << std::setw(4)
-               << (100. * j.value()) / anz << "%)" << std::endl;
+        SPDLOG_INFO(
+            "height {:1.5f} - {:1.5f} : number {:.3f} ({:4.f}%)",
+            j.key(),
+            j.key() + heightStep,
+            j.value(),
+            (100. * j.value()) / anz);
         average += (j.key() + heightStep / 2.) * j.value();
     }
 
-    debout << "average height (bucket): " << std::fixed << std::setprecision(1) << std::setw(5) << average / anz
-           << std::endl;
-    debout << "average height         : " << std::fixed << std::setprecision(1) << std::setw(5) << avg / anz
-           << std::endl;
+    SPDLOG_INFO("average height (bucket): {:1.5f}", average / anz);
+    SPDLOG_INFO("average height         : {:1.5f}", avg / anz);
 
     return true;
 }
@@ -1095,9 +1094,8 @@ void PersonStorage::setMarkerHeights(const std::unordered_map<int, float> &heigh
                 }
                 else
                 {
-                    debout << "Warning, the following markerID was not part of the height-file: " << markerID
-                           << std::endl;
-                    debout << "No height set for personNR: " << person.nr() << std::endl;
+                    SPDLOG_WARN("The following markerID was not part of the height-file: {}", markerID);
+                    SPDLOG_WARN("No height set for personNR: {}", person.nr());
                 }
             }
         }
@@ -1141,7 +1139,7 @@ void PersonStorage::setMarkerIDs(const std::unordered_map<int, int> &markerIDs)
         }
         else
         {
-            debout << "Warning, the following personID was not part of the markerID-file: " << personID << std::endl;
+            SPDLOG_WARN("The following personID was not part of the markerID-file: {}", personID);
         }
     }
 }
@@ -1218,9 +1216,11 @@ void PersonStorage::smoothHeight(size_t i, int j)
             {
                 mPersons[i][j].setSp(
                     mPersons[i].at(j).sp().x(), mPersons[i].at(j).sp().y(), mPersons[i].at(j - nrRew).sp().z());
-                debout << "Warning: Trackpoint smoothed height at the end or next to unknown height in "
-                          "the future for trajectory "
-                       << i + 1 << " in frame " << j + firstFrame << "." << std::endl;
+                SPDLOG_WARN(
+                    "Trackpoint smoothed height at the end or next to unknown height in the future for trajectory {} "
+                    "in frame {}.",
+                    i + 1,
+                    j + firstFrame);
             }
         }
         else if(
@@ -1231,9 +1231,11 @@ void PersonStorage::smoothHeight(size_t i, int j)
             {
                 mPersons[i][j].setSp(
                     mPersons[i].at(j).sp().x(), mPersons[i].at(j).sp().y(), mPersons[i].at(j + nrFor).sp().z());
-                debout << "Warning: Trackpoint smoothed height at the beginning or next to unknown "
-                          "height in the past for trajectory "
-                       << i + 1 << " in frame " << j + firstFrame << "." << std::endl;
+                SPDLOG_WARN(
+                    "TrackPoint smoothed height at the beginning or next to unknown height in the past for trajectory "
+                    "{} in frame {}.",
+                    i + 1,
+                    j + firstFrame);
             }
         }
         else if((j + nrFor != tsize) && (j - nrRew >= 0)) // in beiden richtungen hoeheninfo gefunden
@@ -1247,8 +1249,7 @@ void PersonStorage::smoothHeight(size_t i, int j)
             if(fabs(zMedian - mPersons[i].at(j).sp().z()) > 20. * (nrFor + nrRew)) // 20cm
             {
                 mPersons[i][j].setSp(mPersons[i].at(j).sp().x(), mPersons[i].at(j).sp().y(), zMedian);
-                debout << "Warning: Trackpoint smoothed height inside for trajectory " << i + 1 << " in frame "
-                       << j + firstFrame << "." << std::endl;
+                SPDLOG_WARN("Trackpoint smoothed height inside for trajectory {} in frame {}.", i + 1, j + firstFrame);
             }
         }
     }

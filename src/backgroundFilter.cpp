@@ -22,6 +22,7 @@
 
 // nur temporaer fuer anzeige
 #include "helper.h"
+#include "logger.h"
 
 #include <QFileDialog>
 #include <opencv2/highgui.hpp>
@@ -218,7 +219,7 @@ bool BackgroundFilter::load(QString dest) // default = ""
 {
     if(!mBgPointCloud.empty() || mBgModel != nullptr) // initialisierung
     {
-        debout << "Warning: Eliminate existing background!" << std::endl;
+        SPDLOG_WARN("Eliminate existing background!");
     }
 
     if(1) // (*stereoContext()) // auskommentiert, damit bg auch angelegt werden kann, wenn noch kein video geladen
@@ -239,7 +240,7 @@ bool BackgroundFilter::load(QString dest) // default = ""
             cv::Mat bgImg = cv::imread(dest.toStdString(), cv::IMREAD_GRAYSCALE);
             if(bgImg.empty())
             {
-                debout << "Error: could not read background subtraction file " << dest << "!" << std::endl;
+                SPDLOG_ERROR("could not read background subtraction file {}!", dest);
                 return false;
             }
 
@@ -255,7 +256,7 @@ bool BackgroundFilter::load(QString dest) // default = ""
 
             if constexpr(sizeof(float) != 4)
             {
-                debout << "Warning: the height range coded inside the background picture is not portable!" << std::endl;
+                SPDLOG_WARN("the height range coded inside the background picture is not portable!");
             }
 
             // uebetragen der z-werte in 8-bit-bild ---------------------------------------------------------
@@ -305,8 +306,7 @@ bool BackgroundFilter::load(QString dest) // default = ""
                     CV_8UC1); // = cvCreateImage(cvSize(bgImg->width, bgImg->height), IPL_DEPTH_8U, 1); // CV_8UC1 8, 1
             }
 
-            debout << "import background subtraction file (min " << min << ", max " << max
-                   << ") for stereo mode: " << dest << "." << std::endl;
+            SPDLOG_INFO("import background subtraction file (min {}, max {}) for stereo mode: {}.", min, max, dest);
         }
         else
         {

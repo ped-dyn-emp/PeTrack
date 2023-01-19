@@ -19,6 +19,7 @@
 #include "IO.h"
 #include "compilerInformation.h"
 #include "helper.h"
+#include "logger.h"
 #include "petrack.h"
 #include "tracker.h"
 
@@ -34,7 +35,6 @@
 // Aufrufbeispiel:
 // release/petrack.exe -sequence ../../einzelbilder/wert0001.png -autoSave dir|ttt.avi
 
-
 static QApplication *gApp = nullptr;
 void                 quit(int sig_number)
 {
@@ -43,6 +43,8 @@ void                 quit(int sig_number)
 
 int main(int argc, char *argv[])
 {
+    logger::setupLogger();
+
     Q_INIT_RESOURCE(icons);
 
     QApplication app(argc, argv);
@@ -88,7 +90,7 @@ int main(int argc, char *argv[])
         {
             QTextDocument doc;
             doc.setHtml(commandLineOptionsString);
-            debout << std::endl << doc.toPlainText() << std::endl;
+            SPDLOG_INFO("{}", doc.toPlainText());
             QMessageBox::about(nullptr, QObject::tr("Command line options"), commandLineOptionsString);
             return 0; // 0 means exit success // 1?
         }
@@ -161,17 +163,17 @@ int main(int argc, char *argv[])
         {
             // hier koennte je nach dateiendung *pet oder *avi oder *png angenommern werden
             // aber ueberpruefen, ob variable project oder sequence schon besetzt!!!
-            std::cout << "Option ignored (use -? for help): " << arg.at(i) << std::endl;
+            SPDLOG_WARN("Option ignored (use -? for help): {}", arg.at(i));
         }
     }
 
-    std::cout << "Starting PeTrack" << std::endl;
-    std::cout << "Version: " << PETRACK_VERSION << std::endl;
-    std::cout << "Commit id: " << GIT_COMMIT_HASH << std::endl;
-    std::cout << "Commit date: " << GIT_COMMIT_DATE << std::endl;
-    std::cout << "Build from branch: " << GIT_BRANCH << std::endl;
-    std::cout << "Compile date: " << COMPILE_TIMESTAMP << std::endl;
-    std::cout << "Build with: " << COMPILER_ID << " (" << COMPILER_VERSION << ")" << std::endl;
+    SPDLOG_INFO("Starting PeTrack");
+    SPDLOG_INFO("Version: {}", PETRACK_VERSION);
+    SPDLOG_INFO("Commit id: {}", GIT_COMMIT_HASH);
+    SPDLOG_INFO("Commit date: {}", GIT_COMMIT_DATE);
+    SPDLOG_INFO("Build from branch: {}", GIT_BRANCH);
+    SPDLOG_INFO("Compile date: {}", COMPILE_TIMESTAMP);
+    SPDLOG_INFO("Build with: {} ({})", COMPILER_ID, COMPILER_VERSION);
 
     Petrack petrack;
     petrack.setPeTrackVersion(PETRACK_VERSION);
@@ -217,7 +219,7 @@ int main(int argc, char *argv[])
         QFileInfo info{intrinsicImagesDir.absolutePath()};
         if(!(intrinsicImagesDir.exists() && info.isDir()))
         {
-            std::cout << "Error: " << intrinsicDir << " isn't an existing directory.\n";
+            SPDLOG_ERROR("{} isn't an existing directory.", intrinsicDir);
             return EXIT_FAILURE;
         }
         QStringList calibFiles;
@@ -251,7 +253,7 @@ int main(int argc, char *argv[])
             }
             else // markerIDs contains an error string
             {
-                debout << "Error: " << std::get<std::string>(markerIDs) << "\n";
+                SPDLOG_ERROR("{}", std::get<std::string>(markerIDs));
                 return EXIT_FAILURE;
             }
         }
@@ -267,7 +269,7 @@ int main(int argc, char *argv[])
             }
             else // markerHeights contains an error string
             {
-                debout << "Error: " << std::get<std::string>(markerHeights) << "\n";
+                SPDLOG_ERROR("{}", std::get<std::string>(markerHeights));
                 return EXIT_FAILURE;
             }
         }
@@ -302,7 +304,7 @@ int main(int argc, char *argv[])
         }
         else // heights contains an error string
         {
-            debout << "Error: " << std::get<std::string>(markerIDs) << "\n";
+            SPDLOG_ERROR("{}", std::get<std::string>(markerIDs));
             return EXIT_FAILURE;
         }
     }
@@ -318,7 +320,7 @@ int main(int argc, char *argv[])
         }
         else // heights contains an error string
         {
-            debout << "Error: " << std::get<std::string>(markerHeights) << "\n";
+            SPDLOG_ERROR("{}", std::get<std::string>(markerHeights));
             return EXIT_FAILURE;
         }
     }

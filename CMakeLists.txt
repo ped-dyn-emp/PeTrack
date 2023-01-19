@@ -128,6 +128,9 @@ endif()
 ################################################################################
 # Dependencies
 ################################################################################
+# spdlog
+add_subdirectory(spdlog)
+
 # ezc3d
 set(DUMMY ${BUILD_SHARED_LIBS})
 set(BUILD_SHARED_LIBS FALSE CACHE BOOL "Choose if build should be a dynamic or static library")
@@ -241,9 +244,7 @@ target_include_directories(petrack_core PRIVATE "${CMAKE_SOURCE_DIR}/ui")
 set_target_properties(${OpenCV_LIBS} PROPERTIES
     MAP_IMPORTED_CONFIG_DEBUG RELEASE
     MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELEASE)
-
 target_link_libraries(petrack_core PUBLIC ${OpenCV_LIBS})
-
 #*****************************************************************
 # Linking QWT                                                    *
 #*****************************************************************
@@ -259,6 +260,12 @@ else()
 endif()
 
 target_sources(petrack_core PRIVATE src/analysePlot.cpp)
+
+#*****************************************************************
+# Linking spdlog                                                    *
+#*****************************************************************
+target_link_libraries(petrack_core PUBLIC spdlog::spdlog)
+target_link_libraries(petrack PUBLIC spdlog::spdlog)
 
 #*****************************************************************
 # Linking ezc3d                                                  *
@@ -332,6 +339,7 @@ target_sources(petrack_core PRIVATE
     include/codeMarkerWidget.h
     include/multiColorMarkerWidget.h
     include/imageItem.h
+    include/logger.h
     include/logoItem.h
     include/gridItem.h
     include/coordItem.h

@@ -18,6 +18,8 @@
 
 #include "aviFileWriter.h"
 
+#include "logger.h"
+
 #include <cassert>
 #include <cstdio>
 #include <iostream>
@@ -223,12 +225,12 @@ bool AviFileWriter::appendFrame(const unsigned char *pBuffer, bool /*bInvert*/)
     }
     else
     {
-        std::cout << "error: unkown video format." << std::endl;
+        SPDLOG_ERROR("unknown video format.");
         return false;
     }
     if(!frame.data)
     {
-        std::cout << "error: while saving video data." << std::endl;
+        SPDLOG_ERROR("saving video data failed.");
         return false;
     }
 

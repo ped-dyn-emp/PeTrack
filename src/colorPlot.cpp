@@ -19,6 +19,7 @@
 #include "colorPlot.h"
 
 #include "control.h"
+#include "logger.h"
 #include "tracker.h"
 
 #include <QMouseEvent>
@@ -278,7 +279,7 @@ void RectPlotItem::delMap(int index)
     {
         if(index != 0)
         {
-            debout << "Invalid index for map deletion!" << std::endl;
+            SPDLOG_INFO("Invalid index for map deletion!");
             return;
         }
         mMaps.replace(0, RectMap());
@@ -291,7 +292,7 @@ void RectPlotItem::delMap(int index)
         return;
     }
 
-    debout << "Invalid index for map deletion!" << std::endl;
+    SPDLOG_INFO("Invalid index for map deletion!");
     return;
 }
 
@@ -674,8 +675,7 @@ bool ColorPlot::printDistribution() const
     j = dict.constBegin();
     while(j != dict.constEnd())
     {
-        debout << "height " << std::fixed << std::setprecision(1) << std::setw(5) << j.key() << " - number "
-               << std::setw(3) << j.value() << " (" << std::setw(4) << (100. * j.value()) / anz << "%)" << std::endl;
+        SPDLOG_INFO("height: {:5.1f} - number {:3d} ({:4d}%)", j.key(), j.value(), (100. * j.value()) / anz);
         ++j;
     }
     return true;

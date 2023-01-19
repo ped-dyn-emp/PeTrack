@@ -18,6 +18,8 @@
 
 #include "helper.h"
 
+#include "logger.h"
+
 #include <opencv2/opencv.hpp>
 
 QString proFileName; ///< Path to the project (.pet) file; used for saving relative paths via getFileList and
@@ -96,7 +98,7 @@ void copyToQImage(QImage &qImg, cv::Mat &img) // war static functin in animatiol
     }
     else
     {
-        std::cout << "Error: " << channels << " channels are not supported!" << std::endl;
+        SPDLOG_ERROR("{} channels are not supported!", channels);
     }
 }
 

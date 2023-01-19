@@ -26,6 +26,7 @@
 #include <QList>
 #include <QRegularExpression>
 #include <QTextStream>
+#include <spdlog/fmt/bundled/format.h>
 
 class PersonStorage;
 class Petrack;
@@ -99,10 +100,23 @@ public:
     [[nodiscard]] bool   isDetection() const;
 };
 
-
 QTextStream  &operator>>(QTextStream &s, TrackPoint &tp);
 QTextStream  &operator<<(QTextStream &s, const TrackPoint &tp);
 std::ostream &operator<<(std::ostream &s, const TrackPoint &tp);
+
+template <>
+struct fmt::formatter<TrackPoint>
+{
+    constexpr auto parse(format_parse_context &ctx) -> decltype(ctx.begin()) { return ctx.end(); }
+
+    template <typename FormatContext>
+    auto format(const TrackPoint &input, FormatContext &ctx) -> decltype(ctx.out())
+    {
+        std::stringstream stream;
+        stream << input;
+        return format_to(ctx.out(), "{}", stream.str());
+    }
+};
 
 //--------------------------------------------------------------------------
 

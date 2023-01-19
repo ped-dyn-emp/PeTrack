@@ -24,6 +24,7 @@
 // Marker Size is a A4 copy of file (from takahiro from japan, nishinari group)
 
 #include "helper.h"
+#include "logger.h"
 #include "markerJapan.h"
 #include "tracker.h"
 
@@ -408,7 +409,7 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
         }
         else
         {
-            debout << "Warning: white is to dark!" << std::endl;
+            SPDLOG_WARN("white is too dark!");
         }
 
         // eigentlich muesset saettigung ueber histogramm angepasst werden!!
@@ -420,8 +421,8 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
     // dann wird der marker genommen, der den groessten radius hat
     if(abs(mCol.value() - colOther.value()) < 10) //&& abs(mCol.saturation()-colOther.saturation()) < 40
     {
-        debout << "Warning: both marker have nearly the same color at " << mHead.center().x() << ", "
-               << mHead.center().y() << "!" << std::endl;
+        SPDLOG_WARN(
+            "both marker have nearly the same color at ({:.2f}, {:.2f}", mHead.center().x(), mHead.center().y());
     }
 }
 

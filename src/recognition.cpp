@@ -24,6 +24,7 @@
 #include "colorMarkerWidget.h"
 #include "control.h"
 #include "helper.h"
+#include "logger.h"
 #include "markerCasern.h"
 #include "markerHermes.h"
 #include "markerJapan.h"
@@ -1225,7 +1226,7 @@ void findContourMarker(
         }
         else
         {
-            debout << "Error: Wrong number of channels: " << img.channels() << std::endl;
+            SPDLOG_ERROR("wrong number of channels: {}", img.channels());
         }
         grayFix = gray.clone();
 

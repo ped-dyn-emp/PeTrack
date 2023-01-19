@@ -17,6 +17,8 @@
  */
 
 #define CATCH_CONFIG_RUNNER
+#include "logger.h"
+
 #include <QApplication>
 #include <QtTest>
 #include <catch2/catch.hpp>
@@ -48,6 +50,7 @@ int main(int argc, char *argv[])
         argc2 = argc;
         argv2 = argv;
     }
+    logger::setupLogger();
 
     QApplication a(argc2, argv2);
 

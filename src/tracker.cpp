@@ -21,6 +21,7 @@
 #include "animation.h"
 #include "control.h"
 #include "helper.h"
+#include "logger.h"
 #include "multiColorMarkerWidget.h"
 #include "pMessageBox.h"
 #include "petrack.h"
@@ -380,10 +381,12 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
                      (at(size() - 2).qual() == 0))) // das vorherige einfuegen ist 2x nicht auch schon schlecht gewesen
                 {
                     tp = point;
-                    debout << "Warning: Extrapolation instaed of tracking because of big difference from tracked point "
-                              "in speed and direction of person "
-                           << persNr + 1 << " between frame " << mLastFrame << " and " << mLastFrame + 1 << "!"
-                           << std::endl;
+                    SPDLOG_WARN(
+                        "Extrapolation instead of tracking because of big difference from tracked point in speed and "
+                        "direction of person {} between frame {} and {}!",
+                        persNr + 1,
+                        mLastFrame,
+                        mLastFrame + 1);
                     tp = last() + tmp; // nur vektor wird hier durch + geaendert
                     tp.setQual(0);
                     // im anschluss koennte noch dunkelster pkt in umgebung gesucht werden!!!
@@ -392,9 +395,11 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
                 }
                 else
                 {
-                    debout << "Warning: Because of three big differences from tracked point in speed and direction "
-                              "between last three frames the track point of person "
-                           << persNr + 1 << " at " << mLastFrame + 1 << " was NOT inserted!" << std::endl;
+                    SPDLOG_WARN(
+                        "Because of three big differences from tracked point in speed and direction between last three "
+                        "frames the track point of person {} at {} was NOT inserted!",
+                        persNr + 1,
+                        mLastFrame + 1);
                     return false;
                 }
             }
@@ -438,19 +443,23 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
                      (at(1).qual() == 0))) // das vorherige einfuegen ist 2x nicht auch schon schlecht gewesen
                 {
                     tp = point;
-                    debout << "Warning: Extrapolation instaed of tracking because of big difference from tracked point "
-                              "in speed and direction of person "
-                           << persNr + 1 << " between frame " << mFirstFrame << " and " << mFirstFrame - 1 << "!"
-                           << std::endl;
+                    SPDLOG_WARN(
+                        "Extrapolation instead of tracking because of big difference from tracked point in speed and "
+                        "direction of person {} between frame {} and {}!",
+                        persNr + 1,
+                        mLastFrame,
+                        mLastFrame - 1);
                     tp = at(0) + tmp; // nur vektor wird hier durch + geaendert
                     tp.setQual(0);
                     prepend(tp);
                 }
                 else
                 {
-                    debout << "Warning: Because of three big differences from tracked point in speed and direction "
-                              "between last three frames the track point of person "
-                           << persNr + 1 << " at " << mLastFrame - 1 << " was NOT inserted!" << std::endl;
+                    SPDLOG_WARN(
+                        "Because of three big differences from tracked point in speed and direction between last three "
+                        "frames the track point of person {} at {} was NOT inserted!",
+                        persNr + 1,
+                        mLastFrame - 1);
                     return false;
                 }
             }
@@ -481,20 +490,20 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
                 tp.setQual(95);
                 tmp = point + (trackPointAt(frame - 1) - trackPointAt(frame - 1).colPoint());
                 tp.set(tmp.x(), tmp.y());
-                debout << "Warning: move trackpoint according to last distance of structur marker and color marker of "
-                          "person "
-                       << persNr + 1 << ":" << std::endl;
-                debout << "         " << point << " -> " << tp << std::endl;
+                SPDLOG_WARN(
+                    "move TrackPoint according to last distance of structure marker and color marker of person {}:",
+                    persNr + 1);
+                SPDLOG_WARN("         {} -> {}", point, tp);
             }
             else if(trackPointExist(frame + 1) && trackPointAt(frame + 1).qual() > 90)
             {
                 tp.setQual(95);
                 tmp = point + (trackPointAt(frame + 1) - trackPointAt(frame + 1).colPoint());
                 tp.set(tmp.x(), tmp.y());
-                debout << "Warning: move trackpoint according to last distance of structur marker and color marker of "
-                          "person "
-                       << persNr + 1 << ":" << std::endl;
-                debout << "         " << point << " -> " << tp << std::endl;
+                SPDLOG_WARN(
+                    "move TrackPoint according to last distance of structure marker and color marker of person {}:",
+                    persNr + 1);
+                SPDLOG_WARN("         {} -> {}", point, tp);
             }
         }
 
@@ -514,8 +523,10 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
                ((distance = (trackPointAt(frame).distanceToPoint(tp))) > 1.5 * tmp.length()) && (distance > 3))
             {
                 int anz;
-                debout << "Warning: Big difference in location between existing and replacing track point of person "
-                       << persNr + 1 << " in frame " << frame << "!" << std::endl;
+                SPDLOG_WARN(
+                    "Big difference in location between existing and replacing track point of person {} in frame {}!",
+                    persNr + 1,
+                    frame);
                 // qualitaet anpassen, da der weg zum pkt nicht der richtige gewesen sein kann
                 // zurueck
                 anz = 1;
@@ -736,7 +747,7 @@ size_t Tracker::calcPrevFeaturePoints(
                 mPrevFeaturePointsIdx.push_back(i);
                 if(j > MAX_COUNT - 2)
                 {
-                    debout << "Warning: reached maximal number of tracking point: " << MAX_COUNT << std::endl;
+                    SPDLOG_WARN("reached maximal number of tracking point: {}", MAX_COUNT);
                     break; // for loop
                 }
             }
@@ -865,8 +876,8 @@ int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int bord
             if(mStatus[i] == TrackStatus::NotTracked && v.x() >= dist && v.y() >= dist &&
                v.x() <= img.cols - 1 - dist && v.y() <= img.rows - 1 - dist)
             {
-                debout << "Warning: Lost trajectory inside picture of person " << mPrevFeaturePointsIdx[i] + 1
-                       << " at frame " << frame << "!" << std::endl;
+                SPDLOG_WARN(
+                    "lost trajectory inside picture of person {} a frame {}!", mPrevFeaturePointsIdx[i] + 1, frame);
             }
         }
     }
@@ -966,13 +977,13 @@ int Tracker::track(
 
     if(mGrey.empty())
     {
-        debout << "ERROR: you have to initialize tracking before using tracker!" << std::endl;
+        SPDLOG_ERROR("you have to initialize tracking before using tracker!");
         return -1;
     }
 
     if(img.empty())
     {
-        debout << "ERROR: no NULL image allowed for tracking!" << std::endl;
+        SPDLOG_ERROR("no NULL image allowed for tracking!!");
         return -1;
     }
 
@@ -983,7 +994,7 @@ int Tracker::track(
 
     if(abs(frame - mPrevFrame) == 0)
     {
-        debout << "ERROR: Frame has not changed. There is nothing to track!" << std::endl;
+        SPDLOG_ERROR("Frame has not changed. There is nothing to track!");
         return -1;
     }
 
@@ -997,7 +1008,7 @@ int Tracker::track(
     }
     else
     {
-        debout << "Error: Wrong number of channels: " << img.channels() << std::endl;
+        SPDLOG_ERROR("wrong number of channels: {}", img.channels());
         return -1;
     }
 
@@ -1012,13 +1023,14 @@ int Tracker::track(
         {
             if(abs(frame - mPrevFrame) > MAX_STEP_TRACK)
             {
-                debout << "Warning: no tracking because of too many skipped frames (" << mPrevFrame << " to " << frame
-                       << ")!" << std::endl;
+                SPDLOG_WARN("no tracking because of too many skipped frames ({} to {})!", mPrevFrame, frame);
             }
             else if(abs(frame - mPrevFrame) > 1)
             {
-                debout << "Warning: linear interpolation of skipped frames which are not already tracked ("
-                       << mPrevFrame << " to " << frame << ")." << std::endl; // will be done in insertFeaturePoints
+                SPDLOG_WARN(
+                    "linear interpolation of skipped frames which are not already tracked({} to {}).",
+                    mPrevFrame,
+                    frame);
             }
         }
 
@@ -1126,16 +1138,17 @@ void Tracker::trackFeaturePointsLK(int level, bool adaptive)
         {
             if(l < level)
             {
-                debout << "Warning: try tracking person " << mPrevFeaturePointsIdx[i] << " with pyramid level " << l
-                       << "!" << std::endl;
+                SPDLOG_WARN("try tracking person {} with pyramid level {}", mPrevFeaturePointsIdx[i], l);
             }
 
             winSize = mMainWindow->winSize(nullptr, mPrevFeaturePointsIdx[i], mPrevFrame, l);
             if(winSize < MIN_WIN_SIZE)
             {
                 winSize = MIN_WIN_SIZE;
-                debout << "Warning: set search region to the minimum size of " << MIN_WIN_SIZE << " for person "
-                       << mPrevFeaturePointsIdx[i] << "!" << std::endl;
+                SPDLOG_WARN(
+                    "set search region to the minimum size of {} for person {}!",
+                    MIN_WIN_SIZE,
+                    mPrevFeaturePointsIdx[i] + 1);
             }
 
             std::vector<cv::Point2f> prevFeaturePoint{mPrevFeaturePoints[i]};
@@ -1206,16 +1219,20 @@ void Tracker::refineViaColorPointLK(int level, float errorScale)
 
             if((colorStatus[i] == 1) && (colorTrackError[i] < errorScale * 50.F))
             {
-                debout << "Warning: tracking color marker instead of structural marker of person "
-                       << mPrevFeaturePointsIdx[i] + 1 << " at " << mFeaturePoints[i].x << " x " << mFeaturePoints[i].y
-                       << " / error: " << mTrackError[i] << " / color error: " << colorTrackError[i] << std::endl;
+                SPDLOG_WARN(
+                    "tracking color marker instead of structural marker of person {} at {} x {} / error: {} / color "
+                    "error: {}",
+                    mPrevFeaturePointsIdx[i] + 1,
+                    mFeaturePoints[i].x,
+                    mFeaturePoints[i].y,
+                    mTrackError[i],
+                    colorTrackError[i]);
 
 
                 mFeaturePoints[i] = cv::Point2f(
                     mPrevFeaturePoints[i].x + (colorFeaturePoint[i].x - prevColorFeaturePoint[i].x),
                     mPrevFeaturePoints[i].x + (colorFeaturePoint[i].x - prevColorFeaturePoint[i].x));
-                debout << "         resulting point: " << mFeaturePoints[i].x << " x " << mFeaturePoints[i].y
-                       << std::endl;
+                SPDLOG_INFO("\tresulting point: {} x {}", mFeaturePoints[i].x, mFeaturePoints[i].y);
                 mTrackError[i] = colorTrackError[i];
             }
         }
@@ -1258,10 +1275,11 @@ void Tracker::useBackgroundFilter(QList<int> &trjToDel, BackgroundFilter *bgFilt
                 {
                     // nur zum loeschen vormerken und am ende der fkt loeschen, da sonst Seiteneffekte komplex
                     trjToDel += mPrevFeaturePointsIdx[i];
-                    debout << "Warning: Delete trajectory " << mPrevFeaturePointsIdx[i] + 1
-                           << " inside region of interest, because it laid outside foreground for "
-                           << mMainWindow->getControlWidget()->getFilterBgDeleteNumber() << " successive frames!"
-                           << std::endl;
+                    SPDLOG_WARN(
+                        "delete trajectory {} inside region of interest, because it laid outside foreground for {} "
+                        "successive frames!",
+                        mPrevFeaturePointsIdx[i] + 1,
+                        mMainWindow->getControlWidget()->getFilterBgDeleteNumber());
                 }
                 else
                 {
@@ -1362,7 +1380,7 @@ void Tracker::refineViaNearDarkPoint()
             {
                 mFeaturePoints[i].x = xDark;
                 mFeaturePoints[i].y = yDark;
-                debout << "Move trackpoint to darker pixel for" << i + 1 << "!" << std::endl;
+                SPDLOG_INFO("move TrackPoint to darker pixel for {}!", i + 1);
             }
 
             // interpolation wg nachbargrauwerten:
@@ -1404,7 +1422,7 @@ void TrackPerson::syncTrackPersonMarkerID(int markerID)
         }
         if(mMarkerID != tpMarkerID)
         {
-            std::cout << "ERROR: Two MarkerIDs were found for one trajectory." << std::endl;
+            SPDLOG_ERROR("Two MarkerIDs were found for one trajectory.");
         }
     }
 }

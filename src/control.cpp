@@ -27,6 +27,7 @@
 #include "colorPlot.h"
 #include "colorRangeWidget.h"
 #include "imageItem.h"
+#include "logger.h"
 #include "moCapItem.h"
 #include "multiColorMarkerWidget.h"
 #include "pMessageBox.h"
@@ -41,7 +42,6 @@
 
 #include <QDomElement>
 #include <iomanip>
-
 #define DEFAULT_HEIGHT 180.0
 
 Control::Control(
@@ -3792,7 +3792,7 @@ void Control::getXml(QDomElement &elem)
                             }
                             else
                             {
-                                debout << "Warning: Background subtracting file not readable!" << std::endl;
+                                SPDLOG_WARN("Background subtracting file not readable!");
                             }
                         }
                     }
@@ -4158,7 +4158,7 @@ void Control::getXml(QDomElement &elem)
                 }
                 else
                 {
-                    debout << "Unknown CALIBRATION tag " << subSubElem.tagName() << std::endl;
+                    SPDLOG_WARN("Unknown CALIBRATION tag: {}", subSubElem.tagName());
                 }
             }
         }
@@ -4361,7 +4361,7 @@ void Control::getXml(QDomElement &elem)
 
                         else
                         {
-                            debout << "Unknown RECOGNITION MAP tag " << subSubElem.tagName() << std::endl;
+                            SPDLOG_WARN("Unknown RECOGNITION tag: {}", subSubElem.tagName());
                         }
                     }
 
@@ -4415,7 +4415,7 @@ void Control::getXml(QDomElement &elem)
 
                 else
                 {
-                    debout << "Unknown RECOGNITION tag " << subSubElem.tagName() << std::endl;
+                    SPDLOG_WARN("Unknown RECOGNITION tag: {}", subSubElem.tagName());
                 }
             }
         }
@@ -4813,7 +4813,7 @@ void Control::getXml(QDomElement &elem)
                 }
                 else
                 {
-                    debout << "Unknown TRACKING tag " << subSubElem.tagName() << std::endl;
+                    SPDLOG_WARN("Unknown TRACKING tag: {}", subSubElem.tagName());
                 }
             }
         }
@@ -4872,13 +4872,13 @@ void Control::getXml(QDomElement &elem)
                 }
                 else
                 {
-                    debout << "Unknown ANAYSIS tag " << subSubElem.tagName() << std::endl;
+                    SPDLOG_WARN("Unknown ANALYSIS tag: {}", subSubElem.tagName());
                 }
             }
         }
         else
         {
-            debout << "Unknown CONTROL tag " << subElem.tagName() << std::endl;
+            SPDLOG_WARN("Unknown CONTROL tag: {}", subSubElem.tagName());
         }
     }
 
@@ -4971,7 +4971,8 @@ bool Control::getColors(QColor &clickedColor, QColor &toColor, QColor &fromColor
 
     if(imgPoint.x() < 0 || imgPoint.x() > hsvImg->width() || imgPoint.y() < 0 || imgPoint.y() > hsvImg->height())
     {
-        debout << "Clicked outside the image with color picker." << std::endl;
+        SPDLOG_INFO("Clicked outside the image with color picker.");
+
         return false;
     }
 
@@ -4982,7 +4983,7 @@ bool Control::getColors(QColor &clickedColor, QColor &toColor, QColor &fromColor
     fromColor = map->getActMapFromColor();
     if(!toColor.isValid() || !fromColor.isValid())
     {
-        debout << "Map is corrupted" << std::endl;
+        SPDLOG_WARN("Map is corrupted");
         return false;
     }
     return true;

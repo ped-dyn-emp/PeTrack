@@ -33,6 +33,7 @@ they can be represented in QT.
 
 #include "filter.h"
 #include "helper.h"
+#include "logger.h"
 #include "pMessageBox.h"
 #include "petrack.h"
 
@@ -209,12 +210,11 @@ bool Animation::openTimeFile(QString &timeFileName)
     double fps, dif, difMin = 1000., difMax = -1000.;
     int    minFrame = -1, maxFrame = -1;
 
-    debout << "Found corresponding time file " << timeFileName << std::endl;
+    SPDLOG_INFO("Found corresponding time file: {}", timeFileName);
 
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        debout << "  Error: Cannot open existing time file " << timeFileName << ":" << std::endl
-               << "  " << file.errorString() << std::endl;
+        SPDLOG_ERROR("Cannot open existing time file {}:\n  {}", timeFileName, file.errorString());
         return false;
     }
     else
@@ -231,8 +231,7 @@ bool Animation::openTimeFile(QString &timeFileName)
                 fcycSec   = cycSec;
                 fcycCount = cycCount;
                 dt.setTime_t(sec);
-                debout << "  Recording starts at " << dt.toString("dd.MM.yyyy hh:mm:ss.");
-                std::cout << std::setw(6) << std::setfill('0') << microSec << std::endl;
+                SPDLOG_INFO("Recording starts at {}{:06d}", dt.toString("dd.MM.yyyy hh:mm:ss."), microSec);
                 mFirstSec      = sec;
                 mFirstMicroSec = microSec;
             }
@@ -266,14 +265,21 @@ bool Animation::openTimeFile(QString &timeFileName)
         }
         dt.setTime_t(sec);
         fps = frame / ((cycSec - fcycSec + add) + (cycCount - fcycCount) / 8000.);
-        debout << "  Recording ends   at "
-               << dt.toString(
-                      "dd.MM.yyyy hh:mm:ss."); // entspricht nicht der in statusbar angezeigten zeit des letzten frames,
-                                               // da in statusbar fps und frameanzahl herangezogen wird (genauer)!!!
-        std::cout << std::setw(6) << std::setfill('0') << microSec << std::endl;
-        debout << "  Fps with " << frame + 1 << " frames: " << fps << " (min " << 1. / difMax << " at frame "
-               << maxFrame << " to " << maxFrame + 1 << ", max " << 1. / difMin << " at frame " << minFrame << " to "
-               << minFrame + 1 << ")" << std::endl;
+
+        // entspricht nicht der in statusbar angezeigten zeit des letzten frames, da
+        // in statusbar fps und frameanzahl herangezogen wird (genauer)!!!
+        SPDLOG_INFO("Recording ends at {}{:06d}", dt.toString("dd.MM.yyyy hh:mm:ss."), microSec);
+
+        SPDLOG_INFO(
+            "Fps with {} frames: {} (min {} at frame {} to {}, max {} at frame {} to {}",
+            frame + 1,
+            fps,
+            1. / difMax,
+            maxFrame,
+            maxFrame + 1,
+            1. / difMin,
+            minFrame,
+            minFrame + 1);
         setFPS(fps);
         mStereo         = true;
         mSourceOutFrame = frame; // mNumFrames = frame+1;
@@ -350,9 +356,8 @@ bool Animation::openAnimation(QString fileName)
         }
         if(mTimeFileLoaded && !openRet)
         {
-            debout << "Warning: New loaded time file do not correspond to untouched sequence, because new sequence was "
-                      "not loadable!"
-                   << std::endl;
+            SPDLOG_WARN(
+                "New loaded time file do not correspond to untouched sequence, because new sequence was not loadable!");
         }
         mTimeFileLoaded = false; // reset for new open stereo video sequence
         return openRet;
@@ -637,7 +642,7 @@ bool Animation::openAnimationPhoto(QString fileName)
     }
     if(tempMat.channels() == 4)
     {
-        std::cout << "Warning: PNG-Alpha channel will be ignored." << std::endl;
+        SPDLOG_WARN("PNG-Alpha channel will be ignored");
         tempMat = cv::imread(fileName.toStdString(), cv::IMREAD_COLOR);
     }
 
@@ -717,7 +722,7 @@ cv::Mat Animation::getFramePhoto(int index)
         // Check for invalid input
         if(mImage.empty()) // Check for invalid input
         {
-            debout << "Could not open or find the image" << std::endl;
+            SPDLOG_ERROR("Could not open or find the image.");
             return cv::Mat();
         }
 
@@ -728,8 +733,8 @@ cv::Mat Animation::getFramePhoto(int index)
         // Check image size of each frame
         if((mSize.width() > 0 && mSize.height() > 0) && (mImage.cols != mSize.width() || mImage.rows != mSize.height()))
         {
-            debout << "Could not load image: image size differs in image sequence" << std::endl;
-            debout << "Please ensure to have images of the same size!" << std::endl;
+            SPDLOG_ERROR("Could not load image: image size differs in image sequence.");
+            SPDLOG_ERROR("Please ensure to have images of the same size!");
 
             PCritical(
                 nullptr,
@@ -778,8 +783,10 @@ bool Animation::getInfoPhoto()
         // 1 or 3 channel and 8 bit per pixel
         if(!(((tempImg.channels() == 1) || (tempImg.channels() == 3)) && (tempImg.depth() == CV_8U)))
         {
-            debout << "Error: Only 1 or 3 channels (you are using " << tempImg.channels()
-                   << ") and 8 bpp (you are using " << tempImg.depth() << ") are supported!" << std::endl;
+            SPDLOG_ERROR(
+                "Only 1 or 3 channels (you are using {}) and 8 bpp (you are using {}) are supported!",
+                tempImg.channels(),
+                tempImg.depth());
         }
         else
         {
@@ -1007,7 +1014,7 @@ bool Animation::openAnimationVideo(QString fileName)
         else
             return false;
 #else
-        debout << "Stereo videos temporary not supported!" << std::endl;
+        SPDLOG_ERROR("Stereo videos temporary not supported!");
         return false;
 
 #endif
@@ -1083,7 +1090,7 @@ cv::Mat Animation::getFrameVideo(int index)
             {
                 if(!mVideoCapture.set(cv::CAP_PROP_POS_FRAMES, index))
                 {
-                    debout << "Error: video file does not support skipping." << std::endl;
+                    SPDLOG_ERROR("video file does not support skipping");
                     return cv::Mat();
                 }
             }
@@ -1097,8 +1104,11 @@ cv::Mat Animation::getFrameVideo(int index)
             }
             else
             {
-                debout << "Warning: number of frames in the video seems to be incorrect. Frame[" << index
-                       << "] is not loadable! Set number of Frames to " << index << "." << std::endl;
+                SPDLOG_WARN(
+                    "number of frames in the video seems to be incorrect. Frame[{}] is not loadable! Set number of "
+                    "frame to {}.",
+                    index,
+                    index);
                 mSourceOutFrame = index - 1;
                 setSourceOutFrameNum(mSourceOutFrame);
                 return cv::Mat();
@@ -1135,14 +1145,16 @@ bool Animation::getInfoVideo(QString /*fileName*/)
     cv::Mat tempImg = getFrameVideo(getSourceInFrameNum());
     if(tempImg.empty())
     {
-        debout << "Error: No frame could be retrieved from the capture during getInfoVideo." << std::endl;
+        SPDLOG_ERROR("no frame could be retrieved from the capture during getInfoVideo.");
         return false;
     }
     // 1 or 3 channel and 8 bit per pixel
     if(!(((tempImg.channels() == 1) || (tempImg.channels() == 3)) && (tempImg.depth() == CV_8U)))
     {
-        debout << "Warning: Only 1 or 3 channels (you are using " << tempImg.channels() << ") and 8 bpp (you are using "
-               << tempImg.depth() << ") are supported!" << std::endl;
+        SPDLOG_WARN(
+            "only 1 or 3 channels (you are using {}) and 8 bpp (you are using {}) are supported!",
+            tempImg.channels(),
+            tempImg.depth());
     }
     // Set the size in the QSize structure
     mSize.setHeight(tempImg.rows);
@@ -1176,10 +1188,12 @@ bool Animation::getInfoVideo(QString /*fileName*/)
         // Check if mNumFrames agrees with last readable frame
         if(mMaxFrames != (mVideoCapture.get(cv::CAP_PROP_POS_FRAMES) + 1))
         {
-            debout << "Warning: number of frames detected by OpenCV library (" << mMaxFrames
-                   << ") seems to be incorrect! (set to estimated value: "
-                   << (mVideoCapture.get(cv::CAP_PROP_POS_FRAMES) + 1) << ") [video codec: " << FOURCC << "]"
-                   << std::endl;
+            SPDLOG_WARN(
+                "number of frames detected by OpenCV library ({}) seems to be incorrect! (set to estimated value: {})) "
+                "[video codec {}]",
+                mMaxFrames,
+                mVideoCapture.get(cv::CAP_PROP_POS_FRAMES) + 1,
+                FOURCC);
             mMaxFrames      = mVideoCapture.get(cv::CAP_PROP_POS_FRAMES) + 1;
             mSourceOutFrame = mMaxFrames - 1;
         }
@@ -1205,14 +1219,12 @@ bool Animation::getInfoVideo(QString /*fileName*/)
     int maxFrames     = 9999999; // > 111 h @ 25fps
     if(getNumFrames() <= 0)
     {
-        debout << "Error: Incorrect number (" << getNumFrames() << ") of frames. Setting it to " << defaultFrames << "."
-               << std::endl;
+        SPDLOG_ERROR("incorrect number ({}) of frames. Setting it to {}", getNumFrames(), defaultFrames);
         mSourceOutFrame = getSourceInFrameNum() + defaultFrames;
     }
     if(getNumFrames() > maxFrames) // = 6h * 60mins * 60 secs * 25 frames
     {
-        debout << "Warning: Number of frames (" << getNumFrames() << ") seems to be incorrect. Setting it to "
-               << defaultFrames << "." << std::endl;
+        SPDLOG_ERROR("incorrect number ({}) of frames. Setting it to {}", getNumFrames(), defaultFrames);
         mSourceOutFrame = getSourceInFrameNum() + defaultFrames;
     }
     setSourceOutFrameNum(mSourceOutFrame);
@@ -1224,14 +1236,16 @@ bool Animation::getCameraInfo()
     cv::Mat tempImg = getFrameVideo(0);
     if(tempImg.empty())
     {
-        debout << "Error: No frame could be retrieved from the capture during getInfoVideo." << std::endl;
+        SPDLOG_ERROR("No frame could be retrieved from the capture during getInfoVideo.");
         return false;
     }
     // 1 or 3 channel and 8 bit per pixel
     if(!(((tempImg.channels() == 1) || (tempImg.channels() == 3)) && (tempImg.depth() == CV_8U)))
     {
-        debout << "Warning: Only 1 or 3 channels (you are using " << tempImg.channels() << ") and 8 bpp (you are using "
-               << tempImg.depth() << ") are supported!" << std::endl;
+        SPDLOG_WARN(
+            "only 1 or 3 channels (you are using {}) and 8 bpp (you are using {}) are supported!",
+            tempImg.channels(),
+            tempImg.depth());
     }
     // Set the size in the QSize structure
     mSize.setHeight(tempImg.rows);
