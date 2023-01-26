@@ -40,17 +40,4 @@ ENV PATH="/5.15.2/gcc_64/lib/cmake/Qt5:${PATH}"
 RUN apt-get update && apt-get install -y \
 	libqwt-qt5-dev \
 	libopencv-dev \
-	libopencv-contrib4.5 \
-    catch2
-
-# Install trompeloeil from source (not in package manager)
-RUN git clone https://github.com/rollbear/trompeloeil.git &&\
-    cd trompeloeil &&\
-    git fetch --all --tags &&\
-    git checkout tags/v38 &&\
-    mkdir build &&\
-    cd build && \
-    cmake .. && \
-    cmake --build . --target install
-
-
+	libopencv-contrib4.5

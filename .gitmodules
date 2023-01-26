@@ -3,8 +3,14 @@
 	url = ../petrack-3rdparty.git
 	shallow = true
 [submodule "ezc3d"]
-	path = ezc3d
+	path = deps/ezc3d
 	url = https://github.com/pyomeca/ezc3d.git
 [submodule "spdlog"]
-	path = spdlog
+	path = deps/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "trompeloeil"]
+	path = deps/trompeloeil
+	url = https://github.com/rollbear/trompeloeil.git
+[submodule "Catch2"]
+	path = deps/Catch2
+	url = https://github.com/catchorg/Catch2
