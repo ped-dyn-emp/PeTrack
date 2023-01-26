@@ -129,12 +129,12 @@ endif()
 # Dependencies
 ################################################################################
 # spdlog
-add_subdirectory(spdlog)
+add_subdirectory(deps/spdlog)
 
 # ezc3d
 set(DUMMY ${BUILD_SHARED_LIBS})
 set(BUILD_SHARED_LIBS FALSE CACHE BOOL "Choose if build should be a dynamic or static library")
-add_subdirectory(ezc3d/ EXCLUDE_FROM_ALL)
+add_subdirectory(deps/ezc3d/ EXCLUDE_FROM_ALL)
 # disbale warnings for ezc3d on MSVC
 target_compile_options(ezc3d PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/w>)
 set(BUILD_SHARED_LIBS ${DUMMY})
@@ -297,20 +297,15 @@ endif(WIN32)
 ################################################################################
 if(BUILD_UNIT_TESTS)
     enable_testing()
-    if (USE_3RD_PARTY)
-        add_subdirectory("${CMAKE_SOURCE_DIR}/3rdparty/Catch2")
-        add_subdirectory("${CMAKE_SOURCE_DIR}/3rdparty/trompeloeil")
-    else()
-      find_package(Catch2 REQUIRED)
-      find_package(trompeloeil REQUIRED)
-    endif()
+    add_subdirectory("${CMAKE_SOURCE_DIR}/deps/Catch2")
+    add_subdirectory("${CMAKE_SOURCE_DIR}/deps/trompeloeil")
 
     add_subdirectory(${CMAKE_SOURCE_DIR}/tests/unit_test)
     target_link_libraries(petrack_tests PRIVATE petrack_core git-info)
 
     target_compile_definitions(petrack_tests PUBLIC PETRACK_VERSION="${PROJECT_VERSION}")
 
-    target_link_libraries(petrack_tests PRIVATE Catch2::Catch2 Qt5::Test trompeloeil)
+    target_link_libraries(petrack_tests PRIVATE Catch2::Catch2 Qt5::Test trompeloeil::trompeloeil)
     target_include_directories(petrack_tests PRIVATE
       "${CMAKE_CURRENT_BINARY_DIR}/petrack_core_autogen/include")
 
