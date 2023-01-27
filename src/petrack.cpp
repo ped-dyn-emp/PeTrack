@@ -3941,7 +3941,7 @@ void Petrack::addManualTrackPointOnlyVisible(const QPointF &pos)
 void Petrack::updateControlWidget()
 {
     mControlWidget->setTrackNumberAll(QString("%1").arg(mPersonStorage.nbPersons()));
-    mControlWidget->setTrackShowOnlyNr(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
+    mControlWidget->setTrackShowOnlyNrMaximum(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
     mControlWidget->setTrackNumberVisible(QString("%1").arg(mPersonStorage.visible(mAnimation->getCurrentFrameNum())));
 }
 
@@ -3982,6 +3982,7 @@ void Petrack::deleteTrackPoint(QPointF pos, int direction) // const QPoint &pos
 void Petrack::editTrackPersonComment(QPointF pos)
 {
     mPersonStorage.editTrackPersonComment((Vec2F) pos, mAnimation->getCurrentFrameNum(), getPedestrianUserSelection());
+    updateControlWidget();
 }
 void Petrack::setTrackPersonHeight(QPointF pos)
 {
