@@ -45,7 +45,7 @@ RUN apt-get update && apt-get install -y \
         python3-dev \
     && apt-get clean
 
-RUN pip install pytest aqtinstall
+RUN pip install pytest numpy aqtinstall
 
 # Install Qt 5.15
 RUN aqt install-qt linux desktop 5.15.2
