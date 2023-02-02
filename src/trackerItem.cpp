@@ -695,9 +695,12 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 }
             }
 
-            if(((mControlWidget->isTrackShowPointsChecked()) || (mControlWidget->isTrackShowPathChecked()) ||
-                (mControlWidget->isTrackShowGroundPathChecked())) &&
-               ((person.trackPointExist(curFrame)) || (mControlWidget->isTrackShowOnlyVisibleChecked())))
+            const bool showPathLike = mControlWidget->isTrackShowPointsChecked() ||
+                                      mControlWidget->isTrackShowPathChecked() ||
+                                      mControlWidget->isTrackShowGroundPathChecked();
+            const bool personToDraw =
+                !mControlWidget->isTrackShowOnlyVisibleChecked() || person.trackPointExist(curFrame);
+            if(showPathLike && personToDraw)
             {
                 if(mControlWidget->getTrackShowBefore() == -1)
                 {
