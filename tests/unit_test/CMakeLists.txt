@@ -13,4 +13,6 @@ target_sources(petrack_tests PRIVATE
     tst_petrack.cpp
     tst_extrCalibration.cpp
     tst_filter.cpp
+    tst_intrinsicBox.cpp
+    util.h
 )

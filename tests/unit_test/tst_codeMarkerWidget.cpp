@@ -25,7 +25,7 @@
 SCENARIO("The user opens the CodeMarkerWidget", "[ui]")
 {
     // create the dialog
-    Petrack                 petrack;
+    Petrack                 petrack{"Unknown"};
     reco::CodeMarkerOptions options;
     Ui::CodeMarker         *view = new Ui::CodeMarker();
     CodeMarkerWidget        widget{&petrack, options, view};

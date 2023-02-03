@@ -63,8 +63,9 @@
 int Petrack::trcVersion = 0;
 
 // Reihenfolge des anlegens der objekte ist sehr wichtig
-Petrack::Petrack() :
+Petrack::Petrack(QString petrackVersion) :
     mExtrCalibration(mPersonStorage),
+    mPetrackVersion(std::move(petrackVersion)),
     mAuthors(IO::readAuthors(QCoreApplication::applicationDirPath() + "/.zenodo.json"))
 {
     QIcon icon;
@@ -670,28 +671,6 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
         }
         openXml(doc, openSeq);
         mLastTrackerExport = mTrcFileName;
-
-        if(newerThanVersion(QString("0.9.0"), root.attribute("VERSION")))
-        {
-            PWarning(
-                this,
-                tr("PeTrack"),
-                tr("You are using a project version lower than 0.9: Therefore, the extended intrinsic calibration "
-                   "model is disabled."));
-            mControlWidget->setExtModelChecked(false);
-        }
-        else if(newerThanVersion(QString("0.9.2"), root.attribute("VERSION")))
-        {
-            // only checking one parameter because if the ext. model is used all parameters are not equal to zero
-            if(mControlWidget->getCalibS1() == 0.)
-            {
-                mControlWidget->setExtModelChecked(false);
-            }
-            else
-            {
-                mControlWidget->setExtModelChecked(true);
-            }
-        }
 
         updateWindowTitle();
     }
@@ -2432,36 +2411,17 @@ void Petrack::updateControlImage(cv::Mat &img)
     {
         lastBorderSize = -1;
     }
-
     int diffBorderSize = 0;
-    int iW             = img.cols;
-    int iH             = img.rows;
-
-    // wird auch nochmal in ImageWidget gemacht, aber ist hier frueher noetig
-    double cX = mControlWidget->getCalibCx(); // merken, da min/max value verandernkann wenn aus dem rahmen
-    double cY = mControlWidget->getCalibCy();
-
-    mControlWidget->setCalibCxMin(0 /*iW/2.-50.*/);
-    mControlWidget->setCalibCxMax(iW /*iW/2.+50.*/);
-    mControlWidget->setCalibCyMin(0 /*iH/2.-50.*/);
-    mControlWidget->setCalibCyMax(iH /*iH/2.+50.*/);
-
-    if(mControlWidget->isFixCenterChecked())
+    if(lastBorderSize != -1)
     {
-        mControlWidget->setCalibCx((iW - 1) / 2.);
-        mControlWidget->setCalibCy((iH - 1) / 2.);
+        diffBorderSize = getImageBorderSize() - lastBorderSize;
     }
-    else
-    {
-        if(lastBorderSize != -1)
-        {
-            diffBorderSize = getImageBorderSize() - lastBorderSize;
-        }
-        lastBorderSize = getImageBorderSize();
+    lastBorderSize = getImageBorderSize();
 
-        mControlWidget->setCalibCx(cX + diffBorderSize);
-        mControlWidget->setCalibCy(cY + diffBorderSize);
-    }
+    const int imgWidth  = img.cols;
+    const int imgHeight = img.rows;
+
+    mControlWidget->imageSizeChanged(imgWidth, imgHeight, diffBorderSize);
 }
 
 void Petrack::importTracker(QString dest) // default = ""
@@ -4092,12 +4052,6 @@ void Petrack::skipToFrameFromTrajectory(QPointF pos)
             tr("Too many trajectories"),
             tr("PeTrack can't determine which point you meant. Try selecting fewer trajectories first."));
     }
-}
-
-void Petrack::setPeTrackVersion(const std::string &petrackVersion)
-{
-    mPetrackVersion = QString::fromStdString(petrackVersion);
-    updateWindowTitle();
 }
 
 void Petrack::setGitInformation(

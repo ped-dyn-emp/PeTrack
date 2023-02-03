@@ -297,4 +297,17 @@ T computeMedian(std::vector<T> data)
     std::nth_element(data.begin(), data.begin() + (data.size() - 1) / 2, data.end());
     return 0.5 * (data[data.size() / 2] + data[(data.size() - 1) / 2]);
 }
+
+template <typename T>
+void setValue(T widget, double value)
+{
+    if(widget->minimum() > value || widget->maximum() < value)
+    {
+        std::stringstream ss;
+        ss << "Value " << value << " for " << widget->objectName() << " is out of range from " << widget->minimum()
+           << " to " << widget->maximum();
+        throw std::domain_error(ss.str());
+    }
+    widget->setValue(value);
+}
 #endif

@@ -76,11 +76,7 @@ void ImageItem::setImage(QImage *img)
     matrix.translate(-mMainWindow->getImageBorderSize() - 1, -mMainWindow->getImageBorderSize() - 1);
     setTransform(matrix);
 
-    // value nicht setzen, da mgl mehrere videos mit gleichem objektiv erzeugt
-    mControlWidget->setCalibCxMin(0 /*MAX(0,mImage->width()/2.-50)*/);
-    mControlWidget->setCalibCxMax(mImage->width() /*mImage->width()/2.+50*/);
-    mControlWidget->setCalibCyMin(0 /*MAX(0,mImage->height()/2.-50)*/);
-    mControlWidget->setCalibCyMax(mImage->height() /*mImage->height()/2.+50*/);
+    mControlWidget->imageSizeChanged(mImage->width(), mImage->height(), 0);
 
     // trans nicht setzen, da mgl mehrere videos mit gleicher scene und gleichem koord sinnvoll
     mControlWidget->setCalibCoordTransXMin(-10 * mMainWindow->getImageBorderSize());
@@ -184,8 +180,9 @@ QPointF ImageItem::getPosImage(QPointF pos, float height)
             pos = mapFromItem(mCoordItem, pos); // Einheit anpassen...
             if(mControlWidget->isCoordUseIntrinsicChecked())
             {
-                pos.rx() -= mControlWidget->getCalibCx();
-                pos.ry() -= mControlWidget->getCalibCy();
+                const auto camMat = mControlWidget->getIntrinsicCameraParams();
+                pos.rx() -= camMat.getCx();
+                pos.ry() -= camMat.getCy();
             }
             else
             {
@@ -197,8 +194,9 @@ QPointF ImageItem::getPosImage(QPointF pos, float height)
 
             if(mControlWidget->isCoordUseIntrinsicChecked())
             {
-                pos.rx() += mControlWidget->getCalibCx();
-                pos.ry() += mControlWidget->getCalibCy();
+                const auto camMat = mControlWidget->getIntrinsicCameraParams();
+                pos.rx() += camMat.getCx();
+                pos.ry() += camMat.getCy();
             }
             else
             {
@@ -238,8 +236,9 @@ QPointF ImageItem::getPosReal(QPointF pos, double height)
             //  -.5 da pixel von 0..1023 (in skala bis 1024 anfaengt) laufen
             if(mControlWidget->isCoordUseIntrinsicChecked())
             {
-                pos.rx() -= mControlWidget->getCalibCx();
-                pos.ry() -= mControlWidget->getCalibCy();
+                const auto camMat = mControlWidget->getIntrinsicCameraParams();
+                pos.rx() -= camMat.getCx();
+                pos.ry() -= camMat.getCy();
             }
             else
             {
@@ -250,8 +249,9 @@ QPointF ImageItem::getPosReal(QPointF pos, double height)
                   pos; //((a-height)/a)*pos;
             if(mControlWidget->isCoordUseIntrinsicChecked())
             {
-                pos.rx() += mControlWidget->getCalibCx();
-                pos.ry() += mControlWidget->getCalibCy();
+                const auto camMat = mControlWidget->getIntrinsicCameraParams();
+                pos.rx() += camMat.getCx();
+                pos.ry() += camMat.getCy();
             }
             else
             {

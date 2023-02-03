@@ -19,9 +19,12 @@
 #ifndef AUTOCALIB_H
 #define AUTOCALIB_H
 
+#include "intrinsicCameraParams.h"
+
 #include <QString>
 #include <QStringList>
 #include <opencv2/core/types.hpp>
+#include <optional>
 
 class Petrack;
 class Control;
@@ -78,7 +81,7 @@ public:
         return mSquareSize;
     }
 
-    void autoCalib();
+    std::optional<IntrinsicCameraParams> autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist, bool extModel);
 
 private:
     int runCalibration(

@@ -21,6 +21,7 @@
 
 #include "analysePlot.h"
 #include "colorPlot.h"
+#include "intrinsicCameraParams.h"
 #include "petrack.h"
 #include "recognition.h"
 
@@ -29,20 +30,11 @@
 
 class QGraphicsScene;
 class QDomElement;
+class IntrinsicBox;
 namespace Ui
 {
 class Control;
 }
-
-/**
- * @brief struct used for storing intrinsic camera params.
- *
- * Central place to store this information and easier passing in methods
- */
-using IntrinsicCameraParams = struct IntrinsicCameraParams
-{
-    cv::Mat cameraMatrix = cv::Mat::eye(cv::Size(3, 3), CV_64F);
-};
 
 class Control : public QWidget
 {
@@ -153,85 +145,9 @@ public:
     bool isFilterBgDeleteTrjChecked() const;
     int  getFilterBgDeleteNumber() const;
 
-    double getCalibFx() const;
-    void   setCalibFx(double d);
-    void   setCalibFxMin(double d);
-    void   setCalibFxMax(double d);
-    double getCalibFy() const;
-    void   setCalibFy(double d);
-    void   setCalibFyMin(double d);
-    void   setCalibFyMax(double d);
-    double getCalibCx() const;
-    void   setCalibCx(double d);
-    void   setCalibCxMin(double d);
-    void   setCalibCxMax(double d);
-    double getCalibCy() const;
-    void   setCalibCy(double d);
-    void   setCalibCyMin(double d);
-    void   setCalibCyMax(double d);
-    double getCalibR2() const;
-    void   setCalibR2(double d);
-    void   setCalibR2Min(double d);
-    void   setCalibR2Max(double d);
-    double getCalibR4() const;
-    void   setCalibR4(double d);
-    void   setCalibR4Min(double d);
-    void   setCalibR4Max(double d);
-    double getCalibTx() const;
-    void   setCalibTx(double d);
-    void   setCalibTxMin(double d);
-    void   setCalibTxMax(double d);
-    double getCalibTy() const;
-    void   setCalibTy(double d);
-    void   setCalibTyMin(double d);
-    void   setCalibTyMax(double d);
-    double getCalibR6() const;
-    void   setCalibR6(double d);
-    void   setCalibR6Min(double d);
-    void   setCalibR6Max(double d);
-    double getCalibK4() const;
-    void   setCalibK4(double d);
-    void   setCalibK4Min(double d);
-    void   setCalibK4Max(double d);
-    double getCalibK5() const;
-    void   setCalibK5(double d);
-    void   setCalibK5Min(double d);
-    void   setCalibK5Max(double d);
-    double getCalibK6() const;
-    void   setCalibK6(double d);
-    void   setCalibK6Min(double d);
-    void   setCalibK6Max(double d);
-    double getCalibS1() const;
-    void   setCalibS1(double d);
-    void   setCalibS1Min(double d);
-    void   setCalibS1Max(double d);
-    double getCalibS2() const;
-    void   setCalibS2(double d);
-    void   setCalibS2Min(double d);
-    void   setCalibS2Max(double d);
-    double getCalibS3() const;
-    void   setCalibS3(double d);
-    void   setCalibS3Min(double d);
-    void   setCalibS3Max(double d);
-    double getCalibS4() const;
-    void   setCalibS4(double d);
-    void   setCalibS4Min(double d);
-    void   setCalibS4Max(double d);
-    double getCalibTAUX() const;
-    void   setCalibTAUX(double d);
-    void   setCalibTAUXMin(double d);
-    void   setCalibTAUXMax(double d);
-    double getCalibTAUY() const;
-    void   setCalibTAUY(double d);
-    void   setCalibTAUYMin(double d);
-    void   setCalibTAUYMax(double d);
     double getCalibReprError() const;
     void   setCalibReprError(double d);
-    void   setExtModelChecked(bool b);
-    bool   isFixCenterChecked() const;
-    bool   isQuadAspectRatioChecked() const;
-    bool   isTangDistChecked() const;
-    bool   isExtModelChecked() const;
+    void   imageSizeChanged(int width, int height, int borderDiff);
 
     double getCalibExtrRot1();
     void   setCalibExtrRot1(double d);
@@ -364,13 +280,9 @@ public:
     bool           isExportUseMeterChecked() const;
     bool           isExportCommentChecked() const;
 
+    IntrinsicCameraParams getIntrinsicCameraParams() const;
+    void                  runAutoCalib();
 
-    /**
-     * @brief Get read-only IntrinsicCameraParams.
-     *
-     * The params can be changed by setting its content e.g. camera params (fx, fy, cx, cy) directly
-     */
-    inline IntrinsicCameraParams getIntrinsicCameraParams() const { return mIntrinsicCameraParams; }
 
 #ifdef QWT
     AnalysePlot *getAnalysePlot() const;
@@ -651,32 +563,8 @@ private slots:
     void on_filterSwapH_stateChanged(int i);
     void on_filterSwapV_stateChanged(int i);
 
-    void on_apply_stateChanged(int i);
-    void on_fx_valueChanged(double d);
-    void on_fy_valueChanged(double d);
-    void on_cx_valueChanged(double d);
-    void on_cy_valueChanged(double d);
-    void on_r2_valueChanged(double d);
-    void on_r4_valueChanged(double d);
-    void on_r6_valueChanged(double d);
-    void on_tx_valueChanged(double d);
-    void on_ty_valueChanged(double d);
-    void on_k4_valueChanged(double d);
-    void on_k5_valueChanged(double d);
-    void on_k6_valueChanged(double d);
-    void on_s1_valueChanged(double d);
-    void on_s2_valueChanged(double d);
-    void on_s3_valueChanged(double d);
-    void on_s4_valueChanged(double d);
-    void on_taux_valueChanged(double d);
-    void on_tauy_valueChanged(double d);
+    void on_intrinsicParamsChanged(IntrinsicCameraParams params);
 
-    void on_quadAspectRatio_stateChanged(int i);
-    void on_fixCenter_stateChanged(int i);
-    void on_tangDist_stateChanged(int i);
-    void on_extModelCheckBox_stateChanged(int i);
-    void on_autoCalib_clicked();
-    void on_calibFiles_clicked();
 
     void on_coordShow_stateChanged(int i);
     void on_coordFix_stateChanged(int i);
@@ -752,21 +640,16 @@ private slots:
     void setMoCapSize(int size);
     void toggleRecoROIButtons();
     void toggleTrackROIButtons();
-    void on_boardSizeX_valueChanged(int arg1);
-
-    void on_boardSizeY_valueChanged(int arg1);
-
-    void on_squareSize_valueChanged(double arg1);
 
 signals:
     void userChangedRecoMethod(reco::RecognitionMethod method);
 
 private:
-    Petrack              *mMainWindow;
-    Ui::Control          *mUi;
-    IntrinsicCameraParams mIntrinsicCameraParams;
-    QGraphicsScene       *mScene;
-    bool                  mColorChanging;
+    Petrack        *mMainWindow;
+    Ui::Control    *mUi;
+    IntrinsicBox   *mIntr;
+    QGraphicsScene *mScene;
+    bool            mColorChanging;
     bool mIndexChanging; // shows, if the index of the color model is really changing; nor while constructor (initialer
                          // durchlauf) and may be while loading xml file
     bool mLoading;       // shows, if new project is just loading

@@ -13,35 +13,29 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://cdwww.gnu.org/licenses/>.
  */
 
-#ifndef CALIBFILTER_H
-#define CALIBFILTER_H
+#ifndef UTIL_H
+#define UTIL_H
 
-#include "filter.h"
-#include "intrinsicCameraParams.h"
+#include <QDomNode>
+#include <QTextStream>
 
-/**
- * @brief Undistortion filter
- *
- * This class is a filter which undistorts the image using the camera matrix from intrinsic calibration.
- * It caches the mapping from distorted to undistorted image.
- */
-class CalibFilter : public Filter
+namespace
 {
-private:
-    Parameter<IntrinsicCameraParams> mCamParams;
 
-    cv::Mat map1;
-    cv::Mat map2;
+/*
+ * @brief Transforms node to QString for debugging/logging
+ *
+ */
+QString nodeToString(QDomNode &node)
+{
+    QString     str;
+    QTextStream stream(&str);
+    node.save(stream, 4 /*indent*/);
+    return str;
+}
 
-public:
-    CalibFilter();
-
-    cv::Mat act(cv::Mat &img, cv::Mat &res);
-
-    Parameter<IntrinsicCameraParams> &getCamParams();
-};
-
-#endif
+} // anonymous namespace
+#endif // UTIL_H

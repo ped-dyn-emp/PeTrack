@@ -489,23 +489,12 @@ void ExtrCalibration::calibExtrParams()
     {
         int bS = mMainWindow->getImageBorderSize();
         /* Create Camera-Matrix form Camera-Params in the Petrack-GUI */
-        // clang-format off
-        cv::Mat camMat = (cv::Mat_<double>(3,3) <<
-                      mControlWidget->getCalibFx(), 0, mControlWidget->getCalibCx()-bS,
-                      0, mControlWidget->getCalibFy(), mControlWidget->getCalibCy()-bS,
-                      0, 0, 1);
-        // clang-format on
-        cv::Mat distMat =
-            (cv::Mat_<double>(8, 1) << 0, // mControlWidget->r2->value(),
-             0,                           // mControlWidget->r4->value(),
-             0,                           // mControlWidget->tx->value(),
-             0,                           // mControlWidget->ty->value(),
-             // r^>4 not supported
-             0, // mControlWidget->r6->value(),
-             0, // mControlWidget->k4->value(),
-             0, // mControlWidget->k5->value(),
-             0  // mControlWidget->k6->value()
-            );
+        cv::Mat camMat = mControlWidget->getIntrinsicCameraParams().cameraMatrix;
+        camMat.at<double>(0, 2) -= bS;
+        camMat.at<double>(1, 2) -= bS;
+
+        cv::Mat distMat = cv::Mat::zeros(cv::Size(8, 1), CV_64F);
+
         /* Create Mat-objects of point correspondences */
         cv::Mat op(points3D);
         cv::Mat ip(points2D);
@@ -828,8 +817,13 @@ cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d)
     cv::Point2f point2D = cv::Point2f(0.0, 0.0);
     if(point3D.z != 0)
     {
-        point2D.x = (mControlWidget->getCalibFx() * point3D.x) / point3D.z + (mControlWidget->getCalibCx() - bS);
-        point2D.y = (mControlWidget->getCalibFy() * point3D.y) / point3D.z + (mControlWidget->getCalibCy() - bS);
+        const auto camMat = mControlWidget->getIntrinsicCameraParams();
+        const auto fx     = camMat.getFx();
+        const auto fy     = camMat.getFy();
+        const auto cx     = camMat.getCx();
+        const auto cy     = camMat.getCy();
+        point2D.x         = (fx * point3D.x) / point3D.z + (cx - bS);
+        point2D.y         = (fy * point3D.y) / point3D.z + (cy - bS);
     }
     if(false && bS > 0)
     {
@@ -890,9 +884,14 @@ cv::Point3f ExtrCalibration::get3DPoint(const cv::Point2f &p2d, double h) const
         mControlWidget->getCalibExtrTrans2(),
         mControlWidget->getCalibExtrTrans3()};
 
+    const auto camMat = mControlWidget->getIntrinsicCameraParams();
+    const auto fx     = camMat.getFx();
+    const auto fy     = camMat.getFy();
+    const auto cx     = camMat.getCx();
+    const auto cy     = camMat.getCy();
+
     // Subtract principal point and border, so we can assume pinhole camera
-    const cv::Vec2d centeredImagePoint{
-        p2d.x - (mControlWidget->getCalibCx() - bS), p2d.y - (mControlWidget->getCalibCy() - bS)};
+    const cv::Vec2d centeredImagePoint{p2d.x - (cx - bS), p2d.y - (cy - bS)};
 
 
     /* Basic Idea:
@@ -923,7 +922,7 @@ cv::Point3f ExtrCalibration::get3DPoint(const cv::Point2f &p2d, double h) const
 
     // calc Rv, (R = rot_inv)
     // rotatedProj = Rv
-    const cv::Vec2d focalLength{mControlWidget->getCalibFx(), mControlWidget->getCalibFy()};
+    const cv::Vec2d focalLength{fx, fy};
     const cv::Vec2d pinholeProjectionXY = cv::Mat(centeredImagePoint.div(focalLength));
     const cv::Vec3d pinholeProjectionXY1{pinholeProjectionXY[0], pinholeProjectionXY[1], 1};
     const cv::Vec3d rotatedProj = rot_inv * pinholeProjectionXY1;
@@ -934,12 +933,12 @@ cv::Point3f ExtrCalibration::get3DPoint(const cv::Point2f &p2d, double h) const
     // Evaluate line at depth z; calc point in camera coords
     // written this way instead of z * pinholeProjectionXY1 (i.e. z * v) to not change test results due to floating
     // point precision diff
-    resultPoint.x = (p2d.x - (mControlWidget->getCalibCx() - bS));
-    resultPoint.y = (p2d.y - (mControlWidget->getCalibCy() - bS));
+    resultPoint.x = (p2d.x - (cx - bS));
+    resultPoint.y = (p2d.y - (cy - bS));
     resultPoint.z = z;
 
-    resultPoint.x = resultPoint.x * z / mControlWidget->getCalibFx();
-    resultPoint.y = resultPoint.y * z / mControlWidget->getCalibFy();
+    resultPoint.x = resultPoint.x * z / fx;
+    resultPoint.y = resultPoint.y * z / fy;
 
     // We transform from cam coords to world coords with W = R * C - T
     // we now calc: W = R * (C - R^-1*T), which is equivalent

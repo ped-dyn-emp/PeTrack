@@ -117,9 +117,15 @@ bool AutoCalib::openCalibFiles()
  * detection is successful at least in one image, the detected points are used
  * for the intrinsic calibration of the camera.
  *
- * Also sets the GUI elements to the calculated value.
+ * @param quadAspectRatio whether to fix the aspect ratio
+ * @param fixCenter whether to fix the center/focal point
+ * @param tangDist whether to use non-zero tangential distortion
+ * @param extModel whether to use "extended" calibration model
+ *
+ * @return new parameters or std::nullopt, if no calibration could be done
  */
-void AutoCalib::autoCalib()
+std::optional<IntrinsicCameraParams>
+AutoCalib::autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist, bool extModel)
 {
     if(mMainWindow)
     {
@@ -127,7 +133,7 @@ void AutoCalib::autoCalib()
         if(mCalibFiles.isEmpty())
         {
             PInformation(mMainWindow, Petrack::tr("Petrack"), Petrack::tr("At first you have to select files."));
-            return;
+            return std::nullopt;
         }
 
         cv::Size board_size(
@@ -190,7 +196,7 @@ void AutoCalib::autoCalib()
                     mMainWindow->updateImage(origImg); // now the last view will be deleted
                 }
 #endif
-                return;
+                return std::nullopt;
             }
 
             // muss nur bei einem bild gemacht werden
@@ -241,23 +247,23 @@ void AutoCalib::autoCalib()
                 QString("Chessboard pattern (%1x%2) not found in calibration files.")
                     .arg(board_size.width)
                     .arg(board_size.height));
-            return;
+            return std::nullopt;
         }
         // set flags for calibration
-        if(mControlWidget->isQuadAspectRatioChecked())
+        if(quadAspectRatio)
         {
             flags |= CV_CALIB_FIX_ASPECT_RATIO; // durch setzen von aspect_ratio kann fix ascpect anders als 1:1
                                                 // eingestellt werden
         }
-        if(mControlWidget->isFixCenterChecked())
+        if(fixCenter)
         {
             flags |= CV_CALIB_FIX_PRINCIPAL_POINT;
         }
-        if(!mControlWidget->isTangDistChecked())
+        if(!tangDist)
         {
             flags |= CV_CALIB_ZERO_TANGENT_DIST;
         }
-        if(mControlWidget->isExtModelChecked())
+        if(extModel)
         {
             flags |= CV_CALIB_RATIONAL_MODEL + CV_CALIB_THIN_PRISM_MODEL + CV_CALIB_TILTED_MODEL;
         }
@@ -301,28 +307,6 @@ void AutoCalib::autoCalib()
             dist_coeffs.at<double>(0, 11));
         SPDLOG_INFO("taux: {} tauy: {}", dist_coeffs.at<double>(0, 12), dist_coeffs.at<double>(0, 13));
 
-        // set calibration values
-        mControlWidget->setCalibFx(camera_matrix.at<double>(0, 0));
-        mControlWidget->setCalibFy(camera_matrix.at<double>(1, 1));
-        mControlWidget->setCalibCx(camera_matrix.at<double>(0, 2) + mMainWindow->getImageBorderSize());
-        mControlWidget->setCalibCy(camera_matrix.at<double>(1, 2) + mMainWindow->getImageBorderSize());
-        mControlWidget->setCalibR2(dist_coeffs.at<double>(0, 0));
-        mControlWidget->setCalibR4(dist_coeffs.at<double>(0, 1));
-        mControlWidget->setCalibTx(dist_coeffs.at<double>(0, 2));
-        mControlWidget->setCalibTy(dist_coeffs.at<double>(0, 3));
-        mControlWidget->setCalibR6(dist_coeffs.at<double>(0, 4));
-        mControlWidget->setCalibK4(dist_coeffs.at<double>(0, 5));
-        mControlWidget->setCalibK5(dist_coeffs.at<double>(0, 6));
-        mControlWidget->setCalibK6(dist_coeffs.at<double>(0, 7));
-        mControlWidget->setCalibS1(dist_coeffs.at<double>(0, 8));
-        mControlWidget->setCalibS2(dist_coeffs.at<double>(0, 9));
-        mControlWidget->setCalibS3(dist_coeffs.at<double>(0, 10));
-        mControlWidget->setCalibS4(dist_coeffs.at<double>(0, 11));
-        mControlWidget->setCalibTAUX(dist_coeffs.at<double>(0, 12));
-        mControlWidget->setCalibTAUY(dist_coeffs.at<double>(0, 13));
-        mControlWidget->setCalibReprError(reproj_errs);
-
-
 #ifdef SHOW_CALIB_MAINWINDOW
         // reset view to animation image
         if(!origImg.empty())
@@ -330,7 +314,18 @@ void AutoCalib::autoCalib()
             mMainWindow->updateImage(origImg); // now the last view will be deleted
         }
 #endif
+
+        // set calibration values
+        IntrinsicCameraParams params;
+        params.cameraMatrix = camera_matrix;
+        params.cameraMatrix.at<double>(0, 2) += mMainWindow->getImageBorderSize();
+        params.cameraMatrix.at<double>(1, 2) += mMainWindow->getImageBorderSize();
+        dist_coeffs.convertTo(params.distortionCoeffs, CV_32F);
+        params.reprojectionError = reproj_errs;
+
+        return params;
     }
+    return std::nullopt;
 }
 
 

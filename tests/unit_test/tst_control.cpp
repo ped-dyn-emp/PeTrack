@@ -19,6 +19,7 @@
 #include "control.h"
 #include "imageItem.h"
 #include "ui_control.h"
+#include "util.h"
 #include "view.h"
 
 #include <QGraphicsScene>
@@ -73,7 +74,7 @@ void checkSelectedColor(
 
 SCENARIO("I open PeTrack with a red image", "[ui][config]")
 {
-    Petrack pet{};
+    Petrack pet{"Unknown"};
     cv::Mat redTestImage{cv::Size(50, 50), CV_8UC3, cv::Scalar(179, 255, 200)};
     cv::cvtColor(redTestImage, redTestImage, cv::COLOR_HSV2BGR);
     // NOTE Gibt es eine bessere Methode, als das Bild erst zu speichern?
@@ -258,24 +259,14 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
 
 SCENARIO("Open PeTrack check defaults", "[ui][config]")
 {
-    Petrack pet{};
+    Petrack pet{"Unknown"};
     REQUIRE(pet.getRecognizer().getRecoMethod() == reco::RecognitionMethod::MultiColor);
 }
 
-/**
- * @brief Transforms node to QString for debugging/logging
- */
-QString nodeToString(QDomNode &node)
-{
-    QString     str;
-    QTextStream stream(&str);
-    node.save(stream, 4 /*indent*/);
-    return str;
-}
 
 TEST_CASE("Loading from and saving to XML node", "[config]")
 {
-    Petrack      pet{};
+    Petrack      pet{"0.9.1"};
     Control     *control = pet.getControlWidget();
     QDomDocument doc;
     QDomElement  save = doc.createElement("CONTROL");
@@ -303,7 +294,7 @@ TEST_CASE("Loading from and saving to XML node", "[config]")
 
 SCENARIO("Change the show only people list", "[ui][config][tracking][path]")
 {
-    Petrack  pet{};
+    Petrack  pet{"Unknown"};
     Control *control = pet.getControlWidget();
     control->setTrackShowOnlyListChecked(true);
 

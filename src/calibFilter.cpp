@@ -18,84 +18,29 @@
 
 #include "calibFilter.h"
 
-#include "helper.h"
+#include <opencv2/calib3d.hpp>
+#include <opencv2/imgproc.hpp>
 
 
-CalibFilter::CalibFilter() : Filter()
+Parameter<IntrinsicCameraParams> &CalibFilter::getCamParams()
 {
-    getFx().setMinimum(500.);
-    getFx().setMaximum(5000.);
-    getFx().setValue(881.);
+    return mCamParams;
+}
 
-    getFy().setMinimum(500.);
-    getFy().setMaximum(5000.);
-    getFy().setValue(881.);
+CalibFilter::CalibFilter() : Filter(), mCamParams(this)
+{
+    IntrinsicCameraParams params;
 
-    getCx().setMinimum(0.);
-    getCx().setMaximum(4096 /*1023.*/);
-    getCx().setValue(511.5);
+    constexpr double defaultFocalLength = 881;
+    constexpr double defaultCx          = 551.5;
+    constexpr double defaultCy          = 383.5;
+    params.setFx(defaultFocalLength);
+    params.setFy(defaultFocalLength);
+    params.setCx(defaultCx);
+    params.setCy(defaultCy);
 
-    getCy().setMinimum(0.);
-    getCy().setMaximum(2160 /*767.*/);
-    getCy().setValue(383.5);
-
-    getR2().setMinimum(-5.);
-    getR2().setMaximum(5.);
-    getR2().setValue(0.);
-
-    getR4().setMinimum(-5.);
-    getR4().setMaximum(5.);
-    getR4().setValue(0.);
-
-    getTx().setMinimum(-5.);
-    getTx().setMaximum(5.);
-    getTx().setValue(0.);
-
-    getTy().setMinimum(-5.);
-    getTy().setMaximum(5.);
-    getTy().setValue(0.);
-
-    getR6().setMinimum(-5.);
-    getR6().setMaximum(5.);
-    getR6().setValue(0.);
-
-    getK4().setMinimum(-5.);
-    getK4().setMaximum(5.);
-    getK4().setValue(0.);
-
-    getK5().setMinimum(-5.);
-    getK5().setMaximum(5.);
-    getK5().setValue(0.);
-
-    getK6().setMinimum(-5.);
-    getK6().setMaximum(5.);
-    getK6().setValue(0.);
-
-    getS1().setMinimum(-5.);
-    getS1().setMaximum(5.);
-    getS1().setValue(0.);
-
-    getS2().setMinimum(-5.);
-    getS2().setMaximum(5.);
-    getS2().setValue(0.);
-
-    getS3().setMinimum(-5.);
-    getS3().setMaximum(5.);
-    getS3().setValue(0.);
-
-    getS4().setMinimum(-5.);
-    getS4().setMaximum(5.);
-    getS4().setValue(0.);
-
-    getTAUX().setMinimum(-5.);
-    getTAUX().setMaximum(5.);
-    getTAUX().setValue(0.);
-
-    getTAUY().setMinimum(-5.);
-    getTAUY().setMaximum(5.);
-    getTAUY().setValue(0.);
-
-    mReprojectionError = std::numeric_limits<double>::quiet_NaN();
+    // distortionCoeffs already 0-initalized
+    mCamParams.setValue(params);
 }
 
 /**
@@ -112,117 +57,15 @@ cv::Mat CalibFilter::act(cv::Mat &img, cv::Mat &res)
 {
     if(this->changed() || map1.size() != img.size())
     {
-        cv::Mat camera =
-            (cv::Mat_<float>(3, 3) << getFx().getValue(),
-             0,
-             getCx().getValue(),
-             0,
-             getFy().getValue(),
-             getCy().getValue(),
-             0,
-             0,
-             1);
-        cv::Mat dist =
-            (cv::Mat_<float>(1, 14) << getR2().getValue(),
-             getR4().getValue(),
-             getTx().getValue(),
-             getTy().getValue(),
-             getR6().getValue(),
-             getK4().getValue(),
-             getK5().getValue(),
-             getK6().getValue(),
-             getS1().getValue(),
-             getS2().getValue(),
-             getS3().getValue(),
-             getS4().getValue(),
-             getTAUX().getValue(),
-             getTAUY().getValue());
+        cv::Mat camera;
+        // conversion to CV_32F such that regression tests don't fail
+        mCamParams.getValue().cameraMatrix.convertTo(camera, CV_32F);
+        const cv::Mat dist = mCamParams.getValue().distortionCoeffs;
 
-
-        initUndistortRectifyMap(camera, dist, cv::Mat_<double>::eye(3, 3), camera, img.size(), CV_16SC2, map1, map2);
+        cv::initUndistortRectifyMap(
+            camera, dist, cv::Mat_<double>::eye(3, 3), camera, img.size(), CV_16SC2, map1, map2);
     }
 
     cv::remap(img, res, map1, map2, cv::INTER_LINEAR, cv::BORDER_CONSTANT);
     return res;
-}
-
-Parameter<double> &CalibFilter::getFx()
-{
-    return mFx;
-}
-Parameter<double> &CalibFilter::getFy()
-{
-    return mFy;
-}
-Parameter<double> &CalibFilter::getCx()
-{
-    return mCx;
-}
-Parameter<double> &CalibFilter::getCy()
-{
-    return mCy;
-}
-Parameter<double> &CalibFilter::getR2()
-{
-    return mR2;
-}
-Parameter<double> &CalibFilter::getR4()
-{
-    return mR4;
-}
-Parameter<double> &CalibFilter::getTx()
-{
-    return mTx;
-}
-Parameter<double> &CalibFilter::getTy()
-{
-    return mTy;
-}
-Parameter<double> &CalibFilter::getR6()
-{
-    return mR6;
-}
-Parameter<double> &CalibFilter::getK4()
-{
-    return mK4;
-}
-Parameter<double> &CalibFilter::getK5()
-{
-    return mK5;
-}
-Parameter<double> &CalibFilter::getK6()
-{
-    return mK6;
-}
-Parameter<double> &CalibFilter::getS1()
-{
-    return mS1;
-}
-Parameter<double> &CalibFilter::getS2()
-{
-    return mS2;
-}
-Parameter<double> &CalibFilter::getS3()
-{
-    return mS3;
-}
-Parameter<double> &CalibFilter::getS4()
-{
-    return mS4;
-}
-Parameter<double> &CalibFilter::getTAUX()
-{
-    return mTAUX;
-}
-Parameter<double> &CalibFilter::getTAUY()
-{
-    return mTAUY;
-}
-double CalibFilter::getReprojectionError() const
-{
-    return mReprojectionError;
-}
-void CalibFilter::setReprojectionError(double d)
-{
-    mReprojectionError = d;
 }
