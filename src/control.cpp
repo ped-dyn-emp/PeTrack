@@ -27,6 +27,7 @@
 #include "colorPlot.h"
 #include "colorRangeWidget.h"
 #include "imageItem.h"
+#include "intrinsicBox.h"
 #include "logger.h"
 #include "moCapItem.h"
 #include "multiColorMarkerWidget.h"
@@ -89,105 +90,39 @@ Control::Control(
     QObject::connect(
         &missingFrames, &MissingFrames::executeChanged, mUi->missingFramesCalculated, &QCheckBox::setChecked);
 
-    // Weitere Verzerrungsparameter werden vllt. spaeter mal gebraucht bisher von OpenCV nicht beruecksichtig. Muessen
-    // dann noch in die Oberflaeche eingebaut werden Deniz: OpenCV kann Sie mittlerweile benutzen, wenn man
-    // calibrateCamera die Flag CALIB_RATIONAL_MODEL übergibt; Ergibt eine genauere Kalibration Auch rechenintensiver,
-    // aber da wir das einmal machen und dann Speichern, ist das auch egal Diese Boxen müssten in die UI eingebaut und
-    // der entsprechende Aufruf in AutoCalib müsste angepasst werden
+    mIntr = new IntrinsicBox(
+        this,
+        *mMainWindow->getAutoCalib(),
+        *mMainWindow->getCalibFilter(),
+        [this]()
+        {
+            if(!mMainWindow->isLoading())
+            {
+                mMainWindow->updateImage();
+            }
+        });
+    mIntr->setObjectName(QString::fromUtf8("intr"));
 
+    ui->verticalLayout_13->insertWidget(1, mIntr);
 
-    mUi->filterBrightContrast->setCheckState(
-        mMainWindow->getBrightContrastFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
-    mUi->filterBorder->setCheckState(mMainWindow->getBorderFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
-    mUi->filterBg->setCheckState(mMainWindow->getBackgroundFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
-    mUi->apply->setCheckState(mMainWindow->getCalibFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
+    FilterSettings filterSettings;
+    filterSettings.useBrightContrast = mMainWindow->getBrightContrastFilter()->getEnabled();
+    filterSettings.useBorder         = mMainWindow->getBorderFilter()->getEnabled();
+    filterSettings.useBackground     = mMainWindow->getBackgroundFilter()->getEnabled();
 
-    mUi->filterSwap->setCheckState(mMainWindow->getSwapFilter()->getEnabled() ? Qt::Checked : Qt::Unchecked);
-    mUi->filterSwapH->setCheckState(
-        mMainWindow->getSwapFilter()->getSwapHorizontally().getValue() ? Qt::Checked : Qt::Unchecked);
-    mUi->filterSwapV->setCheckState(
-        mMainWindow->getSwapFilter()->getSwapVertically().getValue() ? Qt::Checked : Qt::Unchecked);
+    filterSettings.useSwap  = mMainWindow->getSwapFilter()->getEnabled();
+    filterSettings.useSwapH = mMainWindow->getSwapFilter()->getSwapHorizontally().getValue();
+    filterSettings.useSwapV = mMainWindow->getSwapFilter()->getSwapVertically().getValue();
+    mUi->filterBeforeBox->setFilterSettings(filterSettings);
+
+    connect(mIntr, &IntrinsicBox::paramsChanged, this, &Control::on_intrinsicParamsChanged);
 
     setFilterBorderSizeMin(mMainWindow->getBorderFilter()->getBorderSize().getMinimum());
     setFilterBorderSizeMax(mMainWindow->getBorderFilter()->getBorderSize().getMaximum());
 
-    setCalibFxMin(mMainWindow->getCalibFilter()->getFx().getMinimum());
-    setCalibFxMax(mMainWindow->getCalibFilter()->getFx().getMaximum());
-    setCalibFx(mMainWindow->getCalibFilter()->getFx().getValue());
-
-    setCalibFyMin(mMainWindow->getCalibFilter()->getFy().getMinimum());
-    setCalibFyMax(mMainWindow->getCalibFilter()->getFy().getMaximum());
-    setCalibFy(mMainWindow->getCalibFilter()->getFy().getValue());
-
-    setCalibCx(mMainWindow->getCalibFilter()->getCx().getValue());
-
-    setCalibCy(mMainWindow->getCalibFilter()->getCy().getValue());
-
-    setCalibR2Min(mMainWindow->getCalibFilter()->getR2().getMinimum());
-    setCalibR2Max(mMainWindow->getCalibFilter()->getR2().getMaximum());
-    setCalibR2(mMainWindow->getCalibFilter()->getR2().getValue());
-
-    setCalibR4Min(mMainWindow->getCalibFilter()->getR4().getMinimum());
-    setCalibR4Max(mMainWindow->getCalibFilter()->getR4().getMaximum());
-    setCalibR4(mMainWindow->getCalibFilter()->getR4().getValue());
-
-    setCalibR6Min(mMainWindow->getCalibFilter()->getR6().getMinimum());
-    setCalibR6Max(mMainWindow->getCalibFilter()->getR6().getMaximum());
-    setCalibR6(mMainWindow->getCalibFilter()->getR6().getValue());
-
-    setCalibTxMin(mMainWindow->getCalibFilter()->getTx().getMinimum());
-    setCalibTxMax(mMainWindow->getCalibFilter()->getTx().getMaximum());
-    setCalibTx(mMainWindow->getCalibFilter()->getTx().getValue());
-
-    setCalibTyMin(mMainWindow->getCalibFilter()->getTy().getMinimum());
-    setCalibTyMax(mMainWindow->getCalibFilter()->getTy().getMaximum());
-    setCalibTy(mMainWindow->getCalibFilter()->getTy().getValue());
-
-    setCalibK4Min(mMainWindow->getCalibFilter()->getK4().getMinimum());
-    setCalibK4Max(mMainWindow->getCalibFilter()->getK4().getMaximum());
-    setCalibK4(mMainWindow->getCalibFilter()->getK4().getValue());
-
-    setCalibK5Min(mMainWindow->getCalibFilter()->getK5().getMinimum());
-    setCalibK5Max(mMainWindow->getCalibFilter()->getK5().getMaximum());
-    setCalibK5(mMainWindow->getCalibFilter()->getK5().getValue());
-
-    setCalibK6Min(mMainWindow->getCalibFilter()->getK6().getMinimum());
-    setCalibK6Max(mMainWindow->getCalibFilter()->getK6().getMaximum());
-    setCalibK6(mMainWindow->getCalibFilter()->getK6().getValue());
-
-    setCalibS1Min(mMainWindow->getCalibFilter()->getS1().getMinimum());
-    setCalibS1Max(mMainWindow->getCalibFilter()->getS1().getMaximum());
-    setCalibS1(mMainWindow->getCalibFilter()->getS1().getValue());
-
-    setCalibS2Min(mMainWindow->getCalibFilter()->getS2().getMinimum());
-    setCalibS2Max(mMainWindow->getCalibFilter()->getS2().getMaximum());
-    setCalibS2(mMainWindow->getCalibFilter()->getS2().getValue());
-
-    setCalibS3Min(mMainWindow->getCalibFilter()->getS3().getMinimum());
-    setCalibS3Max(mMainWindow->getCalibFilter()->getS3().getMaximum());
-    setCalibS3(mMainWindow->getCalibFilter()->getS3().getValue());
-
-    setCalibS4Min(mMainWindow->getCalibFilter()->getS4().getMinimum());
-    setCalibS4Max(mMainWindow->getCalibFilter()->getS4().getMaximum());
-    setCalibS4(mMainWindow->getCalibFilter()->getS4().getValue());
-
-    setCalibTAUXMin(mMainWindow->getCalibFilter()->getTAUX().getMinimum());
-    setCalibTAUXMax(mMainWindow->getCalibFilter()->getTAUX().getMaximum());
-    setCalibTAUX(mMainWindow->getCalibFilter()->getTAUX().getValue());
-
-    setCalibTAUYMin(mMainWindow->getCalibFilter()->getTAUY().getMinimum());
-    setCalibTAUYMax(mMainWindow->getCalibFilter()->getTAUY().getMaximum());
-    setCalibTAUY(mMainWindow->getCalibFilter()->getTAUY().getValue());
-    setCalibReprError(mMainWindow->getCalibFilter()->getReprojectionError());
-
-
-    // statt folgender Zeile kann zB on_cx_valueChanged einfach kodiert werden (su)
-    //  connect(mUi->cx, SIGNAL(valueChanged(double mUi->cx)), this, SLOT(on_cx_valueChanged));
-
     // will be done by designer: mUi->colorPlot->setParent(colorBox); //because it is just integrated via frame in
     // designer
 
-    connect(mUi->extModelCheckBox, &QCheckBox::stateChanged, this, &Control::on_extModelCheckBox_stateChanged);
     mUi->colorPlot->setControlWidget(this);
 
     mIndexChanging = false;
@@ -676,311 +611,36 @@ bool Control::getAdaptiveLevel() const
 
 int Control::getFilterBorderSize() const
 {
-    return mUi->filterBorderParamSize->value();
+    return mUi->filterBeforeBox->getFilterBorderSize();
 }
 void Control::setFilterBorderSizeMin(int i)
 {
-    mUi->filterBorderParamSize->setMinimum(i);
-    mUi->filterBorderParamSize_spin->setMinimum(i);
+    mUi->filterBeforeBox->setFilterBorderSizeMin(i);
 }
 void Control::setFilterBorderSizeMax(int i)
 {
-    mUi->filterBorderParamSize->setMaximum(i);
-    mUi->filterBorderParamSize_spin->setMaximum(i);
+    mUi->filterBeforeBox->setFilterBorderSizeMax(i);
 }
 
 bool Control::isFilterBgChecked() const
 {
-    return mUi->filterBg->isChecked();
+    return mUi->filterBeforeBox->isFilterBgChecked();
 }
 
 bool Control::isFilterBgDeleteTrjChecked() const
 {
-    return mUi->filterBgDeleteTrj->isChecked();
+    return mUi->filterBeforeBox->isFilterBgDeleteTrjChecked();
 }
 
 int Control::getFilterBgDeleteNumber() const
 {
-    return mUi->filterBgDeleteNumber->value();
+    return mUi->filterBeforeBox->getFilterBgDeleteNumber();
 }
 
-double Control::getCalibFx() const
+void Control::imageSizeChanged(int width, int height, int borderDiff)
 {
-    return mUi->fx->value();
+    mIntr->imageSizeChanged(width, height, borderDiff);
 }
-
-void Control::setCalibFx(double d)
-{
-    mUi->fx->setValue(d);
-}
-
-void Control::setCalibFxMin(double d)
-{
-    mUi->fx->setMinimum(d);
-}
-
-void Control::setCalibFxMax(double d)
-{
-    mUi->fx->setMaximum(d);
-}
-
-double Control::getCalibFy() const
-{
-    return mUi->fy->value();
-}
-
-void Control::setCalibFy(double d)
-{
-    mUi->fy->setValue(d);
-}
-
-void Control::setCalibFyMin(double d)
-{
-    mUi->fy->setMinimum(d);
-}
-
-void Control::setCalibFyMax(double d)
-{
-    mUi->fy->setMaximum(d);
-}
-
-double Control::getCalibCx() const
-{
-    return mUi->cx->value();
-}
-
-void Control::setCalibCx(double d)
-{
-    mUi->cx->setValue(d);
-}
-
-void Control::setCalibCxMin(double d)
-{
-    mUi->cx->setMinimum(d);
-}
-
-void Control::setCalibCxMax(double d)
-{
-    mUi->cx->setMaximum(d);
-}
-
-double Control::getCalibCy() const
-{
-    return mUi->cy->value();
-}
-
-void Control::setCalibCy(double d)
-{
-    mUi->cy->setValue(d);
-}
-
-void Control::setCalibCyMin(double d)
-{
-    mUi->cy->setMinimum(d);
-}
-
-void Control::setCalibCyMax(double d)
-{
-    mUi->cy->setMaximum(d);
-}
-
-double Control::getCalibR2() const
-{
-    return mUi->r2->value();
-}
-
-void Control::setCalibR2(double d)
-{
-    mUi->r2->setValue(d);
-}
-
-void Control::setCalibR2Min(double d)
-{
-    mUi->r2->setMinimum(d);
-}
-
-void Control::setCalibR2Max(double d)
-{
-    mUi->r2->setMaximum(d);
-}
-
-double Control::getCalibR4() const
-{
-    return mUi->r4->value();
-}
-
-void Control::setCalibR4(double d)
-{
-    mUi->r4->setValue(d);
-}
-
-void Control::setCalibR4Min(double d)
-{
-    mUi->r4->setMinimum(d);
-}
-
-void Control::setCalibR4Max(double d)
-{
-    mUi->r4->setMaximum(d);
-}
-
-double Control::getCalibR6() const
-{
-    return mUi->r6->value();
-}
-
-void Control::setCalibR6(double d)
-{
-    mUi->r6->setValue(d);
-}
-
-void Control::setCalibR6Min(double d)
-{
-    mUi->r6->setMinimum(d);
-}
-void Control::setCalibR6Max(double d)
-{
-    mUi->r6->setMaximum(d);
-}
-
-double Control::getCalibS1() const
-{
-    return mUi->s1->value();
-}
-void Control::setCalibS1(double d)
-{
-    mUi->s1->setValue(d);
-}
-void Control::setCalibS1Min(double d)
-{
-    mUi->s1->setMinimum(d);
-}
-void Control::setCalibS1Max(double d)
-{
-    mUi->s1->setMaximum(d);
-}
-
-double Control::getCalibS2() const
-{
-    return mUi->s2->value();
-}
-void Control::setCalibS2(double d)
-{
-    mUi->s2->setValue(d);
-}
-void Control::setCalibS2Min(double d)
-{
-    mUi->s2->setMinimum(d);
-}
-void Control::setCalibS2Max(double d)
-{
-    mUi->s2->setMaximum(d);
-}
-
-double Control::getCalibS3() const
-{
-    return mUi->s3->value();
-}
-void Control::setCalibS3(double d)
-{
-    mUi->s3->setValue(d);
-}
-void Control::setCalibS3Min(double d)
-{
-    mUi->s3->setMinimum(d);
-}
-void Control::setCalibS3Max(double d)
-{
-    mUi->s3->setMaximum(d);
-}
-
-double Control::getCalibS4() const
-{
-    return mUi->s4->value();
-}
-void Control::setCalibS4(double d)
-{
-    mUi->s4->setValue(d);
-}
-void Control::setCalibS4Min(double d)
-{
-    mUi->s4->setMinimum(d);
-}
-void Control::setCalibS4Max(double d)
-{
-    mUi->s4->setMaximum(d);
-}
-
-double Control::getCalibTAUX() const
-{
-    return mUi->taux->value();
-}
-void Control::setCalibTAUX(double d)
-{
-    mUi->taux->setValue(d);
-}
-void Control::setCalibTAUXMin(double d)
-{
-    mUi->taux->setMinimum(d);
-}
-void Control::setCalibTAUXMax(double d)
-{
-    mUi->taux->setMaximum(d);
-}
-
-double Control::getCalibTAUY() const
-{
-    return mUi->tauy->value();
-}
-void Control::setCalibTAUY(double d)
-{
-    mUi->tauy->setValue(d);
-}
-void Control::setCalibTAUYMin(double d)
-{
-    mUi->tauy->setMinimum(d);
-}
-void Control::setCalibTAUYMax(double d)
-{
-    mUi->tauy->setMaximum(d);
-}
-
-void Control::setCalibReprError(double d)
-{
-    mUi->intrError->setText(QString("%1").arg(d));
-}
-void Control::setExtModelChecked(bool b)
-{
-    if(b)
-    {
-        mUi->extModelCheckBox->setChecked(true);
-    }
-    else
-    {
-        mUi->extModelCheckBox->setChecked(false);
-    }
-}
-
-bool Control::isFixCenterChecked() const
-{
-    return mUi->fixCenter->isChecked();
-}
-
-bool Control::isQuadAspectRatioChecked() const
-{
-    return mUi->quadAspectRatio->isChecked();
-}
-
-bool Control::isTangDistChecked() const
-{
-    return mUi->tangDist->isChecked();
-}
-
-bool Control::isExtModelChecked() const
-{
-    return mUi->extModelCheckBox->isChecked();
-}
-
 
 double Control::getCalibExtrRot1()
 {
@@ -1042,105 +702,6 @@ void Control::setCalibExtrTrans3(double d)
     mUi->trans3->setValue(d);
 }
 
-double Control::getCalibTx() const
-{
-    return mUi->tx->value();
-}
-
-void Control::setCalibTx(double d)
-{
-    mUi->tx->setValue(d);
-}
-
-void Control::setCalibTxMin(double d)
-{
-    mUi->tx->setMinimum(d);
-}
-
-void Control::setCalibTxMax(double d)
-{
-    mUi->tx->setMaximum(d);
-}
-
-double Control::getCalibTy() const
-{
-    return mUi->ty->value();
-}
-
-void Control::setCalibTy(double d)
-{
-    mUi->ty->setValue(d);
-}
-
-void Control::setCalibTyMin(double d)
-{
-    mUi->ty->setMinimum(d);
-}
-
-void Control::setCalibTyMax(double d)
-{
-    mUi->ty->setMaximum(d);
-}
-
-double Control::getCalibK4() const
-{
-    return mUi->k4->value();
-}
-
-void Control::setCalibK4(double d)
-{
-    mUi->k4->setValue(d);
-}
-
-void Control::setCalibK4Min(double d)
-{
-    mUi->k4->setMinimum(d);
-}
-
-void Control::setCalibK4Max(double d)
-{
-    mUi->k4->setMaximum(d);
-}
-
-double Control::getCalibK5() const
-{
-    return mUi->k5->value();
-}
-
-void Control::setCalibK5(double d)
-{
-    mUi->k5->setValue(d);
-}
-
-void Control::setCalibK5Min(double d)
-{
-    mUi->k5->setMinimum(d);
-}
-
-void Control::setCalibK5Max(double d)
-{
-    mUi->k5->setMaximum(d);
-}
-
-double Control::getCalibK6() const
-{
-    return mUi->k6->value();
-}
-
-void Control::setCalibK6(double d)
-{
-    mUi->k6->setValue(d);
-}
-
-void Control::setCalibK6Min(double d)
-{
-    mUi->k6->setMinimum(d);
-}
-
-void Control::setCalibK6Max(double d)
-{
-    mUi->k6->setMaximum(d);
-}
 
 int Control::getCalibGridDimension()
 {
@@ -2453,34 +2014,13 @@ void Control::on_filterSwapV_stateChanged(int i)
 
 void Control::on_filterBg_stateChanged(int i)
 {
-    static int showCheckState = mUi->filterBgShow->checkState();
-
+    mUi->filterBeforeBox->toggleBackgroundUi(static_cast<Qt::CheckState>(i));
     if(i == Qt::Checked)
     {
-        mUi->filterBgShow->setEnabled(true);
-        mUi->filterBgUpdate->setEnabled(true);
-        mUi->filterBgReset->setEnabled(true);
-        mUi->filterBgSave->setEnabled(true);
-        mUi->filterBgLoad->setEnabled(true);
-        if(showCheckState == Qt::Checked)
-        {
-            mUi->filterBgShow->setCheckState(Qt::Checked);
-        }
-        mUi->filterBgDeleteNumber->setEnabled(true);
-        mUi->filterBgDeleteTrj->setEnabled(true);
         mMainWindow->getBackgroundFilter()->enable();
     }
-    else if(i == Qt::Unchecked)
+    else
     {
-        mUi->filterBgShow->setEnabled(false);
-        mUi->filterBgUpdate->setEnabled(false);
-        mUi->filterBgReset->setEnabled(false);
-        mUi->filterBgSave->setEnabled(false);
-        mUi->filterBgLoad->setEnabled(false);
-        showCheckState = mUi->filterBgShow->checkState();
-        mUi->filterBgShow->setCheckState(Qt::Unchecked);
-        mUi->filterBgDeleteNumber->setEnabled(false);
-        mUi->filterBgDeleteTrj->setEnabled(false);
         mMainWindow->getBackgroundFilter()->disable();
     }
     if(!mMainWindow->isLoading())
@@ -2531,330 +2071,19 @@ void Control::on_filterBgLoad_clicked()
     }
 }
 
-void Control::on_apply_stateChanged(int i)
-{
-    if(i == Qt::Checked)
-    {
-        mMainWindow->getCalibFilter()->enable();
-    }
-    else if(i == Qt::Unchecked)
-    {
-        mMainWindow->getCalibFilter()->disable();
-    }
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-}
 
-void Control::on_fx_valueChanged(double d)
+void Control::on_intrinsicParamsChanged(IntrinsicCameraParams params)
 {
-    mIntrinsicCameraParams.cameraMatrix.at<double>(0, 0) = d;
-    mMainWindow->getCalibFilter()->getFx().setValue(d);
-    if(mUi->quadAspectRatio->isChecked())
-    {
-        mUi->fy->setValue(d);
-    }
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    setMeasuredAltitude();
-    mUi->intrError->setText(QString("invalid"));
-}
-
-void Control::on_fy_valueChanged(double d)
-{
-    mIntrinsicCameraParams.cameraMatrix.at<double>(1, 1) = d;
-    mMainWindow->getCalibFilter()->getFy().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    setMeasuredAltitude();
-    mUi->intrError->setText(QString("invalid"));
-}
-
-void Control::on_cx_valueChanged(double d)
-{
-    mIntrinsicCameraParams.cameraMatrix.at<double>(0, 2) = d;
+    mMainWindow->getCalibFilter()->getCamParams().setValue(params);
     mMainWindow->setStatusPosReal();
-    mMainWindow->getCalibFilter()->getCx().setValue(d);
     if(!mMainWindow->isLoading())
     {
+        mMainWindow->updateImage();
         mMainWindow->updateCoord();
     }
-    mUi->intrError->setText(QString("invalid"));
+    setMeasuredAltitude();
 }
 
-void Control::on_cy_valueChanged(double d)
-{
-    mIntrinsicCameraParams.cameraMatrix.at<double>(1, 2) = d;
-    mMainWindow->setStatusPosReal();
-    mMainWindow->getCalibFilter()->getCy().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-
-void Control::on_r2_valueChanged(double d)
-{
-    mMainWindow->getCalibFilter()->getR2().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-
-void Control::on_r4_valueChanged(double d)
-{
-    mMainWindow->getCalibFilter()->getR4().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-
-void Control::on_r6_valueChanged(double d)
-{
-    mMainWindow->getCalibFilter()->getR6().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-void Control::on_s1_valueChanged(double d)
-{
-    mMainWindow->getCalibFilter()->getS1().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-void Control::on_s2_valueChanged(double d)
-{
-    mMainWindow->getCalibFilter()->getS2().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-void Control::on_s3_valueChanged(double d)
-{
-    mMainWindow->getCalibFilter()->getS3().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-void Control::on_s4_valueChanged(double d)
-{
-    mMainWindow->getCalibFilter()->getS4().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-void Control::on_taux_valueChanged(double d)
-{
-    mMainWindow->getCalibFilter()->getTAUX().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-void Control::on_tauy_valueChanged(double d)
-{
-    mMainWindow->getCalibFilter()->getTAUY().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-
-
-void Control::on_tx_valueChanged(double d)
-{
-    mMainWindow->getCalibFilter()->getTx().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-
-void Control::on_ty_valueChanged(double d)
-{
-    mMainWindow->getCalibFilter()->getTy().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-void Control::on_k4_valueChanged(double d)
-{
-    mMainWindow->getCalibFilter()->getK4().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-void Control::on_k5_valueChanged(double d)
-{
-    mMainWindow->getCalibFilter()->getK5().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-void Control::on_k6_valueChanged(double d)
-{
-    mMainWindow->getCalibFilter()->getK6().setValue(d);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-void Control::on_quadAspectRatio_stateChanged(int i)
-{
-    static double oldFyValue = 0;
-
-    if(i == Qt::Checked)
-    {
-        oldFyValue = mUi->fy->value();
-        mUi->fy->setValue(mUi->fx->value());
-        mUi->fy->setDisabled(true);
-    }
-    else if(i == Qt::Unchecked)
-    {
-        mUi->fy->setEnabled(true);
-        mUi->fy->setValue(oldFyValue);
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-
-void Control::on_fixCenter_stateChanged(int i)
-{
-    static double oldCxValue = 0;
-    static double oldCyValue = 0;
-
-    if(i == Qt::Checked)
-    {
-        oldCxValue = mUi->cx->value();
-        oldCyValue = mUi->cy->value();
-        if(mMainWindow->getImage())
-        {
-            mUi->cx->setValue(
-                (mMainWindow->getImage()->width() - 1) / 2.); // mgl auch iplimg,wenn bild vergroessert wird
-            mUi->cy->setValue((mMainWindow->getImage()->height() - 1) / 2.);
-        }
-        mUi->cx->setDisabled(true);
-        mUi->cy->setDisabled(true);
-    }
-    else if(i == Qt::Unchecked)
-    {
-        mUi->cx->setEnabled(true);
-        mUi->cy->setEnabled(true);
-        mUi->cx->setValue(oldCxValue);
-        mUi->cy->setValue(oldCyValue);
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-
-void Control::on_tangDist_stateChanged(int i)
-{
-    static double oldTxValue = 0;
-    static double oldTyValue = 0;
-
-    if(i == Qt::Checked)
-    {
-        mUi->tx->setEnabled(true);
-        mUi->ty->setEnabled(true);
-        mUi->tx->setValue(oldTxValue);
-        mUi->ty->setValue(oldTyValue);
-    }
-    else if(i == Qt::Unchecked)
-    {
-        oldTxValue = mUi->tx->value();
-        oldTyValue = mUi->ty->value();
-        mUi->tx->setValue(0.);
-        mUi->ty->setValue(0.);
-        mUi->tx->setDisabled(true);
-        mUi->ty->setDisabled(true);
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-
-void Control::on_extModelCheckBox_stateChanged(int i)
-{
-    if(i == Qt::Checked)
-    {
-        mUi->k4->setEnabled(true);
-        mUi->k5->setEnabled(true);
-        mUi->k6->setEnabled(true);
-        mUi->s1->setEnabled(true);
-        mUi->s2->setEnabled(true);
-        mUi->s3->setEnabled(true);
-        mUi->s4->setEnabled(true);
-        mUi->taux->setEnabled(true);
-        mUi->tauy->setEnabled(true);
-    }
-    else if(i == Qt::Unchecked)
-    {
-        mUi->k4->setDisabled(true);
-        mUi->k5->setDisabled(true);
-        mUi->k6->setDisabled(true);
-        mUi->s1->setDisabled(true);
-        mUi->s2->setDisabled(true);
-        mUi->s3->setDisabled(true);
-        mUi->s4->setDisabled(true);
-        mUi->taux->setDisabled(true);
-        mUi->tauy->setDisabled(true);
-    }
-    mUi->intrError->setText(QString("invalid"));
-}
-
-void Control::on_boardSizeX_valueChanged(int x)
-{
-    mMainWindow->getAutoCalib()->setBoardSizeX(x);
-}
-
-void Control::on_boardSizeY_valueChanged(int y)
-{
-    mMainWindow->getAutoCalib()->setBoardSizeY(y);
-}
-
-void Control::on_squareSize_valueChanged(double s)
-{
-    mMainWindow->getAutoCalib()->setSquareSize(s);
-}
-
-void Control::on_autoCalib_clicked()
-{
-    mMainWindow->getAutoCalib()->autoCalib();
-}
-void Control::on_calibFiles_clicked()
-{
-    if(mMainWindow->getAutoCalib()->openCalibFiles())
-    {
-        mUi->autoCalib->setEnabled(true);
-    }
-}
 
 //---------------------------------------
 void Control::on_rot1_valueChanged(double /*arg1*/)
@@ -3269,9 +2498,11 @@ void Control::setMeasuredAltitude()
 {
     if(mMainWindow->getImageItem())
     {
+        auto       camMat = mIntr->getIntrinsicCameraParams();
+        const auto fx     = camMat.getFx();
+        const auto fy     = camMat.getFy();
         mUi->coordAltitudeMeasured->setText(
-            QString("(measured: %1)")
-                .arg((getCalibFx() + getCalibFy()) / 2. * mMainWindow->getImageItem()->getCmPerPixel(), 6, 'f', 1));
+            QString("(measured: %1)").arg((fx + fy) / 2. * mMainWindow->getImageItem()->getCmPerPixel(), 6, 'f', 1));
     }
 }
 
@@ -3292,89 +2523,17 @@ void Control::setXml(QDomElement &elem)
     subElem = (elem.ownerDocument()).createElement("CALIBRATION");
     elem.appendChild(subElem);
 
-    subSubElem = (elem.ownerDocument()).createElement("BRIGHTNESS");
-    subSubElem.setAttribute("ENABLED", mUi->filterBrightContrast->isChecked());
-    subSubElem.setAttribute("VALUE", mUi->filterBrightParam->value());
-    subElem.appendChild(subSubElem);
-
-    subSubElem = (elem.ownerDocument()).createElement("CONTRAST");
-    subSubElem.setAttribute("ENABLED", mUi->filterBrightContrast->isChecked());
-    subSubElem.setAttribute("VALUE", mUi->filterContrastParam->value());
-    subElem.appendChild(subSubElem);
-
     BorderFilter *bf = mMainWindow->getBorderFilter();
     QColor        col(bf->getBorderColR().getValue(), bf->getBorderColG().getValue(), bf->getBorderColB().getValue());
-    subSubElem = (elem.ownerDocument()).createElement("BORDER");
-    subSubElem.setAttribute("ENABLED", mUi->filterBorder->isChecked());
-    subSubElem.setAttribute("VALUE", mUi->filterBorderParamSize->value());
-    subSubElem.setAttribute("COLOR", col.name());
-    subElem.appendChild(subSubElem);
-
-    subSubElem = (elem.ownerDocument()).createElement("SWAP");
-    subSubElem.setAttribute("ENABLED", mUi->filterSwap->isChecked());
-    subSubElem.setAttribute("HORIZONTALLY", mUi->filterSwapH->isChecked());
-    subSubElem.setAttribute("VERTICALLY", mUi->filterSwapV->isChecked());
-    subElem.appendChild(subSubElem);
-
-    subSubElem = (elem.ownerDocument()).createElement("BG_SUB");
-    subSubElem.setAttribute("ENABLED", isFilterBgChecked());
-    subSubElem.setAttribute("UPDATE", mUi->filterBgUpdate->isChecked());
-    subSubElem.setAttribute("SHOW", mUi->filterBgShow->isChecked());
     fn = mMainWindow->getBackgroundFilter()->getFilename();
     if(fn != "")
     {
         fn = getFileList(fn, mMainWindow->getProFileName());
     }
-    subSubElem.setAttribute("FILE", fn);
-    subSubElem.setAttribute("DELETE", mUi->filterBgDeleteTrj->isChecked());
-    subSubElem.setAttribute("DELETE_NUMBER", mUi->filterBgDeleteNumber->value());
-    subElem.appendChild(subSubElem);
+    mUi->filterBeforeBox->setXml(subElem, col, fn);
 
-    subSubElem = (elem.ownerDocument()).createElement("PATTERN");
-    subSubElem.setAttribute("BOARD_SIZE_X", mMainWindow->getAutoCalib()->getBoardSizeX()); // 6
-    subSubElem.setAttribute("BOARD_SIZE_Y", mMainWindow->getAutoCalib()->getBoardSizeY()); // 8 oder 9
-    subSubElem.setAttribute("SQUARE_SIZE", mMainWindow->getAutoCalib()->getSquareSize());  // in cm
-    subElem.appendChild(subSubElem);
-
-    subSubElem = (elem.ownerDocument()).createElement("INTRINSIC_PARAMETERS");
-    subSubElem.setAttribute("ENABLED", mUi->apply->isChecked());
-    subSubElem.setAttribute("FX", mUi->fx->value());
-    subSubElem.setAttribute("FY", mUi->fy->value());
-    subSubElem.setAttribute("CX", mUi->cx->value());
-    subSubElem.setAttribute("CY", mUi->cy->value());
-    subSubElem.setAttribute("R2", mUi->r2->value());
-    subSubElem.setAttribute("R4", mUi->r4->value());
-    subSubElem.setAttribute("R6", mUi->r6->value());
-    subSubElem.setAttribute("TX", mUi->tx->value());
-    subSubElem.setAttribute("TY", mUi->ty->value());
-    subSubElem.setAttribute("K4", mUi->k4->value());
-    subSubElem.setAttribute("K5", mUi->k5->value());
-    subSubElem.setAttribute("K6", mUi->k6->value());
-    subSubElem.setAttribute("S1", mUi->s1->value());
-    subSubElem.setAttribute("S2", mUi->s2->value());
-    subSubElem.setAttribute("S3", mUi->s3->value());
-    subSubElem.setAttribute("S4", mUi->s4->value());
-    subSubElem.setAttribute("TAUX", mUi->taux->value());
-    subSubElem.setAttribute("TAUY", mUi->tauy->value());
-    subSubElem.setAttribute("ReprError", mMainWindow->getCalibFilter()->getReprojectionError());
-
-    subSubElem.setAttribute("QUAD_ASPECT_RATIO", mUi->quadAspectRatio->isChecked());
-    subSubElem.setAttribute("FIX_CENTER", mUi->fixCenter->isChecked());
-    subSubElem.setAttribute("TANG_DIST", mUi->tangDist->isChecked());
-    subSubElem.setAttribute("EXT_MODEL_ENABLED", mUi->extModelCheckBox->isChecked());
-    // in dateiname darf kein , vorkommen - das blank ", " zur uebersich - beim einlesen wird nur ","
-    // genommen und blanks rundherum abgeschnitten, falls von hand editiert wurde
-    QStringList fl = mMainWindow->getAutoCalib()->getCalibFiles();
-    for(int i = 0; i < fl.size(); ++i)
-    {
-        if(QFileInfo(fl.at(i)).isRelative() && QFileInfo(fl.at(i)).exists())
-        {
-            fl.replace(i, fl.at(i) + ";" + QFileInfo(fl.at(i)).absoluteFilePath());
-        }
-    }
-    subSubElem.setAttribute("CALIB_FILES", fl.join(", "));
-    subElem.appendChild(subSubElem);
-
+    // PATTERN and INTRINSIC_PARAMETERS elements
+    mIntr->setXml(subElem);
 
     subSubElem = (elem.ownerDocument()).createElement("EXTRINSIC_PARAMETERS");
 
@@ -3701,42 +2860,16 @@ void Control::getXml(QDomElement &elem)
             for(subSubElem = subElem.firstChildElement(); !subSubElem.isNull();
                 subSubElem = subSubElem.nextSiblingElement())
             {
-                if(subSubElem.tagName() == "BRIGHTNESS")
+                if(mUi->filterBeforeBox->getXmlSub(subSubElem))
                 {
-                    if(subSubElem.hasAttribute("ENABLED"))
-                    {
-                        mUi->filterBrightContrast->setCheckState(
-                            subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("VALUE"))
-                    {
-                        mUi->filterBrightParam->setValue(subSubElem.attribute("VALUE").toInt());
-                    }
+                    // intentionally left blank
                 }
-                else if(subSubElem.tagName() == "CONTRAST")
+                else if(mIntr->getXml(subSubElem))
                 {
-                    if(subSubElem.hasAttribute("ENABLED"))
-                    {
-                        mUi->filterBrightContrast->setCheckState(
-                            subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    //,mMainWindow->getContrastFilter()->getEnabled() ? "1" : "0" //Qt::Unchecked
-                    if(subSubElem.hasAttribute("VALUE"))
-                    {
-                        mUi->filterContrastParam->setValue(subSubElem.attribute("VALUE").toInt());
-                    }
+                    // intentionally left blank
                 }
                 else if(subSubElem.tagName() == "BORDER")
                 {
-                    if(subSubElem.hasAttribute("ENABLED"))
-                    {
-                        mUi->filterBorder->setCheckState(
-                            subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("VALUE"))
-                    {
-                        mUi->filterBorderParamSize->setValue(subSubElem.attribute("VALUE").toInt());
-                    }
                     if(subSubElem.hasAttribute("COLOR"))
                     {
                         QColor color(subSubElem.attribute("COLOR"));
@@ -3745,41 +2878,8 @@ void Control::getXml(QDomElement &elem)
                         mMainWindow->getBorderFilter()->getBorderColB().setValue(color.blue());
                     }
                 }
-                else if(subSubElem.tagName() == "SWAP")
-                {
-                    if(subSubElem.hasAttribute("ENABLED"))
-                    {
-                        mUi->filterSwap->setCheckState(
-                            subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("HORIZONTALLY"))
-                    {
-                        mUi->filterSwapH->setCheckState(
-                            subSubElem.attribute("HORIZONTALLY").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("VERTICALLY"))
-                    {
-                        mUi->filterSwapV->setCheckState(
-                            subSubElem.attribute("VERTICALLY").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                }
                 else if(subSubElem.tagName() == "BG_SUB")
                 {
-                    if(subSubElem.hasAttribute("ENABLED"))
-                    {
-                        mUi->filterBg->setCheckState(
-                            subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("UPDATE"))
-                    {
-                        mUi->filterBgUpdate->setCheckState(
-                            subSubElem.attribute("UPDATE").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("SHOW"))
-                    {
-                        mUi->filterBgShow->setCheckState(
-                            subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
                     if(subSubElem.hasAttribute("FILE"))
                     {
                         QString f = subSubElem.attribute("FILE");
@@ -3794,178 +2894,6 @@ void Control::getXml(QDomElement &elem)
                             {
                                 SPDLOG_WARN("Background subtracting file not readable!");
                             }
-                        }
-                    }
-                    if(subSubElem.hasAttribute("DELETE"))
-                    {
-                        mUi->filterBgDeleteTrj->setCheckState(
-                            subSubElem.attribute("DELETE").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("DELETE_NUMBER"))
-                    {
-                        mUi->filterBgDeleteNumber->setValue(subSubElem.attribute("DELETE_NUMBER").toInt());
-                    }
-                }
-                else if(subSubElem.tagName() == "PATTERN")
-                {
-                    if(subSubElem.hasAttribute("BOARD_SIZE_X"))
-                    {
-                        mUi->boardSizeX->setValue(subSubElem.attribute("BOARD_SIZE_X").toInt());
-                    }
-                    if(subSubElem.hasAttribute("BOARD_SIZE_Y"))
-                    {
-                        mUi->boardSizeY->setValue(subSubElem.attribute("BOARD_SIZE_Y").toInt());
-                    }
-                    if(subSubElem.hasAttribute("SQUARE_SIZE"))
-                    {
-                        mUi->squareSize->setValue(subSubElem.attribute("SQUARE_SIZE").toDouble());
-                    }
-                }
-                else if(subSubElem.tagName() == "INTRINSIC_PARAMETERS")
-                {
-                    if(subSubElem.hasAttribute("ENABLED"))
-                    {
-                        mUi->apply->setCheckState(
-                            subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("FX"))
-                    {
-                        mUi->fx->setValue(subSubElem.attribute("FX").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("FY"))
-                    {
-                        mUi->fy->setValue(subSubElem.attribute("FY").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("CX"))
-                    {
-                        double cx_val = subSubElem.attribute("CX").toDouble();
-                        if(cx_val < mUi->cx->minimum())
-                        {
-                            mUi->cx->setMinimum(cx_val - 50);
-                        }
-                        if(cx_val > mUi->cx->maximum())
-                        {
-                            mUi->cx->setMaximum(cx_val + 50);
-                        }
-                        mUi->cx->setValue(cx_val);
-                    }
-                    if(subSubElem.hasAttribute("CY"))
-                    {
-                        double cy_val = subSubElem.attribute("CY").toDouble();
-                        if(cy_val < mUi->cy->minimum())
-                        {
-                            mUi->cy->setMinimum(cy_val - 50);
-                        }
-                        if(cy_val > mUi->cy->maximum())
-                        {
-                            mUi->cy->setMaximum(cy_val + 50);
-                        }
-                        mUi->cy->setValue(cy_val);
-                    }
-                    if(subSubElem.hasAttribute("R2"))
-                    {
-                        mUi->r2->setValue(subSubElem.attribute("R2").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("R4"))
-                    {
-                        mUi->r4->setValue(subSubElem.attribute("R4").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("R6"))
-                    {
-                        mUi->r6->setValue(subSubElem.attribute("R6").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("TX"))
-                    {
-                        mUi->tx->setValue(subSubElem.attribute("TX").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("TY"))
-                    {
-                        mUi->ty->setValue(subSubElem.attribute("TY").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("K4"))
-                    {
-                        mUi->k4->setValue(subSubElem.attribute("K4").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("K5"))
-                    {
-                        mUi->k5->setValue(subSubElem.attribute("K5").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("K6"))
-                    {
-                        mUi->k6->setValue(subSubElem.attribute("K6").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("S1"))
-                    {
-                        mUi->s1->setValue(subSubElem.attribute("S1").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("S2"))
-                    {
-                        mUi->s2->setValue(subSubElem.attribute("S2").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("S3"))
-                    {
-                        mUi->s3->setValue(subSubElem.attribute("S3").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("S4"))
-                    {
-                        mUi->s4->setValue(subSubElem.attribute("S4").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("TAUX"))
-                    {
-                        mUi->taux->setValue(subSubElem.attribute("TAUX").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("TAUY"))
-                    {
-                        mUi->tauy->setValue(subSubElem.attribute("TAUY").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("ReprError"))
-                    {
-                        mUi->intrError->setText(QString("%1").arg(subSubElem.attribute("ReprError").toDouble()));
-                    }
-                    if(subSubElem.hasAttribute("QUAD_ASPECT_RATIO"))
-                    {
-                        mUi->quadAspectRatio->setCheckState(
-                            subSubElem.attribute("QUAD_ASPECT_RATIO").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("FIX_CENTER"))
-                    {
-                        mUi->fixCenter->setCheckState(
-                            subSubElem.attribute("FIX_CENTER").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("TANG_DIST"))
-                    {
-                        mUi->tangDist->setCheckState(
-                            subSubElem.attribute("TANG_DIST").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("EXT_MODEL_ENABLED"))
-                    {
-                        mUi->extModelCheckBox->setCheckState(
-                            subSubElem.attribute("EXT_MODEL_ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("CALIB_FILES"))
-                    {
-                        QStringList fl = (subSubElem.attribute("CALIB_FILES")).split(",");
-                        QString     tmpStr;
-                        for(int i = 0; i < fl.size(); ++i)
-                        {
-                            if((fl[i] = fl[i].trimmed()) == "")
-                            {
-                                fl.removeAt(i);
-                            }
-                            else
-                            {
-                                tmpStr = getExistingFile(fl[i], mMainWindow->getProFileName());
-                                if(tmpStr != "")
-                                {
-                                    fl[i] = tmpStr;
-                                }
-                            }
-                        }
-                        // auch setzen, wenn leer, vielleicht ist das ja gewuenscht
-                        mMainWindow->getAutoCalib()->setCalibFiles(fl);
-                        if(!fl.isEmpty())
-                        {
-                            mUi->autoCalib->setEnabled(true);
                         }
                     }
                 }
@@ -5152,6 +4080,16 @@ bool Control::isExportUseMeterChecked() const
 bool Control::isExportCommentChecked() const
 {
     return mUi->exportComment->isChecked();
+}
+
+IntrinsicCameraParams Control::getIntrinsicCameraParams() const
+{
+    return mIntr->getIntrinsicCameraParams();
+}
+
+void Control::runAutoCalib()
+{
+    mIntr->runAutoCalib();
 }
 
 double Control::getDefaultHeight() const

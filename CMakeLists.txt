@@ -387,6 +387,9 @@ target_sources(petrack_core PRIVATE
     include/frameRange.h
     include/pdoublespinbox.h
     include/pspinbox.h
+    include/filterBeforeBox.h
+    include/intrinsicBox.h
+    include/intrinsicCameraParams.h
     )
 
 target_sources(petrack_core PRIVATE
@@ -450,6 +453,9 @@ target_sources(petrack_core PRIVATE
     src/manualTrackpointMover.cpp
     src/pdoublespinbox.cpp
     src/pspinbox.cpp
+    src/intrinsicBox.cpp
+    src/filterBeforeBox.cpp
+    src/intrinsicCameraParams.cpp
     ui/about.ui
     ui/codeMarker.ui
     ui/colorMarker.ui
@@ -459,6 +465,8 @@ target_sources(petrack_core PRIVATE
     ui/control.ui
     ui/openMoCapDialog.ui
     ui/moCapSelectionWidget.ui
+    ui/filterBeforeBox.ui
+    ui/intrinsicBox.ui
 )
 
 target_sources(petrack PRIVATE

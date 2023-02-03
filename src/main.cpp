@@ -18,6 +18,7 @@
 
 #include "IO.h"
 #include "compilerInformation.h"
+#include "control.h"
 #include "helper.h"
 #include "logger.h"
 #include "petrack.h"
@@ -175,8 +176,7 @@ int main(int argc, char *argv[])
     SPDLOG_INFO("Compile date: {}", COMPILE_TIMESTAMP);
     SPDLOG_INFO("Build with: {} ({})", COMPILER_ID, COMPILER_VERSION);
 
-    Petrack petrack;
-    petrack.setPeTrackVersion(PETRACK_VERSION);
+    Petrack petrack(PETRACK_VERSION);
     petrack.setGitInformation(GIT_COMMIT_HASH, GIT_COMMIT_DATE, GIT_BRANCH);
     petrack.setCompileInformation(COMPILE_OS, COMPILE_TIMESTAMP, COMPILER_ID, COMPILER_VERSION);
 
@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
             calibFiles.append(file.absoluteFilePath());
         }
         petrack.getAutoCalib()->setCalibFiles(calibFiles);
-        petrack.getAutoCalib()->autoCalib();
+        petrack.getControlWidget()->runAutoCalib();
     }
 
     if(autoExportView)

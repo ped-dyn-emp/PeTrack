@@ -57,7 +57,7 @@ SCENARIO("I want to get the render data with one person loaded", "[ui]")
     person.setSamplerate(1);
     // default time offset 0
 
-    Petrack       pet;
+    Petrack       pet{"Unknown"};
     Autosave      save{pet};
     PersonStorage st{pet, save};
     ExtrCalibMock extrCalib{st};

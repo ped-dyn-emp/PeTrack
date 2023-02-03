@@ -27,7 +27,7 @@ constexpr float VEC_MARGIN = 0.01;
 
 TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
 {
-    Petrack  petrack{};
+    Petrack  petrack{"Unknown"};
     auto     calib   = petrack.getExtrCalibration();
     Control *control = petrack.getControlWidget();
 

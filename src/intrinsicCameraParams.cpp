@@ -13,35 +13,20 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://cdwww.gnu.org/licenses/>.
  */
 
-#ifndef CALIBFILTER_H
-#define CALIBFILTER_H
-
-#include "filter.h"
 #include "intrinsicCameraParams.h"
 
-/**
- * @brief Undistortion filter
- *
- * This class is a filter which undistorts the image using the camera matrix from intrinsic calibration.
- * It caches the mapping from distorted to undistorted image.
- */
-class CalibFilter : public Filter
+IntrinsicCameraParams::IntrinsicCameraParams(const IntrinsicCameraParams &other)
 {
-private:
-    Parameter<IntrinsicCameraParams> mCamParams;
+    *this = other;
+}
 
-    cv::Mat map1;
-    cv::Mat map2;
-
-public:
-    CalibFilter();
-
-    cv::Mat act(cv::Mat &img, cv::Mat &res);
-
-    Parameter<IntrinsicCameraParams> &getCamParams();
-};
-
-#endif
+IntrinsicCameraParams &IntrinsicCameraParams::operator=(const IntrinsicCameraParams &other)
+{
+    cameraMatrix      = other.cameraMatrix.clone();
+    distortionCoeffs  = other.distortionCoeffs.clone();
+    reprojectionError = other.reprojectionError;
+    return *this;
+}

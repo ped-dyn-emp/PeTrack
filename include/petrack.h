@@ -103,7 +103,7 @@ class Petrack : public QMainWindow
     Q_OBJECT
 
 public:
-    Petrack();
+    Petrack(QString petrackVersion);
     ~Petrack();
     static int trcVersion; // version numbr for writing TRC-Trajectorie files
 
@@ -321,12 +321,6 @@ public:
     }
 
     void updateWindowTitle();
-
-    /**
-     * @brief Sets the information about the compiled PeTrack version.
-     * @param petrackVersion current PeTrack version
-     */
-    void setPeTrackVersion(const std::string &petrackVersion);
 
     /**
      * @brief Sets the information about the compiled git commit hash, commit
