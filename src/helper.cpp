@@ -23,47 +23,63 @@
 #include <opencv2/opencv.hpp>
 
 QString proFileName; ///< Path to the project (.pet) file; used for saving relative paths via getFileList and
-                     ///< getExistingFile
-QString commandLineOptionsString = QObject::tr(
-    "<p><code>petrack [-help|-?] [[-project] project.pet] </code><br>"
-    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>[-sequence imageSequenceOrVideo]</code><br>"
-    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>[-autoSave|-autosave "
-    "imgFldOrVideo|proj.pet|trackerFile]</code></code><br>"
-    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>[-autoTrack|-autotrack trackerFile]</code><br>"
-    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>[-autoReadMarkerID|-autoreadmarkerid "
-    "markerIdFile]</code><br>"
-    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>[-autoReadHeight|-autoreadheight "
-    "heightFile]</code><br>"
-    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>[-autoPlay|-autoplay trackerFile]</code><br>"
-    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>[-autoExportView|-autoexportview "
-    "outputFile]</code></p>"
-    "<dl><dt><kbd>-help|-?</kbd></dt><dd>shows help information for command line options</dd>"
-    "<dt><kbd>-project</kbd></dt><dd>optional option to set project file; otherwise the argument without option flag "
-    "is used as project file</dd>"
-    "<dt><kbd>-sequence imageSequenceOrVideo</kbd></dt><dd>loads image sequence or video; option overwrites "
-    "<kbd>SRC</kbd> attribute in project file</dd>"
-    "<dt><kbd>-autoSave|-autosave imgFldOrVideo|proj.pet|trackerFile</kbd></dt><dd>if the argument ends with "
-    "<kbd>pet</kbd>, a project file will be written to <kbd>proj.pet</kbd> at the end; if the argument ends with "
-    "<kbd>txt,dat </kbd>or<kbd> trav</kbd>, the trajectories will be written in a format according to the suffix of "
-    "<kbd>trackerFile</kbd>; otherwise <kbd>imgFldOrVideo</kbd> is the folder to store the image sequence or a name of "
-    "a video file for the direct export; in all cases <kbd>PeTrack</kbd> ends after finishing the work</dd>"
-    "<dt><kbd>-autoTrack|-autotrack trackerFile</kbd></dt><dd>calculates automatically the trajectories of marked "
-    "pedestrians and stores the result to <kbd>trackerFile</kbd></dd>"
-    "<dt><kbd>-autoReadMarkerID|-autoreadmarkerid markerFile</kbd></dt><dd> automatically reads the "
-    "<kbd>txt-file</kbd> including personID and markerID and applies the markerIDs to the corresponding person. If "
-    "-autoTrack is not used, saving trackerFiles using -autoSaveTracker is recommended.</dd>"
-    "<dt><kbd>-autoReadHeight|-autoreadheight heightFile</kbd></dt><dd> automatically reads the <kbd>trackerFile</kbd> "
-    "including markerID and individual height and applies the heights to the corresponding person</dd>"
-    "<dt><kbd>-autoPlay|-autoplay trackerFile</kbd></dt><dd>plays the video or image sequence and stores the "
-    "trajectories to <kbd>trackerFile</kbd></dd>"
-    "<dt><kbd>-autoExportView|-autoexportview outputFile</kbd></dt><dd>exports the view, e.g., the undistorted video "
-    "or the video with trajectories, to <kbd>outputFile</kbd></dd></dl>"
-    "<p>Example:<br>To generate trajectories from a single image sequence starting with <kbd>frame000.jpg</kbd>"
-    "with settings stored in the project file <kbd>project.pet</kbd>, export tracker file <kbd>trackerFile</kbd>"
-    "and exit with saving the project to <kbd>project.pet</kbd> again:</p>"
-    "<p><code>petrack.exe -project project.pet -sequence frame000.jpg</code><br>"
-    "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>-autoTrack trackerFile -autoSave "
-    "project.pet</code></p>");
+///< getExistingFile
+const QString commandLineOptionsString = []() -> QString
+{
+    const std::vector<std::pair<QString, QString>> options{
+        {"-sequence imageSequenceOrVideo",
+         "loads image sequence or video; option overwrites <kbd>SRC</kbd> attribute in project file"},
+        {"-autoSave|-autosave imgFldOrVideo|proj.pet|trackerFile",
+         "if the argument ends with <kbd>pet</kbd>, a project file will be written to <kbd>proj.pet</kbd> at the end; "
+         "if the argument ends with <kbd>txt,dat </kbd>or<kbd> trav</kbd>, the trajectories will be written in a "
+         "format according to the suffix of <kbd>trackerFile</kbd>; otherwise <kbd>imgFldOrVideo</kbd> is the folder "
+         "to store the image sequence or a name of a video file for the direct export; in all cases <kbd>PeTrack</kbd> "
+         "ends after finishing the work"},
+        {"-autoTrack|-autotrack trackerFile",
+         "calculates automatically the trajectories of marked pedestrians and stores the result to "
+         "<kbd>trackerFile</kbd>"},
+        {"-autoReadMarkerID|-autoreadmarkerid markerIdFile",
+         "automatically reads the <kbd>txt-file</kbd> including personID and markerID and applies the markerIDs to the "
+         "corresponding person. If -autoTrack is not used, saving trackerFiles using -autoSaveTracker is recommended."},
+        {"-autoReadHeight|-autoreadheight heightFile",
+         "automatically reads the <kbd>trackerFile</kbd> "
+         "including markerID and individual height and applies the heights to the corresponding person"},
+        {"-autoPlay|-autoplay trackerFile",
+         "plays the video or image sequence and stores the "
+         "trajectories to <kbd>trackerFile</kbd>"},
+        {"-autoExportView|-autoexportview outputFile",
+         "exports the view, e.g., the undistorted video "
+         "or the video with trajectories, to <kbd>outputFile</kbd>"},
+        {"-autoIntrinsic | -autointrinsic calibDir",
+         "performs intrinsic calibration with the files in <kbd>calibDir</kbd>. Saving the pet-file with "
+         "<kbd>-autoSave</kbd> is recommended, since else the calculated parameters will be lost."}};
+
+    // help and project are supposed to be on the same line as petrack
+    // therefore they are handled separately
+    QString petrackCall{"<p><code>petrack [-help|-?] [[-project] project.pet]</code><br>"};
+    QString allExplanations{"<dl><dt><kbd>-help|-?</kbd></dt><dd>shows help information for command line "
+                            "options</dd><dt><kbd>-project</kbd></dt><dd>optional option to set project file; "
+                            "otherwise the argument without option flag is used as project file</dd>"};
+    for(const auto &[command, explanation] : options)
+    {
+        petrackCall +=
+            QString{"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>[%1]</code><br>"}.arg(command);
+
+        allExplanations += QString{"<dt><kbd>%1</kbd></dt><dd>%2</dd>"}.arg(command, explanation);
+    }
+    petrackCall += QString{"</p>"};
+    allExplanations += QString{"</dl>"};
+
+    const QString example{
+        "<p>Example:<br>To generate trajectories from a single image sequence starting with <kbd>frame000.jpg</kbd>"
+        "with settings stored in the project file <kbd>project.pet</kbd>, export tracker file <kbd>trackerFile</kbd>"
+        "and exit with saving the project to <kbd>project.pet</kbd> again:</p>"
+        "<p><code>petrack.exe -project project.pet -sequence frame000.jpg</code><br>"
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<code>-autoTrack trackerFile -autoSave "
+        "project.pet</code></p>"};
+
+    return petrackCall + allExplanations + example;
+}();
 
 
 void copyToQImage(QImage &qImg, cv::Mat &img) // war static functin in animatioln class
