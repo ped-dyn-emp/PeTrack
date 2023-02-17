@@ -304,8 +304,8 @@ void setValue(T widget, double value)
     if(widget->minimum() > value || widget->maximum() < value)
     {
         std::stringstream ss;
-        ss << "Value " << value << " for " << widget->objectName() << " is out of range from " << widget->minimum()
-           << " to " << widget->maximum();
+        ss << "Value " << value << " for " << widget->objectName().toStdString() << " is out of range from "
+           << widget->minimum() << " to " << widget->maximum();
         throw std::domain_error(ss.str());
     }
     widget->setValue(value);

@@ -22,7 +22,7 @@
 BorderFilter::BorderFilter() : Filter()
 {
     mSize.setMinimum(0.);
-    mSize.setMaximum(300);
+    mSize.setMaximum(750);
     mSize.setValue(0.);
 
     mRed.setMinimum(0.);
