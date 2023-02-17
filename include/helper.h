@@ -23,8 +23,8 @@
 #include <QString>
 #include <opencv2/opencv.hpp>
 
-extern QString commandLineOptionsString;
-extern QString proFileName; ///< Path to the project (.pet) file; defined in helper.cpp
+extern const QString commandLineOptionsString;
+extern QString       proFileName; ///< Path to the project (.pet) file; defined in helper.cpp
 
 constexpr const char *file_name(const char *path)
 {
