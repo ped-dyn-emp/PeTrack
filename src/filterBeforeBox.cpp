@@ -18,6 +18,8 @@
 
 #include "filterBeforeBox.h"
 
+#include "helper.h"
+#include "pMessageBox.h"
 #include "ui_filterBeforeBox.h"
 
 #include <QDomElement>
@@ -80,7 +82,14 @@ bool FilterBeforeBox::getXmlSub(QDomElement &subSubElem)
         }
         if(subSubElem.hasAttribute("VALUE"))
         {
-            mUi->filterBorderParamSize->setValue(subSubElem.attribute("VALUE").toInt());
+            try
+            {
+                setValue(mUi->filterBorderParamSize, subSubElem.attribute("VALUE").toInt());
+            }
+            catch(std::domain_error &e)
+            {
+                PCritical(nullptr, "Out-of-range value", QString::fromStdString(e.what()));
+            }
         }
         // bgColor still needs to be read by control
         return false;
