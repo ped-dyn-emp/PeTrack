@@ -87,12 +87,41 @@ def compare_intrinsic_calib(test_pet: ET.ElementTree, truth_pet: ET.ElementTree)
     assert test_calib_params == approx(truth_calib_params, abs=0.1)
 
 
-def test_autoCalib(pytestconfig):
+def test_autoCalib_default_options(pytestconfig):
     petrack_path = pytestconfig.getoption("path")
     project = "../../../demo/00_files/00_empty.pet"
     real_intrinsic = "../../../demo/01_calibration/01_intrinsic.pet"
     intrinsic_dir = "../../../demo/00_files/calibration/intrinsic"
     output = "../data/calibTest.pet"
+
+    # run autocalib on demo project
+    subprocess.run(
+        [
+            petrack_path,
+            "-project",
+            project,
+            "-autoIntrinsic",
+            intrinsic_dir,
+            "-autosave",
+            output,
+            "-platform",
+            "offscreen",
+        ],
+        check=True,
+    )
+
+    test_pet = ET.parse(output)
+    truth_pet = ET.parse(real_intrinsic)
+
+    compare_intrinsic_calib(test_pet, truth_pet)
+
+
+def test_autoCalib_old_model(pytestconfig):
+    petrack_path = pytestconfig.getoption("path")
+    project = "../data/00_empty.pet"
+    real_intrinsic = "../data/01_intrinsic.pet"
+    intrinsic_dir = "../../../demo/00_files/calibration/intrinsic"
+    output = "../data/calibTest.pet" # same for other test, cannot be run concurrently
 
     # run autocalib on demo project
     subprocess.run(
