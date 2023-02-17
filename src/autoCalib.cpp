@@ -279,6 +279,7 @@ AutoCalib::autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist, bool e
             dist_coeffs,
             &reproj_errs);
 
+
         SPDLOG_INFO("{}", ok ? "Calibration succeeded." : "Calibration failed.");
         SPDLOG_INFO("Intrinsic reprojection error is: {:f}", reproj_errs);
 
@@ -379,10 +380,16 @@ int AutoCalib::runCalibration(
         camera_matrix.ptr<double>(1)[1] = 1.;
     }
 
-
+    cv::Mat dist_coeffs_out;
     *reproj_errs = calibrateCamera(
-        object_points, image_points, img_size, camera_matrix, dist_coeffs, rot_vects, trans_vects, flags);
+        object_points, image_points, img_size, camera_matrix, dist_coeffs_out, rot_vects, trans_vects, flags);
 
+    // guarantee the same size by only changing new values; input is a zero-vector
+    // (some methods generate less coefficients than others/ normal vs. extended model)
+    for(int i = 0; i < dist_coeffs_out.cols; ++i)
+    {
+        dist_coeffs.at<double>(i) = dist_coeffs_out.at<double>(i);
+    }
 
     code = 1;
     return code;
