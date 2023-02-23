@@ -3,6 +3,9 @@
 
 # Reviewer Checklist
 
+## Formatting
+- [ ] the pre-build checks succeed 
+
 ## General code quality
 - [ ] naming conventions are met (see .clang-tidy for detailed information)
 - [ ] no static analyzer warnings in new code parts (e.g., use clang-tidy for checking)
