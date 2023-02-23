@@ -67,5 +67,15 @@
       "name": "Schrödter, Tobias",
       "orcid": "0000-0002-1071-060X"
     }
+  ],
+  "keywords": [
+    "pedestrian dynamics",
+    "tracking",
+    "experiments",
+    "detection",
+    "recognition",
+    "aruco",
+    "camera calibration",
+    "trajectory correction"
   ]
 }
