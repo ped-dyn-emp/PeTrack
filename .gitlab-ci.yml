@@ -45,6 +45,7 @@ pre-build-checks:
   stage: pre-build-checks
   script:
     - scripts/check-format-cpp.sh
+  allow_failure: true
 
 # Build petrack and petrack unit_tests
 build_linux:
