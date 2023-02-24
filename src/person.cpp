@@ -45,10 +45,6 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
     imgSize.width  = disp->width;
     imgSize.height = disp->height;
 
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "go mkless : " << getElapsedTime() << endl;
-#endif
 
     int    x, y;
     float *pcData, *yPcData;
@@ -204,10 +200,6 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
     QTextStream ellipsOut(&ellipsFile);
 #endif
 
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "vor cont  : " << getElapsedTime() << endl;
-#endif
 
     step = 2.55 / ((max - min) / STEP_SIZE); // STEP_SIZE cm Schritte, daher 2.55, da min und max in meter
     for(threshold = step; threshold < 255 - step; threshold += step) // von kopf zum fuss = von klein nach gross
@@ -387,10 +379,6 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
             // take the next contour
             contours = contours->h_next;
         }
-#ifdef TIME_MEASUREMENT
-        //        "==========: "
-        debout << "vor insert: " << getElapsedTime() << endl;
-#endif
 
         insertEllipses(el, dist);
 
@@ -419,10 +407,6 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
         if(firstContour)
             cvClearSeq(firstContour); // not free only available for next push
     }
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "nach cont : " << getElapsedTime() << endl;
-#endif
 
 
     optimize();
@@ -499,10 +483,6 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
     cvReleaseImage(&gray);
     cvReleaseImage(&binImg);
     cvReleaseMemStorage(&storage);
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "ed search : " << getElapsedTime() << endl;
-#endif
 }
 
 // el liste aller ellipsen eines thresholds der hoehe
