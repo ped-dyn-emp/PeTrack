@@ -132,7 +132,7 @@ void ColorMarkerWidget::getXml(QDomElement &elem)
             {
                 fromHue = h;
                 fromSat = s;
-                fromVal = s;
+                fromVal = v;
                 fromTriangle->setColor(col);
                 styleString = QString("background-color: hsv(%1,%2,%3)").arg(h).arg(s).arg(v);
                 fromColor->setStyleSheet(styleString);
