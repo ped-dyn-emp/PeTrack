@@ -809,6 +809,12 @@ void TrackerReal::exportXml(QTextStream &outXml, bool alternateHeight, bool useT
  */
 std::vector<MissingFrame> TrackerReal::computeDroppedFrames(Petrack *petrack)
 {
+    if(petrack->getImageFiltered().empty())
+    {
+        throw std::runtime_error(
+            "Can not compute missing frames with an empty video. Please load a video, and try again.");
+    }
+
     // Save current state
     auto recognitionState = petrack->getControlWidget()->isPerformRecognitionChecked();
     petrack->getControlWidget()->setPerformRecognitionChecked(false);

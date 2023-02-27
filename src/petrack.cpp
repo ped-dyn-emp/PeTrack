@@ -2720,14 +2720,20 @@ int Petrack::calculateRealTracker()
 
 void Petrack::exportTracker(QString dest) // default = ""
 {
-    if(mTracker)
+    try
     {
+        if(!mTracker)
+        {
+            return;
+        }
+
+
         // if no destination file or folder is given
         if(dest.isEmpty())
         {
             QFileDialog fileDialog(
                 this,
-                tr("Select file for exporting tracking pathes"),
+                tr("Select file for exporting tracking paths"),
                 mLastTrackerExport,
                 tr("Tracker (*.*);;Petrack tracker (*.trc);;Text (*.txt);;Text for gnuplot(*.dat);;XML Travisto "
                    "(*.trav);;All supported types (*.txt *.trc *.dat *.trav *.);;All files (*.*)"));
@@ -2739,405 +2745,411 @@ void Petrack::exportTracker(QString dest) // default = ""
             {
                 dest = fileDialog.selectedFiles().at(0);
             }
+
+            if(dest.isEmpty())
+            {
+                return;
+            }
         }
 
-        if(!dest.isEmpty())
+        QList<int> pers, frame;
+        bool autoCorrectOnlyExport = (mReco.getRecoMethod() == reco::RecognitionMethod::MultiColor) && // multicolor
+                                     mMultiColorMarkerWidget->autoCorrect->isChecked() &&
+                                     mMultiColorMarkerWidget->autoCorrectOnlyExport->isChecked();
+
+        if(dest.right(4) == ".trc")
         {
-            QList<int> pers, frame;
-            bool autoCorrectOnlyExport = (mReco.getRecoMethod() == reco::RecognitionMethod::MultiColor) && // multicolor
-                                         mMultiColorMarkerWidget->autoCorrect->isChecked() &&
-                                         mMultiColorMarkerWidget->autoCorrectOnlyExport->isChecked();
-
-            if(dest.right(4) == ".trc")
-            {
 #ifdef TIME_MEASUREMENT
-                double time1 = 0.0, tstart;
-                tstart       = clock();
+            double time1 = 0.0, tstart;
+            tstart       = clock();
 #endif
-                QTemporaryFile file;
+            QTemporaryFile file;
 
-                if(!file.open() /*!file.open(QIODevice::WriteOnly | QIODevice::Text)*/)
-                {
-                    PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(file.errorString()));
-                    return;
-                }
-                QProgressDialog progress(
-                    "Export TRC-File", nullptr, 0, static_cast<int>(mPersonStorage.nbPersons() + 1), this->window());
-                progress.setWindowTitle("Export .trc-File");
-                progress.setWindowModality(Qt::WindowModal);
-                progress.setVisible(true);
-                progress.setValue(0);
-                progress.setLabelText(QString("Export tracking data ..."));
+            if(!file.open() /*!file.open(QIODevice::WriteOnly | QIODevice::Text)*/)
+            {
+                PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(file.errorString()));
+                return;
+            }
+            QProgressDialog progress(
+                "Export TRC-File", nullptr, 0, static_cast<int>(mPersonStorage.nbPersons() + 1), this->window());
+            progress.setWindowTitle("Export .trc-File");
+            progress.setWindowModality(Qt::WindowModal);
+            progress.setVisible(true);
+            progress.setValue(0);
+            progress.setLabelText(QString("Export tracking data ..."));
 
+            qApp->processEvents();
+
+            trcVersion = 4;
+
+            SPDLOG_INFO(
+                "export tracking data to {} ({} person(s), file version {})",
+                dest,
+                mPersonStorage.nbPersons(),
+                trcVersion);
+            QTextStream out(&file);
+
+            out << "version " << trcVersion << Qt::endl;
+            out << mPersonStorage.nbPersons() << Qt::endl;
+            const auto &persons = mPersonStorage.getPersons();
+            for(size_t i = 0; i < persons.size(); ++i)
+            {
                 qApp->processEvents();
-
-                trcVersion = 4;
-
-                SPDLOG_INFO(
-                    "export tracking data to {} ({} person(s), file version {})",
-                    dest,
-                    mPersonStorage.nbPersons(),
-                    trcVersion);
-                QTextStream out(&file);
-
-                out << "version " << trcVersion << Qt::endl;
-                out << mPersonStorage.nbPersons() << Qt::endl;
-                const auto &persons = mPersonStorage.getPersons();
-                for(size_t i = 0; i < persons.size(); ++i)
-                {
-                    qApp->processEvents();
-                    progress.setLabelText(
-                        QString("Export person %1 of %2 ...").arg(i + 1).arg(mPersonStorage.nbPersons()));
-                    progress.setValue(static_cast<int>(i + 1));
-                    out << persons[i] << Qt::endl;
-                }
-                file.flush();
-                file.close();
-#ifdef TIME_MEASUREMENT
-                time1 += clock() - tstart;
-                time1 = time1 / CLOCKS_PER_SEC;
-                cout << "  time(writing) = " << time1 << " sec." << endl;
-
-                time1  = 0.0;
-                tstart = clock();
-#endif
-                progress.setLabelText(QString("Save file ..."));
-                qApp->processEvents();
-
-                if(QFile::exists(dest))
-                {
-                    QFile::remove(dest);
-                }
-
-                if(!file.copy(dest))
-                {
-                    PCritical(
-                        this,
-                        tr("PeTrack"),
-                        tr("Could not export tracking data.\n"
-                           "Please try again!"));
-                }
-                else
-                {
-                    statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
-                }
-
-                progress.setValue(static_cast<int>(mPersonStorage.nbPersons() + 1));
-
-                SPDLOG_INFO("finished.");
-                mAutosave.resetTrackPersonCounter();
-
-#ifdef TIME_MEASUREMENT
-                time1 += clock() - tstart;
-                time1 = time1 / CLOCKS_PER_SEC;
-                cout << "  time(copying) = " << time1 << " sec." << endl;
-
-//                time1 = 0.0;
-//                tstart = clock();
-#endif
-
-#ifdef TIME_MEASUREMENT
-//                time1 += clock() - tstart;
-//                time1 = time1/CLOCKS_PER_SEC;
-//                cout << "  time(checkPlausibility) = " << time1 << " sec." << endl;
-#endif
-                mTrcFileName =
-                    dest; // fuer Project-File, dann koennte track path direkt mitgeladen werden, wenn er noch da ist
+                progress.setLabelText(QString("Export person %1 of %2 ...").arg(i + 1).arg(mPersonStorage.nbPersons()));
+                progress.setValue(static_cast<int>(i + 1));
+                out << persons[i] << Qt::endl;
             }
-            else if(dest.right(4) == ".txt")
+            file.flush();
+            file.close();
+#ifdef TIME_MEASUREMENT
+            time1 += clock() - tstart;
+            time1 = time1 / CLOCKS_PER_SEC;
+            cout << "  time(writing) = " << time1 << " sec." << endl;
+
+            time1  = 0.0;
+            tstart = clock();
+#endif
+            progress.setLabelText(QString("Save file ..."));
+            qApp->processEvents();
+
+            if(QFile::exists(dest))
             {
-                QTemporaryFile file;
-
-                if(!file.open())
-                {
-                    PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(file.errorString()));
-                    return;
-                }
-
-                SPDLOG_INFO("export tracking data to {} ({} person(s))...", dest, mPersonStorage.nbPersons());
-
-#ifdef TIME_MEASUREMENT
-                double time1 = 0.0, tstart;
-                tstart       = clock();
-#endif
-                // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um waehrend
-                // play mehrfachberuecksichtigung von punkten auszuschliessen, aenderungen in altitude neu in berechnung
-                // einfliessen zu lassen)
-                if(mControlWidget->isTrackRecalcHeightChecked())
-                {
-                    if(mControlWidget->getCalibCoordDimension() == 0) // 3D
-                    {
-                        ; // Nothing to be done because z already the right height
-                    }
-                    else // 2D
-                    {
-                        mPersonStorage.recalcHeight(mControlWidget->getCameraAltitude());
-                    }
-                }
-#ifdef TIME_MEASUREMENT
-                time1 += clock() - tstart;
-                time1 = time1 / CLOCKS_PER_SEC;
-                cout << "  time(recalcHeight) = " << time1 << " sec." << endl;
-
-                time1  = 0.0;
-                tstart = clock();
-#endif
-                mTrackerReal->calculate(
-                    this,
-                    mTracker,
-                    mImageItem,
-                    mControlWidget->getColorPlot(),
-                    mMissingFrames,
-                    getImageBorderSize(),
-                    mControlWidget->isTrackMissingFramesChecked(),
-                    mStereoWidget->stereoUseForExport->isChecked(),
-                    mControlWidget->getTrackAlternateHeight(),
-                    mControlWidget->getCameraAltitude(),
-                    mStereoWidget->stereoUseCalibrationCenter->isChecked(),
-                    mControlWidget->isExportElimTpChecked(),
-                    mControlWidget->isExportElimTrjChecked(),
-                    mControlWidget->isExportSmoothChecked(),
-                    mControlWidget->isExportViewDirChecked(),
-                    mControlWidget->isExportAngleOfViewChecked(),
-                    mControlWidget->isExportMarkerIDChecked(),
-                    autoCorrectOnlyExport);
-#ifdef TIME_MEASUREMENT
-                time1 += clock() - tstart;
-                time1 = time1 / CLOCKS_PER_SEC;
-                cout << "  time(calculate) = " << time1 << " sec." << endl;
-
-                time1  = 0.0;
-                tstart = clock();
-#endif
-
-                QTextStream out(&file);
-
-                out << "# PeTrack project: " << QFileInfo(getProFileName()).fileName() << Qt::endl;
-                out << "# raw trajectory file: " << QFileInfo(getTrackFileName()).fileName() << Qt::endl;
-                out << "# framerate: " << mAnimation->getFPS() << " fps" << Qt::endl;
-
-                if(mControlWidget->isExportCommentChecked())
-                {
-                    out << "# personal information:" << Qt::endl;
-                    out << "# ID| Comment" << Qt::endl;
-
-                    // std out
-                    SPDLOG_INFO("Printing comment table...");
-                    SPDLOG_INFO("ID  | Comment");
-                    SPDLOG_INFO("----|----------------");
-
-                    for(int i = 0; i < static_cast<int>(mPersonStorage.nbPersons()); ++i)
-                    {
-                        auto commentSplit = mPersonStorage.at(i).comment().split("\n", Qt::KeepEmptyParts);
-                        out << "#" << qSetFieldWidth(3) << (i + 1) << qSetFieldWidth(0) << "|" << commentSplit.at(0)
-                            << Qt::endl;
-                        SPDLOG_INFO("{:04d}|{}", (i + 1), commentSplit.at(0));
-                        commentSplit.pop_front();
-                        for(const QString &line : commentSplit)
-                        {
-                            out << "#" << qSetFieldWidth(3) << " " << qSetFieldWidth(0) << "|" << line << Qt::endl;
-                            SPDLOG_INFO("    |{}", line);
-                        }
-                    }
-                }
-                mTrackerReal->exportTxt(
-                    out,
-                    mControlWidget->getTrackAlternateHeight(),
-                    mStereoWidget->stereoUseForExport->isChecked(),
-                    mControlWidget->isExportViewDirChecked(),
-                    mControlWidget->isExportAngleOfViewChecked(),
-                    mControlWidget->isExportUseMeterChecked(),
-                    mControlWidget->isExportMarkerIDChecked());
-                // out << *mTrackerReal;
-                file.flush();
-                file.close();
-
-                if(QFile::exists(dest))
-                {
-                    QFile::remove(dest);
-                }
-
-                if(!file.copy(dest))
-                {
-                    PCritical(
-                        this,
-                        tr("PeTrack"),
-                        tr("Could not export tracking data.\n"
-                           "Please try again!"));
-                }
-                else
-                {
-                    statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
-                }
-
-                SPDLOG_INFO("finished");
-
-#ifdef TIME_MEASUREMENT
-                time1 += clock() - tstart;
-                time1 = time1 / CLOCKS_PER_SEC;
-                cout << "  time(export) = " << time1 << " sec." << endl;
-
-//                time1 = 0.0;
-//                tstart = clock();
-#endif
-
-#ifdef TIME_MEASUREMENT
-//                time1 += clock() - tstart;
-//                time1 = time1/CLOCKS_PER_SEC;
-//                cout << "  time(checkPlausibility) = " << time1 << " sec." << endl;
-#endif
+                QFile::remove(dest);
             }
-            else if(dest.right(4) == ".dat")
+
+            if(!file.copy(dest))
             {
-                QTemporaryFile fileDat;
-
-                if(!fileDat.open()) //! fileDat.open(QIODevice::WriteOnly | QIODevice::Text))
-                {
-                    PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(fileDat.errorString()));
-                    return;
-                }
-                // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um waehrend
-                // play mehrfachberuecksichtigung von punkten auszuschliessen, aenderungen in altitude neu in berechnung
-                // einfliessen zu lassen)
-                if(mControlWidget->isTrackRecalcHeightChecked())
-                {
-                    mPersonStorage.recalcHeight(mControlWidget->getCameraAltitude());
-                }
-                mTrackerReal->calculate(
+                PCritical(
                     this,
-                    mTracker,
-                    mImageItem,
-                    mControlWidget->getColorPlot(),
-                    mMissingFrames,
-                    getImageBorderSize(),
-                    mControlWidget->isTrackMissingFramesChecked(),
-                    mStereoWidget->stereoUseForExport->isChecked(),
-                    mControlWidget->getTrackAlternateHeight(),
-                    mControlWidget->getCameraAltitude(),
-                    mStereoWidget->stereoUseCalibrationCenter->isChecked(),
-                    mControlWidget->isExportElimTpChecked(),
-                    mControlWidget->isExportElimTrjChecked(),
-                    mControlWidget->isExportSmoothChecked(),
-                    mControlWidget->isExportViewDirChecked(),
-                    mControlWidget->isExportAngleOfViewChecked(),
-                    mControlWidget->isExportMarkerIDChecked(),
-                    autoCorrectOnlyExport);
-
-                SPDLOG_INFO("export tracking data to {} ({} person(s))...", dest, mPersonStorage.nbPersons());
-                QTextStream outDat(&fileDat);
-                mTrackerReal->exportDat(
-                    outDat, mControlWidget->getTrackAlternateHeight(), mStereoWidget->stereoUseForExport->isChecked());
-                fileDat.flush();
-                fileDat.close();
-
-                if(QFile::exists(dest))
-                {
-                    QFile::remove(dest);
-                }
-
-                if(!fileDat.copy(dest))
-                {
-                    PCritical(
-                        this,
-                        tr("PeTrack"),
-                        tr("Could not export tracking data.\n"
-                           "Please try again!"));
-                }
-                else
-                {
-                    statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
-                }
-
-                SPDLOG_INFO("finished");
-            }
-            else if(dest.right(5) == ".trav")
-            {
-                // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um waehrend
-                // play mehrfachberuecksichtigung von punkten auszuschliessen, aenderungen in altitude neu in berechnung
-                // einfliessen zu lassen)
-                if(mControlWidget->isTrackRecalcHeightChecked())
-                {
-                    mPersonStorage.recalcHeight(mControlWidget->getCameraAltitude());
-                }
-
-                mTrackerReal->calculate(
-                    this,
-                    mTracker,
-                    mImageItem,
-                    mControlWidget->getColorPlot(),
-                    mMissingFrames,
-                    getImageBorderSize(),
-                    mControlWidget->isTrackMissingFramesChecked(),
-                    mStereoWidget->stereoUseForExport->isChecked(),
-                    mControlWidget->getTrackAlternateHeight(),
-                    mControlWidget->getCameraAltitude(),
-                    mStereoWidget->stereoUseCalibrationCenter->isChecked(),
-                    mControlWidget->isExportElimTpChecked(),
-                    mControlWidget->isExportElimTrjChecked(),
-                    mControlWidget->isExportSmoothChecked(),
-                    mControlWidget->isExportViewDirChecked(),
-                    mControlWidget->isExportAngleOfViewChecked(),
-                    mControlWidget->isExportMarkerIDChecked(),
-                    autoCorrectOnlyExport);
-
-                QTemporaryFile fileXml;
-                if(!fileXml.open()) //! fileXml.open(QIODevice::WriteOnly | QIODevice::Text))
-                {
-                    PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(fileXml.errorString()));
-                    return;
-                }
-                SPDLOG_INFO("export tracking data to {} ({} person(s))...", dest, mPersonStorage.nbPersons());
-                // already done: mTrackerReal->calculate(mTracker, mImageItem, mControlWidget->getColorPlot(),
-                // getImageBorderSize(), mControlWidget->trackMissingFrames->checkState());
-                QTextStream outXml(&fileXml);
-                outXml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << Qt::endl;
-                outXml << "<trajectoriesDataset>" << Qt::endl;
-                outXml << "    <header version=\"1.0\">" << Qt::endl;
-                outXml << "        <roomCaption>PeTrack: " << mAnimation->getFileBase() << "</roomCaption>" << Qt::endl;
-                outXml << "        <roomID>0</roomID>" << Qt::endl;
-                outXml << "        <agents>" << mPersonStorage.nbPersons() << "</agents>" << Qt::endl;
-                outXml << "        <frameRate>" << mAnimation->getFPS() << "</frameRate> <!--per second-->" << Qt::endl;
-                // outXml << "        <timeStep>" << 1000./mAnimation->getFPS() << "</timeStep>   <!-- millisecond-->"
-                // << endl; inverse von
-                outXml << "        <timeFirstFrame sec=\"" << mAnimation->getFirstFrameSec() << "\" microsec=\""
-                       << mAnimation->getFirstFrameMicroSec() << "\"/> <!-- " << mAnimation->getTimeString(0) << " -->"
-                       << Qt::endl;
-                outXml << "    </header>" << Qt::endl << Qt::endl;
-
-                mTrackerReal->exportXml(
-                    outXml, mControlWidget->getTrackAlternateHeight(), mStereoWidget->stereoUseForExport->isChecked());
-
-                outXml << "</trajectoriesDataset>" << Qt::endl;
-                fileXml.flush();
-                fileXml.close();
-
-                if(QFile::exists(dest))
-                {
-                    QFile::remove(dest);
-                }
-
-                if(!fileXml.copy(dest))
-                {
-                    PCritical(
-                        this,
-                        tr("PeTrack"),
-                        tr("Could not export tracking data.\n"
-                           "Please try again!"));
-                }
-                else
-                {
-                    statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
-                }
-
-                SPDLOG_INFO("finished");
+                    tr("PeTrack"),
+                    tr("Could not export tracking data.\n"
+                       "Please try again!"));
             }
             else
-            { // wenn keine Dateiendung, dann wird trc und txt herausgeschrieben
-                exportTracker(dest + ".trc");
-                exportTracker(dest + ".txt");
+            {
+                statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
             }
-            mLastTrackerExport = dest;
+
+            progress.setValue(static_cast<int>(mPersonStorage.nbPersons() + 1));
+
+            SPDLOG_INFO("finished.");
+            mAutosave.resetTrackPersonCounter();
+
+#ifdef TIME_MEASUREMENT
+            time1 += clock() - tstart;
+            time1 = time1 / CLOCKS_PER_SEC;
+            cout << "  time(copying) = " << time1 << " sec." << endl;
+
+//                time1 = 0.0;
+//                tstart = clock();
+#endif
+
+#ifdef TIME_MEASUREMENT
+//                time1 += clock() - tstart;
+//                time1 = time1/CLOCKS_PER_SEC;
+//                cout << "  time(checkPlausibility) = " << time1 << " sec." << endl;
+#endif
+            mTrcFileName = dest; // fuer Project-File, dann koennte track path direkt mitgeladen werden, wenn er
+                                 // noch da ist
         }
+        else if(dest.right(4) == ".txt")
+        {
+            QTemporaryFile file;
+
+            if(!file.open())
+            {
+                PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(file.errorString()));
+                return;
+            }
+
+            SPDLOG_INFO("export tracking data to {} ({} person(s))...", dest, mPersonStorage.nbPersons());
+
+#ifdef TIME_MEASUREMENT
+            double time1 = 0.0, tstart;
+            tstart       = clock();
+#endif
+            // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um
+            // waehrend play mehrfachberuecksichtigung von punkten auszuschliessen, aenderungen in altitude neu
+            // in berechnung einfliessen zu lassen)
+            if(mControlWidget->isTrackRecalcHeightChecked())
+            {
+                if(mControlWidget->getCalibCoordDimension() == 0) // 3D
+                {
+                    ; // Nothing to be done because z already the right height
+                }
+                else // 2D
+                {
+                    mPersonStorage.recalcHeight(mControlWidget->getCameraAltitude());
+                }
+            }
+#ifdef TIME_MEASUREMENT
+            time1 += clock() - tstart;
+            time1 = time1 / CLOCKS_PER_SEC;
+            cout << "  time(recalcHeight) = " << time1 << " sec." << endl;
+
+            time1  = 0.0;
+            tstart = clock();
+#endif
+            mTrackerReal->calculate(
+                this,
+                mTracker,
+                mImageItem,
+                mControlWidget->getColorPlot(),
+                mMissingFrames,
+                getImageBorderSize(),
+                mControlWidget->isTrackMissingFramesChecked(),
+                mStereoWidget->stereoUseForExport->isChecked(),
+                mControlWidget->getTrackAlternateHeight(),
+                mControlWidget->getCameraAltitude(),
+                mStereoWidget->stereoUseCalibrationCenter->isChecked(),
+                mControlWidget->isExportElimTpChecked(),
+                mControlWidget->isExportElimTrjChecked(),
+                mControlWidget->isExportSmoothChecked(),
+                mControlWidget->isExportViewDirChecked(),
+                mControlWidget->isExportAngleOfViewChecked(),
+                mControlWidget->isExportMarkerIDChecked(),
+                autoCorrectOnlyExport);
+#ifdef TIME_MEASUREMENT
+            time1 += clock() - tstart;
+            time1 = time1 / CLOCKS_PER_SEC;
+            cout << "  time(calculate) = " << time1 << " sec." << endl;
+
+            time1  = 0.0;
+            tstart = clock();
+#endif
+
+            QTextStream out(&file);
+
+            out << "# PeTrack project: " << QFileInfo(getProFileName()).fileName() << Qt::endl;
+            out << "# raw trajectory file: " << QFileInfo(getTrackFileName()).fileName() << Qt::endl;
+            out << "# framerate: " << mAnimation->getFPS() << " fps" << Qt::endl;
+
+            if(mControlWidget->isExportCommentChecked())
+            {
+                out << "# personal information:" << Qt::endl;
+                out << "# ID| Comment" << Qt::endl;
+
+                // std out
+                SPDLOG_INFO("Printing comment table...");
+                SPDLOG_INFO("ID  | Comment");
+                SPDLOG_INFO("----|----------------");
+
+                for(int i = 0; i < static_cast<int>(mPersonStorage.nbPersons()); ++i)
+                {
+                    auto commentSplit = mPersonStorage.at(i).comment().split("\n", Qt::KeepEmptyParts);
+                    out << "#" << qSetFieldWidth(3) << (i + 1) << qSetFieldWidth(0) << "|" << commentSplit.at(0)
+                        << Qt::endl;
+                    SPDLOG_INFO("{:04d}|{}", (i + 1), commentSplit.at(0));
+                    commentSplit.pop_front();
+                    for(const QString &line : commentSplit)
+                    {
+                        out << "#" << qSetFieldWidth(3) << " " << qSetFieldWidth(0) << "|" << line << Qt::endl;
+                        SPDLOG_INFO("    |{}", line);
+                    }
+                }
+            }
+            mTrackerReal->exportTxt(
+                out,
+                mControlWidget->getTrackAlternateHeight(),
+                mStereoWidget->stereoUseForExport->isChecked(),
+                mControlWidget->isExportViewDirChecked(),
+                mControlWidget->isExportAngleOfViewChecked(),
+                mControlWidget->isExportUseMeterChecked(),
+                mControlWidget->isExportMarkerIDChecked());
+            // out << *mTrackerReal;
+            file.flush();
+            file.close();
+
+            if(QFile::exists(dest))
+            {
+                QFile::remove(dest);
+            }
+
+            if(!file.copy(dest))
+            {
+                PCritical(
+                    this,
+                    tr("PeTrack"),
+                    tr("Could not export tracking data.\n"
+                       "Please try again!"));
+            }
+            else
+            {
+                statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
+            }
+
+            SPDLOG_INFO("finished");
+
+#ifdef TIME_MEASUREMENT
+            time1 += clock() - tstart;
+            time1 = time1 / CLOCKS_PER_SEC;
+            cout << "  time(export) = " << time1 << " sec." << endl;
+
+//                time1 = 0.0;
+//                tstart = clock();
+#endif
+
+#ifdef TIME_MEASUREMENT
+//                time1 += clock() - tstart;
+//                time1 = time1/CLOCKS_PER_SEC;
+//                cout << "  time(checkPlausibility) = " << time1 << " sec." << endl;
+#endif
+        }
+        else if(dest.right(4) == ".dat")
+        {
+            QTemporaryFile fileDat;
+
+            if(!fileDat.open()) //! fileDat.open(QIODevice::WriteOnly | QIODevice::Text))
+            {
+                PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(fileDat.errorString()));
+                return;
+            }
+            // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um
+            // waehrend play mehrfachberuecksichtigung von punkten auszuschliessen, aenderungen in altitude neu
+            // in berechnung einfliessen zu lassen)
+            if(mControlWidget->isTrackRecalcHeightChecked())
+            {
+                mPersonStorage.recalcHeight(mControlWidget->getCameraAltitude());
+            }
+            mTrackerReal->calculate(
+                this,
+                mTracker,
+                mImageItem,
+                mControlWidget->getColorPlot(),
+                mMissingFrames,
+                getImageBorderSize(),
+                mControlWidget->isTrackMissingFramesChecked(),
+                mStereoWidget->stereoUseForExport->isChecked(),
+                mControlWidget->getTrackAlternateHeight(),
+                mControlWidget->getCameraAltitude(),
+                mStereoWidget->stereoUseCalibrationCenter->isChecked(),
+                mControlWidget->isExportElimTpChecked(),
+                mControlWidget->isExportElimTrjChecked(),
+                mControlWidget->isExportSmoothChecked(),
+                mControlWidget->isExportViewDirChecked(),
+                mControlWidget->isExportAngleOfViewChecked(),
+                mControlWidget->isExportMarkerIDChecked(),
+                autoCorrectOnlyExport);
+
+            SPDLOG_INFO("export tracking data to {} ({} person(s))...", dest, mPersonStorage.nbPersons());
+            QTextStream outDat(&fileDat);
+            mTrackerReal->exportDat(
+                outDat, mControlWidget->getTrackAlternateHeight(), mStereoWidget->stereoUseForExport->isChecked());
+            fileDat.flush();
+            fileDat.close();
+
+            if(QFile::exists(dest))
+            {
+                QFile::remove(dest);
+            }
+
+            if(!fileDat.copy(dest))
+            {
+                PCritical(
+                    this,
+                    tr("PeTrack"),
+                    tr("Could not export tracking data.\n"
+                       "Please try again!"));
+            }
+            else
+            {
+                statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
+            }
+
+            SPDLOG_INFO("finished");
+        }
+        else if(dest.right(5) == ".trav")
+        {
+            // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um
+            // waehrend play mehrfachberuecksichtigung von punkten auszuschliessen, aenderungen in altitude neu
+            // in berechnung einfliessen zu lassen)
+            if(mControlWidget->isTrackRecalcHeightChecked())
+            {
+                mPersonStorage.recalcHeight(mControlWidget->getCameraAltitude());
+            }
+
+            mTrackerReal->calculate(
+                this,
+                mTracker,
+                mImageItem,
+                mControlWidget->getColorPlot(),
+                mMissingFrames,
+                getImageBorderSize(),
+                mControlWidget->isTrackMissingFramesChecked(),
+                mStereoWidget->stereoUseForExport->isChecked(),
+                mControlWidget->getTrackAlternateHeight(),
+                mControlWidget->getCameraAltitude(),
+                mStereoWidget->stereoUseCalibrationCenter->isChecked(),
+                mControlWidget->isExportElimTpChecked(),
+                mControlWidget->isExportElimTrjChecked(),
+                mControlWidget->isExportSmoothChecked(),
+                mControlWidget->isExportViewDirChecked(),
+                mControlWidget->isExportAngleOfViewChecked(),
+                mControlWidget->isExportMarkerIDChecked(),
+                autoCorrectOnlyExport);
+
+            QTemporaryFile fileXml;
+            if(!fileXml.open()) //! fileXml.open(QIODevice::WriteOnly | QIODevice::Text))
+            {
+                PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(dest).arg(fileXml.errorString()));
+                return;
+            }
+            SPDLOG_INFO("export tracking data to {} ({} person(s))...", dest, mPersonStorage.nbPersons());
+            // already done: mTrackerReal->calculate(mTracker, mImageItem, mControlWidget->getColorPlot(),
+            // getImageBorderSize(), mControlWidget->trackMissingFrames->checkState());
+            QTextStream outXml(&fileXml);
+            outXml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << Qt::endl;
+            outXml << "<trajectoriesDataset>" << Qt::endl;
+            outXml << "    <header version=\"1.0\">" << Qt::endl;
+            outXml << "        <roomCaption>PeTrack: " << mAnimation->getFileBase() << "</roomCaption>" << Qt::endl;
+            outXml << "        <roomID>0</roomID>" << Qt::endl;
+            outXml << "        <agents>" << mPersonStorage.nbPersons() << "</agents>" << Qt::endl;
+            outXml << "        <frameRate>" << mAnimation->getFPS() << "</frameRate> <!--per second-->" << Qt::endl;
+            // outXml << "        <timeStep>" << 1000./mAnimation->getFPS() << "</timeStep>   <!--
+            // millisecond-->"
+            // << endl; inverse von
+            outXml << "        <timeFirstFrame sec=\"" << mAnimation->getFirstFrameSec() << "\" microsec=\""
+                   << mAnimation->getFirstFrameMicroSec() << "\"/> <!-- " << mAnimation->getTimeString(0) << " -->"
+                   << Qt::endl;
+            outXml << "    </header>" << Qt::endl << Qt::endl;
+
+            mTrackerReal->exportXml(
+                outXml, mControlWidget->getTrackAlternateHeight(), mStereoWidget->stereoUseForExport->isChecked());
+
+            outXml << "</trajectoriesDataset>" << Qt::endl;
+            fileXml.flush();
+            fileXml.close();
+
+            if(QFile::exists(dest))
+            {
+                QFile::remove(dest);
+            }
+
+            if(!fileXml.copy(dest))
+            {
+                PCritical(
+                    this,
+                    tr("PeTrack"),
+                    tr("Could not export tracking data.\n"
+                       "Please try again!"));
+            }
+            else
+            {
+                statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
+            }
+
+            SPDLOG_INFO("finished");
+        }
+        else
+        { // wenn keine Dateiendung, dann wird trc und txt herausgeschrieben
+            exportTracker(dest + ".trc");
+            exportTracker(dest + ".txt");
+        }
+        mLastTrackerExport = dest;
+    }
+    catch(const std::runtime_error &error)
+    {
+        PCritical(this, "Failed to export trajectories", error.what());
     }
 }
 
