@@ -25,6 +25,8 @@ import numpy as np
 
 
 def read_intrinsics(tree: ET.ElementTree) -> np.ndarray:
+    # NOTE: needs non-nan reprojection error
+
     node = tree.find("./CONTROL/CALIBRATION/INTRINSIC_PARAMETERS")
     if node is None:
         raise RuntimeError("Invalid pet-File! No Calibration node")
@@ -49,8 +51,7 @@ def read_intrinsics(tree: ET.ElementTree) -> np.ndarray:
     tx = float(node.get("TX", "nan"))
     ty = float(node.get("TY", "nan"))
 
-    # currently not used
-    # error leads to nan-value (Issue #364) being saved in demo
+    # comparison will fail, if this is NaN
     reprojection_error = float(node.get("ReprError", "nan"))
     return np.array(
         [
@@ -73,7 +74,7 @@ def read_intrinsics(tree: ET.ElementTree) -> np.ndarray:
             tauy,
             tx,
             ty,
-            #reprojection_error,
+            reprojection_error,
         ]
     )
 
