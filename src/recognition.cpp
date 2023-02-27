@@ -662,6 +662,7 @@ void detail::refineWithAruco(
         // NOTE: For now, add as parameter of findMulticolorMarker
         codeOpt.setOffsetCropRect2Roi(offsetCropRect2Roi);
         findCodeMarker(subImg, crossList, options.method, codeOpt, intrinsicCameraParams);
+        codeOpt.setOffsetCropRect2Roi({0, 0});
 
         resolveMoreThanOneCode(lengthini, crossList, blob, offsetCropRect2Roi);
 
