@@ -161,103 +161,110 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
     }
     else if(subSubElem.tagName() == "INTRINSIC_PARAMETERS")
     {
+        IntrinsicCameraParams params;
         if(subSubElem.hasAttribute("ENABLED"))
         {
             mUi->apply->setCheckState(subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
         }
         if(subSubElem.hasAttribute("FX"))
         {
-            mUi->fx->setValue(subSubElem.attribute("FX").toDouble());
+            params.setFx(subSubElem.attribute("FX").toDouble());
         }
         if(subSubElem.hasAttribute("FY"))
         {
-            mUi->fy->setValue(subSubElem.attribute("FY").toDouble());
+            params.setFy(subSubElem.attribute("FY").toDouble());
         }
         if(subSubElem.hasAttribute("CX"))
         {
-            double cx_val = subSubElem.attribute("CX").toDouble();
-            if(cx_val < mUi->cx->minimum())
+            double cxVal = subSubElem.attribute("CX").toDouble();
+            if(cxVal < mUi->cx->minimum())
             {
-                mUi->cx->setMinimum(cx_val - 50);
+                mUi->cx->setMinimum(cxVal - 50);
             }
-            if(cx_val > mUi->cx->maximum())
+            if(cxVal > mUi->cx->maximum())
             {
-                mUi->cx->setMaximum(cx_val + 50);
+                mUi->cx->setMaximum(cxVal + 50);
             }
-            mUi->cx->setValue(cx_val);
+            params.setCx(cxVal);
         }
         if(subSubElem.hasAttribute("CY"))
         {
-            double cy_val = subSubElem.attribute("CY").toDouble();
-            if(cy_val < mUi->cy->minimum())
+            double cyVal = subSubElem.attribute("CY").toDouble();
+            if(cyVal < mUi->cy->minimum())
             {
-                mUi->cy->setMinimum(cy_val - 50);
+                mUi->cy->setMinimum(cyVal - 50);
             }
-            if(cy_val > mUi->cy->maximum())
+            if(cyVal > mUi->cy->maximum())
             {
-                mUi->cy->setMaximum(cy_val + 50);
+                mUi->cy->setMaximum(cyVal + 50);
             }
-            mUi->cy->setValue(cy_val);
+            params.setCy(cyVal);
         }
         if(subSubElem.hasAttribute("R2"))
         {
-            mUi->r2->setValue(subSubElem.attribute("R2").toDouble());
+            params.distortionCoeffs.at<float>(0) = subSubElem.attribute("R2").toDouble();
         }
         if(subSubElem.hasAttribute("R4"))
         {
-            mUi->r4->setValue(subSubElem.attribute("R4").toDouble());
+            params.distortionCoeffs.at<float>(1) = subSubElem.attribute("R4").toDouble();
         }
         if(subSubElem.hasAttribute("R6"))
         {
-            mUi->r6->setValue(subSubElem.attribute("R6").toDouble());
+            params.distortionCoeffs.at<float>(4) = subSubElem.attribute("R6").toDouble();
         }
         if(subSubElem.hasAttribute("TX"))
         {
-            mUi->tx->setValue(subSubElem.attribute("TX").toDouble());
+            params.distortionCoeffs.at<float>(2) = subSubElem.attribute("TX").toDouble();
         }
         if(subSubElem.hasAttribute("TY"))
         {
-            mUi->ty->setValue(subSubElem.attribute("TY").toDouble());
+            params.distortionCoeffs.at<float>(3) = subSubElem.attribute("TY").toDouble();
         }
         if(subSubElem.hasAttribute("K4"))
         {
-            mUi->k4->setValue(subSubElem.attribute("K4").toDouble());
+            params.distortionCoeffs.at<float>(5) = subSubElem.attribute("K4").toDouble();
         }
         if(subSubElem.hasAttribute("K5"))
         {
-            mUi->k5->setValue(subSubElem.attribute("K5").toDouble());
+            params.distortionCoeffs.at<float>(6) = subSubElem.attribute("K5").toDouble();
         }
         if(subSubElem.hasAttribute("K6"))
         {
-            mUi->k6->setValue(subSubElem.attribute("K6").toDouble());
+            params.distortionCoeffs.at<float>(7) = subSubElem.attribute("K6").toDouble();
         }
         if(subSubElem.hasAttribute("S1"))
         {
-            mUi->s1->setValue(subSubElem.attribute("S1").toDouble());
+            params.distortionCoeffs.at<float>(8) = subSubElem.attribute("S1").toDouble();
         }
         if(subSubElem.hasAttribute("S2"))
         {
-            mUi->s2->setValue(subSubElem.attribute("S2").toDouble());
+            params.distortionCoeffs.at<float>(9) = subSubElem.attribute("S2").toDouble();
         }
         if(subSubElem.hasAttribute("S3"))
         {
-            mUi->s3->setValue(subSubElem.attribute("S3").toDouble());
+            params.distortionCoeffs.at<float>(10) = subSubElem.attribute("S3").toDouble();
         }
         if(subSubElem.hasAttribute("S4"))
         {
-            mUi->s4->setValue(subSubElem.attribute("S4").toDouble());
+            params.distortionCoeffs.at<float>(11) = subSubElem.attribute("S4").toDouble();
         }
         if(subSubElem.hasAttribute("TAUX"))
         {
-            mUi->taux->setValue(subSubElem.attribute("TAUX").toDouble());
+            params.distortionCoeffs.at<float>(12) = subSubElem.attribute("TAUX").toDouble();
         }
         if(subSubElem.hasAttribute("TAUY"))
         {
-            mUi->tauy->setValue(subSubElem.attribute("TAUY").toDouble());
+            params.distortionCoeffs.at<float>(13) = subSubElem.attribute("TAUY").toDouble();
         }
         if(subSubElem.hasAttribute("ReprError"))
         {
-            mUi->intrError->setText(QString("%1").arg(subSubElem.attribute("ReprError").toDouble()));
+            bool conversionSuccessful;
+            params.reprojectionError = subSubElem.attribute("ReprError").toDouble(&conversionSuccessful);
+            if(!conversionSuccessful)
+            {
+                // Qt sets to inf instead of nan
+                params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
+            }
         }
         if(subSubElem.hasAttribute("QUAD_ASPECT_RATIO"))
         {
@@ -303,7 +310,8 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
                 mUi->autoCalib->setEnabled(true);
             }
         }
-        QDomElement root = subSubElem.ownerDocument().firstChildElement("PETRACK");
+
+        const QDomElement root = subSubElem.ownerDocument().firstChildElement("PETRACK");
 
         if(newerThanVersion(QString("0.9.0"), root.attribute("VERSION")))
         {
@@ -326,6 +334,8 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
                 mUi->extModelCheckBox->setChecked(true);
             }
         }
+
+        setIntrinsicCameraParams(params);
     }
     else
     {

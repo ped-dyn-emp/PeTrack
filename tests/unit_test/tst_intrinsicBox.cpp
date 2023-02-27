@@ -240,8 +240,7 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
                     cv::norm(oldParams.distortionCoeffs - newParams.distortionCoeffs) ==
                     Approx(0).margin(SERIALIZATION_MARGIN));
 
-                // NOTE: bug already in master, will fix after this is merged
-                // CHECK(oldparams.reprojectionError == Approx(newparams.reprojectionError));
+                CHECK(oldParams.reprojectionError == Approx(newParams.reprojectionError));
             }
         }
     }
