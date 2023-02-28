@@ -248,10 +248,6 @@ bool Player::updateImage()
         return false;
     }
     qApp->processEvents();
-#ifdef TIME_MEASUREMENT
-    double time1 = 0.0, tstart;
-    tstart       = clock();
-#endif
 
     QFuture<void> future = QtConcurrent::run([&]() { mMainWindow->updateImage(mImg); });
     future.waitForFinished();
@@ -260,11 +256,6 @@ bool Player::updateImage()
     {
         mAviFile.appendFrame((const unsigned char *) mImg.data, true);
     }
-#ifdef TIME_MEASUREMENT
-    time1 += clock() - tstart;
-    time1 = time1 / CLOCKS_PER_SEC;
-    cout << "  time(update image) = " << time1 << " sec." << endl;
-#endif
     mSlider->setValue(
         mAnimation->getCurrentFrameNum()); //(1000*mAnimation->getCurrentFrameNum())/mAnimation->getNumFrames());
     mFrameNum->setText(QString().number(mAnimation->getCurrentFrameNum()));
@@ -275,10 +266,6 @@ bool Player::updateImage()
 bool Player::forward()
 {
     qApp->processEvents();
-#ifdef TIME_MEASUREMENT
-    double time1 = 0.0, tstart;
-    tstart       = clock();
-#endif
 
     bool should_be_last_frame = mAnimation->getCurrentFrameNum() == mAnimation->getSourceOutFrameNum();
 
@@ -291,27 +278,14 @@ bool Player::forward()
             SPDLOG_WARN("video unexpected finished.");
         }
     }
-#ifdef TIME_MEASUREMENT
-    time1 += clock() - tstart;
-    time1 = time1 / CLOCKS_PER_SEC;
-    cout << "  time(load frame) = " << time1 << " sec." << endl;
-#endif
+
     return updateImage();
 }
 
 bool Player::backward()
 {
     qApp->processEvents();
-#ifdef TIME_MEASUREMENT
-    double time1 = 0.0, tstart;
-    tstart       = clock();
-#endif
     mImg = mAnimation->getPreviousFrame();
-#ifdef TIME_MEASUREMENT
-    time1 += clock() - tstart;
-    time1 = time1 / CLOCKS_PER_SEC;
-    cout << "  time(load frame) = " << time1 << " sec." << endl;
-#endif
     return updateImage();
 }
 

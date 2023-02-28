@@ -813,19 +813,12 @@ void PersonStorage::checkPlausibility(
     QRectF     rect      = mMainWindow.getRecoRoiItem()->rect();
     int        lastFrame = mMainWindow.getAnimation()->getNumFrames() - 1;
 
-#ifdef TIME_MEASUREMENT
-    double time1, tstart;
-#endif
     // test, if the trajectory is very short (less than 10 Trackpoints)
     if(testLength)
     {
         progress.setValue(0);
         progress.setLabelText("Check trajectories lengths...");
         qApp->processEvents();
-#ifdef TIME_MEASUREMENT
-        time1  = 0.0;
-        tstart = clock();
-#endif
         for(i = 0; i < static_cast<int>(mPersons.size()); ++i) // ueber TrackPerson
         {
             progress.setValue(static_cast<int>(i * 100. / mPersons.size()));
@@ -837,11 +830,6 @@ void PersonStorage::checkPlausibility(
                 frame.append(mPersons[i].firstFrame());
             }
         }
-#ifdef TIME_MEASUREMENT
-        time1 += clock() - tstart;
-        time1 = time1 / CLOCKS_PER_SEC;
-        cout << "  time(testLength) = " << time1 << " sec." << endl;
-#endif
     }
 
     // check, if trajectory starts and ends outside the recognition area
@@ -850,10 +838,7 @@ void PersonStorage::checkPlausibility(
         progress.setValue(100);
         progress.setLabelText("Check if trajectories are inside image...");
         qApp->processEvents();
-#ifdef TIME_MEASUREMENT
-        time1  = 0.0;
-        tstart = clock();
-#endif
+
         for(i = 0; i < static_cast<int>(mPersons.size()); ++i) // ueber TrackPerson
         {
             qApp->processEvents();
@@ -885,11 +870,6 @@ void PersonStorage::checkPlausibility(
                 frame.append(mPersons[i].lastFrame());
             }
         }
-#ifdef TIME_MEASUREMENT
-        time1 += clock() - tstart;
-        time1 = time1 / CLOCKS_PER_SEC;
-        cout << "  time(testInside) = " << time1 << " sec." << endl;
-#endif
     }
 
     // testen, ob grosse Geschwindigkeitsaenderungen
@@ -899,10 +879,7 @@ void PersonStorage::checkPlausibility(
         qApp->processEvents();
         progress.setValue(200);
         progress.setLabelText("Check velocity...");
-#ifdef TIME_MEASUREMENT
-        time1  = 0.0;
-        tstart = clock();
-#endif
+
         double d01, d12, d23;
         for(i = 0; i < static_cast<int>(mPersons.size()); ++i) // ueber TrackPerson
         {
@@ -927,11 +904,6 @@ void PersonStorage::checkPlausibility(
                 }
             }
         }
-#ifdef TIME_MEASUREMENT
-        time1 += clock() - tstart;
-        time1 = time1 / CLOCKS_PER_SEC;
-        cout << "  time(testVelocity) = " << time1 << " sec." << endl;
-#endif
     }
 
     // testen, ob zwei trackpoint sehr nah beieinanderliegen (es gibt trajektorien, die uebereinander liegen, wenn nicht
@@ -941,10 +913,7 @@ void PersonStorage::checkPlausibility(
         progress.setValue(300);
         progress.setLabelText("Check if trajectories are equal...");
         qApp->processEvents();
-#ifdef TIME_MEASUREMENT
-        time1  = 0.0;
-        tstart = clock();
-#endif
+
         int lLF = largestLastFrame();
         int f;
         for(f = smallestFirstFrame(); f <= lLF; ++f)
@@ -971,11 +940,6 @@ void PersonStorage::checkPlausibility(
                 }
             }
         }
-#ifdef TIME_MEASUREMENT
-        time1 += clock() - tstart;
-        time1 = time1 / CLOCKS_PER_SEC;
-        cout << "  time(testEqual) = " << time1 << " sec." << endl;
-#endif
     }
 }
 

@@ -310,11 +310,6 @@ void pet::StereoContext::preprocess()
 // cameraRight is default, da disp mit diesem identisch
 IplImage *pet::StereoContext::getRectified(enum Camera camera)
 {
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "in rectify: " << getElapsedTime() << endl;
-#endif
-
     if((camera != cameraRight) && (camera != cameraLeft))
         camera = mAnimation->getCaptureStereo()->getCamera();
 
@@ -420,12 +415,6 @@ IplImage *pet::StereoContext::getRectified(enum Camera camera)
 #endif
 
 
-#ifdef TIME_MEASUREMENT
-            //        "==========: "
-            debout << "ou rectify: " << getElapsedTime() << endl;
-#endif
-
-
             return &mRectRight;
         }
         else
@@ -476,11 +465,6 @@ IplImage *pet::StereoContext::getRectified(enum Camera camera)
 
 IplImage *pet::StereoContext::getDisparity(bool *dispNew)
 {
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "in    disp: " << getElapsedTime() << endl;
-#endif
-
     if(dispNew != NULL)
         *dispNew = false;
     if((mStatus & preprocessed) && !(mStatus & genDisparity))
@@ -1098,13 +1082,6 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
         mMin                 = 0;
         mMax                 = SHRT_MAX;
 #endif
-
-
-#ifdef TIME_MEASUREMENT
-        //        "==========: "
-        debout << "out   disp: " << getElapsedTime() << endl;
-#endif
-
 
         return &mDisparity;
     }

@@ -2757,13 +2757,9 @@ void Petrack::exportTracker(QString dest) // default = ""
                                      mMultiColorMarkerWidget->autoCorrect->isChecked() &&
                                      mMultiColorMarkerWidget->autoCorrectOnlyExport->isChecked();
 
-        if(dest.right(4) == ".trc")
-        {
-#ifdef TIME_MEASUREMENT
-            double time1 = 0.0, tstart;
-            tstart       = clock();
-#endif
-            QTemporaryFile file;
+            if(dest.right(4) == ".trc")
+            {
+                QTemporaryFile file;
 
             if(!file.open() /*!file.open(QIODevice::WriteOnly | QIODevice::Text)*/)
             {
@@ -2789,28 +2785,22 @@ void Petrack::exportTracker(QString dest) // default = ""
                 trcVersion);
             QTextStream out(&file);
 
-            out << "version " << trcVersion << Qt::endl;
-            out << mPersonStorage.nbPersons() << Qt::endl;
-            const auto &persons = mPersonStorage.getPersons();
-            for(size_t i = 0; i < persons.size(); ++i)
-            {
-                qApp->processEvents();
-                progress.setLabelText(QString("Export person %1 of %2 ...").arg(i + 1).arg(mPersonStorage.nbPersons()));
-                progress.setValue(static_cast<int>(i + 1));
-                out << persons[i] << Qt::endl;
-            }
-            file.flush();
-            file.close();
-#ifdef TIME_MEASUREMENT
-            time1 += clock() - tstart;
-            time1 = time1 / CLOCKS_PER_SEC;
-            cout << "  time(writing) = " << time1 << " sec." << endl;
+                out << "version " << trcVersion << Qt::endl;
+                out << mPersonStorage.nbPersons() << Qt::endl;
+                const auto &persons = mPersonStorage.getPersons();
+                for(size_t i = 0; i < persons.size(); ++i)
+                {
+                    qApp->processEvents();
+                    progress.setLabelText(
+                        QString("Export person %1 of %2 ...").arg(i + 1).arg(mPersonStorage.nbPersons()));
+                    progress.setValue(static_cast<int>(i + 1));
+                    out << persons[i] << Qt::endl;
+                }
+                file.flush();
+                file.close();
 
-            time1  = 0.0;
-            tstart = clock();
-#endif
-            progress.setLabelText(QString("Save file ..."));
-            qApp->processEvents();
+                progress.setLabelText(QString("Save file ..."));
+                qApp->processEvents();
 
             if(QFile::exists(dest))
             {
@@ -2835,22 +2825,8 @@ void Petrack::exportTracker(QString dest) // default = ""
             SPDLOG_INFO("finished.");
             mAutosave.resetTrackPersonCounter();
 
-#ifdef TIME_MEASUREMENT
-            time1 += clock() - tstart;
-            time1 = time1 / CLOCKS_PER_SEC;
-            cout << "  time(copying) = " << time1 << " sec." << endl;
-
-//                time1 = 0.0;
-//                tstart = clock();
-#endif
-
-#ifdef TIME_MEASUREMENT
-//                time1 += clock() - tstart;
-//                time1 = time1/CLOCKS_PER_SEC;
-//                cout << "  time(checkPlausibility) = " << time1 << " sec." << endl;
-#endif
-            mTrcFileName = dest; // fuer Project-File, dann koennte track path direkt mitgeladen werden, wenn er
-                                 // noch da ist
+                mTrcFileName =
+                    dest; // fuer Project-File, dann koennte track path direkt mitgeladen werden, wenn er// noch da ist
         }
         else if(dest.right(4) == ".txt")
         {
@@ -2864,59 +2840,40 @@ void Petrack::exportTracker(QString dest) // default = ""
 
             SPDLOG_INFO("export tracking data to {} ({} person(s))...", dest, mPersonStorage.nbPersons());
 
-#ifdef TIME_MEASUREMENT
-            double time1 = 0.0, tstart;
-            tstart       = clock();
-#endif
-            // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um
+                // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um
             // waehrend play mehrfachberuecksichtigung von punkten auszuschliessen, aenderungen in altitude neu
             // in berechnung einfliessen zu lassen)
-            if(mControlWidget->isTrackRecalcHeightChecked())
-            {
-                if(mControlWidget->getCalibCoordDimension() == 0) // 3D
+                if(mControlWidget->isTrackRecalcHeightChecked())
                 {
-                    ; // Nothing to be done because z already the right height
+                    if(mControlWidget->getCalibCoordDimension() == 0) // 3D
+                    {
+                        ; // Nothing to be done because z already the right height
+                    }
+                    else // 2D
+                    {
+                        mPersonStorage.recalcHeight(mControlWidget->getCameraAltitude());
+                    }
                 }
-                else // 2D
-                {
-                    mPersonStorage.recalcHeight(mControlWidget->getCameraAltitude());
-                }
-            }
-#ifdef TIME_MEASUREMENT
-            time1 += clock() - tstart;
-            time1 = time1 / CLOCKS_PER_SEC;
-            cout << "  time(recalcHeight) = " << time1 << " sec." << endl;
 
-            time1  = 0.0;
-            tstart = clock();
-#endif
-            mTrackerReal->calculate(
-                this,
-                mTracker,
-                mImageItem,
-                mControlWidget->getColorPlot(),
-                mMissingFrames,
-                getImageBorderSize(),
-                mControlWidget->isTrackMissingFramesChecked(),
-                mStereoWidget->stereoUseForExport->isChecked(),
-                mControlWidget->getTrackAlternateHeight(),
-                mControlWidget->getCameraAltitude(),
-                mStereoWidget->stereoUseCalibrationCenter->isChecked(),
-                mControlWidget->isExportElimTpChecked(),
-                mControlWidget->isExportElimTrjChecked(),
-                mControlWidget->isExportSmoothChecked(),
-                mControlWidget->isExportViewDirChecked(),
-                mControlWidget->isExportAngleOfViewChecked(),
-                mControlWidget->isExportMarkerIDChecked(),
-                autoCorrectOnlyExport);
-#ifdef TIME_MEASUREMENT
-            time1 += clock() - tstart;
-            time1 = time1 / CLOCKS_PER_SEC;
-            cout << "  time(calculate) = " << time1 << " sec." << endl;
-
-            time1  = 0.0;
-            tstart = clock();
-#endif
+                mTrackerReal->calculate(
+                    this,
+                    mTracker,
+                    mImageItem,
+                    mControlWidget->getColorPlot(),
+                    mMissingFrames,
+                    getImageBorderSize(),
+                    mControlWidget->isTrackMissingFramesChecked(),
+                    mStereoWidget->stereoUseForExport->isChecked(),
+                    mControlWidget->getTrackAlternateHeight(),
+                    mControlWidget->getCameraAltitude(),
+                    mStereoWidget->stereoUseCalibrationCenter->isChecked(),
+                    mControlWidget->isExportElimTpChecked(),
+                    mControlWidget->isExportElimTrjChecked(),
+                    mControlWidget->isExportSmoothChecked(),
+                    mControlWidget->isExportViewDirChecked(),
+                    mControlWidget->isExportAngleOfViewChecked(),
+                    mControlWidget->isExportMarkerIDChecked(),
+                    autoCorrectOnlyExport);
 
             QTextStream out(&file);
 
@@ -2978,26 +2935,11 @@ void Petrack::exportTracker(QString dest) // default = ""
                 statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
             }
 
-            SPDLOG_INFO("finished");
-
-#ifdef TIME_MEASUREMENT
-            time1 += clock() - tstart;
-            time1 = time1 / CLOCKS_PER_SEC;
-            cout << "  time(export) = " << time1 << " sec." << endl;
-
-//                time1 = 0.0;
-//                tstart = clock();
-#endif
-
-#ifdef TIME_MEASUREMENT
-//                time1 += clock() - tstart;
-//                time1 = time1/CLOCKS_PER_SEC;
-//                cout << "  time(checkPlausibility) = " << time1 << " sec." << endl;
-#endif
-        }
-        else if(dest.right(4) == ".dat")
-        {
-            QTemporaryFile fileDat;
+                SPDLOG_INFO("finished");
+            }
+            else if(dest.right(4) == ".dat")
+            {
+                QTemporaryFile fileDat;
 
             if(!fileDat.open()) //! fileDat.open(QIODevice::WriteOnly | QIODevice::Text))
             {
@@ -3279,12 +3221,6 @@ int Petrack::winSize(QPointF *pos, int pers, int frame, int level)
 
 void Petrack::updateImage(bool imageChanged) // default = false (only true for new animation frame)
 {
-#ifdef TIME_MEASUREMENT
-    // die reine Ausgabe  folgender Zeile kostet 1-2 Millisekunden
-    //        "==========: "
-    debout << "go  update: " << getElapsedTime() << endl;
-#endif
-
     mCodeMarkerItem->resetSavedMarkers();
 
     static int  lastRecoFrame            = -10000;
@@ -3313,10 +3249,6 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
         // Filter anwenden, Reihenfolge wichtig - Rechenintensive moeglichst frueh
         // fkt so nur mit kopierenden filtern
-#ifdef TIME_MEASUREMENT
-        //        "==========: "
-        debout << "vor filter: " << getElapsedTime() << endl;
-#endif
 
         if(imageChanged || swapChanged)
         {
@@ -3345,10 +3277,6 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             mImgFiltered = mBorderFilter.getLastResult();
         }
 
-#ifdef TIME_MEASUREMENT
-        //        "==========: "
-        debout << "nch filter: " << getElapsedTime() << endl;
-#endif
         if(borderChanged)
         {
             updateControlImage(mImgFiltered);
@@ -3362,10 +3290,6 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         }
 #endif
 
-#ifdef TIME_MEASUREMENT
-        //        "==========: "
-        debout << "vor  calib: " << getElapsedTime() << endl;
-#endif
         if(imageChanged || swapChanged || brightContrastChanged || borderChanged || calibChanged)
         {
             mImgFiltered = mCalibFilter->apply(mImgFiltered);
@@ -3374,11 +3298,6 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         {
             mImgFiltered = mCalibFilter->getLastResult();
         }
-
-#ifdef TIME_MEASUREMENT
-        //        "==========: "
-        debout << "nach calib: " << getElapsedTime() << endl;
-#endif
 
         if(brightContrastChanged || swapChanged || borderChanged || calibChanged)
         {
@@ -3403,11 +3322,6 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         {
             mImgFiltered = mBackgroundFilter.getLastResult();
         }
-
-#ifdef TIME_MEASUREMENT
-        //        "==========: "
-        debout << "nach    bg: " << getElapsedTime() << endl;
-#endif
 
         // delete track list, if intrinsic param have changed
         if(calibChanged && mPersonStorage.nbPersons() > 0) // mCalibFilter.getEnabled() &&
@@ -3470,10 +3384,6 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             // if (mPrevIplImgFiltered) // wenn ein vorheriges bild vorliegt
             //  mPrevIplImgFiltered == NULL zeigt an, dass neue bildfolge && mPrevFrame == -1 ebenso
             //  winSize(), wurde mal uebergeben
-#ifdef TIME_MEASUREMENT
-            debout << "vor  track: " << getElapsedTime() << endl;
-#endif
-            //            debout << "test" << endl;
             int anz = mTracker->track(
                 mImgFiltered,
                 rect,
@@ -3484,9 +3394,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                 mReco.getRecoMethod(),
                 mControlWidget->getTrackRegionLevels(),
                 getPedestriansToTrack());
-#ifdef TIME_MEASUREMENT
-            debout << "nach track: " << getElapsedTime() << endl;
-#endif
+
             mControlWidget->setTrackNumberNow(QString("%1").arg(anz));
             mTrackChanged            = false;
             borderChangedForTracking = false;
@@ -3523,10 +3431,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                     myRound(mRecognitionRoiItem->rect().height()));
                 QList<TrackPoint> persList;
                 auto              recoMethod = mReco.getRecoMethod();
-#ifdef TIME_MEASUREMENT
-                //        "==========: "
-                debout << "vor   reco: " << getElapsedTime() << endl;
-#endif
+
                 if((recoMethod == reco::RecognitionMethod::Casern) || (recoMethod == reco::RecognitionMethod::Hermes) ||
                    (recoMethod == reco::RecognitionMethod::Color) || (recoMethod == reco::RecognitionMethod::Japan) ||
                    (recoMethod == reco::RecognitionMethod::MultiColor) ||
@@ -3547,10 +3452,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                     pl.calcPersonPos(mImgFiltered, rect, &persList, mStereoContext, getBackgroundFilter(), markerLess);
                 }
 #endif
-#ifdef TIME_MEASUREMENT
-                //        "==========: "
-                debout << "nach  reco: " << getElapsedTime() << endl;
-#endif
+
                 mPersonStorage.addPoints(persList, frameNum, mReco.getRecoMethod());
 
                 // folgendes lieber im Anschluss, ggf beim exportieren oder statt test direkt del:
@@ -3612,11 +3514,8 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
         semaphore.release();
     }
-#ifdef TIME_MEASUREMENT
-    //        "==========: "
-    debout << "stp update: " << getElapsedTime() << endl;
-#endif
 }
+
 void Petrack::updateImage(const cv::Mat &img)
 {
     mImg = img;
