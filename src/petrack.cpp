@@ -3497,7 +3497,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         }
         else
         {
-            getScene()->update(); // repaint();
+            getScene()->views().first()->viewport()->repaint();
             qApp->processEvents();
             // update pixel color (because image pixel moves)
             setStatusColor();
