@@ -45,7 +45,6 @@ pre-build-checks:
   stage: pre-build-checks
   script:
     - scripts/check-format-cpp.sh
-  allow_failure: true
 
 # Build petrack and petrack unit_tests
 build_linux:
@@ -91,7 +90,6 @@ regression_test_linux:
       junit: "tests/regression_test/tests/pytest_report.xml"
   needs: ["build_linux"]
 
-
 ###############################################################################
 # Windows CI
 ###############################################################################
@@ -110,6 +108,7 @@ build_windows:
     paths:
       - "./build"
     expire_in: 2 hrs
+  needs: []
 
 # Execute unit tests
 unit_test_windows:
@@ -174,7 +173,6 @@ make_release_windows:
     - winInst=$(echo petrack-installer-*)
     - curl -k -T $winInst -u "${SCIEBO_WIN_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$winInst --fail-with-body
 
-
 ###############################################################################
 # MacOS CI
 ###############################################################################
@@ -186,11 +184,11 @@ build_macos:
   script:
     - mkdir build
     - cd build
-    - cmake -G Ninja .. 
-      -DBUILD_BUNDLE=ON 
-      -DBUILD_UNIT_TESTS=ON 
-      -DFAIL_ON_WARNINGS=ON 
-      -DCatch2_DIR=$Catch2_DIR 
+    - cmake -G Ninja ..
+      -DBUILD_BUNDLE=ON
+      -DBUILD_UNIT_TESTS=ON
+      -DFAIL_ON_WARNINGS=ON
+      -DCatch2_DIR=$Catch2_DIR
       -Dtrompeloeil_DIR=$trompeloeil_DIR
       -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
     - cmake --build .
@@ -202,6 +200,7 @@ build_macos:
       - "build/"
       - "build/petrack-installer-*"
     expire_in: 2 hrs
+  needs: []
 
 # Execute unit tests
 unit_test_macos:
@@ -239,11 +238,11 @@ make_release_macos:
   image: $CI_REGISTRY/ped-dyn-emp/petrack/alpine
   stage: deploy
   rules:
-   - if: $CI_PIPELINE_SOURCE == "schedule"
-     when: never
-   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
-   - cd build
-   - macosInst=$(echo petrack-installer-*)
-   - curl -k -T $macosInst -u "${SCIEBO_MACOS_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$macosInst --fail-with-body
-  dependencies: [ "build_macos" ]
+    - cd build
+    - macosInst=$(echo petrack-installer-*)
+    - curl -k -T $macosInst -u "${SCIEBO_MACOS_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$macosInst --fail-with-body
+  dependencies: ["build_macos"]

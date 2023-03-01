@@ -1546,7 +1546,7 @@ void Petrack::print()
         // HighResolution font zu gross! und laengere laufzeit und eher overflow
         // aber so pixelig und keine schoenen linien
         QPrinter printer(QPrinter::ScreenResolution); // ScreenResolution, HighResolution// liefert zu hause:
-                                                      // QWin32PrintEngine::initialize: GetPrinter failed ()
+        // QWin32PrintEngine::initialize: GetPrinter failed ()
         printer.setPageSize(QPageSize{QPageSize::PageSizeId::A4});
         QPrintDialog dialog(&printer, this);
         if(dialog.exec())
@@ -2757,9 +2757,9 @@ void Petrack::exportTracker(QString dest) // default = ""
                                      mMultiColorMarkerWidget->autoCorrect->isChecked() &&
                                      mMultiColorMarkerWidget->autoCorrectOnlyExport->isChecked();
 
-            if(dest.right(4) == ".trc")
-            {
-                QTemporaryFile file;
+        if(dest.right(4) == ".trc")
+        {
+            QTemporaryFile file;
 
             if(!file.open() /*!file.open(QIODevice::WriteOnly | QIODevice::Text)*/)
             {
@@ -2785,22 +2785,21 @@ void Petrack::exportTracker(QString dest) // default = ""
                 trcVersion);
             QTextStream out(&file);
 
-                out << "version " << trcVersion << Qt::endl;
-                out << mPersonStorage.nbPersons() << Qt::endl;
-                const auto &persons = mPersonStorage.getPersons();
-                for(size_t i = 0; i < persons.size(); ++i)
-                {
-                    qApp->processEvents();
-                    progress.setLabelText(
-                        QString("Export person %1 of %2 ...").arg(i + 1).arg(mPersonStorage.nbPersons()));
-                    progress.setValue(static_cast<int>(i + 1));
-                    out << persons[i] << Qt::endl;
-                }
-                file.flush();
-                file.close();
-
-                progress.setLabelText(QString("Save file ..."));
+            out << "version " << trcVersion << Qt::endl;
+            out << mPersonStorage.nbPersons() << Qt::endl;
+            const auto &persons = mPersonStorage.getPersons();
+            for(size_t i = 0; i < persons.size(); ++i)
+            {
                 qApp->processEvents();
+                progress.setLabelText(QString("Export person %1 of %2 ...").arg(i + 1).arg(mPersonStorage.nbPersons()));
+                progress.setValue(static_cast<int>(i + 1));
+                out << persons[i] << Qt::endl;
+            }
+            file.flush();
+            file.close();
+
+            progress.setLabelText(QString("Save file ..."));
+            qApp->processEvents();
 
             if(QFile::exists(dest))
             {
@@ -2825,8 +2824,8 @@ void Petrack::exportTracker(QString dest) // default = ""
             SPDLOG_INFO("finished.");
             mAutosave.resetTrackPersonCounter();
 
-                mTrcFileName =
-                    dest; // fuer Project-File, dann koennte track path direkt mitgeladen werden, wenn er// noch da ist
+            mTrcFileName =
+                dest; // fuer Project-File, dann koennte track path direkt mitgeladen werden, wenn er// noch da ist
         }
         else if(dest.right(4) == ".txt")
         {
@@ -2840,40 +2839,40 @@ void Petrack::exportTracker(QString dest) // default = ""
 
             SPDLOG_INFO("export tracking data to {} ({} person(s))...", dest, mPersonStorage.nbPersons());
 
-                // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um
+            // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um
             // waehrend play mehrfachberuecksichtigung von punkten auszuschliessen, aenderungen in altitude neu
             // in berechnung einfliessen zu lassen)
-                if(mControlWidget->isTrackRecalcHeightChecked())
+            if(mControlWidget->isTrackRecalcHeightChecked())
+            {
+                if(mControlWidget->getCalibCoordDimension() == 0) // 3D
                 {
-                    if(mControlWidget->getCalibCoordDimension() == 0) // 3D
-                    {
-                        ; // Nothing to be done because z already the right height
-                    }
-                    else // 2D
-                    {
-                        mPersonStorage.recalcHeight(mControlWidget->getCameraAltitude());
-                    }
+                    ; // Nothing to be done because z already the right height
                 }
+                else // 2D
+                {
+                    mPersonStorage.recalcHeight(mControlWidget->getCameraAltitude());
+                }
+            }
 
-                mTrackerReal->calculate(
-                    this,
-                    mTracker,
-                    mImageItem,
-                    mControlWidget->getColorPlot(),
-                    mMissingFrames,
-                    getImageBorderSize(),
-                    mControlWidget->isTrackMissingFramesChecked(),
-                    mStereoWidget->stereoUseForExport->isChecked(),
-                    mControlWidget->getTrackAlternateHeight(),
-                    mControlWidget->getCameraAltitude(),
-                    mStereoWidget->stereoUseCalibrationCenter->isChecked(),
-                    mControlWidget->isExportElimTpChecked(),
-                    mControlWidget->isExportElimTrjChecked(),
-                    mControlWidget->isExportSmoothChecked(),
-                    mControlWidget->isExportViewDirChecked(),
-                    mControlWidget->isExportAngleOfViewChecked(),
-                    mControlWidget->isExportMarkerIDChecked(),
-                    autoCorrectOnlyExport);
+            mTrackerReal->calculate(
+                this,
+                mTracker,
+                mImageItem,
+                mControlWidget->getColorPlot(),
+                mMissingFrames,
+                getImageBorderSize(),
+                mControlWidget->isTrackMissingFramesChecked(),
+                mStereoWidget->stereoUseForExport->isChecked(),
+                mControlWidget->getTrackAlternateHeight(),
+                mControlWidget->getCameraAltitude(),
+                mStereoWidget->stereoUseCalibrationCenter->isChecked(),
+                mControlWidget->isExportElimTpChecked(),
+                mControlWidget->isExportElimTrjChecked(),
+                mControlWidget->isExportSmoothChecked(),
+                mControlWidget->isExportViewDirChecked(),
+                mControlWidget->isExportAngleOfViewChecked(),
+                mControlWidget->isExportMarkerIDChecked(),
+                autoCorrectOnlyExport);
 
             QTextStream out(&file);
 
@@ -2935,11 +2934,11 @@ void Petrack::exportTracker(QString dest) // default = ""
                 statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
             }
 
-                SPDLOG_INFO("finished");
-            }
-            else if(dest.right(4) == ".dat")
-            {
-                QTemporaryFile fileDat;
+            SPDLOG_INFO("finished");
+        }
+        else if(dest.right(4) == ".dat")
+        {
+            QTemporaryFile fileDat;
 
             if(!fileDat.open()) //! fileDat.open(QIODevice::WriteOnly | QIODevice::Text))
             {
