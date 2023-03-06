@@ -18,6 +18,7 @@
 
 #include "backgroundItem.h"
 
+#include "filterBeforeBox.h"
 #include "petrack.h"
 #include "view.h"
 
@@ -26,10 +27,12 @@
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,
 // so dass pixel quadratisch
-BackgroundItem::BackgroundItem(QWidget *wParent, QGraphicsItem *parent) : QGraphicsItem(parent)
+BackgroundItem::BackgroundItem(QWidget *wParent, QGraphicsItem *parent, FilterBeforeBox &filterBefore) :
+    QGraphicsItem(parent)
 {
     mMainWindow = (class Petrack *) wParent;
     mImage      = nullptr;
+    filterBefore.setBackgroundItem(this);
     //    setEnabled(false); // all mouse events cannot access this item, but it will be seen
     // einzig move koennte interessant sein, um grid zu verschieben?!
 }

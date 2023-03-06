@@ -27,7 +27,6 @@
 #include <optional>
 
 class Petrack;
-class Control;
 
 /**
  * @brief Class for intrinsic calibration
@@ -96,7 +95,6 @@ private:
         double                               *reproj_errs);
 
     Petrack    *mMainWindow;
-    Control    *mControlWidget;
     QStringList mCalibFiles;
     int         mBoardSizeX, mBoardSizeY;
     float       mSquareSize;

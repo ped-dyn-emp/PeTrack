@@ -32,6 +32,7 @@
 #include "colorMarkerWidget.h"
 #include "colorRangeWidget.h"
 #include "control.h"
+#include "filterBeforeBox.h"
 #include "gridItem.h"
 #include "helper.h"
 #include "imageItem.h"
@@ -110,7 +111,29 @@ Petrack::Petrack(QString petrackVersion) :
     connect(mRecognitionRoiItem, &RoiItem::changed, this, [=]() { this->setRecognitionChanged(true); });
     mRecognitionRoiItem->setZValue(5); // groesser heisst weiter oben
 
-    mControlWidget = new Control(*this, *mScene, mReco, *mTrackingRoiItem, *mRecognitionRoiItem, mMissingFrames);
+
+    // setup control
+
+    auto updateImageCallback = [this]()
+    {
+        if(!isLoading())
+        {
+            updateImage();
+        }
+    };
+
+    auto *filterBeforeBox = new FilterBeforeBox(
+        nullptr, // reparented when added to layout
+        *getBackgroundFilter(),
+        *getBrightContrastFilter(),
+        *getBorderFilter(),
+        *getSwapFilter(),
+        updateImageCallback);
+
+    mControlWidget =
+        new Control(*this, *mScene, mReco, *mTrackingRoiItem, *mRecognitionRoiItem, mMissingFrames, filterBeforeBox);
+
+    // end setup control
 
     mStereoWidget = new StereoWidget(this);
     mStereoWidget->setWindowFlags(Qt::Window);
@@ -210,7 +233,7 @@ Petrack::Petrack(QString petrackVersion) :
 
     //---------------------------
 
-    mBackgroundItem = new BackgroundItem(this);
+    mBackgroundItem = new BackgroundItem(this, nullptr, *filterBeforeBox);
     mBackgroundItem->setZValue(2.2); // um so groesser um so hoeher um so eher zu sehen
     mBackgroundItem->setVisible(false);
 

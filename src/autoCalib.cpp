@@ -18,7 +18,6 @@
 
 #include "autoCalib.h"
 
-#include "control.h"
 #include "logger.h"
 #include "pMessageBox.h"
 #include "petrack.h"
@@ -35,8 +34,7 @@
 
 AutoCalib::AutoCalib()
 {
-    mMainWindow    = nullptr;
-    mControlWidget = nullptr;
+    mMainWindow = nullptr;
 
     // 6x8 und 4.6cm passen zu dem Schachbrettmuster auf der Eisenplatte mit Griff
     mBoardSizeX = 6;
@@ -48,8 +46,7 @@ AutoCalib::~AutoCalib() {}
 
 void AutoCalib::setMainWindow(Petrack *mw)
 {
-    mMainWindow    = mw;
-    mControlWidget = mw->getControlWidget();
+    mMainWindow = mw;
 }
 
 bool AutoCalib::isEmptyCalibFiles()

@@ -26,6 +26,11 @@ namespace Ui
 class FilterBeforeBox;
 }
 class QDomElement;
+class BackgroundFilter;
+class BrightContrastFilter;
+class BorderFilter;
+class SwapFilter;
+class BackgroundItem;
 
 struct FilterSettings
 {
@@ -42,12 +47,20 @@ class FilterBeforeBox : public QGroupBox
     Q_OBJECT
 
 public:
-    explicit FilterBeforeBox(QWidget *parent);
+    explicit FilterBeforeBox(
+        QWidget              *parent,
+        BackgroundFilter     &bgFilter,
+        BrightContrastFilter &brightContrastFilter,
+        BorderFilter         &borderFilter,
+        SwapFilter           &swapFilter,
+        std::function<void()> updateImageCallback);
     FilterBeforeBox(const FilterBeforeBox &)            = delete;
     FilterBeforeBox(FilterBeforeBox &&)                 = delete;
     FilterBeforeBox &operator=(const FilterBeforeBox &) = delete;
     FilterBeforeBox &operator=(FilterBeforeBox &&)      = delete;
     ~FilterBeforeBox() override;
+
+    void setBackgroundItem(BackgroundItem *item);
 
     int  getFilterBorderSize() const;
     void setFilterBorderSizeMin(int i);
@@ -63,9 +76,32 @@ public:
     bool getXmlSub(QDomElement &subSubElem);
     void setXml(QDomElement &subElem, QColor bgColor, const QString &bgFilename) const;
 
+private slots:
+    void on_filterBrightContrast_stateChanged(int i);
+    void on_filterContrastParam_valueChanged(int i);
+    void on_filterBrightParam_valueChanged(int i);
+    void on_filterBorder_stateChanged(int i);
+    void on_filterBorderParamSize_valueChanged(int i);
+    void on_filterBorderParamCol_clicked();
+    void on_filterBg_stateChanged(int i);
+    void on_filterBgShow_stateChanged(int i);
+    void on_filterBgUpdate_stateChanged(int i);
+    void on_filterBgReset_clicked();
+    void on_filterBgSave_clicked();
+    void on_filterBgLoad_clicked();
+    void on_filterSwap_stateChanged(int i);
+    void on_filterSwapH_stateChanged(int i);
+    void on_filterSwapV_stateChanged(int i);
+
 private:
-    Ui::FilterBeforeBox *mUi;
-    bool                 mShowBackgroundCache;
+    Ui::FilterBeforeBox  *mUi;
+    bool                  mShowBackgroundCache;
+    std::function<void()> mUpdateImageCallback;
+    BackgroundFilter     &mBgFilter;
+    BrightContrastFilter &mBrightContrastFilter;
+    BorderFilter         &mBorderFilter;
+    SwapFilter           &mSwapFilter;
+    BackgroundItem       *mBgItem;
 };
 
 #endif // FILTERBEFOREBOX_H

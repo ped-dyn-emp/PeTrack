@@ -89,6 +89,9 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::TabFocus</enum>
+      </property>
       <attribute name="title">
        <string>calibration</string>
       </attribute>
@@ -137,7 +140,7 @@
             <x>0</x>
             <y>0</y>
             <width>477</width>
-            <height>641</height>
+            <height>619</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -147,13 +150,6 @@
            </sizepolicy>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_13">
-           <item>
-            <widget class="FilterBeforeBox" name="filterBeforeBox">
-             <property name="title">
-              <string>filter before</string>
-             </property>
-            </widget>
-           </item>
            <item>
             <widget class="QGroupBox" name="extr">
              <property name="sizePolicy">
@@ -6446,6 +6442,16 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>PSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>pspinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>pdoublespinbox.h</header>
+  </customwidget>
+  <customwidget>
    <class>AnalysePlot</class>
    <extends>QFrame</extends>
    <header>analysePlot.h</header>
@@ -6455,22 +6461,6 @@
    <class>ColorPlot</class>
    <extends>QFrame</extends>
    <header>colorPlot.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>PDoubleSpinBox</class>
-   <extends>QDoubleSpinBox</extends>
-   <header>pdoublespinbox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>PSpinBox</class>
-   <extends>QSpinBox</extends>
-   <header>pspinbox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>FilterBeforeBox</class>
-   <extends>QGroupBox</extends>
-   <header>filterBeforeBox.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
