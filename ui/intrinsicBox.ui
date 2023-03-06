@@ -28,6 +28,9 @@
     <height>16777215</height>
    </size>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::TabFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>GroupBox</string>
   </property>
@@ -798,16 +801,46 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PDoubleSpinBox</class>
-   <extends>QDoubleSpinBox</extends>
-   <header>pdoublespinbox.h</header>
-  </customwidget>
-  <customwidget>
    <class>PSpinBox</class>
    <extends>QSpinBox</extends>
    <header>pspinbox.h</header>
   </customwidget>
+  <customwidget>
+   <class>PDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>pdoublespinbox.h</header>
+  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>apply</tabstop>
+  <tabstop>fx</tabstop>
+  <tabstop>fy</tabstop>
+  <tabstop>cx</tabstop>
+  <tabstop>cy</tabstop>
+  <tabstop>r2</tabstop>
+  <tabstop>r4</tabstop>
+  <tabstop>r6</tabstop>
+  <tabstop>tx</tabstop>
+  <tabstop>ty</tabstop>
+  <tabstop>k4</tabstop>
+  <tabstop>k5</tabstop>
+  <tabstop>k6</tabstop>
+  <tabstop>s1</tabstop>
+  <tabstop>s2</tabstop>
+  <tabstop>s3</tabstop>
+  <tabstop>s4</tabstop>
+  <tabstop>taux</tabstop>
+  <tabstop>tauy</tabstop>
+  <tabstop>quadAspectRatio</tabstop>
+  <tabstop>fixCenter</tabstop>
+  <tabstop>tangDist</tabstop>
+  <tabstop>extModelCheckBox</tabstop>
+  <tabstop>boardSizeX</tabstop>
+  <tabstop>boardSizeY</tabstop>
+  <tabstop>squareSize</tabstop>
+  <tabstop>autoCalib</tabstop>
+  <tabstop>calibFiles</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -26,6 +26,7 @@
 #include "colorMarkerWidget.h"
 #include "colorPlot.h"
 #include "colorRangeWidget.h"
+#include "filterBeforeBox.h"
 #include "imageItem.h"
 #include "intrinsicBox.h"
 #include "logger.h"
@@ -51,8 +52,9 @@ Control::Control(
     reco::Recognizer &recognizer,
     RoiItem          &trackRoiItem,
     RoiItem          &recoRoiItem,
-    MissingFrames    &missingFrames) :
-    Control(parent, scene, recognizer, trackRoiItem, recoRoiItem, new Ui::Control(), missingFrames)
+    MissingFrames    &missingFrames,
+    FilterBeforeBox  *filterBefore) :
+    Control(parent, scene, recognizer, trackRoiItem, recoRoiItem, new Ui::Control(), missingFrames, filterBefore)
 {
 }
 
@@ -63,8 +65,9 @@ Control::Control(
     RoiItem          &trackRoiItem,
     RoiItem          &recoRoiItem,
     Ui::Control      *ui,
-    MissingFrames    &missingFrames) :
-    QWidget(&parent), mUi(ui)
+    MissingFrames    &missingFrames,
+    FilterBeforeBox  *filterBefore) :
+    QWidget(&parent), mUi(ui), mFilterBefore(filterBefore)
 {
     setAccessibleName("Control");
     mMainWindow = (class Petrack *) &parent;
@@ -90,20 +93,17 @@ Control::Control(
     QObject::connect(
         &missingFrames, &MissingFrames::executeChanged, mUi->missingFramesCalculated, &QCheckBox::setChecked);
 
-    mIntr = new IntrinsicBox(
-        this,
-        *mMainWindow->getAutoCalib(),
-        *mMainWindow->getCalibFilter(),
-        [this]()
+    auto updateImageCallback = [this]()
+    {
+        if(!mMainWindow->isLoading())
         {
-            if(!mMainWindow->isLoading())
-            {
-                mMainWindow->updateImage();
-            }
-        });
-    mIntr->setObjectName(QString::fromUtf8("intr"));
+            mMainWindow->updateImage();
+        }
+    };
 
-    ui->verticalLayout_13->insertWidget(1, mIntr);
+    // layout reparents widget
+    ui->verticalLayout_13->insertWidget(0, mFilterBefore);
+    mFilterBefore->setObjectName("filterBeforeBox");
 
     FilterSettings filterSettings;
     filterSettings.useBrightContrast = mMainWindow->getBrightContrastFilter()->getEnabled();
@@ -113,7 +113,17 @@ Control::Control(
     filterSettings.useSwap  = mMainWindow->getSwapFilter()->getEnabled();
     filterSettings.useSwapH = mMainWindow->getSwapFilter()->getSwapHorizontally().getValue();
     filterSettings.useSwapV = mMainWindow->getSwapFilter()->getSwapVertically().getValue();
-    mUi->filterBeforeBox->setFilterSettings(filterSettings);
+    mFilterBefore->setFilterSettings(filterSettings);
+
+    mIntr = new IntrinsicBox(this, *mMainWindow->getAutoCalib(), *mMainWindow->getCalibFilter(), updateImageCallback);
+    mIntr->setObjectName(QString::fromUtf8("intr"));
+
+    ui->verticalLayout_13->insertWidget(1, mIntr);
+
+    // integrate new widgets in tabbing order
+    ui->calib->setFocusProxy(ui->rot1);
+    QWidget::setTabOrder(mFilterBefore, mIntr);
+    QWidget::setTabOrder(mIntr, ui->calib);
 
     connect(mIntr, &IntrinsicBox::paramsChanged, this, &Control::on_intrinsicParamsChanged);
 
@@ -611,30 +621,30 @@ bool Control::getAdaptiveLevel() const
 
 int Control::getFilterBorderSize() const
 {
-    return mUi->filterBeforeBox->getFilterBorderSize();
+    return mFilterBefore->getFilterBorderSize();
 }
 void Control::setFilterBorderSizeMin(int i)
 {
-    mUi->filterBeforeBox->setFilterBorderSizeMin(i);
+    mFilterBefore->setFilterBorderSizeMin(i);
 }
 void Control::setFilterBorderSizeMax(int i)
 {
-    mUi->filterBeforeBox->setFilterBorderSizeMax(i);
+    mFilterBefore->setFilterBorderSizeMax(i);
 }
 
 bool Control::isFilterBgChecked() const
 {
-    return mUi->filterBeforeBox->isFilterBgChecked();
+    return mFilterBefore->isFilterBgChecked();
 }
 
 bool Control::isFilterBgDeleteTrjChecked() const
 {
-    return mUi->filterBeforeBox->isFilterBgDeleteTrjChecked();
+    return mFilterBefore->isFilterBgDeleteTrjChecked();
 }
 
 int Control::getFilterBgDeleteNumber() const
 {
-    return mUi->filterBeforeBox->getFilterBgDeleteNumber();
+    return mFilterBefore->getFilterBgDeleteNumber();
 }
 
 void Control::imageSizeChanged(int width, int height, int borderDiff)
@@ -1903,173 +1913,6 @@ void Control::on_trackRoiFix_stateChanged(int i)
 }
 
 //---------------------- calibration
-void Control::on_filterBrightContrast_stateChanged(int i)
-{
-    if(i == Qt::Checked)
-    {
-        mMainWindow->getBrightContrastFilter()->enable();
-    }
-    else if(i == Qt::Unchecked)
-    {
-        mMainWindow->getBrightContrastFilter()->disable();
-    }
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-}
-
-void Control::on_filterContrastParam_valueChanged(int i)
-{
-    mMainWindow->getBrightContrastFilter()->getContrast().setValue(i);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-}
-
-void Control::on_filterBrightParam_valueChanged(int i)
-{
-    mMainWindow->getBrightContrastFilter()->getBrightness().setValue(i);
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-}
-
-void Control::on_filterBorder_stateChanged(int i)
-{
-    if(i == Qt::Checked)
-    {
-        mMainWindow->getBorderFilter()->enable();
-    }
-    else if(i == Qt::Unchecked)
-    {
-        mMainWindow->getBorderFilter()->disable();
-    }
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-}
-
-void Control::on_filterBorderParamSize_valueChanged(int i)
-{
-    mMainWindow->setImageBorderSize(2 * i); // 2* because undistored has problem with sizes not dividable  of 4
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-}
-
-void Control::on_filterBorderParamCol_clicked()
-{
-    BorderFilter *bf    = mMainWindow->getBorderFilter();
-    QColor        color = QColorDialog::getColor(
-        QColor(bf->getBorderColR().getValue(), bf->getBorderColG().getValue(), bf->getBorderColB().getValue()), this);
-    bf->getBorderColR().setValue(color.red());
-    bf->getBorderColG().setValue(color.green());
-    bf->getBorderColB().setValue(color.blue());
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-}
-
-void Control::on_filterSwap_stateChanged(int i)
-{
-    if(i == Qt::Checked)
-    {
-        mMainWindow->getSwapFilter()->enable();
-    }
-    else if(i == Qt::Unchecked)
-    {
-        mMainWindow->getSwapFilter()->disable();
-    }
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-}
-
-void Control::on_filterSwapH_stateChanged(int i)
-{
-    mMainWindow->getSwapFilter()->getSwapHorizontally().setValue(i == Qt::Checked);
-
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-}
-
-void Control::on_filterSwapV_stateChanged(int i)
-{
-    mMainWindow->getSwapFilter()->getSwapVertically().setValue(i == Qt::Checked);
-
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-}
-
-void Control::on_filterBg_stateChanged(int i)
-{
-    mUi->filterBeforeBox->toggleBackgroundUi(static_cast<Qt::CheckState>(i));
-    if(i == Qt::Checked)
-    {
-        mMainWindow->getBackgroundFilter()->enable();
-    }
-    else
-    {
-        mMainWindow->getBackgroundFilter()->disable();
-    }
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage(
-            true); // true, da auch bei stehendem bild neue berechnungen durchgefuehrt werden sollen
-    }
-}
-
-void Control::on_filterBgUpdate_stateChanged(int i)
-{
-    if(i == Qt::Checked)
-    {
-        mMainWindow->getBackgroundFilter()->setUpdate(true); //  enable();
-    }
-    else if(i == Qt::Unchecked)
-    {
-        mMainWindow->getBackgroundFilter()->setUpdate(false); //->disable();
-    }
-}
-
-void Control::on_filterBgReset_clicked()
-{
-    mMainWindow->getBackgroundFilter()->reset();
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-}
-
-void Control::on_filterBgShow_stateChanged(int i)
-{
-    mMainWindow->getBackgroundItem()->setVisible(i);
-    mScene->update();
-}
-
-void Control::on_filterBgSave_clicked()
-{
-    mMainWindow->getBackgroundFilter()->save();
-}
-
-void Control::on_filterBgLoad_clicked()
-{
-    mMainWindow->getBackgroundFilter()->load();
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-}
 
 
 void Control::on_intrinsicParamsChanged(IntrinsicCameraParams params)
@@ -2530,7 +2373,7 @@ void Control::setXml(QDomElement &elem)
     {
         fn = getFileList(fn, mMainWindow->getProFileName());
     }
-    mUi->filterBeforeBox->setXml(subElem, col, fn);
+    mFilterBefore->setXml(subElem, col, fn);
 
     // PATTERN and INTRINSIC_PARAMETERS elements
     mIntr->setXml(subElem);
@@ -2860,7 +2703,7 @@ void Control::getXml(QDomElement &elem)
             for(subSubElem = subElem.firstChildElement(); !subSubElem.isNull();
                 subSubElem = subSubElem.nextSiblingElement())
             {
-                if(mUi->filterBeforeBox->getXmlSub(subSubElem))
+                if(mFilterBefore->getXmlSub(subSubElem))
                 {
                     // intentionally left blank
                 }

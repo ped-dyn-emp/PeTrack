@@ -55,6 +55,9 @@ IntrinsicBox::IntrinsicBox(
     mUi->apply->setCheckState(mCalibFilter.getEnabled() ? Qt::Checked : Qt::Unchecked);
 
     setIntrinsicCameraParams(mCalibFilter.getCamParams().getValue());
+
+    // FocusPolicy: TabFocus and first ui-element as proxy are needed for tab order
+    setFocusProxy(mUi->apply);
 }
 
 IntrinsicBox::~IntrinsicBox()

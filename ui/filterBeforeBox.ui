@@ -28,6 +28,9 @@
     <height>16777215</height>
    </size>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::TabFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>GroupBox</string>
   </property>
@@ -399,6 +402,16 @@
     </widget>
    </item>
   </layout>
+  <zorder>filterBorder</zorder>
+  <zorder>line_2</zorder>
+  <zorder>filterBg</zorder>
+  <zorder>filterBrightParam</zorder>
+  <zorder>line</zorder>
+  <zorder>filterSwap</zorder>
+  <zorder>filterContrastParam</zorder>
+  <zorder>label_20</zorder>
+  <zorder>line_3</zorder>
+  <zorder>filterBrightContrast</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -407,6 +420,23 @@
    <header>pspinbox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>filterBrightContrast</tabstop>
+  <tabstop>filterBorder</tabstop>
+  <tabstop>filterBorderParamSize_spin</tabstop>
+  <tabstop>filterBorderParamCol</tabstop>
+  <tabstop>filterBg</tabstop>
+  <tabstop>filterBgShow</tabstop>
+  <tabstop>filterBgUpdate</tabstop>
+  <tabstop>filterBgReset</tabstop>
+  <tabstop>filterBgLoad</tabstop>
+  <tabstop>filterBgSave</tabstop>
+  <tabstop>filterBgDeleteTrj</tabstop>
+  <tabstop>filterBgDeleteNumber</tabstop>
+  <tabstop>filterSwap</tabstop>
+  <tabstop>filterSwapH</tabstop>
+  <tabstop>filterSwapV</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

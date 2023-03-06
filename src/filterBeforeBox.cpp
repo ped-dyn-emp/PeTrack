@@ -18,22 +18,52 @@
 
 #include "filterBeforeBox.h"
 
+#include "backgroundFilter.h"
+#include "backgroundItem.h"
+#include "borderFilter.h"
+#include "brightContrastFilter.h"
 #include "helper.h"
 #include "pMessageBox.h"
+#include "swapFilter.h"
 #include "ui_filterBeforeBox.h"
 
+#include <QColorDialog>
 #include <QDomElement>
 
-FilterBeforeBox::FilterBeforeBox(QWidget *parent) : QGroupBox(parent), mUi(new Ui::FilterBeforeBox)
+FilterBeforeBox::FilterBeforeBox(
+    QWidget              *parent,
+    BackgroundFilter     &bgFilter,
+    BrightContrastFilter &brightContrastFilter,
+    BorderFilter         &borderFilter,
+    SwapFilter           &swapFilter,
+    std::function<void()> updateImageCallback) :
+    QGroupBox(parent),
+    mUi(new Ui::FilterBeforeBox),
+    mUpdateImageCallback(std::move(updateImageCallback)),
+    mBgFilter(bgFilter),
+    mBrightContrastFilter(brightContrastFilter),
+    mBorderFilter(borderFilter),
+    mSwapFilter(swapFilter)
 {
     mUi->setupUi(this);
     mShowBackgroundCache = mUi->filterBgShow->checkState();
     toggleBackgroundUi(mUi->filterBg->checkState());
+
+    // FocusPolicy: TabFocus and first ui-element as proxy are needed for tab order
+    setFocusProxy(mUi->filterBrightContrast);
 }
 
 FilterBeforeBox::~FilterBeforeBox()
 {
     delete mUi;
+}
+
+/// BackgroundItem is created after Control, but some Items need Control to work
+/// Since we do not want to separate the initializations too much, we use a non-owning
+/// pointer and setter approach
+void FilterBeforeBox::setBackgroundItem(BackgroundItem *item)
+{
+    mBgItem = item;
 }
 
 void FilterBeforeBox::setFilterSettings(const FilterSettings &settings)
@@ -239,4 +269,142 @@ void FilterBeforeBox::toggleBackgroundUi(Qt::CheckState state)
         mUi->filterBgDeleteTrj->setEnabled(false);
         mUi->label_65->setEnabled(false);
     }
+}
+
+void FilterBeforeBox::on_filterBrightContrast_stateChanged(int i)
+{
+    if(i == Qt::Checked)
+    {
+        mBrightContrastFilter.enable();
+    }
+    else if(i == Qt::Unchecked)
+    {
+        mBrightContrastFilter.disable();
+    }
+    mUpdateImageCallback();
+}
+
+void FilterBeforeBox::on_filterContrastParam_valueChanged(int i)
+{
+    mBrightContrastFilter.getContrast().setValue(i);
+    mUpdateImageCallback();
+}
+
+void FilterBeforeBox::on_filterBrightParam_valueChanged(int i)
+{
+    mBrightContrastFilter.getBrightness().setValue(i);
+    mUpdateImageCallback();
+}
+
+void FilterBeforeBox::on_filterBorder_stateChanged(int i)
+{
+    if(i == Qt::Checked)
+    {
+        mBorderFilter.enable();
+    }
+    else if(i == Qt::Unchecked)
+    {
+        mBorderFilter.disable();
+    }
+    mUpdateImageCallback();
+}
+
+void FilterBeforeBox::on_filterBorderParamSize_valueChanged(int i)
+{
+    // 2* because undistored has problem with sizes not dividable  of 4
+    mBorderFilter.getBorderSize().setValue(2 * i);
+    mUpdateImageCallback();
+}
+
+void FilterBeforeBox::on_filterBorderParamCol_clicked()
+{
+    QColor color = QColorDialog::getColor(
+        QColor(
+            mBorderFilter.getBorderColR().getValue(),
+            mBorderFilter.getBorderColG().getValue(),
+            mBorderFilter.getBorderColB().getValue()),
+        this);
+    mBorderFilter.getBorderColR().setValue(color.red());
+    mBorderFilter.getBorderColG().setValue(color.green());
+    mBorderFilter.getBorderColB().setValue(color.blue());
+    mUpdateImageCallback();
+}
+
+void FilterBeforeBox::on_filterSwap_stateChanged(int i)
+{
+    if(i == Qt::Checked)
+    {
+        mSwapFilter.enable();
+    }
+    else if(i == Qt::Unchecked)
+    {
+        mSwapFilter.disable();
+    }
+    mUpdateImageCallback();
+}
+
+void FilterBeforeBox::on_filterSwapH_stateChanged(int i)
+{
+    mSwapFilter.getSwapHorizontally().setValue(i == Qt::Checked);
+
+    mUpdateImageCallback();
+}
+
+void FilterBeforeBox::on_filterSwapV_stateChanged(int i)
+{
+    mSwapFilter.getSwapVertically().setValue(i == Qt::Checked);
+
+    mUpdateImageCallback();
+}
+
+void FilterBeforeBox::on_filterBg_stateChanged(int i)
+{
+    toggleBackgroundUi(static_cast<Qt::CheckState>(i));
+    if(i == Qt::Checked)
+    {
+        mBgFilter.enable();
+    }
+    else
+    {
+        mBgFilter.disable();
+    }
+    mUpdateImageCallback();
+}
+
+void FilterBeforeBox::on_filterBgUpdate_stateChanged(int i)
+{
+    if(i == Qt::Checked)
+    {
+        mBgFilter.setUpdate(true);
+    }
+    else if(i == Qt::Unchecked)
+    {
+        mBgFilter.setUpdate(false);
+    }
+}
+
+void FilterBeforeBox::on_filterBgReset_clicked()
+{
+    mBgFilter.reset();
+    mUpdateImageCallback();
+}
+
+void FilterBeforeBox::on_filterBgShow_stateChanged(int i)
+{
+    if(mBgItem)
+    {
+        mBgItem->setVisible(i);
+        mUpdateImageCallback();
+    }
+}
+
+void FilterBeforeBox::on_filterBgSave_clicked()
+{
+    mBgFilter.save();
+}
+
+void FilterBeforeBox::on_filterBgLoad_clicked()
+{
+    mBgFilter.load();
+    mUpdateImageCallback();
 }

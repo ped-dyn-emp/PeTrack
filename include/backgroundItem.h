@@ -23,6 +23,7 @@
 
 class Petrack;
 class Control;
+class FilterBeforeBox;
 class Tracker;
 
 class BackgroundItem : public QGraphicsItem
@@ -32,7 +33,7 @@ private:
     QImage  *mImage;
 
 public:
-    BackgroundItem(QWidget *wParent, QGraphicsItem *parent = nullptr);
+    BackgroundItem(QWidget *wParent, QGraphicsItem *parent, FilterBeforeBox &filterBefore);
     QRectF boundingRect() const;
     void   paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };

@@ -31,6 +31,7 @@
 class QGraphicsScene;
 class QDomElement;
 class IntrinsicBox;
+class FilterBeforeBox;
 namespace Ui
 {
 class Control;
@@ -47,7 +48,8 @@ public:
         reco::Recognizer &recognizer,
         RoiItem          &trackRoiItem,
         RoiItem          &recoRoiItem,
-        MissingFrames    &missingFrames);
+        MissingFrames    &missingFrames,
+        FilterBeforeBox  *filterBefore);
     Control(
         QWidget          &parent,
         QGraphicsScene   &scene,
@@ -55,7 +57,8 @@ public:
         RoiItem          &trackRoiItem,
         RoiItem          &recoRoiItem,
         Ui::Control      *ui,
-        MissingFrames    &missingFrames);
+        MissingFrames    &missingFrames,
+        FilterBeforeBox  *filterBefore);
 
     void setScene(QGraphicsScene *sc);
 
@@ -547,24 +550,7 @@ private slots:
     void on_roiShow_stateChanged(int i);
     void on_roiFix_stateChanged(int i);
 
-    void on_filterBrightContrast_stateChanged(int i);
-    void on_filterContrastParam_valueChanged(int i);
-    void on_filterBrightParam_valueChanged(int i);
-    void on_filterBorder_stateChanged(int i);
-    void on_filterBorderParamSize_valueChanged(int i);
-    void on_filterBorderParamCol_clicked();
-    void on_filterBg_stateChanged(int i);
-    void on_filterBgShow_stateChanged(int i);
-    void on_filterBgUpdate_stateChanged(int i);
-    void on_filterBgReset_clicked();
-    void on_filterBgSave_clicked();
-    void on_filterBgLoad_clicked();
-    void on_filterSwap_stateChanged(int i);
-    void on_filterSwapH_stateChanged(int i);
-    void on_filterSwapV_stateChanged(int i);
-
     void on_intrinsicParamsChanged(IntrinsicCameraParams params);
-
 
     void on_coordShow_stateChanged(int i);
     void on_coordFix_stateChanged(int i);
@@ -645,11 +631,12 @@ signals:
     void userChangedRecoMethod(reco::RecognitionMethod method);
 
 private:
-    Petrack        *mMainWindow;
-    Ui::Control    *mUi;
-    IntrinsicBox   *mIntr;
-    QGraphicsScene *mScene;
-    bool            mColorChanging;
+    Petrack         *mMainWindow;
+    Ui::Control     *mUi;
+    IntrinsicBox    *mIntr;
+    FilterBeforeBox *mFilterBefore;
+    QGraphicsScene  *mScene;
+    bool             mColorChanging;
     bool mIndexChanging; // shows, if the index of the color model is really changing; nor while constructor (initialer
                          // durchlauf) and may be while loading xml file
     bool mLoading;       // shows, if new project is just loading
