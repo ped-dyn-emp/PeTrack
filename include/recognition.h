@@ -303,9 +303,8 @@ namespace detail
         const ColorBlob   &blob,
         const Vec2F        offset);
 
-    void findCodeMarker(
+    QList<TrackPoint> findCodeMarker(
         cv::Mat                     &img,
-        QList<TrackPoint>           &crossList,
         RecognitionMethod            recoMethod,
         const CodeMarkerOptions     &opt,
         const IntrinsicCameraParams &intrinsicCameraParams);

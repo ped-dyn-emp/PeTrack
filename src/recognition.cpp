@@ -661,7 +661,8 @@ void detail::refineWithAruco(
         // TODO: Use Reference to actual codeMarkerOptions in MulticolorMarkerOptions
         // NOTE: For now, add as parameter of findMulticolorMarker
         codeOpt.setOffsetCropRect2Roi(offsetCropRect2Roi);
-        findCodeMarker(subImg, crossList, options.method, codeOpt, intrinsicCameraParams);
+        QList<TrackPoint> detectedCodes = findCodeMarker(subImg, options.method, codeOpt, intrinsicCameraParams);
+        crossList.append(detectedCodes);
         codeOpt.setOffsetCropRect2Roi({0, 0});
 
         resolveMoreThanOneCode(lengthini, crossList, blob, offsetCropRect2Roi);
@@ -1022,22 +1023,20 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *contro
 
 /**
  * @brief uses OpenCV libraries to detect Aruco CodeMarkers
- * @param img
- * @param crossList[out] list of detected TrackPoints
- * @param controlWidget
+ * @param img image to find codes in
  * @param opt arucomarker parameters used for detection
  * @param intrinsicCameraParams used for estimating arucomarker orientation
+ * @return list of all detected codes in given image
  */
-void detail::findCodeMarker(
+QList<TrackPoint> detail::findCodeMarker(
     cv::Mat                     &img,
-    QList<TrackPoint>           &crossList,
     RecognitionMethod            recoMethod,
     const CodeMarkerOptions     &opt,
     const IntrinsicCameraParams &intrinsicCameraParams)
 {
     CodeMarkerItem *codeMarkerItem = opt.getCodeMarkerItem();
     Control        *controlWidget  = opt.getControlWidget();
-    const auto     &par            = opt.getDetectorParams();
+    const auto     &parameters     = opt.getDetectorParams();
 
     cv::Ptr<cv::aruco::Dictionary> dictionary =
         cv::aruco::getPredefinedDictionary(cv::aruco::PREDEFINED_DICTIONARY_NAME(opt.getIndexOfMarkerDict()));
@@ -1047,97 +1046,93 @@ void detail::findCodeMarker(
         dictionary = detail::getDictMip36h12();
     }
 
-    cv::Ptr<cv::aruco::DetectorParameters> detectorParams = cv::aruco::DetectorParameters::create();
 
-    double minMarkerPerimeterRate = 0.03, maxMarkerPerimeterRate = 4, minCornerDistanceRate = 0.05,
-           minMarkerDistanceRate = 0.05;
+    double minMarkerPerimeterRate = std::numeric_limits<double>::quiet_NaN();
+    double maxMarkerPerimeterRate = std::numeric_limits<double>::quiet_NaN();
+    double minCornerDistanceRate  = parameters.getMinCornerDistance();
+    double minMarkerDistanceRate  = parameters.getMinMarkerDistance();
 
     Petrack *mainWindow = controlWidget->getMainWindow();
 
-    int bS = mainWindow->getImageBorderSize();
+    int borderSize = mainWindow->getImageBorderSize();
 
-    if(controlWidget->getCalibCoordDimension() == 0) // 3D
+    // 3D - Case
+    if(controlWidget->getCalibCoordDimension() == 0)
     {
         QRect rect(
             myRound(mainWindow->getRecoRoiItem()->rect().x()),
             myRound(mainWindow->getRecoRoiItem()->rect().y()),
             myRound(mainWindow->getRecoRoiItem()->rect().width()),
             myRound(mainWindow->getRecoRoiItem()->rect().height()));
-        QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(), rect.y(), controlWidget->getDefaultHeight()),
-                p2 = mainWindow->getImageItem()->getCmPerPixel(
-                    rect.x() + rect.width(), rect.y(), controlWidget->getDefaultHeight()),
-                p3 = mainWindow->getImageItem()->getCmPerPixel(
-                    rect.x(), rect.y() + rect.height(), controlWidget->getDefaultHeight()),
-                p4 = mainWindow->getImageItem()->getCmPerPixel(
-                    rect.x() + rect.width(), rect.y() + rect.height(), controlWidget->getDefaultHeight());
+        QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(), rect.y(), controlWidget->getDefaultHeight());
+        QPointF p2 = mainWindow->getImageItem()->getCmPerPixel(
+            rect.x() + rect.width(), rect.y(), controlWidget->getDefaultHeight());
+        QPointF p3 = mainWindow->getImageItem()->getCmPerPixel(
+            rect.x(), rect.y() + rect.height(), controlWidget->getDefaultHeight());
+        QPointF p4 = mainWindow->getImageItem()->getCmPerPixel(
+            rect.x() + rect.width(), rect.y() + rect.height(), controlWidget->getDefaultHeight());
 
-        double cmPerPixel_min = std::min(
-            std::min(std::min(p1.x(), p1.y()), std::min(p2.x(), p2.y())),
-            std::min(std::min(p3.x(), p3.y()), std::min(p4.x(), p4.y())));
-        double cmPerPixel_max = std::max(
-            std::max(std::max(p1.x(), p1.y()), std::max(p2.x(), p2.y())),
-            std::max(std::max(p3.x(), p3.y()), std::max(p4.x(), p4.y())));
+        double cmPerPixelMin = std::min({p1.x(), p1.y(), p2.x(), p2.y(), p3.x(), p3.y(), p4.x(), p4.y()});
+        double cmPerPixelMax = std::max({p1.x(), p1.y(), p2.x(), p2.y(), p3.x(), p3.y(), p4.x(), p4.y()});
 
         if(recoMethod ==
            RecognitionMethod::Code) // for usage of codemarker with CodeMarker-function (-> without MulticolorMarker)
         {
             minMarkerPerimeterRate =
-                (par.getMinMarkerPerimeter() * 4. / cmPerPixel_max) / std::max(rect.width(), rect.height());
+                (parameters.getMinMarkerPerimeter() * 4. / cmPerPixelMax) / std::max(rect.width(), rect.height());
             maxMarkerPerimeterRate =
-                (par.getMaxMarkerPerimeter() * 4. / cmPerPixel_min) / std::max(rect.width(), rect.height());
+                (parameters.getMaxMarkerPerimeter() * 4. / cmPerPixelMin) / std::max(rect.width(), rect.height());
         }
         else if(recoMethod == RecognitionMethod::MultiColor) // for usage of codemarker with MulticolorMarker
         {
-            minMarkerPerimeterRate = (par.getMinMarkerPerimeter() * 4. / cmPerPixel_max) / std::max(img.cols, img.rows);
-            maxMarkerPerimeterRate = (par.getMaxMarkerPerimeter() * 4. / cmPerPixel_min) / std::max(img.cols, img.rows);
+            minMarkerPerimeterRate =
+                (parameters.getMinMarkerPerimeter() * 4. / cmPerPixelMax) / std::max(img.cols, img.rows);
+            maxMarkerPerimeterRate =
+                (parameters.getMaxMarkerPerimeter() * 4. / cmPerPixelMin) / std::max(img.cols, img.rows);
         }
-
-        minCornerDistanceRate = par.getMinCornerDistance();
-        minMarkerDistanceRate = par.getMinMarkerDistance();
     }
     else // 2D
     {
-        double cmPerPixel      = mainWindow->getImageItem()->getCmPerPixel();
-        minMarkerPerimeterRate = (par.getMinMarkerPerimeter() * 4 / cmPerPixel) /
-                                 std::max(mainWindow->getImage()->width() - bS, mainWindow->getImage()->height() - bS);
-        maxMarkerPerimeterRate = (par.getMaxMarkerPerimeter() * 4 / cmPerPixel) /
-                                 std::max(mainWindow->getImage()->width() - bS, mainWindow->getImage()->height() - bS);
-
-        minCornerDistanceRate = par.getMinCornerDistance();
-        minMarkerDistanceRate = par.getMinMarkerDistance();
+        double cmPerPixel = mainWindow->getImageItem()->getCmPerPixel();
+        minMarkerPerimeterRate =
+            (parameters.getMinMarkerPerimeter() * 4 / cmPerPixel) /
+            std::max(mainWindow->getImage()->width() - borderSize, mainWindow->getImage()->height() - borderSize);
+        maxMarkerPerimeterRate =
+            (parameters.getMaxMarkerPerimeter() * 4 / cmPerPixel) /
+            std::max(mainWindow->getImage()->width() - borderSize, mainWindow->getImage()->height() - borderSize);
     }
 
-    detectorParams->adaptiveThreshWinSizeMin    = par.getAdaptiveThreshWinSizeMin();
-    detectorParams->adaptiveThreshWinSizeMax    = par.getAdaptiveThreshWinSizeMax();
-    detectorParams->adaptiveThreshWinSizeStep   = par.getAdaptiveThreshWinSizeStep();
-    detectorParams->adaptiveThreshConstant      = par.getAdaptiveThreshConstant();
+    auto detectorParams = cv::aruco::DetectorParameters::create();
+
+    detectorParams->adaptiveThreshWinSizeMin    = parameters.getAdaptiveThreshWinSizeMin();
+    detectorParams->adaptiveThreshWinSizeMax    = parameters.getAdaptiveThreshWinSizeMax();
+    detectorParams->adaptiveThreshWinSizeStep   = parameters.getAdaptiveThreshWinSizeStep();
+    detectorParams->adaptiveThreshConstant      = parameters.getAdaptiveThreshConstant();
     detectorParams->minMarkerPerimeterRate      = minMarkerPerimeterRate;
     detectorParams->maxMarkerPerimeterRate      = maxMarkerPerimeterRate;
-    detectorParams->polygonalApproxAccuracyRate = par.getPolygonalApproxAccuracyRate();
+    detectorParams->polygonalApproxAccuracyRate = parameters.getPolygonalApproxAccuracyRate();
     detectorParams->minCornerDistanceRate       = minCornerDistanceRate;
-    detectorParams->minDistanceToBorder         = par.getMinDistanceToBorder();
+    detectorParams->minDistanceToBorder         = parameters.getMinDistanceToBorder();
     detectorParams->minMarkerDistanceRate       = minMarkerDistanceRate;
     // No refinement is default value
     // TODO Check if this is the best MEthod for our usecase
-    if(par.getDoCornerRefinement())
+    if(parameters.getDoCornerRefinement())
     {
         detectorParams->cornerRefinementMethod = cv::aruco::CornerRefineMethod::CORNER_REFINE_SUBPIX;
     }
-    detectorParams->cornerRefinementWinSize               = par.getCornerRefinementWinSize();
-    detectorParams->cornerRefinementMaxIterations         = par.getCornerRefinementMaxIterations();
-    detectorParams->cornerRefinementMinAccuracy           = par.getCornerRefinementMinAccuracy();
-    detectorParams->markerBorderBits                      = par.getMarkerBorderBits();
-    detectorParams->perspectiveRemovePixelPerCell         = par.getPerspectiveRemovePixelPerCell();
-    detectorParams->perspectiveRemoveIgnoredMarginPerCell = par.getPerspectiveRemoveIgnoredMarginPerCell();
-    detectorParams->maxErroneousBitsInBorderRate          = par.getMaxErroneousBitsInBorderRate();
-    detectorParams->minOtsuStdDev                         = par.getMinOtsuStdDev();
-    detectorParams->errorCorrectionRate                   = par.getErrorCorrectionRate();
+    detectorParams->cornerRefinementWinSize               = parameters.getCornerRefinementWinSize();
+    detectorParams->cornerRefinementMaxIterations         = parameters.getCornerRefinementMaxIterations();
+    detectorParams->cornerRefinementMinAccuracy           = parameters.getCornerRefinementMinAccuracy();
+    detectorParams->markerBorderBits                      = parameters.getMarkerBorderBits();
+    detectorParams->perspectiveRemovePixelPerCell         = parameters.getPerspectiveRemovePixelPerCell();
+    detectorParams->perspectiveRemoveIgnoredMarginPerCell = parameters.getPerspectiveRemoveIgnoredMarginPerCell();
+    detectorParams->maxErroneousBitsInBorderRate          = parameters.getMaxErroneousBitsInBorderRate();
+    detectorParams->minOtsuStdDev                         = parameters.getMinOtsuStdDev();
+    detectorParams->errorCorrectionRate                   = parameters.getErrorCorrectionRate();
 
     std::vector<int>                      ids;
-    std::vector<std::vector<cv::Point2f>> corners, rejected;
-    ids.clear();
-    corners.clear();
-    rejected.clear();
+    std::vector<std::vector<cv::Point2f>> corners;
+    std::vector<std::vector<cv::Point2f>> rejected;
 
     cv::aruco::detectMarkers(img, dictionary, corners, ids, detectorParams, rejected);
 
@@ -1146,34 +1141,43 @@ void detail::findCodeMarker(
 
     if(ids.empty())
     {
-        // if no markers are found return to prevent opencv errors because of empty corners and thus empty rvecs vectors
-        return;
+        // if no markers are found return to prevent opencv errors because of empty corners and thus empty
+        // rotationVectors vectors
+        return {};
     }
 
     // value only relevant for axis length when drawing axes
     float                  markerLength = (float) opt.getDetectorParams().getMinCornerDistance();
-    std::vector<cv::Vec3d> rvecs, tvecs;
+    std::vector<cv::Vec3d> rotationVectors;
+    std::vector<cv::Vec3d> translationVectors;
     cv::Mat                cameraMatrix = intrinsicCameraParams.cameraMatrix;
     cv::Mat                distCoeff    = cv::Mat::zeros(cv::Size(1, 5), CV_32F);
-    cv::aruco::estimatePoseSingleMarkers(corners, markerLength, cameraMatrix, distCoeff, rvecs, tvecs);
+    cv::aruco::estimatePoseSingleMarkers(
+        corners, markerLength, cameraMatrix, distCoeff, rotationVectors, translationVectors);
+
+    // store all detected codes as TrackPoints in a list to return
+    QList<TrackPoint> trackPoints;
 
     // detected code markers
     for(size_t i = 0; i < ids.size(); i++)
     {
-        double x =
-            (corners.at(i).at(0).x + corners.at(i).at(1).x + corners.at(i).at(2).x + corners.at(i).at(3).x) * 0.25;
-        double y =
-            (corners.at(i).at(0).y + corners.at(i).at(1).y + corners.at(i).at(2).y + corners.at(i).at(3).y) * 0.25;
+        const auto &codeCorners = corners.at(i);
+
+        double codeX = (codeCorners.at(0).x + codeCorners.at(1).x + codeCorners.at(2).x + codeCorners.at(3).x) / 4.;
+        double codeY = (codeCorners.at(0).y + codeCorners.at(1).y + codeCorners.at(2).y + codeCorners.at(3).y) / 4.;
 
         cv::Matx<double, 3, 3> rotMat;
-        cv::Rodrigues(rvecs[i], rotMat);
+        cv::Rodrigues(rotationVectors[i], rotMat);
 
         cv::Vec3d orientation = cv::normalize(rotMat * cv::Vec3d(0, 1, 0));
 
-        TrackPoint trackPoint(Vec2F(x, y), 100, ids.at(i)); // 100 beste qualitaet
+        // code marker should have the best possible quality i.e. 100
+        TrackPoint trackPoint(Vec2F(codeX, codeY), 100, ids.at(i));
         trackPoint.setOrientation(orientation);
-        crossList.append(std::move(trackPoint));
+        trackPoints.append(trackPoint);
     }
+
+    return trackPoints;
 }
 
 void findContourMarker(
@@ -1368,7 +1372,7 @@ QList<TrackPoint> Recognizer::getMarkerPos(
             findColorMarker(tImg, crossList, controlWidget);
             break;
         case RecognitionMethod::Code:
-            findCodeMarker(tImg, crossList, mRecoMethod, mCodeMarkerOptions, intrinsicCameraParams);
+            crossList = findCodeMarker(tImg, mRecoMethod, mCodeMarkerOptions, intrinsicCameraParams);
             break;
         case RecognitionMethod::Casern:
             [[fallthrough]];
