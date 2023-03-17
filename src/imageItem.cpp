@@ -66,7 +66,15 @@ void ImageItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 
 void ImageItem::setImage(QImage *img)
 {
+    if(img->isNull())
+    {
+        mImage = nullptr;
+        setTransform(QTransform());
+        mMainWindow->updateSceneRect();
+        return;
+    }
     mImage = img;
+
 
     QTransform matrix;
     matrix.translate(

@@ -366,11 +366,16 @@ void Petrack::updateSceneRect()
 {
     double iW = 0, iH = 0, bS = 0;
 
-    if(mImage)
+    if(mImage && !mImage->isNull())
     {
         iW = mImage->width();
         iH = mImage->height();
         bS = getImageBorderSize();
+    }
+    else
+    {
+        mScene->setSceneRect(mScene->itemsBoundingRect());
+        return;
     }
 
     if(mControlWidget->getCalibCoordShow())
@@ -558,9 +563,23 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     // open koennte am schluss passieren, dann wuerde nicht erst unveraendertes bild angezeigt,
     // dafuer koennte es aber sein, dass werte zb bei fx nicht einstellbar sind!
     mSeqFileName = seq;
-    if(openSeq && (seq != ""))
+    if(openSeq)
     {
-        openSequence(seq); // wenn leer, dann kommt abfrage hoch, welche datei; abbrechen, wenn aktuelle gewuenscht
+        if(seq != "")
+        {
+            openSequence(seq);
+        }
+        else
+        {
+            mAnimation->reset();
+            mImg         = cv::Mat();
+            mImgFiltered = cv::Mat();
+            delete mImage;
+            mImage = nullptr;
+            updateSequence();
+            mLogoItem->ensureVisible();
+            mLogoItem->fadeIn();
+        }
     }
 
     mMissingFrames.setExecuted(missingFramesExecuted);
@@ -926,14 +945,7 @@ void Petrack::openCameraLiveStream(int camID /* =-1*/)
     updateSequence();
     updateWindowTitle();
     mPlayerWidget->setFPS(mAnimation->getFPS());
-    if(mOpenGLAct->isChecked())
-    {
-        mLogoItem->fadeOut(1);
-    }
-    else
-    {
-        mLogoItem->fadeOut(50);
-    }
+    mLogoItem->fadeOut();
     updateCoord();
 
     mPlayerWidget->play(PlayerState::FORWARD);
@@ -1003,14 +1015,7 @@ void Petrack::openSequence(QString fileName) // default fileName = ""
         updateSequence();
         updateWindowTitle();
         mPlayerWidget->setFPS(mAnimation->getFPS());
-        if(mOpenGLAct->isChecked())
-        {
-            mLogoItem->fadeOut(1);
-        }
-        else
-        {
-            mLogoItem->fadeOut(50);
-        }
+        mLogoItem->fadeOut();
         updateCoord();
         mMissingFrames.reset();
     }
@@ -1688,8 +1693,8 @@ void Petrack::antialias()
 void Petrack::opengl()
 {
     mView->setViewport(mOpenGLAct->isChecked() ? new QGLWidget(QGLFormat(QGL::SampleBuffers)) : new QWidget);
-
-    // alten freigeben wegen new????
+    // need full viewport update for fade out animation of LogoItem to work
+    mView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 }
 void Petrack::reset()
 {
@@ -3550,22 +3555,35 @@ void Petrack::updateSequence()
     QImage *oldImage = mImage;
 
     QSize size = mAnimation->getSize();
-    size.setWidth(size.width() + 2 * getImageBorderSize()); // border is inside the mImage!
-    size.setHeight(size.height() + 2 * getImageBorderSize());
-    mImage = new QImage(size, QImage::Format_RGB888); // 32); //wird in updateImage gemacht
-
-    // set roi for recognition if image size changes or roi is zero
-    // in oldImage steckt border drin, mIplImg->height zeigt noch auf altes ursprungsbild
-    // mRecognitionRoiItem->rect().width() != 0 && oldImage == NULL wenn projektdatei eingelesen wird!!!!!
-    if((mRecognitionRoiItem->rect().width() == 0) || // default while initialization, after that >= MIN_SIZE
-       (oldImage && ((oldImage->width() != mImage->width()) || (oldImage->height() != mImage->height()))))
+    if(size != QSize{0, 0})
     {
-        mRecognitionRoiItem->setRect(-getImageBorderSize(), -getImageBorderSize(), mImage->width(), mImage->height());
+        size.setWidth(size.width() + 2 * getImageBorderSize()); // border is inside the mImage!
+        size.setHeight(size.height() + 2 * getImageBorderSize());
     }
-    if((mTrackingRoiItem->rect().width() == 0) ||
-       (oldImage && ((oldImage->width() != mImage->width()) || (oldImage->height() != mImage->height()))))
+    mImage = new QImage(size, QImage::Format_RGB888);
+
+
+    if(size == QSize{0, 0})
     {
-        mTrackingRoiItem->setRect(-getImageBorderSize(), -getImageBorderSize(), mImage->width(), mImage->height());
+        // separate handling because border should currently be ignored
+        // will be applied when a sequence is loaded in
+        mRecognitionRoiItem->setRect(0, 0, 0, 0);
+        mTrackingRoiItem->setRect(0, 0, 0, 0);
+    }
+    else
+    {
+        const bool imageSizeChanged = oldImage && (oldImage->rect() != mImage->rect());
+        // set roi for recognition if image size changes or roi is zero
+        if((mRecognitionRoiItem->rect().width() == 0) || imageSizeChanged)
+        {
+            mRecognitionRoiItem->setRect(
+                -getImageBorderSize(), -getImageBorderSize(), mImage->width(), mImage->height());
+        }
+
+        if((mTrackingRoiItem->rect().width() == 0) || imageSizeChanged)
+        {
+            mTrackingRoiItem->setRect(-getImageBorderSize(), -getImageBorderSize(), mImage->width(), mImage->height());
+        }
     }
 
     cv::Size size2;
