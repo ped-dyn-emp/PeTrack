@@ -163,9 +163,10 @@ void setColorParameter(const QColor &fromColor, const QColor &toColor, bool inve
 Vec2F autoCorrectColorMarker(const Vec2F &boxImageCentre, Control *controlWidget)
 {
     Petrack    *mainWindow = controlWidget->getMainWindow();
+    auto        extrParams = controlWidget->getExtrinsicParameters();
     cv::Point2f tp         = mainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(
-        -controlWidget->getCalibCoord3DTransX() - controlWidget->getCalibExtrTrans1(),
-        -controlWidget->getCalibCoord3DTransY() - controlWidget->getCalibExtrTrans2(),
+        -controlWidget->getCalibCoord3DTransX() - extrParams.trans1,
+        -controlWidget->getCalibCoord3DTransY() - extrParams.trans2,
         0));
     Vec2F       pixUnderCam(tp.x, tp.y); // CvPoint
     Vec2F       boxImageCentreWithBorder = boxImageCentre;

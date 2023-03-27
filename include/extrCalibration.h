@@ -19,11 +19,14 @@
 #ifndef EXTRCALIBRATION_H
 #define EXTRCALIBRATION_H
 
+#include "extrinsicParameters.h"
+
 #include <QDomElement>
 #include <QString>
 #include <array>
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include <optional>
 #include <vector>
 
 class Petrack;
@@ -165,30 +168,30 @@ private:
 public:
     ExtrCalibration(PersonStorage &storage);
     ~ExtrCalibration();
-    void                            setMainWindow(Petrack *mw);
-    bool                            isEmptyExtrCalibFile();
-    bool                            isSetExtrCalib();
-    void                            setExtrCalibFile(const QString &f);
-    QString                         getExtrCalibFile();
-    bool                            openExtrCalibFile();
-    bool                            loadExtrCalibFile();
-    bool                            saveExtrCalibPoints();
-    bool                            fetch2DPoints();
-    void                            calibExtrParams();
-    bool                            calcReprojectionError();
-    virtual cv::Point2f             getImagePoint(cv::Point3f p3d);
-    cv::Point3f                     get3DPoint(const cv::Point2f &p2d, double h) const;
-    cv::Point3f                     transformRT(cv::Point3f p);
-    cv::Vec3d                       camToWorldRotation(const cv::Vec3d &vec) const;
-    bool                            isOutsideImage(cv::Point2f p2d);
-    inline bool                     isOutsideImage(cv::Point3f p3d) { return isOutsideImage(getImagePoint(p3d)); }
-    inline std::vector<cv::Point3f> get3DList() { return points3D; }
-    inline void                     set3DList(std::vector<cv::Point3f> list3D) { this->points3D = list3D; }
-    inline std::vector<cv::Point2f> get2DList() { return points2D; }
-    inline void                     set2DList(std::vector<cv::Point2f> list2D) { this->points2D = list2D; }
-    inline float                    getCamHeight() const { return camHeight; }
-    inline void                     setCamHeight(float cHeight) { this->camHeight = cHeight; }
-    inline ReprojectionError        getReprojectionError()
+    void                               setMainWindow(Petrack *mw);
+    bool                               isEmptyExtrCalibFile();
+    bool                               isSetExtrCalib();
+    void                               setExtrCalibFile(const QString &f);
+    QString                            getExtrCalibFile();
+    std::optional<ExtrinsicParameters> openExtrCalibFile();
+    std::optional<ExtrinsicParameters> loadExtrCalibFile();
+    bool                               saveExtrCalibPoints();
+    std::optional<ExtrinsicParameters> fetch2DPoints();
+    std::optional<ExtrinsicParameters> calibExtrParams();
+    bool                               calcReprojectionError();
+    virtual cv::Point2f                getImagePoint(cv::Point3f p3d);
+    cv::Point3f                        get3DPoint(const cv::Point2f &p2d, double h) const;
+    cv::Point3f                        transformRT(cv::Point3f p);
+    cv::Vec3d                          camToWorldRotation(const cv::Vec3d &vec) const;
+    bool                               isOutsideImage(cv::Point2f p2d);
+    inline bool                        isOutsideImage(cv::Point3f p3d) { return isOutsideImage(getImagePoint(p3d)); }
+    inline std::vector<cv::Point3f>    get3DList() { return points3D; }
+    inline void                        set3DList(std::vector<cv::Point3f> list3D) { this->points3D = list3D; }
+    inline std::vector<cv::Point2f>    get2DList() { return points2D; }
+    inline void                        set2DList(std::vector<cv::Point2f> list2D) { this->points2D = list2D; }
+    inline float                       getCamHeight() const { return camHeight; }
+    inline void                        setCamHeight(float cHeight) { this->camHeight = cHeight; }
+    inline ReprojectionError           getReprojectionError()
     {
         if(!reprojectionError.isValid())
         {

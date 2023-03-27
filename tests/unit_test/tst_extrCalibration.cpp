@@ -19,21 +19,29 @@
 #include "extrCalibration.h"
 #include "petrack.h"
 
+#include <QDomDocument>
 #include <catch2/catch.hpp>
 
 
 // use margin for absolute difference, as epsilon would be relative which is useless when comparing to 0
-constexpr float VEC_MARGIN = 0.01;
+constexpr float VEC_MARGIN = 0.01f;
 
 TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
 {
     Petrack  petrack{"Unknown"};
-    auto     calib   = petrack.getExtrCalibration();
+    auto    *calib   = petrack.getExtrCalibration();
     Control *control = petrack.getControlWidget();
 
-    control->setCalibExtrRot1(0);
-    control->setCalibExtrRot2(0);
-    control->setCalibExtrRot3(0);
+    const QString testConfig{
+        R"(<CONTROL>
+                <CALIBRATION>
+                    <EXTRINSIC_PARAMETERS EXTR_ROT_1="%1" EXTR_ROT_2="%2" EXTR_ROT_3="%3" EXTR_TRANS_1="0" EXTR_TRANS_2="0" EXTR_TRANS_3="0" />
+                </CALIBRATION>
+            </CONTROL>)"};
+
+    QDomDocument doc;
+    doc.setContent(testConfig.arg("0", "0", "0"));
+    control->getXml(doc.documentElement());
 
     SECTION("Identity Coordinate System")
     {
@@ -49,7 +57,8 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
     SECTION("Rotated around z-axis")
     {
         // rotate 90 degrees
-        control->setCalibExtrRot3(PI / 2);
+        doc.setContent(testConfig.arg("0", "0", QString::number(PI / 2)));
+        control->getXml(doc.documentElement());
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 0, 0)) - cv::Vec3d(0, -1, 0)) ==
             Approx(0).margin(VEC_MARGIN));
@@ -67,7 +76,8 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
             Approx(0).margin(VEC_MARGIN));
 
         // negative rotation
-        control->setCalibExtrRot3(-PI);
+        doc.setContent(testConfig.arg("0", "0", QString::number(-PI)));
+        control->getXml(doc.documentElement());
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 0, 0)) - cv::Vec3d(-1, 0, 0)) ==
             Approx(0).margin(VEC_MARGIN));
@@ -80,9 +90,8 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
     SECTION("Wild rotation")
     {
         // vector (1, 1, 1) with length pi/2
-        control->setCalibExtrRot1(0.9067);
-        control->setCalibExtrRot2(0.9067);
-        control->setCalibExtrRot3(0.9067);
+        doc.setContent(testConfig.arg("0.9067", "0.9067", "0.9067"));
+        control->getXml(doc.documentElement());
 
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 1, 1)) - cv::Vec3d(1, 1, 1)) ==
@@ -98,9 +107,14 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
 
         SECTION("Translation should not matter")
         {
-            control->setCalibExtrTrans1(10);
-            control->setCalibExtrTrans2(-20);
-            control->setCalibExtrTrans3(-500);
+            const QString testConfig{
+                R"(<CONTROL>
+                        <CALIBRATION>
+                            <EXTRINSIC_PARAMETERS EXTR_ROT_1="%1" EXTR_ROT_2="%2" EXTR_ROT_3="%3" EXTR_TRANS_1="10" EXTR_TRANS_2="-20" EXTR_TRANS_3="-500" />
+                        </CALIBRATION>
+                    </CONTROL>)"};
+            doc.setContent(testConfig.arg("0.9067", "0.9067", "0.9067"));
+            control->getXml(doc.documentElement());
             REQUIRE(
                 cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 0, 0)) - cv::Vec3d(0.33, -0.24, 0.91)) ==
                 Approx(0).margin(VEC_MARGIN));
@@ -113,9 +127,8 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
 
     SECTION("Another Wild Rotation")
     {
-        control->setCalibExtrRot1(0.5);
-        control->setCalibExtrRot2(-2);
-        control->setCalibExtrRot3(1.1);
+        doc.setContent(testConfig.arg("0.5", "-2", "1.1"));
+        control->getXml(doc.documentElement());
 
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 1, 1)) - cv::Vec3d(0.2, -0.63, -1.6)) ==

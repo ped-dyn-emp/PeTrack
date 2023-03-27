@@ -1,0 +1,301 @@
+/*
+ * PeTrack - Software for tracking pedestrians movement in videos
+ * Copyright (C) 2023 Forschungszentrum Jülich GmbH, IAS-7
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+#include "extrinsicBox.h"
+
+#include "extrCalibration.h"
+#include "helper.h"
+#include "ui_extrinsicBox.h"
+
+#include <QDialogButtonBox>
+#include <QDomElement>
+#include <QMessageBox>
+#include <QStyle>
+#include <utility>
+
+ExtrinsicBox::ExtrinsicBox(
+    QWidget              *parent,
+    Ui::extr             *ui,
+    ExtrCalibration      &extrCalib,
+    std::function<void()> updateCoordCallback) :
+    QGroupBox(parent), mUi(ui), mExtrCalibration(extrCalib), mUpdateCoordCallback(std::move(updateCoordCallback))
+{
+    mUi->setupUi(this);
+    setFocusProxy(mUi->rot1);
+    // use default values from struct as default for UI
+    setExtrinsicParameters(mParams);
+}
+
+ExtrinsicBox::ExtrinsicBox(QWidget *parent, ExtrCalibration &extrCalib, std::function<void()> updateCoordCallback) :
+    ExtrinsicBox(parent, new Ui::extr, extrCalib, std::move(updateCoordCallback))
+{
+}
+
+void ExtrinsicBox::setEnabledExtrParams(bool enable)
+{
+    mUi->rot1->setEnabled(enable);
+    mUi->rot2->setEnabled(enable);
+    mUi->rot3->setEnabled(enable);
+    mUi->trans1->setEnabled(enable);
+    mUi->trans2->setEnabled(enable);
+    mUi->trans3->setEnabled(enable);
+}
+
+const ExtrinsicParameters &ExtrinsicBox::getExtrinsicParameters() const
+{
+    return mParams;
+}
+
+void ExtrinsicBox::setExtrinsicParameters(const ExtrinsicParameters &params)
+{
+    setValue(mUi->trans1, params.trans1);
+    setValue(mUi->trans2, params.trans2);
+    setValue(mUi->trans3, params.trans3);
+    setValue(mUi->rot1, params.rot1);
+    setValue(mUi->rot2, params.rot2);
+    setValue(mUi->rot3, params.rot3);
+}
+
+void ExtrinsicBox::on_extrCalibFetch_clicked()
+{
+    auto newCalib = mExtrCalibration.fetch2DPoints();
+    if(newCalib)
+    {
+        setExtrinsicParameters(*newCalib);
+    }
+}
+
+void ExtrinsicBox::on_coordLoad3DCalibPoints_clicked()
+{
+    auto newCalib = mExtrCalibration.openExtrCalibFile();
+    if(newCalib)
+    {
+        setExtrinsicParameters(*newCalib);
+    }
+    mUpdateCoordCallback();
+}
+
+void ExtrinsicBox::on_rot1_valueChanged(double newVal)
+{
+    mParams.rot1 = newVal;
+    mUpdateCoordCallback();
+}
+
+void ExtrinsicBox::on_rot2_valueChanged(double newVal)
+{
+    mParams.rot2 = newVal;
+    mUpdateCoordCallback();
+}
+
+void ExtrinsicBox::on_rot3_valueChanged(double newVal)
+{
+    mParams.rot3 = newVal;
+    mUpdateCoordCallback();
+}
+
+void ExtrinsicBox::on_trans1_valueChanged(double newVal)
+{
+    mParams.trans1 = newVal;
+    mUpdateCoordCallback();
+}
+
+void ExtrinsicBox::on_trans2_valueChanged(double newVal)
+{
+    mParams.trans2 = newVal;
+    mUpdateCoordCallback();
+}
+
+void ExtrinsicBox::on_trans3_valueChanged(double newVal)
+{
+    mParams.trans3 = newVal;
+    mUpdateCoordCallback();
+}
+
+void ExtrinsicBox::on_extrCalibSave_clicked()
+{
+    mExtrCalibration.saveExtrCalibPoints();
+}
+
+void ExtrinsicBox::on_extrCalibShowError_clicked()
+{
+    QString      out;
+    QDialog      msgBox;
+    QGridLayout *layout = new QGridLayout();
+    msgBox.setLayout(layout);
+    QLabel *tableView = new QLabel(&msgBox);
+    layout->addWidget(tableView, 1, 1);
+    QLabel *titel = new QLabel(&msgBox);
+    titel->setText("<b>Reprojection error for extrinsic calibration:</b>");
+    layout->addWidget(titel, 0, 1);
+
+    if(!mExtrCalibration.getReprojectionError().isValid())
+    {
+        out = QString("No File for extrinsic calibration found!");
+        tableView->setText(out);
+    }
+    else
+    {
+        out                    = QString("<table>"
+                                         "<tr><th></th>"
+                                         "<th>average   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>"
+                                         "<th>std. deviation                          &nbsp;</th>"
+                                         "<th>variance  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>"
+                                         "<th>max       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th></tr>"
+                                         "<tr><td>Point   height: &nbsp;&nbsp;            </td><td> %0 cm</td><td> %1 cm</td><td> %2 "
+                                         "cm</td><td> %3 cm</td></tr>"
+                                         "<tr><td>Default height: <small>[%12 cm]</small> </td><td> %4 cm</td><td> %5 cm</td><td> %6 "
+                                         "cm</td><td> %7 cm</td></tr>"
+                                         "<tr><td>Pixel    error: &nbsp;&nbsp;            </td><td> %8 px</td><td> %9 px</td><td> %10 "
+                                         "px</td><td> %11 px</td></tr>"
+                                         "</table>");
+        const auto &reproError = mExtrCalibration.getReprojectionError().getData();
+        for(double value : reproError)
+        {
+            if(value < 0)
+            {
+                out = out.arg("-");
+            }
+            else
+            {
+                out = out.arg(value);
+            }
+        }
+        tableView->setText(out);
+    }
+
+    msgBox.setWindowTitle("PeTrack");
+    QIcon   icon     = QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation);
+    QLabel *infoIcon = new QLabel(&msgBox);
+    int     iconSize = msgBox.style()->pixelMetric(QStyle::PM_MessageBoxIconSize, nullptr, &msgBox);
+    infoIcon->setPixmap(icon.pixmap(iconSize, iconSize));
+    layout->addWidget(infoIcon, 0, 0);
+    QDialogButtonBox *ok = new QDialogButtonBox(QDialogButtonBox::Ok);
+    layout->addWidget(ok, 2, 1);
+    connect(ok, &QDialogButtonBox::clicked, &msgBox, &QDialog::close);
+    msgBox.setFixedSize(msgBox.sizeHint());
+    msgBox.exec();
+}
+
+void ExtrinsicBox::on_extrCalibShowPoints_clicked()
+{
+    QString     out_str;
+    QTextStream out(&out_str);
+
+    unsigned int i;
+
+    out << "<table><tr><th>Nr.</th><th>3D.x</th><th>3D.y</th><th>3D.z</th><th>2D.x</th><th>2D.y</th></tr>" << Qt::endl;
+
+
+    for(i = 0; i < std::max(mExtrCalibration.get3DList().size(), mExtrCalibration.get2DList().size()); ++i)
+    {
+        out << "<tr>";
+        if(i < mExtrCalibration.get3DList().size())
+        {
+            out << "<td>[" << QString::number(i + 1, 'i', 0) << "]: </td><td>"
+                << QString::number(mExtrCalibration.get3DList().at(i).x, 'f', 1) << "</td><td>"
+                << QString::number(mExtrCalibration.get3DList().at(i).y, 'f', 1) << "</td><td>"
+                << QString::number(mExtrCalibration.get3DList().at(i).z, 'f', 1) << "</td><td>";
+        }
+        else
+        {
+            out << "<td>-</td><td>-</td><td>-</td>";
+        }
+        if(i < mExtrCalibration.get2DList().size())
+        {
+            out << QString::number(mExtrCalibration.get2DList().at(i).x, 'f', 3) << "</td><td>"
+                << QString::number(mExtrCalibration.get2DList().at(i).y, 'f', 3) << "</td>";
+        }
+        else
+        {
+            out << "<td>-</td><td>-</td>";
+        }
+        out << "</tr>" << Qt::endl;
+    }
+    out << "</table>" << Qt::endl;
+
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("PeTrack");
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.setText("Currently loaded point correspondences<br />for extrinsic calibration:");
+    msgBox.setInformativeText(out_str);
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.exec();
+}
+
+/// returns whether the all attributes were consumed
+bool ExtrinsicBox::getXml(QDomElement &subSubElem)
+{
+    if(subSubElem.tagName() == "EXTRINSIC_PARAMETERS")
+    {
+        ExtrinsicParameters params;
+        if(subSubElem.hasAttribute("EXTR_ROT_1"))
+        {
+            params.rot1 = subSubElem.attribute("EXTR_ROT_1").toDouble();
+        }
+        if(subSubElem.hasAttribute("EXTR_ROT_2"))
+        {
+            params.rot2 = subSubElem.attribute("EXTR_ROT_2").toDouble();
+        }
+        if(subSubElem.hasAttribute("EXTR_ROT_3"))
+        {
+            params.rot3 = subSubElem.attribute("EXTR_ROT_3").toDouble();
+        }
+        if(subSubElem.hasAttribute("EXTR_TRANS_1"))
+        {
+            params.trans1 = subSubElem.attribute("EXTR_TRANS_1").toDouble();
+        }
+        if(subSubElem.hasAttribute("EXTR_TRANS_2"))
+        {
+            params.trans2 = subSubElem.attribute("EXTR_TRANS_2").toDouble();
+        }
+        if(subSubElem.hasAttribute("EXTR_TRANS_3"))
+        {
+            params.trans3 = subSubElem.attribute("EXTR_TRANS_3").toDouble();
+        }
+        setExtrinsicParameters(params);
+
+        if(subSubElem.hasAttribute("EXTERNAL_CALIB_FILE"))
+        {
+            if(getExistingFile(QString::fromStdString(subSubElem.attribute("EXTERNAL_CALIB_FILE").toStdString())) != "")
+            {
+                mExtrCalibration.setExtrCalibFile(
+                    getExistingFile(QString::fromStdString(subSubElem.attribute("EXTERNAL_CALIB_FILE").toStdString())));
+                // mMainWindow->isLoading() is true; doesn't perform calibration -> ignore return
+                mExtrCalibration.loadExtrCalibFile();
+            }
+        }
+    }
+    return false;
+}
+
+void ExtrinsicBox::setXml(QDomElement &subSubElem) const
+{
+    subSubElem.setAttribute("EXTR_ROT_1", mUi->rot1->value());
+    subSubElem.setAttribute("EXTR_ROT_2", mUi->rot2->value());
+    subSubElem.setAttribute("EXTR_ROT_3", mUi->rot3->value());
+    subSubElem.setAttribute("EXTR_TRANS_1", mUi->trans1->value());
+    subSubElem.setAttribute("EXTR_TRANS_2", mUi->trans2->value());
+    subSubElem.setAttribute("EXTR_TRANS_3", mUi->trans3->value());
+}
+
+
+ExtrinsicBox::~ExtrinsicBox()
+{
+    delete mUi;
+}

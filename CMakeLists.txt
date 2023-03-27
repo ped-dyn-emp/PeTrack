@@ -390,7 +390,9 @@ target_sources(petrack_core PRIVATE
     include/filterBeforeBox.h
     include/intrinsicBox.h
     include/intrinsicCameraParams.h
-    )
+    include/extrinsicBox.h
+    include/extrinsicParameters.h
+)
 
 target_sources(petrack_core PRIVATE
     src/aboutDialog.cpp
@@ -456,6 +458,7 @@ target_sources(petrack_core PRIVATE
     src/intrinsicBox.cpp
     src/filterBeforeBox.cpp
     src/intrinsicCameraParams.cpp
+    src/extrinsicBox.cpp
     ui/about.ui
     ui/codeMarker.ui
     ui/colorMarker.ui
@@ -467,6 +470,7 @@ target_sources(petrack_core PRIVATE
     ui/moCapSelectionWidget.ui
     ui/filterBeforeBox.ui
     ui/intrinsicBox.ui
+    ui/extrinsicBox.ui
 )
 
 target_sources(petrack PRIVATE

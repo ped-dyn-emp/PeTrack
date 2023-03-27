@@ -558,7 +558,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                     rect,
                                     Qt::AlignHCenter,
                                     QString("-\n%2").arg(
-                                        -mControlWidget->getCalibExtrTrans3() - tp.sp().z(), 6, 'f', 1));
+                                        -mControlWidget->getExtrinsicParameters().trans3 - tp.sp().z(), 6, 'f', 1));
                             }
                             else
                             {
@@ -577,7 +577,8 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                     Qt::AlignHCenter,
                                     QString("%1\n%2")
                                         .arg(height, 6, 'f', 1)
-                                        .arg(-mControlWidget->getCalibExtrTrans3() - tp.sp().z(), 6, 'f', 1));
+                                        .arg(
+                                            -mControlWidget->getExtrinsicParameters().trans3 - tp.sp().z(), 6, 'f', 1));
                             }
                             else
                             {
@@ -634,7 +635,8 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                             if(tp.sp().z() > 0)
                             {
                                 p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(
-                                    cv::Point2f(tp.x(), tp.y()), -mControlWidget->getCalibExtrTrans3() - tp.sp().z());
+                                    cv::Point2f(tp.x(), tp.y()),
+                                    -mControlWidget->getExtrinsicParameters().trans3 - tp.sp().z());
                             }
                             else
                             {
@@ -676,7 +678,8 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                             if(tp.sp().z() > 0)
                             {
                                 p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(
-                                    cv::Point2f(tp.x(), tp.y()), -mControlWidget->getCalibExtrTrans3() - tp.sp().z());
+                                    cv::Point2f(tp.x(), tp.y()),
+                                    -mControlWidget->getExtrinsicParameters().trans3 - tp.sp().z());
                             }
                             else
                             {
@@ -775,10 +778,11 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                     {
                                         p3d_height_p1 = mMainWindow->getExtrCalibration()->get3DPoint(
                                             cv::Point2f(person.at(j - 1).x(), person.at(j - 1).y()),
-                                            -mControlWidget->getCalibExtrTrans3() - person.at(j - 1).sp().z());
+                                            -mControlWidget->getExtrinsicParameters().trans3 -
+                                                person.at(j - 1).sp().z());
                                         p3d_height_p2 = mMainWindow->getExtrCalibration()->get3DPoint(
                                             cv::Point2f(person.at(j).x(), person.at(j).y()),
-                                            -mControlWidget->getCalibExtrTrans3() - person.at(j).sp().z());
+                                            -mControlWidget->getExtrinsicParameters().trans3 - person.at(j).sp().z());
                                     }
                                     else
                                     {

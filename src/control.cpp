@@ -26,6 +26,7 @@
 #include "colorMarkerWidget.h"
 #include "colorPlot.h"
 #include "colorRangeWidget.h"
+#include "extrinsicBox.h"
 #include "filterBeforeBox.h"
 #include "imageItem.h"
 #include "intrinsicBox.h"
@@ -120,10 +121,25 @@ Control::Control(
 
     ui->verticalLayout_13->insertWidget(1, mIntr);
 
+    mExtr = new ExtrinsicBox(
+        this,
+        *mMainWindow->getExtrCalibration(),
+        [this]()
+        {
+            if(!isLoading())
+            {
+                mMainWindow->updateCoord();
+                mScene->update();
+            }
+        });
+    mExtr->setObjectName(QString::fromUtf8("extr"));
+    ui->verticalLayout_13->insertWidget(2, mExtr);
+
     // integrate new widgets in tabbing order
-    ui->calib->setFocusProxy(ui->rot1);
+    ui->calib->setFocusProxy(ui->coordShow);
     QWidget::setTabOrder(mFilterBefore, mIntr);
-    QWidget::setTabOrder(mIntr, ui->calib);
+    QWidget::setTabOrder(mIntr, mExtr);
+    QWidget::setTabOrder(mExtr, ui->calib);
 
     connect(mIntr, &IntrinsicBox::paramsChanged, this, &Control::on_intrinsicParamsChanged);
 
@@ -652,64 +668,9 @@ void Control::imageSizeChanged(int width, int height, int borderDiff)
     mIntr->imageSizeChanged(width, height, borderDiff);
 }
 
-double Control::getCalibExtrRot1()
+const ExtrinsicParameters &Control::getExtrinsicParameters() const
 {
-    return mUi->rot1->value();
-}
-
-void Control::setCalibExtrRot1(double d)
-{
-    mUi->rot1->setValue(d);
-}
-
-double Control::getCalibExtrRot2()
-{
-    return mUi->rot2->value();
-}
-
-void Control::setCalibExtrRot2(double d)
-{
-    mUi->rot2->setValue(d);
-}
-
-double Control::getCalibExtrRot3()
-{
-    return mUi->rot3->value();
-}
-
-void Control::setCalibExtrRot3(double d)
-{
-    mUi->rot3->setValue(d);
-}
-
-double Control::getCalibExtrTrans1()
-{
-    return mUi->trans1->value();
-}
-
-void Control::setCalibExtrTrans1(double d)
-{
-    mUi->trans1->setValue(d);
-}
-
-double Control::getCalibExtrTrans2()
-{
-    return mUi->trans2->value();
-}
-
-void Control::setCalibExtrTrans2(double d)
-{
-    mUi->trans2->setValue(d);
-}
-
-double Control::getCalibExtrTrans3()
-{
-    return mUi->trans3->value();
-}
-
-void Control::setCalibExtrTrans3(double d)
-{
-    mUi->trans3->setValue(d);
+    return mExtr->getExtrinsicParameters();
 }
 
 
@@ -776,16 +737,6 @@ int Control::getCalibGridScale()
 void Control::setCalibGridScale(int i)
 {
     mUi->gridScale->setValue(i);
-}
-
-void Control::setEnabledExtrParams(bool enable)
-{
-    mUi->rot1->setEnabled(enable);
-    mUi->rot2->setEnabled(enable);
-    mUi->rot3->setEnabled(enable);
-    mUi->trans1->setEnabled(enable);
-    mUi->trans2->setEnabled(enable);
-    mUi->trans3->setEnabled(enable);
 }
 
 void Control::setGridMinMaxTranslation(int minx, int maxx, int miny, int maxy)
@@ -1929,53 +1880,6 @@ void Control::on_intrinsicParamsChanged(IntrinsicCameraParams params)
 
 
 //---------------------------------------
-void Control::on_rot1_valueChanged(double /*arg1*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_rot2_valueChanged(double /*arg1*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_rot3_valueChanged(double /*arg1*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_trans1_valueChanged(double /*arg1*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_trans2_valueChanged(double /*arg1*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_trans3_valueChanged(double /*arg1*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
 
 void Control::on_extCalibPointsShow_stateChanged(int /*arg1*/)
 {
@@ -1985,65 +1889,6 @@ void Control::on_extCalibPointsShow_stateChanged(int /*arg1*/)
     }
 }
 
-void Control::on_extrCalibShowError_clicked()
-{
-    QString      out;
-    QDialog      msgBox;
-    QGridLayout *layout = new QGridLayout();
-    msgBox.setLayout(layout);
-    QLabel *tableView = new QLabel(&msgBox);
-    layout->addWidget(tableView, 1, 1);
-    QLabel *titel = new QLabel(&msgBox);
-    titel->setText("<b>Reprojection error for extrinsic calibration:</b>");
-    layout->addWidget(titel, 0, 1);
-
-    if(!mMainWindow->getExtrCalibration()->getReprojectionError().isValid())
-    {
-        out = QString("No File for extrinsic calibration found!");
-        tableView->setText(out);
-    }
-    else
-    {
-        out                    = QString("<table>"
-                                         "<tr><th></th>"
-                                         "<th>average   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>"
-                                         "<th>std. deviation                          &nbsp;</th>"
-                                         "<th>variance  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>"
-                                         "<th>max       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th></tr>"
-                                         "<tr><td>Point   height: &nbsp;&nbsp;            </td><td> %0 cm</td><td> %1 cm</td><td> %2 "
-                                         "cm</td><td> %3 cm</td></tr>"
-                                         "<tr><td>Default height: <small>[%12 cm]</small> </td><td> %4 cm</td><td> %5 cm</td><td> %6 "
-                                         "cm</td><td> %7 cm</td></tr>"
-                                         "<tr><td>Pixel    error: &nbsp;&nbsp;            </td><td> %8 px</td><td> %9 px</td><td> %10 "
-                                         "px</td><td> %11 px</td></tr>"
-                                         "</table>");
-        const auto &reproError = mMainWindow->getExtrCalibration()->getReprojectionError().getData();
-        for(double value : reproError)
-        {
-            if(value < 0)
-            {
-                out = out.arg("-");
-            }
-            else
-            {
-                out = out.arg(value);
-            }
-        }
-        tableView->setText(out);
-    }
-
-    msgBox.setWindowTitle("PeTrack");
-    QIcon   icon     = QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation);
-    QLabel *infoIcon = new QLabel(&msgBox);
-    int     iconSize = msgBox.style()->pixelMetric(QStyle::PM_MessageBoxIconSize, nullptr, &msgBox);
-    infoIcon->setPixmap(icon.pixmap(iconSize, iconSize));
-    layout->addWidget(infoIcon, 0, 0);
-    QDialogButtonBox *ok = new QDialogButtonBox(QDialogButtonBox::Ok);
-    layout->addWidget(ok, 2, 1);
-    connect(ok, &QDialogButtonBox::clicked, &msgBox, &QDialog::close);
-    msgBox.setFixedSize(msgBox.sizeHint());
-    msgBox.exec();
-}
 
 void Control::on_extVanishPointsShow_stateChanged(int /*arg1*/)
 {
@@ -2052,73 +1897,7 @@ void Control::on_extVanishPointsShow_stateChanged(int /*arg1*/)
         mScene->update();
     }
 }
-void Control::on_coordLoad3DCalibPoints_clicked()
-{
-    mMainWindow->getExtrCalibration()->openExtrCalibFile();
 
-    mMainWindow->updateCoord();
-    mScene->update();
-}
-
-void Control::on_extrCalibSave_clicked()
-{
-    mMainWindow->getExtrCalibration()->saveExtrCalibPoints();
-}
-
-void Control::on_extrCalibFetch_clicked()
-{
-    mMainWindow->getExtrCalibration()->fetch2DPoints();
-}
-
-void Control::on_extrCalibShowPoints_clicked()
-{
-    QString     out_str;
-    QTextStream out(&out_str);
-
-    unsigned int i;
-
-    out << "<table><tr><th>Nr.</th><th>3D.x</th><th>3D.y</th><th>3D.z</th><th>2D.x</th><th>2D.y</th></tr>" << Qt::endl;
-
-
-    for(i = 0; i < std::max(
-                       mMainWindow->getExtrCalibration()->get3DList().size(),
-                       mMainWindow->getExtrCalibration()->get2DList().size());
-        ++i)
-    {
-        out << "<tr>";
-        if(i < mMainWindow->getExtrCalibration()->get3DList().size())
-        {
-            out << "<td>[" << QString::number(i + 1, 'i', 0) << "]: </td><td>"
-                << QString::number(mMainWindow->getExtrCalibration()->get3DList().at(i).x, 'f', 1) << "</td><td>"
-                << QString::number(mMainWindow->getExtrCalibration()->get3DList().at(i).y, 'f', 1) << "</td><td>"
-                << QString::number(mMainWindow->getExtrCalibration()->get3DList().at(i).z, 'f', 1) << "</td><td>";
-        }
-        else
-        {
-            out << "<td>-</td><td>-</td><td>-</td>";
-        }
-        if(i < mMainWindow->getExtrCalibration()->get2DList().size())
-        {
-            out << QString::number(mMainWindow->getExtrCalibration()->get2DList().at(i).x, 'f', 3) << "</td><td>"
-                << QString::number(mMainWindow->getExtrCalibration()->get2DList().at(i).y, 'f', 3) << "</td>";
-        }
-        else
-        {
-            out << "<td>-</td><td>-</td>";
-        }
-        out << "</tr>" << Qt::endl;
-    }
-    out << "</table>" << Qt::endl;
-
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("PeTrack");
-    msgBox.setIcon(QMessageBox::Information);
-    msgBox.setText("Currently loaded point correspondences<br />for extrinsic calibration:");
-    msgBox.setInformativeText(out_str);
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.setDefaultButton(QMessageBox::Ok);
-    msgBox.exec();
-}
 
 //---------------------------------------
 void Control::on_gridTab_currentChanged(int /*index*/)
@@ -2193,13 +1972,13 @@ void Control::on_coordTab_currentChanged(int index)
 {
     if(index == 1)
     {
-        setEnabledExtrParams(false);
+        mExtr->setEnabledExtrParams(false);
         mUi->trackShowGroundPosition->setEnabled(false);
         mUi->trackShowGroundPath->setEnabled(false);
     }
     else
     {
-        setEnabledExtrParams(true);
+        mExtr->setEnabledExtrParams(true);
         mUi->trackShowGroundPosition->setEnabled(true);
         mUi->trackShowGroundPath->setEnabled(true);
     }
@@ -2378,14 +2157,8 @@ void Control::setXml(QDomElement &elem)
     // PATTERN and INTRINSIC_PARAMETERS elements
     mIntr->setXml(subElem);
 
-    subSubElem = (elem.ownerDocument()).createElement("EXTRINSIC_PARAMETERS");
-
-    subSubElem.setAttribute("EXTR_ROT_1", mUi->rot1->value());
-    subSubElem.setAttribute("EXTR_ROT_2", mUi->rot2->value());
-    subSubElem.setAttribute("EXTR_ROT_3", mUi->rot3->value());
-    subSubElem.setAttribute("EXTR_TRANS_1", mUi->trans1->value());
-    subSubElem.setAttribute("EXTR_TRANS_2", mUi->trans2->value());
-    subSubElem.setAttribute("EXTR_TRANS_3", mUi->trans3->value());
+    subSubElem = (subElem.ownerDocument()).createElement("EXTRINSIC_PARAMETERS");
+    mExtr->setXml(subSubElem);
 
     subSubElem.setAttribute("SHOW_CALIB_POINTS", mUi->extCalibPointsShow->isChecked());
 
@@ -2688,7 +2461,7 @@ void Control::setXml(QDomElement &elem)
 }
 
 // read data from xml node
-void Control::getXml(QDomElement &elem)
+void Control::getXml(const QDomElement &elem)
 {
     QDomElement subElem, subSubElem, subSubSubElem;
 
@@ -2708,6 +2481,10 @@ void Control::getXml(QDomElement &elem)
                     // intentionally left blank
                 }
                 else if(mIntr->getXml(subSubElem))
+                {
+                    // intentionally left blank
+                }
+                else if(mExtr->getXml(subSubElem))
                 {
                     // intentionally left blank
                 }
@@ -2742,30 +2519,6 @@ void Control::getXml(QDomElement &elem)
                 }
                 else if(subSubElem.tagName() == "EXTRINSIC_PARAMETERS")
                 {
-                    if(subSubElem.hasAttribute("EXTR_ROT_1"))
-                    {
-                        mUi->rot1->setValue(subSubElem.attribute("EXTR_ROT_1").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("EXTR_ROT_2"))
-                    {
-                        mUi->rot2->setValue(subSubElem.attribute("EXTR_ROT_2").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("EXTR_ROT_3"))
-                    {
-                        mUi->rot3->setValue(subSubElem.attribute("EXTR_ROT_3").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("EXTR_TRANS_1"))
-                    {
-                        mUi->trans1->setValue(subSubElem.attribute("EXTR_TRANS_1").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("EXTR_TRANS_2"))
-                    {
-                        mUi->trans2->setValue(subSubElem.attribute("EXTR_TRANS_2").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("EXTR_TRANS_3"))
-                    {
-                        mUi->trans3->setValue(subSubElem.attribute("EXTR_TRANS_3").toDouble());
-                    }
                     if(subSubElem.hasAttribute("SHOW_CALIB_POINTS"))
                     {
                         mUi->extCalibPointsShow->setCheckState(
@@ -2779,19 +2532,7 @@ void Control::getXml(QDomElement &elem)
                     else
                     {
                         mUi->coordTab->setCurrentIndex(1); //  = 2D
-                        setEnabledExtrParams(false);
-                    }
-                    if(subSubElem.hasAttribute("EXTERNAL_CALIB_FILE"))
-                    {
-                        if(getExistingFile(
-                               QString::fromStdString(subSubElem.attribute("EXTERNAL_CALIB_FILE").toStdString()),
-                               mMainWindow->getProFileName()) != "")
-                        {
-                            mMainWindow->getExtrCalibration()->setExtrCalibFile(getExistingFile(
-                                QString::fromStdString(subSubElem.attribute("EXTERNAL_CALIB_FILE").toStdString()),
-                                mMainWindow->getProFileName()));
-                            mMainWindow->getExtrCalibration()->loadExtrCalibFile();
-                        }
+                        mExtr->setEnabledExtrParams(false);
                     }
 
                     if(subSubElem.hasAttribute("SHOW"))
