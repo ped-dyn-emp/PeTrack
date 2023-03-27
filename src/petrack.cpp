@@ -2646,7 +2646,7 @@ void Petrack::importTracker(QString dest) // default = ""
                 tPoint.setSp(
                     x,
                     y,
-                    -mControlWidget->getCalibExtrTrans3() -
+                    -mControlWidget->getExtrinsicParameters().trans3 -
                         z); // fuer den Abstand zur Kamera in z-Richtung wie bei einer Stereokamera
 
                 // Neue ID ? ==> letzte Person beendet ==> abspeichern

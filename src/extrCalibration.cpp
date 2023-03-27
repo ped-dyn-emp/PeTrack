@@ -75,7 +75,7 @@ QString ExtrCalibration::getExtrCalibFile()
     }
 }
 
-bool ExtrCalibration::openExtrCalibFile()
+std::optional<ExtrinsicParameters> ExtrCalibration::openExtrCalibFile()
 {
     if(mMainWindow)
     {
@@ -97,7 +97,7 @@ bool ExtrCalibration::openExtrCalibFile()
             return loadExtrCalibFile();
         }
     }
-    return false;
+    return std::nullopt;
 }
 
 // following function copied from OpenCV
@@ -152,195 +152,190 @@ static bool isPlanarObjectPoints(cv::InputArray _objectPoints, double threshold 
  *
  * @return
  */
-bool ExtrCalibration::loadExtrCalibFile()
+std::optional<ExtrinsicParameters> ExtrCalibration::loadExtrCalibFile()
 {
-    bool all_ok = true;
-
-    if(!mExtrCalibFile.isEmpty())
+    if(mExtrCalibFile.isEmpty())
     {
-        if(mExtrCalibFile.right(4) == ".3dc" || mExtrCalibFile.right(4) == ".txt")
+        return std::nullopt;
+    }
+
+    if(mExtrCalibFile.right(4) != ".3dc" && mExtrCalibFile.right(4) != ".txt")
+    {
+        PWarning(nullptr, "Unsupported File Type", "Unsupported file extension (supported: .3dc, .txt)");
+        return std::nullopt;
+    }
+
+    QFile file(mExtrCalibFile);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        PCritical(
+            mMainWindow,
+            QObject::tr("Petrack"),
+            QObject::tr("Error: Cannot open %1:\n%2.").arg(mExtrCalibFile, file.errorString()));
+        return std::nullopt;
+    }
+
+    SPDLOG_INFO("Reading 3D calibration data from {} ...", mExtrCalibFile);
+
+    std::vector<cv::Point3f> points3D_tmp;
+    std::vector<cv::Point2f> points2D_tmp;
+
+    QTextStream in(&file);
+    QString     line;
+    int         line_counter = 0, counter;
+    float       x, y, z, px, py;
+    float       zahl;
+    bool        with_2D_data = false, with_3D_data = false, end_loop = false;
+
+    // Exit loop when reaching the end of the file
+    while(!in.atEnd())
+    {
+        // Neue Zeile einlesen
+        line = in.readLine();
+        ++line_counter;
+
+        // Kommentare ueberlesen
+        if(line.startsWith("#", Qt::CaseInsensitive) || line.startsWith(";;", Qt::CaseInsensitive) ||
+           line.startsWith("//", Qt::CaseInsensitive) || line.startsWith("!", Qt::CaseInsensitive))
         {
-            QFile file(mExtrCalibFile);
-            if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            continue;
+        }
+
+        QTextStream stream(&line);
+        counter  = 0;
+        end_loop = false;
+
+        while(!stream.atEnd() && !end_loop)
+        {
+            stream >> zahl;
+            ++counter;
+
+            switch(counter)
             {
-                PCritical(
-                    mMainWindow,
-                    QObject::tr("Petrack"),
-                    QObject::tr("Error: Cannot open %1:\n%2.").arg(mExtrCalibFile, file.errorString()));
-                return false;
-            }
-
-            SPDLOG_INFO("Reading 3D calibration data from {} ...", mExtrCalibFile);
-
-            std::vector<cv::Point3f> points3D_tmp;
-            std::vector<cv::Point2f> points2D_tmp;
-
-            QTextStream in(&file);
-            QString     line;
-            int         line_counter = 0, counter;
-            float       x, y, z, px, py;
-            float       zahl;
-            bool        with_2D_data = false, with_3D_data = false, end_loop = false;
-
-            // Exit loop when reaching the end of the file
-            while(!in.atEnd())
-            {
-                // Neue Zeile einlesen
-                line = in.readLine();
-                ++line_counter;
-
-                // Kommentare ueberlesen
-                if(line.startsWith("#", Qt::CaseInsensitive) || line.startsWith(";;", Qt::CaseInsensitive) ||
-                   line.startsWith("//", Qt::CaseInsensitive) || line.startsWith("!", Qt::CaseInsensitive))
-                {
-                    continue;
-                }
-
-                QTextStream stream(&line);
-                counter  = 0;
-                end_loop = false;
-
-                while(!stream.atEnd() && !end_loop)
-                {
-                    stream >> zahl;
-                    ++counter;
-
-                    switch(counter)
+                case 1:
+                    x = zahl;
+                    if(!with_3D_data)
                     {
-                        case 1:
-                            x = zahl;
-                            if(!with_3D_data)
-                            {
-                                points3D_tmp.clear();
-                                with_3D_data = true;
-                            }
-                            break;
-                        case 2:
-                            y = zahl;
-                            break;
-                        case 3:
-                            z = zahl;
-                            break;
-                        case 4:
-                            px = zahl;
-                            if(!with_2D_data)
-                            {
-                                points2D_tmp.clear();
-                                with_2D_data = true;
-                            }
-                            break;
-                        case 5:
-                            py = zahl;
-                            break;
-                        default:
-                            end_loop = true;
+                        points3D_tmp.clear();
+                        with_3D_data = true;
                     }
-                }
-                if(counter == 1)
-                {
-                    SPDLOG_INFO("Optional number of points in line {} ignored.", line_counter);
-                }
-                else if(counter != 3 && counter != 5)
-                {
-                    SPDLOG_INFO("Something wrong in line {} ({})! Ignored. (counter={})", line_counter, line, counter);
-                }
+                    break;
+                case 2:
+                    y = zahl;
+                    break;
+                case 3:
+                    z = zahl;
+                    break;
+                case 4:
+                    px = zahl;
+                    if(!with_2D_data)
+                    {
+                        points2D_tmp.clear();
+                        with_2D_data = true;
+                    }
+                    break;
+                case 5:
+                    py = zahl;
+                    break;
+                default:
+                    end_loop = true;
+            }
+        }
+        if(counter == 1)
+        {
+            SPDLOG_INFO("Optional number of points in line {} ignored.", line_counter);
+        }
+        else if(counter != 3 && counter != 5)
+        {
+            SPDLOG_INFO("Something wrong in line {} ({})! Ignored. (counter={})", line_counter, line, counter);
+        }
 
-                // 3D daten abspeichern
-                if(with_3D_data && (counter == 3 || counter == 5))
-                {
-                    points3D_tmp.push_back(cv::Point3f(x, y, z));
-                }
-                // 2D daten abspeichern
-                if(with_2D_data && counter == 5)
-                {
-                    points2D_tmp.push_back(cv::Point2f(px, py));
-                }
-            }
-            // Check if there are more than 4 points for calibration in the file
-            if(points3D_tmp.size() < 4)
-            {
-                PCritical(
-                    mMainWindow,
-                    QObject::tr("PeTrack"),
-                    QObject::tr("Error: Not enough points given: %1 (minimum 4 (coplanar) or 6 (not coplanar) "
-                                "needed!). Please check your extrinsic "
-                                "calibration file!")
-                        .arg(points3D_tmp.size()));
-                all_ok = false;
-            }
-            else if(!isPlanarObjectPoints(points3D_tmp) && points3D_tmp.size() < 6)
-            {
-                // Non-planar points use DLT - we need at least 6 points; not only 4
-                PCritical(
-                    mMainWindow,
-                    QObject::tr("PeTrack"),
-                    QObject::tr("Error: Not enough points given: %1 (minimum 4 (coplanar) or 6 (not coplanar) "
-                                "needed!). Please check your extrinsic "
-                                "calibration file!")
-                        .arg(points3D_tmp.size()));
-                all_ok = false;
-            }
-            // Check if 2D points delivered and if the number of 2D and 3D points agree
-            else if(points2D_tmp.size() > 0 && points2D_tmp.size() != points3D_tmp.size())
-            {
-                PCritical(
-                    mMainWindow,
-                    QObject::tr("PeTrack"),
-                    QObject::tr(
-                        "Error: Unsupported File Format in: %1 (number of 3D (%2) and 2D (%3) points disagree!)")
-                        .arg(mExtrCalibFile)
-                        .arg(points3D_tmp.size())
-                        .arg(points2D_tmp.size()));
-                all_ok = false;
-            }
-            // Check if number of loaded 3D points agree with stored 2D points
-            else if(!with_2D_data && points2D.size() > 0 && points3D_tmp.size() != points2D.size())
-            {
-                // ask if stored 2D points should be deleted?
-                int result = PWarning(
-                    mMainWindow,
-                    QObject::tr("PeTrack"),
-                    QObject::tr("Number of 3D points (%1) disagree with number of stored 2D points (%2)!<br />The 2D "
-                                "points will be deleted! You have to fetch new ones from the image!")
-                        .arg(points3D_tmp.size())
-                        .arg(points2D.size()),
-                    PMessageBox::StandardButton::Ok | PMessageBox::StandardButton::Abort);
-                if(result != PMessageBox::StandardButton::Ok)
-                {
-                    all_ok = false;
-                }
-                else
-                {
-                    points2D.clear();
-                }
-            }
-            if(all_ok)
-            {
-                if(with_3D_data)
-                {
-                    points3D = points3D_tmp;
-                }
-                if(with_2D_data)
-                {
-                    points2D = points2D_tmp;
-                }
-            }
+        // 3D daten abspeichern
+        if(with_3D_data && (counter == 3 || counter == 5))
+        {
+            points3D_tmp.push_back(cv::Point3f(x, y, z));
+        }
+        // 2D daten abspeichern
+        if(with_2D_data && counter == 5)
+        {
+            points2D_tmp.push_back(cv::Point2f(px, py));
+        }
+    }
+    // Check if there are more than 4 points for calibration in the file
+    if(points3D_tmp.size() < 4)
+    {
+        PCritical(
+            mMainWindow,
+            QObject::tr("PeTrack"),
+            QObject::tr("Error: Not enough points given: %1 (minimum 4 (coplanar) or 6 (not coplanar) "
+                        "needed!). Please check your extrinsic "
+                        "calibration file!")
+                .arg(points3D_tmp.size()));
+        return std::nullopt;
+    }
+
+    // Non-planar points use DLT - we need at least 6 points; not only 4
+    if(!isPlanarObjectPoints(points3D_tmp) && points3D_tmp.size() < 6)
+    {
+        PCritical(
+            mMainWindow,
+            QObject::tr("PeTrack"),
+            QObject::tr("Error: Not enough points given: %1 (minimum 4 (coplanar) or 6 (not coplanar) "
+                        "needed!). Please check your extrinsic "
+                        "calibration file!")
+                .arg(points3D_tmp.size()));
+        return std::nullopt;
+    }
+
+    // Check if 2D points delivered and if the number of 2D and 3D points agree
+    if(points2D_tmp.size() > 0 && points2D_tmp.size() != points3D_tmp.size())
+    {
+        PCritical(
+            mMainWindow,
+            QObject::tr("PeTrack"),
+            QObject::tr("Error: Unsupported File Format in: %1 (number of 3D (%2) and 2D (%3) points disagree!)")
+                .arg(mExtrCalibFile)
+                .arg(points3D_tmp.size())
+                .arg(points2D_tmp.size()));
+        return std::nullopt;
+    }
+
+    // Check if number of loaded 3D points agree with stored 2D points
+    if(!with_2D_data && points2D.size() > 0 && points3D_tmp.size() != points2D.size())
+    {
+        // ask if stored 2D points should be deleted?
+        int result = PWarning(
+            mMainWindow,
+            QObject::tr("PeTrack"),
+            QObject::tr("Number of 3D points (%1) disagree with number of stored 2D points (%2)!<br />The 2D "
+                        "points will be deleted! You have to fetch new ones from the image!")
+                .arg(points3D_tmp.size())
+                .arg(points2D.size()),
+            PMessageBox::StandardButton::Ok | PMessageBox::StandardButton::Abort);
+        if(result != PMessageBox::StandardButton::Ok)
+        {
+            return std::nullopt;
         }
         else
         {
-            SPDLOG_WARN("unsupported file extension (supported: .3dc, .txt)");
+            points2D.clear();
         }
     }
-    else
+
+    if(with_3D_data)
     {
-        // no calib_file
-        all_ok = false;
+        points3D = points3D_tmp;
     }
-    if(all_ok && !mMainWindow->isLoading())
+    if(with_2D_data)
     {
-        calibExtrParams();
+        points2D = points2D_tmp;
     }
-    return all_ok;
+
+    if(!mMainWindow->isLoading())
+    {
+        return calibExtrParams();
+    }
+    return std::nullopt;
 }
 
 /**
@@ -350,49 +345,37 @@ bool ExtrCalibration::loadExtrCalibFile()
  *
  * @return true if calibration did take place
  */
-bool ExtrCalibration::fetch2DPoints()
+std::optional<ExtrinsicParameters> ExtrCalibration::fetch2DPoints()
 {
-    bool all_ok = true;
     if(!mMainWindow->getTracker() || mPersonStorage.nbPersons() < 4)
     {
         PCritical(
             mMainWindow,
             QObject::tr("Petrack"),
             QObject::tr("Error: At minimum four 3D calibration points needed for 3D calibration."));
-        all_ok = false;
+        return std::nullopt;
     }
-    else
-    {
-        size_t sz_2d = mPersonStorage.nbPersons();
 
-        if(points3D.size() > 0 && sz_2d != points3D.size())
-        {
-            PCritical(
-                mMainWindow,
-                QObject::tr("Petrack"),
-                QObject::tr("Count of 2D-Points (%1) and 3D-Points (%2) disagree").arg(sz_2d).arg(points3D.size()));
-            all_ok = false;
-        }
-        // debout << "Marked 2D-Image-Points: " << endl;
-        if(all_ok)
-        {
-            points2D.clear();
+    size_t sz_2d = mPersonStorage.nbPersons();
 
-            for(int i = 0; i < static_cast<int>(sz_2d); i++)
-            {
-                // debout << "[" << i << "]: (" << mMainWindow->getTracker()->at(i).at(0).x() << ", " <<
-                // mMainWindow->getTracker()->at(i).at(0).y() << ")" << endl;
-                //  Info: Tracker->TrackPerson->TrackPoint->Vec2F
-                points2D.push_back(cv::Point2f(mPersonStorage.at(i).at(0).x(), mPersonStorage.at(i).at(0).y()));
-            }
-        }
-    }
-    if(all_ok)
+    if(points3D.size() > 0 && sz_2d != points3D.size())
     {
-        mPersonStorage.clear();
-        calibExtrParams();
+        PCritical(
+            mMainWindow,
+            QObject::tr("Petrack"),
+            QObject::tr("Count of 2D-Points (%1) and 3D-Points (%2) disagree").arg(sz_2d).arg(points3D.size()));
+        return std::nullopt;
     }
-    return all_ok;
+
+    points2D.clear();
+    for(int i = 0; i < static_cast<int>(sz_2d); i++)
+    {
+        //  Info: Tracker->TrackPerson->TrackPoint->Vec2F
+        points2D.push_back(cv::Point2f(mPersonStorage.at(i).at(0).x(), mPersonStorage.at(i).at(0).y()));
+    }
+
+    mPersonStorage.clear();
+    return calibExtrParams();
 }
 
 /**
@@ -483,123 +466,122 @@ bool ExtrCalibration::isSetExtrCalib()
 /**
  * @brief Extrinsic calibration with help of cv::solvePnP
  */
-void ExtrCalibration::calibExtrParams()
+std::optional<ExtrinsicParameters> ExtrCalibration::calibExtrParams()
 {
-    if(!points3D.empty() && !points2D.empty() && points2D.size() == points3D.size())
+    if(points3D.empty() || points2D.empty() || points2D.size() != points3D.size())
     {
-        int bS = mMainWindow->getImageBorderSize();
-        /* Create Camera-Matrix form Camera-Params in the Petrack-GUI */
-        cv::Mat camMat = mControlWidget->getIntrinsicCameraParams().cameraMatrix;
-        camMat.at<double>(0, 2) -= bS;
-        camMat.at<double>(1, 2) -= bS;
-
-        cv::Mat distMat = cv::Mat::zeros(cv::Size(8, 1), CV_64F);
-
-        /* Create Mat-objects of point correspondences */
-        cv::Mat op(points3D);
-        cv::Mat ip(points2D);
-
-        /* Mat-objects for result rotation and translation vectors */
-        cv::Mat rvec(3, 1, CV_64F), /*,0),*/ tvec(3, 1, CV_64F); //,0);
-
-        // Solve the PnP-Problem to calibrate the camera to its environment
-
-        cv::solvePnP(op, ip, camMat, distMat, rvec, tvec, false, cv::SOLVEPNP_ITERATIVE);
-
-        cv::Mat rot_mat(3, 3, CV_64F); //, 0);
-        // Transform the rotation vector into a rotation matrix with opencvs rodrigues method
-        Rodrigues(rvec, rot_mat);
-
-        rotation_matrix[0] = rot_mat.at<double>(0, 0);
-        rotation_matrix[1] = rot_mat.at<double>(0, 1);
-        rotation_matrix[2] = rot_mat.at<double>(0, 2);
-        rotation_matrix[3] = rot_mat.at<double>(1, 0);
-        rotation_matrix[4] = rot_mat.at<double>(1, 1);
-        rotation_matrix[5] = rot_mat.at<double>(1, 2);
-        rotation_matrix[6] = rot_mat.at<double>(2, 0);
-        rotation_matrix[7] = rot_mat.at<double>(2, 1);
-        rotation_matrix[8] = rot_mat.at<double>(2, 2);
-
-        translation_vector[0] = tvec.at<double>(0, 0);
-        translation_vector[1] = tvec.at<double>(0, 1);
-        translation_vector[2] = tvec.at<double>(0, 2);
-
-        translation_vector2[0] = rotation_matrix[0] * translation_vector[0] +
-                                 rotation_matrix[3] * translation_vector[1] +
-                                 rotation_matrix[6] * translation_vector[2];
-        translation_vector2[1] = rotation_matrix[1] * translation_vector[0] +
-                                 rotation_matrix[4] * translation_vector[1] +
-                                 rotation_matrix[7] * translation_vector[2];
-        translation_vector2[2] = rotation_matrix[2] * translation_vector[0] +
-                                 rotation_matrix[5] * translation_vector[1] +
-                                 rotation_matrix[8] * translation_vector[2];
-
-        SPDLOG_INFO("-.- ESTIMATED ROTATION -.-");
-        for(size_t p = 0; p < 3; p++)
-        {
-            SPDLOG_INFO("{}, {}, {}", rotation_matrix[p * 3], rotation_matrix[p * 3 + 1], rotation_matrix[p * 3] + 2);
-        }
-        SPDLOG_INFO("-.- ESTIMATED TRANSLATION -.-");
-        SPDLOG_INFO("{}, {}, {}", translation_vector[0], translation_vector[1], translation_vector[2]);
-
-        SPDLOG_INFO("-.- Translation vector -.-");
-        SPDLOG_INFO("{}, {}, {}", translation_vector2[0], translation_vector2[1], translation_vector2[2]);
-
-        SPDLOG_INFO("-.- Rotation vector -.-");
-        SPDLOG_INFO("{}, {}, {}", rvec.at<double>(0, 0), rvec.at<double>(1, 0), rvec.at<double>(2, 0));
-
-        camHeight = translation_vector2[2] < 0 ? -translation_vector2[2] : translation_vector2[2];
-
-        mControlWidget->setCalibExtrRot1(rvec.at<double>(0, 0));
-        mControlWidget->setCalibExtrRot2(rvec.at<double>(1, 0));
-        mControlWidget->setCalibExtrRot3(rvec.at<double>(2, 0));
-
-        mControlWidget->setCalibExtrTrans1(translation_vector2[0]);
-        mControlWidget->setCalibExtrTrans2(translation_vector2[1]);
-        mControlWidget->setCalibExtrTrans3(translation_vector2[2]);
-
-        if(!calcReprojectionError())
-        {
-            SPDLOG_WARN("Extrinsic calibration not possible! Please select other 2D/3D points!");
-            mControlWidget->setCalibExtrRot1(0);
-            mControlWidget->setCalibExtrRot2(0);
-            mControlWidget->setCalibExtrRot3(0);
-
-            translation_vector2[0] = 0;
-            translation_vector2[1] = 0;
-            translation_vector2[2] = 0;
-
-            rotation_matrix[0] = 0;
-            rotation_matrix[1] = 0;
-            rotation_matrix[2] = 0;
-
-            mControlWidget->setCalibExtrTrans1(translation_vector2[0]);
-            mControlWidget->setCalibExtrTrans2(translation_vector2[1]);
-            mControlWidget->setCalibExtrTrans3(translation_vector2[2]);
-
-            reprojectionError = ReprojectionError{};
-
-            PCritical(
-                mMainWindow,
-                QObject::tr("Petrack"),
-                QObject::tr("Error: Could not calculate extrinsic calibration. Please select other 2D/3D point "
-                            "correspondences for extrinsic calibration!"));
-
-            isExtCalib = false;
-
-            return;
-        }
-
-        isExtCalib = true;
-
-        SPDLOG_INFO("End of extern calibration!");
+        QString msg = QString{"Invalid point correspondences for camera calibration\n"
+                              "2D points: %1, 3D points %2"}
+                          .arg(points2D.size())
+                          .arg(points3D.size());
+        PWarning(nullptr, "Invalid point correspondences", msg);
+        return std::nullopt;
     }
-    else
+
+    int bS = mMainWindow->getImageBorderSize();
+    /* Create Camera-Matrix form Camera-Params in the Petrack-GUI */
+    cv::Mat camMat = mControlWidget->getIntrinsicCameraParams().cameraMatrix;
+    camMat.at<double>(0, 2) -= bS;
+    camMat.at<double>(1, 2) -= bS;
+
+    cv::Mat distMat = cv::Mat::zeros(cv::Size(8, 1), CV_64F);
+
+    /* Create Mat-objects of point correspondences */
+    cv::Mat op(points3D);
+    cv::Mat ip(points2D);
+
+    /* Mat-objects for result rotation and translation vectors */
+    cv::Mat rvec(3, 1, CV_64F), /*,0),*/ tvec(3, 1, CV_64F); //,0);
+
+    // Solve the PnP-Problem to calibrate the camera to its environment
+    cv::solvePnP(op, ip, camMat, distMat, rvec, tvec, false, cv::SOLVEPNP_ITERATIVE);
+
+    cv::Mat rot_mat(3, 3, CV_64F); //, 0);
+    // Transform the rotation vector into a rotation matrix with opencvs rodrigues method
+    Rodrigues(rvec, rot_mat);
+
+    rotation_matrix[0] = rot_mat.at<double>(0, 0);
+    rotation_matrix[1] = rot_mat.at<double>(0, 1);
+    rotation_matrix[2] = rot_mat.at<double>(0, 2);
+    rotation_matrix[3] = rot_mat.at<double>(1, 0);
+    rotation_matrix[4] = rot_mat.at<double>(1, 1);
+    rotation_matrix[5] = rot_mat.at<double>(1, 2);
+    rotation_matrix[6] = rot_mat.at<double>(2, 0);
+    rotation_matrix[7] = rot_mat.at<double>(2, 1);
+    rotation_matrix[8] = rot_mat.at<double>(2, 2);
+
+    translation_vector[0] = tvec.at<double>(0, 0);
+    translation_vector[1] = tvec.at<double>(0, 1);
+    translation_vector[2] = tvec.at<double>(0, 2);
+
+    translation_vector2[0] = rotation_matrix[0] * translation_vector[0] + rotation_matrix[3] * translation_vector[1] +
+                             rotation_matrix[6] * translation_vector[2];
+    translation_vector2[1] = rotation_matrix[1] * translation_vector[0] + rotation_matrix[4] * translation_vector[1] +
+                             rotation_matrix[7] * translation_vector[2];
+    translation_vector2[2] = rotation_matrix[2] * translation_vector[0] + rotation_matrix[5] * translation_vector[1] +
+                             rotation_matrix[8] * translation_vector[2];
+
+    SPDLOG_INFO("-.- ESTIMATED ROTATION -.-");
+    for(size_t p = 0; p < 3; p++)
     {
-        std::cerr << "# Warning: invalid point correspondences for camera calibration." << std::endl;
-        std::cerr << "# 2D points:" << points2D.size() << ", 3D points: " << points3D.size() << std::endl;
+        SPDLOG_INFO("{}, {}, {}", rotation_matrix[p * 3], rotation_matrix[p * 3 + 1], rotation_matrix[p * 3] + 2);
     }
+    SPDLOG_INFO("-.- ESTIMATED TRANSLATION -.-");
+    SPDLOG_INFO("{}, {}, {}", translation_vector[0], translation_vector[1], translation_vector[2]);
+
+    SPDLOG_INFO("-.- Translation vector -.-");
+    SPDLOG_INFO("{}, {}, {}", translation_vector2[0], translation_vector2[1], translation_vector2[2]);
+
+    SPDLOG_INFO("-.- Rotation vector -.-");
+    SPDLOG_INFO("{}, {}, {}", rvec.at<double>(0, 0), rvec.at<double>(1, 0), rvec.at<double>(2, 0));
+
+    camHeight = translation_vector2[2] < 0 ? -translation_vector2[2] : translation_vector2[2];
+
+    ExtrinsicParameters results;
+
+    results.rot1 = rvec.at<double>(0, 0);
+    results.rot2 = rvec.at<double>(1, 0);
+    results.rot3 = rvec.at<double>(2, 0);
+
+    results.trans1 = translation_vector2[0];
+    results.trans2 = translation_vector2[1];
+    results.trans3 = translation_vector2[2];
+
+    if(!calcReprojectionError())
+    {
+        SPDLOG_WARN("Extrinsic calibration not possible! Please select other 2D/3D points!");
+        results.rot1 = 0;
+        results.rot2 = 0;
+        results.rot3 = 0;
+
+        translation_vector2[0] = 0;
+        translation_vector2[1] = 0;
+        translation_vector2[2] = 0;
+
+        rotation_matrix[0] = 0;
+        rotation_matrix[1] = 0;
+        rotation_matrix[2] = 0;
+
+        results.trans1 = translation_vector2[0];
+        results.trans2 = translation_vector2[1];
+        results.trans3 = translation_vector2[2];
+
+        reprojectionError = ReprojectionError{};
+
+        PCritical(
+            mMainWindow,
+            QObject::tr("Petrack"),
+            QObject::tr("Error: Could not calculate extrinsic calibration. Please select other 2D/3D point "
+                        "correspondences for extrinsic calibration!"));
+
+        isExtCalib = false;
+        return results;
+    }
+
+    isExtCalib = true;
+    SPDLOG_INFO("End of extern calibration!");
     mMainWindow->getScene()->update();
+    return results;
 }
 
 /**
@@ -779,11 +761,12 @@ cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d)
     // ToDo: use projectPoints();
     int bS = mMainWindow->getImage() ? mMainWindow->getImageBorderSize() : 0;
 
-    double rvec_array[3], translation_vector[3];
+    double      rvec_array[3], translation_vector[3];
+    const auto &extrParams = mControlWidget->getExtrinsicParameters();
 
-    rvec_array[0] = mControlWidget->getCalibExtrRot1();
-    rvec_array[1] = mControlWidget->getCalibExtrRot2();
-    rvec_array[2] = mControlWidget->getCalibExtrRot3();
+    rvec_array[0] = extrParams.rot1;
+    rvec_array[1] = extrParams.rot2;
+    rvec_array[2] = extrParams.rot3;
 
     cv::Mat rvec(3, 1, CV_64F, rvec_array), rot_inv;
     cv::Mat rot_mat(3, 3, CV_64F), e(3, 3, CV_64F);
@@ -795,15 +778,12 @@ cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d)
 
     e = rot_inv * rot_mat;
 
-    translation_vector[0] = rot_mat.at<double>(0, 0) * mControlWidget->getCalibExtrTrans1() +
-                            rot_mat.at<double>(0, 1) * mControlWidget->getCalibExtrTrans2() +
-                            rot_mat.at<double>(0, 2) * mControlWidget->getCalibExtrTrans3();
-    translation_vector[1] = rot_mat.at<double>(1, 0) * mControlWidget->getCalibExtrTrans1() +
-                            rot_mat.at<double>(1, 1) * mControlWidget->getCalibExtrTrans2() +
-                            rot_mat.at<double>(1, 2) * mControlWidget->getCalibExtrTrans3();
-    translation_vector[2] = rot_mat.at<double>(2, 0) * mControlWidget->getCalibExtrTrans1() +
-                            rot_mat.at<double>(2, 1) * mControlWidget->getCalibExtrTrans2() +
-                            rot_mat.at<double>(2, 2) * mControlWidget->getCalibExtrTrans3();
+    translation_vector[0] = rot_mat.at<double>(0, 0) * extrParams.trans1 +
+                            rot_mat.at<double>(0, 1) * extrParams.trans2 + rot_mat.at<double>(0, 2) * extrParams.trans3;
+    translation_vector[1] = rot_mat.at<double>(1, 0) * extrParams.trans1 +
+                            rot_mat.at<double>(1, 1) * extrParams.trans2 + rot_mat.at<double>(1, 2) * extrParams.trans3;
+    translation_vector[2] = rot_mat.at<double>(2, 0) * extrParams.trans1 +
+                            rot_mat.at<double>(2, 1) * extrParams.trans2 + rot_mat.at<double>(2, 2) * extrParams.trans3;
 
     cv::Point3f point3D;
 
@@ -846,8 +826,8 @@ cv::Vec3d ExtrCalibration::camToWorldRotation(const cv::Vec3d &camVec) const
 {
     // Transform the rotation vector into a rotation matrix with opencvs rodrigues method
     cv::Matx<double, 3, 3> rotMat(3, 3, CV_64F);
-    const auto             rvec = cv::Vec3d(
-        mControlWidget->getCalibExtrRot1(), mControlWidget->getCalibExtrRot2(), mControlWidget->getCalibExtrRot3());
+    const auto            &extrParams = mControlWidget->getExtrinsicParameters();
+    const auto             rvec       = cv::Vec3d(extrParams.rot1, extrParams.rot2, extrParams.rot3);
     Rodrigues(rvec, rotMat);
 
     auto      rotInv   = rotMat.inv(cv::DECOMP_LU);
@@ -871,18 +851,13 @@ cv::Point3f ExtrCalibration::get3DPoint(const cv::Point2f &p2d, double h) const
     // Transform the rotation vector into a rotation matrix with opencvs rodrigues method
     cv::Matx<double, 3, 3> rot_inv;
     cv::Matx<double, 3, 3> rot_mat(3, 3, CV_64F);
-    const cv::Mat          rvec =
-        (cv::Mat_<double>(3, 1) << mControlWidget->getCalibExtrRot1(),
-         mControlWidget->getCalibExtrRot2(),
-         mControlWidget->getCalibExtrRot3());
+    const auto            &extrParams = mControlWidget->getExtrinsicParameters();
+    const cv::Mat          rvec       = (cv::Mat_<double>(3, 1) << extrParams.rot1, extrParams.rot2, extrParams.rot3);
     Rodrigues(rvec, rot_mat);
     rot_inv = rot_mat.inv(cv::DECOMP_LU, nullptr);
 
     // Create translation vector
-    cv::Vec3d translation{
-        mControlWidget->getCalibExtrTrans1(),
-        mControlWidget->getCalibExtrTrans2(),
-        mControlWidget->getCalibExtrTrans3()};
+    cv::Vec3d translation{extrParams.trans1, extrParams.trans2, extrParams.trans3};
 
     const auto camMat = mControlWidget->getIntrinsicCameraParams();
     const auto fx     = camMat.getFx();

@@ -21,6 +21,7 @@
 
 #include "analysePlot.h"
 #include "colorPlot.h"
+#include "extrinsicParameters.h"
 #include "intrinsicCameraParams.h"
 #include "petrack.h"
 #include "recognition.h"
@@ -31,6 +32,7 @@
 class QGraphicsScene;
 class QDomElement;
 class IntrinsicBox;
+class ExtrinsicBox;
 class FilterBeforeBox;
 namespace Ui
 {
@@ -152,19 +154,7 @@ public:
     void   setCalibReprError(double d);
     void   imageSizeChanged(int width, int height, int borderDiff);
 
-    double getCalibExtrRot1();
-    void   setCalibExtrRot1(double d);
-    double getCalibExtrRot2();
-    void   setCalibExtrRot2(double d);
-    double getCalibExtrRot3();
-    void   setCalibExtrRot3(double d);
-    double getCalibExtrTrans1();
-    void   setCalibExtrTrans1(double d);
-    double getCalibExtrTrans2();
-    void   setCalibExtrTrans2(double d);
-    double getCalibExtrTrans3();
-    void   setCalibExtrTrans3(double d);
-    void   setEnabledExtrParams(bool enable);
+    const ExtrinsicParameters &getExtrinsicParameters() const;
 
     int    getCalibCoordDimension();
     bool   getCalibExtrCalibPointsShow();
@@ -242,7 +232,7 @@ public:
     double getCameraAltitude() const;
 
     void       setXml(QDomElement &elem);
-    void       getXml(QDomElement &elem);
+    void       getXml(const QDomElement &elem);
     bool       isLoading() const { return mMainWindow->isLoading(); }
     ColorPlot *getColorPlot() const;
     void       replotColorplot();
@@ -561,7 +551,6 @@ private slots:
     void on_coordAltitude_valueChanged(double d);
     void on_coordUnit_valueChanged(double d);
     void on_coordUseIntrinsic_stateChanged(int i);
-    void on_coordLoad3DCalibPoints_clicked();
 
     void setMeasuredAltitude();
 
@@ -587,21 +576,9 @@ private slots:
     void on_coord3DTransZ_valueChanged(int value);
     void on_coord3DAxeLen_valueChanged(int value);
 
-    void on_rot1_valueChanged(double arg1);
-    void on_rot2_valueChanged(double arg1);
-    void on_rot3_valueChanged(double arg1);
-    void on_trans1_valueChanged(double arg1);
-    void on_trans2_valueChanged(double arg1);
-    void on_trans3_valueChanged(double arg1);
-
     void on_coord3DSwapX_stateChanged(int arg1);
     void on_coord3DSwapY_stateChanged(int arg1);
     void on_coord3DSwapZ_stateChanged(int arg1);
-
-    void on_extrCalibSave_clicked();
-    void on_extrCalibFetch_clicked();
-    void on_extrCalibShowPoints_clicked();
-    void on_extrCalibShowError_clicked();
 
     void on_trackPathColorButton_clicked();
     void on_trackGroundPathColorButton_clicked();
@@ -635,11 +612,12 @@ private:
     Ui::Control     *mUi;
     IntrinsicBox    *mIntr;
     FilterBeforeBox *mFilterBefore;
+    ExtrinsicBox    *mExtr;
     QGraphicsScene  *mScene;
     bool             mColorChanging;
     bool mIndexChanging; // shows, if the index of the color model is really changing; nor while constructor (initialer
-                         // durchlauf) and may be while loading xml file
-    bool mLoading;       // shows, if new project is just loading
+    // durchlauf) and may be while loading xml file
+    bool mLoading; // shows, if new project is just loading
 };
 
 #endif

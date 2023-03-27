@@ -21,21 +21,21 @@
 
 BorderFilter::BorderFilter() : Filter()
 {
-    mSize.setMinimum(0.);
+    mSize.setMinimum(0);
     mSize.setMaximum(750);
-    mSize.setValue(0.);
+    mSize.setValue(0);
 
-    mRed.setMinimum(0.);
-    mRed.setMaximum(200.);
-    mRed.setValue(0.);
+    mRed.setMinimum(0);
+    mRed.setMaximum(200);
+    mRed.setValue(0);
 
-    mGreen.setMinimum(0.);
-    mGreen.setMaximum(200.);
-    mGreen.setValue(0.);
+    mGreen.setMinimum(0);
+    mGreen.setMaximum(200);
+    mGreen.setValue(0);
 
-    mBlue.setMinimum(0.);
-    mBlue.setMaximum(200.);
-    mBlue.setValue(0.);
+    mBlue.setMinimum(0);
+    mBlue.setMaximum(200);
+    mBlue.setValue(0);
 
     setOnCopy(false);
 }

@@ -146,10 +146,11 @@ QPointF ImageItem::getCmPerPixel(float px, float py, float h)
 ///*
 double ImageItem::getAngleToGround(float px, float py, float height)
 {
+    const auto &extrParams = mControlWidget->getExtrinsicParameters();
     cv::Point3f cam(
-        -mControlWidget->getCalibCoord3DTransX() - mControlWidget->getCalibExtrTrans1(),
-        -mControlWidget->getCalibCoord3DTransY() - mControlWidget->getCalibExtrTrans2(),
-        -mControlWidget->getCalibCoord3DTransZ() - mControlWidget->getCalibExtrTrans3());
+        -mControlWidget->getCalibCoord3DTransX() - extrParams.trans1,
+        -mControlWidget->getCalibCoord3DTransY() - extrParams.trans2,
+        -mControlWidget->getCalibCoord3DTransZ() - extrParams.trans3);
 
     cv::Point3f posInImage = mMainWindow->getExtrCalibration()->get3DPoint(
         cv::Point2f(px - mMainWindow->getImageBorderSize(), py - mMainWindow->getImageBorderSize()), height);
