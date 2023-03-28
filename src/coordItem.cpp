@@ -20,9 +20,7 @@
 
 #include "control.h"
 #include "extrCalibration.h"
-#include "logger.h"
 #include "petrack.h"
-#include "view.h"
 
 #include <QtWidgets>
 #include <cmath>
@@ -215,8 +213,8 @@ void CoordItem::updateData()
             matrix.scale(1, 1);
             setTransform(matrix);
 
-            double axeLen = mControlWidget->getCalibCoord3DAxeLen();
-            int    bS     = mMainWindow->getImageBorderSize();
+            const double axeLen = mControlWidget->getCalibCoord3DAxeLen();
+            const int    bS     = mMainWindow->getImageBorderSize();
 
             // Coordinate-system origin at (tX,tY,tZ)
             if(extCalib->isSetExtrCalib())
@@ -269,8 +267,6 @@ void CoordItem::updateData()
 
 void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    bool debug = false;
-
     ////////////////////////////////
     // Drawing Calibration Points //
     ////////////////////////////////
@@ -318,39 +314,10 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 painter->setBrush(Qt::black);
                 painter->drawText(QPointF(p2.x + 10, p2.y + font.pixelSize()), QObject::tr("%1").arg((i + 1)));
 
-                if(p2.x < calibPointsMin.x)
-                {
-                    calibPointsMin.x = p2.x;
-                }
-                if(p2.x > calibPointsMax.x)
-                {
-                    calibPointsMax.x = p2.x;
-                }
-                if(p3.x < calibPointsMin.x)
-                {
-                    calibPointsMin.x = p3.x;
-                }
-                if(p3.x > calibPointsMax.x)
-                {
-                    calibPointsMax.x = p3.x;
-                }
-
-                if(p2.y < calibPointsMin.y)
-                {
-                    calibPointsMin.y = p2.y;
-                }
-                if(p2.y > calibPointsMax.y)
-                {
-                    calibPointsMax.y = p2.y;
-                }
-                if(p3.y < calibPointsMin.y)
-                {
-                    calibPointsMin.y = p3.y;
-                }
-                if(p3.y > calibPointsMax.y)
-                {
-                    calibPointsMax.y = p3.y;
-                }
+                calibPointsMin.x = std::min({calibPointsMin.x, p2.x, p3.x});
+                calibPointsMin.y = std::min({calibPointsMin.y, p2.y, p3.y});
+                calibPointsMax.x = std::max({calibPointsMax.x, p2.x, p3.x});
+                calibPointsMax.y = std::max({calibPointsMax.y, p2.y, p3.y});
             }
         }
     }
@@ -369,63 +336,32 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 
             painter->setPen(QPen(QBrush(Qt::blue), 0));
 
-            static QPointF points[3];
-
             // Koordinatenachsen
-            points[0].setX(-10.);
-            points[0].setY(0.);
-            points[1].setX(100.);
-            points[1].setY(0.);
-            painter->drawLine(points[0], points[1]);
-
-            points[0].setX(0.);
-            points[0].setY(10.);
-            points[1].setX(0.);
-            points[1].setY(-100.);
-            painter->drawLine(points[0], points[1]);
+            painter->drawLine(QPoint{-10, 0}, QPoint{100, 0});
+            painter->drawLine(QPoint{0, 10}, QPoint{0, -100});
 
             // Ticks
             for(int i = 1; i < 11; i++) // i=10 zeichnen sieht ungewoehnlich aus, laeest sich aber besser mit messen
             {
-                points[0].setX(2.);
-                points[0].setY(-i * 10.);
-                points[1].setX(-2.);
-                points[1].setY(-i * 10.);
-                painter->drawLine(points[0], points[1]);
-                points[0].setX(i * 10.);
-                points[0].setY(2.);
-                points[1].setX(i * 10.);
-                points[1].setY(-2.);
-                painter->drawLine(points[0], points[1]);
+                painter->drawLine(QPoint{2, -i * 10}, QPoint{-2, -i * 10});
+                painter->drawLine(QPoint{i * 10, 2}, QPoint{i * 10, -2});
             }
 
             // Beschriftung
-            points[0].setX(97.);
-            points[0].setY(12.);
-            painter->drawText(points[0], QObject::tr("1"));
-            points[0].setX(-8.);
-            points[0].setY(-97.);
-            painter->drawText(points[0], QObject::tr("1"));
+            painter->drawText(QPoint{97, 12}, QObject::tr("1"));
+            painter->drawText(QPoint{-8, -97}, QObject::tr("1"));
 
             // Pfeilspitzen
             painter->setPen(Qt::NoPen);
             painter->setBrush(Qt::blue);
 
-            points[0].setX(100.);
-            points[0].setY(0.);
-            points[1].setX(95.);
-            points[1].setY(2.);
-            points[2].setX(95.);
-            points[2].setY(-2.);
-            painter->drawPolygon(points, 3);
+            QPolygon arrowTipX;
+            arrowTipX << QPoint(100, 0) << QPoint(95, 2) << QPoint(95, -2);
+            painter->drawPolygon(arrowTipX);
 
-            points[0].setX(0.);
-            points[0].setY(-100.);
-            points[1].setX(2.);
-            points[1].setY(-95.);
-            points[2].setX(-2.);
-            points[2].setY(-95.);
-            painter->drawPolygon(points, 3);
+            QPolygon arrowTipY;
+            arrowTipY << QPoint(0, -100) << QPoint(2, -95) << QPoint(-2, -95);
+            painter->drawPolygon(arrowTipY);
         }
         else
         {
@@ -435,111 +371,11 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 
             if(extCalib->isSetExtrCalib())
             {
-                QPointF     points[4];
-                cv::Point2f p[4];
-                QString     coordinaten;
-
-                /////////////////////////////////////////////////////
-                // Draw a cube (Quader) near coord system          //
-                /////////////////////////////////////////////////////
-
-                bool drawCube = false;
-
-                if(drawCube)
+                auto getImgPoint = [this](const cv::Point3f &realPoint)
                 {
-                    painter->setPen(Qt::green);
-                    // Boden
-                    p[0] = extCalib->getImagePoint(cv::Point3f(100, 100, 0));
-                    p[1] = extCalib->getImagePoint(cv::Point3f(200, 100, 0));
-                    painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                    p[0] = extCalib->getImagePoint(cv::Point3f(200, 100, 0));
-                    p[1] = extCalib->getImagePoint(cv::Point3f(200, 200, 0));
-                    painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                    p[0] = extCalib->getImagePoint(cv::Point3f(200, 200, 0));
-                    p[1] = extCalib->getImagePoint(cv::Point3f(100, 200, 0));
-                    painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                    p[0] = extCalib->getImagePoint(cv::Point3f(100, 200, 0));
-                    p[1] = extCalib->getImagePoint(cv::Point3f(100, 100, 0));
-                    painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                    // Seiten
-                    p[0] = extCalib->getImagePoint(cv::Point3f(100, 100, 0));
-                    p[1] = extCalib->getImagePoint(cv::Point3f(100, 100, 100));
-                    painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                    p[0] = extCalib->getImagePoint(cv::Point3f(200, 100, 0));
-                    p[1] = extCalib->getImagePoint(cv::Point3f(200, 100, 100));
-                    painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                    p[0] = extCalib->getImagePoint(cv::Point3f(100, 200, 0));
-                    p[1] = extCalib->getImagePoint(cv::Point3f(100, 200, 100));
-                    painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                    p[0] = extCalib->getImagePoint(cv::Point3f(200, 200, 0));
-                    p[1] = extCalib->getImagePoint(cv::Point3f(200, 200, 100));
-                    painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                    // Oben
-                    p[0] = extCalib->getImagePoint(cv::Point3f(100, 100, 100));
-                    p[1] = extCalib->getImagePoint(cv::Point3f(200, 100, 100));
-                    painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                    p[0] = extCalib->getImagePoint(cv::Point3f(200, 100, 100));
-                    p[1] = extCalib->getImagePoint(cv::Point3f(200, 200, 100));
-                    painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                    p[0] = extCalib->getImagePoint(cv::Point3f(200, 200, 100));
-                    p[1] = extCalib->getImagePoint(cv::Point3f(100, 200, 100));
-                    painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                    p[0] = extCalib->getImagePoint(cv::Point3f(100, 200, 100));
-                    p[1] = extCalib->getImagePoint(cv::Point3f(100, 100, 100));
-                    painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                }
-
-                /////////////////////////////////////////////////////
-                // Draw the bounding rect                          //
-                /////////////////////////////////////////////////////
-
-                bool drawBoundingRect = false;
-
-                if(drawBoundingRect)
-                {
-                    QRectF boundingBox = boundingRect();
-                    double min_x = boundingBox.x(), max_x = min_x + boundingBox.width();
-                    double min_y = boundingBox.y(), max_y = min_y + boundingBox.height();
-
-                    painter->setPen(Qt::cyan);
-                    painter->drawLine(QPointF(min_x, min_y), QPointF(min_x, max_y));
-                    painter->drawLine(QPointF(min_x, max_y), QPointF(max_x, max_y));
-                    painter->drawLine(QPointF(max_x, max_y), QPointF(max_x, min_y));
-                    painter->drawLine(QPointF(max_x, min_y), QPointF(min_x, min_y));
-                }
-
-                /////////////////////////////////////////////////////
-                // Draw a rect around the whole coordinate system //
-                /////////////////////////////////////////////////////
-
-                bool paintRectCoordArea = false;
-
-                if(paintRectCoordArea)
-                {
-                    int min_x = std::min(std::min(x.x, y.x), std::min(z.x, ursprung.x));
-                    int max_x = std::max(std::max(x.x, y.x), std::max(z.x, ursprung.x));
-
-                    int min_y = std::min(std::min(x.y, y.y), std::min(z.y, ursprung.y));
-                    int max_y = std::max(std::max(x.y, y.y), std::max(z.y, ursprung.y));
-
-                    painter->setFont(QFont("Arial", 20));
-
-                    painter->setPen(Qt::green);
-
-                    painter->drawLine(QPointF(min_x, min_y), QPointF(min_x, max_y));
-                    painter->drawLine(QPointF(min_x, max_y), QPointF(max_x, max_y));
-                    painter->drawLine(QPointF(max_x, max_y), QPointF(max_x, min_y));
-                    painter->drawLine(QPointF(max_x, min_y), QPointF(min_x, min_y));
-
-                    coordinaten = QString::asprintf("(%d, %d)", min_x, min_y);
-                    painter->drawText(QPoint(min_x - 45, min_y - 10), coordinaten);
-
-                    coordinaten = QString::asprintf("%d", max_y - min_y);
-                    painter->drawText(QPoint(min_x + 10, min_y + (max_y - min_y) / 2.0), coordinaten);
-
-                    coordinaten = QString::asprintf("%d", max_x - min_x);
-                    painter->drawText(QPoint(min_x + (max_x - min_x) / 2.0, min_y + 30), coordinaten);
-                }
+                    const auto imgPoint = extCalib->getImagePoint(realPoint);
+                    return QPointF(imgPoint.x, imgPoint.y);
+                };
 
 
                 //////////////////////////////
@@ -547,13 +383,9 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 //////////////////////////////
 
                 painter->setPen(QPen(QBrush(Qt::blue), coordLineWidth));
-                p[0] = extCalib->getImagePoint(cv::Point3f(0, 0, 0));
-                p[1] = extCalib->getImagePoint(cv::Point3f(x3D.x, x3D.y, x3D.z));
-                painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                p[1] = extCalib->getImagePoint(cv::Point3f(y3D.x, y3D.y, y3D.z));
-                painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                p[1] = extCalib->getImagePoint(cv::Point3f(z3D.x, z3D.y, z3D.z));
-                painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
+                painter->drawLine(getImgPoint({0, 0, 0}), getImgPoint(x3D));
+                painter->drawLine(getImgPoint({0, 0, 0}), getImgPoint(y3D));
+                painter->drawLine(getImgPoint({0, 0, 0}), getImgPoint(z3D));
 
                 /////////////////////////////////
                 // Drawing the X,Y,Z - Symbols //
@@ -562,12 +394,13 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 painter->setPen(QPen(QBrush(Qt::black), coordLineWidth));
                 painter->setFont(QFont("Arial", 15));
 
-                p[0] = extCalib->getImagePoint(cv::Point3f(x3D.x + 10, x3D.y, x3D.z));
-                painter->drawText(QPointF(p[0].x - 5, p[0].y + 5), QString("X"));
-                p[0] = extCalib->getImagePoint(cv::Point3f(y3D.x, y3D.y + 10, y3D.z));
-                painter->drawText(QPointF(p[0].x - 5, p[0].y + 5), QString("Y"));
-                p[0] = extCalib->getImagePoint(cv::Point3f(z3D.x, z3D.y, z3D.z + 10));
-                painter->drawText(QPointF(p[0].x - 5, p[0].y + 5), QString("Z"));
+                const QPointF labelOffset{-5, 5};
+                const QPointF xLabelPos = getImgPoint(x3D + cv::Point3f(10, 0, 0)) + labelOffset;
+                const QPointF yLabelPos = getImgPoint(y3D + cv::Point3f(0, 10, 0)) + labelOffset;
+                const QPointF zLabelPos = getImgPoint(z3D + cv::Point3f(0, 0, 10)) + labelOffset;
+                painter->drawText(xLabelPos, QString("X"));
+                painter->drawText(yLabelPos, QString("Y"));
+                painter->drawText(zLabelPos, QString("Z"));
 
                 //////////////////////////////
                 // Drawing the tick-markers //
@@ -582,193 +415,88 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                     // Solange Achsen-Ende noch nicht erreicht: Markierung zeichnen
                     if(i + tickLength < x3D.x)
                     {
-                        p[0] = extCalib->getImagePoint(cv::Point3f(i, -tickLength, 0));
-                        p[1] = extCalib->getImagePoint(cv::Point3f(i, tickLength, 0));
-                        painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                        p[0] = extCalib->getImagePoint(cv::Point3f(i, 0, -tickLength));
-                        p[1] = extCalib->getImagePoint(cv::Point3f(i, 0, tickLength));
-                        painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                        p[0] = extCalib->getImagePoint(cv::Point3f(i, 0, 0));
+                        painter->drawLine(
+                            getImgPoint(cv::Point3f(i, -tickLength, 0)), getImgPoint(cv::Point3f(i, tickLength, 0)));
+                        painter->drawLine(
+                            getImgPoint(cv::Point3f(i, 0, -tickLength)), getImgPoint(cv::Point3f(i, 0, tickLength)));
                     }
                     if(i + tickLength < y3D.y)
                     {
-                        p[0] = extCalib->getImagePoint(cv::Point3f(-tickLength, i, 0));
-                        p[1] = extCalib->getImagePoint(cv::Point3f(tickLength, i, 0));
-                        painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                        p[0] = extCalib->getImagePoint(cv::Point3f(0, i, -tickLength));
-                        p[1] = extCalib->getImagePoint(cv::Point3f(0, i, tickLength));
-                        painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
+                        painter->drawLine(
+                            getImgPoint(cv::Point3f(-tickLength, i, 0)), getImgPoint(cv::Point3f(tickLength, i, 0)));
+                        painter->drawLine(
+                            getImgPoint(cv::Point3f(0, i, -tickLength)), getImgPoint(cv::Point3f(0, i, tickLength)));
                     }
                     if(i + tickLength < z3D.z)
                     {
-                        p[0] = extCalib->getImagePoint(cv::Point3f(-tickLength, 0, i));
-                        p[1] = extCalib->getImagePoint(cv::Point3f(tickLength, 0, i));
-                        painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                        p[0] = extCalib->getImagePoint(cv::Point3f(0, -tickLength, i));
-                        p[1] = extCalib->getImagePoint(cv::Point3f(0, tickLength, i));
-                        painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
+                        painter->drawLine(
+                            getImgPoint(cv::Point3f(-tickLength, 0, i)), getImgPoint(cv::Point3f(tickLength, 0, i)));
+                        painter->drawLine(
+                            getImgPoint(cv::Point3f(0, -tickLength, i)), getImgPoint(cv::Point3f(0, tickLength, i)));
                     }
                 }
 
                 QFont font("Arial", tickLength * 0.5);
                 painter->setFont(font);
 
-                painter->setPen(Qt::green);
-                painter->setBrush(Qt::green);
-                painter->setFont(QFont("Arial", 20));
-
-                if(debug)
-                {
-                    coordinaten = QString::asprintf("(%.2f, %.2f)", ursprung.x, ursprung.y);
-                }
-                if(debug)
-                {
-                    painter->drawText(QPoint(ursprung.x - 100, ursprung.y), coordinaten);
-                }
-
                 //////////////////////////////////////////////
                 // Drawing the peaks at the end of the axis //
                 //////////////////////////////////////////////
 
-                int peakSize = AXIS_MARKERS_LENGTH;
+                constexpr int peakSize = AXIS_MARKERS_LENGTH;
+                painter->setPen(QPen(QBrush(Qt::blue), coordLineWidth));
+                painter->setBrush(Qt::NoBrush); // don't fill polygons
 
                 ///////
                 // X //
                 ///////
 
-                p[0]      = extCalib->getImagePoint(cv::Point3f(x3D.x, 0, 0));
-                p[1]      = extCalib->getImagePoint(cv::Point3f(x3D.x - peakSize, -peakSize, 0));
-                p[2]      = extCalib->getImagePoint(cv::Point3f(x3D.x - peakSize, peakSize, 0));
-                points[0] = QPointF(p[0].x, p[0].y);
-                points[1] = QPointF(p[1].x, p[1].y);
-                points[2] = QPointF(p[2].x, p[2].y);
-                painter->setPen(Qt::green);
-                painter->setPen(QPen(QBrush(Qt::blue), coordLineWidth));
-                painter->drawLine(points[0], points[1]);
-                painter->drawLine(points[0], points[2]);
-                painter->drawLine(points[2], points[1]);
-                p[0]      = extCalib->getImagePoint(cv::Point3f(x3D.x, 0, 0));
-                p[1]      = extCalib->getImagePoint(cv::Point3f(x3D.x - peakSize, 0, -peakSize));
-                p[2]      = extCalib->getImagePoint(cv::Point3f(x3D.x - peakSize, 0, peakSize));
-                p[3]      = extCalib->getImagePoint(cv::Point3f(x3D.x + peakSize, 0, 0));
-                points[0] = QPointF(p[0].x, p[0].y);
-                points[1] = QPointF(p[1].x, p[1].y);
-                points[2] = QPointF(p[2].x, p[2].y);
-                painter->setPen(Qt::green);
-                painter->setPen(QPen(QBrush(Qt::blue), coordLineWidth));
-                painter->drawLine(points[0], points[1]);
-                painter->drawLine(points[0], points[2]);
-                painter->drawLine(points[2], points[1]);
-
-                if(debug)
-                {
-                    coordinaten = QString::asprintf("(% .2f, % .2f)", p[1].x, p[1].y);
-                }
-                if(debug)
-                {
-                    painter->drawText(QPoint(p[3].x, p[3].y), coordinaten);
-                }
-
-                if(debug)
-                {
-                    coordinaten = QString::fromLatin1("X");
-                }
-                if(debug)
-                {
-                    painter->drawText(QPoint(p[1].x, p[1].y), coordinaten);
-                }
+                /* clang-format off */
+                QPolygonF arrowTipX1;
+                arrowTipX1 << getImgPoint({x3D.x, 0, 0})
+                           << getImgPoint({x3D.x - peakSize, -peakSize, 0})
+                           << getImgPoint({x3D.x - peakSize, peakSize, 0});
+                QPolygonF arrowTipX2;
+                arrowTipX2 << getImgPoint({x3D.x, 0, 0})
+                           << getImgPoint({x3D.x - peakSize, 0, -peakSize})
+                           << getImgPoint({x3D.x - peakSize, 0, peakSize});
+                /* clang-format on */
+                painter->drawPolygon(arrowTipX1);
+                painter->drawPolygon(arrowTipX2);
 
                 ///////
                 // Y //
                 ///////
 
-                p[0]      = extCalib->getImagePoint(cv::Point3f(0, y3D.y, 0));
-                p[1]      = extCalib->getImagePoint(cv::Point3f(-peakSize, y3D.y - peakSize, 0));
-                p[2]      = extCalib->getImagePoint(cv::Point3f(peakSize, y3D.y - peakSize, 0));
-                points[0] = QPointF(p[0].x, p[0].y);
-                points[1] = QPointF(p[1].x, p[1].y);
-                points[2] = QPointF(p[2].x, p[2].y);
-                painter->setPen(Qt::green);
-                painter->setPen(QPen(QBrush(Qt::blue), coordLineWidth));
-                painter->drawLine(points[0], points[1]);
-                painter->drawLine(points[0], points[2]);
-                painter->drawLine(points[2], points[1]);
-                p[0]      = extCalib->getImagePoint(cv::Point3f(0, y3D.y, 0));
-                p[1]      = extCalib->getImagePoint(cv::Point3f(0, y3D.y - peakSize, -peakSize));
-                p[2]      = extCalib->getImagePoint(cv::Point3f(0, y3D.y - peakSize, peakSize));
-                p[3]      = extCalib->getImagePoint(cv::Point3f(0, y3D.y + peakSize, 0));
-                points[0] = QPointF(p[0].x, p[0].y);
-                points[1] = QPointF(p[1].x, p[1].y);
-                points[2] = QPointF(p[2].x, p[2].y);
-                painter->setPen(Qt::green);
-                painter->setPen(QPen(QBrush(Qt::blue), coordLineWidth));
-                painter->drawLine(points[0], points[1]);
-                painter->drawLine(points[0], points[2]);
-                painter->drawLine(points[2], points[1]);
-
-                if(debug)
-                {
-                    coordinaten = QString::asprintf("(%.2f, %.2f)", p[1].x, p[1].y);
-                }
-                if(debug)
-                {
-                    painter->drawText(QPoint(p[3].x, p[3].y), coordinaten);
-                }
-
-                if(debug)
-                {
-                    coordinaten = QString::fromLatin1("Y");
-                }
-                if(debug)
-                {
-                    painter->drawText(QPoint(p[1].x, p[1].y), coordinaten);
-                }
+                /* clang-format off */
+                QPolygonF arrowTipY1;
+                arrowTipY1 << getImgPoint({0, y3D.y, 0})
+                           << getImgPoint({-peakSize, y3D.y - peakSize, 0})
+                           << getImgPoint({peakSize, y3D.y - peakSize, 0});
+                QPolygonF arrowTipY2;
+                arrowTipY2 << getImgPoint({0, y3D.y, 0})
+                           << getImgPoint({0, y3D.y - peakSize, -peakSize})
+                           << getImgPoint({0, y3D.y - peakSize, peakSize});
+                /* clang-format on */
+                painter->drawPolygon(arrowTipY1);
+                painter->drawPolygon(arrowTipY2);
 
                 ///////
                 // Z //
                 ///////
 
-                p[0]      = extCalib->getImagePoint(cv::Point3f(0, 0, z3D.z));
-                p[1]      = extCalib->getImagePoint(cv::Point3f(0, -peakSize, z3D.z - peakSize));
-                p[2]      = extCalib->getImagePoint(cv::Point3f(0, peakSize, z3D.z - peakSize));
-                points[0] = QPointF(p[0].x, p[0].y);
-                points[1] = QPointF(p[1].x, p[1].y);
-                points[2] = QPointF(p[2].x, p[2].y);
-                painter->setPen(Qt::green);
-                painter->setPen(QPen(QBrush(Qt::blue), coordLineWidth));
-                painter->drawLine(points[0], points[1]);
-                painter->drawLine(points[0], points[2]);
-                painter->drawLine(points[2], points[1]);
-                p[0]      = extCalib->getImagePoint(cv::Point3f(0, 0, z3D.z));
-                p[1]      = extCalib->getImagePoint(cv::Point3f(-peakSize, 0, z3D.z - peakSize));
-                p[2]      = extCalib->getImagePoint(cv::Point3f(peakSize, 0, z3D.z - peakSize));
-                p[3]      = extCalib->getImagePoint(cv::Point3f(0, 0, z3D.z + peakSize));
-                points[0] = QPointF(p[0].x, p[0].y);
-                points[1] = QPointF(p[1].x, p[1].y);
-                points[2] = QPointF(p[2].x, p[2].y);
-                painter->setPen(Qt::green);
-                painter->setPen(QPen(QBrush(Qt::blue), coordLineWidth));
-                painter->drawLine(points[0], points[1]);
-                painter->drawLine(points[0], points[2]);
-                painter->drawLine(points[2], points[1]);
-
-                if(debug)
-                {
-                    coordinaten = QString::asprintf("(%.2f, %.2f)", p[1].x, p[1].y);
-                }
-                if(debug)
-                {
-                    painter->drawText(QPoint(p[3].x, p[3].y), coordinaten);
-                }
-
-                if(debug)
-                {
-                    coordinaten = QString::fromLatin1("Z");
-                }
-                if(debug)
-                {
-                    painter->drawText(QPoint(p[1].x, p[1].y), coordinaten);
-                }
+                /* clang-format off */
+                QPolygonF arrowTipZ1;
+                arrowTipZ1 << getImgPoint({0, 0, z3D.z})
+                           << getImgPoint({0, -peakSize, z3D.z - peakSize})
+                           << getImgPoint({0, peakSize, z3D.z - peakSize});
+                QPolygonF arrowTipZ2;
+                arrowTipZ2 << getImgPoint({0, 0, z3D.z})
+                           << getImgPoint({-peakSize, 0, z3D.z - peakSize})
+                           << getImgPoint({peakSize, 0, z3D.z - peakSize});
+                /* clang-format on */
+                painter->drawPolygon(arrowTipZ1);
+                painter->drawPolygon(arrowTipZ2);
             }
         }
     }
