@@ -112,14 +112,7 @@ bool FilterBeforeBox::getXmlSub(QDomElement &subSubElem)
         }
         if(subSubElem.hasAttribute("VALUE"))
         {
-            try
-            {
-                setValue(mUi->filterBorderParamSize, subSubElem.attribute("VALUE").toInt());
-            }
-            catch(std::domain_error &e)
-            {
-                PCritical(nullptr, "Out-of-range value", QString::fromStdString(e.what()));
-            }
+            setValue(mUi->filterBorderParamSize, subSubElem.attribute("VALUE").toInt());
         }
         // bgColor still needs to be read by control
         return false;

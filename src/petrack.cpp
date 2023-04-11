@@ -686,6 +686,11 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
             PCritical(this, tr("PeTrack"), tr("Cannot open %1:\n%2.").arg(fileName, file.errorString()));
             return;
         }
+
+        QDomDocument oldSettings;
+        QString      oldProFilename = mProFileName;
+        saveXml(oldSettings);
+
         resetSettings();
         QDomDocument doc("PETRACK"); // eigentlich Pfad zu Beschreibungsdatei fuer Dateiaufbau
         if(!doc.setContent(&file))
@@ -711,7 +716,20 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
                         .arg(fileName, mPetrackVersion, root.attribute("VERSION")));
             }
         }
-        openXml(doc, openSeq);
+        try
+        {
+            openXml(doc, openSeq);
+        }
+        catch(std::domain_error &e)
+        {
+            // reset to settings before trying to load new file
+            openXml(oldSettings);
+            setProFileName(oldProFilename);
+
+            auto errorStr = QString{"Error during reading of pet file:\n%1"}.arg(e.what());
+            PCritical(this, "Could not read pet-file", errorStr);
+            return;
+        }
         mLastTrackerExport = mTrcFileName;
 
         updateWindowTitle();
