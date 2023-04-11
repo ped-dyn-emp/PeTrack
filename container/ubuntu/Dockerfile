@@ -56,3 +56,6 @@ RUN apt-get update && apt-get install -y \
 	libqwt-qt5-dev \
 	libopencv-dev \
 	libopencv-contrib4.5
+
+RUN ["useradd", "ci"]
+USER "ci"
