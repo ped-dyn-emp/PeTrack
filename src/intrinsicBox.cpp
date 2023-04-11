@@ -77,34 +77,24 @@ void IntrinsicBox::setIntrinsicCameraParams(const IntrinsicCameraParams &params)
         // don't want to send signals for intermediate params
         const QSignalBlocker blocker(this);
 
-        try
-        {
-            setValue(mUi->fx, params.getFx());
-            setValue(mUi->fy, params.getFy());
-            setValue(mUi->cx, params.getCx());
-            setValue(mUi->cy, params.getCy());
-            setValue(mUi->r2, static_cast<double>(params.distortionCoeffs.at<float>(0)));
-            setValue(mUi->r4, static_cast<double>(params.distortionCoeffs.at<float>(1)));
-            setValue(mUi->tx, static_cast<double>(params.distortionCoeffs.at<float>(2)));
-            setValue(mUi->ty, static_cast<double>(params.distortionCoeffs.at<float>(3)));
-            setValue(mUi->r6, static_cast<double>(params.distortionCoeffs.at<float>(4)));
-            setValue(mUi->k4, static_cast<double>(params.distortionCoeffs.at<float>(5)));
-            setValue(mUi->k5, static_cast<double>(params.distortionCoeffs.at<float>(6)));
-            setValue(mUi->k6, static_cast<double>(params.distortionCoeffs.at<float>(7)));
-            setValue(mUi->s1, static_cast<double>(params.distortionCoeffs.at<float>(8)));
-            setValue(mUi->s2, static_cast<double>(params.distortionCoeffs.at<float>(9)));
-            setValue(mUi->s3, static_cast<double>(params.distortionCoeffs.at<float>(10)));
-            setValue(mUi->s4, static_cast<double>(params.distortionCoeffs.at<float>(11)));
-            setValue(mUi->taux, static_cast<double>(params.distortionCoeffs.at<float>(12)));
-            setValue(mUi->tauy, static_cast<double>(params.distortionCoeffs.at<float>(13)));
-        }
-        catch(std::domain_error &e)
-        {
-            std::stringstream ss;
-            ss << e.what() << "\nUsing old values instead";
-            PCritical(nullptr, "Out-of-range value", QString::fromStdString(ss.str()));
-            return;
-        }
+        setValue(mUi->fx, params.getFx());
+        setValue(mUi->fy, params.getFy());
+        setValue(mUi->cx, params.getCx());
+        setValue(mUi->cy, params.getCy());
+        setValue(mUi->r2, static_cast<double>(params.distortionCoeffs.at<float>(0)));
+        setValue(mUi->r4, static_cast<double>(params.distortionCoeffs.at<float>(1)));
+        setValue(mUi->tx, static_cast<double>(params.distortionCoeffs.at<float>(2)));
+        setValue(mUi->ty, static_cast<double>(params.distortionCoeffs.at<float>(3)));
+        setValue(mUi->r6, static_cast<double>(params.distortionCoeffs.at<float>(4)));
+        setValue(mUi->k4, static_cast<double>(params.distortionCoeffs.at<float>(5)));
+        setValue(mUi->k5, static_cast<double>(params.distortionCoeffs.at<float>(6)));
+        setValue(mUi->k6, static_cast<double>(params.distortionCoeffs.at<float>(7)));
+        setValue(mUi->s1, static_cast<double>(params.distortionCoeffs.at<float>(8)));
+        setValue(mUi->s2, static_cast<double>(params.distortionCoeffs.at<float>(9)));
+        setValue(mUi->s3, static_cast<double>(params.distortionCoeffs.at<float>(10)));
+        setValue(mUi->s4, static_cast<double>(params.distortionCoeffs.at<float>(11)));
+        setValue(mUi->taux, static_cast<double>(params.distortionCoeffs.at<float>(12)));
+        setValue(mUi->tauy, static_cast<double>(params.distortionCoeffs.at<float>(13)));
 
         if(params.reprojectionError == std::numeric_limits<float>::quiet_NaN())
         {

@@ -68,5 +68,3 @@ void LogoItem::fadeIn()
     mFadeAnimation->setDuration(mFadeDuration);
     mFadeAnimation->start();
 }
-
-#include "moc_logoItem.cpp"

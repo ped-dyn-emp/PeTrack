@@ -126,10 +126,9 @@ TEST_CASE("IntrinsicCameraParams values")
         {
             params.distortionCoeffs.at<float>(12) = 56468;
             auto oldParams                        = intrBox.getIntrinsicCameraParams();
-            THEN("The values do not get changed")
+            THEN("An exception is thrown")
             {
-                intrBox.setIntrinsicCameraParams(params);
-                CHECK(intrBox.getIntrinsicCameraParams() == oldParams);
+                CHECK_THROWS_AS(intrBox.setIntrinsicCameraParams(params), std::domain_error);
             }
         }
 
