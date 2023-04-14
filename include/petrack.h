@@ -35,6 +35,7 @@
 #include "backgroundFilter.h"
 #include "borderFilter.h"
 #include "brightContrastFilter.h"
+#include "calibFilter.h"
 #include "coordItem.h"
 #include "extrCalibration.h"
 #include "manualTrackpointMover.h"
@@ -45,7 +46,6 @@
 #include "swapFilter.h"
 #include "trackerReal.h"
 
-class CalibFilter;
 class Animation;
 class RoiItem;
 class RecognitionRoiItem;
@@ -262,7 +262,7 @@ public:
     inline QAction *getHideControlActor() { return mHideControlsAct; }
 
     // Attention: not type save, be care that animation is not stereo
-    inline CalibFilter *getCalibFilter() { return (CalibFilter *) mCalibFilter; }
+    inline CalibFilter *getCalibFilter() { return &mCalibFilter; }
 #ifdef STEREO
     // Attention: not type save, be care that animation is stereo
     inline CalibStereoFilter *getCalibStereoFilter()
@@ -469,7 +469,7 @@ private:
 
     QPointF mMousePosOnImage;
 
-    Filter              *mCalibFilter;
+    CalibFilter          mCalibFilter;
     BrightContrastFilter mBrightContrastFilter;
     BorderFilter         mBorderFilter;
     SwapFilter           mSwapFilter;

@@ -42,6 +42,8 @@ public:
     cv::Mat act(cv::Mat &img, cv::Mat &res);
 
     Parameter<IntrinsicCameraParams> &getCamParams();
+    cv::Mat                           getMap1();
+    cv::Mat                           getMap2();
 };
 
 #endif

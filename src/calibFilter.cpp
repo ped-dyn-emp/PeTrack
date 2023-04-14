@@ -47,7 +47,7 @@ CalibFilter::CalibFilter() : Filter(), mCamParams(this)
  * @brief Undistorts the image.
  *
  * This method calculates and caches the mapping for undistortion.
- * The mapping is applied to the input image.
+ * The mapping is applied to the input image
  *
  * @param img[in]
  * @param res[out]
@@ -68,4 +68,27 @@ cv::Mat CalibFilter::act(cv::Mat &img, cv::Mat &res)
 
     cv::remap(img, res, map1, map2, cv::INTER_LINEAR, cv::BORDER_CONSTANT);
     return res;
+}
+/**
+ * @brief Returns the first output map of function "initUndistortRectifyMap"
+ *
+ * This method returns an undistortion and rectification transformation map. This map contains pairs of (x,y) points.
+ * Link to definition of method "initUndistortRectifyMap"
+ * https://docs.opencv.org/4.5.5/d9/d0c/group__calib3d.html#ga7dfb72c9cf9780a347fbe3d1c47e5d5a
+ */
+cv::Mat CalibFilter::getMap1()
+{
+    return map1;
+}
+
+/**
+ * @brief Returns the second output map of function "initUndistortRectifyMap"
+ *
+ * This method returns an undistortion and rectification transformation map. This map contains indices in a table of
+ * interpolation coefficients. Link to definition of method "initUndistortRectifyMap"
+ * https://docs.opencv.org/4.5.5/d9/d0c/group__calib3d.html#ga7dfb72c9cf9780a347fbe3d1c47e5d5a
+ */
+cv::Mat CalibFilter::getMap2()
+{
+    return map2;
 }
