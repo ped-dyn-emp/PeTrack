@@ -393,6 +393,7 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
                     // keine Extrapolation der Groesse
                     append(tp);
                 }
+
                 else
                 {
                     SPDLOG_WARN(
@@ -403,6 +404,7 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
                     return false;
                 }
             }
+
             else
             {
                 append(point);
@@ -753,7 +755,6 @@ size_t Tracker::calcPrevFeaturePoints(
             }
         }
     }
-
     return mPrevFeaturePointsIdx.size();
 }
 
@@ -778,7 +779,7 @@ size_t Tracker::calcPrevFeaturePoints(
  * @param errorScale
  * @return
  */
-int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int borderSize, float errorScale)
+int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int borderSize, cv::Mat map1, float errorScale)
 {
     int        inserted = 0;
     TrackPoint v;
@@ -798,79 +799,104 @@ int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int bord
         {
             v = Vec2F(mFeaturePoints.at(i).x, mFeaturePoints.at(i).y); // umwandlung nach TrackPoint bei "="
 
-            // ausserhalb der groesse des originalbildes
-            if((v.x() >= borderSize && v.y() >= borderSize && v.x() <= img.cols - 1 - borderSize &&
-                v.y() <= img.rows - 1 - borderSize) ||
-               (mTrackError[i] <
-                errorScale * MAX_TRACK_ERROR)) // nur bei kleinem Fehler darf auch im Randbereich getrackt werden
+            cv::Rect    rect(cv::Point2f(), map1.size());
+            cv::Point2f p(v.x(), v.y());
+
+            /*
+             * Check if the map1 contains the current track point, because otherwise the point is outside of the
+             * original image and it is not necessary to go ahead with this point.
+             */
+            if(rect.contains(p))
             {
-                // das Beschraenken auf die Bildgroesse ist reine sicherheitsmassnahme,
-                // oft sind tracking paths auch ausserhalb des bildes noch gut,
-                // aber beim tracken in die andere richtung kann es bei petrack probleme machen
-                if(v.x() >= 0 && v.y() >= 0 && v.x() <= img.cols - 1 && v.y() <= img.rows - 1)
+                cv::Vec2s vOriginal        = map1.at<cv::Vec2s>(v.y(), v.x());
+                short     sx               = vOriginal[0];
+                short     sy               = vOriginal[1];
+                int       headsize         = mMainWindow->getHeadSize();
+                float     distanceToBorder = headsize / 5.;
+
+                /*
+                 * To avoid problems at the image border, persons should only be tracked up to a certain distance to the
+                 * image border. So it is checked, if the current track point is to close to a border of the original
+                 * distorted image.
+                 */
+                if(sy - borderSize >= distanceToBorder && sx - borderSize >= distanceToBorder &&
+                   sy + borderSize <= img.rows - distanceToBorder && sx + borderSize <= img.cols - distanceToBorder)
                 {
-                    // borderSize abziehen, da Trackerdaten am Rand des Originalbildes 0/0 ist
-                    // set position relative to original image size
-                    v += borderSize2F;
-
+                    // ausserhalb der groesse des originalbildes
+                    if((v.x() >= borderSize && v.y() >= borderSize && v.x() <= img.cols - 1 - borderSize &&
+                        v.y() <= img.rows - 1 - borderSize) ||
+                       (mTrackError[i] <
+                        errorScale *
+                            MAX_TRACK_ERROR)) // nur bei kleinem Fehler darf auch im Randbereich getrackt werden
+                    {
+                        // das Beschraenken auf die Bildgroesse ist reine sicherheitsmassnahme,
+                        // oft sind tracking paths auch ausserhalb des bildes noch gut,
+                        // aber beim tracken in die andere richtung kann es bei petrack probleme machen
+                        if(v.x() >= 0 && v.y() >= 0 && v.x() <= img.cols - 1 && v.y() <= img.rows - 1)
+                        {
+                            // borderSize abziehen, da Trackerdaten am Rand des Originalbildes 0/0 ist
+                            // set position relative to original image size
+                            v += borderSize2F;
 #ifndef STEREO_DISABLED
-                    float x = -1, y = -1;
-                    // ACHTUNG: BORDER NICHT BEACHTET bei point.x()...
-                    // calculate height with disparity map
-                    if(mMainWindow->getStereoContext() &&
-                       mMainWindow->getStereoWidget()->stereoUseForHeight->isChecked())
-                    {
-                        mMainWindow->getStereoContext()->getMedianXYZaround((int) v.x(), (int) v.y(), &x, &y, &z);
-                        {
-                            v.setSp(x, y, z); // v.setZdistanceToCam(z);
-                        }
-                        //(*this)[i].setHeight(z, mMainWindow->getControlWidget()->getCameraAltitude(), frame);
-                    }
+                            float x = -1, y = -1;
+                            // ACHTUNG: BORDER NICHT BEACHTET bei point.x()...
+                            // calculate height with disparity map
+                            if(mMainWindow->getStereoContext() &&
+                               mMainWindow->getStereoWidget()->stereoUseForHeight->isChecked())
+                            {
+                                mMainWindow->getStereoContext()->getMedianXYZaround(
+                                    (int) v.x(), (int) v.y(), &x, &y, &z);
+                                {
+                                    v.setSp(x, y, z);
+                                }
+                            }
 #endif
+                            // wenn bei punkten, die nicht am rand liegen, der fehler gross ist,
+                            // wird geguckt, ob der sprung sich zur vorherigen richtung stark veraendert hat
+                            // wenn sprung sehr unterschiedlich, wird lieber interpoliert oder stehen geblieben
+                            // ist richtung ok, dann wird dunkelstes pixel gesucht
+                            // (subpixel aufgrund von nachbarpixel)
+                            // oder einfach bei schlechtem fehler mit groesserem winSize=30 den Problempunkt nochmal
+                            // machen
+                            // TODO Wird gerade eben nicht gemacht. Sollten wir???
 
-                    // wenn bei punkten, die nicht am rand liegen, der fehler gross ist,
-                    // wird geguckt, ob der sprung sich zur vorherigen richtung stark veraendert hat
-                    // wenn sprung sehr unterschiedlich, wird lieber interpoliert oder stehen geblieben
-                    // ist richtung ok, dann wird dunkelstes pixel gesucht
-                    // (subpixel aufgrund von nachbarpixel)
-                    // oder einfach bei schlechtem fehler mit groesserem winSize=30 den Problempunkt nochmal machen
-                    // TODO Wird gerade eben nicht gemacht. Sollten wir???
+                            // ueberpruefen, ob tracking ziel auf anderem tracking path landet, dann beide trackpaths
+                            // verschmelzen lassen
+                            found = false;
+                            if(mMainWindow->getControlWidget()
+                                   ->isTrackMergeChecked()) // wenn zusammengefuehrt=merge=verschmolzen werden soll
+                            {
+                                found = tryMergeTrajectories(v, i, frame);
+                            }
 
+                            // wenn keine verschmelzung erfolgte, versuchen trackpoint einzufuegen
+                            if(!found)
+                            {
+                                qual = static_cast<int>(errorToQual(mTrackError[i]));
+                                if(qual < 20)
+                                {
+                                    qual = 20;
+                                }
+                                v.setQual(qual); // qual um 50, damit nur reco-kopf-ellipsen points nicht herauskegeln
+                                // bei insertAtFrame wird qual beruecksichtigt, ob vorheiger besser
 
-                    // ueberpruefen, ob tracking ziel auf anderem tracking path landet, dann beide trackpaths
-                    // verschmelzen lassen
-                    found = false;
-                    if(mMainWindow->getControlWidget()
-                           ->isTrackMergeChecked()) // wenn zusammengefuehrt=merge=verschmolzen werden soll
-                    {
-                        found = tryMergeTrajectories(v, i, frame);
-                    }
+                                mPersonStorage.insertFeaturePoint(
+                                    mPrevFeaturePointsIdx[i],
+                                    frame,
+                                    v,
+                                    mPrevFeaturePointsIdx[i],
+                                    (mMainWindow->getControlWidget()->isTrackExtrapolationChecked()),
+                                    z,
+                                    mMainWindow->getControlWidget()->getCameraAltitude());
+                            }
 
-                    // wenn keine verschmelzung erfolgte, versuchen trackpoint einzufuegen
-                    if(!found)
-                    {
-                        qual = static_cast<int>(errorToQual(mTrackError[i]));
-                        if(qual < 20)
-                        {
-                            qual = 20;
+                            ++inserted;
                         }
-                        v.setQual(qual); // qual um 50, damit nur reco-kopf-ellipsen points nicht herauskegeln
-                        // bei insertAtFrame wird qual beruecksichtigt, ob vorheiger besser
-
-                        mPersonStorage.insertFeaturePoint(
-                            mPrevFeaturePointsIdx[i],
-                            frame,
-                            v,
-                            mPrevFeaturePointsIdx[i],
-                            (mMainWindow->getControlWidget()->isTrackExtrapolationChecked()),
-                            z,
-                            mMainWindow->getControlWidget()->getCameraAltitude());
                     }
-
-                    ++inserted;
                 }
             }
         }
+
         else
         {
             if(mStatus[i] == TrackStatus::NotTracked && v.x() >= dist && v.y() >= dist &&
@@ -905,8 +931,8 @@ bool Tracker::tryMergeTrajectories(const TrackPoint &v, size_t i, int frame)
         if(j != mPrevFeaturePointsIdx[i] && other.trackPointExist(frame) &&
            (other.trackPointAt(frame).distanceToPoint(v) < mMainWindow->getHeadSize(nullptr, j, frame) / 2.))
         {
-            // um ein fehltracking hin zu einer anderen Trajektorie nicht zum Verschmelzen dieser fuehren zu lassen
-            // (die fehlerbehandlung durch interpolation wird in insertAtFrame durchgefuehrt)
+            // um ein fehltracking hin zu einer anderen Trajektorie nicht zum Verschmelzen dieser fuehren zu
+            // lassen (die fehlerbehandlung durch interpolation wird in insertAtFrame durchgefuehrt)
             if(!((person.trackPointExist(frame - 1) &&
                   (person.trackPointAt(frame - 1).distanceToPoint(v) >
                    mMainWindow->getHeadSize(nullptr, mPrevFeaturePointsIdx[i], frame - 1) / 2.)) ||
@@ -944,8 +970,8 @@ bool Tracker::tryMergeTrajectories(const TrackPoint &v, size_t i, int frame)
 
 // default: int winSize=10, int level=3
 // winSize=3 ist genauer, aber kann auch leichter abgelenkt werden; winSize=30 ist robuster aber ungenauer
-// level kann groesser gewaehlt werden, wenn winSize klein, macht aber keinen grossen unterschied; (0) waere ohne
-// pyramide war , int winSize=10
+// level kann groesser gewaehlt werden, wenn winSize klein, macht aber keinen grossen unterschied; (0) waere
+// ohne pyramide war , int winSize=10
 /**
  * @brief Tracks points from the last frame in this (current) frame
  *
@@ -963,6 +989,7 @@ bool Tracker::tryMergeTrajectories(const TrackPoint &v, size_t i, int frame)
 int Tracker::track(
     cv::Mat                &img,
     cv::Rect               &rect,
+    cv::Mat                 map1,
     int                     frame,
     bool                    reTrack,
     int                     reQual,
@@ -1040,26 +1067,26 @@ int Tracker::track(
         refineViaColorPointLK(level, errorScale);
 
         BackgroundFilter *bgFilter = mMainWindow->getBackgroundFilter();
-        // testen, ob Punkt im Vordergrund liegt, ansonsten, wenn nicht gerade zuvor detektiert, ganze trajektorie
-        // loeschen (maximnale laenge ausserhalb ist somit 2 frames)
+        // testen, ob Punkt im Vordergrund liegt, ansonsten, wenn nicht gerade zuvor detektiert, ganze
+        // trajektorie loeschen (maximnale laenge ausserhalb ist somit 2 frames)
         if(bgFilter && bgFilter->getEnabled() && (mPrevFrame != -1)) // nur fuer den fall von bgSubtraction durchfuehren
         {
             useBackgroundFilter(trjToDel, bgFilter);
         }
 
         // (bei schlechten, aber noch ertraeglichem fehler in der naehe dunkelsten punkt suchen)
-        // dieser ansatz kann dazu fuehren, dass bei starken helligkeitsunterschieden auf pappe zum schatten gewandert
-        // wird!!!
+        // dieser ansatz kann dazu fuehren, dass bei starken helligkeitsunterschieden auf pappe zum schatten
+        // gewandert wird!!!
         if(!mMainWindow->getStereoWidget()->stereoUseForReco->isChecked() &&
            ((recoMethod == reco::RecognitionMethod::Casern) ||
-            (recoMethod ==
-             reco::RecognitionMethod::Hermes))) // nicht benutzen, wenn ueber disparity der kopf gesucht wird und somit
-                                                // kein marker vorhanden oder zumindest nicht am punkt lewigen muss
+            (recoMethod == reco::RecognitionMethod::Hermes))) // nicht benutzen, wenn ueber disparity der kopf
+                                                              // gesucht wird und somit kein marker vorhanden
+                                                              // oder zumindest nicht am punkt lewigen muss
         {
             refineViaNearDarkPoint();
         }
 
-        insertFeaturePoints(frame, numOfPeopleToTrack, img, borderSize, errorScale);
+        insertFeaturePoints(frame, numOfPeopleToTrack, img, borderSize, map1, errorScale);
     }
 
     cv::swap(mPrevGrey, mGrey);
@@ -1068,7 +1095,8 @@ int Tracker::track(
 
     // delete vorher ausgewaehlte trj
     // ACHTUNG: einzige stelle in tracker, wo eine trj geloescht wird
-    // trackNumberAll, trackShowOnlyNr werden nicht angepasst, dies wird aber am ende von petrack::updateimage gemacht
+    // trackNumberAll, trackShowOnlyNr werden nicht angepasst, dies wird aber am ende von petrack::updateimage
+    // gemacht
     for(int i = 0; i < trjToDel.size(); ++i) // ueber TrackPerson
     {
         mPersonStorage.delPointOf(trjToDel[i], 0, -1);
@@ -1078,6 +1106,7 @@ int Tracker::track(
     // da am bildrand pfade keinen nachfolger haben und somit dort immer neu bestimmt werden!
     return static_cast<int>(numOfPeopleToTrack);
 }
+
 
 /**
  * @brief Calculates the image pyramids for Lucas-Kanade
@@ -1194,8 +1223,8 @@ void Tracker::refineViaColorPointLK(int level, float errorScale)
     for(size_t i = 0; i < mPrevFeaturePointsIdx.size(); ++i)
     {
         const auto &person = mPersonStorage.at(mPrevFeaturePointsIdx[i]);
-        // wenn fehler zu gross, dann Farbmarkerelement nehmen // fuer multicolor marker / farbiger hut mit schwarzem
-        // punkt
+        // wenn fehler zu gross, dann Farbmarkerelement nehmen // fuer multicolor marker / farbiger hut mit
+        // schwarzem punkt
         if(useColor && mTrackError[i] > errorScale * 150.F &&
            person.at(mPrevFrame - person.firstFrame()).color().isValid())
         {

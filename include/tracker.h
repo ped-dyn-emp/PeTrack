@@ -266,12 +266,13 @@ public:
         int          borderSize,
         QSet<size_t> onlyVisible);
 
-    int insertFeaturePoints(int frame, size_t count, cv::Mat &img, int borderSize, float errorScale);
+    int insertFeaturePoints(int frame, size_t count, cv::Mat &img, int borderSize, cv::Mat map1, float errorScale);
 
     // frame ist frame fuer naechsten prev frame
     int track(
         cv::Mat                &img,
         cv::Rect               &rect,
+        cv::Mat                 map1,
         int                     frame,
         bool                    reTrack,
         int                     reQual,

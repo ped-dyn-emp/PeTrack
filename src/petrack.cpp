@@ -97,10 +97,7 @@ Petrack::Petrack(QString petrackVersion) :
     mSwapFilter.disable();
     mBackgroundFilter.disable();
     mStereoContext = nullptr;
-    mCalibFilter   = new CalibFilter; // schoener waere erst zu erzeugen, wenn video geladen wird, da sonst bei stereo
-                                      // erst normealer und dann stereo objekt erzeugt wird
-    mCalibFilter->disable(); // aber control widget greift schon bei erzeugung auf alle objekte zur einstellung zurueck
-
+    mCalibFilter.disable();
     mScene = new QGraphicsScene(this);
 
     mTrackingRoiItem = new RoiItem(this, Qt::blue);
@@ -3288,7 +3285,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         bool brightContrastChanged = mBrightContrastFilter.changed();
         bool swapChanged           = mSwapFilter.changed();
         bool borderChanged         = mBorderFilter.changed();
-        bool calibChanged          = mCalibFilter->changed();
+        bool calibChanged          = mCalibFilter.changed();
 
         // speicherverwaltung wird komplett von filtern ueberneommen
 
@@ -3337,11 +3334,11 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
         if(imageChanged || swapChanged || brightContrastChanged || borderChanged || calibChanged)
         {
-            mImgFiltered = mCalibFilter->apply(mImgFiltered);
+            mImgFiltered = mCalibFilter.apply(mImgFiltered);
         }
         else
         {
-            mImgFiltered = mCalibFilter->getLastResult();
+            mImgFiltered = mCalibFilter.getLastResult();
         }
 
         if(brightContrastChanged || swapChanged || borderChanged || calibChanged)
@@ -3429,9 +3426,11 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             // if (mPrevIplImgFiltered) // wenn ein vorheriges bild vorliegt
             //  mPrevIplImgFiltered == NULL zeigt an, dass neue bildfolge && mPrevFrame == -1 ebenso
             //  winSize(), wurde mal uebergeben
-            int anz = mTracker->track(
+            cv::Mat map1 = mCalibFilter.getMap1();
+            int     anz  = mTracker->track(
                 mImgFiltered,
                 rect,
+                map1,
                 frameNum,
                 mControlWidget->isTrackRepeatChecked(),
                 mControlWidget->getTrackRepeatQual(),
