@@ -160,6 +160,10 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         }
 
         QAction *selectedAction = menu.exec(event->screenPos());
+        if(selectedAction == nullptr)
+        {
+            return;
+        }
         if(selectedAction == creTrj)
         {
             mMainWindow->addOrMoveManualTrackPoint(event->scenePos());
