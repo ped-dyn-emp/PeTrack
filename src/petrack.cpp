@@ -188,6 +188,10 @@ Petrack::Petrack(QString petrackVersion) :
     connect(mView, &GraphicsView::mouseAltReleased, this, &Petrack::releaseTrackPoint);
     connect(mView, &GraphicsView::mouseCtrlWheel, this, &Petrack::scrollShowOnly);
 
+    mLogWindow = new LogWindow(this, nullptr);
+    mLogWindow->setWindowFlags(Qt::Window);
+    mLogWindow->setWindowTitle("Log");
+
     mPlayerWidget = new Player(mAnimation, this);
 
     QVBoxLayout *vLayout = new QVBoxLayout;
@@ -1745,6 +1749,10 @@ void Petrack::showHideControlWidget()
     // show | hide Control
     mViewWidget->hideControls(mHideControlsAct->isChecked());
 }
+void Petrack::showLogWindow()
+{
+    mLogWindow->show();
+}
 
 void Petrack::setCamera()
 {
@@ -1868,6 +1876,9 @@ void Petrack::createActions()
     mHideControlsAct->setCheckable(true);
     connect(mHideControlsAct, SIGNAL(triggered()), this, SLOT(showHideControlWidget()));
     connect(mHideControlsAct, SIGNAL(changed()), this, SLOT(showHideControlWidget()));
+
+    mShowLogWindowAct = new QAction(tr("&Show log window"), this);
+    connect(mShowLogWindowAct, &QAction::triggered, this, &Petrack::showLogWindow);
 
     mCropZoomViewAct = new QAction(tr("&Transform while saving"), this); // Crop and zoom while saving
     mCropZoomViewAct->setCheckable(true);
@@ -2028,6 +2039,8 @@ void Petrack::createMenus()
     mViewMenu->addAction(mFontAct);
     mViewMenu->addSeparator();
     mViewMenu->addAction(mHideControlsAct);
+    mViewMenu->addSeparator();
+    mViewMenu->addAction(mShowLogWindowAct);
 
     mDeleteMenu = new QMenu(tr("&Delete"), this);
     mDeleteMenu->addAction(mDelPastAct);

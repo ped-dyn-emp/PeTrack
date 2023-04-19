@@ -23,21 +23,27 @@
 #include <QString>
 #include <spdlog/fmt/bundled/format.h>
 #include <spdlog/fmt/ostr.h>
+#include <spdlog/sinks/ringbuffer_sink.h>
 #include <spdlog/sinks/stdout_sinks.h>
 #include <spdlog/spdlog.h>
 
 namespace logger
 {
+// Note: when changing this, also adapt messageBoxLogFormat accordingly!
+const std::string logFormat            = "[%s:%#:%!][%l] %v";
 const std::string messageBoxLoggerName = "pMessageBox";
 const std::string messageBoxLogFormat  = "[{}:{}:{}][{}] {}";
 
 inline void setupLogger()
 {
+    // add ringbuffer_sink to default logger to store messages for logwindow
+    auto ringbufferSink = std::make_shared<spdlog::sinks::ringbuffer_sink_mt>(10);
+    spdlog::default_logger()->sinks().push_back(ringbufferSink);
+
     // setup global logger, which should be used to display message on the command line only
     spdlog::set_level(spdlog::level::trace);
 
-    // Note: when changing this, also adapt messageBoxLogFormat accordingly!
-    spdlog::set_pattern("[%s:%#:%!][%l] %v");
+    spdlog::set_pattern(logFormat);
 
     // setup logger, which is used when also a dialog is displayed to the user
     auto messageBoxLogger = spdlog::stdout_logger_mt("pMessageBox");

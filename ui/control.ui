@@ -2239,6 +2239,7 @@
                 <widget class="QLabel" name="recoNumberNow">
                  <property name="font">
                   <font>
+                   <weight>75</weight>
                    <bold>true</bold>
                   </font>
                  </property>
@@ -3586,6 +3587,7 @@
               <widget class="QLabel" name="trackNumberNow">
                <property name="font">
                 <font>
+                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -3626,6 +3628,7 @@
               <widget class="QLabel" name="trackNumberVisible">
                <property name="font">
                 <font>
+                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
@@ -3641,6 +3644,7 @@
               <widget class="QLabel" name="trackNumberAll">
                <property name="font">
                 <font>
+                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
