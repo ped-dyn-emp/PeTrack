@@ -52,6 +52,11 @@ public:
     void        loadAutosave();
     bool        isAutosave(const QString &file);
 
+    int  getPetSaveInterval() const;
+    void setPetSaveInterval(int petSaveInterval);
+    int  getChangesTillAutosave() const;
+    void setChangesTillAutosave(int changesTillAutosave);
+
 private:
     static QString           buildAutosaveName(const QString &projectFileName, const QString &ending);
     static AutosaveFilenames autosaveNamesTrc(const QString &projectFileName);
@@ -59,16 +64,24 @@ private:
     void                     saveTrc();
     QStringList              getAutosave();
     static QStringList       getAutosave(const QFileInfo &projectPath);
+    void                     startTimer();
+    void                     stopTimer();
+    void                     restartTimer();
 
 private slots:
     void savePet();
 
 private:
-    static constexpr int petSaveInterval     = 120 * 1000; // in ms -> 120s
-    static constexpr int changesTillAutosave = 10;
+    /**
+     * Time interval in ms in which the pet file will be automatically be saved (in ms). Will be set with value from
+     * PeTrack::readSettings().
+     */
+    int petSaveInterval = -1;
 
-    void startTimer();
-    void stopTimer();
+    /**
+     * Number of changes until the trajectory (trc) will be saved. Will be set with value from PeTrack::readSettings().
+     */
+    int changesTillAutosave = -1;
 
     Petrack &mPetrack;
     QTimer  *mTimer;
