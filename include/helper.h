@@ -277,7 +277,6 @@ inline clock_t getElapsedTime()
 }
 bool newerThanVersion(const QString &q1, const QString &q2);
 
-
 /**
  * Computes the median of the values in a given vector.
  * @tparam T any sortable type

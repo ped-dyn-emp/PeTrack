@@ -38,6 +38,7 @@
 #include "calibFilter.h"
 #include "coordItem.h"
 #include "extrCalibration.h"
+#include "logwindow.h"
 #include "manualTrackpointMover.h"
 #include "moCapController.h"
 #include "moCapPerson.h"
@@ -86,6 +87,7 @@ class ColorMarkerWidget;
 class CodeMarkerWidget;
 class MultiColorMarkerWidget;
 class ViewWidget;
+class LogWindow;
 class Player;
 class TrackerItem;
 class StereoItem;
@@ -126,6 +128,7 @@ private slots:
     void fitInROI();
     void commandLineOptions();
     void keyBindings();
+    void showLogWindow();
     void about();
     void onlineHelp();
     void setCamera();
@@ -221,6 +224,7 @@ public:
     inline ColorMarkerWidget      *getColorMarkerWidget() { return mColorMarkerWidget; }
     inline CodeMarkerWidget       *getCodeMarkerWidget() { return mCodeMarkerWidget; }
     inline MultiColorMarkerWidget *getMultiColorMarkerWidget() { return mMultiColorMarkerWidget; }
+    inline LogWindow              *getLogWindow() { return mLogWindow; }
     inline GraphicsView           *getView() { return mView; }
     inline QGraphicsScene         *getScene() { return mScene; }
     inline QImage                 *getImage() { return mImage; }
@@ -377,6 +381,7 @@ private:
     ColorMarkerWidget      *mColorMarkerWidget;
     CodeMarkerWidget       *mCodeMarkerWidget;
     MultiColorMarkerWidget *mMultiColorMarkerWidget;
+    LogWindow              *mLogWindow;
 
     QAction      *mOpenSeqAct;
     QAction      *mOpenCameraAct;
@@ -420,6 +425,7 @@ private:
     QAction      *mDelPartRoiAct;
     QAction      *mCommandAct;
     QAction      *mKeyAct;
+    QAction      *mShowLogWindowAct;
     QAction      *mAboutAct;
     QAction      *mOnlineHelpAct;
     QAction      *mAutosaveSettings;
