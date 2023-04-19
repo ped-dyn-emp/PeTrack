@@ -349,6 +349,9 @@ public:
     const QString &getLastTrackerExport() const;
     void           setLastTrackerExport(const QString &newLastTrackerExport);
 
+private slots:
+    void openAutosaveSettings();
+
 private:
     void createActions();
     void createMenus();
@@ -419,6 +422,7 @@ private:
     QAction      *mKeyAct;
     QAction      *mAboutAct;
     QAction      *mOnlineHelpAct;
+    QAction      *mAutosaveSettings;
     QActionGroup *mCameraGroupView;
     QMenu        *mPlaybackSpeedMenu;
 

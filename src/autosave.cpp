@@ -174,6 +174,11 @@ void Autosave::stopTimer()
     }
 }
 
+void Autosave::restartTimer()
+{
+    stopTimer();
+    startTimer();
+}
 
 QString Autosave::buildAutosaveName(const QString &projectFileName, const QString &ending)
 {
@@ -297,4 +302,41 @@ QStringList Autosave::getAutosave(const QFileInfo &projectPath)
     }
 
     return QStringList{};
+}
+
+/**
+ * Time interval for pet file saves in s
+ * @return Time interval for pet file saves in s
+ */
+int Autosave::getPetSaveInterval() const
+{
+    return petSaveInterval / 1000;
+}
+
+/**
+ * Sets the time interval till the pet file is saved
+ * @param petSaveInterval time interval till save in s
+ */
+void Autosave::setPetSaveInterval(int petSaveInterval)
+{
+    Autosave::petSaveInterval = petSaveInterval * 1000;
+    restartTimer();
+}
+
+/**
+ * Number of changes until the trajectory (trc) will be saved
+ * @return Number of changes until the trajectory (trc) will be saved
+ */
+int Autosave::getChangesTillAutosave() const
+{
+    return changesTillAutosave;
+}
+
+/**
+ * Sets the number of changes until the trajectory (trc) is saved
+ * @param changesTillAutosave number of changes till save
+ */
+void Autosave::setChangesTillAutosave(int changesTillAutosave)
+{
+    Autosave::changesTillAutosave = changesTillAutosave;
 }

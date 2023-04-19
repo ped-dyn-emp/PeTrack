@@ -25,6 +25,7 @@
 #include "aboutDialog.h"
 #include "animation.h"
 #include "autoCalib.h"
+#include "autosaveSettings.h"
 #include "backgroundItem.h"
 #include "calibFilter.h"
 #include "codeMarkerWidget.h"
@@ -1847,6 +1848,9 @@ void Petrack::createActions()
     mResetSettingsAct->setEnabled(false); // da es noch nicht fehlerfrei funktioniert
     connect(mResetSettingsAct, SIGNAL(triggered()), this, SLOT(resetSettings()));
 
+    mAutosaveSettings = new QAction(tr("Autosave Settings"), this);
+    connect(mAutosaveSettings, &QAction::triggered, this, &Petrack::openAutosaveSettings);
+
     mExitAct = new QAction(tr("E&xit"), this);
     mExitAct->setShortcut(tr("Ctrl+Q"));
     connect(mExitAct, SIGNAL(triggered()), this, SLOT(close()));
@@ -1993,6 +1997,7 @@ void Petrack::createMenus()
     mFileMenu->addAction(mPrintAct);
     mFileMenu->addSeparator();
     mFileMenu->addAction(mResetSettingsAct);
+    mFileMenu->addAction(mAutosaveSettings);
     mFileMenu->addSeparator();
     mFileMenu->addAction(mExitAct);
 
@@ -2305,6 +2310,8 @@ void Petrack::readSettings()
     antialias();
     opengl();
     mSplitter->restoreState(settings.value("controlSplitterSizes").toByteArray());
+    mAutosave.setPetSaveInterval(settings.value("petSaveInterval", 120).toDouble());
+    mAutosave.setChangesTillAutosave(settings.value("changesTillAutosave", 10).toInt());
 }
 
 /**
@@ -2325,6 +2332,8 @@ void Petrack::writeSettings()
         settings.setValue("calibFile", mAutoCalib.getCalibFile(0));
     }
     settings.setValue("controlSplitterSizes", mSplitter->saveState());
+    settings.setValue("petSaveInterval", mAutosave.getPetSaveInterval());
+    settings.setValue("changesTillAutosave", mAutosave.getChangesTillAutosave());
 }
 
 bool Petrack::maybeSave()
@@ -4019,6 +4028,19 @@ void Petrack::skipToFrameFromTrajectory(QPointF pos)
             this,
             tr("Too many trajectories"),
             tr("PeTrack can't determine which point you meant. Try selecting fewer trajectories first."));
+    }
+}
+
+void Petrack::openAutosaveSettings()
+{
+    AutosaveSettings *autosaveSettings =
+        new AutosaveSettings(mAutosave.getPetSaveInterval(), mAutosave.getChangesTillAutosave(), this);
+    autosaveSettings->setModal(true);
+
+    if(autosaveSettings->exec() == QDialog::Accepted)
+    {
+        mAutosave.setPetSaveInterval(autosaveSettings->getPetSaveInterval());
+        mAutosave.setChangesTillAutosave(autosaveSettings->getChangesTillAutosave());
     }
 }
 

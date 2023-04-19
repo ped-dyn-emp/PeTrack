@@ -392,6 +392,7 @@ target_sources(petrack_core PRIVATE
     include/intrinsicCameraParams.h
     include/extrinsicBox.h
     include/extrinsicParameters.h
+    include/autosaveSettings.h
 )
 
 target_sources(petrack_core PRIVATE
@@ -459,6 +460,7 @@ target_sources(petrack_core PRIVATE
     src/filterBeforeBox.cpp
     src/intrinsicCameraParams.cpp
     src/extrinsicBox.cpp
+    src/autosaveSettings.cpp
     ui/about.ui
     ui/codeMarker.ui
     ui/colorMarker.ui
@@ -471,6 +473,7 @@ target_sources(petrack_core PRIVATE
     ui/filterBeforeBox.ui
     ui/intrinsicBox.ui
     ui/extrinsicBox.ui
+    ui/autosaveSettings.ui
 )
 
 target_sources(petrack PRIVATE
