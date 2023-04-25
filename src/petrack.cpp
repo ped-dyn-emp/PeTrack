@@ -433,6 +433,29 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
                 {
                     seq = tmpSeq;
                 }
+
+                // will show undistorted image until calibration is loaded as well
+                // but image changes maximum values e.g. for cx; need to set this first to ensure that the
+                // correct values can be read in
+                mSeqFileName = seq;
+                if(openSeq)
+                {
+                    if(seq != "")
+                    {
+                        openSequence(seq);
+                    }
+                    else
+                    {
+                        mAnimation->reset();
+                        mImg         = cv::Mat();
+                        mImgFiltered = cv::Mat();
+                        delete mImage;
+                        mImage = nullptr;
+                        updateSequence();
+                        mLogoItem->ensureVisible();
+                        mLogoItem->fadeIn();
+                    }
+                }
             }
             if(elem.hasAttribute("STATUS_HEIGHT"))
             {
@@ -562,27 +585,6 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
             SPDLOG_ERROR("Unknown PETRACK tag {}", elem.tagName());
         }
     }
-    // open koennte am schluss passieren, dann wuerde nicht erst unveraendertes bild angezeigt,
-    // dafuer koennte es aber sein, dass werte zb bei fx nicht einstellbar sind!
-    mSeqFileName = seq;
-    if(openSeq)
-    {
-        if(seq != "")
-        {
-            openSequence(seq);
-        }
-        else
-        {
-            mAnimation->reset();
-            mImg         = cv::Mat();
-            mImgFiltered = cv::Mat();
-            delete mImage;
-            mImage = nullptr;
-            updateSequence();
-            mLogoItem->ensureVisible();
-            mLogoItem->fadeIn();
-        }
-    }
 
     mMissingFrames.setExecuted(missingFramesExecuted);
     mMissingFrames.setMissingFrames(missingFrames);
@@ -647,6 +649,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     }
     setCamera();
     mPlayerWidget->setFPS(fps); // erst spaet setzen, damit Wert den des geladenen Videos ueberschreiben kann
+    updateImage();              // needed to undistort, draw border, etc. for first display
     setLoading(false);
 }
 
