@@ -130,8 +130,18 @@ void IntrinsicBox::imageSizeChanged(int width, int height, int borderDiff)
     }
     else
     {
-        mUi->cx->setValue(cX + borderDiff);
-        mUi->cy->setValue(cY + borderDiff);
+        try
+        {
+            setValue(mUi->cx, cX + borderDiff);
+            setValue(mUi->cy, cY + borderDiff);
+        }
+        catch(std::domain_error &)
+        {
+            PCritical(
+                nullptr,
+                "Image resize invalidated data",
+                "The image has a different size for which the current values for cx and cy are not valid anymore.");
+        }
     }
 }
 
