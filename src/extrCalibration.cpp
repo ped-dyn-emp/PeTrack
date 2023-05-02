@@ -159,7 +159,7 @@ std::optional<ExtrinsicParameters> ExtrCalibration::loadExtrCalibFile()
         return std::nullopt;
     }
 
-    if(mExtrCalibFile.right(4) != ".3dc" && mExtrCalibFile.right(4) != ".txt")
+    if(!mExtrCalibFile.endsWith(".3dc", Qt::CaseInsensitive) && !mExtrCalibFile.endsWith(".txt", Qt::CaseInsensitive))
     {
         PWarning(nullptr, "Unsupported File Type", "Unsupported file extension (supported: .3dc, .txt)");
         return std::nullopt;

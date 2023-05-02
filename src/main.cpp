@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
             // hat tracker_file bestimmte Dateiendung txt oder trc, dann wird nur genau diese exportiert, sonst beide
             autoPlayDest = arg.at(++i);
         }
-        else if(arg.at(i).right(4) == ".pet")
+        else if(arg.at(i).endsWith(".pet", Qt::CaseInsensitive))
         {
             // -project option ueberschreibt *.pet uebergabe ohne option!!
             if(project.isEmpty())
@@ -198,9 +198,11 @@ int main(int argc, char *argv[])
     {
         petrack.openSequence(sequence);
     }
-    if(autoSave && (autoSaveDest.right(4) != ".pet"))
+    if(autoSave && (!autoSaveDest.endsWith(".pet", Qt::CaseInsensitive)))
     {
-        if((autoSaveDest.right(4) == ".txt") || (autoSaveDest.right(5) == ".trav") || (autoSaveDest.right(4) == ".dat"))
+        if((autoSaveDest.endsWith(".txt", Qt::CaseInsensitive)) ||
+           (autoSaveDest.endsWith(".trav", Qt::CaseInsensitive)) ||
+           (autoSaveDest.endsWith(".dat", Qt::CaseInsensitive)))
         {
             petrack.exportTracker(autoSaveDest); // projekt wird geladen und nur Trajektoprien herausgeschrieben (zB
                                                  // wenn sich .pet (altitude) oder .trc aendert (delrec))
@@ -275,7 +277,7 @@ int main(int argc, char *argv[])
         }
 
         petrack.exportTracker(autoTrackDest);
-        if(autoSave && (autoSaveDest.right(4) == ".pet"))
+        if(autoSave && (autoSaveDest.endsWith(".pet", Qt::CaseInsensitive)))
         {
             petrack.saveProject(autoSaveDest);
         }
@@ -287,7 +289,7 @@ int main(int argc, char *argv[])
     {
         petrack.playAll();
         petrack.exportTracker(autoPlayDest);
-        if(autoSave && (autoSaveDest.right(4) == ".pet"))
+        if(autoSave && (autoSaveDest.endsWith(".pet", Qt::CaseInsensitive)))
         {
             petrack.saveProject(autoSaveDest);
         }
@@ -329,7 +331,7 @@ int main(int argc, char *argv[])
     {
         petrack.exportTracker(autoSaveTrackerFile);
     }
-    if(autoSave && (autoSaveDest.right(4) == ".pet"))
+    if(autoSave && (autoSaveDest.endsWith(".pet", Qt::CaseInsensitive)))
     {
         petrack.saveProject(autoSaveDest);
         return EXIT_SUCCESS;

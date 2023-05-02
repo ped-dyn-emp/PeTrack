@@ -348,11 +348,11 @@ void Petrack::dropEvent(QDropEvent *event)
 {
     if(event->mimeData()->hasUrls())
     {
-        if(event->mimeData()->urls().first().toLocalFile().right(4) == ".pet")
+        if(event->mimeData()->urls().first().toLocalFile().endsWith(".pet", Qt::CaseInsensitive))
         {
             openProject(event->mimeData()->urls().first().toLocalFile());
         }
-        else if(event->mimeData()->urls().first().toLocalFile().right(4) == ".trc")
+        else if(event->mimeData()->urls().first().toLocalFile().endsWith(".trc", Qt::CaseInsensitive))
         {
             importTracker(event->mimeData()->urls().first().toLocalFile());
         }
@@ -1148,7 +1148,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
             }
         }
     }
-    auto extension = dest.right(4);
+    auto extension = dest.right(4).toLower();
 
     int fourcc = -1;
     if(extension == ".mp4")
@@ -1481,7 +1481,8 @@ void Petrack::saveView(QString dest) // default = ""
 
         if(!dest.isEmpty())
         {
-            if(dest.right(4) == ".pdf" || dest.right(3) == ".ps" || dest.right(4) == ".eps")
+            if(dest.endsWith(".pdf", Qt::CaseInsensitive) || dest.endsWith(".ps", Qt::CaseInsensitive) ||
+               dest.endsWith(".eps", Qt::CaseInsensitive))
             {
                 QPdfWriter pdfWriter(dest);
                 pdfWriter.setPageMargins({0, 0, 0, 0});
@@ -1562,7 +1563,8 @@ void Petrack::saveImage(QString dest) // default = ""
 
         if(!dest.isEmpty())
         {
-            if(dest.right(4) == ".pdf" || dest.right(3) == ".ps" || dest.right(4) == ".eps")
+            if(dest.endsWith(".pdf", Qt::CaseInsensitive) || dest.endsWith(".ps", Qt::CaseInsensitive) ||
+               dest.endsWith(".eps", Qt::CaseInsensitive))
             {
                 QPdfWriter pdfWriter(dest);
                 pdfWriter.setPageMargins({0, 0, 0, 0});
@@ -2513,7 +2515,7 @@ void Petrack::importTracker(QString dest) // default = ""
 
     if(!dest.isEmpty())
     {
-        if(dest.right(4) == ".trc")
+        if(dest.endsWith(".trc", Qt::CaseInsensitive))
         {
             QFile file(dest);
             int   i, sz;
@@ -2593,8 +2595,8 @@ void Petrack::importTracker(QString dest) // default = ""
             mTrcFileName =
                 dest; // fuer Project-File, dann koennte track path direkt mitgeladen werden, wenn er noch da ist
         }
-        else if(dest.right(4) == ".txt") // 3D Koordinaten als Tracking-Daten importieren Zeilenformat: Personennr,
-                                         // Framenr, x, y, z
+        else if(dest.endsWith(".txt", Qt::CaseInsensitive)) // 3D Koordinaten als Tracking-Daten importieren
+                                                            // Zeilenformat: Personennr, Framenr, x, y, z
         {
             PWarning(
                 this,
@@ -2825,7 +2827,7 @@ void Petrack::exportTracker(QString dest) // default = ""
                                      mMultiColorMarkerWidget->autoCorrect->isChecked() &&
                                      mMultiColorMarkerWidget->autoCorrectOnlyExport->isChecked();
 
-        if(dest.right(4) == ".trc")
+        if(dest.endsWith(".trc", Qt::CaseInsensitive))
         {
             QTemporaryFile file;
 
@@ -2895,7 +2897,7 @@ void Petrack::exportTracker(QString dest) // default = ""
             mTrcFileName =
                 dest; // fuer Project-File, dann koennte track path direkt mitgeladen werden, wenn er// noch da ist
         }
-        else if(dest.right(4) == ".txt")
+        else if(dest.endsWith(".txt", Qt::CaseInsensitive))
         {
             QTemporaryFile file;
 
@@ -3004,7 +3006,7 @@ void Petrack::exportTracker(QString dest) // default = ""
 
             SPDLOG_INFO("finished");
         }
-        else if(dest.right(4) == ".dat")
+        else if(dest.endsWith(".dat", Qt::CaseInsensitive))
         {
             QTemporaryFile fileDat;
 
@@ -3067,7 +3069,7 @@ void Petrack::exportTracker(QString dest) // default = ""
 
             SPDLOG_INFO("finished");
         }
-        else if(dest.right(5) == ".trav")
+        else if(dest.endsWith(".trav", Qt::CaseInsensitive))
         {
             // recalcHeight true, wenn personenhoehe ueber trackpoints neu berechnet werden soll (z.b. um
             // waehrend play mehrfachberuecksichtigung von punkten auszuschliessen, aenderungen in altitude neu
