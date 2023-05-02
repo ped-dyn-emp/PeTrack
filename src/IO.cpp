@@ -55,7 +55,7 @@ std::variant<std::unordered_map<int, float>, std::string> IO::readHeightFile(con
     if(!heightFileName.isEmpty())
     {
         // Import heights from txt-file
-        if(heightFileName.right(4) == ".txt")
+        if(heightFileName.endsWith(".txt", Qt::CaseInsensitive))
         {
             QFile heightFile(heightFileName);
             if(!heightFile.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -280,7 +280,7 @@ std::variant<std::unordered_map<int, int>, std::string> IO::readMarkerIDFile(con
     if(!markerFileName.isEmpty())
     {
         // Import heights from txt-file
-        if(markerFileName.right(4) == ".txt")
+        if(markerFileName.endsWith(".txt", Qt::CaseInsensitive))
         {
             QFile markerFile(markerFileName);
             if(!markerFile.open(QIODevice::ReadOnly | QIODevice::Text))

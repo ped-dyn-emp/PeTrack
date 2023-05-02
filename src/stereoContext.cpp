@@ -1439,7 +1439,7 @@ bool pet::StereoContext::exportPointCloud(QString dest) // default = ""
 
         if(!dest.isEmpty())
         {
-            if(dest.right(4) == ".pts")
+            if(dest.endsWith(".pts", Qt::CaseInsensitive))
             {
                 QFile file(dest);
 

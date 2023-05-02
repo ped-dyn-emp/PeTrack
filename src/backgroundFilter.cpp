@@ -117,7 +117,7 @@ bool BackgroundFilter::save(QString /*dest*/) // default = ""
         }
         if(!dest.isEmpty())
         {
-            if(dest.right(4) != ".png")
+            if(!dest.endsWith(".png", Qt::CaseInsensitive))
                 dest = dest + ".png";
 
             Mat bgImg(Size(mBgPointCloud.cols, mBgPointCloud.rows), CV_8UC1);
