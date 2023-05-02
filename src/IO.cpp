@@ -110,7 +110,7 @@ std::variant<std::unordered_map<int, float>, std::string> IO::readHeightFile(con
 
                     if(auto inserted = markerHeights.insert(std::make_pair(markerID, height)); !inserted.second)
                     {
-                        return "Duplicate entry for markerID = " + std::to_string(markerID) + ".";
+                        return "File contains two height-entries for markerID = " + std::to_string(markerID) + ".";
                     }
                 }
                 else if(splitLine.empty())

@@ -69,7 +69,8 @@ TEST_CASE("src/IO", "[tracking][io]")
                 auto errorMessage = IO::readHeightFile(QString::fromStdString(heigtFileName));
                 REQUIRE(std::holds_alternative<std::string>(errorMessage));
                 std::string errorAsString = std::get<std::string>(errorMessage);
-                REQUIRE_THAT(errorAsString, Catch::Matchers::Equals("Duplicate entry for markerID = 987."));
+                REQUIRE_THAT(
+                    errorAsString, Catch::Matchers::Equals("File contains two height-entries for markerID = 987."));
             }
 
             SECTION("Wrong inputs")
