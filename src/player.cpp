@@ -398,9 +398,11 @@ void Player::playVideo()
                 if(mState == PlayerState::FORWARD &&
                    mAnimation->getCurrentFrameNum() == mAnimation->getSourceOutFrameNum())
                 {
-                    currentFrame = 0;
+                    currentFrame = mAnimation->getSourceInFrameNum();
                 }
-                else if(mState == PlayerState::BACKWARD && mAnimation->getCurrentFrameNum() == 0)
+                else if(
+                    mState == PlayerState::BACKWARD &&
+                    mAnimation->getCurrentFrameNum() == mAnimation->getSourceInFrameNum())
                 {
                     currentFrame = mAnimation->getSourceOutFrameNum();
                 }
