@@ -33,6 +33,7 @@
 #include "colorMarkerWidget.h"
 #include "colorRangeWidget.h"
 #include "control.h"
+#include "editMoCapDialog.h"
 #include "filterBeforeBox.h"
 #include "gridItem.h"
 #include "helper.h"
@@ -1050,6 +1051,12 @@ void Petrack::openMoCapFile()
     dialog.exec();
 }
 
+void Petrack::editMoCapSettings()
+{
+    auto *dialog = new EditMoCapDialog(this, mMoCapStorage, [this]() { mScene->update(); });
+    dialog->show();
+}
+
 void Petrack::updateWindowTitle()
 {
     QString title;
@@ -1811,6 +1818,9 @@ void Petrack::createActions()
     mOpenMoCapAct = new QAction(tr("Manage MoCap Files"), this);
     connect(mOpenMoCapAct, &QAction::triggered, this, &Petrack::openMoCapFile);
 
+    mEditMoCapAct = new QAction(tr("Edit MoCap Settings"), this);
+    connect(mEditMoCapAct, &QAction::triggered, this, &Petrack::editMoCapSettings);
+
     mSaveSeqVidAct = new QAction(tr("Save Video"), this);
     mSaveSeqVidAct->setEnabled(false);
     connect(mSaveSeqVidAct, SIGNAL(triggered()), this, SLOT(saveVideo()));
@@ -2004,6 +2014,7 @@ void Petrack::createMenus()
     mFileMenu->addAction(mOpenSeqAct);
     mFileMenu->addAction(mOpenCameraAct);
     mFileMenu->addAction(mOpenMoCapAct);
+    mFileMenu->addAction(mEditMoCapAct);
     mFileMenu->addAction(mSaveSeqVidAct);
     mFileMenu->addAction(mSaveSeqVidViewAct);
     mFileMenu->addAction(mSaveImageAct);

@@ -134,7 +134,10 @@ std::vector<SegmentRenderData> MoCapController::getRenderData(int currentFrame, 
     std::vector<SegmentRenderData> renderData;
     for(const auto &person : mStorage.getPersons())
     {
-        transformPersonSkeleton(person, framerate, currentFrame, renderData);
+        if(person.isVisible())
+        {
+            transformPersonSkeleton(person, framerate, currentFrame, renderData);
+        }
     }
     return renderData;
 }
@@ -379,6 +382,17 @@ void MoCapController::getXml(const QDomElement &elem)
                     metadata.setSamplerate(subElem.attribute("SAMPLE_RATE").toInt(&ok));
                     std::stringstream ss;
                     ss << "Element SAMPLE_RATE of file " << path << " does not contain a valid integer!";
+                    if(!ok)
+                    {
+                        throw std::invalid_argument(ss.str());
+                    }
+                }
+                if(subElem.hasAttribute("VISIBLE"))
+                {
+                    metadata.setVisible(subElem.attribute("VISIBLE").toInt(&ok));
+                    std::stringstream ss;
+                    ss << "Element VISIBLE of file " << path
+                       << " does not contain a valid value integer (should be 0 or 1)!";
                     if(!ok)
                     {
                         throw std::invalid_argument(ss.str());

@@ -394,6 +394,8 @@ target_sources(petrack_core PRIVATE
     include/extrinsicBox.h
     include/extrinsicParameters.h
     include/autosaveSettings.h
+    include/editMoCapDialog.h
+    include/moCapEditingWidget.h
 )
 
 target_sources(petrack_core PRIVATE
@@ -463,6 +465,10 @@ target_sources(petrack_core PRIVATE
     src/logwindow.cpp
     src/extrinsicBox.cpp
     src/autosaveSettings.cpp
+    src/editMoCapDialog.cpp
+    src/moCapEditingWidget.cpp
+    ui/moCapEditingWidget.ui
+    ui/editMoCapDialog.ui
     ui/about.ui
     ui/codeMarker.ui
     ui/colorMarker.ui

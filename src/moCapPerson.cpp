@@ -69,6 +69,16 @@ const MoCapPersonMetadata &MoCapPerson::getMetadata() const
     return mMetadata;
 }
 
+bool MoCapPerson::isVisible() const
+{
+    return mMetadata.isVisible();
+}
+
+void MoCapPerson::setVisible(bool visible)
+{
+    mMetadata.setVisible(visible);
+}
+
 void MoCapPerson::setMetadata(const MoCapPersonMetadata &metadata)
 {
     mMetadata = metadata;
@@ -85,6 +95,7 @@ void MoCapPerson::setXml(QDomElement &elem) const
     subElem.setAttribute("FILE", getFileList(QString::fromStdString(mMetadata.getFilepath())));
     subElem.setAttribute("SAMPLE_RATE", mMetadata.getSamplerate());
     subElem.setAttribute("SYSTEM", mMetadata.getSystem());
+    subElem.setAttribute("VISIBLE", mMetadata.isVisible());
 }
 
 void MoCapStorage::addPerson(const MoCapPerson &person)
