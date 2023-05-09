@@ -144,6 +144,7 @@ public slots:
     void openSequence(QString fileName = "");
     void openCameraLiveStream(int camID = -1);
     void openMoCapFile();
+    void editMoCapSettings();
     void saveSequence(bool saveVideo, bool saveView = false, QString dest = "");
     void saveView(QString dest = "");
     void saveImage(QString dest = "");
@@ -386,6 +387,7 @@ private:
     QAction      *mOpenSeqAct;
     QAction      *mOpenCameraAct;
     QAction      *mOpenMoCapAct;
+    QAction      *mEditMoCapAct;
     QAction      *mSaveSeqVidAct;
     QAction      *mSaveSeqVidViewAct;
     QAction      *mSaveSeqImgAct;
@@ -510,8 +512,8 @@ private:
     bool mAutoTrackOptimizeColor;
     bool mLoading;
 
-    MoCapStorage    mStorage;
-    MoCapController mMoCapController{mStorage, mExtrCalibration};
+    MoCapStorage    mMoCapStorage;
+    MoCapController mMoCapController{mMoCapStorage, mExtrCalibration};
 
     QString mPetrackVersion{"Unknown"};  ///< Version of PeTrack used to compile
     QString mGitCommitID{"Unknown"};     ///< Commit hash used to compile

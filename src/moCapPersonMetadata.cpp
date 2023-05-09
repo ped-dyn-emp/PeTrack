@@ -95,6 +95,16 @@ const std::string &MoCapPersonMetadata::getFilepath() const
     return mFilepath;
 }
 
+bool MoCapPersonMetadata::isVisible() const
+{
+    return mVisible;
+}
+
+void MoCapPersonMetadata::setVisible(bool newVisible)
+{
+    mVisible = newVisible;
+}
+
 MoCapSystem MoCapPersonMetadata::getSystem() const
 {
     return mSystem;
@@ -119,7 +129,8 @@ bool operator==(const MoCapPersonMetadata &lhs, const MoCapPersonMetadata &rhs)
 {
     return (
         lhs.getFilepath().compare(rhs.getFilepath()) == 0 && std::abs(lhs.getOffset() - rhs.getOffset()) < 1e-4 &&
-        std::abs(lhs.getSamplerate() - rhs.getSamplerate()) < 1e-4 && lhs.getSystem() == rhs.getSystem());
+        std::abs(lhs.getSamplerate() - rhs.getSamplerate()) < 1e-4 && lhs.getSystem() == rhs.getSystem() &&
+        lhs.isVisible() == rhs.isVisible());
 }
 
 bool operator!=(const MoCapPersonMetadata &lhs, const MoCapPersonMetadata &rhs)

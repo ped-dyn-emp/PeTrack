@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>529</width>
-    <height>151</height>
+    <height>159</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="mainLayout">
    <item>
     <widget class="QScrollArea" name="scrollArea">
      <property name="sizePolicy">
@@ -42,7 +42,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>509</width>
+        <width>505</width>
         <height>69</height>
        </rect>
       </property>

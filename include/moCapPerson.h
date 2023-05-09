@@ -49,6 +49,8 @@ public:
     const SkeletonTree        &getSkeleton(size_t samples) const;
     const std::string         &getFilename() const;
     const MoCapPersonMetadata &getMetadata() const;
+    bool                       isVisible() const;
+    void                       setVisible(bool visible);
 
 
     void setXml(QDomElement &elem) const;

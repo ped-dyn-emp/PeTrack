@@ -24,6 +24,7 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QScrollBar>
 
 OpenMoCapDialog::OpenMoCapDialog(QWidget *parent, MoCapController &controller) :
     QDialog(parent), mUi(new Ui::OpenMoCapDialog), mController(controller), mParent(parent)
@@ -43,6 +44,14 @@ OpenMoCapDialog::OpenMoCapDialog(QWidget *parent, MoCapController &controller) :
 
     connect(mUi->pushButtonOK, &QPushButton::clicked, this, &OpenMoCapDialog::clickedOk);
     connect(mUi->pushButtonCancel, &QPushButton::clicked, this, &OpenMoCapDialog::close);
+
+    mUi->moCapSelections->setMinimumSize(mUi->moCapSelections->minimumSizeHint());
+    // Scroll Area needs to be set manually; should respect minimum size of widget, but does not
+    // add some extra width for the frame and scrollbar
+    mUi->scrollArea->setMinimumWidth(
+        mUi->moCapSelections->sizeHint().width() + 2 * mUi->scrollArea->frameWidth() +
+        mUi->scrollArea->verticalScrollBar()->sizeHint().width());
+    resize(mUi->mainLayout->sizeHint());
 }
 
 

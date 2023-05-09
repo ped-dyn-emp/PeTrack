@@ -69,13 +69,16 @@ public:
     double             getOffset() const;
     double             getUserTimeOffset() const;
     const std::string &getFilepath() const;
+    bool               isVisible() const;
+    void               setVisible(bool newVisible);
 
 private:
     std::string mFilepath       = "";
     MoCapSystem mSystem         = XSensC3D;
     double      mSamplerate     = 60;
-    double      mUserTimeOffset = 0; ///< user chosen time offset from MoCap to video in seconds
-    double      mFileTimeOffset = 0; ///< time offset in seconds not from user but from MoCap-file
+    double      mUserTimeOffset = 0;    ///< user chosen time offset from MoCap to video in seconds
+    double      mFileTimeOffset = 0;    ///< time offset in seconds not from user but from MoCap-file
+    bool        mVisible        = true; ///< whether this person should be visualised
 };
 
 bool readsTheSame(const MoCapPersonMetadata &lhs, const MoCapPersonMetadata &rhs);
