@@ -46,6 +46,8 @@ public:
 private slots:
     void onTimeOffsetChanged(double newOffset);
     void onVisibleChanged(int newState);
+    void onTranslationChanged(double);
+    void onRotationChanged(double newAngle);
 
 private:
     Ui::MoCapEditingWidget *mUi;

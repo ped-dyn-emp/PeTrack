@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>139</width>
-    <height>117</height>
+    <width>402</width>
+    <height>155</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -57,10 +57,20 @@
     </layout>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
+    <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0,0,0">
      <property name="sizeConstraint">
       <enum>QLayout::SetMinAndMaxSize</enum>
      </property>
+     <item row="2" column="3">
+      <widget class="PDoubleSpinBox" name="trans_y">
+       <property name="minimum">
+        <double>-99999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>99999.000000000000000</double>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="sizePolicy">
@@ -74,16 +84,57 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="4">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Rotation</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>x [cm]</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="1">
       <widget class="PDoubleSpinBox" name="timeOffset">
+       <property name="decimals">
+        <number>3</number>
+       </property>
        <property name="minimum">
         <double>-999.000000000000000</double>
        </property>
+       <property name="maximum">
+        <double>999.000000000000000</double>
+       </property>
        <property name="singleStep">
-        <double>0.100000000000000</double>
+        <double>0.010000000000000</double>
        </property>
        <property name="value">
         <double>0.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>y [cm]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>z [cm]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>angle [°]</string>
        </property>
       </widget>
      </item>
@@ -97,6 +148,43 @@
        </property>
        <property name="text">
         <string>offset [s]:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="PDoubleSpinBox" name="trans_x">
+       <property name="minimum">
+        <double>-99999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>99999.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Translation</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="3">
+      <widget class="PDoubleSpinBox" name="trans_z">
+       <property name="minimum">
+        <double>-99999.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>99999.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="5">
+      <widget class="PDoubleSpinBox" name="angle">
+       <property name="minimum">
+        <double>-360.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>360.000000000000000</double>
        </property>
       </widget>
      </item>

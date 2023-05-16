@@ -21,7 +21,6 @@
 
 #include "helper.h"
 
-#include <QMatrix4x4>
 #include <QVector3D>
 #include <opencv2/core/types_c.h>
 

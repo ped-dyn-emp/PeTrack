@@ -31,7 +31,7 @@ def compare_xml(test: ET.ElementTree, truth: ET.ElementTree):
             if test_attrib[0] == "SOURCE_FRAME_IN":
                 # in 00_empty.pet = -1; but -1 gets read as 0, i.e. beginning of video
                 # need extra comparison for this
-                assert int(test_attrib[1]) == 0 and int(truth_attrib[1]) == -1
+                assert int(test_attrib[1]) == 0 and int(truth_attrib[1]) == -1, f"Failed comparison for SOURCE_FRAME_IN"
                 continue
 
             try:

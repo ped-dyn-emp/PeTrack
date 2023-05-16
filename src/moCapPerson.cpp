@@ -34,6 +34,11 @@ double MoCapPerson::getSampleIndex(double time) const
     return mMetadata.getSamplerate() * (time + mMetadata.getOffset());
 }
 
+SkeletonTree MoCapPerson::getSample(size_t sample) const
+{
+    return mSkeletons.at(sample).transformed(mMetadata.getRotation(), mMetadata.getTranslation());
+}
+
 void MoCapPerson::setSamplerate(double samplerate)
 {
     mMetadata.setSamplerate(samplerate);
@@ -47,6 +52,17 @@ void MoCapPerson::setUserTimeOffset(double timeOffset)
 void MoCapPerson::setFileTimeOffset(double timeOffset)
 {
     mMetadata.setFileTimeOffset(timeOffset);
+}
+
+void MoCapPerson::setTranslation(const cv::Vec3f &trans)
+{
+    cv::Affine3f newTrans{cv::Mat::eye({3, 3}, CV_32F), trans};
+    mMetadata.setTranslation(newTrans);
+}
+
+void MoCapPerson::setRotation(double angle)
+{
+    mMetadata.setAngle(angle);
 }
 
 void MoCapPerson::addSkeleton(const SkeletonTree &skeleton)
@@ -96,6 +112,11 @@ void MoCapPerson::setXml(QDomElement &elem) const
     subElem.setAttribute("SAMPLE_RATE", mMetadata.getSamplerate());
     subElem.setAttribute("SYSTEM", mMetadata.getSystem());
     subElem.setAttribute("VISIBLE", mMetadata.isVisible());
+    subElem.setAttribute("ANGLE", mMetadata.getAngle());
+    auto trans = mMetadata.getTranslation().translation();
+    subElem.setAttribute("TRANS_X", trans[0]);
+    subElem.setAttribute("TRANS_Y", trans[1]);
+    subElem.setAttribute("TRANS_Z", trans[2]);
 }
 
 void MoCapStorage::addPerson(const MoCapPerson &person)

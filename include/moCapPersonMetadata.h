@@ -58,27 +58,34 @@ public:
     void setSamplerate(double samplerate);
     void setUserTimeOffset(double offset);
     void setFileTimeOffset(double offset);
+    void setAngle(double angle);
+    void setTranslation(const cv::Affine3f &trans);
     void setMetadata(
         const std::string &filepath,
         MoCapSystem,
         double samplerate,
         double userTimeOffset,
         double fileTimeOffset);
-    MoCapSystem        getSystem() const;
-    double             getSamplerate() const;
-    double             getOffset() const;
-    double             getUserTimeOffset() const;
-    const std::string &getFilepath() const;
-    bool               isVisible() const;
-    void               setVisible(bool newVisible);
+    MoCapSystem         getSystem() const;
+    double              getSamplerate() const;
+    double              getOffset() const;
+    double              getUserTimeOffset() const;
+    const std::string  &getFilepath() const;
+    bool                isVisible() const;
+    void                setVisible(bool newVisible);
+    const cv::Affine3f &getRotation() const;
+    const cv::Affine3f &getTranslation() const;
+    double              getAngle() const;
 
 private:
-    std::string mFilepath       = "";
-    MoCapSystem mSystem         = XSensC3D;
-    double      mSamplerate     = 60;
-    double      mUserTimeOffset = 0;    ///< user chosen time offset from MoCap to video in seconds
-    double      mFileTimeOffset = 0;    ///< time offset in seconds not from user but from MoCap-file
-    bool        mVisible        = true; ///< whether this person should be visualised
+    std::string  mFilepath       = "";
+    MoCapSystem  mSystem         = XSensC3D;
+    double       mSamplerate     = 60;
+    double       mUserTimeOffset = 0; ///< user chosen time offset from MoCap to video in seconds
+    double       mFileTimeOffset = 0; ///< time offset in seconds not from user but from MoCap-file
+    cv::Affine3f mRotation       = cv::Affine3d::Identity(); ///< user chosen rotation around root-pos for viz
+    cv::Affine3f mTranslation    = cv::Affine3d::Identity(); ///< user chosen translation for viz; unit is cm
+    bool         mVisible        = true;                     ///< whether this person should be visualised
 };
 
 bool readsTheSame(const MoCapPersonMetadata &lhs, const MoCapPersonMetadata &rhs);

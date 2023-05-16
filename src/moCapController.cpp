@@ -112,9 +112,9 @@ void MoCapController::transformPersonSkeleton(
     }
 
     // Head Direction Arrow
-    Vec3F headDir_v = preSample.getHeadDir() * (1 - weight) + postSample.getHeadDir() * weight;
-    headDir_v.normalize();
-    cv::Point3f headDir = cv::Point3f(headDir_v.x(), headDir_v.y(), headDir_v.z());
+    cv::Vec3f headDir_v = preSample.getHeadDir() * (1 - weight) + postSample.getHeadDir() * weight;
+    headDir_v           = cv::normalize(headDir_v);
+    cv::Point3f headDir = cv::Point3f(headDir_v);
     headDir *= neckToHead3D.length();
 
     // Start arrow at 75% the way from C7 to top of head
@@ -397,6 +397,38 @@ void MoCapController::getXml(const QDomElement &elem)
                     {
                         throw std::invalid_argument(ss.str());
                     }
+                }
+                if(subElem.hasAttribute("ANGLE"))
+                {
+                    double            angle = subElem.attribute("ANGLE").toDouble(&ok);
+                    std::stringstream ss;
+                    ss << "Element ANGLE of file " << path
+                       << " does not contain a valid angle (should be between -360 and 360)!";
+                    if(!ok || abs(angle) > 360)
+                    {
+                        throw std::invalid_argument(ss.str());
+                    }
+                    metadata.setAngle(angle);
+                }
+                if(subElem.hasAttribute("TRANS_X") && subElem.hasAttribute("TRANS_Y") &&
+                   subElem.hasAttribute("TRANS_Z"))
+                {
+                    bool   allOk  = true;
+                    double transX = subElem.attribute("TRANS_X").toDouble(&ok);
+                    allOk &= ok;
+                    double transY = subElem.attribute("TRANS_Y").toDouble(&ok);
+                    allOk &= ok;
+                    double transZ = subElem.attribute("TRANS_Z").toDouble(&ok);
+                    allOk &= ok;
+
+                    std::stringstream ss;
+                    ss << "Element TRANS of file " << path << " does not contain a valid translation!";
+                    if(!allOk)
+                    {
+                        throw std::invalid_argument(ss.str());
+                    }
+                    metadata.setTranslation(
+                        cv::Affine3f(cv::Mat::eye(3, 3, CV_32F), cv::Vec3f(transX, transY, transZ)));
                 }
                 savedMetadata.push_back(metadata);
             }
