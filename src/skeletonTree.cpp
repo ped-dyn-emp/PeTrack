@@ -89,3 +89,25 @@ std::vector<SkeletonLine> SkeletonTree::getLines() const
     recurseSkeleton(mRoot, lines);
     return lines;
 }
+
+void transformTree(SkeletonNode &node, const cv::Affine3f &transform)
+{
+    node.transform(transform);
+    for(auto &child : node.getChildren())
+    {
+        transformTree(child, transform);
+    }
+}
+
+SkeletonTree SkeletonTree::transformed(cv::Affine3f rotation, cv::Affine3f translation) const
+{
+    SkeletonTree transformed{*this};
+    auto         transFrom       = cv::Affine3f().translate(mRotationCenter);
+    auto         transTo         = cv::Affine3f().translate(-mRotationCenter);
+    auto         rot_around_head = transTo.concatenate(rotation.concatenate(transFrom));
+    auto         transform       = rot_around_head.concatenate(translation);
+    transformTree(transformed.mRoot, transform);
+    cv::Matx33f rot      = transform.rotation();
+    transformed.mHeadDir = rot * mHeadDir;
+    return transformed;
+}

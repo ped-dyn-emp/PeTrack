@@ -37,13 +37,15 @@ class QDomElement;
 class MoCapPerson
 {
 public:
-    double                     getSampleIndex(double time) const;
-    inline bool                hasSample(size_t index) const { return index < mSkeletons.size(); };
-    inline const SkeletonTree &getSample(size_t sample) const { return mSkeletons.at(sample); }
+    double       getSampleIndex(double time) const;
+    inline bool  hasSample(size_t index) const { return index < mSkeletons.size(); }
+    SkeletonTree getSample(size_t sample) const;
 
     void                       setSamplerate(double samplerate);
     void                       setUserTimeOffset(double timeOffset);
     void                       setFileTimeOffset(double timeOffset);
+    void                       setTranslation(const cv::Vec3f &trans);
+    void                       setRotation(double angle);
     void                       setMetadata(const MoCapPersonMetadata &metadata);
     void                       addSkeleton(const SkeletonTree &skeleton);
     const SkeletonTree        &getSkeleton(size_t samples) const;

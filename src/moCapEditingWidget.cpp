@@ -30,6 +30,11 @@ MoCapEditingWidget::MoCapEditingWidget(QWidget *parent, MoCapPerson &moCapPerson
     mUi->fileName->setText(QString::fromStdString(mPerson.getFilename()));
     mUi->timeOffset->setValue(mPerson.getMetadata().getUserTimeOffset());
     mUi->showPerson->setChecked(mPerson.isVisible());
+    mUi->angle->setValue(mPerson.getMetadata().getAngle());
+    auto trans = mPerson.getMetadata().getTranslation().translation();
+    mUi->trans_x->setValue(trans[0]);
+    mUi->trans_y->setValue(trans[1]);
+    mUi->trans_z->setValue(trans[2]);
 
     connect(
         mUi->timeOffset,
@@ -37,6 +42,22 @@ MoCapEditingWidget::MoCapEditingWidget(QWidget *parent, MoCapPerson &moCapPerson
         this,
         &MoCapEditingWidget::onTimeOffsetChanged);
     connect(mUi->showPerson, &QCheckBox::stateChanged, this, &MoCapEditingWidget::onVisibleChanged);
+    connect(mUi->angle, qOverload<double>(&PDoubleSpinBox::valueChanged), this, &MoCapEditingWidget::onRotationChanged);
+    connect(
+        mUi->trans_x,
+        qOverload<double>(&PDoubleSpinBox::valueChanged),
+        this,
+        &MoCapEditingWidget::onTranslationChanged);
+    connect(
+        mUi->trans_y,
+        qOverload<double>(&PDoubleSpinBox::valueChanged),
+        this,
+        &MoCapEditingWidget::onTranslationChanged);
+    connect(
+        mUi->trans_z,
+        qOverload<double>(&PDoubleSpinBox::valueChanged),
+        this,
+        &MoCapEditingWidget::onTranslationChanged);
 
     setMinimumSize(mUi->mainLayout->minimumSize());
 }
@@ -65,5 +86,18 @@ void MoCapEditingWidget::onTimeOffsetChanged(double newOffset)
 void MoCapEditingWidget::onVisibleChanged(int newState)
 {
     mPerson.setVisible(newState == Qt::Checked);
+    mUpdateOverlay();
+}
+
+void MoCapEditingWidget::onTranslationChanged(double /*newVal*/)
+{
+    cv::Vec3f trans(mUi->trans_x->value(), mUi->trans_y->value(), mUi->trans_z->value());
+    mPerson.setTranslation(trans);
+    mUpdateOverlay();
+}
+
+void MoCapEditingWidget::onRotationChanged(double newAngle)
+{
+    mPerson.setRotation(newAngle);
     mUpdateOverlay();
 }

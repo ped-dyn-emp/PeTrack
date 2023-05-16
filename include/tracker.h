@@ -25,6 +25,7 @@
 #include <QColor>
 #include <QList>
 #include <QRegularExpression>
+#include <QSet>
 #include <QTextStream>
 #include <spdlog/fmt/bundled/format.h>
 

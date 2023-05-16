@@ -132,6 +132,8 @@ public:
      */
     inline cv::Point3f getPos() const { return mPoint; }
 
+    inline void transform(const cv::Affine3f &transform) { mPoint = transform * mPoint; }
+
 private:
     uint8_t                   mId;       /**< An identifier for the node. */
     cv::Point3f               mPoint;    /**< Position of the node. */
@@ -166,7 +168,11 @@ public:
      * @param[in] root  The root node for the Skeleton.
      * @param[in] dir  The direction the head is facing. The vector will be normalized.
      */
-    SkeletonTree(SkeletonNode root, const Vec3F &dir) : mRoot(std::move(root)), mHeadDir(dir) { mHeadDir.normalize(); }
+    SkeletonTree(SkeletonNode root, const cv::Vec3f &dir, const cv::Point3f &rotationCenter) :
+        mRoot(std::move(root)), mHeadDir(dir), mRotationCenter(rotationCenter)
+    {
+        mHeadDir = cv::normalize(mHeadDir);
+    }
 
     /**
      * @brief Moving constructor for the Skeleton.
@@ -176,7 +182,11 @@ public:
      * @param[in] root  The root node as a r-value.
      * @param[in] dir  The direction the head is facing in as a r-value
      */
-    SkeletonTree(SkeletonNode &&root, Vec3F &&dir) : mRoot(root), mHeadDir(dir) { mHeadDir.normalize(); }
+    SkeletonTree(SkeletonNode &&root, cv::Vec3f &&dir, cv::Point3f &&rotationCenter) :
+        mRoot(root), mHeadDir(dir), mRotationCenter(rotationCenter)
+    {
+        mHeadDir = cv::normalize(mHeadDir);
+    }
 
     std::vector<SkeletonLine> getLines() const;
 
@@ -200,11 +210,19 @@ public:
      *
      * @return The normalized direction of the head.
      */
-    inline const Vec3F &getHeadDir() const { return mHeadDir; }
+    inline const cv::Vec3f &getHeadDir() const { return mHeadDir; }
+
+    /**
+     * @brief Returns a copy translated by translation
+     * @param translation vector to add to each skeleton point
+     * @return translated copy of skeleton
+     */
+    SkeletonTree transformed(cv::Affine3f rotation, cv::Affine3f translation) const;
 
 private:
-    SkeletonNode mRoot;    /**< Root node of the skeleton. */
-    Vec3F        mHeadDir; /**< Direction the head is facing to. This value is normalized. */
+    SkeletonNode mRoot;           /**< Root node of the skeleton. */
+    cv::Vec3f    mHeadDir;        /**< Direction the head is facing to. This value is normalized. */
+    cv::Point3f  mRotationCenter; /**< Center of rotation for this skeleton tree (top of head)  */
 };
 
 

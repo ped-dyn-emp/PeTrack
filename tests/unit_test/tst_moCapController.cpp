@@ -75,7 +75,7 @@ SCENARIO("I want to get the render data with one person loaded", "[ui]")
 
     GIVEN("a skeleton with a head direction")
     {
-        person.addSkeleton({rootA, Vec3F{1, 0, 0}});
+        person.addSkeleton({rootA, cv::Vec3f{1, 0, 0}, {0, 0, 0}});
         // TODO Person entsprechend anpassen
         // NOTE Also am besten Person in der arrow/narrow GIVEN aufbauen
         AND_GIVEN("no interpolation")
@@ -106,7 +106,7 @@ SCENARIO("I want to get the render data with one person loaded", "[ui]")
         }
         AND_GIVEN("interpolation")
         {
-            person.addSkeleton({rootB, Vec3F{0, 1, 0}});
+            person.addSkeleton({rootB, cv::Vec3f{0, 1, 0}, cv::Vec3f{0, 0, 0}});
             storage.addPerson(person);
 
             THEN("we get the correct render data")

@@ -90,6 +90,25 @@ void MoCapPersonMetadata::setFileTimeOffset(double offset)
     mFileTimeOffset = offset;
 }
 
+void MoCapPersonMetadata::setAngle(double angle)
+{
+    // create rotation matrix rotating by angle in xy-plane
+    // -angle because OpenCV is made for left-handed image coords
+    auto rot2D = cv::getRotationMatrix2D({0, 0}, -angle, 1);
+    rot2D.convertTo(rot2D, CV_32F);
+    cv::Mat rot3D    = cv::Mat::eye({3, 3}, CV_32F);
+    auto    rot_view = rot3D.rowRange(0, 2).colRange(0, 2);
+    rot2D.rowRange(0, 2).colRange(0, 2).copyTo(rot_view);
+
+    mRotation = cv::Affine3f(rot3D);
+}
+
+void MoCapPersonMetadata::setTranslation(const cv::Affine3f &trans)
+{
+    mTranslation = trans;
+}
+
+
 const std::string &MoCapPersonMetadata::getFilepath() const
 {
     return mFilepath;
@@ -103,6 +122,34 @@ bool MoCapPersonMetadata::isVisible() const
 void MoCapPersonMetadata::setVisible(bool newVisible)
 {
     mVisible = newVisible;
+}
+
+const cv::Affine3f &MoCapPersonMetadata::getRotation() const
+{
+    return mRotation;
+}
+
+const cv::Affine3f &MoCapPersonMetadata::getTranslation() const
+{
+    return mTranslation;
+}
+
+/**
+ * @brief Returns angle with which to rotate the person
+ *
+ * The person can be rotated around its rotation point. That is
+ * usually the top of head. It is rotated in the xy-plane. This
+ * is the angle the person is rotated by.
+ *
+ * @return returns angle in degrees
+ */
+double MoCapPersonMetadata::getAngle() const
+{
+    // assume perfect rotation matrix
+    // [ cos a -sin a ]
+    // [ sin a  cos a ]
+    const auto &rot = mRotation.rotation();
+    return atan2(rot(1, 0), rot(0, 0)) * (180 / CV_PI);
 }
 
 MoCapSystem MoCapPersonMetadata::getSystem() const

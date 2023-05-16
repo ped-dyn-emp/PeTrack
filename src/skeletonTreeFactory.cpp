@@ -38,8 +38,8 @@ SkeletonTree SkeletonTreeFactory::generateTree(const XSenseStruct &points)
     SkeletonNode &neck = root.addChild(SkeletonNode(1, points.mNeck1));
 
     // continue with the neck
-    SkeletonNode &neck2 = neck.addChild(SkeletonNode(19, points.mNeck2));
-    neck2.addChild(SkeletonNode(2, points.mHeadTop));
+    SkeletonNode &neck2     = neck.addChild(SkeletonNode(19, points.mNeck2));
+    SkeletonNode &topOfHead = neck2.addChild(SkeletonNode(2, points.mHeadTop));
 
     // add the left arm
     SkeletonNode &lShoulder = neck.addChild(SkeletonNode(3, points.mShldrL));
@@ -73,7 +73,7 @@ SkeletonTree SkeletonTreeFactory::generateTree(const XSenseStruct &points)
     // the direction is calculated using the cross product
     cv::Point3f dir = headUp.cross(rightVector);
 
-    SkeletonTree skeleton(std::move(root), Vec3F(dir));
+    SkeletonTree skeleton(std::move(root), dir, topOfHead.getPos());
 
     return skeleton;
 }
