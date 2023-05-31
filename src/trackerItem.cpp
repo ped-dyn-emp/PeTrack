@@ -112,19 +112,18 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
                 }
             }
         }
-        QMenu       menu;
-        TrackPerson tp;
-        float       height             = 0.f;
-        bool        height_set_by_user = false;
-        QAction    *delTrj = nullptr, *delFutureTrj = nullptr, *delPastTrj = nullptr, *creTrj = nullptr,
+        QMenu    menu;
+        float    height             = 0.f;
+        bool     height_set_by_user = false;
+        QAction *delTrj = nullptr, *delFutureTrj = nullptr, *delPastTrj = nullptr, *creTrj = nullptr,
                 *infoTrj = nullptr, *addComment = nullptr, *setHeight = nullptr, *resetHeight = nullptr,
                 *setMarkerID = nullptr;
 
         if(found)
         {
-            i      = iNearest;
-            tp     = persons[i];
-            height = tp.height();
+            i              = iNearest;
+            TrackPerson tp = persons[i];
+            height         = tp.height();
 
             if(height < MIN_HEIGHT + 1)
             {
@@ -244,7 +243,7 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
                                   "<tr><td>comment:</td><td>%5</td></tr>"
                                   "<tr><td></td><td></td></tr>");
                 }
-
+                TrackPerson tp = persons[i];
                 if(tp.lastFrame() - tp.firstFrame() > 5)
                 {
                     out.append(QString("<tr><td>frame [%6]:</td><td>[%7, %8]</td></tr>"
@@ -404,11 +403,10 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
             {
                 if(mControlWidget->isTrackHeadSizedChecked())
                 {
-                    pSP = mMainWindow->getHeadSize(nullptr, static_cast<int>(i), curFrame); // headSize;
+                    pSP = mMainWindow->getHeadSize(nullptr, static_cast<int>(i), curFrame);
                 }
-                const TrackPoint &tp = person[curFrame - person.firstFrame()];
-                if(mControlWidget->isTrackShowCurrentPointChecked()) //(mControlWidget->recoShowColor->checkState() ==
-                                                                     // Qt::Checked)
+                const TrackPoint &tp = person.trackPointAt(curFrame);
+                if(mControlWidget->isTrackShowCurrentPointChecked())
                 {
                     painter->setBrush(Qt::NoBrush);
                     painter->setPen(currentPointLineWidthPen);
