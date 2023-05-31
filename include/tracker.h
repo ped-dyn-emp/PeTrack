@@ -119,29 +119,31 @@ struct fmt::formatter<TrackPoint>
     }
 };
 
-//--------------------------------------------------------------------------
-
-// the list index is the frame number plus mFirstFrame 0..mLastFrame-mFirstFrame
-// no frame is left blank
-class TrackPerson : public QList<TrackPoint>
+/**
+ * @brief Stores all tracking information for a whole trajectory, as markerID, color, comment and also the
+ * corresponding TrackPoints.
+ *
+ * A TrackPerson contains all TrackPoints from mFirstFrame to mLastFrame. The index in mData is the frame number plus
+ * mFirstFrame.
+ *
+ * Important: It is always a continuous range of frames for each person! No gaps in the middle!
+ */
+class TrackPerson
 {
 private:
-    int mNr;             // person number
-    int mMarkerID = -1;  // markerID of Trackperson; -1 as positive values including 0 do exist as
-                         // ArucoCodeNumbers-Values
-    double mHeight;      // height of the person
-    int    mHeightCount; // number of colors where mHeight is averaged
-    int    mFirstFrame;  // 0.. frame where the person was tracked the first time
-    int    mLastFrame;   // 0..
-    // int qual; // quality
-    bool    mNewReco;  // true if person was just recognized
-    QColor  mCol;      // color of point
-    QString mComment;  // comment for person
-    int     mNrInBg;   // number of successive frames in the background
-    int     mColCount; // number of colors where mCol is average from
+    int               mNr;            //< person number
+    int               mMarkerID = -1; //< unique marker ID of person, -1 indicates no found/used marker
+    double            mHeight;        //< height of the person
+    int               mHeightCount;   //< number of colors where mHeight is averaged
+    int               mFirstFrame;    //< frame where the person was tracked the first time
+    bool              mNewReco;       //< true if person was just recognized
+    QColor            mColor;         //< average color of person
+    QString           mComment;       //< comment for person
+    int               mNrInBg;        //< number of successive frames in the background
+    int               mColorCount;    //< number of colors where mColor is average from
+    QList<TrackPoint> mData{};        //< TrackPoints from mFirstFrame to mLastFrame;
 
 public:
-    TrackPerson();
     TrackPerson(int nr, int frame, const TrackPoint &p);
 
     TrackPerson(int nr, int frame, const TrackPoint &p, int markerID);
@@ -152,8 +154,7 @@ public:
     inline void setNrInBg(int n) { mNrInBg = n; }
 
     inline double height() const { return mHeight; }
-    // echte Personengroesse beim einlesen der trj datei
-    inline void setHeight(double h) { mHeight = h; }
+    inline void   setHeight(double h) { mHeight = h; }
     // beim setzen der Hoehe wird Mittelwert gebildet
     // z is z distance to camera
     // altitude is height of the camera over floor
@@ -172,16 +173,13 @@ public:
 
     inline int           getMarkerID() const { return mMarkerID; }
     inline void          setMarkerID(const int markerID) { mMarkerID = markerID; }
-    inline const QColor &color() const { return mCol; }
-    inline void          setColor(const QColor &col) { mCol = col; }
+    inline const QColor &color() const { return mColor; }
+    inline void          setColor(const QColor &col) { mColor = col; }
     inline bool          newReco() const { return mNewReco; }
     inline void          setNewReco(bool b) { mNewReco = b; }
     inline int           firstFrame() const { return mFirstFrame; }
-    inline void          setFirstFrame(int f) { mFirstFrame = f; }
-    inline int           lastFrame() const { return mLastFrame; }
-    inline void          setLastFrame(int f) { mLastFrame = f; }
+    inline int           lastFrame() const { return mFirstFrame + mData.size() - 1; }
     inline int           nr() const { return mNr; }
-    inline void          setNr(int nr) { mNr = nr; }
     inline const QString comment() const { return mComment; }
     /**
      * @brief Get the comment without line breaks
@@ -192,26 +190,45 @@ public:
     inline QString serializeComment() const { return QString{mComment}.replace(QRegularExpression("\n"), "<br>"); }
 
     inline void       setComment(QString s) { mComment = s; }
-    inline int        colCount() const { return mColCount; }
-    inline void       setColCount(int c) { mColCount = c; }
+    inline int        colCount() const { return mColorCount; }
+    inline void       setColCount(int c) { mColorCount = c; }
     void              addColor(const QColor &col);
     void              optimizeColor();
     bool              trackPointExist(int frame) const;
-    const TrackPoint &trackPointAt(int frame) const; // & macht bei else probleme, sonst mit [] zugreifbar
+    const TrackPoint &trackPointAt(int frame) const;
     // gibt -1 zurueck, wenn frame oder naechster frame nicht existiert
     // entfernung ist absolut
     double distanceToNextFrame(int frame) const;
     void   syncTrackPersonMarkerID(int markerID);
+
+    const TrackPoint &at(int i) const;
+
+    int                               size() const;
+    bool                              isEmpty() const;
+    const TrackPoint                 &first() const;
+    const TrackPoint                 &last() const;
+    QList<TrackPoint>::const_iterator begin() const;
+    QList<TrackPoint>::const_iterator end() const;
+    QList<TrackPoint>::const_iterator cbegin() const;
+    QList<TrackPoint>::const_iterator cend() const;
+
+    void append(const TrackPoint &trackPoint);
+    void clear();
+    void replaceTrackPoint(int frame, TrackPoint trackPoint);
+    void updateStereoPoint(int frame, Vec3F stereoPoint);
+    void updateMarkerID(int frame, int markerID);
+
+    void removeFramesBetween(int startFrame, int endFrame);
 };
 
 // mHeightCount wird nicht e3xportiert und auch nicht wieder eingelesen -> nach import auf 0 obwohl auf height ein wert
 // steht, daher immer mheight auf -1 testen!!!
 // keine Konsistenzueberpruefung
-QTextStream &operator>>(QTextStream &s, TrackPerson &tp);
-
 QTextStream &operator<<(QTextStream &s, const TrackPerson &tp);
 
 std::ostream &operator<<(std::ostream &s, const TrackPerson &tp);
+
+TrackPerson fromTrc(QTextStream &stream);
 
 //----------------------------------------------------------------------------
 

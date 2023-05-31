@@ -60,6 +60,7 @@
 #include <QtPrintSupport/QPrinter>
 #include <cmath>
 #include <ctime>
+#include <deque>
 #include <iomanip>
 #include <opencv2/opencv.hpp>
 
@@ -2542,7 +2543,6 @@ void Petrack::importTracker(QString dest) // default = ""
             mTracker->reset();
 
             QTextStream in(&file);
-            TrackPerson tp;
             QString     comment;
 
             bool    ok; // shows if int stands in first line - that was in the first version of trc file
@@ -2584,16 +2584,8 @@ void Petrack::importTracker(QString dest) // default = ""
             }
             for(i = 0; i < sz; ++i)
             {
-                if(trcVersion == 2)
-                {
-                    in >> tp;
-                }
-                else if(trcVersion >= 3)
-                {
-                    in >> tp;
-                }
+                TrackPerson tp = fromTrc(in);
                 mPersonStorage.addPerson(tp);
-                tp.clear(); // loeschen, sonst immer weitere pfade angehangen werden
             }
 
             mControlWidget->setTrackNumberAll(QString("%1").arg(mPersonStorage.nbPersons()));
@@ -2616,8 +2608,8 @@ void Petrack::importTracker(QString dest) // default = ""
                    "system now is exactly at the same position and orientation than at export time!"));
 
             QFile file(dest);
-            // size of person list
-            int sz = 0;
+
+            int numberImportedPersons = 0;
 
             if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
             {
@@ -2630,100 +2622,103 @@ void Petrack::importTracker(QString dest) // default = ""
             mTracker->reset();
 
             QTextStream in(&file);
-            TrackPerson tp;
             TrackPoint  tPoint;
-            cv::Point2f p2d;
 
             QString line;
-            QString headerline;
-            bool    exec_once_flag        = false;
-            double  conversionFactorTo_cm = 1.0;
-            int     personNr = -1, frameNr = -1, current_personNr = 1;
-            float   x, y, z;
+            bool    unitFound            = false;
+            double  conversionFactorToCM = 1.0;
 
-            while(1)
+            std::unordered_map<int, std::map<int, Vec3F>> personData;
+            QString                                       headerline;
+
+            while(in.readLineInto(&line))
             {
-                // Falls Datei am Ende letzte Person abspeichern und Lese-Schleife beenden
-                if(in.atEnd())
-                {
-                    tp.setLastFrame(frameNr);
-                    mPersonStorage.addPerson(tp);
-                    ++sz;
-                    tp.clear();
-                    break;
-                }
-
-                line = in.readLine();
-
-                // Kommentare ueberlesen
                 if(line.startsWith("#", Qt::CaseInsensitive))
                 {
                     headerline = line;
                     continue;
                 }
 
-                if((!exec_once_flag) && (!headerline.contains("cm")))
+                if((!unitFound) && (!headerline.contains("cm")))
                 {
-                    conversionFactorTo_cm = 100.0;
-                    exec_once_flag        = true;
+                    conversionFactorToCM = 100.0;
+                    unitFound            = true;
                     PWarning(
                         this,
                         tr("PeTrack"),
                         tr("PeTrack will interpret position data as unit [m]. No header with [cm] found."));
                 }
 
-                QTextStream stream(&line);
+                // Read data from line with format: persNr frameNr x y z
+                int   personNr = -1, frameNr = -1;
+                float x, y, z;
 
-                // Zeile als Stream einlesen Format: [id frame x y z]
+                QTextStream stream(&line);
                 stream >> personNr >> frameNr >> x >> y >> z;
 
                 // convert data to cm
-                x = x * conversionFactorTo_cm;
-                y = y * conversionFactorTo_cm;
-                z = z * conversionFactorTo_cm;
+                x = x * conversionFactorToCM;
+                y = y * conversionFactorToCM;
+                z = z * conversionFactorToCM;
 
-                // 3-dimensionale Berechnung/Anzeige des Punktes
-                if(mControlWidget->getCalibCoordDimension() == 0)
+                if(personData[personNr].find(frameNr) == personData[personNr].end())
                 {
-                    p2d = mExtrCalibration.getImagePoint(cv::Point3f(x, y, z));
+                    personData[personNr][frameNr] = Vec3F(x, y, z);
                 }
-                // 2-dimensionale Berechnung/Anzeige des Punktes
                 else
                 {
-                    QPointF pos = mImageItem->getPosImage(QPointF(x, y), z);
-                    p2d.x       = pos.x();
-                    p2d.y       = pos.y();
+                    PCritical(
+                        this,
+                        "Error importing txt file",
+                        tr("Could not import the data from the provided txt file, as the data for person %1 in frame "
+                           "%1 is twice in the txt-file.")
+                            .arg(personNr)
+                            .arg(frameNr));
+                    return;
+                }
+            }
+
+            for(auto &[persNr, frameData] : personData)
+            {
+                std::deque<TrackPoint> pixelPoints;
+                for(auto &[frameNr, realWorldCoordinates] : frameData)
+                {
+                    cv::Point2f p2d;
+
+                    if(mControlWidget->getCalibCoordDimension() == 0)
+                    {
+                        // compute image point from 3d calibration
+                        p2d = mExtrCalibration.getImagePoint(
+                            cv::Point3f(realWorldCoordinates.x(), realWorldCoordinates.y(), realWorldCoordinates.z()));
+                    }
+                    else
+                    {
+                        // compute image point from 2d calibration
+                        QPointF pos = mImageItem->getPosImage(
+                            QPointF(realWorldCoordinates.x(), realWorldCoordinates.y()), realWorldCoordinates.z());
+                        p2d.x = pos.x();
+                        p2d.y = pos.y();
+                    }
+
+                    TrackPoint trackPoint(Vec2F(p2d.x, p2d.y), 100);
+                    trackPoint.setSp(
+                        realWorldCoordinates.x(),
+                        realWorldCoordinates.y(),
+                        -mControlWidget->getExtrinsicParameters().trans3 -
+                            realWorldCoordinates.z()); // distance to camera as with stereo cameras
+                    pixelPoints.push_back(trackPoint);
                 }
 
-                tPoint = TrackPoint(Vec2F(p2d.x, p2d.y), 100);
-                tPoint.setSp(
-                    x,
-                    y,
-                    -mControlWidget->getExtrinsicParameters().trans3 -
-                        z); // fuer den Abstand zur Kamera in z-Richtung wie bei einer Stereokamera
+                TrackPerson trackPerson(persNr, frameData.begin()->first, pixelPoints.front());
+                trackPerson.setHeight(frameData.begin()->second.z());
+                pixelPoints.pop_front();
 
-                // Neue ID ? ==> letzte Person beendet ==> abspeichern
-                if(personNr > current_personNr)
+                for(const auto &trackPoint : pixelPoints)
                 {
-                    mPersonStorage.addPerson(tp);
-                    ++sz;
-                    current_personNr++;
-                    tp.clear();
+                    trackPerson.append(trackPoint);
                 }
-
-                // TrackPerson leer ? ==> Neue TrackPerson erstellen
-                if(tp.isEmpty())
-                {
-                    tp = TrackPerson(personNr, frameNr, tPoint);
-                    tp.setFirstFrame(frameNr);
-                    tp.setHeight(z);
-                }
-                // TrackPoint an TrackPerson anhaengen
-                else
-                {
-                    tp.setLastFrame(frameNr);
-                    tp.append(tPoint);
-                }
+                mPersonStorage.addPerson(trackPerson);
+                numberImportedPersons++;
             }
 
             mControlWidget->setTrackNumberAll(QString("%1").arg(mPersonStorage.nbPersons()));
@@ -2732,9 +2727,8 @@ void Petrack::importTracker(QString dest) // default = ""
                 QString("%1").arg(mPersonStorage.visible(mAnimation->getCurrentFrameNum())));
             mControlWidget->replotColorplot();
             file.close();
-            SPDLOG_INFO("import {} ({} person(s))", dest, sz);
-            mTrcFileName =
-                dest; // fuer Project-File, dann koennte track path direkt mitgeladen werden, wenn er noch da ist
+            SPDLOG_INFO("import {} ({} person(s))", dest, numberImportedPersons);
+            mTrcFileName = dest;
         }
         else
         {

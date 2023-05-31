@@ -35,25 +35,16 @@
 void PersonStorage::splitPerson(size_t pers, int frame)
 {
     mAutosave.trackPersonModified();
-    int j;
 
     if(mPersons.at(pers).firstFrame() < frame)
     {
         mPersons.push_back(mPersons.at(pers));
 
         // alte trj einkuerzen und ab aktuellem frame zukunft loeschen
-        for(j = 0; j < mPersons.at(pers).lastFrame() - frame + 1; ++j)
-        {
-            mPersons[pers].removeLast();
-        }
-        mPersons[pers].setLastFrame(frame - 1);
+        mPersons[pers].removeFramesBetween(frame, mPersons[pers].lastFrame());
 
         // neu angehaengte/gedoppelte trajektorie
-        for(j = 0; j < frame - mPersons.back().firstFrame(); ++j)
-        {
-            mPersons.back().removeFirst();
-        }
-        mPersons.back().setFirstFrame(frame);
+        mPersons.back().removeFramesBetween(mPersons[pers].firstFrame(), frame - 1);
     }
 }
 
@@ -96,11 +87,7 @@ bool PersonStorage::delPointOf(int pers, int direction, int frame)
     mAutosave.trackPersonModified();
     if(direction == -1)
     {
-        for(int j = 0; j < frame - mPersons.at(pers).firstFrame(); ++j)
-        {
-            mPersons[pers].removeFirst();
-        }
-        mPersons[pers].setFirstFrame(frame);
+        mPersons[pers].removeFramesBetween(mPersons[pers].firstFrame(), frame - 1);
     }
     else if(direction == 0)
     {
@@ -108,13 +95,8 @@ bool PersonStorage::delPointOf(int pers, int direction, int frame)
     }
     else if(direction == 1)
     {
-        for(int j = 0; j < mPersons.at(pers).lastFrame() - frame; ++j)
-        {
-            mPersons[pers].removeLast();
-        }
-        mPersons[pers].setLastFrame(frame);
+        mPersons[pers].removeFramesBetween(frame + 1, mPersons[pers].lastFrame());
     }
-
     return true;
 }
 
@@ -159,21 +141,14 @@ void PersonStorage::delPointAll(Direction direction, int frame)
             switch(direction)
             {
                 case Direction::Previous:
-                    for(int j = 0; j < frame - mPersons.at(i).firstFrame(); ++j)
-                    {
-                        mPersons[i].removeFirst();
-                    }
-                    mPersons[i].setFirstFrame(frame);
+                    mPersons[i].removeFramesBetween(mPersons[i].firstFrame(), frame - 1);
+
                     break;
                 case Direction::Whole:
                     mPersons.erase(mPersons.begin() + i--); // nach Loeschen wird i um 1 erniedrigt
                     break;
                 case Direction::Following:
-                    for(int j = 0; j < mPersons.at(i).lastFrame() - frame; ++j)
-                    {
-                        mPersons[i].removeLast();
-                    }
-                    mPersons[i].setLastFrame(frame);
+                    mPersons[i].removeFramesBetween(frame + 1, mPersons[i].lastFrame());
                     break;
             }
         }
@@ -410,8 +385,7 @@ void PersonStorage::moveTrackPoint(int personID, int frame, const Vec2F &newPosi
     newPoint.setQual(100);
     if(person.trackPointExist(frame))
     {
-        int idx     = frame - person.firstFrame();
-        person[idx] = newPoint;
+        person.replaceTrackPoint(frame, newPoint);
     }
     else
     {
@@ -972,9 +946,9 @@ void PersonStorage::resetPos()
     mAutosave.trackPersonModified();
     for(auto &person : mPersons)
     {
-        for(auto &point : person)
+        for(int frame = person.firstFrame(); frame <= person.lastFrame(); ++frame)
         {
-            point.setSp(-1., -1., -1.);
+            person.updateStereoPoint(frame, {-1, -1, -1});
         }
     }
 }
@@ -1044,7 +1018,7 @@ void PersonStorage::setMarkerHeights(const std::unordered_map<int, float> &heigh
     mAutosave.trackPersonModified();
     for(auto &person : mPersons) // over TrackPerson
     {
-        for(auto &point : person) // over TrackPoints
+        for(const auto &point : person) // over TrackPoints
         {
             // markerID of current person at current TrackPoint:
             int markerID = point.getMarkerID();
@@ -1067,7 +1041,7 @@ void PersonStorage::setMarkerHeights(const std::unordered_map<int, float> &heigh
 }
 
 /**
- * Sets/Overwrites the markerID for a specific person and all trackpaints belonging to that person
+ * Sets/Overwrites the markerID for a specific person and all trackpoints belonging to that person
  * @param personIndex internal id of persons (0 based)
  * @param markerIDs new marker ID
  */
@@ -1079,9 +1053,10 @@ void PersonStorage::setMarkerID(size_t personIndex, int markerID, bool manual)
     }
     auto &person = mPersons.at(personIndex);
     person.setMarkerID(markerID);
-    for(auto &trackPoint : person) // over TrackPoints
+    person.syncTrackPersonMarkerID(markerID);
+    for(int frame = person.firstFrame(); frame <= person.lastFrame(); ++frame)
     {
-        trackPoint.setMarkerID(markerID);
+        person.updateMarkerID(frame, markerID);
     }
 }
 
@@ -1146,7 +1121,7 @@ void PersonStorage::purge(int frame)
 }
 
 /**
- * @brief Smoothes the height of a stereo point of a person
+ * @brief Smooths the height of a stereo point of a person
  * @param i index of person whose heights/z-coordinates to smooth
  * @param j index of the stereo point whose height to smooth
  */
@@ -1156,7 +1131,8 @@ void PersonStorage::smoothHeight(size_t i, int j)
     // haben: j auf j+1
     int  tsize      = mPersons[i].size();
     auto firstFrame = mPersons[i].firstFrame();
-    if(mPersons[i][j].sp().z() != -1)
+
+    if(mPersons[i].at(j).sp().z() != -1)
     {
         int nrFor = 1; // anzahl der ztrackpoint ohne hoeheninfo
         int nrRew = 1;
@@ -1178,8 +1154,9 @@ void PersonStorage::smoothHeight(size_t i, int j)
         {
             if(fabs(mPersons[i].at(j - nrRew).sp().z() - mPersons[i].at(j).sp().z()) > nrRew * 40.) // 40cm
             {
-                mPersons[i][j].setSp(
-                    mPersons[i].at(j).sp().x(), mPersons[i].at(j).sp().y(), mPersons[i].at(j - nrRew).sp().z());
+                mPersons[i].updateStereoPoint(
+                    j + mPersons[i].firstFrame(),
+                    {mPersons[i].at(j).sp().x(), mPersons[i].at(j).sp().y(), mPersons[i].at(j - nrRew).sp().z()});
                 SPDLOG_WARN(
                     "Trackpoint smoothed height at the end or next to unknown height in the future for trajectory {} "
                     "in frame {}.",
@@ -1193,8 +1170,9 @@ void PersonStorage::smoothHeight(size_t i, int j)
         {
             if(fabs(mPersons[i].at(j + nrFor).sp().z() - mPersons[i].at(j).sp().z()) > nrFor * 40.) // 40cm
             {
-                mPersons[i][j].setSp(
-                    mPersons[i].at(j).sp().x(), mPersons[i].at(j).sp().y(), mPersons[i].at(j + nrFor).sp().z());
+                mPersons[i].updateStereoPoint(
+                    j + mPersons[i].firstFrame(),
+                    {mPersons[i].at(j).sp().x(), mPersons[i].at(j).sp().y(), mPersons[i].at(j + nrFor).sp().z()});
                 SPDLOG_WARN(
                     "TrackPoint smoothed height at the beginning or next to unknown height in the past for trajectory "
                     "{} in frame {}.",
@@ -1212,7 +1190,8 @@ void PersonStorage::smoothHeight(size_t i, int j)
             // lineare interpolation
             if(fabs(zMedian - mPersons[i].at(j).sp().z()) > 20. * (nrFor + nrRew)) // 20cm
             {
-                mPersons[i][j].setSp(mPersons[i].at(j).sp().x(), mPersons[i].at(j).sp().y(), zMedian);
+                mPersons[i].updateStereoPoint(
+                    j + mPersons[i].firstFrame(), {mPersons[i].at(j).sp().x(), mPersons[i].at(j).sp().y(), zMedian});
                 SPDLOG_WARN("Trackpoint smoothed height inside for trajectory {} in frame {}.", i + 1, j + firstFrame);
             }
         }
@@ -1262,7 +1241,7 @@ int PersonStorage::merge(int pers1, int pers2)
         for(int k = 0; k < person.size(); ++k)
         {
             // bei insertAtFrame wird qual beruecksichtigt, ob vorheriger besser
-            other.insertAtFrame(person.firstFrame() + k, person[k], pers2, extrapolate);
+            other.insertAtFrame(person.firstFrame() + k, person.at(k), pers2, extrapolate);
         }
         deleteIndex = pers1;
     }
@@ -1271,7 +1250,7 @@ int PersonStorage::merge(int pers1, int pers2)
         for(int k = other.size() - 1; k > -1; --k)
         {
             // bei insertAtFrame wird qual beruecksichtigt, ob vorheriger besser
-            person.insertAtFrame(other.firstFrame() + k, other[k], pers1, extrapolate);
+            person.insertAtFrame(other.firstFrame() + k, other.at(k), pers1, extrapolate);
         }
         deleteIndex = pers2;
     }
@@ -1280,7 +1259,7 @@ int PersonStorage::merge(int pers1, int pers2)
         for(int k = 0; k < other.size(); ++k)
         {
             // bei insertAtFrame wird qual beruecksichtigt, ob vorheriger besser
-            person.insertAtFrame(other.firstFrame() + k, other[k], pers1, extrapolate);
+            person.insertAtFrame(other.firstFrame() + k, other.at(k), pers1, extrapolate);
         }
         deleteIndex = pers2;
     }

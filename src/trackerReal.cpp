@@ -232,7 +232,7 @@ int TrackerReal::calculate(
                                 // trj genommen werden soll
                 {
                     // changes Trajectories!
-                    mPersonStorage.smoothHeight(i, j);
+                    mPersonStorage.smoothHeight(i, j + person.firstFrame());
                 }
                 if(useTrackpoints)
                 {
@@ -241,14 +241,14 @@ int TrackerReal::calculate(
                     {
                         trackPersonReal.addEnd(
                             Vec3F(
-                                person[j].sp().x() + center.x(),
-                                center.y() - person[j].sp().y(),
-                                altitude - person[j].sp().z()),
+                                person.at(j).sp().x() + center.x(),
+                                center.y() - person.at(j).sp().y(),
+                                altitude - person.at(j).sp().z()),
                             firstFrame + j);
                     }
                     else
                     {
-                        trackPersonReal.addEnd(person[j].sp(), firstFrame + j);
+                        trackPersonReal.addEnd(person.at(j).sp(), firstFrame + j);
                     }
                 }
                 else
@@ -317,10 +317,10 @@ int TrackerReal::calculate(
                             }
                             if(exportAutoCorrect)
                             {
-                                moveDir += reco::autoCorrectColorMarker(person[j], mMainWindow->getControlWidget());
+                                moveDir += reco::autoCorrectColorMarker(person.at(j), mMainWindow->getControlWidget());
                             }
 
-                            pos = imageItem->getPosReal((person[j] + moveDir + br).toQPointF(), bestZ);
+                            pos = imageItem->getPosReal((person.at(j) + moveDir + br).toQPointF(), bestZ);
                             trackPersonReal.addEnd(Vec3F(pos.x(), pos.y(), bestZ), firstFrame + j);
                         }
                     }
@@ -328,21 +328,21 @@ int TrackerReal::calculate(
                     {
                         if(exportAutoCorrect)
                         {
-                            moveDir += reco::autoCorrectColorMarker(person[j], mMainWindow->getControlWidget());
+                            moveDir += reco::autoCorrectColorMarker(person.at(j), mMainWindow->getControlWidget());
                         }
 
-                        pos = imageItem->getPosReal((person[j] + moveDir + br).toQPointF(), height);
+                        pos = imageItem->getPosReal((person.at(j) + moveDir + br).toQPointF(), height);
                         trackPersonReal.addEnd(pos, firstFrame + j);
                         if(exportAngleOfView)
                         {
-                            angle = (90. -
-                                     imageItem->getAngleToGround((person[j] + br).x(), (person[j] + br).y(), height)) *
+                            angle = (90. - imageItem->getAngleToGround(
+                                               (person.at(j) + br).x(), (person.at(j) + br).y(), height)) *
                                     PI / 180.;
                             trackPersonReal.last().setAngleOfView(angle);
                         }
                         if(exportMarkerID)
                         {
-                            trackPersonReal.last().setMarkerID(person[j].getMarkerID());
+                            trackPersonReal.last().setMarkerID(person.at(j).getMarkerID());
                         }
                     }
                 }
@@ -354,7 +354,7 @@ int TrackerReal::calculate(
                     // multicolor markers can also be used together with code markers
                     if(method == reco::RecognitionMethod::Code || method == reco::RecognitionMethod::MultiColor)
                     {
-                        auto orientation = person[j].getOrientation();
+                        auto orientation = person.at(j).getOrientation();
                         orientation      = petrack->getExtrCalibration()->camToWorldRotation(orientation);
                         trackPersonReal.last().setViewDirection(Vec2F(orientation[0], orientation[1]).unit());
                     }
@@ -367,9 +367,10 @@ int TrackerReal::calculate(
                         // trackPersonReal.init(firstFrame+addFrames, height) oder aber innerhalb des trackink path
                         // mit for schleife ueber f
                         if((exportViewingDirection) &&
-                           (person[j].color().isValid())) // wenn blickrichtung mit ausgegeben werden soll
+                           (person.at(j).color().isValid())) // wenn blickrichtung mit ausgegeben werden soll
                         {
-                            colPos = imageItem->getPosReal((person[j].colPoint() + moveDir + br).toQPointF(), height);
+                            colPos =
+                                imageItem->getPosReal((person.at(j).colPoint() + moveDir + br).toQPointF(), height);
                             trackPersonReal.last().setViewDirection(colPos - pos);
                         }
                     }
@@ -386,7 +387,7 @@ int TrackerReal::calculate(
                             // border unberuecksichtigt
                             for(f = 1; f <= anz; ++f)
                             {
-                                sp = person[j].sp() + f * (person[j + 1].sp() - person[j].sp()) / (anz + 1);
+                                sp = person.at(j).sp() + f * (person.at(j + 1).sp() - person.at(j).sp()) / (anz + 1);
                                 if(useCalibrationCenter)
                                 {
                                     trackPersonReal.addEnd(
@@ -413,12 +414,13 @@ int TrackerReal::calculate(
                                 moveDir.set(0, 0);
                                 if(exportAutoCorrect)
                                 {
-                                    moveDir += reco::autoCorrectColorMarker(person[j], mMainWindow->getControlWidget());
+                                    moveDir +=
+                                        reco::autoCorrectColorMarker(person.at(j), mMainWindow->getControlWidget());
                                 }
 
-                                pos2 =
-                                    (imageItem->getPosReal((person[j + 1] + moveDir + br).toQPointF(), height) - pos) /
-                                    (anz + 1);
+                                pos2 = (imageItem->getPosReal((person.at(j + 1) + moveDir + br).toQPointF(), height) -
+                                        pos) /
+                                       (anz + 1);
                                 for(f = 1; f <= anz; ++f)
                                 {
                                     trackPersonReal.addEnd(pos + f * pos2, -1); // -1 zeigt an, dass nur interpoliert
