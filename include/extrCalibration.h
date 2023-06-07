@@ -36,23 +36,23 @@ class PersonStorage;
 class ReprojectionError
 {
 private:
-    bool   mValid = false;
-    double mPointHeightAvg;
-    double mPointHeightStdDev;
-    double mPointHeightVariance;
-    double mPointHeightMax;
+    bool   mValid               = false;
+    double mPointHeightAvg      = 0;
+    double mPointHeightStdDev   = 0;
+    double mPointHeightVariance = 0;
+    double mPointHeightMax      = 0;
 
-    double mDefaultHeightAvg;
-    double mDefaultHeightStdDev;
-    double mDefaultHeightVariance;
-    double mDefaultHeightMax;
+    double mDefaultHeightAvg      = 0;
+    double mDefaultHeightStdDev   = 0;
+    double mDefaultHeightVariance = 0;
+    double mDefaultHeightMax      = 0;
 
-    double mPixelAvg;
-    double mPixelStdDev;
-    double mPixelVariance;
-    double mPixelMax;
+    double mPixelAvg      = 0;
+    double mPixelStdDev   = 0;
+    double mPixelVariance = 0;
+    double mPixelMax      = 0;
 
-    double mUsedDefaultHeight;
+    double mUsedDefaultHeight = 0;
 
 public:
     ReprojectionError() = default;
