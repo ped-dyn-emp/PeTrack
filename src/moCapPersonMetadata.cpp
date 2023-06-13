@@ -164,7 +164,7 @@ double MoCapPersonMetadata::getSamplerate() const
 
 double MoCapPersonMetadata::getOffset() const
 {
-    return mUserTimeOffset + mFileTimeOffset;
+    return -mUserTimeOffset + mFileTimeOffset;
 }
 
 double MoCapPersonMetadata::getUserTimeOffset() const
