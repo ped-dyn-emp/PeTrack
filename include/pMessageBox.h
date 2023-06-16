@@ -19,6 +19,7 @@
 #ifndef PMESSAGEBOX_H
 #define PMESSAGEBOX_H
 
+#include <QCloseEvent>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <spdlog/spdlog.h>
@@ -31,6 +32,7 @@ class QLabel;
 #define PWarning(...)     PMessageBox::warning(__FILE__, __func__, __LINE__, __VA_ARGS__)
 #define PCritical(...)    PMessageBox::critical(__FILE__, __func__, __LINE__, __VA_ARGS__)
 #define PQuestion(...)    PMessageBox::question(__FILE__, __func__, __LINE__, __VA_ARGS__)
+#define PCustom(...)      PMessageBox::custom(__FILE__, __func__, __LINE__, __VA_ARGS__)
 
 
 /**
@@ -56,6 +58,14 @@ public:
         const QString  &informativeText = QString(),
         StandardButtons buttons         = StandardButton::Ok,
         StandardButton  defaultButton   = StandardButton::NoButton);
+    PMessageBox(
+        QWidget       *parent,
+        const QString &title,
+        const QString &msg,
+        const QIcon   &icon,
+        const QString &informativeText = QString(),
+        QStringList    customButtons   = QStringList(),
+        QString        defaultButton   = QString());
 
     static int information(
         const char     *file,
@@ -93,9 +103,19 @@ public:
         const QString  &text,
         StandardButtons buttons       = (StandardButton::Yes | StandardButton::No),
         StandardButton  defaultButton = StandardButton::NoButton);
+    static int custom(
+        const char    *file,
+        const char    *func,
+        int            line,
+        QWidget       *parent,
+        const QString &title,
+        const QString &text,
+        QStringList    customButtons = QStringList(),
+        QString        defaultButton = QString());
 
 private:
     static void setMinimumWidth(QLabel *textLabel);
+    void        closeEvent(QCloseEvent *event);
 };
 
 #endif // PMESSAGEBOX_H
