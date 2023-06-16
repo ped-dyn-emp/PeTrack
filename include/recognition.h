@@ -297,18 +297,20 @@ namespace detail
         ArucoOptions                &options,
         const IntrinsicCameraParams &intrinsicCameraParams);
 
-    void resolveMoreThanOneCode(
-        const int          lengthini,
-        QList<TrackPoint> &crossList,
-        const ColorBlob   &blob,
-        const Vec2F        offset);
+
+    QList<TrackPoint>
+    filterCodesByBoundingRect(const QList<TrackPoint> &codes, const cv::Rect &bound, const Vec2F offset);
+
+    TrackPoint resolveMoreThanOneCandidateCode(QList<TrackPoint> &codes, const Vec2F reference);
 
     QList<TrackPoint> findCodeMarker(
         cv::Mat                     &img,
         RecognitionMethod            recoMethod,
         const CodeMarkerOptions     &opt,
-        const IntrinsicCameraParams &intrinsicCameraParams);
+        const IntrinsicCameraParams &intrinsicCameraParams,
+        bool                         appendRejectedCodes = false);
     cv::Ptr<cv::aruco::Dictionary> getDictMip36h12();
+
 } // namespace detail
 } // namespace reco
 

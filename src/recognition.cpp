@@ -590,6 +590,47 @@ void detail::refineWithBlackDot(
 }
 
 /**
+ * Filters passed codes and removes all that are not inside the given bounding rect
+ * @param codes the detected codes
+ * @param bound the Rect where the codes have to be inside of
+ * @return A List of all TrackPoints inside the boundingRect of the given blob.
+ */
+QList<TrackPoint>
+detail::filterCodesByBoundingRect(const QList<TrackPoint> &codes, const cv::Rect &bound, const Vec2F offset)
+{
+    QList<TrackPoint> pointsInside;
+
+    for(const auto &code : codes)
+    {
+        if((code + offset).toCvPoint().inside(bound))
+        {
+            pointsInside.append(code);
+        }
+    }
+
+    return pointsInside;
+}
+
+/**
+ * @brief Choose the correct out of multiple candidate codes used for recognition.
+ *
+ * If multiple codes are present, take the one that is closest to the reference point.
+ *
+ * @param codes the list of codes of which one should be chosen.
+ * @param reference the point, to which the closest code is chosen.
+ *
+ * @return the code closest to the reference point.
+ */
+TrackPoint detail::resolveMoreThanOneCandidateCode(QList<TrackPoint> &codes, const Vec2F reference)
+{
+    return *std::min_element(
+        codes.begin(),
+        codes.end(),
+        [&](const TrackPoint &a, const TrackPoint &b)
+        { return reference.distanceToPoint(a) < reference.distanceToPoint(b); });
+}
+
+/**
  * @brief Refined colorBlobs with Aruco Markers
  *
  * An aruco marker inside the detected bounding rect is searched. If it is found,
@@ -648,8 +689,6 @@ void detail::refineWithAruco(
 
         cv::Mat subImg = img(cropRect); // --> shallow copy (points to original data)
 
-        int lengthini = crossList.size(); // initial length of crossList (before findCodeMarker() is called)
-
         Vec2F offsetCropRect2Roi; // needed for drawing detected ArucoCode-Candidates correctly -> passed on to
                                   // findCodeMarker()-Function
         offsetCropRect2Roi.setX(cropRect.x);
@@ -662,106 +701,61 @@ void detail::refineWithAruco(
         // TODO: Use Reference to actual codeMarkerOptions in MulticolorMarkerOptions
         // NOTE: For now, add as parameter of findMulticolorMarker
         codeOpt.setOffsetCropRect2Roi(offsetCropRect2Roi);
-        QList<TrackPoint> detectedCodes = findCodeMarker(subImg, options.method, codeOpt, intrinsicCameraParams);
-        crossList.append(detectedCodes);
+
+        QList<TrackPoint> addedCodes = findCodeMarker(subImg, options.method, codeOpt, intrinsicCameraParams, true);
         codeOpt.setOffsetCropRect2Roi({0, 0});
 
-        resolveMoreThanOneCode(lengthini, crossList, blob, offsetCropRect2Roi);
+        // remove all detected codes in the image, that are not inside the bounding box of the color blob
+        addedCodes = filterCodesByBoundingRect(addedCodes, blob.box.boundingRect(), offsetCropRect2Roi);
 
-        // The next three statements each:
-        // - set the offset of subImg with regards to ROI //(ROI to original image is archieved later in the code for
-        // all methods)
-        // - add the functionality of autocorrection
-        // - deal with functionality of ignore/not ignore heads without identified ArucoMarker
-        if(lengthini !=
-           crossList
-               .size()) // if CodeMarker-Call returns crossList containing a new element (identified the ArucoMarker)
+        // used for autocorrection (if enabled)
+        Vec2F moveDir(0, 0);
+        if(autoCorrect && !autoCorrectOnlyExport)
         {
-            Vec2F moveDir;
-            if(autoCorrect && !autoCorrectOnlyExport)
-            {
-                moveDir = autoCorrectColorMarker(blob.imageCenter, controlWidget);
-            }
-            else
-            {
-                moveDir = Vec2F(0, 0);
-            }
-            crossList.back().setCol(blob.color);
-            crossList.back().setColPoint(Vec2F(box.center.x, box.center.y));
-            crossList.back() = crossList.back() + (Vec2F(cropRect.x, cropRect.y) + moveDir);
+            moveDir = autoCorrectColorMarker(blob.imageCenter, controlWidget);
         }
-        else if(!ignoreWithoutMarker && (lengthini == crossList.size())) // in case ignoreWithoutMarker isn't checked
-                                                                         // and CodeMarker-Call returns empty crossList
-                                                                         // (could not identify a marker) the center of
-                                                                         // the smallest rectangle around the colorblobb
-                                                                         // is used as position
-        {
-            offsetCropRect2Roi.setX(0); // set to zero as cooridinates are directly used from cropRect
-            offsetCropRect2Roi.setY(0);
 
-            Vec2F moveDir;
-            if(autoCorrect && !autoCorrectOnlyExport)
+        // there are detected markers or candidates
+        if(!addedCodes.empty())
+        {
+            // the aruco detection first adds detected codes followed by candidates
+            bool isDetected = addedCodes.first().getMarkerID() >= 0;
+
+            if(isDetected)
             {
-                moveDir = autoCorrectColorMarker(blob.imageCenter, controlWidget);
+                // codes are already filtered to be inside bounding rect, so just take the first
+                auto code = addedCodes.at(0);
+
+                code.setCol(blob.color);
+                code = code + Vec2F(cropRect.x, cropRect.y) + moveDir;
+                crossList.append(code);
+                // if a code was fully detected we are done
+                continue;
             }
-            else
-            {
-                moveDir = Vec2F(0, 0);
-            }
+
+            // reference center point of blob
+            Vec2F      referencePosition(box.center.x, box.center.y);
+            TrackPoint trackPoint(referencePosition + moveDir, 90, Vec2F(box.center.x, box.center.y), blob.color);
+
+            auto resolvedCode = resolveMoreThanOneCandidateCode(addedCodes, referencePosition - offsetCropRect2Roi);
+
+            resolvedCode.setQual(TrackPoint::bestDetectionQual);
+            resolvedCode.setCol(blob.color);
+            resolvedCode = resolvedCode + Vec2F(cropRect.x, cropRect.y) + moveDir;
+            crossList.append(resolvedCode);
+            continue;
+        }
+
+        // case not even candidates were detected
+        if(addedCodes.empty() && !ignoreWithoutMarker)
+        {
+            // set to zero as coordinates are directly used from cropRect
             crossList.append(TrackPoint(
-                Vec2F(box.center.x, box.center.y) + moveDir,
-                90,
-                Vec2F(box.center.x, box.center.y),
-                blob.color)); // 100 beste qualitaet
-        }
-    }
-}
-
-
-/**
- * @brief Modifies CrossList to only contain codes inside the head-boundingbox
- *
- * This function deletes every new marker in crosslist, which is
- * not inside the bounding rect of the blob. If multiple new
- * codes are inside the bounding rect, only the first one
- * encountered is not deleted.
- *
- * @param lengthini initial length of crosslist
- * @param crossList list of detected markers
- * @param blob (Color-)Blob of the detected person
- * @param offset offset from CropRect to ROI
- */
-void detail::resolveMoreThanOneCode(
-    const int          lengthini,
-    QList<TrackPoint> &crossList,
-    const ColorBlob   &blob,
-    const Vec2F        offset)
-{
-    if(lengthini + 1 < crossList.size())
-    {
-        int        correctIndex = -1;
-        const auto blobRect     = blob.box.boundingRect();
-        for(int i = lengthini; i < crossList.size(); ++i)
-        {
-            auto detectedTP = crossList[i];
-            if((detectedTP + offset).toCvPoint().inside(blobRect))
-            {
-                correctIndex = i;
-                break;
-            }
+                Vec2F(box.center.x, box.center.y) + moveDir, 90, Vec2F(box.center.x, box.center.y), blob.color));
+            continue;
         }
 
-        if(correctIndex == -1)
-        {
-            // will be treated like no code was found to begin with
-            crossList.erase(crossList.begin() + lengthini, crossList.end());
-        }
-        else
-        {
-            crossList[lengthini] = crossList[correctIndex];
-            crossList.erase(crossList.begin() + lengthini + 1, crossList.end());
-        }
-    }
+    } // end for
 }
 
 /**
@@ -1021,19 +1015,24 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *contro
         contours.pop_back();
     }
 }
-
 /**
  * @brief uses OpenCV libraries to detect Aruco CodeMarkers
  * @param img image to find codes in
  * @param opt arucomarker parameters used for detection
  * @param intrinsicCameraParams used for estimating arucomarker orientation
+ * @param appendRejectedCodes append trackpoints of rejected codes to the list of detected codes.
+ *          OpenCV returns rejected code candidates. These are often the correct codes, but the information is
+ *          unreadable. If this flag is set to true, these rejected candidates get added as trackpoint
+ *          like usual detected codes do, but without markerID.
+ *          These points will only be appended if no code was detected.
  * @return list of all detected codes in given image
  */
 QList<TrackPoint> detail::findCodeMarker(
     cv::Mat                     &img,
     RecognitionMethod            recoMethod,
     const CodeMarkerOptions     &opt,
-    const IntrinsicCameraParams &intrinsicCameraParams)
+    const IntrinsicCameraParams &intrinsicCameraParams,
+    bool                         appendRejectedCodes)
 {
     CodeMarkerItem *codeMarkerItem = opt.getCodeMarkerItem();
     Control        *controlWidget  = opt.getControlWidget();
@@ -1140,7 +1139,12 @@ QList<TrackPoint> detail::findCodeMarker(
     codeMarkerItem->addDetectedMarkers(corners, ids, opt.getOffsetCropRect2Roi());
     codeMarkerItem->addRejectedMarkers(rejected, opt.getOffsetCropRect2Roi());
 
-    if(ids.empty())
+    if(appendRejectedCodes && !rejected.empty())
+    {
+        corners.insert(corners.end(), rejected.begin(), rejected.end());
+    }
+
+    if(corners.empty())
     {
         // if no markers are found return to prevent opencv errors because of empty corners and thus empty
         // rotationVectors vectors
@@ -1159,8 +1163,9 @@ QList<TrackPoint> detail::findCodeMarker(
     // store all detected codes as TrackPoints in a list to return
     QList<TrackPoint> trackPoints;
 
+
     // detected code markers
-    for(size_t i = 0; i < ids.size(); i++)
+    for(size_t i = 0; i < corners.size(); i++)
     {
         const auto &codeCorners = corners.at(i);
 
@@ -1172,12 +1177,20 @@ QList<TrackPoint> detail::findCodeMarker(
 
         cv::Vec3d orientation = cv::normalize(rotMat * cv::Vec3d(0, 1, 0));
 
-        // code marker should have the best possible quality i.e. 100
-        TrackPoint trackPoint(Vec2F(codeX, codeY), 100, ids.at(i));
+
+        // use best quality for code markers, even for candidates
+        TrackPoint trackPoint(Vec2F(codeX, codeY), TrackPoint::bestDetectionQual);
+
+        // overwrite qual and ID if not candidate
+        if(i < ids.size())
+        {
+            // code marker should have the best possible quality i.e. 100
+            trackPoint.setMarkerID(ids.at(i));
+        }
         trackPoint.setOrientation(orientation);
+
         trackPoints.append(trackPoint);
     }
-
     return trackPoints;
 }
 
