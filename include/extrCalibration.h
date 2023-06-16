@@ -152,18 +152,10 @@ private:
     std::vector<cv::Point3f> points3D;
     std::vector<cv::Point2f> points2D;
 
-    double *rotation_matrix;
-    double *translation_vector;
-    double *translation_vector2;
-
-    double *camValues;
-    double *distValues;
-    bool    isExtCalib;
-    float   camHeight;
+    float camHeight;
 
     ReprojectionError reprojectionError;
     QString           mExtrCalibFile;
-    void              init();
 
 public:
     ExtrCalibration(PersonStorage &storage);

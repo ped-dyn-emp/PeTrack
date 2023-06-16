@@ -40,19 +40,8 @@ void ExtrCalibration::setMainWindow(Petrack *mw)
 {
     mMainWindow    = mw;
     mControlWidget = mw->getControlWidget();
-    init();
 }
-void ExtrCalibration::init()
-{
-    rotation_matrix     = new double[9];
-    translation_vector  = new double[3];
-    translation_vector2 = new double[3];
 
-    camValues  = new double[9];
-    distValues = new double[8];
-
-    isExtCalib = false;
-}
 bool ExtrCalibration::isEmptyExtrCalibFile()
 {
     return mExtrCalibFile.isEmpty();
@@ -478,6 +467,8 @@ std::optional<ExtrinsicParameters> ExtrCalibration::calibExtrParams()
         return std::nullopt;
     }
 
+    cv::Vec3d translation_vector2{0., 0., 0.};
+
     int bS = mMainWindow->getImageBorderSize();
     /* Create Camera-Matrix form Camera-Params in the Petrack-GUI */
     cv::Mat camMat = mControlWidget->getIntrinsicCameraParams().cameraMatrix;
@@ -500,48 +491,37 @@ std::optional<ExtrinsicParameters> ExtrCalibration::calibExtrParams()
     // Transform the rotation vector into a rotation matrix with opencvs rodrigues method
     Rodrigues(rvec, rot_mat);
 
-    rotation_matrix[0] = rot_mat.at<double>(0, 0);
-    rotation_matrix[1] = rot_mat.at<double>(0, 1);
-    rotation_matrix[2] = rot_mat.at<double>(0, 2);
-    rotation_matrix[3] = rot_mat.at<double>(1, 0);
-    rotation_matrix[4] = rot_mat.at<double>(1, 1);
-    rotation_matrix[5] = rot_mat.at<double>(1, 2);
-    rotation_matrix[6] = rot_mat.at<double>(2, 0);
-    rotation_matrix[7] = rot_mat.at<double>(2, 1);
-    rotation_matrix[8] = rot_mat.at<double>(2, 2);
-
-    translation_vector[0] = tvec.at<double>(0, 0);
-    translation_vector[1] = tvec.at<double>(0, 1);
-    translation_vector[2] = tvec.at<double>(0, 2);
-
-    translation_vector2[0] = rotation_matrix[0] * translation_vector[0] + rotation_matrix[3] * translation_vector[1] +
-                             rotation_matrix[6] * translation_vector[2];
-    translation_vector2[1] = rotation_matrix[1] * translation_vector[0] + rotation_matrix[4] * translation_vector[1] +
-                             rotation_matrix[7] * translation_vector[2];
-    translation_vector2[2] = rotation_matrix[2] * translation_vector[0] + rotation_matrix[5] * translation_vector[1] +
-                             rotation_matrix[8] * translation_vector[2];
+    //(inverse of rot_mat is its transposed) we want rot_inverse times tvec, which looks like
+    translation_vector2[0] = rot_mat.at<double>(0, 0) * tvec.at<double>(0) +
+                             rot_mat.at<double>(1, 0) * tvec.at<double>(1) +
+                             rot_mat.at<double>(2, 0) * tvec.at<double>(2);
+    translation_vector2[1] = rot_mat.at<double>(0, 1) * tvec.at<double>(0) +
+                             rot_mat.at<double>(1, 1) * tvec.at<double>(1) +
+                             rot_mat.at<double>(2, 1) * tvec.at<double>(2);
+    translation_vector2[2] = rot_mat.at<double>(0, 2) * tvec.at<double>(0) +
+                             rot_mat.at<double>(1, 2) * tvec.at<double>(1) +
+                             rot_mat.at<double>(2, 2) * tvec.at<double>(2);
 
     SPDLOG_INFO("-.- ESTIMATED ROTATION -.-");
-    for(size_t p = 0; p < 3; p++)
-    {
-        SPDLOG_INFO("{}, {}, {}", rotation_matrix[p * 3], rotation_matrix[p * 3 + 1], rotation_matrix[p * 3] + 2);
-    }
+    SPDLOG_INFO("{}, {}, {}", rot_mat.at<double>(0, 0), rot_mat.at<double>(0, 1), rot_mat.at<double>(0, 2));
+    SPDLOG_INFO("{}, {}, {}", rot_mat.at<double>(1, 0), rot_mat.at<double>(1, 1), rot_mat.at<double>(1, 2));
+    SPDLOG_INFO("{}, {}, {}", rot_mat.at<double>(2, 0), rot_mat.at<double>(2, 1), rot_mat.at<double>(2, 2));
     SPDLOG_INFO("-.- ESTIMATED TRANSLATION -.-");
-    SPDLOG_INFO("{}, {}, {}", translation_vector[0], translation_vector[1], translation_vector[2]);
+    SPDLOG_INFO("{}, {}, {}", tvec.at<double>(0), tvec.at<double>(1), tvec.at<double>(2));
 
     SPDLOG_INFO("-.- Translation vector -.-");
     SPDLOG_INFO("{}, {}, {}", translation_vector2[0], translation_vector2[1], translation_vector2[2]);
 
     SPDLOG_INFO("-.- Rotation vector -.-");
-    SPDLOG_INFO("{}, {}, {}", rvec.at<double>(0, 0), rvec.at<double>(1, 0), rvec.at<double>(2, 0));
+    SPDLOG_INFO("{}, {}, {}", rvec.at<double>(0), rvec.at<double>(1), rvec.at<double>(2));
 
     camHeight = translation_vector2[2] < 0 ? -translation_vector2[2] : translation_vector2[2];
 
     ExtrinsicParameters results;
 
-    results.rot1 = rvec.at<double>(0, 0);
-    results.rot2 = rvec.at<double>(1, 0);
-    results.rot3 = rvec.at<double>(2, 0);
+    results.rot1 = rvec.at<double>(0);
+    results.rot2 = rvec.at<double>(1);
+    results.rot3 = rvec.at<double>(2);
 
     results.trans1 = translation_vector2[0];
     results.trans2 = translation_vector2[1];
@@ -558,10 +538,6 @@ std::optional<ExtrinsicParameters> ExtrCalibration::calibExtrParams()
         translation_vector2[1] = 0;
         translation_vector2[2] = 0;
 
-        rotation_matrix[0] = 0;
-        rotation_matrix[1] = 0;
-        rotation_matrix[2] = 0;
-
         results.trans1 = translation_vector2[0];
         results.trans2 = translation_vector2[1];
         results.trans3 = translation_vector2[2];
@@ -573,12 +549,9 @@ std::optional<ExtrinsicParameters> ExtrCalibration::calibExtrParams()
             QObject::tr("Petrack"),
             QObject::tr("Error: Could not calculate extrinsic calibration. Please select other 2D/3D point "
                         "correspondences for extrinsic calibration!"));
-
-        isExtCalib = false;
         return results;
     }
 
-    isExtCalib = true;
     SPDLOG_INFO("End of extern calibration!");
     mMainWindow->getScene()->update();
     return results;
