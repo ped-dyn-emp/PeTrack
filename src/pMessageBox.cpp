@@ -37,7 +37,7 @@
  * @param msg message to display on the dialog
  * @param icon icon to display (e.g. yellow warning triangle)
  * @param informativeText longer text (or table via html/rich text) to show
- * @param buttons buttons for the user to click default: only Ok)
+ * @param buttons buttons for the user to click (default: only Ok)
  * @param defaultButton button used when pressing enter
  */
 PMessageBox::PMessageBox(
@@ -105,14 +105,7 @@ PMessageBox::PMessageBox(
         [=](QAbstractButton *button)
         {
             int ret = buttonBox->standardButton(button);
-            if(ret == StandardButton::NoButton)
-            {
-                this->done(-1);
-            }
-            else
-            {
-                this->done(ret);
-            }
+            this->done(ret);
         });
 
     layout->setSpacing(20);
@@ -122,7 +115,108 @@ PMessageBox::PMessageBox(
 
     setFixedSize(sizeHint());
 }
+/**
+ * @brief Constructs a PMessageBox
+ *
+ * @param parent pointer to parent widget
+ * @param title title of the dialog window
+ * @param msg message to display on the dialog
+ * @param icon icon to display (e.g. yellow warning triangle)
+ * @param informativeText longer text (or table via html/rich text) to show
+ * @param customButtons custom buttons for the user to click
+ * @param defaultButton button used when pressing enter
+ */
+PMessageBox::PMessageBox(
+    QWidget       *parent,
+    const QString &title,
+    const QString &msg,
+    const QIcon   &icon,
+    const QString &informativeText,
+    QStringList    customButtons,
+    QString        defaultButton) :
+    QDialog(
+        parent,
+        Qt::MSWindowsFixedSizeDialogHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
+{
+    QGridLayout *layout = new QGridLayout();
+    setLayout(layout);
 
+    QFont                    f = QApplication::font("QMessageBox");
+    Qt::TextInteractionFlags flags(style()->styleHint(QStyle::SH_MessageBox_TextInteractionFlags, nullptr, this));
+
+    QLabel *detailedText = new QLabel(this);
+    if(!informativeText.isEmpty())
+    {
+        detailedText->setWordWrap(true);
+        detailedText->setTextInteractionFlags(flags);
+        detailedText->setFont(f);
+        detailedText->setText(informativeText);
+        layout->addWidget(detailedText, 1, 1);
+    }
+
+    QLabel *text = new QLabel(this);
+    text->setWordWrap(true);
+    text->setTextInteractionFlags(flags);
+    text->setFont(f);
+    text->setText(msg);
+    layout->addWidget(text, 0, 1);
+
+    setWindowTitle(title);
+    QLabel *infoIcon = new QLabel(this);
+    int     iconSize = style()->pixelMetric(QStyle::PM_MessageBoxIconSize, nullptr, this);
+    infoIcon->setPixmap(icon.pixmap(iconSize, iconSize));
+    layout->addWidget(infoIcon, 0, 0);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(this);
+    if(!customButtons.isEmpty())
+    {
+        for(auto button : customButtons)
+        {
+            buttonBox->addButton(button, QDialogButtonBox::ActionRole);
+        }
+    }
+    else
+    {
+        SPDLOG_WARN("Message Box contains no buttons");
+    }
+    layout->addWidget(buttonBox, 2, 1);
+    if(!defaultButton.isEmpty() and !customButtons.isEmpty())
+    {
+        bool found = false;
+        for(auto button : buttonBox->buttons())
+        {
+            QPushButton *def = (QPushButton *) button;
+            def->setAutoDefault(false);
+            if(button->text() == defaultButton)
+            {
+                found = true;
+                def->setDefault(true);
+            }
+        }
+        if(!found)
+        {
+            QPushButton *def = (QPushButton *) buttonBox->buttons()[0];
+            def->setDefault(true);
+            SPDLOG_WARN("Given default button does is non-specified button");
+        }
+    }
+    // return the index of clicked button, -1 if none was clicked
+    connect(
+        buttonBox,
+        &QDialogButtonBox::clicked,
+        this,
+        [=](QAbstractButton *button)
+        {
+            int ret = buttonBox->buttons().indexOf(button);
+            this->done(ret);
+        });
+    layout->setSpacing(20);
+
+    setMinimumWidth(text);
+    setMinimumWidth(detailedText);
+
+    setFixedSize(sizeHint());
+}
 /**
  * @brief Opens a dialog with given title, text and buttons and also logs the message.
  *
@@ -298,6 +392,41 @@ int PMessageBox::question(
 
     return msg.exec();
 }
+/**
+ * @brief Opens a dialog with given title, text and buttons and returns chosen action.
+ *
+ * This Method opens a modal dialog with given text and buttons. The
+ *
+ * The index of the pressed button is returned, -1 if none was pressed
+ *
+ * @param parent Pointer to parent
+ * @param title title of dialog window
+ * @param text message to the user
+ * @param customButtons customButtons to use
+ * @param defaultButton button to press, when pressing enter
+ * @return clicked button index
+ */
+int PMessageBox::custom(
+    const char * /*file*/,
+    const char * /*func*/,
+    int /*line*/,
+    QWidget       *parent,
+    const QString &title,
+    const QString &text,
+    QStringList    customButtons,
+    QString        defaultButton)
+{
+    QIcon       icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation);
+    PMessageBox msg  = PMessageBox(parent, title, text, icon, QString(), customButtons, defaultButton);
+
+    if(QGuiApplication::platformName() == "offscreen")
+    {
+        throw std::runtime_error(
+            QString("user-interaction demanded during offscreen mode with message\n%1").arg(text).toStdString());
+    }
+
+    return msg.exec();
+}
 
 void PMessageBox::setMinimumWidth(QLabel *textLabel)
 {
@@ -314,4 +443,9 @@ void PMessageBox::setMinimumWidth(QLabel *textLabel)
     doc.setTextWidth(textLabel->fontMetrics().averageCharWidth() * 120);
 
     textLabel->setMinimumWidth(static_cast<int>(doc.idealWidth()));
+}
+void PMessageBox::closeEvent(QCloseEvent *event)
+{
+    this->done(-1);
+    event->accept();
 }

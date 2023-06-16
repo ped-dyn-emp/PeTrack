@@ -1646,7 +1646,13 @@ void Petrack::about()
 
 void Petrack::commandLineOptions()
 {
-    PMessageBox *mb = new PMessageBox{this, tr("Command line options"), commandLineOptionsString, QIcon()};
+    PMessageBox *mb = new PMessageBox{
+        this,
+        tr("Command line options"),
+        commandLineOptionsString,
+        QIcon(),
+        QString(),
+        PMessageBox::StandardButton::Yes};
     mb->setModal(false);
     mb->setAttribute(Qt::WA_DeleteOnClose);
     mb->show();
@@ -1703,7 +1709,8 @@ void Petrack::keyBindings()
             .arg(arrowLeft)
             .arg(arrowRight);
 
-    PMessageBox *mb = new PMessageBox(this, tr("Key Bindings"), out, QIcon());
+    PMessageBox *mb =
+        new PMessageBox(this, tr("Key Bindings"), out, QIcon(), QString(), PMessageBox::StandardButton::Yes);
     mb->setAttribute(Qt::WA_DeleteOnClose);
     mb->setModal(false);
 
