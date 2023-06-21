@@ -28,6 +28,7 @@
 #include <utility>
 
 class PersonStorage;
+class WorldImageCorrespondence;
 
 struct MissingFrame
 {
@@ -180,24 +181,24 @@ public:
     // mControlWidget->getColorPlot()
     // petrack...mImageItem
     int calculate(
-        Petrack       *petrack,
-        Tracker       *tracker,
-        ImageItem     *imageItem,
-        ColorPlot     *colorPlot,
-        MissingFrames &missing,
-        int            imageBorderSize        = 0,
-        bool           missingFramesInserted  = true,
-        bool           useTrackpoints         = false,
-        bool           alternateHeight        = false,
-        double         altitude               = 0,
-        bool           useCalibrationCenter   = true,
-        bool           exportElimTp           = false,
-        bool           exportElimTrj          = false,
-        bool           exportSmooth           = true,
-        bool           exportViewingDirection = false,
-        bool           exportAngleOfView      = false,
-        bool           exportMarkerID         = false,
-        bool           exportAutoCorrect      = false);
+        Petrack                        *petrack,
+        Tracker                        *tracker,
+        const WorldImageCorrespondence *worldImageCorr,
+        ColorPlot                      *colorPlot,
+        MissingFrames                  &missing,
+        int                             imageBorderSize        = 0,
+        bool                            missingFramesInserted  = true,
+        bool                            useTrackpoints         = false,
+        bool                            alternateHeight        = false,
+        double                          altitude               = 0,
+        bool                            useCalibrationCenter   = true,
+        bool                            exportElimTp           = false,
+        bool                            exportElimTrj          = false,
+        bool                            exportSmooth           = true,
+        bool                            exportViewingDirection = false,
+        bool                            exportAngleOfView      = false,
+        bool                            exportMarkerID         = false,
+        bool                            exportAutoCorrect      = false);
 
     void calcMinMax();
     int  largestFirstFrame();

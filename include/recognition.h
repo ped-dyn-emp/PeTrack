@@ -33,6 +33,7 @@ class Control;
 class ImageItem;
 class CodeMarkerItem;
 struct IntrinsicCameraParams;
+class WorldImageCorrespondence;
 
 namespace reco
 {
@@ -263,11 +264,11 @@ namespace detail
         bool ignoreWithoutMarker = true;  ///< should markers without dot be ignored?
         bool autoCorrect         = false; ///< should perspective correction be performed
         bool autoCorrectOnlyExport =
-            false;                      ///< should perspective correction only be performed when exporting trajectories
-        ImageItem *imageItem = nullptr; ///< used for getAngleToGround and such
-        QColor     midHue;              ///< middle hue of the color map
-        double     dotSize       = 5;   ///< size of the black dot
-        Control   *controlWidget = nullptr; ///< pointer to Control used for autoCorrect
+            false; ///< should perspective correction only be performed when exporting trajectories
+        const WorldImageCorrespondence *worldImageCorr = nullptr; ///< used for getAngleToGround and such
+        QColor                          midHue;                   ///< middle hue of the color map
+        double                          dotSize       = 5;        ///< size of the black dot
+        Control                        *controlWidget = nullptr;  ///< pointer to Control used for autoCorrect
     };
 
     struct ArucoOptions
@@ -283,13 +284,14 @@ namespace detail
     };
 
     std::vector<ColorBlob> findColorBlob(const ColorBlobDetectionParams &options);
-    void                   restrictPositionBlackDot(ColorBlob &blob, ImageItem *imageItem, int bS, cv::Rect &cropRect);
-    cv::Mat                customBgr2Gray(const cv::Mat &subImg, const QColor &midHue);
-    void                   refineWithBlackDot(
-                          std::vector<ColorBlob> &blobs,
-                          const cv::Mat          &img,
-                          QList<TrackPoint>      &crossList,
-                          const BlackDotOptions  &options);
+    void
+    restrictPositionBlackDot(ColorBlob &blob, const WorldImageCorrespondence *imageItem, int bS, cv::Rect &cropRect);
+    cv::Mat customBgr2Gray(const cv::Mat &subImg, const QColor &midHue);
+    void    refineWithBlackDot(
+           std::vector<ColorBlob> &blobs,
+           const cv::Mat          &img,
+           QList<TrackPoint>      &crossList,
+           const BlackDotOptions  &options);
     void refineWithAruco(
         std::vector<ColorBlob>      &blobs,
         const cv::Mat               &img,

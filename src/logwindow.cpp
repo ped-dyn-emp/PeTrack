@@ -23,6 +23,8 @@
 #include "spdlog/sinks/ringbuffer_sink.h"
 #include "ui_logwindow.h"
 
+#include <QFileDialog>
+
 LogWindow::LogWindow(QWidget *parent, Ui::LogWindow *ui) : QWidget(parent)
 {
     mMainWindow = (class Petrack *) parent;

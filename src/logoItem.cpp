@@ -22,6 +22,7 @@
 
 #include <QApplication>
 #include <QPainter>
+#include <QPropertyAnimation>
 
 
 LogoItem::LogoItem(QWidget *wParent, QGraphicsItem *parent) : QGraphicsObject(parent)

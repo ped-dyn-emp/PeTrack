@@ -36,12 +36,8 @@ class ExtrinsicBox : public QGroupBox
     Q_OBJECT
 
 public:
-    explicit ExtrinsicBox(
-        QWidget              *parent,
-        Ui::extr             *ui,
-        ExtrCalibration      &extrCalib,
-        std::function<void()> updateCoordCallback);
-    explicit ExtrinsicBox(QWidget *parent, ExtrCalibration &extrCalib, std::function<void()> updateCoordCallback);
+    explicit ExtrinsicBox(QWidget *parent, Ui::extr *ui, ExtrCalibration &extrCalib);
+    explicit ExtrinsicBox(QWidget *parent, ExtrCalibration &extrCalib);
     ExtrinsicBox(const ExtrinsicBox &other)            = delete;
     ExtrinsicBox(ExtrinsicBox &&other)                 = delete;
     ExtrinsicBox &operator=(const ExtrinsicBox &other) = delete;
@@ -54,6 +50,10 @@ public:
 
     bool getXml(QDomElement &subSubElem);
     void setXml(QDomElement &subElem) const;
+
+signals:
+    void enabledChanged(bool enabled);
+    void extrinsicChanged();
 
 private slots:
 
@@ -73,10 +73,9 @@ private slots:
     void on_extrCalibShowError_clicked();
 
 private:
-    Ui::extr             *mUi;
-    ExtrCalibration      &mExtrCalibration;
-    ExtrinsicParameters   mParams;
-    std::function<void()> mUpdateCoordCallback;
+    Ui::extr           *mUi;
+    ExtrCalibration    &mExtrCalibration;
+    ExtrinsicParameters mParams;
 };
 
 #endif // EXTRINSICBOX_H

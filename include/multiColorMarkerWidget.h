@@ -25,6 +25,7 @@
 #include "multiColorMarkerItem.h"
 #include "petrack.h"
 #include "ui_multiColorMarker.h"
+#include "worldImageCorrespondence.h"
 
 #include <QtWidgets>
 
@@ -151,9 +152,10 @@ private slots:
         {
             if(mMainWindow->getImageItem() && mMainWindow->getImage() && mMainWindow->getControlWidget())
             {
-                QPointF cmPerPixel1 = mMainWindow->getImageItem()->getCmPerPixel(
-                    0, 0, mMainWindow->getControlWidget()->getDefaultHeight());
-                QPointF cmPerPixel2 = mMainWindow->getImageItem()->getCmPerPixel(
+                const auto &worldImgCorr = mMainWindow->getWorldImageCorrespondence();
+                QPointF     cmPerPixel1 =
+                    worldImgCorr.getCmPerPixel(0, 0, mMainWindow->getControlWidget()->getDefaultHeight());
+                QPointF cmPerPixel2 = worldImgCorr.getCmPerPixel(
                     mMainWindow->getImage()->width() - 1,
                     mMainWindow->getImage()->height() - 1,
                     mMainWindow->getControlWidget()->getDefaultHeight());

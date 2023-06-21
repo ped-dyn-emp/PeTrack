@@ -32,7 +32,7 @@ TEST_CASE("ExtrinsicBox: display of values in UI")
     PersonStorage   storage(petrack, autosave);
     ExtrCalibration calib(storage);
     Ui::extr       *ui = new Ui::extr();
-    ExtrinsicBox    extrBox(nullptr, ui, calib, []() {});
+    ExtrinsicBox    extrBox(nullptr, ui, calib);
 
     ExtrinsicParameters params;
     params.rot1   = 0.5;
@@ -79,7 +79,7 @@ TEST_CASE("ExtrinsicBox: reading/writing xml")
     Autosave        autosave(petrack);
     PersonStorage   storage(petrack, autosave);
     ExtrCalibration calib(storage);
-    ExtrinsicBox    extrBox(nullptr, calib, []() {});
+    ExtrinsicBox    extrBox(nullptr, calib);
 
     WHEN("We change the extrinsic parameters")
     {
@@ -105,7 +105,7 @@ TEST_CASE("ExtrinsicBox: reading/writing xml")
                 Autosave        autosave(petrack);
                 PersonStorage   storage(petrack, autosave);
                 ExtrCalibration calib(storage);
-                ExtrinsicBox    extrBox(nullptr, calib, []() {});
+                ExtrinsicBox    extrBox(nullptr, calib);
 
                 extrBox.getXml(elem);
                 CHECK(extrBox.getExtrinsicParameters() == params);

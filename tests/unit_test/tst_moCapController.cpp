@@ -30,7 +30,7 @@ class ExtrCalibMock : public trompeloeil::mock_interface<ExtrCalibration>
 {
 public:
     ExtrCalibMock(PersonStorage &storage) : trompeloeil::mock_interface<ExtrCalibration>(storage) {}
-    MAKE_MOCK1(getImagePoint, cv::Point2f(cv::Point3f), override);
+    MAKE_CONST_MOCK1(getImagePoint, cv::Point2f(cv::Point3f), override);
 };
 
 SCENARIO("I want to get the render data with one person loaded", "[ui]")

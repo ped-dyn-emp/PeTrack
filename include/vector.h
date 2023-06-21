@@ -47,18 +47,40 @@ public:
 
     Vec3F(const cv::Point3f &v);
 
-    double x() const;
-    double y() const;
-    double z() const;
-    void   setX(double x);
-    void   setY(double y);
-    void   setZ(double z);
-    void   set(double x, double y, double z);
+    cv::Point3f toCvPoint();
+
+    double  x() const;
+    double  y() const;
+    double  z() const;
+    void    setX(double x);
+    void    setY(double y);
+    void    setZ(double z);
+    void    set(double x, double y, double z);
+    double &operator[](size_t i)
+    {
+        if(i == 0)
+        {
+            return mX;
+        }
+        else if(i == 1)
+        {
+            return mY;
+        }
+        else if(i == 2)
+        {
+            return mZ;
+        }
+        else
+        {
+            throw std::runtime_error("Out-of-range index for Vec3F");
+        }
+    }
 
     Vec3F &operator=(const Vec3F &v) = default;
     Vec3F &operator=(Vec3F &&v)      = default;
 
     Vec3F &operator=(const cv::Point3f &v);
+
 
     Vec3F  operator+(const Vec3F &v) const;
     Vec3F  operator-(const Vec3F &v) const;
@@ -120,11 +142,26 @@ public:
     QPointF      toQPointF() const;
     cv::Point2f  toPoint2f() const;
 
-    double x() const;
-    double y() const;
-    void   setX(double x);
-    void   setY(double y);
-    void   set(double x, double y);
+    double  x() const;
+    double  y() const;
+    void    setX(double x);
+    void    setY(double y);
+    void    set(double x, double y);
+    double &operator[](size_t i)
+    {
+        if(i == 0)
+        {
+            return mX;
+        }
+        else if(i == 1)
+        {
+            return mY;
+        }
+        else
+        {
+            throw std::runtime_error("Out-of-range index for Vec2F");
+        }
+    }
 
     Vec2F &operator=(const CvPoint *v);
 

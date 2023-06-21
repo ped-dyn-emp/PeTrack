@@ -22,6 +22,7 @@
 #include "control.h"
 #include "logger.h"
 #include "pMessageBox.h"
+#include "petrack.h"
 
 #include <QApplication>
 #include <QIntValidator>

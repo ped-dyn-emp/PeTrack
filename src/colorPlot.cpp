@@ -20,6 +20,7 @@
 
 #include "control.h"
 #include "logger.h"
+#include "personStorage.h"
 #include "tracker.h"
 
 #include <QMouseEvent>

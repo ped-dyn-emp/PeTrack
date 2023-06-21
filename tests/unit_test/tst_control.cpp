@@ -18,6 +18,7 @@
 
 #include "control.h"
 #include "imageItem.h"
+#include "petrack.h"
 #include "ui_control.h"
 #include "util.h"
 #include "view.h"

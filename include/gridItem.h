@@ -21,6 +21,7 @@
 
 class Petrack;
 class Control;
+class CoordinateSystemBox;
 
 #include "extrCalibration.h"
 
@@ -29,17 +30,18 @@ class Control;
 class GridItem : public QGraphicsItem
 {
 private:
-    Petrack         *mMainWindow;
-    ExtrCalibration *extCalib;
-    Control         *mControlWidget;
-    float            mouse_x, mouse_y;
-    int              gridTrans_x, gridTrans_y;
-    int              gridDimension;
+    Petrack             *mMainWindow;
+    ExtrCalibration     *mExtCalib;
+    CoordinateSystemBox *mCoordSys;
+    Control             *mControlWidget;
+    float                mouse_x, mouse_y;
+    int                  gridTrans_x, gridTrans_y;
+    int                  gridDimension;
 
 public:
     inline void setGridDimension(int gDimension) { this->gridDimension = gDimension; }
     inline int  getGridDimension() const { return this->gridDimension; }
-    GridItem(QWidget *wParent, QGraphicsItem *parent = nullptr);
+    GridItem(QWidget *wParent, QGraphicsItem *parent, CoordinateSystemBox *coordSys);
     QRectF boundingRect() const;
     void   mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void   mousePressEvent(QGraphicsSceneMouseEvent *event);

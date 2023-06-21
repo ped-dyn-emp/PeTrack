@@ -20,18 +20,17 @@
 
 #include "IO.h"
 #include "analysePlot.h"
-#include "backgroundItem.h"
 #include "calibFilter.h"
 #include "codeMarkerWidget.h"
 #include "colorMarkerWidget.h"
 #include "colorPlot.h"
 #include "colorRangeWidget.h"
+#include "coordinateSystemBox.h"
 #include "extrinsicBox.h"
+#include "extrinsicParameters.h"
 #include "filterBeforeBox.h"
-#include "imageItem.h"
 #include "intrinsicBox.h"
 #include "logger.h"
-#include "moCapItem.h"
 #include "multiColorMarkerWidget.h"
 #include "pMessageBox.h"
 #include "petrack.h"
@@ -42,32 +41,50 @@
 #include "trackerItem.h"
 #include "ui_control.h"
 #include "view.h"
+#include "worldImageCorrespondence.h"
 
 #include <QDomElement>
 #include <iomanip>
 #define DEFAULT_HEIGHT 180.0
 
 Control::Control(
-    QWidget          &parent,
-    QGraphicsScene   &scene,
-    reco::Recognizer &recognizer,
-    RoiItem          &trackRoiItem,
-    RoiItem          &recoRoiItem,
-    MissingFrames    &missingFrames,
-    FilterBeforeBox  *filterBefore) :
-    Control(parent, scene, recognizer, trackRoiItem, recoRoiItem, new Ui::Control(), missingFrames, filterBefore)
+    QWidget             &parent,
+    QGraphicsScene      &scene,
+    reco::Recognizer    &recognizer,
+    RoiItem             &trackRoiItem,
+    RoiItem             &recoRoiItem,
+    MissingFrames       &missingFrames,
+    FilterBeforeBox     *filterBefore,
+    IntrinsicBox        *intrinsicBox,
+    ExtrinsicBox        *extrinsicBox,
+    CoordinateSystemBox *coordSysBox) :
+    Control(
+        parent,
+        scene,
+        recognizer,
+        trackRoiItem,
+        recoRoiItem,
+        new Ui::Control(),
+        missingFrames,
+        filterBefore,
+        intrinsicBox,
+        extrinsicBox,
+        coordSysBox)
 {
 }
 
 Control::Control(
-    QWidget          &parent,
-    QGraphicsScene   &scene,
-    reco::Recognizer &recognizer,
-    RoiItem          &trackRoiItem,
-    RoiItem          &recoRoiItem,
-    Ui::Control      *ui,
-    MissingFrames    &missingFrames,
-    FilterBeforeBox  *filterBefore) :
+    QWidget             &parent,
+    QGraphicsScene      &scene,
+    reco::Recognizer    &recognizer,
+    RoiItem             &trackRoiItem,
+    RoiItem             &recoRoiItem,
+    Ui::Control         *ui,
+    MissingFrames       &missingFrames,
+    FilterBeforeBox     *filterBefore,
+    IntrinsicBox        *intrinsicBox,
+    ExtrinsicBox        *extrinsicBox,
+    CoordinateSystemBox *coordSysBox) :
     QWidget(&parent), mUi(ui), mFilterBefore(filterBefore)
 {
     setAccessibleName("Control");
@@ -94,14 +111,6 @@ Control::Control(
     QObject::connect(
         &missingFrames, &MissingFrames::executeChanged, mUi->missingFramesCalculated, &QCheckBox::setChecked);
 
-    auto updateImageCallback = [this]()
-    {
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    };
-
     // layout reparents widget
     ui->verticalLayout_13->insertWidget(0, mFilterBefore);
     mFilterBefore->setObjectName("filterBeforeBox");
@@ -116,32 +125,36 @@ Control::Control(
     filterSettings.useSwapV = mMainWindow->getSwapFilter()->getSwapVertically().getValue();
     mFilterBefore->setFilterSettings(filterSettings);
 
-    mIntr = new IntrinsicBox(this, *mMainWindow->getAutoCalib(), *mMainWindow->getCalibFilter(), updateImageCallback);
+    mIntr = intrinsicBox;
     mIntr->setObjectName(QString::fromUtf8("intr"));
-
     ui->verticalLayout_13->insertWidget(1, mIntr);
 
-    mExtr = new ExtrinsicBox(
-        this,
-        *mMainWindow->getExtrCalibration(),
-        [this]()
-        {
-            if(!isLoading())
-            {
-                mMainWindow->updateCoord();
-                mScene->update();
-            }
-        });
+    mExtr = extrinsicBox;
     mExtr->setObjectName(QString::fromUtf8("extr"));
     ui->verticalLayout_13->insertWidget(2, mExtr);
 
+    mCoordSys = coordSysBox;
+    coordSysBox->setObjectName(QString::fromUtf8("coord"));
+    ui->verticalLayout_13->insertWidget(3, mCoordSys);
+
     // integrate new widgets in tabbing order
-    ui->calib->setFocusProxy(ui->coordShow);
+    ui->calib->setFocusProxy(ui->gridShow);
     QWidget::setTabOrder(mFilterBefore, mIntr);
     QWidget::setTabOrder(mIntr, mExtr);
-    QWidget::setTabOrder(mExtr, ui->calib);
+    QWidget::setTabOrder(mExtr, mCoordSys);
+    QWidget::setTabOrder(mCoordSys, ui->calib);
 
+    connect(mExtr, &ExtrinsicBox::extrinsicChanged, mCoordSys, &CoordinateSystemBox::updateCoordItem);
     connect(mIntr, &IntrinsicBox::paramsChanged, this, &Control::on_intrinsicParamsChanged);
+    connect(
+        mExtr,
+        &ExtrinsicBox::enabledChanged,
+        this,
+        [this](bool enabled)
+        {
+            mUi->trackShowGroundPosition->setEnabled(enabled);
+            mUi->trackShowGroundPath->setEnabled(enabled);
+        });
 
     setFilterBorderSizeMin(mMainWindow->getBorderFilter()->getBorderSize().getMinimum());
     setFilterBorderSizeMax(mMainWindow->getBorderFilter()->getBorderSize().getMaximum());
@@ -666,11 +679,42 @@ int Control::getFilterBgDeleteNumber() const
 void Control::imageSizeChanged(int width, int height, int borderDiff)
 {
     mIntr->imageSizeChanged(width, height, borderDiff);
+    // trans nicht setzen, da mgl mehrere videos mit gleicher scene und gleichem koord sinnvoll
+    const Vec2F min(-10 * mMainWindow->getImageBorderSize(), -10 * mMainWindow->getImageBorderSize());
+    const Vec2F max(
+        10 * (width - mMainWindow->getImageBorderSize()), 10 * (height - mMainWindow->getImageBorderSize()));
+    setCalibCoord2DTransMinMax(min, max);
+    mMainWindow->updateSceneRect();
 }
 
 const ExtrinsicParameters &Control::getExtrinsicParameters() const
 {
     return mExtr->getExtrinsicParameters();
+}
+
+const WorldImageCorrespondence &Control::getWorldImageCorrespondence() const
+{
+    return *mCoordSys;
+}
+
+void Control::setCalibCoord2DTransMinMax(Vec2F min, Vec2F max)
+{
+    mCoordSys->setCoordTrans2DMinMax(min, max);
+}
+
+Vec2F Control::getCalibCoord2DTrans()
+{
+    return mCoordSys->getCoordTrans2D();
+}
+
+Vec3F Control::getCalibCoord3DTrans() const
+{
+    return mCoordSys->getCoordTrans3D();
+}
+
+SwapAxis Control::getCalibCoord3DSwap() const
+{
+    return mCoordSys->getSwap3D();
 }
 
 
@@ -797,206 +841,18 @@ void Control::setCalibGrid3DResolution(int i)
 
 int Control::getCalibCoordDimension()
 {
-    return mUi->coordTab->currentIndex();
+    return mCoordSys->getCalibCoordDimension();
 }
 
-bool Control::getCalibExtrCalibPointsShow()
-{
-    return mUi->extCalibPointsShow->isChecked();
-}
-
-bool Control::getCalibExtrVanishPointsShow()
-{
-    return mUi->extVanishPointsShow->isChecked();
-}
 
 bool Control::getCalibCoordShow()
 {
-    return mUi->coordShow->isChecked();
-}
-
-void Control::setCalibCoordShow(bool b)
-{
-    mUi->coordShow->setChecked(b);
-}
-
-bool Control::getCalibCoordFix()
-{
-    return mUi->coordFix->isChecked();
-}
-
-void Control::setCalibCoordFix(bool b)
-{
-    mUi->coordFix->setChecked(b);
-}
-
-int Control::getCalibCoordRotate()
-{
-    return mUi->coordRotate->value();
-}
-
-void Control::setCalibCoordRotate(int i)
-{
-    mUi->coordRotate->setValue(i);
-}
-
-int Control::getCalibCoordTransX()
-{
-    return mUi->coordTransX->value();
-}
-
-void Control::setCalibCoordTransX(int i)
-{
-    mUi->coordTransX->setValue(i);
-}
-
-int Control::getCalibCoordTransXMax()
-{
-    return mUi->coordTransX->maximum();
-}
-
-void Control::setCalibCoordTransXMax(int i)
-{
-    mUi->coordTransX->setMaximum(i);
-    mUi->coordTransX_spin->setMaximum(i);
-}
-
-int Control::getCalibCoordTransXMin()
-{
-    return mUi->coordTransX->minimum();
-}
-
-void Control::setCalibCoordTransXMin(int i)
-{
-    mUi->coordTransX->setMinimum(i);
-    mUi->coordTransX_spin->setMinimum(i);
-}
-
-int Control::getCalibCoordTransY()
-{
-    return mUi->coordTransY->value();
-}
-
-void Control::setCalibCoordTransY(int i)
-{
-    mUi->coordTransY->setValue(i);
-}
-
-int Control::getCalibCoordTransYMax()
-{
-    return mUi->coordTransY->maximum();
-}
-
-void Control::setCalibCoordTransYMax(int i)
-{
-    mUi->coordTransY->setMaximum(i);
-    mUi->coordTransY_spin->setMaximum(i);
-}
-
-int Control::getCalibCoordTransYMin()
-{
-    return mUi->coordTransY->minimum();
-}
-
-void Control::setCalibCoordTransYMin(int i)
-{
-    mUi->coordTransY->setMinimum(i);
-    mUi->coordTransY_spin->setMinimum(i);
+    return mCoordSys->getCalibCoordShow();
 }
 
 int Control::getCalibCoordScale()
 {
-    return mUi->coordScale->value();
-}
-
-void Control::setCalibCoordScale(int i)
-{
-    mUi->coordScale->setValue(i);
-}
-
-double Control::getCalibCoordUnit()
-{
-    return mUi->coordUnit->value();
-}
-
-void Control::setCalibCoordUnit(double d)
-{
-    mUi->coordUnit->setValue(d);
-}
-
-bool Control::isCoordUseIntrinsicChecked() const
-{
-    return mUi->coordUseIntrinsic->isChecked();
-}
-
-int Control::getCalibCoord3DTransX()
-{
-    return mUi->coord3DTransX->value();
-}
-
-void Control::setCalibCoord3DTransX(int i)
-{
-    mUi->coord3DTransX->setValue(i);
-}
-
-int Control::getCalibCoord3DTransY()
-{
-    return mUi->coord3DTransY->value();
-}
-
-void Control::setCalibCoord3DTransY(int i)
-{
-    mUi->coord3DTransY->setValue(i);
-}
-
-int Control::getCalibCoord3DTransZ()
-{
-    return mUi->coord3DTransZ->value();
-}
-
-void Control::setCalibCoord3DTransZ(int i)
-{
-    mUi->coord3DTransZ->setValue(i);
-}
-
-int Control::getCalibCoord3DAxeLen()
-{
-    return mUi->coord3DAxeLen->value();
-}
-
-void Control::setCalibCoord3DAxeLen(int i)
-{
-    mUi->coord3DAxeLen->setValue(i);
-}
-
-bool Control::getCalibCoord3DSwapX()
-{
-    return mUi->coord3DSwapX->isChecked();
-}
-
-void Control::setCalibCoord3DSwapX(bool b)
-{
-    mUi->coord3DSwapX->setChecked(b);
-}
-
-bool Control::getCalibCoord3DSwapY()
-{
-    return mUi->coord3DSwapY->isChecked();
-}
-
-void Control::setCalibCoord3DSwapY(bool b)
-{
-    mUi->coord3DSwapY->setChecked(b);
-}
-
-bool Control::getCalibCoord3DSwapZ()
-{
-    return mUi->coord3DSwapZ->isChecked();
-}
-
-void Control::setCalibCoord3DSwapZ(bool b)
-{
-    mUi->coord3DSwapZ->setChecked(b);
+    return mCoordSys->getCoordPose2D().scale;
 }
 
 //-------------------- analysis
@@ -1873,30 +1729,13 @@ void Control::on_intrinsicParamsChanged(IntrinsicCameraParams params)
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
-        mMainWindow->updateCoord();
+        mCoordSys->updateCoordItem();
     }
-    setMeasuredAltitude();
+    mCoordSys->setMeasuredAltitude();
 }
 
 
 //---------------------------------------
-
-void Control::on_extCalibPointsShow_stateChanged(int /*arg1*/)
-{
-    if(!isLoading())
-    {
-        mScene->update();
-    }
-}
-
-
-void Control::on_extVanishPointsShow_stateChanged(int /*arg1*/)
-{
-    if(!isLoading())
-    {
-        mScene->update();
-    }
-}
 
 
 //---------------------------------------
@@ -1968,165 +1807,7 @@ void Control::on_grid3DResolution_valueChanged(int /*value*/)
 }
 
 //---------------------------------------
-void Control::on_coordTab_currentChanged(int index)
-{
-    if(index == 1)
-    {
-        mExtr->setEnabledExtrParams(false);
-        mUi->trackShowGroundPosition->setEnabled(false);
-        mUi->trackShowGroundPath->setEnabled(false);
-    }
-    else
-    {
-        mExtr->setEnabledExtrParams(true);
-        mUi->trackShowGroundPosition->setEnabled(true);
-        mUi->trackShowGroundPath->setEnabled(true);
-    }
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-        mScene->update();
-    }
-}
 
-void Control::on_coordShow_stateChanged(int /*i*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-        mScene->update();
-        setMeasuredAltitude(); // da measured nicht aktualisiert wird, waehrend scale verschoben und show
-                               // deaktiviert und beim aktivieren sonst ein falscher wert zum angezeigten koord
-                               // waere
-    }
-    // mScene->update(); //mScene->sceneRect() // ging auch, aber dann wurde zu oft matrix berechnet etc
-    // mMainWindow->getImageWidget()->update(); // repaint() zeichnet sofort - schneller aber mgl flicker
-}
-
-void Control::on_coordFix_stateChanged(int /*i*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_coordRotate_valueChanged(int /*i*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_coordTransX_valueChanged(int /*i*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_coordTransY_valueChanged(int /*i*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_coordScale_valueChanged(int /*i*/)
-{
-    mMainWindow->updateCoord();
-    setMeasuredAltitude();
-    mMainWindow->setHeadSize();
-}
-
-void Control::on_coordAltitude_valueChanged(double /*d*/)
-{
-    mMainWindow->setHeadSize();
-    mScene->update(); // fuer kreis um kopf, der mgl der realen kopfgroesse angepasst wird
-}
-
-void Control::on_coordUnit_valueChanged(double /*d*/)
-{
-    setMeasuredAltitude();
-    mMainWindow->setHeadSize();
-    mScene->update(); // fuer kreis um kopf, der mgl der realen kopfgroesse angepasst wird
-}
-
-void Control::on_coordUseIntrinsic_stateChanged(int /*i*/)
-{
-    mMainWindow->setStatusPosReal();
-}
-
-void Control::on_coord3DTransX_valueChanged(int /*value*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_coord3DTransY_valueChanged(int /*value*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_coord3DTransZ_valueChanged(int /*value*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_coord3DAxeLen_valueChanged(int /*value*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_coord3DSwapX_stateChanged(int /*arg1*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_coord3DSwapY_stateChanged(int /*arg1*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::on_coord3DSwapZ_stateChanged(int /*arg1*/)
-{
-    if(!isLoading())
-    {
-        mMainWindow->updateCoord();
-    }
-}
-
-void Control::setMeasuredAltitude()
-{
-    if(mMainWindow->getImageItem())
-    {
-        auto       camMat = mIntr->getIntrinsicCameraParams();
-        const auto fx     = camMat.getFx();
-        const auto fy     = camMat.getFy();
-        mUi->coordAltitudeMeasured->setText(
-            QString("(measured: %1)").arg((fx + fy) / 2. * mMainWindow->getImageItem()->getCmPerPixel(), 6, 'f', 1));
-    }
-}
 
 //---------------------------------------
 // store data in xml node
@@ -2160,7 +1841,6 @@ void Control::setXml(QDomElement &elem)
     subSubElem = (subElem.ownerDocument()).createElement("EXTRINSIC_PARAMETERS");
     mExtr->setXml(subSubElem);
 
-    subSubElem.setAttribute("SHOW_CALIB_POINTS", mUi->extCalibPointsShow->isChecked());
 
     QString ef = mMainWindow->getExtrCalibration()->getExtrCalibFile();
     if(ef != "")
@@ -2169,24 +1849,8 @@ void Control::setXml(QDomElement &elem)
     }
     subSubElem.setAttribute("EXTERNAL_CALIB_FILE", ef);
 
-    subSubElem.setAttribute("COORD_DIMENSION", mUi->coordTab->currentIndex());
+    mCoordSys->setXml(subSubElem);
 
-    subSubElem.setAttribute("SHOW", mUi->coordShow->isChecked());
-    subSubElem.setAttribute("FIX", mUi->coordFix->isChecked());
-    subSubElem.setAttribute("ROTATE", mUi->coordRotate->value());
-    subSubElem.setAttribute("TRANS_X", mUi->coordTransX->value());
-    subSubElem.setAttribute("TRANS_Y", mUi->coordTransY->value());
-    subSubElem.setAttribute("SCALE", mUi->coordScale->value());
-    subSubElem.setAttribute("ALTITUDE", mUi->coordAltitude->value());
-    subSubElem.setAttribute("UNIT", mUi->coordUnit->value());
-    subSubElem.setAttribute("USE_INTRINSIC_CENTER", mUi->coordUseIntrinsic->isChecked());
-    subSubElem.setAttribute("COORD3D_TRANS_X", mUi->coord3DTransX->value());
-    subSubElem.setAttribute("COORD3D_TRANS_Y", mUi->coord3DTransY->value());
-    subSubElem.setAttribute("COORD3D_TRANS_Z", mUi->coord3DTransZ->value());
-    subSubElem.setAttribute("COORD3D_AXIS_LEN", mUi->coord3DAxeLen->value());
-    subSubElem.setAttribute("COORD3D_SWAP_X", mUi->coord3DSwapX->isChecked());
-    subSubElem.setAttribute("COORD3D_SWAP_Y", mUi->coord3DSwapY->isChecked());
-    subSubElem.setAttribute("COORD3D_SWAP_Z", mUi->coord3DSwapZ->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("ALIGNMENT_GRID");
@@ -2488,6 +2152,10 @@ void Control::getXml(const QDomElement &elem)
                 {
                     // intentionally left blank
                 }
+                else if(mCoordSys->getXml(subSubElem))
+                {
+                    // intentionally left blank
+                }
                 else if(subSubElem.tagName() == "BORDER")
                 {
                     if(subSubElem.hasAttribute("COLOR"))
@@ -2515,105 +2183,6 @@ void Control::getXml(const QDomElement &elem)
                                 SPDLOG_WARN("Background subtracting file not readable!");
                             }
                         }
-                    }
-                }
-                else if(subSubElem.tagName() == "EXTRINSIC_PARAMETERS")
-                {
-                    if(subSubElem.hasAttribute("SHOW_CALIB_POINTS"))
-                    {
-                        mUi->extCalibPointsShow->setCheckState(
-                            subSubElem.attribute("SHOW_CALIB_POINTS").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-
-                    if(subSubElem.hasAttribute("COORD_DIMENSION"))
-                    {
-                        mUi->coordTab->setCurrentIndex(subSubElem.attribute("COORD_DIMENSION").toInt());
-                    }
-                    else
-                    {
-                        mUi->coordTab->setCurrentIndex(1); //  = 2D
-                        mExtr->setEnabledExtrParams(false);
-                    }
-
-                    if(subSubElem.hasAttribute("SHOW"))
-                    {
-                        mUi->coordShow->setCheckState(
-                            subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("FIX"))
-                    {
-                        mUi->coordFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("ROTATE"))
-                    {
-                        mUi->coordRotate->setValue(subSubElem.attribute("ROTATE").toInt());
-                    }
-                    if(subSubElem.hasAttribute("TRANS_X"))
-                    {
-                        int trans_x = subSubElem.attribute("TRANS_X").toInt();
-                        if(trans_x > mUi->coordTransX->maximum())
-                        {
-                            setCalibCoordTransXMax(trans_x);
-                        }
-                        mUi->coordTransX->setValue(trans_x);
-                    }
-                    if(subSubElem.hasAttribute("TRANS_Y"))
-                    {
-                        int trans_y = subSubElem.attribute("TRANS_Y").toInt();
-                        if(trans_y > mUi->coord3DTransY->maximum())
-                        {
-                            setCalibCoordTransYMax(trans_y);
-                        }
-                        mUi->coordTransY->setValue(trans_y);
-                    }
-                    mUi->coordTransY->setValue(subSubElem.attribute("TRANS_Y").toInt());
-                    if(subSubElem.hasAttribute("SCALE"))
-                    {
-                        mUi->coordScale->setValue(subSubElem.attribute("SCALE").toInt());
-                    }
-                    if(subSubElem.hasAttribute("ALTITUDE"))
-                    {
-                        mUi->coordAltitude->setValue(subSubElem.attribute("ALTITUDE").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("UNIT"))
-                    {
-                        mUi->coordUnit->setValue(subSubElem.attribute("UNIT").toDouble());
-                    }
-                    if(subSubElem.hasAttribute("USE_INTRINSIC_CENTER"))
-                    {
-                        mUi->coordUseIntrinsic->setCheckState(
-                            subSubElem.attribute("USE_INTRINSIC_CENTER").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("COORD3D_TRANS_X"))
-                    {
-                        mUi->coord3DTransX->setValue(subSubElem.attribute("COORD3D_TRANS_X").toInt());
-                    }
-                    if(subSubElem.hasAttribute("COORD3D_TRANS_Y"))
-                    {
-                        mUi->coord3DTransY->setValue(subSubElem.attribute("COORD3D_TRANS_Y").toInt());
-                    }
-                    if(subSubElem.hasAttribute("COORD3D_TRANS_Z"))
-                    {
-                        mUi->coord3DTransZ->setValue(subSubElem.attribute("COORD3D_TRANS_Z").toInt());
-                    }
-                    if(subSubElem.hasAttribute("COORD3D_AXIS_LEN"))
-                    {
-                        mUi->coord3DAxeLen->setValue(subSubElem.attribute("COORD3D_AXIS_LEN").toInt());
-                    }
-                    if(subSubElem.hasAttribute("COORD3D_SWAP_X"))
-                    {
-                        mUi->coord3DSwapX->setCheckState(
-                            subSubElem.attribute("COORD3D_SWAP_X").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("COORD3D_SWAP_Y"))
-                    {
-                        mUi->coord3DSwapY->setCheckState(
-                            subSubElem.attribute("COORD3D_SWAP_Y").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("COORD3D_SWAP_Z"))
-                    {
-                        mUi->coord3DSwapZ->setCheckState(
-                            subSubElem.attribute("COORD3D_SWAP_Z").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
                 else if(subSubElem.tagName() == "ALIGNMENT_GRID")
@@ -3393,8 +2962,12 @@ void Control::getXml(const QDomElement &elem)
             SPDLOG_WARN("Unknown CONTROL tag: {}", subSubElem.tagName());
         }
     }
+    mCoordSys->updateCoordItem();
+}
 
-    mMainWindow->updateCoord();
+bool Control::isLoading() const
+{
+    return mMainWindow->isLoading();
 }
 
 ColorPlot *Control::getColorPlot() const
@@ -3683,7 +3256,7 @@ double Control::getDefaultHeight() const
 
 double Control::getCameraAltitude() const
 {
-    return mUi->coordAltitude->value();
+    return mCoordSys->getCameraAltitude();
 }
 
 /**

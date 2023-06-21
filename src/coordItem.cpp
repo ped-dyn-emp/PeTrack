@@ -19,6 +19,7 @@
 #include "coordItem.h"
 
 #include "control.h"
+#include "coordinateSystemBox.h"
 #include "extrCalibration.h"
 #include "petrack.h"
 
@@ -28,17 +29,14 @@
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,
 // so dass pixel quadratisch
-CoordItem::CoordItem(QWidget *wParent, QGraphicsItem *parent) : QGraphicsItem(parent)
+CoordItem::CoordItem(QWidget *wParent, QGraphicsItem *parent, CoordinateSystemBox *coordSys) :
+    QGraphicsObject(parent), mCoordSys(coordSys)
 {
     mMainWindow    = (class Petrack *) wParent;
     extCalib       = mMainWindow->getExtrCalibration();
     mControlWidget = mMainWindow->getControlWidget();
 
-    // Set Min and Max
-    calibPointsMin.x = 50000;
-    calibPointsMax.x = 0;
-    calibPointsMin.y = 50000;
-    calibPointsMax.y = 0;
+    QObject::connect(coordSys, &CoordinateSystemBox::coordDataChanged, this, &CoordItem::updateData);
 
     updateData(); // um zB setFlags(ItemIsMovable) je nach anzeige zu aendern
 }
@@ -53,43 +51,14 @@ CoordItem::CoordItem(QWidget *wParent, QGraphicsItem *parent) : QGraphicsItem(pa
  */
 QRectF CoordItem::boundingRect() const
 {
-    // bounding box wird in lokalen koordinaten angegeben!!! (+-10 wegen zahl "1")
-    if(mControlWidget->getCalibCoordShow())
-    {
-        if(mControlWidget->getCalibCoordDimension() != 0) // 2D view
-        {
-            return QRectF(-110., -110., 220., 220.);
-        }
-        else // 3D view
-        {
-            double min_x = std::min(std::min(x.x, y.x), std::min(z.x, ursprung.x));
-            double max_x = std::max(std::max(x.x, y.x), std::max(z.x, ursprung.x));
-
-            double min_y = std::min(std::min(x.y, y.y), std::min(z.y, ursprung.y));
-            double max_y = std::max(std::max(x.y, y.y), std::max(z.y, ursprung.y));
-
-            if(mControlWidget->getCalibExtrCalibPointsShow())
-            {
-                min_x = std::min(float(min_x), calibPointsMin.x);
-                max_x = std::max(float(max_x), calibPointsMax.x);
-
-                min_y = std::min(float(min_y), calibPointsMin.y);
-                max_y = std::max(float(max_y), calibPointsMax.y);
-            }
-            return QRectF(min_x - 25, min_y - 25, max_x - min_x + 50, max_y - min_y + 50);
-        }
-    }
-    else
-    {
-        return QRectF(0., 0., 0., 0.);
-    }
+    return mBoundingRect;
 }
 
 // event, of moving mouse while button is pressed
 void CoordItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     // if coordinate system position is not fixed
-    if(!mControlWidget->getCalibCoordFix())
+    if(!mCoordSys->getCalibCoordFix())
     {
         setCursor(Qt::ClosedHandCursor);
 
@@ -97,19 +66,18 @@ void CoordItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                        event->lastScenePos();   // screenPos()-buttonDownScreenPos(Qt::RightButton) also interesting
         if(event->buttons() == Qt::RightButton) // event->button() doesnt work
         {
-            mControlWidget->setCalibCoordRotate(
-                mControlWidget->getCalibCoordRotate() -
-                (int) (3. * (diff.x() + diff.y()))); // 10* nicht noetig, da eh nur relativ
+            auto pose2D = mCoordSys->getCoordPose2D();
+            pose2D.angle -= (int) (3. * (diff.x() + diff.y()));
+            mCoordSys->setCoordPose2D(pose2D);
         }
         else if(event->buttons() == Qt::LeftButton)
         {
-            if(mControlWidget->getCalibCoordDimension() == 0) // 3D
+            if(mCoordSys->getCalibCoordDimension() == 0) // 3D
             {
-                cv::Point3f p_cur = extCalib->get3DPoint(
-                    cv::Point2f(event->scenePos().x(), event->scenePos().y()), mControlWidget->getCalibCoord3DTransZ());
-                cv::Point3f p_last = extCalib->get3DPoint(
-                    cv::Point2f(mouse_x /*event->lastScenePos().x()*/, mouse_y /*event->lastScenePos().y()*/),
-                    mControlWidget->getCalibCoord3DTransZ());
+                auto        trans = mCoordSys->getCoordTrans3D();
+                cv::Point3f p_cur =
+                    extCalib->get3DPoint(cv::Point2f(event->scenePos().x(), event->scenePos().y()), trans.z());
+                cv::Point3f p_last = extCalib->get3DPoint(cv::Point2f(mouse_x, mouse_y), trans.z());
                 // ToDo:
                 // Problem: Die Mouse Bewegungen, die erfasst werden sind zu gering, sodass viele Werte als 0 gewertet
                 // werden und nicht als Bewegung bercksichtigt werden, obwohl man die Maus bewegt. D.h. die Maus bewegt
@@ -117,28 +85,32 @@ void CoordItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 // und das Kooridnatensystem bewegt sich nicht. Effekt wird noch verstrkt, da das stndig passiert
                 // Besonders schnelle Mausbewegungen lindern den Effekt
 
-                mControlWidget->setCalibCoord3DTransX(
-                    coordTrans_x - (mControlWidget->getCalibCoord3DSwapX() ? -1 : 1) * round(p_last.x - p_cur.x));
-                mControlWidget->setCalibCoord3DTransY(
-                    coordTrans_y - (mControlWidget->getCalibCoord3DSwapY() ? -1 : 1) * round(p_last.y - p_cur.y));
+                auto swap = mCoordSys->getSwap3D();
+                trans[0]  = coordTrans_x - (swap.x ? -1 : 1) * round(p_last.x - p_cur.x);
+                trans[1]  = coordTrans_y - (swap.y ? -1 : 1) * round(p_last.y - p_cur.y);
+                mCoordSys->setCoordTrans3D(trans);
             }
             else
             {
-                mControlWidget->setCalibCoordTransX(mControlWidget->getCalibCoordTransX() + (int) (10. * diff.x()));
-                mControlWidget->setCalibCoordTransY(mControlWidget->getCalibCoordTransY() + (int) (10. * diff.y()));
+                auto pose = mCoordSys->getCoordPose2D();
+                pose.position[0] += 10. * diff.x();
+                pose.position[1] += 10. * diff.y();
+                mCoordSys->setCoordPose2D(pose);
             }
         }
         else if(event->buttons() == Qt::MiddleButton)
         {
-            if(mControlWidget->getCalibCoordDimension() == 0)
+            if(mCoordSys->getCalibCoordDimension() == 0)
             {
-                mControlWidget->setCalibCoord3DAxeLen(
-                    mControlWidget->getCalibCoord3DAxeLen() + (int) (10. * (diff.x() - diff.y())));
+                int axeLen = mCoordSys->getCoord3DAxeLen();
+                axeLen += (int) (10. * (diff.x() - diff.y()));
+                mCoordSys->setCoord3DAxeLen(axeLen);
             }
             else
             {
-                mControlWidget->setCalibCoordScale(
-                    mControlWidget->getCalibCoordScale() + (int) (10. * (diff.x() - diff.y())));
+                auto pose2D = mCoordSys->getCoordPose2D();
+                pose2D.scale += (int) (10. * (diff.x() - diff.y()));
+                mCoordSys->setCoordPose2D(pose2D);
             }
         }
     }
@@ -150,15 +122,16 @@ void CoordItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void CoordItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(!mControlWidget->getCalibCoordFix())
+    if(!mCoordSys->getCalibCoordFix())
     {
         if(event->button() == Qt::LeftButton)
         {
             mouse_x = event->scenePos().x();
             mouse_y = event->scenePos().y();
 
-            coordTrans_x = mControlWidget->getCalibCoord3DTransX();
-            coordTrans_y = mControlWidget->getCalibCoord3DTransY();
+            auto trans   = mCoordSys->getCoordTrans3D();
+            coordTrans_x = trans.x();
+            coordTrans_y = trans.y();
         }
     }
     else
@@ -169,7 +142,8 @@ void CoordItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void CoordItem::updateData()
 {
-    if(!mControlWidget->getCalibCoordFix())
+    auto state = mCoordSys->getCoordItemState();
+    if(state.isMovable)
     {
         setFlag(
             ItemIsMovable); // noetig, damit mouseEvent leftmousebutton weitergegeben wird, aber drag mach ich selber
@@ -181,84 +155,14 @@ void CoordItem::updateData()
             false); // noetig, damit mouseEvent leftmousebutton weitergegeben wird, aber drag mach ich selber
     }
 
-    if(mControlWidget->getCalibCoordDimension() == 1) // 2D
-    {
-        double sc = mControlWidget->getCalibCoordScale() / 10.;
-        double tX = mControlWidget->getCalibCoordTransX() / 10.;
-        double tY = mControlWidget->getCalibCoordTransY() / 10.;
-        double ro = mControlWidget->getCalibCoordRotate() / 10.;
+    setTransform(state.matrix);
+    x3D = state.x3D;
+    y3D = state.y3D;
+    z3D = state.z3D;
 
-        // aktualisierung der transformationsmatrix
-        QTransform matrix;
-        // matrix wird nur bei aenderungen neu bestimmt
-        matrix.translate(tX, tY);
-        matrix.rotate(ro);
-        matrix.scale(sc / 100., sc / 100.);
-        // matrix.shear(tX,tY);
-        setTransform(matrix);
-    }
-    else // 3D
-    {
-        ////////////////////////////////////////
-        //     3D World-Coordinate-System     //
-        ////////////////////////////////////////
-        if(mMainWindow->getImage())
-        {
-            // Reset Matrix - No Matrix Transformations for 3D Coordsystem
-            // aktualisierung der transformationsmatrix
-            QTransform matrix;
-            // matrix wird nur bei aenderungen neu bestimmt
-            matrix.translate(0, 0);
-            matrix.rotate(0);
-            matrix.scale(1, 1);
-            setTransform(matrix);
+    prepareGeometryChange();
+    mBoundingRect = state.boundingRect;
 
-            const double axeLen = mControlWidget->getCalibCoord3DAxeLen();
-            const int    bS     = mMainWindow->getImageBorderSize();
-
-            // Coordinate-system origin at (tX,tY,tZ)
-            if(extCalib->isSetExtrCalib())
-            {
-                ursprung = extCalib->getImagePoint(cv::Point3f(0, 0, 0));
-
-                x3D = cv::Point3f(axeLen, 0, 0);
-                y3D = cv::Point3f(0, axeLen, 0);
-                z3D = cv::Point3f(0, 0, axeLen);
-
-                // Tests if the origin-point of the coordinate-system is outside the image
-                if(extCalib->isOutsideImage(ursprung))
-                {
-                    return;
-                }
-                x3D.x++;
-                y3D.y++;
-                z3D.z++;
-
-                // Kuerzt die Koordinaten-Achsen, falls sie aus dem angezeigten Bild raus laufen wuerden
-                do
-                {
-                    x3D.x--;
-                    x = extCalib->getImagePoint(x3D);
-                    // tests if the coord system axis are inside the view or outside, if outside short them till they
-                    // are inside the image
-                } while(x.x < -bS || x.x > mMainWindow->getImage()->width() - bS || x.y < -bS ||
-                        x.y > mMainWindow->getImage()->height() - bS);
-                do
-                {
-                    y3D.y--;
-                    y = extCalib->getImagePoint(y3D);
-                } while(y.x < -bS || y.x > mMainWindow->getImage()->width() - bS || y.y < -bS ||
-                        y.y > mMainWindow->getImage()->height() - bS);
-                do
-                {
-                    z3D.z--;
-                    z = extCalib->getImagePoint(z3D);
-                } while(z.x < -bS || z.x > mMainWindow->getImage()->width() - bS || z.y < -bS ||
-                        z.y > mMainWindow->getImage()->height() - bS);
-            }
-        }
-        prepareGeometryChange();
-    }
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -270,14 +174,13 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
     ////////////////////////////////
     // Drawing Calibration Points //
     ////////////////////////////////
-    if(mControlWidget->getCalibExtrCalibPointsShow() && mControlWidget->getCalibCoordDimension() == 0)
+    if(mCoordSys->getCalibExtrCalibPointsShow() && mCoordSys->getCalibCoordDimension() == 0)
     {
         if(extCalib->isSetExtrCalib())
         {
             QFont font;
             font.setBold(mControlWidget->isTrackNumberBoldChecked());
             font.setPixelSize(mControlWidget->getTrackNumberSize());
-
             painter->setFont(font);
 
             for(size_t i = 0; i < extCalib->get2DList().size(); i++)
@@ -293,14 +196,14 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 painter->setBrush(Qt::blue);
 
                 // Projected 3D-Points
-                cv::Point3f p3d = extCalib->get3DList().at(i);
-                p3d.x -= mControlWidget->getCalibCoord3DTransX();
-                p3d.y -= mControlWidget->getCalibCoord3DTransY();
-                p3d.z -= mControlWidget->getCalibCoord3DTransZ();
+                cv::Point3f p3d   = extCalib->get3DList().at(i);
+                auto        trans = mCoordSys->getCoordTrans3D();
+                p3d -= trans.toCvPoint();
 
-                p3d.x *= (mControlWidget->getCalibCoord3DSwapX() ? -1 : 1);
-                p3d.y *= (mControlWidget->getCalibCoord3DSwapY() ? -1 : 1);
-                p3d.z *= (mControlWidget->getCalibCoord3DSwapZ() ? -1 : 1);
+                auto swap = mCoordSys->getSwap3D();
+                p3d.x *= (swap.x ? -1 : 1);
+                p3d.y *= (swap.y ? -1 : 1);
+                p3d.z *= (swap.z ? -1 : 1);
 
                 cv::Point2f p3 = extCalib->getImagePoint(p3d);
 
@@ -313,22 +216,17 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 painter->setPen(Qt::black);
                 painter->setBrush(Qt::black);
                 painter->drawText(QPointF(p2.x + 10, p2.y + font.pixelSize()), QObject::tr("%1").arg((i + 1)));
-
-                calibPointsMin.x = std::min({calibPointsMin.x, p2.x, p3.x});
-                calibPointsMin.y = std::min({calibPointsMin.y, p2.y, p3.y});
-                calibPointsMax.x = std::max({calibPointsMax.x, p2.x, p3.x});
-                calibPointsMax.y = std::max({calibPointsMax.y, p2.y, p3.y});
             }
         }
     }
 
-    if(mControlWidget->getCalibCoordShow())
+    if(mCoordSys->getCalibCoordShow())
     {
         // general configuration
         painter->setPen(Qt::blue);
         painter->setBrush(QBrush(Qt::blue, Qt::SolidPattern));
 
-        if(mControlWidget->getCalibCoordDimension() == 1) // 2D
+        if(mCoordSys->getCalibCoordDimension() == 1) // 2D
         {
             //////////////////////////
             // 2D Coordinate-System //
@@ -365,7 +263,7 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
         }
         else
         {
-            double axeLen = mControlWidget->getCalibCoord3DAxeLen();
+            double axeLen = mCoordSys->getCoord3DAxeLen();
 
             qreal coordLineWidth = 2.0;
 

@@ -27,6 +27,7 @@
 #include "petrack.h"
 #include "player.h"
 #include "recognition.h"
+#include "worldImageCorrespondence.h"
 
 #include <fstream>
 #include <opencv2/highgui.hpp>
@@ -124,26 +125,26 @@ TrackerReal::TrackerReal(QWidget *wParent, PersonStorage &storage) :
 
 // default: int imageBorderSize = 0, bool missingFramesInserted = true, bool useTrackpoints = false
 int TrackerReal::calculate(
-    Petrack       *petrack,
-    Tracker       *tracker,
-    ImageItem     *imageItem,
-    ColorPlot     *colorPlot,
-    MissingFrames &missingFrames,
-    int            imageBorderSize,
-    bool           missingFramesInserted,
-    bool           useTrackpoints,
-    bool           alternateHeight,
-    double         altitude,
-    bool           useCalibrationCenter,
-    bool           exportElimTp,
-    bool           exportElimTrj,
-    bool           exportSmooth,
-    bool           exportViewingDirection,
-    bool           exportAngleOfView,
-    bool           exportMarkerID,
-    bool           exportAutoCorrect)
+    Petrack                        *petrack,
+    Tracker                        *tracker,
+    const WorldImageCorrespondence *worldImageCorr,
+    ColorPlot                      *colorPlot,
+    MissingFrames                  &missingFrames,
+    int                             imageBorderSize,
+    bool                            missingFramesInserted,
+    bool                            useTrackpoints,
+    bool                            alternateHeight,
+    double                          altitude,
+    bool                            useCalibrationCenter,
+    bool                            exportElimTp,
+    bool                            exportElimTrj,
+    bool                            exportSmooth,
+    bool                            exportViewingDirection,
+    bool                            exportAngleOfView,
+    bool                            exportMarkerID,
+    bool                            exportAutoCorrect)
 {
-    if(tracker || imageItem || colorPlot)
+    if(tracker || colorPlot)
     {
         if(size() > 0)
         {
@@ -182,13 +183,13 @@ int TrackerReal::calculate(
         QList<int>      tmpMissingList;    // frame nr
         QList<int>      tmpMissingListAnz; // anzahl frames
         TrackPersonReal trackPersonReal;
-        QPointF         center = imageItem->getPosReal(
-            QPointF(imageItem->boundingRect().width() / 2., imageItem->boundingRect().height() / 2.), 0.);
-        Vec3F   sp;
-        int     tsize;
-        int     extrapolated;
-        QPointF colPos;
-        float   angle;
+        auto            imgRect = mMainWindow->getImage()->size();
+        QPointF         center  = worldImageCorr->getPosReal(QPointF(imgRect.width() / 2., imgRect.height() / 2.), 0.);
+        Vec3F           sp;
+        int             tsize;
+        int             extrapolated;
+        QPointF         colPos;
+        float           angle;
 
         const auto &persons = mPersonStorage.getPersons();
         for(size_t i = 0; i < persons.size(); ++i) // ueber trajektorien
@@ -320,7 +321,7 @@ int TrackerReal::calculate(
                                 moveDir += reco::autoCorrectColorMarker(person.at(j), mMainWindow->getControlWidget());
                             }
 
-                            pos = imageItem->getPosReal((person.at(j) + moveDir + br).toQPointF(), bestZ);
+                            pos = worldImageCorr->getPosReal((person.at(j) + moveDir + br).toQPointF(), bestZ);
                             trackPersonReal.addEnd(Vec3F(pos.x(), pos.y(), bestZ), firstFrame + j);
                         }
                     }
@@ -331,11 +332,11 @@ int TrackerReal::calculate(
                             moveDir += reco::autoCorrectColorMarker(person.at(j), mMainWindow->getControlWidget());
                         }
 
-                        pos = imageItem->getPosReal((person.at(j) + moveDir + br).toQPointF(), height);
+                        pos = worldImageCorr->getPosReal((person.at(j) + moveDir + br).toQPointF(), height);
                         trackPersonReal.addEnd(pos, firstFrame + j);
                         if(exportAngleOfView)
                         {
-                            angle = (90. - imageItem->getAngleToGround(
+                            angle = (90. - worldImageCorr->getAngleToGround(
                                                (person.at(j) + br).x(), (person.at(j) + br).y(), height)) *
                                     PI / 180.;
                             trackPersonReal.last().setAngleOfView(angle);
@@ -369,8 +370,8 @@ int TrackerReal::calculate(
                         if((exportViewingDirection) &&
                            (person.at(j).color().isValid())) // wenn blickrichtung mit ausgegeben werden soll
                         {
-                            colPos =
-                                imageItem->getPosReal((person.at(j).colPoint() + moveDir + br).toQPointF(), height);
+                            colPos = worldImageCorr->getPosReal(
+                                (person.at(j).colPoint() + moveDir + br).toQPointF(), height);
                             trackPersonReal.last().setViewDirection(colPos - pos);
                         }
                     }
@@ -418,9 +419,10 @@ int TrackerReal::calculate(
                                         reco::autoCorrectColorMarker(person.at(j), mMainWindow->getControlWidget());
                                 }
 
-                                pos2 = (imageItem->getPosReal((person.at(j + 1) + moveDir + br).toQPointF(), height) -
-                                        pos) /
-                                       (anz + 1);
+                                pos2 =
+                                    (worldImageCorr->getPosReal((person.at(j + 1) + moveDir + br).toQPointF(), height) -
+                                     pos) /
+                                    (anz + 1);
                                 for(f = 1; f <= anz; ++f)
                                 {
                                     trackPersonReal.addEnd(pos + f * pos2, -1); // -1 zeigt an, dass nur interpoliert
@@ -887,7 +889,7 @@ std::vector<std::unordered_map<int, double>> utils::computeDisplacement(
     std::vector<std::unordered_map<int, double>> displacementsPerFrame(maxFrameNum + 1);
 
     // compute window size
-    auto cmPerPixelXYMiddle = petrack->getImageItem()->getCmPerPixel(
+    auto cmPerPixelXYMiddle = petrack->getWorldImageCorrespondence().getCmPerPixel(
         static_cast<float>(prevFrame.cols / 2),
         static_cast<float>(prevFrame.rows / 2),
         static_cast<float>(petrack->getControlWidget()->getDefaultHeight()));
@@ -936,7 +938,7 @@ std::vector<std::unordered_map<int, double>> utils::computeDisplacement(
             {
                 auto id = idsInFrame[frame - 1][i];
 
-                auto cmPerPixelXY = petrack->getImageItem()->getCmPerPixel(
+                auto cmPerPixelXY = petrack->getWorldImageCorrespondence().getCmPerPixel(
                     nextFeaturePoint[i].x, nextFeaturePoint[i].y, petrack->getControlWidget()->getDefaultHeight());
 
                 auto mPerPixel = (cmPerPixelXY.x() + cmPerPixelXY.y()) / 2. / 100.;

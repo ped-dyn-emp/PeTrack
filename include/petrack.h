@@ -36,7 +36,6 @@
 #include "borderFilter.h"
 #include "brightContrastFilter.h"
 #include "calibFilter.h"
-#include "coordItem.h"
 #include "extrCalibration.h"
 #include "logwindow.h"
 #include "manualTrackpointMover.h"
@@ -51,6 +50,7 @@ class Animation;
 class RoiItem;
 class RecognitionRoiItem;
 class GridItem;
+class WorldImageCorrespondence;
 
 #ifdef STEREO_DISABLED
 enum Camera
@@ -75,9 +75,12 @@ class QImage;
 class QString;
 class GraphicsView;
 class QGraphicsScene;
+class QXmlStreamWriter;
+class QSplitter;
 class QDoubleSpinBox;
 class QFrame;
 
+class CoordItem;
 class ImageItem;
 class LogoItem;
 class Control;
@@ -249,14 +252,6 @@ public:
     inline Animation   *getAnimation() { return mAnimation; }
     inline Player      *getPlayer() { return mPlayerWidget; }
 
-    inline void updateCoord()
-    {
-        if(mCoordItem)
-        {
-            mCoordItem->updateData();
-        }
-    }
-
     inline QPointF getMousePosOnImage() { return mMousePosOnImage; }
 
     inline void setRecognitionChanged(bool b) { mRecognitionChanged = b; }
@@ -316,7 +311,8 @@ public:
     {
         return &mExtrCalibration;
     }
-    inline double getStatusFPS() const
+    const WorldImageCorrespondence &getWorldImageCorrespondence();
+    inline double                   getStatusFPS() const
     {
         return mShowFPS;
     }
@@ -487,8 +483,9 @@ private:
     SwapFilter           mSwapFilter;
     BackgroundFilter     mBackgroundFilter;
 
-    AutoCalib       mAutoCalib;
-    ExtrCalibration mExtrCalibration;
+    AutoCalib                       mAutoCalib;
+    ExtrCalibration                 mExtrCalibration;
+    const WorldImageCorrespondence *mWorldImageCorrespondence;
 
     bool mRecognitionChanged;
     bool mTrackChanged;

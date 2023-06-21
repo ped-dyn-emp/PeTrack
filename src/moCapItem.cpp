@@ -22,6 +22,9 @@
 #include "moCapController.h"
 #include "petrack.h"
 
+#include <QPainter>
+#include <QtMath> // for M_PI
+
 
 /**
  * @brief Constructor of moCapItem
