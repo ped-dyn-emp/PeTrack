@@ -16,34 +16,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef IMAGEITEM_H
-#define IMAGEITEM_H
+#ifndef COORDINATESTRUCTS_H
+#define COORDINATESTRUCTS_H
 
-#include <QGraphicsObject>
+#include "vector.h"
 
-class Petrack;
-class Control;
-
-class ImageItem : public QGraphicsObject
+struct CoordPose2D
 {
-    Q_OBJECT
-private:
-    Petrack *mMainWindow;
-    QImage  *mImage;
-
-public:
-    ImageItem(QWidget *wParent, QGraphicsItem *parent);
-
-    QRectF boundingRect() const;
-    void   paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
-    void setImage(QImage *img);
-
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
-
-signals:
-    void imageChanged(int width, int height, int borderDiff);
+    Vec2F  position;
+    double angle;
+    double scale;
+    double unit;
 };
 
-#endif
+struct SwapAxis
+{
+    bool x;
+    bool y;
+    bool z;
+};
+
+inline bool operator==(const SwapAxis &lhs, const SwapAxis &rhs)
+{
+    return (lhs.x == rhs.x) && (lhs.y == rhs.y) && (lhs.z == rhs.z);
+}
+
+struct CoordPose3D
+{
+    Vec3F    position;
+    SwapAxis swap;
+};
+
+#endif // COORDINATESTRUCTS_H

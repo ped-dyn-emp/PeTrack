@@ -16,5 +16,6 @@ target_sources(petrack_tests PRIVATE
     tst_intrinsicBox.cpp
     util.h
     tst_extrinsicBox.cpp
+    tst_coordinateSystemBox.cpp
     tst_tracker.cpp
 )

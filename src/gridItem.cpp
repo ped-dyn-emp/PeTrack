@@ -19,6 +19,7 @@
 #include "gridItem.h"
 
 #include "control.h"
+#include "coordinateSystemBox.h"
 #include "logger.h"
 #include "petrack.h"
 #include "view.h"
@@ -26,10 +27,11 @@
 #include <QtWidgets>
 #include <cmath>
 
-GridItem::GridItem(QWidget *wParent, QGraphicsItem *parent) : QGraphicsItem(parent)
+GridItem::GridItem(QWidget *wParent, QGraphicsItem *parent, CoordinateSystemBox *coordSys) :
+    QGraphicsItem(parent), mCoordSys(coordSys)
 {
     mMainWindow    = (class Petrack *) wParent;
-    extCalib       = mMainWindow->getExtrCalibration();
+    mExtCalib      = mMainWindow->getExtrCalibration();
     mControlWidget = mMainWindow->getControlWidget();
 }
 
@@ -78,15 +80,15 @@ void GridItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         {
             if(mControlWidget->getCalibGridDimension() == 0)
             {
-                cv::Point3f p3d = extCalib->get3DPoint(
+                const auto &swap = mCoordSys->getSwap3D();
+
+                cv::Point3f p3d = mExtCalib->get3DPoint(
                     cv::Point2f(event->scenePos().x(), event->scenePos().y()), mControlWidget->getCalibGrid3DTransZ());
-                cv::Point3f p3d_last = extCalib->get3DPoint(
+                cv::Point3f p3d_last = mExtCalib->get3DPoint(
                     cv::Point2f(mouse_x /*event->lastScenePos().x()*/, mouse_y /*event->lastScenePos().y()*/),
                     mControlWidget->getCalibGrid3DTransZ());
-                mControlWidget->setCalibGrid3DTransX(
-                    gridTrans_x + (mControlWidget->getCalibCoord3DSwapX() ? -1 : 1) * round(p3d.x - p3d_last.x));
-                mControlWidget->setCalibGrid3DTransY(
-                    gridTrans_y + (mControlWidget->getCalibCoord3DSwapY() ? -1 : 1) * round(p3d.y - p3d_last.y));
+                mControlWidget->setCalibGrid3DTransX(gridTrans_x + (swap.x ? -1 : 1) * round(p3d.x - p3d_last.x));
+                mControlWidget->setCalibGrid3DTransY(gridTrans_y + (swap.y ? -1 : 1) * round(p3d.y - p3d_last.y));
             }
             else
             {
@@ -263,13 +265,13 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
     bool        vanishPointXIsInsideImage = false;
     cv::Point2f vanishPointY, vanishPointX;
     double      x, y;
-    if(mMainWindow->getImage() && extCalib->isSetExtrCalib())
+    if(mMainWindow->getImage() && mExtCalib->isSetExtrCalib())
     {
         // create 2 parallel lines in x-direction
         cv::Point3f a3d = cv::Point3f(-500, -500, 0), b3d = cv::Point3f(500, -500, 0), c3d = cv::Point3f(-500, 500, 0),
                     d3d = cv::Point3f(500, 500, 0);
-        cv::Point2f a2d = extCalib->getImagePoint(a3d), b2d = extCalib->getImagePoint(b3d),
-                    c2d = extCalib->getImagePoint(c3d), d2d = extCalib->getImagePoint(d3d);
+        cv::Point2f a2d = mExtCalib->getImagePoint(a3d), b2d = mExtCalib->getImagePoint(b3d),
+                    c2d = mExtCalib->getImagePoint(c3d), d2d = mExtCalib->getImagePoint(d3d);
 
         // y = m*x+n
         float m1 = (b2d.y - a2d.y) / (b2d.x - a2d.x), m2 = (d2d.y - c2d.y) / (d2d.x - c2d.x), n1 = a2d.y - m1 * a2d.x,
@@ -283,8 +285,8 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         // create 2 parallel lines in y-direction
         a3d = cv::Point3f(-500, -500, 0), b3d = cv::Point3f(-500, 500, 0), c3d = cv::Point3f(500, -500, 0),
         d3d = cv::Point3f(500, 500, 0);
-        a2d = extCalib->getImagePoint(a3d), b2d = extCalib->getImagePoint(b3d), c2d = extCalib->getImagePoint(c3d),
-        d2d = extCalib->getImagePoint(d3d);
+        a2d = mExtCalib->getImagePoint(a3d), b2d = mExtCalib->getImagePoint(b3d), c2d = mExtCalib->getImagePoint(c3d),
+        d2d = mExtCalib->getImagePoint(d3d);
 
         // y = m*x+n
         m1 = (b2d.y - a2d.y) / (b2d.x - a2d.x), m2 = (d2d.y - c2d.y) / (d2d.x - c2d.x), n1 = a2d.y - m1 * a2d.x,
@@ -295,13 +297,13 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         y            = ((m1 * x + n1) + (m2 * x + n2)) / 2.0;
         vanishPointX = cv::Point2f(x, y);
 
-        vanishPointYIsInsideImage = !extCalib->isOutsideImage(vanishPointY);
-        vanishPointXIsInsideImage = !extCalib->isOutsideImage(vanishPointX);
+        vanishPointYIsInsideImage = !mExtCalib->isOutsideImage(vanishPointY);
+        vanishPointXIsInsideImage = !mExtCalib->isOutsideImage(vanishPointX);
 
         ////////////////////////////////
         // Drawing Vanish Points      //
         ////////////////////////////////
-        if(mControlWidget->getCalibExtrVanishPointsShow())
+        if(mCoordSys->getCalibExtrVanishPointsShow())
         {
             painter->setPen(Qt::yellow);
             painter->drawLine(
@@ -402,7 +404,7 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         }
         else
         {
-            if(extCalib->isSetExtrCalib())
+            if(mExtCalib->isSetExtrCalib())
             {
                 double min_x = INT_MAX, min_y = INT_MAX, max_x = INT_MIN, max_y = INT_MIN;
                 int    y_offset = -bS;
@@ -418,13 +420,13 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
 
                 cv::Point3f points[4];
                 // top left corner
-                points[0] = extCalib->get3DPoint(cv::Point2f(0 - bS, y_offset), tZ3D);
+                points[0] = mExtCalib->get3DPoint(cv::Point2f(0 - bS, y_offset), tZ3D);
                 // top right corner
-                points[1] = extCalib->get3DPoint(cv::Point2f(iW, y_offset), tZ3D);
+                points[1] = mExtCalib->get3DPoint(cv::Point2f(iW, y_offset), tZ3D);
                 // bottom left corner
-                points[2] = extCalib->get3DPoint(cv::Point2f(0 - bS, iH), tZ3D);
+                points[2] = mExtCalib->get3DPoint(cv::Point2f(0 - bS, iH), tZ3D);
                 // bottom right corner
-                points[3] = extCalib->get3DPoint(cv::Point2f(iW, iH), tZ3D);
+                points[3] = mExtCalib->get3DPoint(cv::Point2f(iW, iH), tZ3D);
 
 
                 painter->setPen(Qt::green);
@@ -456,11 +458,11 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
                         // Draw simple Grid around origin point
                         for(int i = 0; i <= 2500; i += resolution)
                         {
-                            p[0] = extCalib->getImagePoint(cv::Point3f(tX3D + 2500, tY3D + i, tZ3D));
-                            p[1] = extCalib->getImagePoint(cv::Point3f(tX3D, tY3D + i, tZ3D));
+                            p[0] = mExtCalib->getImagePoint(cv::Point3f(tX3D + 2500, tY3D + i, tZ3D));
+                            p[1] = mExtCalib->getImagePoint(cv::Point3f(tX3D, tY3D + i, tZ3D));
                             painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
-                            p[0] = extCalib->getImagePoint(cv::Point3f(tX3D + i, tY3D + 2500, tZ3D));
-                            p[1] = extCalib->getImagePoint(cv::Point3f(tX3D + i, tY3D, tZ3D));
+                            p[0] = mExtCalib->getImagePoint(cv::Point3f(tX3D + i, tY3D + 2500, tZ3D));
+                            p[1] = mExtCalib->getImagePoint(cv::Point3f(tX3D + i, tY3D, tZ3D));
                             painter->drawLine(QPointF(p[0].x, p[0].y), QPointF(p[1].x, p[1].y));
                         }
                     }
@@ -471,14 +473,14 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
                         {
                             for(int j = min_x * 5; j < max_x * 5; j += resolution)
                             {
-                                p[0] = extCalib->getImagePoint(cv::Point3f(tX3D + i, tY3D + j, tZ3D));
-                                p[1] = extCalib->getImagePoint(cv::Point3f(tX3D + i + resolution, tY3D + j, tZ3D));
+                                p[0] = mExtCalib->getImagePoint(cv::Point3f(tX3D + i, tY3D + j, tZ3D));
+                                p[1] = mExtCalib->getImagePoint(cv::Point3f(tX3D + i + resolution, tY3D + j, tZ3D));
 
                                 point[0] = QPointF(p[0].x, p[0].y);
                                 point[1] = QPointF(p[1].x, p[1].y);
 
-                                p[0] = extCalib->getImagePoint(cv::Point3f(tX3D + i, tY3D + j, tZ3D));
-                                p[1] = extCalib->getImagePoint(cv::Point3f(tX3D + i, tY3D + j + resolution, tZ3D));
+                                p[0] = mExtCalib->getImagePoint(cv::Point3f(tX3D + i, tY3D + j, tZ3D));
+                                p[1] = mExtCalib->getImagePoint(cv::Point3f(tX3D + i, tY3D + j + resolution, tZ3D));
 
                                 point[2] = QPointF(p[0].x, p[0].y);
                                 point[3] = QPointF(p[1].x, p[1].y);
@@ -515,57 +517,50 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
                 }
                 else
                 {
-                    int swapX = mControlWidget->getCalibCoord3DSwapX() ? -1 : 1;
-                    int swapY = mControlWidget->getCalibCoord3DSwapY() ? -1 : 1;
-                    int grid_height =
-                        tZ3D -
-                        mControlWidget
-                            ->getCalibCoord3DTransZ(); // Da extCalibration immer vom Koordinatensystemursprung ausgeht
-                                                       // (Das Grid soll aber unabhngig davon gezeichnet werden)
+                    const auto &swap  = mCoordSys->getSwap3D();
+                    const auto  trans = mCoordSys->getCoordTrans3D();
+                    int         swapX = swap.x ? -1 : 1;
+                    int         swapY = swap.y ? -1 : 1;
+                    int grid_height = tZ3D - trans.z(); // Da extCalibration immer vom Koordinatensystemursprung ausgeht
+                                                        // (Das Grid soll aber unabhngig davon gezeichnet werden)
 
                     // horizontal lines from the left to the right on height tZ3D the lines start from origin point
                     // (tY3D) until max_y or if tY3D < min_y it starts with min_y because otherwise it is outside the
                     // image
 
-                    for(int i = -mControlWidget->getCalibCoord3DTransY() + tY3D; i < (swapY > 0 ? max_y : -min_y);
-                        i += resolution)
+                    for(int i = -trans.y() + tY3D; i < (swapY > 0 ? max_y : -min_y); i += resolution)
                     {
                         // Bildpunkte zu den Endpunkten der Linie holen
-                        p[0] = extCalib->getImagePoint(cv::Point3f(min_x, swapY * i, grid_height));
-                        p[1] = extCalib->getImagePoint(cv::Point3f(max_x, swapY * i, grid_height));
+                        p[0] = mExtCalib->getImagePoint(cv::Point3f(min_x, swapY * i, grid_height));
+                        p[1] = mExtCalib->getImagePoint(cv::Point3f(max_x, swapY * i, grid_height));
                         drawLine(painter, p, y_offset);
                     }
                     // see above but now the lines start from origin point (tY3D) until min_y
                     // y-
-                    for(int i = -mControlWidget->getCalibCoord3DTransY() + tY3D - resolution;
-                        i > (swapY > 0 ? min_y : -max_y);
-                        i -= resolution)
+                    for(int i = -trans.y() + tY3D - resolution; i > (swapY > 0 ? min_y : -max_y); i -= resolution)
                     {
                         // Bildpunkte zu den Endpunkten der Linie holen
-                        p[0] = extCalib->getImagePoint(cv::Point3f(min_x, swapY * i, grid_height));
-                        p[1] = extCalib->getImagePoint(cv::Point3f(max_x, swapY * i, grid_height));
+                        p[0] = mExtCalib->getImagePoint(cv::Point3f(min_x, swapY * i, grid_height));
+                        p[1] = mExtCalib->getImagePoint(cv::Point3f(max_x, swapY * i, grid_height));
                         drawLine(painter, p, y_offset);
                     }
                     // vertical lines from the top to the bottom on height tZ3D the lines start from origin point(tX3D)
                     // until max_x of if tX3D < minx it starts with min_x because otherwise the lines are outside the
                     // image x+
-                    for(int i = -mControlWidget->getCalibCoord3DTransX() + tX3D; i < (swapX > 0 ? max_x : -min_x);
-                        i += resolution)
+                    for(int i = -trans.x() + tX3D; i < (swapX > 0 ? max_x : -min_x); i += resolution)
                     {
                         // Bildpunkte zu den Endpunkten der Linie holen
-                        p[0] = extCalib->getImagePoint(cv::Point3f(swapX * i, min_y, grid_height));
-                        p[1] = extCalib->getImagePoint(cv::Point3f(swapX * i, max_y, grid_height));
+                        p[0] = mExtCalib->getImagePoint(cv::Point3f(swapX * i, min_y, grid_height));
+                        p[1] = mExtCalib->getImagePoint(cv::Point3f(swapX * i, max_y, grid_height));
                         drawLine(painter, p, y_offset);
                     }
                     // see above but now the lines start from origin point until min_x
                     // x-
-                    for(int i = -mControlWidget->getCalibCoord3DTransX() + tX3D - resolution;
-                        i > (swapX > 0 ? min_x : -max_x);
-                        i -= resolution)
+                    for(int i = -trans.x() + tX3D - resolution; i > (swapX > 0 ? min_x : -max_x); i -= resolution)
                     {
                         // Bildpunkte zu den Endpunkten der Linie holen
-                        p[0] = extCalib->getImagePoint(cv::Point3f(swapX * i, min_y, grid_height));
-                        p[1] = extCalib->getImagePoint(cv::Point3f(swapX * i, max_y, grid_height));
+                        p[0] = mExtCalib->getImagePoint(cv::Point3f(swapX * i, min_y, grid_height));
+                        p[1] = mExtCalib->getImagePoint(cv::Point3f(swapX * i, max_y, grid_height));
                         drawLine(painter, p, y_offset);
                     }
                 }

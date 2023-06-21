@@ -33,6 +33,7 @@
 #include "pMessageBox.h"
 #include "roiItem.h"
 #include "tracker.h"
+#include "worldImageCorrespondence.h"
 
 #include <QPointF>
 #include <QRect>
@@ -164,15 +165,14 @@ Vec2F autoCorrectColorMarker(const Vec2F &boxImageCentre, Control *controlWidget
 {
     Petrack    *mainWindow = controlWidget->getMainWindow();
     auto        extrParams = controlWidget->getExtrinsicParameters();
-    cv::Point2f tp         = mainWindow->getExtrCalibration()->getImagePoint(cv::Point3f(
-        -controlWidget->getCalibCoord3DTransX() - extrParams.trans1,
-        -controlWidget->getCalibCoord3DTransY() - extrParams.trans2,
-        0));
-    Vec2F       pixUnderCam(tp.x, tp.y); // CvPoint
-    Vec2F       boxImageCentreWithBorder = boxImageCentre;
+    auto        trans      = controlWidget->getCalibCoord3DTrans();
+    cv::Point2f tp         = mainWindow->getExtrCalibration()->getImagePoint(
+        cv::Point3f(-trans.x() - extrParams.trans1, -trans.y() - extrParams.trans2, 0));
+    Vec2F pixUnderCam(tp.x, tp.y); // CvPoint
+    Vec2F boxImageCentreWithBorder = boxImageCentre;
     boxImageCentreWithBorder += Vec2F(mainWindow->getImageBorderSize(), mainWindow->getImageBorderSize());
     pixUnderCam += Vec2F(mainWindow->getImageBorderSize(), mainWindow->getImageBorderSize());
-    float angle = 90 - mainWindow->getImageItem()->getAngleToGround(
+    float angle = 90 - mainWindow->getWorldImageCorrespondence().getAngleToGround(
                            boxImageCentreWithBorder.x(),
                            boxImageCentreWithBorder.y(),
                            175); // Hoehe 175 cm ist egal, da auf jeder Hoehe gleicher Winkel
@@ -320,20 +320,25 @@ Vec2F autoCorrectColorMarker(const Vec2F &boxImageCentre, Control *controlWidget
  * @brief Restricts the position in which the black dot should be according to position in image.
  *
  * @param[in] blob ColorBlob for which to restrict the position
- * @param[in] mainWindow pointer to Petrack for getImageItem
+ * @param[in] worldImageCorr reference to world to image correspondence
  * @param[in] bS bordersize
  * @param[in,out] cropRect cropRect to restrict/resize
  */
-void detail::restrictPositionBlackDot(ColorBlob &blob, ImageItem *imageItem, int bS, cv::Rect &cropRect)
+void detail::restrictPositionBlackDot(
+    ColorBlob                      &blob,
+    const WorldImageCorrespondence *worldImageCorr,
+    int                             bS,
+    cv::Rect                       &cropRect)
 {
     double xy, x1, x2, y1, y2;
 
     Vec2F &boxImageCentre = blob.imageCenter;
-    xy                    = imageItem->getAngleToGround(boxImageCentre.x() + bS, boxImageCentre.y() + bS, 175);
-    x1                    = imageItem->getAngleToGround(boxImageCentre.x() + bS + 10, boxImageCentre.y() + bS, 175);
-    x2                    = imageItem->getAngleToGround(boxImageCentre.x() + bS - 10, boxImageCentre.y() + bS, 175);
-    y1                    = imageItem->getAngleToGround(boxImageCentre.x() + bS, boxImageCentre.y() + bS + 10, 175);
-    y2                    = imageItem->getAngleToGround(boxImageCentre.x() + bS, boxImageCentre.y() + bS - 10, 175);
+
+    xy = worldImageCorr->getAngleToGround(boxImageCentre.x() + bS, boxImageCentre.y() + bS, 175);
+    x1 = worldImageCorr->getAngleToGround(boxImageCentre.x() + bS + 10, boxImageCentre.y() + bS, 175);
+    x2 = worldImageCorr->getAngleToGround(boxImageCentre.x() + bS - 10, boxImageCentre.y() + bS, 175);
+    y1 = worldImageCorr->getAngleToGround(boxImageCentre.x() + bS, boxImageCentre.y() + bS + 10, 175);
+    y2 = worldImageCorr->getAngleToGround(boxImageCentre.x() + bS, boxImageCentre.y() + bS - 10, 175);
 
     double           subFactorBig   = 1. - .75 * (90. - xy) / 90.; //  -.5 //in 1.0..0.25 // xy in 0..90
     constexpr double subFactorSmall = .85;                         // .9
@@ -457,16 +462,16 @@ void detail::refineWithBlackDot(
     QList<TrackPoint>      &crossList,
     const BlackDotOptions  &options)
 {
-    constexpr int border                = 4; // zusaetzlicher rand um subrects
-    const int     bS                    = options.borderSize;
-    const bool    restrictPosition      = options.restrictPosition;
-    ImageItem    *imageItem             = options.imageItem;
-    const QColor  midHue                = options.midHue;
-    const double  dotSize               = options.dotSize;
-    const bool    ignoreWithoutMarker   = options.ignoreWithoutMarker;
-    const bool    autoCorrect           = options.autoCorrect;
-    const bool    autoCorrectOnlyExport = options.autoCorrectOnlyExport;
-    Control      *controlWidget         = options.controlWidget;
+    constexpr int                   border                = 4; // zusaetzlicher rand um subrects
+    const int                       bS                    = options.borderSize;
+    const bool                      restrictPosition      = options.restrictPosition;
+    const WorldImageCorrespondence *worldImageCorr        = options.worldImageCorr;
+    const QColor                    midHue                = options.midHue;
+    const double                    dotSize               = options.dotSize;
+    const bool                      ignoreWithoutMarker   = options.ignoreWithoutMarker;
+    const bool                      autoCorrect           = options.autoCorrect;
+    const bool                      autoCorrectOnlyExport = options.autoCorrectOnlyExport;
+    Control                        *controlWidget         = options.controlWidget;
 
     for(ColorBlob &blob : blobs)
     {
@@ -483,7 +488,7 @@ void detail::refineWithBlackDot(
 
         if(restrictPosition)
         {
-            restrictPositionBlackDot(blob, imageItem, bS, cropRect);
+            restrictPositionBlackDot(blob, worldImageCorr, bS, cropRect);
         }
 
         // cvtColor results in really dark images, especially with red shades
@@ -527,7 +532,7 @@ void detail::refineWithBlackDot(
                         subMaxExpansion = subBox.size.width;
                     }
 
-                    QPointF cmPerPixel = imageItem->getCmPerPixel(
+                    QPointF cmPerPixel = worldImageCorr->getCmPerPixel(
                         cropRect.x + subBox.center.x, cropRect.y + subBox.center.y, controlWidget->getDefaultHeight());
                     double cmPerPixelAvg = (cmPerPixel.x() + cmPerPixel.y()) / 2.;
                     double markerSize =
@@ -865,7 +870,7 @@ void findMultiColorMarker(
             options.midHue                = midHue;
             options.dotSize               = dotSize;
             options.controlWidget         = controlWidget;
-            options.imageItem             = mainWindow->getImageItem();
+            options.worldImageCorr        = &mainWindow->getWorldImageCorrespondence();
 
             // adds to crosslist
             refineWithBlackDot(blobs, img, crossList, options);
@@ -1064,12 +1069,13 @@ QList<TrackPoint> detail::findCodeMarker(
             myRound(mainWindow->getRecoRoiItem()->rect().y()),
             myRound(mainWindow->getRecoRoiItem()->rect().width()),
             myRound(mainWindow->getRecoRoiItem()->rect().height()));
-        QPointF p1 = mainWindow->getImageItem()->getCmPerPixel(rect.x(), rect.y(), controlWidget->getDefaultHeight());
-        QPointF p2 = mainWindow->getImageItem()->getCmPerPixel(
+        QPointF p1 = mainWindow->getWorldImageCorrespondence().getCmPerPixel(
+            rect.x(), rect.y(), controlWidget->getDefaultHeight());
+        QPointF p2 = mainWindow->getWorldImageCorrespondence().getCmPerPixel(
             rect.x() + rect.width(), rect.y(), controlWidget->getDefaultHeight());
-        QPointF p3 = mainWindow->getImageItem()->getCmPerPixel(
+        QPointF p3 = mainWindow->getWorldImageCorrespondence().getCmPerPixel(
             rect.x(), rect.y() + rect.height(), controlWidget->getDefaultHeight());
-        QPointF p4 = mainWindow->getImageItem()->getCmPerPixel(
+        QPointF p4 = mainWindow->getWorldImageCorrespondence().getCmPerPixel(
             rect.x() + rect.width(), rect.y() + rect.height(), controlWidget->getDefaultHeight());
 
         double cmPerPixelMin = std::min({p1.x(), p1.y(), p2.x(), p2.y(), p3.x(), p3.y(), p4.x(), p4.y()});
@@ -1093,7 +1099,7 @@ QList<TrackPoint> detail::findCodeMarker(
     }
     else // 2D
     {
-        double cmPerPixel = mainWindow->getImageItem()->getCmPerPixel();
+        double cmPerPixel = mainWindow->getWorldImageCorrespondence().getCmPerPixel();
         minMarkerPerimeterRate =
             (parameters.getMinMarkerPerimeter() * 4 / cmPerPixel) /
             std::max(mainWindow->getImage()->width() - borderSize, mainWindow->getImage()->height() - borderSize);

@@ -19,7 +19,6 @@
 #include "tracker.h"
 
 #include "animation.h"
-#include "control.h"
 #include "helper.h"
 #include "logger.h"
 #include "multiColorMarkerWidget.h"

@@ -26,6 +26,7 @@
 #include "roiItem.h"
 #include "tracker.h"
 #include "view.h"
+#include "worldImageCorrespondence.h"
 
 #include <QInputDialog>
 #include <QtWidgets>
@@ -648,7 +649,8 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         }
                         p3d_height.z           = 0;
                         cv::Point2f p2d_ground = mMainWindow->getExtrCalibration()->getImagePoint(p3d_height);
-                        QPointF     axis = mMainWindow->getImageItem()->getCmPerPixel(p2d_ground.x, p2d_ground.y, 0);
+                        QPointF     axis =
+                            mMainWindow->getWorldImageCorrespondence().getCmPerPixel(p2d_ground.x, p2d_ground.y, 0);
                         painter->drawLine(QLineF(
                             p2d_ground.x - cross_size * 0.5 * pow(axis.x(), -1),
                             p2d_ground.y - cross_size * 0.5 * pow(axis.y(), -1),

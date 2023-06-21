@@ -447,10 +447,6 @@ bool ExtrCalibration::saveExtrCalibPoints()
     return all_okay;
 }
 
-bool ExtrCalibration::isSetExtrCalib()
-{
-    return true;
-}
 
 /**
  * @brief Extrinsic calibration with help of cv::solvePnP
@@ -585,11 +581,10 @@ bool ExtrCalibration::calcReprojectionError()
 
     for(size_t i = 0; i < num_points; i++)
     {
-        cv::Point2f p2d = get2DList().at(i);
-        cv::Point3f p3d = get3DList().at(i);
-        p3d.x -= mControlWidget->getCalibCoord3DTransX();
-        p3d.y -= mControlWidget->getCalibCoord3DTransY();
-        p3d.z -= mControlWidget->getCalibCoord3DTransZ();
+        cv::Point2f p2d   = get2DList().at(i);
+        cv::Point3f p3d   = get3DList().at(i);
+        auto        trans = mControlWidget->getCalibCoord3DTrans();
+        p3d -= trans.toCvPoint();
         cv::Point2f p3dTo2d = getImagePoint(p3d);
 
         // Error measurements metric (cm)
@@ -626,11 +621,10 @@ bool ExtrCalibration::calcReprojectionError()
     }
     for(size_t i = 0; i < num_points; i++)
     {
-        cv::Point2f p2d = get2DList().at(i);
-        cv::Point3f p3d = get3DList().at(i);
-        p3d.x -= mControlWidget->getCalibCoord3DTransX();
-        p3d.y -= mControlWidget->getCalibCoord3DTransY();
-        p3d.z -= mControlWidget->getCalibCoord3DTransZ();
+        cv::Point2f p2d   = get2DList().at(i);
+        cv::Point3f p3d   = get3DList().at(i);
+        auto        trans = mControlWidget->getCalibCoord3DTrans();
+        p3d -= trans.toCvPoint();
         cv::Point2f p3d_to_2d = getImagePoint(p3d);
 
         // Error measurements metric (cm)
@@ -720,16 +714,16 @@ bool ExtrCalibration::calcReprojectionError()
  * @param p3d 3D point to transform in cm
  * @return calculated 2D projection of p3d
  */
-cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d)
+cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d) const
 {
-    p3d.x *= mControlWidget->getCalibCoord3DSwapX() ? -1 : 1;
-    p3d.y *= mControlWidget->getCalibCoord3DSwapY() ? -1 : 1;
-    p3d.z *= mControlWidget->getCalibCoord3DSwapZ() ? -1 : 1;
+    auto swap = mControlWidget->getCalibCoord3DSwap();
+    p3d.x *= swap.x ? -1 : 1;
+    p3d.y *= swap.y ? -1 : 1;
+    p3d.z *= swap.z ? -1 : 1;
 
     // Adding the coordsystem translation from petrack window
-    p3d.x += mControlWidget->getCalibCoord3DTransX();
-    p3d.y += mControlWidget->getCalibCoord3DTransY();
-    p3d.z += mControlWidget->getCalibCoord3DTransZ();
+    auto trans = mControlWidget->getCalibCoord3DTrans();
+    p3d += trans.toCvPoint();
 
     // ToDo: use projectPoints();
     int bS = mMainWindow->getImage() ? mMainWindow->getImageBorderSize() : 0;
@@ -901,18 +895,18 @@ cv::Point3f ExtrCalibration::get3DPoint(const cv::Point2f &p2d, double h) const
 
 
     // Coordinate Transformations
-    resultPoint.x -= mControlWidget->getCalibCoord3DTransX();
-    resultPoint.y -= mControlWidget->getCalibCoord3DTransY();
-    resultPoint.z -= mControlWidget->getCalibCoord3DTransZ();
+    auto trans = mControlWidget->getCalibCoord3DTrans();
+    resultPoint -= trans.toCvPoint();
 
-    resultPoint.x *= mControlWidget->getCalibCoord3DSwapX() ? -1 : 1;
-    resultPoint.y *= mControlWidget->getCalibCoord3DSwapY() ? -1 : 1;
-    resultPoint.z *= mControlWidget->getCalibCoord3DSwapZ() ? -1 : 1;
+    auto swap = mControlWidget->getCalibCoord3DSwap();
+    resultPoint.x *= swap.x ? -1 : 1;
+    resultPoint.y *= swap.y ? -1 : 1;
+    resultPoint.z *= swap.z ? -1 : 1;
 
     return resultPoint;
 }
 
-bool ExtrCalibration::isOutsideImage(cv::Point2f p2d)
+bool ExtrCalibration::isOutsideImage(cv::Point2f p2d) const
 {
     int bS = mMainWindow->getImage() ? mMainWindow->getImageBorderSize() : 0;
     if(mMainWindow->getImage())

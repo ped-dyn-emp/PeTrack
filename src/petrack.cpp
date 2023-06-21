@@ -23,6 +23,7 @@
 // Added for Qt5 support
 #include "IO.h"
 #include "aboutDialog.h"
+#include "analysePlot.h"
 #include "animation.h"
 #include "autoCalib.h"
 #include "autosaveSettings.h"
@@ -33,11 +34,15 @@
 #include "colorMarkerWidget.h"
 #include "colorRangeWidget.h"
 #include "control.h"
+#include "coordItem.h"
+#include "coordinateSystemBox.h"
 #include "editMoCapDialog.h"
+#include "extrinsicBox.h"
 #include "filterBeforeBox.h"
 #include "gridItem.h"
 #include "helper.h"
 #include "imageItem.h"
+#include "intrinsicBox.h"
 #include "logger.h"
 #include "logoItem.h"
 #include "moCapItem.h"
@@ -55,6 +60,7 @@
 #include "trackerItem.h"
 #include "trackerReal.h"
 #include "view.h"
+#include "worldImageCorrespondence.h"
 
 #include <QtPrintSupport/QPrintDialog>
 #include <QtPrintSupport/QPrinter>
@@ -122,6 +128,10 @@ Petrack::Petrack(QString petrackVersion) :
         }
     };
 
+    auto updateStatusPos = [this]() { setStatusPosReal(); };
+    auto updateHeadSize  = [this]() { setHeadSize(); };
+    auto getBorderSize   = [this]() { return getImageBorderSize(); };
+
     auto *filterBeforeBox = new FilterBeforeBox(
         nullptr, // reparented when added to layout
         *getBackgroundFilter(),
@@ -130,10 +140,36 @@ Petrack::Petrack(QString petrackVersion) :
         *getSwapFilter(),
         updateImageCallback);
 
-    mControlWidget =
-        new Control(*this, *mScene, mReco, *mTrackingRoiItem, *mRecognitionRoiItem, mMissingFrames, filterBeforeBox);
+    auto *intrinsicBox = new IntrinsicBox(this, *getAutoCalib(), *getCalibFilter(), updateImageCallback);
+    auto *extrinsicBox = new ExtrinsicBox(this, *getExtrCalibration());
+    mImageItem         = new ImageItem(this, nullptr);
+    auto *coordSysBox  = new CoordinateSystemBox(
+        this,
+        updateStatusPos,
+        updateHeadSize,
+        getBorderSize,
+        *intrinsicBox,
+        *extrinsicBox,
+        *mImageItem,
+        mExtrCalibration);
+
+    mControlWidget = new Control(
+        *this,
+        *mScene,
+        mReco,
+        *mTrackingRoiItem,
+        *mRecognitionRoiItem,
+        mMissingFrames,
+        filterBeforeBox,
+        intrinsicBox,
+        extrinsicBox,
+        coordSysBox);
+
+    connect(mImageItem, &ImageItem::imageChanged, mControlWidget, &Control::imageSizeChanged);
 
     // end setup control
+
+    mWorldImageCorrespondence = &mControlWidget->getWorldImageCorrespondence();
 
     mStereoWidget = new StereoWidget(this);
     mStereoWidget->setWindowFlags(Qt::Window);
@@ -156,9 +192,6 @@ Petrack::Petrack(QString petrackVersion) :
     mMultiColorMarkerWidget->setWindowFlags(Qt::Window);
     mMultiColorMarkerWidget->setWindowTitle("MultiColor marker parameter");
 
-    mImageItem = new ImageItem(this); // durch uebergabe von scene wird indirekt ein scene->addItem() aufgerufen
-
-
     mAnimation = new Animation(this);
 
     mLogoItem = new LogoItem(this); // durch uebergabe von scene wird indirekt ein scene->addItem() aufgerufen
@@ -166,12 +199,11 @@ Petrack::Petrack(QString petrackVersion) :
 
     mExtrCalibration.setMainWindow(this);
 
-    mGridItem = new GridItem(this);
+    mGridItem = new GridItem(this, nullptr, coordSysBox);
     mGridItem->setZValue(2.5); // durch uebergabe von scene wird indirekt ein scene->addItem() aufgerufen
 
-    mCoordItem = new CoordItem(this);
+    mCoordItem = new CoordItem(this, nullptr, coordSysBox);
     mCoordItem->setZValue(3); // groesser heisst weiter oben
-    mImageItem->setCoordItem(mCoordItem);
 
     mViewWidget = new ViewWidget(this);
     mView       = mViewWidget->view();
@@ -385,15 +417,14 @@ void Petrack::updateSceneRect()
     if(mControlWidget->getCalibCoordShow())
     {
         double scale = mControlWidget->getCalibCoordScale() / 10.;
-        double tX    = mControlWidget->getCalibCoordTransX() / 10.;
-        double tY    = mControlWidget->getCalibCoordTransY() / 10.;
+        auto   t     = mControlWidget->getCalibCoord2DTrans() / 10.;
 
         // setzen der bounding box der scene
         // Faktor 1.1 dient dazu, dass auch Zahl "1" bei coord gut in sichtbaren Bereich passt
-        double xMin = (tX - 1.1 * scale < -bS) ? tX - 1.1 * scale : -bS;
-        double yMin = (tY - 1.1 * scale < -bS) ? tY - 1.1 * scale : -bS;
-        double xMax = (tX + 1.1 * scale > iW - bS) ? tX + 1.1 * scale : iW - bS;
-        double yMax = (tY + 1.1 * scale > iH - bS) ? tY + 1.1 * scale : iH - bS;
+        double xMin = (t.x() - 1.1 * scale < -bS) ? t.x() - 1.1 * scale : -bS;
+        double yMin = (t.y() - 1.1 * scale < -bS) ? t.y() - 1.1 * scale : -bS;
+        double xMax = (t.x() + 1.1 * scale > iW - bS) ? t.x() + 1.1 * scale : iW - bS;
+        double yMax = (t.y() + 1.1 * scale > iH - bS) ? t.y() + 1.1 * scale : iH - bS;
         mScene->setSceneRect(xMin, yMin, xMax - xMin, yMax - yMin);
     }
     else
@@ -611,12 +642,14 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
 
     if(frame != -1)
     {
-        if(mControlWidget->isFilterBgChecked() &&
-           !loaded) // mit dem anfangs geladenen bild wurde bereits faelschlicherweise bg bestimmt
+        // used first loaded image to determine bg, should not have happened
+        if(mControlWidget->isFilterBgChecked() && !loaded)
         {
-            mBackgroundFilter.reset(); // erst nach dem springen zu einem frame background bestimmen
+            // reset background and first skip to selected frame
+            mBackgroundFilter.reset();
         }
-        mPlayerWidget->skipToFrame(frame); // hier wird updateImage ausgefuehrt
+        // will call updateImage and update bg
+        mPlayerWidget->skipToFrame(frame);
     }
     else if(loaded)
     {
@@ -971,7 +1004,6 @@ void Petrack::openCameraLiveStream(int camID /* =-1*/)
     updateWindowTitle();
     mPlayerWidget->setFPS(mAnimation->getFPS());
     mLogoItem->fadeOut();
-    updateCoord();
 
     mPlayerWidget->play(PlayerState::FORWARD);
 }
@@ -1041,7 +1073,6 @@ void Petrack::openSequence(QString fileName) // default fileName = ""
         updateWindowTitle();
         mPlayerWidget->setFPS(mAnimation->getFPS());
         mLogoItem->fadeOut();
-        updateCoord();
         mMissingFrames.reset();
     }
 }
@@ -2250,7 +2281,7 @@ void Petrack::setStatusPosReal() // pos in cm
 {
     if(mImageItem)
     {
-        setStatusPosReal(mImageItem->getPosReal(mMousePosOnImage, getStatusPosRealHeight()));
+        setStatusPosReal(mWorldImageCorrespondence->getPosReal(mMousePosOnImage, getStatusPosRealHeight()));
     }
 }
 
@@ -2263,7 +2294,7 @@ void Petrack::setStatusPosReal(const QPointF &pos) // pos in cm
                                 .arg(pos.x(), 6, 'f', 1)
                                 .arg(pos.y(), 6, 'f', 1)
                                 .arg(
-                                    getImageItem()->getAngleToGround(
+                                    mWorldImageCorrespondence->getAngleToGround(
                                         mMousePosOnImage.x(), mMousePosOnImage.y(), getStatusPosRealHeight()),
                                     5,
                                     'f',
@@ -2432,7 +2463,7 @@ void Petrack::setMousePosOnImage(QPointF pos)
     if(mImage)
     {
         mMousePosOnImage = pos;
-        setStatusPosReal(mImageItem->getPosReal(pos, getStatusPosRealHeight()));
+        setStatusPosReal(mWorldImageCorrespondence->getPosReal(pos, getStatusPosRealHeight()));
 
         // pixel coordinate
         QPoint pos1((int) (pos.x()) + 1, (int) (pos.y()) + 1);
@@ -2510,7 +2541,15 @@ void Petrack::updateControlImage(cv::Mat &img)
     const int imgWidth  = img.cols;
     const int imgHeight = img.rows;
 
-    mControlWidget->imageSizeChanged(imgWidth, imgHeight, diffBorderSize);
+    // no direct invocation to have correct order of invocations
+    // (direct invocation gets executed immediately, i.e. before queued connection)
+    QMetaObject::invokeMethod(
+        mControlWidget,
+        "imageSizeChanged",
+        Qt::ConnectionType::QueuedConnection,
+        Q_ARG(int, imgWidth),
+        Q_ARG(int, imgHeight),
+        Q_ARG(int, diffBorderSize));
 }
 
 void Petrack::importTracker(QString dest) // default = ""
@@ -2701,7 +2740,7 @@ void Petrack::importTracker(QString dest) // default = ""
                     else
                     {
                         // compute image point from 2d calibration
-                        QPointF pos = mImageItem->getPosImage(
+                        QPointF pos = mWorldImageCorrespondence->getPosImage(
                             QPointF(realWorldCoordinates.x(), realWorldCoordinates.y()), realWorldCoordinates.z());
                         p2d.x = pos.x();
                         p2d.y = pos.y();
@@ -2778,7 +2817,7 @@ int Petrack::calculateRealTracker()
     int anz = mTrackerReal->calculate(
         this,
         mTracker,
-        mImageItem,
+        mWorldImageCorrespondence,
         mControlWidget->getColorPlot(),
         mMissingFrames,
         getImageBorderSize(),
@@ -2939,7 +2978,7 @@ void Petrack::exportTracker(QString dest) // default = ""
             mTrackerReal->calculate(
                 this,
                 mTracker,
-                mImageItem,
+                mWorldImageCorrespondence,
                 mControlWidget->getColorPlot(),
                 mMissingFrames,
                 getImageBorderSize(),
@@ -3037,7 +3076,7 @@ void Petrack::exportTracker(QString dest) // default = ""
             mTrackerReal->calculate(
                 this,
                 mTracker,
-                mImageItem,
+                mWorldImageCorrespondence,
                 mControlWidget->getColorPlot(),
                 mMissingFrames,
                 getImageBorderSize(),
@@ -3094,7 +3133,7 @@ void Petrack::exportTracker(QString dest) // default = ""
             mTrackerReal->calculate(
                 this,
                 mTracker,
-                mImageItem,
+                mWorldImageCorrespondence,
                 mControlWidget->getColorPlot(),
                 mMissingFrames,
                 getImageBorderSize(),
@@ -3688,7 +3727,7 @@ void Petrack::setHeadSize(double hS)
 {
     if(hS == -1)
     {
-        mCmPerPixel = getImageItem()->getCmPerPixel();
+        mCmPerPixel = mWorldImageCorrespondence->getCmPerPixel();
         // debout << mCmPerPixel <<endl;
         mHeadSize = (HEAD_SIZE * mControlWidget->getCameraAltitude() /
                      (mControlWidget->getCameraAltitude() - mControlWidget->getDefaultHeight())) /
@@ -3736,12 +3775,13 @@ double Petrack::getHeadSize(QPointF *pos, int pers, int frame)
             h = mPersonStorage.at(pers).height();
             if(z > 0)
             {
-                return (HEAD_SIZE * mControlWidget->getCameraAltitude() / z) / getImageItem()->getCmPerPixel();
+                return (HEAD_SIZE * mControlWidget->getCameraAltitude() / z) /
+                       mWorldImageCorrespondence->getCmPerPixel();
             }
             else if(h > MIN_HEIGHT)
             {
                 return (HEAD_SIZE * mControlWidget->getCameraAltitude() / (mControlWidget->getCameraAltitude() - h)) /
-                       getImageItem()->getCmPerPixel();
+                       mWorldImageCorrespondence->getCmPerPixel();
             }
             else
             {
@@ -3775,6 +3815,11 @@ void Petrack::setProFileName(const QString &fileName)
     proFileName  = fileName;
     mProFileName = fileName;
     updateWindowTitle();
+}
+
+const WorldImageCorrespondence &Petrack::getWorldImageCorrespondence()
+{
+    return *mWorldImageCorrespondence;
 }
 
 /**

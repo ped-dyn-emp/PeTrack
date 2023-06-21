@@ -19,11 +19,8 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#include "analysePlot.h"
-#include "colorPlot.h"
-#include "extrinsicParameters.h"
+#include "coordinateStructs.h"
 #include "intrinsicCameraParams.h"
-#include "petrack.h"
 #include "recognition.h"
 
 #include <Qt>
@@ -33,7 +30,16 @@ class QGraphicsScene;
 class QDomElement;
 class IntrinsicBox;
 class ExtrinsicBox;
+struct ExtrinsicParameters;
 class FilterBeforeBox;
+class Petrack;
+class RoiItem;
+class RectPlotItem;
+class CoordinateSystemBox;
+class ColorPlot;
+class AnalysePlot;
+class MissingFrames;
+class WorldImageCorrespondence;
 namespace Ui
 {
 class Control;
@@ -45,22 +51,28 @@ class Control : public QWidget
 
 public:
     Control(
-        QWidget          &parent,
-        QGraphicsScene   &scene,
-        reco::Recognizer &recognizer,
-        RoiItem          &trackRoiItem,
-        RoiItem          &recoRoiItem,
-        MissingFrames    &missingFrames,
-        FilterBeforeBox  *filterBefore);
+        QWidget             &parent,
+        QGraphicsScene      &scene,
+        reco::Recognizer    &recognizer,
+        RoiItem             &trackRoiItem,
+        RoiItem             &recoRoiItem,
+        MissingFrames       &missingFrames,
+        FilterBeforeBox     *filterBefore,
+        IntrinsicBox        *intrinsicBox,
+        ExtrinsicBox        *extrinsicBox,
+        CoordinateSystemBox *coordSysBox);
     Control(
-        QWidget          &parent,
-        QGraphicsScene   &scene,
-        reco::Recognizer &recognizer,
-        RoiItem          &trackRoiItem,
-        RoiItem          &recoRoiItem,
-        Ui::Control      *ui,
-        MissingFrames    &missingFrames,
-        FilterBeforeBox  *filterBefore);
+        QWidget             &parent,
+        QGraphicsScene      &scene,
+        reco::Recognizer    &recognizer,
+        RoiItem             &trackRoiItem,
+        RoiItem             &recoRoiItem,
+        Ui::Control         *ui,
+        MissingFrames       &missingFrames,
+        FilterBeforeBox     *filterBefore,
+        IntrinsicBox        *intrinsicBox,
+        ExtrinsicBox        *extrinsicBox,
+        CoordinateSystemBox *coordSysBox);
 
     void setScene(QGraphicsScene *sc);
 
@@ -152,53 +164,20 @@ public:
 
     double getCalibReprError() const;
     void   setCalibReprError(double d);
-    void   imageSizeChanged(int width, int height, int borderDiff);
 
     const ExtrinsicParameters &getExtrinsicParameters() const;
 
-    int    getCalibCoordDimension();
-    bool   getCalibExtrCalibPointsShow();
-    bool   getCalibExtrVanishPointsShow();
-    bool   getCalibCoordShow();
-    void   setCalibCoordShow(bool b);
-    bool   getCalibCoordFix();
-    void   setCalibCoordFix(bool b);
-    bool   getIs3DView();
-    void   setIs3DView(bool b);
-    int    getCalibCoordRotate();
-    void   setCalibCoordRotate(int i);
-    int    getCalibCoordTransX();
-    void   setCalibCoordTransX(int i);
-    int    getCalibCoordTransXMax();
-    void   setCalibCoordTransXMax(int i);
-    int    getCalibCoordTransXMin();
-    void   setCalibCoordTransXMin(int i);
-    int    getCalibCoordTransY();
-    void   setCalibCoordTransY(int i);
-    int    getCalibCoordTransYMax();
-    void   setCalibCoordTransYMax(int i);
-    int    getCalibCoordTransYMin();
-    void   setCalibCoordTransYMin(int i);
-    int    getCalibCoordScale();
-    void   setCalibCoordScale(int i);
-    double getCalibCoordUnit();
-    void   setCalibCoordUnit(double d);
-    bool   isCoordUseIntrinsicChecked() const;
+    const WorldImageCorrespondence &getWorldImageCorrespondence() const;
+    void                            setCalibCoord2DTransMinMax(Vec2F min, Vec2F max);
+    Vec2F                           getCalibCoord2DTrans();
 
-    int  getCalibCoord3DTransX();
-    void setCalibCoord3DTransX(int i);
-    int  getCalibCoord3DTransY();
-    void setCalibCoord3DTransY(int i);
-    int  getCalibCoord3DTransZ();
-    void setCalibCoord3DTransZ(int i);
-    int  getCalibCoord3DAxeLen();
-    void setCalibCoord3DAxeLen(int i);
-    bool getCalibCoord3DSwapX();
-    void setCalibCoord3DSwapX(bool b);
-    bool getCalibCoord3DSwapY();
-    void setCalibCoord3DSwapY(bool b);
-    bool getCalibCoord3DSwapZ();
-    void setCalibCoord3DSwapZ(bool b);
+    Vec3F    getCalibCoord3DTrans() const;
+    SwapAxis getCalibCoord3DSwap() const;
+
+    int  getCalibCoordDimension();
+    bool getCalibCoordShow();
+    int  getCalibCoordScale();
+
 
     int  getCalibGridDimension();
     bool getCalibGridShow();
@@ -233,7 +212,7 @@ public:
 
     void       setXml(QDomElement &elem);
     void       getXml(const QDomElement &elem);
-    bool       isLoading() const { return mMainWindow->isLoading(); }
+    bool       isLoading() const;
     ColorPlot *getColorPlot() const;
     void       replotColorplot();
 
@@ -542,18 +521,6 @@ private slots:
 
     void on_intrinsicParamsChanged(IntrinsicCameraParams params);
 
-    void on_coordShow_stateChanged(int i);
-    void on_coordFix_stateChanged(int i);
-    void on_coordRotate_valueChanged(int i);
-    void on_coordTransX_valueChanged(int i);
-    void on_coordTransY_valueChanged(int i);
-    void on_coordScale_valueChanged(int i);
-    void on_coordAltitude_valueChanged(double d);
-    void on_coordUnit_valueChanged(double d);
-    void on_coordUseIntrinsic_stateChanged(int i);
-
-    void setMeasuredAltitude();
-
     void on_gridShow_stateChanged(int i);
     void on_gridFix_stateChanged(int i);
     void on_gridRotate_valueChanged(int i);
@@ -562,23 +529,11 @@ private slots:
     void on_gridScale_valueChanged(int i);
 
     void on_gridTab_currentChanged(int index);
-    void on_coordTab_currentChanged(int index);
-
-    void on_extCalibPointsShow_stateChanged(int arg1);
-    void on_extVanishPointsShow_stateChanged(int arg1);
 
     void on_grid3DTransX_valueChanged(int value);
     void on_grid3DTransY_valueChanged(int value);
     void on_grid3DTransZ_valueChanged(int value);
     void on_grid3DResolution_valueChanged(int value);
-    void on_coord3DTransX_valueChanged(int value);
-    void on_coord3DTransY_valueChanged(int value);
-    void on_coord3DTransZ_valueChanged(int value);
-    void on_coord3DAxeLen_valueChanged(int value);
-
-    void on_coord3DSwapX_stateChanged(int arg1);
-    void on_coord3DSwapY_stateChanged(int arg1);
-    void on_coord3DSwapZ_stateChanged(int arg1);
 
     void on_trackPathColorButton_clicked();
     void on_trackGroundPathColorButton_clicked();
@@ -604,17 +559,23 @@ private slots:
     void toggleRecoROIButtons();
     void toggleTrackROIButtons();
 
+public slots:
+    void imageSizeChanged(int width, int height, int borderDiff);
+
+
 signals:
     void userChangedRecoMethod(reco::RecognitionMethod method);
 
+
 private:
-    Petrack         *mMainWindow;
-    Ui::Control     *mUi;
-    IntrinsicBox    *mIntr;
-    FilterBeforeBox *mFilterBefore;
-    ExtrinsicBox    *mExtr;
-    QGraphicsScene  *mScene;
-    bool             mColorChanging;
+    Petrack             *mMainWindow;
+    Ui::Control         *mUi;
+    IntrinsicBox        *mIntr;
+    FilterBeforeBox     *mFilterBefore;
+    ExtrinsicBox        *mExtr;
+    CoordinateSystemBox *mCoordSys;
+    QGraphicsScene      *mScene;
+    bool                 mColorChanging;
     bool mIndexChanging; // shows, if the index of the color model is really changing; nor while constructor (initialer
     // durchlauf) and may be while loading xml file
     bool mLoading; // shows, if new project is just loading

@@ -30,6 +30,11 @@ Vec3F::Vec3F(double x, double y, double z) : mX(x), mY(y), mZ(z) {}
 
 Vec3F::Vec3F(const cv::Point3f &v) : mX(v.x), mY(v.y), mZ(v.z) {}
 
+cv::Point3f Vec3F::toCvPoint()
+{
+    return cv::Point3f(static_cast<float>(mX), static_cast<float>(mY), static_cast<float>(mZ));
+}
+
 double Vec3F::x() const
 {
     return mX;

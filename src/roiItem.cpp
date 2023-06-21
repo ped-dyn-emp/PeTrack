@@ -20,6 +20,7 @@
 
 #include "petrack.h"
 
+#include <QGraphicsSceneMouseEvent>
 
 RoiItem::RoiItem(QWidget *wParent, const QColor &color) : QObject(wParent)
 {

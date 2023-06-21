@@ -28,12 +28,8 @@
 #include <QStyle>
 #include <utility>
 
-ExtrinsicBox::ExtrinsicBox(
-    QWidget              *parent,
-    Ui::extr             *ui,
-    ExtrCalibration      &extrCalib,
-    std::function<void()> updateCoordCallback) :
-    QGroupBox(parent), mUi(ui), mExtrCalibration(extrCalib), mUpdateCoordCallback(std::move(updateCoordCallback))
+ExtrinsicBox::ExtrinsicBox(QWidget *parent, Ui::extr *ui, ExtrCalibration &extrCalib) :
+    QGroupBox(parent), mUi(ui), mExtrCalibration(extrCalib)
 {
     mUi->setupUi(this);
     setFocusProxy(mUi->rot1);
@@ -41,8 +37,7 @@ ExtrinsicBox::ExtrinsicBox(
     setExtrinsicParameters(mParams);
 }
 
-ExtrinsicBox::ExtrinsicBox(QWidget *parent, ExtrCalibration &extrCalib, std::function<void()> updateCoordCallback) :
-    ExtrinsicBox(parent, new Ui::extr, extrCalib, std::move(updateCoordCallback))
+ExtrinsicBox::ExtrinsicBox(QWidget *parent, ExtrCalibration &extrCalib) : ExtrinsicBox(parent, new Ui::extr, extrCalib)
 {
 }
 
@@ -54,6 +49,7 @@ void ExtrinsicBox::setEnabledExtrParams(bool enable)
     mUi->trans1->setEnabled(enable);
     mUi->trans2->setEnabled(enable);
     mUi->trans3->setEnabled(enable);
+    emit enabledChanged(enable);
 }
 
 const ExtrinsicParameters &ExtrinsicBox::getExtrinsicParameters() const
@@ -87,43 +83,43 @@ void ExtrinsicBox::on_coordLoad3DCalibPoints_clicked()
     {
         setExtrinsicParameters(*newCalib);
     }
-    mUpdateCoordCallback();
+    emit extrinsicChanged();
 }
 
 void ExtrinsicBox::on_rot1_valueChanged(double newVal)
 {
     mParams.rot1 = newVal;
-    mUpdateCoordCallback();
+    emit extrinsicChanged();
 }
 
 void ExtrinsicBox::on_rot2_valueChanged(double newVal)
 {
     mParams.rot2 = newVal;
-    mUpdateCoordCallback();
+    emit extrinsicChanged();
 }
 
 void ExtrinsicBox::on_rot3_valueChanged(double newVal)
 {
     mParams.rot3 = newVal;
-    mUpdateCoordCallback();
+    emit extrinsicChanged();
 }
 
 void ExtrinsicBox::on_trans1_valueChanged(double newVal)
 {
     mParams.trans1 = newVal;
-    mUpdateCoordCallback();
+    emit extrinsicChanged();
 }
 
 void ExtrinsicBox::on_trans2_valueChanged(double newVal)
 {
     mParams.trans2 = newVal;
-    mUpdateCoordCallback();
+    emit extrinsicChanged();
 }
 
 void ExtrinsicBox::on_trans3_valueChanged(double newVal)
 {
     mParams.trans3 = newVal;
-    mUpdateCoordCallback();
+    emit extrinsicChanged();
 }
 
 void ExtrinsicBox::on_extrCalibSave_clicked()

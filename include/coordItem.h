@@ -26,37 +26,42 @@
 class Petrack;
 class Control;
 class ExtrCalibration;
+class CoordinateSystemBox;
+struct CoordPose2D;
+struct CoordPose3D;
 
-class CoordItem : public QGraphicsItem
+class CoordItem : public QGraphicsObject
 {
 private:
-    Petrack         *mMainWindow;
-    ExtrCalibration *extCalib;
-    Control         *mControlWidget;
-    cv::Point2f      ursprung, x, y, z;
-    cv::Point2f      calibPointsMin, calibPointsMax;
-    cv::Point3f      x3D, y3D, z3D;
-    float            mouse_x, mouse_y;
-    int              coordTrans_x, coordTrans_y;
-    int              coordDimension;
+    Petrack             *mMainWindow;
+    ExtrCalibration     *extCalib;
+    Control             *mControlWidget;
+    CoordinateSystemBox *mCoordSys;
+    QRectF               mBoundingRect;
+    cv::Point3f          x3D, y3D, z3D;
+    float                mouse_x, mouse_y;
+    int                  coordTrans_x, coordTrans_y;
+    int                  coordDimension;
 
 public:
     inline void setCoordDimension(int dim) { this->coordDimension = dim; }
     inline int  getCoordDimension() const { return this->coordDimension; }
 
-    CoordItem(QWidget *wParent, QGraphicsItem *parent = nullptr);
+    CoordItem(QWidget *wParent, QGraphicsItem *parent, CoordinateSystemBox *coordSys);
 
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
-    // Update the transformation matrix
-    void updateData();
 
     // defines the minimal rect which contains the coordinate system
-    QRectF boundingRect() const;
+    QRectF boundingRect() const override;
 
     // paint method to draw the perspectiv coordinate-system
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+private slots:
+    // Update the transformation matrix
+    void updateData();
 };
 
 #endif
