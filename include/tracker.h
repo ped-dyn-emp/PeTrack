@@ -300,6 +300,14 @@ public:
         QSet<size_t>            onlyVisible        = QSet<size_t>(),
         int                     errorScaleExponent = 0);
 
+    void checkPlausibility(
+        QList<int> &pers,
+        QList<int> &frame,
+        bool        testEqual    = true,
+        bool        testVelocity = true,
+        bool        testInside   = true,
+        bool        testLength   = true);
+
 private:
     bool tryMergeTrajectories(const TrackPoint &v, size_t i, int frame);
 

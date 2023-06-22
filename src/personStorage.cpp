@@ -36,16 +36,23 @@ void PersonStorage::splitPerson(size_t pers, int frame)
 {
     mAutosave.trackPersonModified();
 
-    if(mPersons.at(pers).firstFrame() < frame)
     {
-        mPersons.push_back(mPersons.at(pers));
+        const QSignalBlocker blocker(this);
+        if(mPersons.at(pers).firstFrame() < frame)
+        {
+            mPersons.push_back(mPersons.at(pers));
 
-        // alte trj einkuerzen und ab aktuellem frame zukunft loeschen
-        mPersons[pers].removeFramesBetween(frame, mPersons[pers].lastFrame());
+            // alte trj einkuerzen und ab aktuellem frame zukunft loeschen
+            deletePersonFrameRange(pers, frame, mPersons[pers].lastFrame());
 
-        // neu angehaengte/gedoppelte trajektorie
-        mPersons.back().removeFramesBetween(mPersons[pers].firstFrame(), frame - 1);
+            // neu angehaengte/gedoppelte trajektorie
+            deletePersonFrameRange(mPersons.size() - 1, mPersons[pers].firstFrame(), frame - 1);
+        }
     }
+
+    emit splitPersonAtFrame(pers, mPersons.size() - 1, frame);
+    emit changedPerson(pers);
+    emit changedPerson(mPersons.size() - 1);
 }
 
 /**
@@ -87,15 +94,15 @@ bool PersonStorage::delPointOf(int pers, int direction, int frame)
     mAutosave.trackPersonModified();
     if(direction == -1)
     {
-        mPersons[pers].removeFramesBetween(mPersons[pers].firstFrame(), frame - 1);
+        deletePersonFrameRange(pers, mPersons[pers].firstFrame(), frame - 1);
     }
     else if(direction == 0)
     {
-        mPersons.erase(mPersons.begin() + pers);
+        deletePerson(pers);
     }
     else if(direction == 1)
     {
-        mPersons[pers].removeFramesBetween(frame + 1, mPersons[pers].lastFrame());
+        deletePersonFrameRange(pers, frame + 1, mPersons[pers].lastFrame());
     }
     return true;
 }
@@ -141,14 +148,13 @@ void PersonStorage::delPointAll(Direction direction, int frame)
             switch(direction)
             {
                 case Direction::Previous:
-                    mPersons[i].removeFramesBetween(mPersons[i].firstFrame(), frame - 1);
-
+                    deletePersonFrameRange(i, mPersons[i].firstFrame(), frame - 1);
                     break;
                 case Direction::Whole:
-                    mPersons.erase(mPersons.begin() + i--); // nach Loeschen wird i um 1 erniedrigt
+                    deletePerson(i--); // after deleting the person decrease i by one
                     break;
                 case Direction::Following:
-                    mPersons[i].removeFramesBetween(frame + 1, mPersons[i].lastFrame());
+                    deletePersonFrameRange(i, frame + 1, mPersons[i].lastFrame());
                     break;
             }
         }
@@ -157,8 +163,7 @@ void PersonStorage::delPointAll(Direction direction, int frame)
             (direction == Direction::Whole) ||
             ((direction == Direction::Following) && (frame < mPersons.at(i).firstFrame())))
         {
-            mPersons.erase(mPersons.begin() + i);
-            i--;
+            deletePerson(i--); // after deleting the person decrease i by one
         }
     }
 }
@@ -185,8 +190,7 @@ void PersonStorage::delPointInsideROI()
                 splitPerson(i, mPersons.at(i).firstFrame() + j);
                 if(inside)
                 {
-                    mPersons.erase(mPersons.begin() + i);
-                    i--;
+                    deletePerson(i--); // after deleting the person decrease i by one
                     inside = !inside;
                 }
                 break;
@@ -195,8 +199,7 @@ void PersonStorage::delPointInsideROI()
         if(inside)
         {
             // rest loeschen
-            mPersons.erase(mPersons.begin() + i);
-            i--;
+            deletePerson(i--); // after deleting the person decrease i by one
         }
     }
 }
@@ -218,8 +221,7 @@ void PersonStorage::delPointROI()
             if(rect.contains(mPersons.at(i).at(j).x(), mPersons.at(i).at(j).y()))
             {
                 anz++;
-                mPersons.erase(mPersons.begin() + i);
-                i--;
+                deletePerson(i--); // after deleting the person decrease i by one
                 break;
             }
         }
@@ -386,6 +388,7 @@ void PersonStorage::moveTrackPoint(int personID, int frame, const Vec2F &newPosi
     if(person.trackPointExist(frame))
     {
         person.replaceTrackPoint(frame, newPoint);
+        emit changedPerson(personID);
     }
     else
     {
@@ -613,6 +616,10 @@ bool PersonStorage::addPoint(
         return false;
     }
 
+    if(found)
+    {
+        emit changedPerson(iNearest);
+    }
     return !found;
 }
 
@@ -747,173 +754,6 @@ void PersonStorage::recalcHeight(float altitude)
     for(auto &person : mPersons)
     {
         person.recalcHeight(altitude);
-    }
-}
-
-/**
- * @brief Performs different tests to check the plausibility of trajectories.
- *
- * This method can check for
- * <ul><li>shortness (less than 10 points)</li>
- * <li>start and endpoint (both should be outside the reco ROI
- * with exceptions for the beginning and end of the video)</li>
- * <li>Fast variations of speed (4 frame interval)</li>
- * <li>TrackPoints are too close together</li></ul>
- *
- * @param pers[in] list of persons (ID) to check
- * @param frame[out] list of frames at which "problems" occured
- * @param testEqual[in] true if warning for very close points are wished
- * @param testVelocity[in] true if warning for fast speed variations is whished
- * @param testInside[in] true if warning for start and endpoint in reco ROI is wished
- * @param testLength[in] true if warning for very short trajectories is wished
- */
-void PersonStorage::checkPlausibility(
-    QList<int> &pers,
-    QList<int> &frame,
-    bool        testEqual,
-    bool        testVelocity,
-    bool        testInside,
-    bool        testLength)
-{
-    QProgressDialog progress("Check Plausibility", nullptr, 0, 400, mMainWindow.window());
-    progress.setWindowTitle("Check plausibility");
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setVisible(true);
-    progress.setValue(0);
-    progress.setLabelText("Check Plausibility...");
-    static int margin = 30; // rand am bild, ab dem trajectorie verloren sein darf
-    int        i, j;
-    double     x, y;
-    QRectF     rect      = mMainWindow.getRecoRoiItem()->rect();
-    int        lastFrame = mMainWindow.getAnimation()->getNumFrames() - 1;
-
-    // test, if the trajectory is very short (less than 10 Trackpoints)
-    if(testLength)
-    {
-        progress.setValue(0);
-        progress.setLabelText("Check trajectories lengths...");
-        qApp->processEvents();
-        for(i = 0; i < static_cast<int>(mPersons.size()); ++i) // ueber TrackPerson
-        {
-            progress.setValue(static_cast<int>(i * 100. / mPersons.size()));
-            qApp->processEvents();
-            if(mPersons.at(i).size() < 10)
-            {
-                SPDLOG_WARN("Trajectory of person {} has less than 10 TrackPoints!", i + 1);
-                pers.append(i + 1);
-                frame.append(mPersons[i].firstFrame());
-            }
-        }
-    }
-
-    // check, if trajectory starts and ends outside the recognition area
-    if(testInside)
-    {
-        progress.setValue(100);
-        progress.setLabelText("Check if trajectories are inside image...");
-        qApp->processEvents();
-
-        for(i = 0; i < static_cast<int>(mPersons.size()); ++i) // ueber TrackPerson
-        {
-            qApp->processEvents();
-            progress.setValue(100 + i * 100. / mPersons.size());
-            x = mPersons[i].first().x();
-            y = mPersons[i].first().y();
-            // mGrey hat gleiche groesse wie zuletzt getracktes bild
-            if(mPersons[i].firstFrame() != 0 && x >= MAX(margin, rect.x()) &&
-               y >= MAX(margin, rect.y())) //&&
-                                           // x <= MIN(mGrey.cols - 1 - 2 * bS - margin, rect.x() + rect.width()) &&
-                                           // y <= MIN(mGrey.rows - 1 - 2 * bS - margin, rect.y() + rect.height()))
-            {
-                SPDLOG_WARN("Start of trajectory inside picture and recognition area of person {}", i + 1);
-                pers.append(i + 1);
-                frame.append(mPersons[i].firstFrame());
-            }
-
-            x = mPersons[i].last().x();
-            y = mPersons[i].last().y();
-            // mGrey hat gleiche groesse wie zuletzt getracktes bild
-            if(mPersons[i].lastFrame() != lastFrame && x >= MAX(margin, rect.x()) &&
-               y >= MAX(margin, rect.y())) //&&
-                                           // x <= MIN(mGrey.cols - 1 - 2 * bS - margin, rect.x() + rect.width()) &&
-                                           // y <= MIN(mGrey.rows - 1 - 2 * bS - margin, rect.y() + rect.height()))
-            {
-                SPDLOG_WARN("End of trajectory inside picture and recognition area of person {}", i + 1);
-
-                pers.append(i + 1);
-                frame.append(mPersons[i].lastFrame());
-            }
-        }
-    }
-
-    // testen, ob grosse Geschwindigkeitsaenderungen
-    // statt distanz koennte man auch noch vektoren vergleichen, was genauere analyse waer!!!!
-    if(testVelocity)
-    {
-        qApp->processEvents();
-        progress.setValue(200);
-        progress.setLabelText("Check velocity...");
-
-        double d01, d12, d23;
-        for(i = 0; i < static_cast<int>(mPersons.size()); ++i) // ueber TrackPerson
-        {
-            qApp->processEvents();
-            progress.setValue(200 + i * 100. / mPersons.size());
-            for(j = 1; j < mPersons.at(i).size() - 2; ++j) // ueber TrackPoint (ohne ersten und letzten beiden)
-            {
-                d01 = mPersons.at(i).at(j).distanceToPoint(mPersons.at(i).at(j - 1));
-                d12 = mPersons.at(i).at(j + 1).distanceToPoint(mPersons.at(i).at(j));
-                d23 = mPersons.at(i).at(j + 2).distanceToPoint(mPersons.at(i).at(j + 1));
-                if(((1.8 * (d01 + d23) / 2.) < d12) &&
-                   ((d12 > 6.) ||
-                    ((d01 + d23) / 2. > 3.))) // geschwindigkeit 1,8-fach && mindestpixelbewegung im schnitt von 3
-                {
-                    SPDLOG_WARN(
-                        "Fast variation of velocity of person {} between frame {} and {}!",
-                        i + 1,
-                        j + mPersons.at(i).firstFrame(),
-                        j + 1 + mPersons.at(i).firstFrame());
-                    pers.append(i + 1);
-                    frame.append(j + mPersons.at(i).firstFrame());
-                }
-            }
-        }
-    }
-
-    // testen, ob zwei trackpoint sehr nah beieinanderliegen (es gibt trajektorien, die uebereinander liegen, wenn nicht
-    // genmergt wird)
-    if(testEqual)
-    {
-        progress.setValue(300);
-        progress.setLabelText("Check if trajectories are equal...");
-        qApp->processEvents();
-
-        int lLF = largestLastFrame();
-        int f;
-        for(f = smallestFirstFrame(); f <= lLF; ++f)
-        {
-            progress.setValue(300 + f * 100. / lLF);
-            qApp->processEvents();
-
-            for(i = 0; i < static_cast<int>(mPersons.size()); ++i)
-            {
-                // if (!pers.contains(i+1)) man koennte nur einmal eine Person aufnehmen, da aufeinanderfolgende frames
-                // oft betroffen
-                for(j = i + 1; j < static_cast<int>(mPersons.size()); ++j)
-                {
-                    if(mPersons.at(i).trackPointExist(f) && mPersons.at(j).trackPointExist(f))
-                    {
-                        if(mPersons.at(i).trackPointAt(f).distanceToPoint(mPersons.at(j).trackPointAt(f)) <
-                           mMainWindow.getHeadSize(nullptr, i, f) / 2.)
-                        {
-                            SPDLOG_WARN("Person {} and {} are very close to each other at frame {}!", i + 1, j + 1, f);
-                            pers.append(i + 1);
-                            frame.append(f);
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -1114,7 +954,7 @@ void PersonStorage::purge(int frame)
             }
             if(count / mPersons.at(i).size() > 0.8) // Achtung, wenn roi klein, dann viele tp nur getrackt
             {
-                mPersons.erase(mPersons.begin() + i); // delete trj}
+                deletePerson(i--); // after deleting the person decrease i by one
             }
         }
     }
@@ -1236,6 +1076,7 @@ int PersonStorage::merge(int pers1, int pers2)
     auto      &other       = mPersons.at(pers2);
     const bool extrapolate = mMainWindow.getControlWidget()->isTrackExtrapolationChecked();
     int        deleteIndex;
+    int        keepIndex;
     if(other.firstFrame() < person.firstFrame() && other.lastFrame() > person.lastFrame())
     {
         for(int k = 0; k < person.size(); ++k)
@@ -1244,6 +1085,7 @@ int PersonStorage::merge(int pers1, int pers2)
             other.insertAtFrame(person.firstFrame() + k, person.at(k), pers2, extrapolate);
         }
         deleteIndex = pers1;
+        keepIndex   = pers2;
     }
     else if(other.firstFrame() < person.firstFrame())
     {
@@ -1253,6 +1095,7 @@ int PersonStorage::merge(int pers1, int pers2)
             person.insertAtFrame(other.firstFrame() + k, other.at(k), pers1, extrapolate);
         }
         deleteIndex = pers2;
+        keepIndex   = pers1;
     }
     else
     {
@@ -1262,8 +1105,23 @@ int PersonStorage::merge(int pers1, int pers2)
             person.insertAtFrame(other.firstFrame() + k, other.at(k), pers1, extrapolate);
         }
         deleteIndex = pers2;
+        keepIndex   = pers1;
     }
-    mPersons.erase(mPersons.begin() + deleteIndex);
+    deletePerson(deleteIndex);
+    emit changedPerson(keepIndex);
 
     return deleteIndex;
+}
+
+std::vector<TrackPerson>::iterator PersonStorage::deletePerson(size_t index)
+{
+    auto retIt = mPersons.erase(mPersons.begin() + index);
+    emit deletedPerson(index);
+    return retIt;
+}
+
+void PersonStorage::deletePersonFrameRange(size_t index, int startFrame, int endFrame)
+{
+    mPersons[index].removeFramesBetween(startFrame, endFrame);
+    emit deletedPersonFrameRange(index, startFrame, endFrame);
 }

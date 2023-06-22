@@ -190,7 +190,6 @@ public:
     int          calculateRealTracker();
     void         exportTracker(QString dest = "");
     void         importTracker(QString dest = "");
-    void         testTracker();
     void         trackAll();
     void         playAll();
     int          winSize(QPointF *pos = nullptr, int pers = -1, int frame = -1, int level = -1);

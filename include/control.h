@@ -26,6 +26,8 @@
 #include <Qt>
 #include <QtWidgets>
 
+class Petrack;
+class Correction;
 class QGraphicsScene;
 class QDomElement;
 class IntrinsicBox;
@@ -211,7 +213,7 @@ public:
     double getCameraAltitude() const;
 
     void       setXml(QDomElement &elem);
-    void       getXml(const QDomElement &elem);
+    void       getXml(const QDomElement &elem, const QString &version);
     bool       isLoading() const;
     ColorPlot *getColorPlot() const;
     void       replotColorplot();
@@ -255,7 +257,6 @@ public:
     IntrinsicCameraParams getIntrinsicCameraParams() const;
     void                  runAutoCalib();
 
-
 #ifdef QWT
     AnalysePlot *getAnalysePlot() const;
 #endif
@@ -271,6 +272,7 @@ public:
         return mMainWindow;
     }
 
+    void resetCorrection();
 
 private slots:
     void on_anaCalculate_clicked();
@@ -320,7 +322,6 @@ private slots:
     void on_trackReset_clicked();
     void on_trackExport_clicked();
     void on_trackImport_clicked();
-    void on_trackTest_clicked();
 
     void on_trackRegionScale_valueChanged(int i);
     void on_trackRegionLevels_valueChanged(int i);
@@ -575,7 +576,9 @@ private:
     ExtrinsicBox        *mExtr;
     CoordinateSystemBox *mCoordSys;
     QGraphicsScene      *mScene;
-    bool                 mColorChanging;
+    Correction          *mCorrectionWidget;
+
+    bool mColorChanging;
     bool mIndexChanging; // shows, if the index of the color model is really changing; nor while constructor (initialer
     // durchlauf) and may be while loading xml file
     bool mLoading; // shows, if new project is just loading

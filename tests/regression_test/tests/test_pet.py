@@ -40,11 +40,11 @@ def compare_xml(test: ET.ElementTree, truth: ET.ElementTree):
                 truth_value = float(truth_attrib[1])
                 assert test_value == approx(
                     truth_value, abs=0.0001
-                ), f"Failed comparion on {test_elem.tag}/{test_attrib[0]}"
+                ), f"Failed comparison on {test_elem.tag}/{test_attrib[0]}"
             except:
                 assert (
                     test_attrib[1] == truth_attrib[1]
-                ), f"Failed comparion on {test_elem.tag}/{test_attrib[0]}"
+                ), f"Failed comparison on {test_elem.tag}/{test_attrib[0]}"
 
 
 def test_defaultPet(pytestconfig):
