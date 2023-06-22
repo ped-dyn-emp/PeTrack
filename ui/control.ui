@@ -3005,111 +3005,6 @@
             </widget>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,0,0,0,0">
-             <item>
-              <widget class="QPushButton" name="trackTest">
-               <property name="maximumSize">
-                <size>
-                 <width>999</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>test</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="testEqual">
-               <property name="maximumSize">
-                <size>
-                 <width>999</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>search for trajectories with similar trackpoints</string>
-               </property>
-               <property name="whatsThis">
-                <string/>
-               </property>
-               <property name="text">
-                <string>equal</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="testVelocity">
-               <property name="maximumSize">
-                <size>
-                 <width>999</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>search for hight velocity variations</string>
-               </property>
-               <property name="whatsThis">
-                <string/>
-               </property>
-               <property name="text">
-                <string>velocity</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="testInside">
-               <property name="maximumSize">
-                <size>
-                 <width>999</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>search for trajectories which start or end outside recognition area</string>
-               </property>
-               <property name="whatsThis">
-                <string/>
-               </property>
-               <property name="text">
-                <string>inside</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="testLength">
-               <property name="maximumSize">
-                <size>
-                 <width>999</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="toolTip">
-                <string>search for short trajectories</string>
-               </property>
-               <property name="whatsThis">
-                <string/>
-               </property>
-               <property name="text">
-                <string>length</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
             <widget class="QGroupBox" name="groupBox_6">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -5083,11 +4978,6 @@
   <tabstop>exportComment</tabstop>
   <tabstop>exportMarkerID</tabstop>
   <tabstop>missingFramesReset</tabstop>
-  <tabstop>trackTest</tabstop>
-  <tabstop>testEqual</tabstop>
-  <tabstop>testVelocity</tabstop>
-  <tabstop>testInside</tabstop>
-  <tabstop>testLength</tabstop>
   <tabstop>trackShowSearchSize</tabstop>
   <tabstop>adaptiveLevel</tabstop>
   <tabstop>trackShow</tabstop>

@@ -41,7 +41,7 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
 
     QDomDocument doc;
     doc.setContent(testConfig.arg("0", "0", "0"));
-    control->getXml(doc.documentElement());
+    control->getXml(doc.documentElement(), QString("0.10.0"));
 
     SECTION("Identity Coordinate System")
     {
@@ -58,7 +58,7 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
     {
         // rotate 90 degrees
         doc.setContent(testConfig.arg("0", "0", QString::number(PI / 2)));
-        control->getXml(doc.documentElement());
+        control->getXml(doc.documentElement(), QString("0.10.0"));
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 0, 0)) - cv::Vec3d(0, -1, 0)) ==
             Approx(0).margin(VEC_MARGIN));
@@ -77,7 +77,7 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
 
         // negative rotation
         doc.setContent(testConfig.arg("0", "0", QString::number(-PI)));
-        control->getXml(doc.documentElement());
+        control->getXml(doc.documentElement(), QString("0.10.0"));
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 0, 0)) - cv::Vec3d(-1, 0, 0)) ==
             Approx(0).margin(VEC_MARGIN));
@@ -91,7 +91,7 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
     {
         // vector (1, 1, 1) with length pi/2
         doc.setContent(testConfig.arg("0.9067", "0.9067", "0.9067"));
-        control->getXml(doc.documentElement());
+        control->getXml(doc.documentElement(), QString("0.10.0"));
 
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 1, 1)) - cv::Vec3d(1, 1, 1)) ==
@@ -114,7 +114,7 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
                         </CALIBRATION>
                     </CONTROL>)"};
             doc.setContent(testConfig.arg("0.9067", "0.9067", "0.9067"));
-            control->getXml(doc.documentElement());
+            control->getXml(doc.documentElement(), QString("0.10.0"));
             REQUIRE(
                 cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 0, 0)) - cv::Vec3d(0.33, -0.24, 0.91)) ==
                 Approx(0).margin(VEC_MARGIN));
@@ -128,7 +128,7 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
     SECTION("Another Wild Rotation")
     {
         doc.setContent(testConfig.arg("0.5", "-2", "1.1"));
-        control->getXml(doc.documentElement());
+        control->getXml(doc.documentElement(), QString("0.10.0"));
 
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 1, 1)) - cv::Vec3d(0.2, -0.63, -1.6)) ==

@@ -20,7 +20,7 @@
 # Project setup
 ################################################################################
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
-project(petrack LANGUAGES CXX VERSION 0.9.4)
+project(petrack LANGUAGES CXX VERSION 0.10.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -398,7 +398,9 @@ target_sources(petrack_core PRIVATE
     include/autosaveSettings.h
     include/editMoCapDialog.h
     include/moCapEditingWidget.h
+    include/plausibility.h
     include/coordinateStructs.h
+    include/correction.h
 )
 
 target_sources(petrack_core PRIVATE
@@ -474,6 +476,8 @@ target_sources(petrack_core PRIVATE
     ui/coordinateSystemBox.ui
     ui/moCapEditingWidget.ui
     ui/editMoCapDialog.ui
+    src/plausibility.cpp
+    src/correction.cpp
     ui/about.ui
     ui/codeMarker.ui
     ui/colorMarker.ui
@@ -483,6 +487,7 @@ target_sources(petrack_core PRIVATE
     ui/control.ui
     ui/openMoCapDialog.ui
     ui/moCapSelectionWidget.ui
+    ui/correction.ui
     ui/filterBeforeBox.ui
     ui/intrinsicBox.ui
     ui/extrinsicBox.ui
@@ -492,7 +497,8 @@ target_sources(petrack_core PRIVATE
 
 target_sources(petrack PRIVATE
   petrack.rc
-  icons/icons.qrc)
+  icons/icons.qrc
+)
 
 #*****************************************************************************
 # CODE AUS DER ALTEN .PRO DATEI, DER NOCH NICHT IN DIE CMAKE EINGEBAUT WURDE *

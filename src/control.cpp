@@ -26,6 +26,7 @@
 #include "colorPlot.h"
 #include "colorRangeWidget.h"
 #include "coordinateSystemBox.h"
+#include "correction.h"
 #include "extrinsicBox.h"
 #include "extrinsicParameters.h"
 #include "filterBeforeBox.h"
@@ -246,6 +247,9 @@ Control::Control(
 
     // "Hide" analysis tab until it is fixed
     mUi->tabs->removeTab(3);
+
+    mCorrectionWidget = new Correction(mMainWindow, mMainWindow->getPersonStorage(), this);
+    mUi->tabs->insertTab(3, mCorrectionWidget, "correction");
 }
 
 void Control::setScene(QGraphicsScene *sc)
@@ -1017,11 +1021,6 @@ void Control::on_trackExport_clicked()
 void Control::on_trackImport_clicked()
 {
     mMainWindow->importTracker();
-}
-
-void Control::on_trackTest_clicked()
-{
-    mMainWindow->testTracker();
 }
 
 void Control::on_trackPathColorButton_clicked()
@@ -2025,24 +2024,6 @@ void Control::setXml(QDomElement &elem)
     subSubElem.setAttribute("ENABLED", mUi->exportMarkerID->isChecked());
     subElem.appendChild(subSubElem);
 
-
-    subSubElem = (elem.ownerDocument()).createElement("TEST_EQUAL");
-    subSubElem.setAttribute("ENABLED", mUi->testEqual->isChecked());
-    subElem.appendChild(subSubElem);
-
-    subSubElem = (elem.ownerDocument()).createElement("TEST_VELOCITY");
-    subSubElem.setAttribute("ENABLED", mUi->testVelocity->isChecked());
-    subElem.appendChild(subSubElem);
-
-    subSubElem = (elem.ownerDocument()).createElement("TEST_INSIDE");
-    subSubElem.setAttribute("ENABLED", mUi->testInside->isChecked());
-    subElem.appendChild(subSubElem);
-
-    subSubElem = (elem.ownerDocument()).createElement("TEST_LENGTH");
-    subSubElem.setAttribute("ENABLED", mUi->testLength->isChecked());
-    subElem.appendChild(subSubElem);
-
-
     subSubElem = (elem.ownerDocument()).createElement("TRACK_FILE");
     fn         = mMainWindow->getTrackFileName();
     if(fn != "")
@@ -2122,12 +2103,17 @@ void Control::setXml(QDomElement &elem)
     subSubElem.setAttribute("REVERSE", mUi->anaConsiderRev->isChecked());
     subSubElem.setAttribute("SHOW_VORONOI", mUi->showVoronoiCells->isChecked());
     subElem.appendChild(subSubElem);
+
+    auto correctionElem = (elem.ownerDocument()).createElement("CORRECTION");
+    mCorrectionWidget->setXml(correctionElem);
+    elem.appendChild(correctionElem);
 }
 
 // read data from xml node
-void Control::getXml(const QDomElement &elem)
+void Control::getXml(const QDomElement &elem, const QString &version)
 {
     QDomElement subElem, subSubElem, subSubSubElem;
+
 
     if(elem.hasAttribute("TAB"))
     {
@@ -2668,35 +2654,35 @@ void Control::getXml(const QDomElement &elem)
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
-                else if(subSubElem.tagName() == "TEST_EQUAL")
+                else if((subSubElem.tagName() == "TEST_EQUAL") && (!newerThanVersion(version, QString("0.10.0"))))
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        mUi->testEqual->setCheckState(
+                        mCorrectionWidget->setTestEqualCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
-                else if(subSubElem.tagName() == "TEST_VELOCITY")
+                else if((subSubElem.tagName() == "TEST_VELOCITY") && (!newerThanVersion(version, QString("0.10.0"))))
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        mUi->testVelocity->setCheckState(
+                        mCorrectionWidget->setTestVelocityCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
-                else if(subSubElem.tagName() == "TEST_INSIDE")
+                else if((subSubElem.tagName() == "TEST_INSIDE") && (!newerThanVersion(version, QString("0.10.0"))))
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        mUi->testInside->setCheckState(
+                        mCorrectionWidget->setTestInsideCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
-                else if(subSubElem.tagName() == "TEST_LENGTH")
+                else if((subSubElem.tagName() == "TEST_LENGTH") && (!newerThanVersion(version, QString("0.10.0"))))
                 {
                     if(subSubElem.hasAttribute("ENABLED"))
                     {
-                        mUi->testLength->setCheckState(
+                        mCorrectionWidget->setTestLengthCheckState(
                             subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
                     }
                 }
@@ -2957,6 +2943,10 @@ void Control::getXml(const QDomElement &elem)
                 }
             }
         }
+        else if(subElem.tagName() == "CORRECTION")
+        {
+            mCorrectionWidget->getXml(subElem);
+        }
         else
         {
             SPDLOG_WARN("Unknown CONTROL tag: {}", subSubElem.tagName());
@@ -3081,22 +3071,22 @@ void Control::replotColorplot()
 
 bool Control::isTestEqualChecked() const
 {
-    return mUi->testEqual->isChecked();
+    return mCorrectionWidget->getTestEqualChecked();
 }
 
 bool Control::isTestVelocityChecked() const
 {
-    return mUi->testVelocity->isChecked();
+    return mCorrectionWidget->getTestVelocityChecked();
 }
 
 bool Control::isTestInsideChecked() const
 {
-    return mUi->testInside->isChecked();
+    return mCorrectionWidget->getTestInsideChecked();
 }
 
 bool Control::isTestLengthChecked() const
 {
-    return mUi->testLength->isChecked();
+    return mCorrectionWidget->getTestLengthChecked();
 }
 
 void Control::setMapX(int val)
@@ -3506,6 +3496,11 @@ void Control::toggleTrackROIButtons()
     bool enabled = (!mUi->trackRoiFix->isChecked()) && mUi->trackRoiShow->isChecked();
     mUi->trackRoiAdjustAutomatically->setEnabled(enabled);
     mUi->trackRoiToFullImageSize->setEnabled(enabled);
+}
+
+void Control::resetCorrection()
+{
+    mCorrectionWidget->clear();
 }
 
 #include "moc_control.cpp"

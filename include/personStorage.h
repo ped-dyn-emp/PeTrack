@@ -33,8 +33,10 @@ struct PersonFrame
     int frame;
 };
 
-class PersonStorage
+class PersonStorage : public QObject
 {
+    Q_OBJECT
+
 public:
     enum class Direction
     {
@@ -101,15 +103,6 @@ public:
         float             height);
     int merge(int pers1, int pers2);
 
-
-    void checkPlausibility(
-        QList<int> &pers,
-        QList<int> &frame,
-        bool        testEqual    = true,
-        bool        testVelocity = true,
-        bool        testInside   = true,
-        bool        testLength   = true);
-
     void optimizeColor();
 
     // reset the height of all persons, but not the pos of the trackpoints
@@ -128,10 +121,19 @@ public:
 
     void setNrInBg(size_t idx, int nr) { mPersons[idx].setNrInBg(nr); }
 
+signals:
+    void deletedPerson(size_t index);
+    void deletedPersonFrameRange(size_t index, int startFrame, int endFrame);
+    void changedPerson(size_t index);
+    void splitPersonAtFrame(size_t index, size_t newIndex, int frame);
+
 private:
     std::vector<TrackPerson> mPersons;
     Petrack                 &mMainWindow;
     Autosave                &mAutosave;
+
+    std::vector<TrackPerson>::iterator deletePerson(size_t index);
+    void                               deletePersonFrameRange(size_t index, int startFrame, int endFrame);
 };
 
 #endif // PERSONSTORAGE_H

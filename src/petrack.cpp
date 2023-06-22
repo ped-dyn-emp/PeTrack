@@ -70,6 +70,7 @@
 #include <iomanip>
 #include <opencv2/opencv.hpp>
 
+
 int Petrack::trcVersion = 0;
 
 // Reihenfolge des anlegens der objekte ist sehr wichtig
@@ -454,6 +455,8 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     int         zoom = 250, rotate = 0, hScroll = 0, vScroll = 0;
     enum Camera cam = cameraUnset;
     setLoading(true);
+    auto petVersion = root.attribute("VERSION");
+
     for(QDomElement elem = root.firstChildElement(); !elem.isNull(); elem = elem.nextSiblingElement())
     {
         if(elem.tagName() == "MAIN")
@@ -521,7 +524,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
         }
         else if(elem.tagName() == "CONTROL")
         {
-            mControlWidget->getXml(elem);
+            mControlWidget->getXml(elem, petVersion);
             QDomElement tmpElem = (elem.firstChildElement("TRACKING")).firstChildElement("PATH");
             if(tmpElem.hasAttribute("ONLY_PEOPLE_NR"))
             {
@@ -1657,6 +1660,7 @@ void Petrack::resetSettings()
 {
     mAnimation->reset();
     openXml(mDefaultSettings, false);
+    mControlWidget->resetCorrection();
 }
 
 void Petrack::about()
@@ -2781,31 +2785,6 @@ void Petrack::importTracker(QString dest) // default = ""
             PCritical(this, tr("PeTrack"), tr("Cannot load %1 maybe because of wrong file extension.").arg(dest));
         }
         lastFile = dest;
-    }
-}
-
-void Petrack::testTracker()
-{
-    static int idx = 0; // index in Fehlerliste, die als letztes angesprungen wurde
-    QList<int> pers, frame;
-
-    mPersonStorage.checkPlausibility(
-        pers,
-        frame,
-        mControlWidget->isTestEqualChecked(),
-        mControlWidget->isTestVelocityChecked(),
-        mControlWidget->isTestInsideChecked(),
-        mControlWidget->isTestLengthChecked());
-    if(pers.length() <= idx)
-    {
-        idx = 0;
-    }
-    if(pers.length() > idx)
-    {
-        mControlWidget->setTrackShowOnly(Qt::Checked);
-        mControlWidget->setTrackShowOnlyNr(pers[idx]);
-        mPlayerWidget->skipToFrame(frame[idx]);
-        ++idx;
     }
 }
 

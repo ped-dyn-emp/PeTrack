@@ -18,4 +18,5 @@ target_sources(petrack_tests PRIVATE
     tst_extrinsicBox.cpp
     tst_coordinateSystemBox.cpp
     tst_tracker.cpp
+    tst_correction.cpp
 )
