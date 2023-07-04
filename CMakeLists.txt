@@ -241,9 +241,13 @@ target_include_directories(petrack_core PRIVATE "${CMAKE_SOURCE_DIR}/ui")
 # Linking OpenCV                                                 *
 #*****************************************************************
 # Debug Version of slows our debug down to a unusable degree
-set_target_properties(${OpenCV_LIBS} PROPERTIES
-    MAP_IMPORTED_CONFIG_DEBUG RELEASE
-    MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELEASE)
+# so link to release always (not possible on MSVC due to
+# debug crt and release crt not being compatible)
+if(NOT ${MSVC})
+    set_target_properties(${OpenCV_LIBS} PROPERTIES
+        MAP_IMPORTED_CONFIG_DEBUG RELEASE
+        MAP_IMPORTED_CONFIG_RELWITHDEBINFO RELEASE)
+endif()
 target_link_libraries(petrack_core PUBLIC ${OpenCV_LIBS})
 #*****************************************************************
 # Linking QWT                                                    *
