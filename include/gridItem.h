@@ -26,27 +26,41 @@ class CoordinateSystemBox;
 #include "extrCalibration.h"
 
 #include <QGraphicsItem>
+#include <utility>
+
 
 class GridItem : public QGraphicsItem
 {
 private:
     Petrack             *mMainWindow;
-    ExtrCalibration     *mExtCalib;
+    ExtrCalibration     *mExtrCalib;
     CoordinateSystemBox *mCoordSys;
     Control             *mControlWidget;
-    float                mouse_x, mouse_y;
-    int                  gridTrans_x, gridTrans_y;
-    int                  gridDimension;
+    float                mMouseX, mMouseY;
+    int                  mGridTransX, mGridTransY;
+    int                  mGridDimension;
 
 public:
-    inline void setGridDimension(int gDimension) { this->gridDimension = gDimension; }
-    inline int  getGridDimension() const { return this->gridDimension; }
+    inline void setGridDimension(int gDimension) { this->mGridDimension = gDimension; }
+    inline int  getGridDimension() const { return this->mGridDimension; }
     GridItem(QWidget *wParent, QGraphicsItem *parent, CoordinateSystemBox *coordSys);
-    QRectF boundingRect() const;
-    void   mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void   mousePressEvent(QGraphicsSceneMouseEvent *event);
-    int    drawLine(QPainter *painter, cv::Point2f *p, int y_offset);
-    void   paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QRectF boundingRect() const override;
+    void   mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+    void   mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void   drawLine(QPainter *painter, const std::array<cv::Point2f, 2> &p);
+    void   paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+private:
+    void draw2DGrid(QPainter *painter, int imageHeight, int imageWidth, int borderSize);
+    void draw3DGrid(
+        QPainter   *painter,
+        int         imageHeight,
+        int         imageWidth,
+        int         borderSize,
+        bool        vanishPointYIsInsideImage,
+        bool        vanishPointXIsInsideImage,
+        cv::Point2f vanishPointY,
+        cv::Point2f vanishPointX);
 };
 
 #endif
