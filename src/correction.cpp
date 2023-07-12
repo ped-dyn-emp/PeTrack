@@ -130,6 +130,10 @@ void FailedChecksTableModel::setFailedChecks(std::vector<plausibility::FailedChe
 
 bool FailedChecksTableModel::removeRows(int row, int count, const QModelIndex &parent)
 {
+    if(count == 0)
+    {
+        return true;
+    }
     beginRemoveRows(parent, row, row + count - 1);
 
     for(int i = 0; i < count; ++i)
