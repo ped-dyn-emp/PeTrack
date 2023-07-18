@@ -2447,6 +2447,7 @@ void Petrack::closeEvent(QCloseEvent *event)
     {
         writeSettings();
         mAutosave.deleteAutosave();
+        mPlayerWidget->pause();
         event->accept();
     }
     else
