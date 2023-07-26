@@ -33,7 +33,6 @@
 #include <QStyle>
 #include <QToolButton>
 #include <QVBoxLayout>
-#include <QtConcurrent>
 
 Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
 {
@@ -250,8 +249,7 @@ bool Player::updateImage()
     }
     qApp->processEvents();
 
-    QFuture<void> future = QtConcurrent::run([&]() { mMainWindow->updateImage(mImg); });
-    future.waitForFinished();
+    mMainWindow->updateImage(mImg);
 
     if(mRec)
     {
