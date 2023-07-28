@@ -691,14 +691,29 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     setLoading(false);
 }
 
+/**
+ * Open a petrack project.
+ * When mProFileName is set and a file, this method will ask to save the project before opening the new one.
+ * If it is not a file, the path is used as directory for the filedialog.
+ *
+ * If the given filename is empty, a dialog opens that asks for a file to open.
+ *
+ * @param fileName the filename to open
+ * @param openSeq  true, if sequence given in project should be opened
+ */
 void Petrack::openProject(QString fileName, bool openSeq) // default fileName="", openSequence = true
 {
-    if(!QFileInfo(mProFileName).isDir()) // a project is already loaded
+    if(QFileInfo(mProFileName).isFile()) // a project is already loaded
     {
         if(!maybeSave())
         {
             return;
         }
+    }
+    else if(!QFileInfo(mProFileName).isDir())
+    {
+        SPDLOG_INFO("mProFileName neither file nor directory - resetting");
+        mProFileName = "";
     }
     // if no destination file or folder is given
     if(fileName.isEmpty())
@@ -884,63 +899,68 @@ bool Petrack::saveSameProject()
     return saveProject(mProFileName);
 }
 
+/**
+ * Ask the user to provide a filename to save project into
+ * @return true if the saving process was done successfully
+ */
 bool Petrack::saveProjectAs()
 {
-    auto fileName = QFileDialog::getSaveFileName(
-        this, tr("Select project file"), mProFileName, tr("PeTrack project file (*.pet);;All files (*.*)"));
-    return saveProject(fileName);
+    // empty filename will trigger file selection box
+    return saveProject("");
 }
 
-/// rueckgabewert zeigt an, ob gesichert werden konnte
+/**
+ * Save the project to the given filename
+ * @param fileName the name of the file to save the project into
+ * @return true if the saving process was done successfully
+ */
 bool Petrack::saveProject(QString fileName) // default fileName=""
 {
-    // if no destination file or folder is given
-    if(fileName.isEmpty() && QFileInfo(mProFileName).isDir())
+    if(fileName.isEmpty())
     {
         fileName = QFileDialog::getSaveFileName(
             this, tr("Select project file"), mProFileName, tr("PeTrack project file (*.pet);;All files (*.*)"));
     }
 
-    if(!fileName.isEmpty())
-    {
-        setProFileName(fileName);
-        QDomDocument doc("PETRACK"); // eigentlich Pfad zu Beschreibungsdatei fuer Dateiaufbau
-        saveXml(doc);
-
-        // file output
-        QByteArray       byteArray;
-        QXmlStreamWriter xmlStream(&byteArray);
-        xmlStream.setAutoFormatting(true);
-        xmlStream.setAutoFormattingIndent(4);
-
-        xmlStream.writeStartDocument();
-        xmlStream.writeDTD("<!DOCTYPE PETRACK>");
-
-        QDomElement element = doc.documentElement();
-        writeXmlElement(xmlStream, element);
-
-        xmlStream.writeEndDocument();
-
-        QFile file(fileName);
-        if(!file.open(QFile::WriteOnly | QFile::Truncate | QFile::Text))
-        {
-            PCritical(this, tr("PeTrack"), tr("Cannot save %1:\n%2.").arg(fileName, file.errorString()));
-            file.close();
-            return false;
-        }
-        file.write(byteArray);
-        file.close(); // also flushes the file
-
-        statusBar()->showMessage(tr("Saved project to %1.").arg(fileName), 5000);
-        SPDLOG_INFO("save project to {}", fileName);
-
-        updateWindowTitle();
-        return true;
-    }
-    else
+    // selection was cancelled
+    if(fileName.isEmpty())
     {
         return false;
     }
+
+    setProFileName(fileName);
+    QDomDocument doc("PETRACK"); // eigentlich Pfad zu Beschreibungsdatei fuer Dateiaufbau
+    saveXml(doc);
+
+    // file output
+    QByteArray       byteArray;
+    QXmlStreamWriter xmlStream(&byteArray);
+    xmlStream.setAutoFormatting(true);
+    xmlStream.setAutoFormattingIndent(4);
+
+    xmlStream.writeStartDocument();
+    xmlStream.writeDTD("<!DOCTYPE PETRACK>");
+
+    QDomElement element = doc.documentElement();
+    writeXmlElement(xmlStream, element);
+
+    xmlStream.writeEndDocument();
+
+    QFile file(fileName);
+    if(!file.open(QFile::WriteOnly | QFile::Truncate | QFile::Text))
+    {
+        PCritical(this, tr("PeTrack"), tr("Cannot save %1:\n%2.").arg(fileName, file.errorString()));
+        file.close();
+        return false;
+    }
+    file.write(byteArray);
+    file.close(); // also flushes the file
+
+    statusBar()->showMessage(tr("Saved project to %1.").arg(fileName), 5000);
+    SPDLOG_INFO("save project to {}", fileName);
+
+    updateWindowTitle();
+    return true;
 }
 
 void Petrack::writeXmlElement(QXmlStreamWriter &xmlStream, QDomElement element)
