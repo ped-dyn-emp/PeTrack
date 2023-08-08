@@ -35,7 +35,7 @@ petrack.exe -project project.pet -sequence frame000.jpg -autoTrack tracker_file 
 ## Tutorial & demo
 A small demo project is provided in the `demo` folder. It contains all necessary files for setting up a project with
 PeTrack. A tutorial leading through all steps can be found in the
-[Wiki](https://jugit.fz-juelich.de/ped-dyn-emp/petrack/-/wikis/usage/Workflow%20for%20performing%20experiments%20to%20by%20analyzed%20with%20PeTrack#using-petrack).
+[Wiki](https://jugit.fz-juelich.de/ped-dyn-emp/petrack/-/wikis/home#for-users-of-petrack).
 The intermediate project files for each step are also included in the `demo` folder.
 
 ## How to cite
