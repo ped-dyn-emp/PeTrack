@@ -44,6 +44,8 @@ elseif(APPLE)
         INSTALL_RPATH @executable_path/../Frameworks
     )
 
+    install(FILES "${OpenCV_DIR}/../../libopencv_videoio_ffmpeg.so" DESTINATION "petrack.app/Contents/Frameworks")
+
     install(CODE [[
         include(BundleUtilities)
 
