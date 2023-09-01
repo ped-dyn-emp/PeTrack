@@ -2387,9 +2387,7 @@ double Petrack::getStatusPosRealHeight()
  */
 void Petrack::readSettings()
 {
-    QSettings settings("Forschungszentrum Juelich GmbH", "PeTrack by Maik Boltes, Daniel Salden");
-    QPoint    pos  = settings.value("pos", QPoint(200, 200)).toPoint();
-    QSize     size = settings.value("size", QSize(400, 400)).toSize();
+    const QSettings settings("Forschungszentrum Juelich GmbH", "PeTrack by Maik Boltes, Daniel Salden");
     mAntialiasAct->setChecked(settings.value("antialias", false).toBool());
     mOpenGLAct->setChecked(settings.value("opengl", false).toBool());
     mSeqFileName = settings.value("seqFileName", QDir::currentPath()).toString();
@@ -2397,8 +2395,8 @@ void Petrack::readSettings()
     // nicht ganz sauber, da so immer schon zu anfang in calib file list etwas drin steht und somit auto ausgefuehrt
     // werden kann wird aber beim ersten openCalib... ueberschrieben
     mAutoCalib.addCalibFile(settings.value("calibFile", QDir::currentPath()).toString());
-    resize(size);
-    move(pos);
+    auto geometry = settings.value("geometry").toByteArray();
+    restoreGeometry(geometry);
     antialias();
     opengl();
     mSplitter->restoreState(settings.value("controlSplitterSizes").toByteArray());
@@ -2413,8 +2411,7 @@ void Petrack::readSettings()
 void Petrack::writeSettings()
 {
     QSettings settings("Forschungszentrum Juelich GmbH", "PeTrack by Maik Boltes, Daniel Salden");
-    settings.setValue("pos", pos());
-    settings.setValue("size", size());
+    settings.setValue("geometry", saveGeometry());
     settings.setValue("antialias", mAntialiasAct->isChecked());
     settings.setValue("opengl", mOpenGLAct->isChecked());
     settings.setValue("seqFileName", mSeqFileName);
