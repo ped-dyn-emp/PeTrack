@@ -1118,6 +1118,21 @@ void Control::on_trackShowOnlyListButton_clicked()
             }
             /// ToDo: lists
         }
+        // Interval detection requires an unchecked checkbox following up the checked ones.
+        // If the checkbox for the last ID is checked, no unchecked checkbox follows.
+        // This edgecase is identified by 'first' not being reset to -1
+        if(first != -1)
+        {
+            last = static_cast<int>(mMainWindow->getPersonStorage().nbPersons());
+            if(first == last)
+            {
+                list.append(QString::number(first));
+            }
+            else
+            {
+                list.append(QString("%1-%2").arg(first).arg(last));
+            }
+        }
         mUi->trackShowOnlyNrList->setText(list.join(","));
     }
 }
