@@ -42,6 +42,7 @@ class ColorPlot;
 class AnalysePlot;
 class MissingFrames;
 class WorldImageCorrespondence;
+class AlignmentGridBox;
 namespace Ui
 {
 class Control;
@@ -62,7 +63,8 @@ public:
         FilterBeforeBox     *filterBefore,
         IntrinsicBox        *intrinsicBox,
         ExtrinsicBox        *extrinsicBox,
-        CoordinateSystemBox *coordSysBox);
+        CoordinateSystemBox *coordSysBox,
+        AlignmentGridBox    *gridBox);
     Control(
         QWidget             &parent,
         QGraphicsScene      &scene,
@@ -74,7 +76,8 @@ public:
         FilterBeforeBox     *filterBefore,
         IntrinsicBox        *intrinsicBox,
         ExtrinsicBox        *extrinsicBox,
-        CoordinateSystemBox *coordSysBox);
+        CoordinateSystemBox *coordSysBox,
+        AlignmentGridBox    *gridBox);
 
     void setScene(QGraphicsScene *sc);
 
@@ -179,31 +182,6 @@ public:
     int  getCalibCoordDimension();
     bool getCalibCoordShow();
     int  getCalibCoordScale();
-
-
-    int  getCalibGridDimension();
-    bool getCalibGridShow();
-    void setCalibGridShow(bool b);
-    bool getCalibGridFix();
-    void setCalibGridFix(bool b);
-    int  getCalibGridRotate();
-    void setCalibGridRotate(int i);
-    int  getCalibGridTransX();
-    void setCalibGridTransX(int i);
-    int  getCalibGridTransY();
-    void setCalibGridTransY(int i);
-    int  getCalibGridScale();
-    void setCalibGridScale(int i);
-
-    int  getCalibGrid3DTransX();
-    void setCalibGrid3DTransX(int i);
-    int  getCalibGrid3DTransY();
-    void setCalibGrid3DTransY(int i);
-    int  getCalibGrid3DTransZ();
-    void setCalibGrid3DTransZ(int i);
-    void setGridMinMaxTranslation(int minx, int maxx, int miny, int maxy);
-    int  getCalibGrid3DResolution();
-    void setCalibGrid3DResolution(int i);
 
     void expandRange(QColor &fromColor, QColor &toColor, const QColor &clickedColor) const;
     void saveChange(const QColor &fromColor, const QColor &toColor, RectPlotItem *map);
@@ -522,20 +500,6 @@ private slots:
 
     void on_intrinsicParamsChanged(IntrinsicCameraParams params);
 
-    void on_gridShow_stateChanged(int i);
-    void on_gridFix_stateChanged(int i);
-    void on_gridRotate_valueChanged(int i);
-    void on_gridTransX_valueChanged(int i);
-    void on_gridTransY_valueChanged(int i);
-    void on_gridScale_valueChanged(int i);
-
-    void on_gridTab_currentChanged(int index);
-
-    void on_grid3DTransX_valueChanged(int value);
-    void on_grid3DTransY_valueChanged(int value);
-    void on_grid3DTransZ_valueChanged(int value);
-    void on_grid3DResolution_valueChanged(int value);
-
     void on_trackPathColorButton_clicked();
     void on_trackGroundPathColorButton_clicked();
     void on_moCapColorButton_clicked();
@@ -575,6 +539,7 @@ private:
     FilterBeforeBox     *mFilterBefore;
     ExtrinsicBox        *mExtr;
     CoordinateSystemBox *mCoordSys;
+    AlignmentGridBox    *mGrid;
     QGraphicsScene      *mScene;
     Correction          *mCorrectionWidget;
 

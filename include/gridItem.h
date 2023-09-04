@@ -20,8 +20,10 @@
 #define GRIDITEM_H
 
 class Petrack;
-class Control;
 class CoordinateSystemBox;
+class AlignmentGridBox;
+struct Grid2D;
+struct Grid3D;
 
 #include "extrCalibration.h"
 
@@ -35,7 +37,7 @@ private:
     Petrack             *mMainWindow;
     ExtrCalibration     *mExtrCalib;
     CoordinateSystemBox *mCoordSys;
-    Control             *mControlWidget;
+    AlignmentGridBox    *mGridBox;
     float                mMouseX, mMouseY;
     int                  mGridTransX, mGridTransY;
     int                  mGridDimension;
@@ -43,7 +45,7 @@ private:
 public:
     inline void setGridDimension(int gDimension) { this->mGridDimension = gDimension; }
     inline int  getGridDimension() const { return this->mGridDimension; }
-    GridItem(QWidget *wParent, QGraphicsItem *parent, CoordinateSystemBox *coordSys);
+    GridItem(QWidget *wParent, QGraphicsItem *parent, CoordinateSystemBox *coordSys, AlignmentGridBox *gridBox);
     QRectF boundingRect() const override;
     void   mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void   mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -51,16 +53,17 @@ public:
     void   paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
-    void draw2DGrid(QPainter *painter, int imageHeight, int imageWidth, int borderSize);
+    void draw2DGrid(QPainter *painter, const Grid2D &params, int imageHeight, int imageWidth, int borderSize);
     void draw3DGrid(
-        QPainter   *painter,
-        int         imageHeight,
-        int         imageWidth,
-        int         borderSize,
-        bool        vanishPointYIsInsideImage,
-        bool        vanishPointXIsInsideImage,
-        cv::Point2f vanishPointY,
-        cv::Point2f vanishPointX);
+        QPainter     *painter,
+        const Grid3D &params,
+        int           imageHeight,
+        int           imageWidth,
+        int           borderSize,
+        bool          vanishPointYIsInsideImage,
+        bool          vanishPointXIsInsideImage,
+        cv::Point2f   vanishPointY,
+        cv::Point2f   vanishPointX);
 };
 
 #endif

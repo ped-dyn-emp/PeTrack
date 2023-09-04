@@ -23,6 +23,7 @@
 // Added for Qt5 support
 #include "IO.h"
 #include "aboutDialog.h"
+#include "alignmentGridBox.h"
 #include "analysePlot.h"
 #include "animation.h"
 #include "autoCalib.h"
@@ -153,6 +154,7 @@ Petrack::Petrack(QString petrackVersion) :
         *extrinsicBox,
         *mImageItem,
         mExtrCalibration);
+    auto *gridBox = new AlignmentGridBox(this);
 
     mControlWidget = new Control(
         *this,
@@ -164,7 +166,8 @@ Petrack::Petrack(QString petrackVersion) :
         filterBeforeBox,
         intrinsicBox,
         extrinsicBox,
-        coordSysBox);
+        coordSysBox,
+        gridBox);
 
     connect(mImageItem, &ImageItem::imageChanged, mControlWidget, &Control::imageSizeChanged);
 
@@ -200,7 +203,7 @@ Petrack::Petrack(QString petrackVersion) :
 
     mExtrCalibration.setMainWindow(this);
 
-    mGridItem = new GridItem(this, nullptr, coordSysBox);
+    mGridItem = new GridItem(this, nullptr, coordSysBox, gridBox);
     mGridItem->setZValue(2.5); // durch uebergabe von scene wird indirekt ein scene->addItem() aufgerufen
 
     mCoordItem = new CoordItem(this, nullptr, coordSysBox);

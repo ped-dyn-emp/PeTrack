@@ -19,6 +19,7 @@
 #include "control.h"
 
 #include "IO.h"
+#include "alignmentGridBox.h"
 #include "analysePlot.h"
 #include "calibFilter.h"
 #include "codeMarkerWidget.h"
@@ -58,7 +59,8 @@ Control::Control(
     FilterBeforeBox     *filterBefore,
     IntrinsicBox        *intrinsicBox,
     ExtrinsicBox        *extrinsicBox,
-    CoordinateSystemBox *coordSysBox) :
+    CoordinateSystemBox *coordSysBox,
+    AlignmentGridBox    *gridBox) :
     Control(
         parent,
         scene,
@@ -70,7 +72,8 @@ Control::Control(
         filterBefore,
         intrinsicBox,
         extrinsicBox,
-        coordSysBox)
+        coordSysBox,
+        gridBox)
 {
 }
 
@@ -85,7 +88,8 @@ Control::Control(
     FilterBeforeBox     *filterBefore,
     IntrinsicBox        *intrinsicBox,
     ExtrinsicBox        *extrinsicBox,
-    CoordinateSystemBox *coordSysBox) :
+    CoordinateSystemBox *coordSysBox,
+    AlignmentGridBox    *gridBox) :
     QWidget(&parent), mUi(ui), mFilterBefore(filterBefore)
 {
     setAccessibleName("Control");
@@ -138,12 +142,15 @@ Control::Control(
     coordSysBox->setObjectName(QString::fromUtf8("coord"));
     ui->verticalLayout_13->insertWidget(3, mCoordSys);
 
+    mGrid = gridBox;
+    ui->verticalLayout_13->insertWidget(4, mGrid);
+
+
     // integrate new widgets in tabbing order
-    ui->calib->setFocusProxy(ui->gridShow);
     QWidget::setTabOrder(mFilterBefore, mIntr);
     QWidget::setTabOrder(mIntr, mExtr);
     QWidget::setTabOrder(mExtr, mCoordSys);
-    QWidget::setTabOrder(mCoordSys, ui->calib);
+    QWidget::setTabOrder(mCoordSys, mGrid);
 
     connect(mExtr, &ExtrinsicBox::extrinsicChanged, mCoordSys, &CoordinateSystemBox::updateCoordItem);
     connect(mIntr, &IntrinsicBox::paramsChanged, this, &Control::on_intrinsicParamsChanged);
@@ -155,6 +162,17 @@ Control::Control(
         {
             mUi->trackShowGroundPosition->setEnabled(enabled);
             mUi->trackShowGroundPath->setEnabled(enabled);
+        });
+    connect(
+        mGrid,
+        &AlignmentGridBox::gridChanged,
+        this,
+        [this]
+        {
+            if(!mMainWindow->isLoading())
+            {
+                mScene->update();
+            }
         });
 
     setFilterBorderSizeMin(mMainWindow->getBorderFilter()->getBorderSize().getMinimum());
@@ -721,127 +739,6 @@ SwapAxis Control::getCalibCoord3DSwap() const
     return mCoordSys->getSwap3D();
 }
 
-
-int Control::getCalibGridDimension()
-{
-    return mUi->gridTab->currentIndex();
-}
-
-bool Control::getCalibGridShow()
-{
-    return mUi->gridShow->isChecked();
-}
-
-void Control::setCalibGridShow(bool b)
-{
-    mUi->gridShow->setChecked(b);
-}
-
-bool Control::getCalibGridFix()
-{
-    return mUi->gridFix->isChecked();
-}
-
-void Control::setCalibGridFix(bool b)
-{
-    mUi->gridFix->setChecked(b);
-}
-
-int Control::getCalibGridRotate()
-{
-    return mUi->gridRotate->value();
-}
-
-void Control::setCalibGridRotate(int i)
-{
-    mUi->gridRotate->setValue(i);
-}
-
-int Control::getCalibGridTransX()
-{
-    return mUi->gridTransX->value();
-}
-
-void Control::setCalibGridTransX(int i)
-{
-    mUi->gridTransX->setValue(i);
-}
-
-int Control::getCalibGridTransY()
-{
-    return mUi->gridTransY->value();
-}
-
-void Control::setCalibGridTransY(int i)
-{
-    mUi->gridTransY->setValue(i);
-}
-
-int Control::getCalibGridScale()
-{
-    return mUi->gridScale->value();
-}
-
-void Control::setCalibGridScale(int i)
-{
-    mUi->gridScale->setValue(i);
-}
-
-void Control::setGridMinMaxTranslation(int minx, int maxx, int miny, int maxy)
-{
-    mUi->grid3DTransX->setMinimum(minx);
-    mUi->grid3DTransX_spin->setMinimum(minx);
-    mUi->grid3DTransX->setMaximum(maxx);
-    mUi->grid3DTransX_spin->setMaximum(maxx);
-    mUi->grid3DTransY->setMinimum(miny);
-    mUi->grid3DTransY_spin->setMinimum(miny);
-    mUi->grid3DTransY->setMaximum(maxy);
-    mUi->grid3DTransY_spin->setMaximum(maxy);
-    mUi->grid3DTransZ->setMinimum(-200);
-    mUi->grid3DTransZ_spin->setMinimum(-200);
-    mUi->grid3DTransZ->setMaximum(500);
-    mUi->grid3DTransZ_spin->setMaximum(500);
-}
-
-int Control::getCalibGrid3DTransX()
-{
-    return mUi->grid3DTransX->value();
-}
-
-void Control::setCalibGrid3DTransX(int i)
-{
-    mUi->grid3DTransX->setValue(i);
-}
-
-int Control::getCalibGrid3DTransY()
-{
-    return mUi->grid3DTransY->value();
-}
-
-void Control::setCalibGrid3DTransY(int i)
-{
-    mUi->grid3DTransY->setValue(i);
-}
-
-int Control::getCalibGrid3DTransZ()
-{
-    return mUi->grid3DTransZ->value();
-}
-
-void Control::setCalibGrid3DTransZ(int i)
-{
-    mUi->grid3DTransZ->setValue(i);
-}
-
-int Control::getCalibGrid3DResolution()
-{
-    return mUi->grid3DResolution->value();
-}
-
-void Control::setCalibGrid3DResolution(int i)
-{
-    mUi->grid3DResolution->setValue(i);
-}
 
 int Control::getCalibCoordDimension()
 {
@@ -1733,81 +1630,6 @@ void Control::on_intrinsicParamsChanged(IntrinsicCameraParams params)
     mCoordSys->setMeasuredAltitude();
 }
 
-
-//---------------------------------------
-
-
-//---------------------------------------
-void Control::on_gridTab_currentChanged(int /*index*/)
-{
-    mScene->update();
-}
-
-void Control::on_gridShow_stateChanged(int /*i*/)
-{
-    mScene->update();
-}
-
-void Control::on_gridFix_stateChanged(int /*i*/)
-{
-    mScene->update();
-}
-
-void Control::on_gridRotate_valueChanged(int /*i*/)
-{
-    mScene->update();
-}
-
-void Control::on_gridTransX_valueChanged(int /*i*/)
-{
-    mScene->update();
-}
-
-void Control::on_gridTransY_valueChanged(int /*i*/)
-{
-    mScene->update();
-}
-
-void Control::on_gridScale_valueChanged(int /*i*/)
-{
-    mScene->update();
-}
-
-void Control::on_grid3DTransX_valueChanged(int /*value*/)
-{
-    if(!isLoading())
-    {
-        mScene->update();
-    }
-}
-
-void Control::on_grid3DTransY_valueChanged(int /*value*/)
-{
-    if(!isLoading())
-    {
-        mScene->update();
-    }
-}
-
-void Control::on_grid3DTransZ_valueChanged(int /*value*/)
-{
-    if(!isLoading())
-    {
-        mScene->update();
-    }
-}
-
-void Control::on_grid3DResolution_valueChanged(int /*value*/)
-{
-    if(!isLoading())
-    {
-        mScene->update();
-    }
-}
-
-//---------------------------------------
-
-
 //---------------------------------------
 // store data in xml node
 void Control::setXml(QDomElement &elem)
@@ -1853,17 +1675,7 @@ void Control::setXml(QDomElement &elem)
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("ALIGNMENT_GRID");
-    subSubElem.setAttribute("GRID_DIMENSION", mUi->gridTab->currentIndex());
-    subSubElem.setAttribute("SHOW", mUi->gridShow->isChecked());
-    subSubElem.setAttribute("FIX", mUi->gridFix->isChecked());
-    subSubElem.setAttribute("ROTATE", mUi->gridRotate->value());
-    subSubElem.setAttribute("TRANS_X", mUi->gridTransX->value());
-    subSubElem.setAttribute("TRANS_Y", mUi->gridTransY->value());
-    subSubElem.setAttribute("SCALE", mUi->gridScale->value());
-    subSubElem.setAttribute("GRID3D_TRANS_X", mUi->grid3DTransX->value());
-    subSubElem.setAttribute("GRID3D_TRANS_Y", mUi->grid3DTransY->value());
-    subSubElem.setAttribute("GRID3D_TRANS_Z", mUi->grid3DTransZ->value());
-    subSubElem.setAttribute("GRID3D_RESOLUTION", mUi->grid3DResolution->value());
+    mGrid->setXml(subSubElem);
     subElem.appendChild(subSubElem);
 
     // - - - - - - - - - - - - - - - - - - -
@@ -2142,6 +1954,10 @@ void Control::getXml(const QDomElement &elem, const QString &version)
                 {
                     // intentionally left blank
                 }
+                else if(mGrid->getXml(subSubElem))
+                {
+                    // intentionally left blank
+                }
                 else if(subSubElem.tagName() == "BORDER")
                 {
                     if(subSubElem.hasAttribute("COLOR"))
@@ -2169,58 +1985,6 @@ void Control::getXml(const QDomElement &elem, const QString &version)
                                 SPDLOG_WARN("Background subtracting file not readable!");
                             }
                         }
-                    }
-                }
-                else if(subSubElem.tagName() == "ALIGNMENT_GRID")
-                {
-                    if(subSubElem.hasAttribute("GRID_DIMENSION"))
-                    {
-                        mUi->gridTab->setCurrentIndex(subSubElem.attribute("GRID_DIMENSION").toInt());
-                    }
-                    else
-                    {
-                        mUi->gridTab->setCurrentIndex(1); //  = 2D
-                    }
-                    if(subSubElem.hasAttribute("SHOW"))
-                    {
-                        mUi->gridShow->setCheckState(
-                            subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("FIX"))
-                    {
-                        mUi->gridFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
-                    }
-                    if(subSubElem.hasAttribute("ROTATE"))
-                    {
-                        mUi->gridRotate->setValue(subSubElem.attribute("ROTATE").toInt());
-                    }
-                    if(subSubElem.hasAttribute("TRANS_X"))
-                    {
-                        mUi->gridTransX->setValue(subSubElem.attribute("TRANS_X").toInt());
-                    }
-                    if(subSubElem.hasAttribute("TRANS_Y"))
-                    {
-                        mUi->gridTransY->setValue(subSubElem.attribute("TRANS_Y").toInt());
-                    }
-                    if(subSubElem.hasAttribute("SCALE"))
-                    {
-                        mUi->gridScale->setValue(subSubElem.attribute("SCALE").toInt());
-                    }
-                    if(subSubElem.hasAttribute("GRID3D_TRANS_X"))
-                    {
-                        mUi->grid3DTransX->setValue(subSubElem.attribute("GRID3D_TRANS_X").toInt());
-                    }
-                    if(subSubElem.hasAttribute("GRID3D_TRANS_Y"))
-                    {
-                        mUi->grid3DTransY->setValue(subSubElem.attribute("GRID3D_TRANS_Y").toInt());
-                    }
-                    if(subSubElem.hasAttribute("GRID3D_TRANS_Z"))
-                    {
-                        mUi->grid3DTransZ->setValue(subSubElem.attribute("GRID3D_TRANS_Z").toInt());
-                    }
-                    if(subSubElem.hasAttribute("GRID3D_RESOLUTION"))
-                    {
-                        mUi->grid3DResolution->setValue(subSubElem.attribute("GRID3D_RESOLUTION").toInt());
                     }
                 }
                 else

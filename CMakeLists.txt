@@ -405,6 +405,7 @@ target_sources(petrack_core PRIVATE
     include/plausibility.h
     include/coordinateStructs.h
     include/correction.h
+    include/alignmentGridBox.h
 )
 
 target_sources(petrack_core PRIVATE
@@ -482,6 +483,8 @@ target_sources(petrack_core PRIVATE
     ui/editMoCapDialog.ui
     src/plausibility.cpp
     src/correction.cpp
+    src/alignmentGridBox.cpp
+    ui/alignmentGridBox.ui
     ui/about.ui
     ui/codeMarker.ui
     ui/colorMarker.ui
