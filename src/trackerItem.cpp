@@ -410,7 +410,6 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 if(mControlWidget->isTrackShowCurrentPointChecked())
                 {
                     painter->setBrush(Qt::NoBrush);
-                    painter->setPen(currentPointLineWidthPen);
                     if(person.newReco())
                     {
                         currentPointLineWidthPen.setColor(Qt::green);
@@ -419,6 +418,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     {
                         currentPointLineWidthPen.setColor(Qt::blue);
                     }
+                    painter->setPen(currentPointLineWidthPen);
                     rect.setRect(tp.x() - pSP / 2., tp.y() - pSP / 2., pSP, pSP);
                     painter->drawEllipse(rect); // direkt waere nur int erlaubt tp.x()-5., tp.y()-5., 10., 10.
                 }
