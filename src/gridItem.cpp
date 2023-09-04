@@ -18,7 +18,7 @@
 
 #include "gridItem.h"
 
-#include "control.h"
+#include "alignmentGridBox.h"
 #include "coordinateSystemBox.h"
 #include "logger.h"
 #include "petrack.h"
@@ -27,12 +27,21 @@
 #include <QtWidgets>
 #include <cmath>
 
-GridItem::GridItem(QWidget *wParent, QGraphicsItem *parent, CoordinateSystemBox *coordSys) :
-    QGraphicsItem(parent), mCoordSys(coordSys)
+// this is a helper to write a visitor for std::visit using multiple lambdas (or other functors for that matter)
+template <class... Ts>
+struct overload : Ts...
 {
-    mMainWindow    = (class Petrack *) wParent;
-    mExtrCalib     = mMainWindow->getExtrCalibration();
-    mControlWidget = mMainWindow->getControlWidget();
+    using Ts::operator()...;
+};
+// deduction guide for template above; needed to get from lambda objects to classes/types
+template <class... Ts>
+overload(Ts...) -> overload<Ts...>; // not needed in C++20 with expanded CTAD rules
+
+GridItem::GridItem(QWidget *wParent, QGraphicsItem *parent, CoordinateSystemBox *coordSys, AlignmentGridBox *gridBox) :
+    QGraphicsItem(parent), mCoordSys(coordSys), mGridBox(gridBox)
+{
+    mMainWindow = (class Petrack *) wParent;
+    mExtrCalib  = mMainWindow->getExtrCalibration();
 }
 
 /**
@@ -62,47 +71,54 @@ QRectF GridItem::boundingRect() const
 // event, of moving mouse while pressing a mouse button
 void GridItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(!mControlWidget->getCalibGridFix() && mControlWidget->getCalibGridShow())
+    if(!mGridBox->isFix() && mGridBox->isShow())
     {
         setCursor(Qt::SizeBDiagCursor);
         QPointF diff = event->scenePos() -
                        event->lastScenePos(); // screenPos()-buttonDownScreenPos(Qt::RightButton) also interesting
         if(event->buttons() == Qt::RightButton)
         {
-            mControlWidget->setCalibGridRotate(
-                mControlWidget->getCalibGridRotate() + (int) (3. * (diff.x() + diff.y())));
+            auto gridParams = mGridBox->getGridParameters();
+            if(std::holds_alternative<Grid2D>(gridParams))
+            {
+                auto params = std::get<Grid2D>(gridParams);
+                mGridBox->setRotation(params.angle + (int) (3. * (diff.x() + diff.y())));
+            }
         }
         else if(event->buttons() == Qt::LeftButton)
         {
-            if(mControlWidget->getCalibGridDimension() == 0)
+            auto gridParams = mGridBox->getGridParameters();
+            if(std::holds_alternative<Grid3D>(gridParams))
             {
-                const auto &swap = mCoordSys->getSwap3D();
+                auto        params = std::get<Grid3D>(gridParams);
+                const auto &swap   = mCoordSys->getSwap3D();
 
-                cv::Point3f p3d = mExtrCalib->get3DPoint(
-                    cv::Point2f(event->scenePos().x(), event->scenePos().y()), mControlWidget->getCalibGrid3DTransZ());
-                cv::Point3f p3d_last =
-                    mExtrCalib->get3DPoint(cv::Point2f(mMouseX, mMouseY), mControlWidget->getCalibGrid3DTransZ());
-                mControlWidget->setCalibGrid3DTransX(mGridTransX + (swap.x ? -1 : 1) * round(p3d.x - p3d_last.x));
-                mControlWidget->setCalibGrid3DTransY(mGridTransY + (swap.y ? -1 : 1) * round(p3d.y - p3d_last.y));
+                cv::Point3f p3d =
+                    mExtrCalib->get3DPoint(cv::Point2f(event->scenePos().x(), event->scenePos().y()), params.trans.z());
+                cv::Point3f p3d_last = mExtrCalib->get3DPoint(cv::Point2f(mMouseX, mMouseY), params.trans.z());
+                mGridBox->setTrans3DX(mGridTransX + (swap.x ? -1 : 1) * round(p3d.x - p3d_last.x));
+                mGridBox->setTrans3DY(mGridTransY + (swap.y ? -1 : 1) * round(p3d.y - p3d_last.y));
             }
             else
             {
                 SPDLOG_INFO("Grid Move 2D: {}, {}", diff.x(), diff.y());
-                mControlWidget->setCalibGridTransX(mControlWidget->getCalibGridTransX() + (int) (10. * diff.x()));
-                mControlWidget->setCalibGridTransY(mControlWidget->getCalibGridTransY() + (int) (10. * diff.y()));
+                auto params = std::get<Grid2D>(gridParams);
+                mGridBox->setTrans2DX(params.trans.x() + (int) (10. * diff.x()));
+                mGridBox->setTrans2DY(params.trans.y() + (int) (10. * diff.y()));
             }
         }
         else if(event->buttons() == Qt::MiddleButton)
         {
-            if(mControlWidget->getCalibGridDimension() == 0)
+            auto gridParams = mGridBox->getGridParameters();
+            if(std::holds_alternative<Grid3D>(gridParams))
             {
-                mControlWidget->setCalibGrid3DResolution(
-                    mControlWidget->getCalibGrid3DResolution() + (int) (10. * (diff.x() - diff.y())));
+                auto params = std::get<Grid3D>(gridParams);
+                mGridBox->setResolution(params.resolution + (int) (10. * (diff.x() - diff.y())));
             }
             else
             {
-                mControlWidget->setCalibGridScale(
-                    mControlWidget->getCalibGridScale() + (int) (10. * (diff.x() - diff.y())));
+                auto params = std::get<Grid2D>(gridParams);
+                mGridBox->setScale(params.scale + (int) (10. * (diff.x() - diff.y())));
             }
         }
     }
@@ -114,15 +130,21 @@ void GridItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void GridItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(!mControlWidget->getCalibGridFix() && mControlWidget->getCalibGridShow())
+    if(!mGridBox->isFix() && mGridBox->isShow())
     {
         if(event->button() == Qt::LeftButton)
         {
             mMouseX = event->scenePos().x();
             mMouseY = event->scenePos().y();
 
-            mGridTransX = mControlWidget->getCalibGrid3DTransX();
-            mGridTransY = mControlWidget->getCalibGrid3DTransY();
+            auto gridParams = mGridBox->getGridParameters();
+            if(std::holds_alternative<Grid3D>(gridParams))
+            {
+                auto params = std::get<Grid3D>(gridParams);
+                // used in 3D mouse move event
+                mGridTransX = params.trans.x();
+                mGridTransY = params.trans.y();
+            }
         }
     }
     else
@@ -138,18 +160,17 @@ void GridItem::drawLine(QPainter *painter, const std::array<cv::Point2f, 2> &p)
     painter->drawLine(line);
 }
 
-void GridItem::draw2DGrid(QPainter *painter, int imageHeight, int imageWidth, int borderSize)
+void GridItem::draw2DGrid(QPainter *painter, const Grid2D &params, int imageHeight, int imageWidth, int borderSize)
 {
     {
-        double scale = mControlWidget->getCalibGridScale() / 10.;
-        double tX    = mControlWidget->getCalibGridTransX() / 10.;
-        double tY    = mControlWidget->getCalibGridTransY() / 10.;
-        double angle = mControlWidget->getCalibGridRotate() / 10.;
+        double scale = params.scale / 10.;
+        Vec2F  trans = params.trans / 10;
+        double angle = params.angle / 10.;
 
         painter->save(); // save current state (like matrix) on stack
 
         QTransform matrixPaint;
-        matrixPaint.translate(tX, tY);
+        matrixPaint.translate(trans.x(), trans.y());
         matrixPaint.rotate(angle);
         painter->setWorldTransform(matrixPaint,
                                    true); // true means relative not absolute transform
@@ -184,14 +205,15 @@ void GridItem::draw2DGrid(QPainter *painter, int imageHeight, int imageWidth, in
 }
 
 void GridItem::draw3DGrid(
-    QPainter   *painter,
-    int         imageHeight,
-    int         imageWidth,
-    int         borderSize,
-    bool        vanishPointYIsInsideImage,
-    bool        vanishPointXIsInsideImage,
-    cv::Point2f vanishPointY,
-    cv::Point2f vanishPointX)
+    QPainter     *painter,
+    const Grid3D &params,
+    int           imageHeight,
+    int           imageWidth,
+    int           borderSize,
+    bool          vanishPointYIsInsideImage,
+    bool          vanishPointXIsInsideImage,
+    cv::Point2f   vanishPointY,
+    cv::Point2f   vanishPointX)
 {
     {
         double minX = INT_MAX, minY = INT_MAX, maxX = INT_MIN, maxY = INT_MIN;
@@ -206,21 +228,18 @@ void GridItem::draw3DGrid(
             yOffset = vanishPointY.y + 100;
         }
 
-        int   gridTransX = mControlWidget->getCalibGrid3DTransX();
-        int   gridTransY = mControlWidget->getCalibGrid3DTransY();
-        int   gridTransZ = mControlWidget->getCalibGrid3DTransZ();
-        Vec3F gridTrans(gridTransX, gridTransY, gridTransZ);
-        int   resolution = mControlWidget->getCalibGrid3DResolution();
+        Vec3F gridTrans  = params.trans;
+        int   resolution = params.resolution;
 
         cv::Point3f corners[4];
         // top left corner
-        corners[0] = mExtrCalib->get3DPoint(cv::Point2f(0 - borderSize, yOffset), gridTransZ);
+        corners[0] = mExtrCalib->get3DPoint(cv::Point2f(0 - borderSize, yOffset), gridTrans.z());
         // top right corner
-        corners[1] = mExtrCalib->get3DPoint(cv::Point2f(imageWidth, yOffset), gridTransZ);
+        corners[1] = mExtrCalib->get3DPoint(cv::Point2f(imageWidth, yOffset), gridTrans.z());
         // bottom left corner
-        corners[2] = mExtrCalib->get3DPoint(cv::Point2f(0 - borderSize, imageHeight), gridTransZ);
+        corners[2] = mExtrCalib->get3DPoint(cv::Point2f(0 - borderSize, imageHeight), gridTrans.z());
         // bottom right corner
-        corners[3] = mExtrCalib->get3DPoint(cv::Point2f(imageWidth, imageHeight), gridTransZ);
+        corners[3] = mExtrCalib->get3DPoint(cv::Point2f(imageWidth, imageHeight), gridTrans.z());
 
         QPolygon poly;
         poly << QPoint(-borderSize, yOffset) << QPoint(imageWidth - borderSize, yOffset)
@@ -246,8 +265,8 @@ void GridItem::draw3DGrid(
         const auto  trans      = gridTrans - coordTrans;
         int         swapX      = swap.x ? -1 : 1;
         int         swapY      = swap.y ? -1 : 1;
-        int         gridHeight = gridTransZ - coordTrans.z(); // Since ExtCalibration always uses origin
-                                                              // but grid should be independent of that
+        int         gridHeight = gridTrans.z() - coordTrans.z(); // Since ExtCalibration always uses origin
+                                                                 // but grid should be independent of that
 
         std::array<cv::Point2f, 2> linePoints;
         // horizontal lines from the left to the right on height tZ3D the lines start from origin point
@@ -293,7 +312,7 @@ void GridItem::draw3DGrid(
 
 void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
-    if(!mControlWidget->getCalibGridFix() && mControlWidget->getCalibGridShow())
+    if(!mGridBox->isFix() && mGridBox->isShow())
     {
         // such that mouseEvent leftmousebutton is forwarded; drag is done ourself
         setFlag(ItemIsMovable);
@@ -369,7 +388,7 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         }
     }
 
-    if(!mControlWidget->getCalibGridShow())
+    if(!mGridBox->isShow())
     {
         return;
     }
@@ -389,13 +408,22 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         iH = (int) mMainWindow->getScene()->height();
     }
 
-    if(mControlWidget->getCalibGridDimension() == 1)
-    {
-        draw2DGrid(painter, iH, iW, bS);
-    }
-    else
-    {
-        draw3DGrid(
-            painter, iH, iW, bS, vanishPointYIsInsideImage, vanishPointXIsInsideImage, vanishPointY, vanishPointX);
-    }
+    auto gridParams = mGridBox->getGridParameters();
+    std::visit(
+        overload{
+            [&](const Grid2D &gridParams) { draw2DGrid(painter, gridParams, iH, iW, bS); },
+            [&](const Grid3D &gridParams)
+            {
+                draw3DGrid(
+                    painter,
+                    gridParams,
+                    iH,
+                    iW,
+                    bS,
+                    vanishPointYIsInsideImage,
+                    vanishPointXIsInsideImage,
+                    vanishPointY,
+                    vanishPointX);
+            }},
+        gridParams);
 }
