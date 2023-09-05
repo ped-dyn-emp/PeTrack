@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            petrack.saveSequence(
+            petrack.exportSequence(
                 true, false, autoSaveDest); // true spielt keine rolle, sondern wird durch dateiendung bestimmt
         }
         return EXIT_SUCCESS; // 0 means exit success// Programm beenden nach speichern! // 1?
@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
     if(autoExportView)
     {
         QFile outputFile{exportViewFile};
-        petrack.saveSequence(true, true, outputFile.fileName());
+        petrack.exportSequence(true, true, outputFile.fileName());
         return EXIT_SUCCESS;
     }
 
