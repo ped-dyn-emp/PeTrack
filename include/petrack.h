@@ -116,10 +116,10 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private slots:
-    void saveVideo();
-    void saveVideoView();
-    void saveImageSequence();
-    void saveViewSequence();
+    void exportVideo();
+    void exportVideoView();
+    void exportImageSequence();
+    void exportViewSequence();
     void print();
     void resetSettings();
     void setGlobalFont();
@@ -148,9 +148,9 @@ public slots:
     void openCameraLiveStream(int camID = -1);
     void openMoCapFile();
     void editMoCapSettings();
-    void saveSequence(bool saveVideo, bool saveView = false, QString dest = "");
-    void saveView(QString dest = "");
-    void saveImage(QString dest = "");
+    void exportSequence(bool saveVideo, bool saveView = false, QString dest = "");
+    void exportView(QString dest = "");
+    void exportImage(QString dest = "");
     void setStatusPosReal();
     void addManualTrackPointOnlyVisible(const QPointF &pos);
     void splitTrackPerson(QPointF pos);
@@ -383,15 +383,15 @@ private:
     QAction      *mOpenCameraAct;
     QAction      *mOpenMoCapAct;
     QAction      *mEditMoCapAct;
-    QAction      *mSaveSeqVidAct;
-    QAction      *mSaveSeqVidViewAct;
-    QAction      *mSaveSeqImgAct;
-    QAction      *mSaveSeqViewAct;
+    QAction      *mExportSeqVidAct;
+    QAction      *mExportSeqVidViewAct;
+    QAction      *mExportSeqImgAct;
+    QAction      *mExportSeqViewAct;
     QAction      *mOpenPrAct;
     QAction      *mSaveAct;
     QAction      *mSavePrAct;
-    QAction      *mSaveImageAct;
-    QAction      *mSaveViewAct;
+    QAction      *mExportImageAct;
+    QAction      *mExportViewAct;
     QAction      *mPrintAct;
     QAction      *mResetSettingsAct;
     QAction      *mExitAct;

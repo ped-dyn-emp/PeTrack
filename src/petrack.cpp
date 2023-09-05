@@ -1145,35 +1145,35 @@ void Petrack::updateWindowTitle()
     setWindowTitle(title);
 }
 
-void Petrack::saveVideo()
+void Petrack::exportVideo()
 {
-    saveSequence(true, false);
+    exportSequence(true, false);
 }
-void Petrack::saveVideoView()
+void Petrack::exportVideoView()
 {
-    saveSequence(true, true);
+    exportSequence(true, true);
 }
-void Petrack::saveImageSequence()
+void Petrack::exportImageSequence()
 {
-    saveSequence(false, false);
+    exportSequence(false, false);
 }
-void Petrack::saveViewSequence()
+void Petrack::exportViewSequence()
 {
-    saveSequence(false, true);
+    exportSequence(false, true);
 }
 
 
 /**
- * @brief Saves current sequence as avi-file or image sequence
+ * @brief Exports current sequence as avi-file or image sequence
  *
- * Saves the loaded image sequence or video from current frame on till the end.
- * One can save the sequence as is or one can save the view shown in PeTrack.
+ * Exports the loaded image sequence or video from current frame on till the end.
+ * One can export the sequence as is or one can export the view shown in PeTrack.
  *
- * @param saveVideo true, if wanting to save a video. Ignored when dest isn't empty
- * @param saveView true, if sequence should be saved as shown in PeTrack (with trajectories etc.)
+ * @param exportVideo true, if wanting to export a video. Ignored when dest isn't empty
+ * @param exportView true, if sequence should be exported as shown in PeTrack (with trajectories etc.)
  * @param dest destination file; if empty, the user chooses via a dialog
  */
-void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // default saveView= false, dest=""
+void Petrack::exportSequence(bool exportVideo, bool exportView, QString dest) // default exportView= false, dest=""
 {
     static QString lastDir;
 
@@ -1185,7 +1185,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
             lastDir = QFileInfo(mSeqFileName).path();
         }
 
-        if(saveVideo)
+        if(exportVideo)
         {
             dest = QFileDialog::getSaveFileName(
                 this,
@@ -1195,21 +1195,15 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
         }
         else
         {
-            if(saveView)
+            if(exportView)
             {
                 dest = QFileDialog::getExistingDirectory(
-                    this,
-                    tr("Select directory to save view sequence"),
-                    lastDir,
-                    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+                    this, tr("Select folder"), lastDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
             }
             else
             {
                 dest = QFileDialog::getExistingDirectory(
-                    this,
-                    tr("Select directory to save image sequence"),
-                    lastDir,
-                    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+                    this, tr("Select folder"), lastDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
             }
         }
     }
@@ -1218,17 +1212,17 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
     int fourcc = -1;
     if(extension == ".mp4")
     {
-        fourcc    = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
-        saveVideo = true;
+        fourcc      = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
+        exportVideo = true;
     }
     else if(extension == ".avi")
     {
-        fourcc    = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
-        saveVideo = true;
+        fourcc      = cv::VideoWriter::fourcc('M', 'J', 'P', 'G');
+        exportVideo = true;
     }
     else
     {
-        saveVideo = false;
+        exportVideo = false;
     }
 
 
@@ -1248,9 +1242,9 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
         bool            writeFrameRet = false;
         cv::VideoWriter outputVideo;
 
-        if(saveVideo)
+        if(exportVideo)
         {
-            if(saveView)
+            if(exportView)
             {
                 if(mCropZoomViewAct->isChecked())
                 {
@@ -1264,7 +1258,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 painter = new QPainter();
             }
 
-            if(saveView)
+            if(exportView)
             {
                 outputVideo = cv::VideoWriter(
                     dest.toStdString(),
@@ -1280,9 +1274,9 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
             }
         }
 
-        if(!saveVideo)
+        if(!exportVideo)
         {
-            if(saveView)
+            if(exportView)
             {
                 if(mCropZoomViewAct->isChecked())
                 {
@@ -1312,7 +1306,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 fileName = dest + "/" + mAnimation->getCurrentFileName();
             }
 
-            if(saveView)
+            if(exportView)
             {
                 painter->begin(viewImage);
                 if(mCropZoomViewAct->isChecked())
@@ -1347,29 +1341,29 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
             iplImgFilteredBGR.create(size, CV_8UC3);
         }
 
-        QProgressDialog progress("", "Abort save", 0, progEnd, this);
+        QProgressDialog progress("", "Abort export", 0, progEnd, this);
         progress.setWindowModality(Qt::WindowModal); // blocks main window
 
-        if(saveVideo)
+        if(exportVideo)
         {
-            if(saveView)
+            if(exportView)
             {
-                progress.setLabelText("Save video view...");
+                progress.setLabelText("Export video view...");
             }
             else
             {
-                progress.setLabelText("Save video...");
+                progress.setLabelText("Export video...");
             }
         }
         else
         {
-            if(saveView)
+            if(exportView)
             {
-                progress.setLabelText("Save view sequence...");
+                progress.setLabelText("Export view sequence...");
             }
             else
             {
-                progress.setLabelText("Save image sequence...");
+                progress.setLabelText("Export image sequence...");
             }
         }
 
@@ -1383,10 +1377,10 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 break;
             }
 
-            if(saveVideo)
+            if(exportVideo)
             {
                 // video sequence
-                if(saveView)
+                if(exportView)
                 {
                     painter->begin(viewImage);
                     if(mCropZoomViewAct->isChecked())
@@ -1400,7 +1394,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                     painter->end();
                 }
 
-                if(saveView)
+                if(exportView)
                 {
                     cv::Mat frame(
                         viewImage->height(),
@@ -1425,14 +1419,14 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                     PCritical(
                         this,
                         tr("PeTrack"),
-                        tr("Cannot save %1 maybe because of wrong file extension or unsupported codec.").arg(dest));
+                        tr("Cannot export %1 maybe because of wrong file extension or unsupported codec.").arg(dest));
                     break;
                 }
             }
             else
             {
                 // single frame sequence
-                if(saveView)
+                if(exportView)
                 {
                     painter->begin(viewImage);
                     if(mCropZoomViewAct->isChecked())
@@ -1449,7 +1443,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 {
                     fileName = (dest + "/" + mAnimation->getFileBase() + "%1.png")
                                    .arg(mPlayerWidget->getPos(), numLength, 10, QChar('0'));
-                    if(saveView)
+                    if(exportView)
                     {
                         saveRet = viewImage->save(fileName);
                     }
@@ -1461,7 +1455,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 else if(formatIsSaveAble)
                 {
                     fileName = dest + "/" + mAnimation->getCurrentFileName();
-                    if(saveView)
+                    if(exportView)
                     {
                         saveRet = viewImage->save(fileName);
                     }
@@ -1473,7 +1467,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 else
                 {
                     fileName = dest + "/" + QFileInfo(mAnimation->getCurrentFileName()).completeBaseName() + ".png";
-                    if(saveView)
+                    if(exportView)
                     {
                         saveRet = viewImage->save(fileName);
                     }
@@ -1485,13 +1479,13 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
                 if(!saveRet)
                 {
                     progress.setValue(progEnd);
-                    PCritical(this, tr("PeTrack"), tr("Cannot save %1.").arg(fileName));
+                    PCritical(this, tr("PeTrack"), tr("Cannot export %1.").arg(fileName));
                     break;
                 }
             }
         } while(mPlayerWidget->frameForward());
 
-        if(!saveVideo && saveView)
+        if(!exportVideo && exportView)
         {
             delete viewImage;
             delete painter;
@@ -1502,7 +1496,7 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
         SPDLOG_INFO("wrote {} of {} frames.", mPlayerWidget->getPos() + 1 - memPos, mAnimation->getNumFrames());
         progress.setValue(progEnd);
 
-        if(saveVideo)
+        if(exportVideo)
         {
             outputVideo.release();
         }
@@ -1513,11 +1507,11 @@ void Petrack::saveSequence(bool saveVideo, bool saveView, QString dest) // defau
 }
 
 /**
- * @brief Saves the current View, including visualizations, in a file (.g. pdf)
+ * @brief Saves the current View, including visualizations, in a file (e.g. pdf)
  *
  * @param dest name of the saved file; if empty, a dialogue for the user opens
  */
-void Petrack::saveView(QString dest) // default = ""
+void Petrack::exportView(QString dest) // default = ""
 {
     static QString lastFile;
 
@@ -1598,7 +1592,7 @@ void Petrack::saveView(QString dest) // default = ""
     }
 }
 
-void Petrack::saveImage(QString dest) // default = ""
+void Petrack::exportImage(QString dest) // default = ""
 {
     static QString lastFile;
 
@@ -1887,23 +1881,23 @@ void Petrack::createActions()
     mEditMoCapAct = new QAction(tr("Edit MoCap Settings"), this);
     connect(mEditMoCapAct, &QAction::triggered, this, &Petrack::editMoCapSettings);
 
-    mSaveSeqVidAct = new QAction(tr("Save Video"), this);
-    mSaveSeqVidAct->setEnabled(false);
-    connect(mSaveSeqVidAct, SIGNAL(triggered()), this, SLOT(saveVideo()));
+    mExportSeqVidAct = new QAction(tr("Export Video"), this);
+    mExportSeqVidAct->setEnabled(false);
+    connect(mExportSeqVidAct, SIGNAL(triggered()), this, SLOT(exportVideo()));
 
-    mSaveSeqVidViewAct = new QAction(tr("Save Video View"), this);
-    mSaveSeqVidViewAct->setEnabled(false);
-    connect(mSaveSeqVidViewAct, SIGNAL(triggered()), this, SLOT(saveVideoView()));
+    mExportSeqVidViewAct = new QAction(tr("Export Video View"), this);
+    mExportSeqVidViewAct->setEnabled(false);
+    connect(mExportSeqVidViewAct, SIGNAL(triggered()), this, SLOT(exportVideoView()));
 
-    mSaveSeqImgAct = new QAction(tr("Save Image S&equence"), this);
-    mSaveSeqImgAct->setShortcut(tr("Ctrl+F"));
-    mSaveSeqImgAct->setEnabled(false);
-    connect(mSaveSeqImgAct, SIGNAL(triggered()), this, SLOT(saveImageSequence()));
+    mExportSeqImgAct = new QAction(tr("Export Image Sequence"), this);
+    mExportSeqImgAct->setShortcut(tr("Ctrl+F"));
+    mExportSeqImgAct->setEnabled(false);
+    connect(mExportSeqImgAct, SIGNAL(triggered()), this, SLOT(exportImageSequence()));
 
-    mSaveSeqViewAct = new QAction(tr("Save View S&equence"), this);
+    mExportSeqViewAct = new QAction(tr("Export View Sequence"), this);
     //    mSaveSeqViewAct->setShortcut(tr("Ctrl+F"));
-    mSaveSeqViewAct->setEnabled(false);
-    connect(mSaveSeqViewAct, SIGNAL(triggered()), this, SLOT(saveViewSequence()));
+    mExportSeqViewAct->setEnabled(false);
+    connect(mExportSeqViewAct, SIGNAL(triggered()), this, SLOT(exportViewSequence()));
 
     mOpenPrAct = new QAction(tr("&Open Project"), this);
     mOpenPrAct->setShortcut(tr("Ctrl+O"));
@@ -1917,15 +1911,15 @@ void Petrack::createActions()
     mSaveAct->setShortcut(tr("Ctrl+S"));
     connect(mSaveAct, SIGNAL(triggered()), this, SLOT(saveSameProject()));
 
-    mSaveImageAct = new QAction(tr("&Save Image"), this);
-    mSaveImageAct->setShortcut(tr("Ctrl+I"));
-    mSaveImageAct->setEnabled(false);
-    connect(mSaveImageAct, SIGNAL(triggered()), this, SLOT(saveImage()));
+    mExportImageAct = new QAction(tr("Export Image"), this);
+    mExportImageAct->setShortcut(tr("Ctrl+I"));
+    mExportImageAct->setEnabled(false);
+    connect(mExportImageAct, SIGNAL(triggered()), this, SLOT(exportImage()));
 
-    mSaveViewAct = new QAction(tr("&Save View"), this);
-    mSaveViewAct->setShortcut(tr("Ctrl+V"));
-    mSaveViewAct->setEnabled(false);
-    connect(mSaveViewAct, SIGNAL(triggered()), this, SLOT(saveView()));
+    mExportViewAct = new QAction(tr("Export View"), this);
+    mExportViewAct->setShortcut(tr("Ctrl+V"));
+    mExportViewAct->setEnabled(false);
+    connect(mExportViewAct, SIGNAL(triggered()), this, SLOT(exportView()));
 
     mPrintAct = new QAction(tr("&Print"), this);
     mPrintAct->setShortcut(tr("Ctrl+P"));
@@ -1940,7 +1934,7 @@ void Petrack::createActions()
     mAutosaveSettings = new QAction(tr("Autosave Settings"), this);
     connect(mAutosaveSettings, &QAction::triggered, this, &Petrack::openAutosaveSettings);
 
-    mExitAct = new QAction(tr("E&xit"), this);
+    mExitAct = new QAction(tr("Exit"), this);
     mExitAct->setShortcut(tr("Ctrl+Q"));
     connect(mExitAct, SIGNAL(triggered()), this, SLOT(close()));
 
@@ -2081,12 +2075,12 @@ void Petrack::createMenus()
     mFileMenu->addAction(mOpenCameraAct);
     mFileMenu->addAction(mOpenMoCapAct);
     mFileMenu->addAction(mEditMoCapAct);
-    mFileMenu->addAction(mSaveSeqVidAct);
-    mFileMenu->addAction(mSaveSeqVidViewAct);
-    mFileMenu->addAction(mSaveImageAct);
-    mFileMenu->addAction(mSaveSeqImgAct);
-    mFileMenu->addAction(mSaveViewAct);
-    mFileMenu->addAction(mSaveSeqViewAct);
+    mFileMenu->addAction(mExportSeqVidAct);
+    mFileMenu->addAction(mExportSeqVidViewAct);
+    mFileMenu->addAction(mExportImageAct);
+    mFileMenu->addAction(mExportSeqImgAct);
+    mFileMenu->addAction(mExportViewAct);
+    mFileMenu->addAction(mExportSeqViewAct);
     mFileMenu->addAction(mPrintAct);
     mFileMenu->addSeparator();
     mFileMenu->addAction(mResetSettingsAct);
@@ -3690,12 +3684,12 @@ void Petrack::updateSequence()
     mPlayerWidget->skipToFrame(0);
     mImageItem->setImage(mImage); // wird in updateImage gemacht
     delete oldImage;
-    mSaveSeqVidAct->setEnabled(true);
-    mSaveSeqVidViewAct->setEnabled(true);
-    mSaveSeqImgAct->setEnabled(true);
-    mSaveSeqViewAct->setEnabled(true);
-    mSaveImageAct->setEnabled(true);
-    mSaveViewAct->setEnabled(true);
+    mExportSeqVidAct->setEnabled(true);
+    mExportSeqVidViewAct->setEnabled(true);
+    mExportSeqImgAct->setEnabled(true);
+    mExportSeqViewAct->setEnabled(true);
+    mExportImageAct->setEnabled(true);
+    mExportViewAct->setEnabled(true);
     mPrintAct->setEnabled(true);
     mResetSettingsAct->setEnabled(true);
 }
