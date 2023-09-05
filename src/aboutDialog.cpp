@@ -34,14 +34,19 @@ AboutDialog::AboutDialog(
 {
     mUi->setupUi(this);
 
-    // perform additional setup here ...
-    mUi->lblVersionValue->setText(version);
-    mUi->lblCommitHashValue->setText(commitHash);
-    mUi->lblCommitDateValue->setText(commitDate);
-    mUi->lblCommitBranchValue->setText(commitBranch);
-    mUi->lblCompilerValue->setText(compiler);
-    mUi->lblCompilerVersionValue->setText(compilerVersion);
-    mUi->lblCompileDateValue->setText(compileDate);
+    /* clang-format off */
+    mUi->versionInfo->setText(
+        "<table> <tr> <td>Version</td> <td>" + version + "</td> </tr> " +
+                "<tr> </tr> "+
+                "<tr> <td>Commit Hash: </td> " + "<td>" + commitHash + "</td> </tr> " +
+                "<tr> <td>Commit Date: </td> <td>" + commitDate + "</td> </tr> " +
+                "<tr> <td>Commit Branch: </td> <td>" + commitBranch + "</td> </tr> " +
+                "<tr> </tr> " +
+                "<tr> <td>Compiler: </td> <td>" + compiler + "</td> </tr> " +
+                "<tr> <td>Compiler Version: </td> <td>" + compilerVersion + "</td> </tr> " +
+                "<tr> <td>Compile Date: </td> <td>" + compileDate + "</td> </tr> " +
+        "</table>");
+    /* clang-format on */
 
     for(std::size_t i = 0; i < authors.size(); ++i)
     {
