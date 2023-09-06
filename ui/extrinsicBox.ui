@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>extr</class>
- <widget class="QGroupBox" name="extr">
+ <widget class="QWidget" name="extr">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -30,9 +30,6 @@
   </property>
   <property name="focusPolicy">
    <enum>Qt::TabFocus</enum>
-  </property>
-  <property name="title">
-   <string>extrinsic parameters</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_7">
    <property name="leftMargin">

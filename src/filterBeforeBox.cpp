@@ -23,6 +23,7 @@
 #include "borderFilter.h"
 #include "brightContrastFilter.h"
 #include "helper.h"
+#include "pGroupBox.h"
 #include "pMessageBox.h"
 #include "swapFilter.h"
 #include "ui_filterBeforeBox.h"
@@ -37,7 +38,7 @@ FilterBeforeBox::FilterBeforeBox(
     BorderFilter         &borderFilter,
     SwapFilter           &swapFilter,
     std::function<void()> updateImageCallback) :
-    QGroupBox(parent),
+    QWidget(parent),
     mUi(new Ui::FilterBeforeBox),
     mUpdateImageCallback(std::move(updateImageCallback)),
     mBgFilter(bgFilter),
@@ -80,7 +81,18 @@ void FilterBeforeBox::setFilterSettings(const FilterSettings &settings)
 /// return false if element was not handled (completely)
 bool FilterBeforeBox::getXmlSub(QDomElement &subSubElem)
 {
-    if(subSubElem.tagName() == "BRIGHTNESS")
+    if(subSubElem.tagName() == "FILTER_BEFORE")
+    {
+        if(this->parent())
+        {
+            auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
+            if(parent)
+            {
+                parent->setImmutable(subSubElem.attribute("IMMUTABLE").toInt());
+            }
+        }
+    }
+    else if(subSubElem.tagName() == "BRIGHTNESS")
     {
         if(subSubElem.hasAttribute("ENABLED"))
         {
@@ -168,6 +180,17 @@ void FilterBeforeBox::setXml(QDomElement &subElem, QColor bgColor, const QString
 {
     QDomElement subSubElem;
 
+    if(this->parent())
+    {
+        auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
+        if(parent)
+        {
+            subSubElem = (subElem.ownerDocument()).createElement("FILTER_BEFORE");
+            subSubElem.setAttribute("IMMUTABLE", parent->isImmutable());
+            subElem.appendChild(subSubElem);
+        }
+    }
+
     subSubElem = (subElem.ownerDocument()).createElement("BRIGHTNESS");
     subSubElem.setAttribute("ENABLED", mUi->filterBrightContrast->isChecked());
     subSubElem.setAttribute("VALUE", mUi->filterBrightParam->value());
@@ -195,7 +218,6 @@ void FilterBeforeBox::setXml(QDomElement &subElem, QColor bgColor, const QString
     subSubElem.setAttribute("ENABLED", isFilterBgChecked());
     subSubElem.setAttribute("UPDATE", mUi->filterBgUpdate->isChecked());
     subSubElem.setAttribute("SHOW", mUi->filterBgShow->isChecked());
-
     subSubElem.setAttribute("FILE", bgFilename);
     subSubElem.setAttribute("DELETE", mUi->filterBgDeleteTrj->isChecked());
     subSubElem.setAttribute("DELETE_NUMBER", mUi->filterBgDeleteNumber->value());

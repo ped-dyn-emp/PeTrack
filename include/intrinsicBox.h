@@ -22,7 +22,7 @@
 
 #include "intrinsicCameraParams.h"
 
-#include <QGroupBox>
+#include <QWidget>
 #include <opencv2/core.hpp>
 
 namespace Ui
@@ -33,7 +33,7 @@ class CalibFilter;
 class AutoCalib;
 class QDomElement;
 
-class IntrinsicBox : public QGroupBox
+class IntrinsicBox : public QWidget
 {
     Q_OBJECT
 

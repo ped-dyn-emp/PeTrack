@@ -20,7 +20,7 @@
 # Project setup
 ################################################################################
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
-project(petrack LANGUAGES CXX VERSION 0.10.0)
+project(petrack LANGUAGES CXX VERSION 0.10.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -405,6 +405,8 @@ target_sources(petrack_core PRIVATE
     include/plausibility.h
     include/coordinateStructs.h
     include/correction.h
+    include/pGroupBox.h
+    include/pGroupBoxFrame.h
     include/alignmentGridBox.h
 )
 
@@ -478,11 +480,15 @@ target_sources(petrack_core PRIVATE
     src/coordinateSystemBox.cpp
     src/editMoCapDialog.cpp
     src/moCapEditingWidget.cpp
+    src/pGroupBoxFrame.cpp
+    ui/pGroupBoxFrame.ui
     ui/coordinateSystemBox.ui
     ui/moCapEditingWidget.ui
     ui/editMoCapDialog.ui
     src/plausibility.cpp
     src/correction.cpp
+    src/pGroupBox.cpp
+    ui/pGroupBox.ui
     src/alignmentGridBox.cpp
     ui/alignmentGridBox.ui
     ui/about.ui

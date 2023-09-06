@@ -19,7 +19,7 @@
 #ifndef FILTERBEFOREBOX_H
 #define FILTERBEFOREBOX_H
 
-#include <QGroupBox>
+#include <QWidget>
 
 namespace Ui
 {
@@ -42,7 +42,7 @@ struct FilterSettings
     bool useSwapV          = false;
 };
 
-class FilterBeforeBox : public QGroupBox
+class FilterBeforeBox : public QWidget
 {
     Q_OBJECT
 

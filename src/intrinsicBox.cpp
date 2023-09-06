@@ -21,6 +21,7 @@
 #include "autoCalib.h"
 #include "calibFilter.h"
 #include "helper.h"
+#include "pGroupBox.h"
 #include "pMessageBox.h"
 #include "ui_intrinsicBox.h"
 
@@ -42,7 +43,7 @@ IntrinsicBox::IntrinsicBox(
     AutoCalib            &autoCalib,
     CalibFilter          &calibFilter,
     std::function<void()> updateImageCallback) :
-    QGroupBox(parent),
+    QWidget(parent),
     mUi(ui),
     mAutoCalib(autoCalib),
     mCalibFilter(calibFilter),
@@ -339,6 +340,18 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
         }
 
         setIntrinsicCameraParams(params);
+
+        if(subSubElem.hasAttribute("IMMUTABLE"))
+        {
+            if(this->parent())
+            {
+                auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
+                if(parent)
+                {
+                    parent->setImmutable(subSubElem.attribute("IMMUTABLE").toInt());
+                }
+            }
+        }
     }
     else
     {
@@ -393,6 +406,15 @@ void IntrinsicBox::setXml(QDomElement &subElem) const
         }
     }
     subSubElem.setAttribute("CALIB_FILES", fl.join(", "));
+
+    if(this->parent())
+    {
+        auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
+        if(parent)
+        {
+            subSubElem.setAttribute("IMMUTABLE", parent->isImmutable());
+        }
+    }
     subElem.appendChild(subSubElem);
 }
 
