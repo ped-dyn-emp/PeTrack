@@ -23,9 +23,9 @@
 #include "vector.h"
 #include "worldImageCorrespondence.h"
 
-#include <QGroupBox>
 #include <QRectF>
 #include <QTransform>
+#include <QWidget>
 #include <opencv2/core/base.hpp>
 
 namespace Ui
@@ -50,7 +50,7 @@ struct CoordItemState
     cv::Point3f z3D;
 };
 
-class CoordinateSystemBox : public QGroupBox, public WorldImageCorrespondence
+class CoordinateSystemBox : public QWidget, public WorldImageCorrespondence
 {
     Q_OBJECT
 

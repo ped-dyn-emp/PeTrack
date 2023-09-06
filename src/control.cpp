@@ -34,6 +34,7 @@
 #include "intrinsicBox.h"
 #include "logger.h"
 #include "multiColorMarkerWidget.h"
+#include "pGroupBox.h"
 #include "pMessageBox.h"
 #include "petrack.h"
 #include "player.h"
@@ -117,7 +118,8 @@ Control::Control(
         &missingFrames, &MissingFrames::executeChanged, mUi->missingFramesCalculated, &QCheckBox::setChecked);
 
     // layout reparents widget
-    ui->verticalLayout_13->insertWidget(0, mFilterBefore);
+    auto *filterBeforePBox = new PGroupBox(this, "filter before", mFilterBefore);
+    ui->verticalLayout_13->insertWidget(0, filterBeforePBox);
     mFilterBefore->setObjectName("filterBeforeBox");
 
     FilterSettings filterSettings;
@@ -132,18 +134,22 @@ Control::Control(
 
     mIntr = intrinsicBox;
     mIntr->setObjectName(QString::fromUtf8("intr"));
-    ui->verticalLayout_13->insertWidget(1, mIntr);
+    auto *intrPBox = new PGroupBox(this, "intrinsic parameters", mIntr);
+    ui->verticalLayout_13->insertWidget(1, intrPBox);
 
     mExtr = extrinsicBox;
     mExtr->setObjectName(QString::fromUtf8("extr"));
-    ui->verticalLayout_13->insertWidget(2, mExtr);
+    auto *extrPBox = new PGroupBox(this, "extrinsic parameters", mExtr);
+    ui->verticalLayout_13->insertWidget(2, extrPBox);
 
     mCoordSys = coordSysBox;
     coordSysBox->setObjectName(QString::fromUtf8("coord"));
-    ui->verticalLayout_13->insertWidget(3, mCoordSys);
+    auto *coordSysPBox = new PGroupBox(this, "coordinate system", mCoordSys);
+    ui->verticalLayout_13->insertWidget(3, coordSysPBox);
 
-    mGrid = gridBox;
-    ui->verticalLayout_13->insertWidget(4, mGrid);
+    mGrid          = gridBox;
+    auto *gridPBox = new PGroupBox(this, "alignment grid", mGrid);
+    ui->verticalLayout_13->insertWidget(4, gridPBox);
 
 
     // integrate new widgets in tabbing order

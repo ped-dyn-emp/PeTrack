@@ -18,11 +18,12 @@
 
 #include "alignmentGridBox.h"
 
+#include "pGroupBox.h"
 #include "ui_alignmentGridBox.h"
 
 #include <QDomElement>
 
-AlignmentGridBox::AlignmentGridBox(QWidget *parent) : QGroupBox(parent), mUi(new Ui::AlignmentGridBox)
+AlignmentGridBox::AlignmentGridBox(QWidget *parent) : QWidget(parent), mUi(new Ui::AlignmentGridBox)
 {
     mUi->setupUi(this);
 
@@ -97,6 +98,15 @@ void AlignmentGridBox::setXml(QDomElement &subSubElem)
     subSubElem.setAttribute("GRID3D_TRANS_Y", mUi->grid3DTransY->value());
     subSubElem.setAttribute("GRID3D_TRANS_Z", mUi->grid3DTransZ->value());
     subSubElem.setAttribute("GRID3D_RESOLUTION", mUi->grid3DResolution->value());
+
+    if(this->parent())
+    {
+        auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
+        if(parent)
+        {
+            subSubElem.setAttribute("IMMUTABLE", parent->isImmutable());
+        }
+    }
 }
 
 bool AlignmentGridBox::getXml(QDomElement &subSubElem)
@@ -150,6 +160,17 @@ bool AlignmentGridBox::getXml(QDomElement &subSubElem)
         if(subSubElem.hasAttribute("GRID3D_RESOLUTION"))
         {
             setValue(mUi->grid3DResolution, subSubElem.attribute("GRID3D_RESOLUTION").toInt());
+        }
+        if(subSubElem.hasAttribute("IMMUTABLE"))
+        {
+            if(this->parent())
+            {
+                auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
+                if(parent)
+                {
+                    parent->setImmutable(subSubElem.attribute("IMMUTABLE").toInt());
+                }
+            }
         }
         return true;
     }

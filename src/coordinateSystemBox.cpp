@@ -23,6 +23,7 @@
 #include "extrinsicBox.h"
 #include "imageItem.h"
 #include "intrinsicBox.h"
+#include "pGroupBox.h"
 #include "ui_coordinateSystemBox.h"
 
 #include <opencv2/core/base.hpp>
@@ -59,7 +60,7 @@ CoordinateSystemBox::CoordinateSystemBox(
     ExtrinsicBox            &extrinsicBox,
     const ImageItem         &imageItem,
     const ExtrCalibration   &extrCalib) :
-    QGroupBox(parent),
+    QWidget(parent),
     mUi(ui),
     mUpdateStatusPos(std::move(updateStatusPos)),
     mUpdateHeadSize(std::move(updateHeadSize)),
@@ -473,6 +474,19 @@ bool CoordinateSystemBox::getXml(const QDomElement &subSubElem)
                 subSubElem.attribute("COORD3D_SWAP_Z").toInt() ? Qt::Checked : Qt::Unchecked);
         }
 
+        if(subSubElem.hasAttribute("IMMUTABLE_COORD_BOX"))
+        {
+            if(this->parent())
+            {
+                auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
+                if(parent)
+                {
+                    parent->setImmutable(subSubElem.attribute("IMMUTABLE_COORD_BOX").toInt());
+                }
+            }
+        }
+
+
         return true;
     }
     return false;
@@ -500,6 +514,15 @@ void CoordinateSystemBox::setXml(QDomElement &subSubElem) const
     subSubElem.setAttribute("COORD3D_SWAP_X", mUi->coord3DSwapX->isChecked());
     subSubElem.setAttribute("COORD3D_SWAP_Y", mUi->coord3DSwapY->isChecked());
     subSubElem.setAttribute("COORD3D_SWAP_Z", mUi->coord3DSwapZ->isChecked());
+
+    if(this->parent())
+    {
+        auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
+        if(parent)
+        {
+            subSubElem.setAttribute("IMMUTABLE_COORD_BOX", parent->isImmutable());
+        }
+    }
 }
 
 void CoordinateSystemBox::setCalibCoordTransXMax(int max)

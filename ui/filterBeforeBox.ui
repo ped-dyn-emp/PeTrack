@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>FilterBeforeBox</class>
- <widget class="QGroupBox" name="FilterBeforeBox">
+ <widget class="QWidget" name="FilterBeforeBox">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -33,18 +33,6 @@
   </property>
   <property name="windowTitle">
    <string>GroupBox</string>
-  </property>
-  <property name="title">
-   <string>filter before</string>
-  </property>
-  <property name="alignment">
-   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-  </property>
-  <property name="flat">
-   <bool>false</bool>
-  </property>
-  <property name="checkable">
-   <bool>false</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,1">
    <property name="leftMargin">

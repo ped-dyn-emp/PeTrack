@@ -21,7 +21,7 @@
 
 #include "vector.h"
 
-#include <QGroupBox>
+#include <QWidget>
 #include <variant>
 
 namespace Ui
@@ -45,7 +45,7 @@ struct Grid3D
 
 using Grid = std::variant<Grid2D, Grid3D>;
 
-class AlignmentGridBox : public QGroupBox
+class AlignmentGridBox : public QWidget
 {
     Q_OBJECT
 

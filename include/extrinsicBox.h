@@ -21,7 +21,7 @@
 
 #include "extrinsicParameters.h"
 
-#include <QGroupBox>
+#include <QWidget>
 
 namespace Ui
 {
@@ -31,7 +31,7 @@ class QDomElement;
 class ExtrCalibration;
 
 
-class ExtrinsicBox : public QGroupBox
+class ExtrinsicBox : public QWidget
 {
     Q_OBJECT
 

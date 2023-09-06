@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>CoordinateSystemBox</class>
- <widget class="QGroupBox" name="CoordinateSystemBox">
+ <widget class="QWidget" name="CoordinateSystemBox">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -30,9 +30,6 @@
   </property>
   <property name="focusPolicy">
    <enum>Qt::TabFocus</enum>
-  </property>
-  <property name="title">
-   <string>coordinate system</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_14">
    <property name="leftMargin">

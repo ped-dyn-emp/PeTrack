@@ -20,6 +20,7 @@
 
 #include "extrCalibration.h"
 #include "helper.h"
+#include "pGroupBox.h"
 #include "ui_extrinsicBox.h"
 
 #include <QDialogButtonBox>
@@ -29,7 +30,7 @@
 #include <utility>
 
 ExtrinsicBox::ExtrinsicBox(QWidget *parent, Ui::extr *ui, ExtrCalibration &extrCalib) :
-    QGroupBox(parent), mUi(ui), mExtrCalibration(extrCalib)
+    QWidget(parent), mUi(ui), mExtrCalibration(extrCalib)
 {
     mUi->setupUi(this);
     setFocusProxy(mUi->rot1);
@@ -276,6 +277,18 @@ bool ExtrinsicBox::getXml(QDomElement &subSubElem)
                 mExtrCalibration.loadExtrCalibFile();
             }
         }
+
+        if(subSubElem.hasAttribute("IMMUTABLE_EXTRINSIC_BOX"))
+        {
+            if(this->parent())
+            {
+                auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
+                if(parent)
+                {
+                    parent->setImmutable(subSubElem.attribute("IMMUTABLE_EXTRINSIC_BOX").toInt());
+                }
+            }
+        }
     }
     return false;
 }
@@ -288,6 +301,15 @@ void ExtrinsicBox::setXml(QDomElement &subSubElem) const
     subSubElem.setAttribute("EXTR_TRANS_1", mUi->trans1->value());
     subSubElem.setAttribute("EXTR_TRANS_2", mUi->trans2->value());
     subSubElem.setAttribute("EXTR_TRANS_3", mUi->trans3->value());
+
+    if(this->parent())
+    {
+        auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
+        if(parent)
+        {
+            subSubElem.setAttribute("IMMUTABLE_EXTRINSIC_BOX", parent->isImmutable());
+        }
+    }
 }
 
 
