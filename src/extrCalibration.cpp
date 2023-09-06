@@ -950,7 +950,7 @@ void ExtrCalibration::getXml(QDomElement &elem)
 
 void ReprojectionError::getXml(QDomElement &subElem)
 {
-    if(subElem.hasAttribute("SUM_PH"))
+    if(subElem.hasAttribute("AVG_PH"))
     {
         mPointHeightAvg = subElem.attribute("AVG_PH").toDouble();
     }
@@ -970,7 +970,7 @@ void ReprojectionError::getXml(QDomElement &subElem)
     {
         mPointHeightMax = subElem.attribute("MAX_PH").toDouble();
     }
-    if(subElem.hasAttribute("SUM_DH"))
+    if(subElem.hasAttribute("AVG_DH"))
     {
         mDefaultHeightAvg = subElem.attribute("AVG_DH").toDouble();
     }
@@ -990,7 +990,7 @@ void ReprojectionError::getXml(QDomElement &subElem)
     {
         mDefaultHeightMax = subElem.attribute("MAX_DH").toDouble();
     }
-    if(subElem.hasAttribute("SUM_PX"))
+    if(subElem.hasAttribute("AVG_PX"))
     {
         mPixelAvg = subElem.attribute("AVG_PX").toDouble();
     }
