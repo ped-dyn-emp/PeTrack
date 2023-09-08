@@ -226,7 +226,7 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QScrollBar" name="coord3DTransZ">
+          <widget class="PSlider" name="coord3DTransZ">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -260,7 +260,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QScrollBar" name="coord3DTransX">
+          <widget class="PSlider" name="coord3DTransX">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -303,7 +303,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QScrollBar" name="coord3DTransY">
+          <widget class="PSlider" name="coord3DTransY">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -420,7 +420,7 @@
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="QScrollBar" name="coord3DAxeLen">
+          <widget class="PSlider" name="coord3DAxeLen">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -676,7 +676,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QScrollBar" name="coordTransX">
+          <widget class="PSlider" name="coordTransX">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -726,7 +726,7 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QScrollBar" name="coordTransY">
+          <widget class="PSlider" name="coordTransY">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -773,7 +773,7 @@
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="QScrollBar" name="coordScale">
+          <widget class="PSlider" name="coordScale">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -873,7 +873,7 @@
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="QScrollBar" name="coordRotate">
+          <widget class="PSlider" name="coordRotate">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -1140,6 +1140,11 @@
    <class>PSpinBox</class>
    <extends>QSpinBox</extends>
    <header>pspinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PSlider</class>
+   <extends>QSlider</extends>
+   <header>pSlider.h</header>
   </customwidget>
   <customwidget>
    <class>PDoubleSpinBox</class>

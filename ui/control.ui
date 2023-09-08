@@ -534,7 +534,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QScrollBar" name="markerBrightness">
+                   <widget class="PSlider" name="markerBrightness">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -815,7 +815,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QScrollBar" name="recoColorZ">
+                   <widget class="PSlider" name="recoColorZ">
                     <property name="minimumSize">
                      <size>
                       <width>100</width>
@@ -866,7 +866,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QScrollBar" name="recoGreyLevel">
+                   <widget class="PSlider" name="recoGreyLevel">
                     <property name="value">
                      <number>50</number>
                     </property>
@@ -889,7 +889,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QScrollBar" name="recoSymbolSize">
+                   <widget class="PSlider" name="recoSymbolSize">
                     <property name="minimum">
                      <number>1</number>
                     </property>
@@ -1015,7 +1015,7 @@
                         </widget>
                        </item>
                        <item row="0" column="2">
-                        <widget class="QScrollBar" name="mapX">
+                        <widget class="PSlider" name="mapX">
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                            <horstretch>0</horstretch>
@@ -1082,7 +1082,7 @@
                         </widget>
                        </item>
                        <item row="1" column="4">
-                        <widget class="QScrollBar" name="mapH">
+                        <widget class="PSlider" name="mapH">
                          <property name="maximum">
                           <number>395</number>
                          </property>
@@ -1105,7 +1105,7 @@
                         </widget>
                        </item>
                        <item row="1" column="2">
-                        <widget class="QScrollBar" name="mapW">
+                        <widget class="PSlider" name="mapW">
                          <property name="maximum">
                           <number>395</number>
                          </property>
@@ -1115,7 +1115,7 @@
                         </widget>
                        </item>
                        <item row="0" column="4">
-                        <widget class="QScrollBar" name="mapY">
+                        <widget class="PSlider" name="mapY">
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                            <horstretch>0</horstretch>
@@ -2277,7 +2277,7 @@
                    </widget>
                   </item>
                   <item row="0" column="1">
-                   <widget class="QScrollBar" name="trackRegionScale">
+                   <widget class="PSlider" name="trackRegionScale">
                     <property name="minimum">
                      <number>1</number>
                     </property>
@@ -2303,7 +2303,7 @@
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="QScrollBar" name="trackRegionLevels">
+                   <widget class="PSlider" name="trackRegionLevels">
                     <property name="minimum">
                      <number>0</number>
                     </property>
@@ -2319,7 +2319,7 @@
                    </widget>
                   </item>
                   <item row="2" column="1">
-                   <widget class="QScrollBar" name="trackErrorExponent">
+                   <widget class="PSlider" name="trackErrorExponent">
                     <property name="minimum">
                      <number>-10</number>
                     </property>
@@ -4125,6 +4125,11 @@
    <class>PSpinBox</class>
    <extends>QSpinBox</extends>
    <header>pspinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PSlider</class>
+   <extends>QSlider</extends>
+   <header>pSlider.h</header>
   </customwidget>
   <customwidget>
    <class>PDoubleSpinBox</class>

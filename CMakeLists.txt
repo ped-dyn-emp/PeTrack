@@ -391,6 +391,7 @@ target_sources(petrack_core PRIVATE
     include/frameRange.h
     include/pdoublespinbox.h
     include/pspinbox.h
+    include/pSlider.h
     include/filterBeforeBox.h
     include/intrinsicBox.h
     include/intrinsicCameraParams.h
@@ -491,6 +492,7 @@ target_sources(petrack_core PRIVATE
     ui/pGroupBox.ui
     src/alignmentGridBox.cpp
     ui/alignmentGridBox.ui
+    src/pSlider.cpp
     ui/about.ui
     ui/codeMarker.ui
     ui/colorMarker.ui

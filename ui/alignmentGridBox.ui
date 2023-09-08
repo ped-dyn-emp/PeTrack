@@ -164,7 +164,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QScrollBar" name="grid3DTransX">
+          <widget class="PSlider" name="grid3DTransX">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -233,7 +233,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QScrollBar" name="grid3DTransY">
+          <widget class="PSlider" name="grid3DTransY">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -293,7 +293,7 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QScrollBar" name="grid3DTransZ">
+          <widget class="PSlider" name="grid3DTransZ">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -368,7 +368,7 @@
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="QScrollBar" name="grid3DResolution">
+          <widget class="PSlider" name="grid3DResolution">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -475,7 +475,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QScrollBar" name="gridTransX">
+          <widget class="PSlider" name="gridTransX">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -550,7 +550,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QScrollBar" name="gridTransY">
+          <widget class="PSlider" name="gridTransY">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -616,7 +616,7 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QScrollBar" name="gridRotate">
+          <widget class="PSlider" name="gridRotate">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -706,7 +706,7 @@
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="QScrollBar" name="gridScale">
+          <widget class="PSlider" name="gridScale">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -780,6 +780,11 @@
    <class>PSpinBox</class>
    <extends>QSpinBox</extends>
    <header>pspinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PSlider</class>
+   <extends>QSlider</extends>
+   <header>pSlider.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
