@@ -171,6 +171,7 @@ public:
     void   setCalibReprError(double d);
 
     const ExtrinsicParameters &getExtrinsicParameters() const;
+    void                       loadExtrinsicCalibFile();
 
     const WorldImageCorrespondence &getWorldImageCorrespondence() const;
     void                            setCalibCoord2DTransMinMax(Vec2F min, Vec2F max);

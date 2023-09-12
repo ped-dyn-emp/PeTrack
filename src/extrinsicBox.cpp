@@ -312,6 +312,16 @@ void ExtrinsicBox::setXml(QDomElement &subSubElem) const
     }
 }
 
+void ExtrinsicBox::loadCalibFile()
+{
+    auto newCalib = mExtrCalibration.loadExtrCalibFile();
+    if(newCalib)
+    {
+        setExtrinsicParameters(*newCalib);
+    }
+    emit extrinsicChanged();
+}
+
 
 ExtrinsicBox::~ExtrinsicBox()
 {

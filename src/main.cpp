@@ -76,6 +76,8 @@ int main(int argc, char *argv[])
     bool        autoPlay      = false;
     bool        autoIntrinsic = false;
     QString     intrinsicDir;
+    bool        autoExtrinsic = false;
+    QString     autoExtrinsicFile;
     QString     autoReadHeightFile;
     bool        autoReadHeight = false;
     QString     autoReadMarkerFile;
@@ -155,6 +157,11 @@ int main(int argc, char *argv[])
             autoIntrinsic = true;
             intrinsicDir  = arg.at(++i);
         }
+        else if((arg.at(i) == "-autoextrinsic") || (arg.at(i) == "-autoExtrinsic"))
+        {
+            autoExtrinsic     = true;
+            autoExtrinsicFile = arg.at(++i);
+        }
         else if((arg.at(i) == "-autoExportView") || (arg.at(i) == "-autoexportview"))
         {
             autoExportView = true;
@@ -231,6 +238,18 @@ int main(int argc, char *argv[])
         }
         petrack.getAutoCalib()->setCalibFiles(calibFiles);
         petrack.getControlWidget()->runAutoCalib();
+    }
+
+    if(autoExtrinsic)
+    {
+        QFileInfo info{autoExtrinsicFile};
+        if(!info.exists())
+        {
+            SPDLOG_ERROR("Extrinsic calibration file {} does not exist!");
+            return EXIT_FAILURE;
+        }
+        petrack.getExtrCalibration()->setExtrCalibFile(autoExtrinsicFile);
+        petrack.getControlWidget()->loadExtrinsicCalibFile();
     }
 
     if(autoExportView)
