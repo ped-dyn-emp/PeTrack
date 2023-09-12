@@ -720,6 +720,11 @@ const ExtrinsicParameters &Control::getExtrinsicParameters() const
     return mExtr->getExtrinsicParameters();
 }
 
+void Control::loadExtrinsicCalibFile()
+{
+    mExtr->loadCalibFile();
+}
+
 const WorldImageCorrespondence &Control::getWorldImageCorrespondence() const
 {
     return *mCoordSys;

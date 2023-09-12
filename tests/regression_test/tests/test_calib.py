@@ -20,6 +20,8 @@ from pytest import approx
 import subprocess
 import xml.etree.ElementTree as ET
 import numpy as np
+from dataclasses import dataclass
+from numpy import r_
 
 # NOTE: Does not test all options; ie. QuadAspectRatio, Fix Center, Ext. Model, ...
 
@@ -79,6 +81,56 @@ def read_intrinsics(tree: ET.ElementTree) -> np.ndarray:
     )
 
 
+@dataclass
+class Extrinsic3DParams:
+    rot: np.ndarray
+    trans: np.ndarray
+    swap: np.ndarray
+    manual_trans: np.ndarray
+
+
+def read_3d_extrinsics(tree: ET.ElementTree) -> Extrinsic3DParams:
+    node = tree.find("./CONTROL/CALIBRATION/EXTRINSIC_PARAMETERS")
+    if node is None:
+        raise RuntimeError("Invalid pet-File! No Calibration node")
+
+    coord_dim = int(node.get("COORD_DIMENSION", "nan"))
+    if coord_dim != 0:
+        raise RuntimeError("Project is 2D project, but only 3D project are compared")
+
+    # axis_len = float(node.get("COORD3D_AXIS_LEN", "nan"))
+    swap_x = int(node.get("COORD3D_SWAP_X", "nan"))
+    swap_y = int(node.get("COORD3D_SWAP_Y", "nan"))
+    swap_z = int(node.get("COORD3D_SWAP_Z", "nan"))
+    manual_trans_x = float(node.get("COORD3D_TRANS_X", "nan"))
+    manual_trans_y = float(node.get("COORD3D_TRANS_Y", "nan"))
+    manual_trans_z = float(node.get("COORD3D_TRANS_Z", "nan"))
+    # calib_file = float(node.get("EXTERNAL_CALIB_FILE", "nan"))
+    rot1 = float(node.get("EXTR_ROT_1", "nan"))
+    rot2 = float(node.get("EXTR_ROT_2", "nan"))
+    rot3 = float(node.get("EXTR_ROT_3", "nan"))
+    trans1 = float(node.get("EXTR_TRANS_1", "nan"))
+    trans2 = float(node.get("EXTR_TRANS_2", "nan"))
+    trans3 = float(node.get("EXTR_TRANS_3", "nan"))
+
+    return Extrinsic3DParams(
+        r_[rot1, rot2, rot3],
+        r_[trans1, trans2, trans3],
+        r_[swap_x, swap_y, swap_z],
+        r_[manual_trans_x, manual_trans_y, manual_trans_z],
+    )
+
+
+def compare_extrinsic_calib(test_pet: ET.ElementTree, truth_pet: ET.ElementTree):
+    test_calib = read_3d_extrinsics(test_pet)
+    truth_calib = read_3d_extrinsics(truth_pet)
+
+    assert test_calib.rot == approx(truth_calib.rot, abs=0.1)
+    assert test_calib.trans == approx(truth_calib.trans, abs=0.1)
+    assert test_calib.manual_trans == approx(truth_calib.manual_trans, abs=0.1)
+    assert (test_calib.swap == truth_calib.swap).all()
+
+
 def compare_intrinsic_calib(test_pet: ET.ElementTree, truth_pet: ET.ElementTree):
     test_calib_params = read_intrinsics(test_pet)
     truth_calib_params = read_intrinsics(truth_pet)
@@ -122,7 +174,7 @@ def test_autoCalib_old_model(pytestconfig):
     project = "../data/00_empty.pet"
     real_intrinsic = "../data/01_intrinsic.pet"
     intrinsic_dir = "../../../demo/00_files/calibration/intrinsic"
-    output = "../data/calibTest.pet" # same for other test, cannot be run concurrently
+    output = "../data/calibTest.pet"  # same for other test, cannot be run concurrently
 
     # run autocalib on demo project
     subprocess.run(
@@ -144,3 +196,34 @@ def test_autoCalib_old_model(pytestconfig):
     truth_pet = ET.parse(real_intrinsic)
 
     compare_intrinsic_calib(test_pet, truth_pet)
+
+
+def test_extr_calib(pytestconfig):
+    petrack_path = pytestconfig.getoption("path")
+    project = "../data/01_intrinsic.pet"
+    real_extrinsic = "../data/02_extrinsic.pet"
+    extrinsic_file = "../data/before.3dc"
+    output = (
+        "../data/extrCalibTest.pet"  # same for other test, cannot be run concurrently
+    )
+
+    # run autocalib on demo project
+    subprocess.run(
+        [
+            petrack_path,
+            "-project",
+            project,
+            "-autoExtrinsic",
+            extrinsic_file,
+            "-autosave",
+            output,
+            "-platform",
+            "offscreen",
+        ],
+        check=True,
+    )
+
+    test_pet = ET.parse(output)
+    truth_pet = ET.parse(real_extrinsic)
+
+    compare_extrinsic_calib(test_pet, truth_pet)

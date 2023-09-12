@@ -523,7 +523,7 @@ std::optional<ExtrinsicParameters> ExtrCalibration::calibExtrParams()
     results.trans2 = translation_vector2[1];
     results.trans3 = translation_vector2[2];
 
-    if(!calcReprojectionError())
+    if(!calcReprojectionError(results))
     {
         SPDLOG_WARN("Extrinsic calibration not possible! Please select other 2D/3D points!");
         results.rot1 = 0;
@@ -564,7 +564,7 @@ std::optional<ExtrinsicParameters> ExtrCalibration::calibExtrParams()
  * </ul>
  * @return
  */
-bool ExtrCalibration::calcReprojectionError()
+bool ExtrCalibration::calcReprojectionError(const ExtrinsicParameters &extrParams)
 {
     //////
     /// \brief error measurements
@@ -585,14 +585,14 @@ bool ExtrCalibration::calcReprojectionError()
         cv::Point3f p3d   = get3DList().at(i);
         auto        trans = mControlWidget->getCalibCoord3DTrans();
         p3d -= trans.toCvPoint();
-        cv::Point2f p3dTo2d = getImagePoint(p3d);
+        cv::Point2f p3dTo2d = getImagePoint(p3d, extrParams);
 
         // Error measurements metric (cm)
-        cv::Point3f p2dTo3d = get3DPoint(p2d, p3d.z);
+        cv::Point3f p2dTo3d = get3DPoint(p2d, p3d.z, extrParams);
 
-        cv::Point3f p2dTo3dMapDefaultHeight = get3DPoint(p2d, mControlWidget->getDefaultHeight());
+        cv::Point3f p2dTo3dMapDefaultHeight = get3DPoint(p2d, mControlWidget->getDefaultHeight(), extrParams);
 
-        cv::Point3f p3dTo2dTo3dMapDefaultHeight = get3DPoint(p3dTo2d, mControlWidget->getDefaultHeight());
+        cv::Point3f p3dTo2dTo3dMapDefaultHeight = get3DPoint(p3dTo2d, mControlWidget->getDefaultHeight(), extrParams);
 
         val = sqrt(pow(p3d.x - p2dTo3d.x, 2) + pow(p3d.y - p2dTo3d.y, 2));
         if(val > max_pH)
@@ -625,15 +625,16 @@ bool ExtrCalibration::calcReprojectionError()
         cv::Point3f p3d   = get3DList().at(i);
         auto        trans = mControlWidget->getCalibCoord3DTrans();
         p3d -= trans.toCvPoint();
-        cv::Point2f p3d_to_2d = getImagePoint(p3d);
+        cv::Point2f p3d_to_2d = getImagePoint(p3d, extrParams);
 
         // Error measurements metric (cm)
-        cv::Point3f p2d_to_3d = get3DPoint(p2d, p3d.z);
+        cv::Point3f p2d_to_3d = get3DPoint(p2d, p3d.z, extrParams);
 
         cv::Point3f p2d_to_3d_mapDefaultHeight =
-            get3DPoint(p2d, mControlWidget->getDefaultHeight()); // mStatusPosRealHeight->value()); ?
+            get3DPoint(p2d, mControlWidget->getDefaultHeight(), extrParams); // mStatusPosRealHeight->value()); ?
 
-        cv::Point3f p3d_to2d_to3d_mapDefaultHeight = get3DPoint(p3d_to_2d, mControlWidget->getDefaultHeight());
+        cv::Point3f p3d_to2d_to3d_mapDefaultHeight =
+            get3DPoint(p3d_to_2d, mControlWidget->getDefaultHeight(), extrParams);
 
         val = pow(sqrt(pow(p3d.x - p2d_to_3d.x, 2) + pow(p3d.y - p2d_to_3d.y, 2)) - (sum_pH / num_points), 2);
         var_pH += val;
@@ -716,6 +717,12 @@ bool ExtrCalibration::calcReprojectionError()
  */
 cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d) const
 {
+    return getImagePoint(p3d, mControlWidget->getExtrinsicParameters());
+}
+
+
+cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d, const ExtrinsicParameters &extrParams) const
+{
     auto swap = mControlWidget->getCalibCoord3DSwap();
     p3d.x *= swap.x ? -1 : 1;
     p3d.y *= swap.y ? -1 : 1;
@@ -728,8 +735,7 @@ cv::Point2f ExtrCalibration::getImagePoint(cv::Point3f p3d) const
     // ToDo: use projectPoints();
     int bS = mMainWindow->getImage() ? mMainWindow->getImageBorderSize() : 0;
 
-    double      rvec_array[3], translation_vector[3];
-    const auto &extrParams = mControlWidget->getExtrinsicParameters();
+    double rvec_array[3], translation_vector[3];
 
     rvec_array[0] = extrParams.rot1;
     rvec_array[1] = extrParams.rot2;
@@ -811,6 +817,12 @@ cv::Vec3d ExtrCalibration::camToWorldRotation(const cv::Vec3d &camVec) const
  */
 cv::Point3f ExtrCalibration::get3DPoint(const cv::Point2f &p2d, double h) const
 {
+    return get3DPoint(p2d, h, mControlWidget->getExtrinsicParameters());
+}
+
+
+cv::Point3f ExtrCalibration::get3DPoint(const cv::Point2f &p2d, double h, const ExtrinsicParameters &extrParams) const
+{
     int bS = mMainWindow->getImage() ? mMainWindow->getImageBorderSize() : 0;
 
     cv::Point3f resultPoint, tmpPoint;
@@ -818,8 +830,7 @@ cv::Point3f ExtrCalibration::get3DPoint(const cv::Point2f &p2d, double h) const
     // Transform the rotation vector into a rotation matrix with opencvs rodrigues method
     cv::Matx<double, 3, 3> rot_inv;
     cv::Matx<double, 3, 3> rot_mat(3, 3, CV_64F);
-    const auto            &extrParams = mControlWidget->getExtrinsicParameters();
-    const cv::Mat          rvec       = (cv::Mat_<double>(3, 1) << extrParams.rot1, extrParams.rot2, extrParams.rot3);
+    const cv::Mat          rvec = (cv::Mat_<double>(3, 1) << extrParams.rot1, extrParams.rot2, extrParams.rot3);
     Rodrigues(rvec, rot_mat);
     rot_inv = rot_mat.inv(cv::DECOMP_LU, nullptr);
 
@@ -926,6 +937,15 @@ bool ExtrCalibration::isOutsideImage(cv::Point2f p2d) const
     {
         return false;
     }
+}
+
+ReprojectionError ExtrCalibration::getReprojectionError()
+{
+    if(!reprojectionError.isValid())
+    {
+        calcReprojectionError(mControlWidget->getExtrinsicParameters());
+    }
+    return reprojectionError;
 }
 
 

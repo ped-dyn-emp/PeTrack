@@ -170,29 +170,25 @@ public:
     bool                               saveExtrCalibPoints();
     std::optional<ExtrinsicParameters> fetch2DPoints();
     std::optional<ExtrinsicParameters> calibExtrParams();
-    bool                               calcReprojectionError();
+    bool                               calcReprojectionError(const ExtrinsicParameters &extrParams);
     virtual cv::Point2f                getImagePoint(cv::Point3f p3d) const;
-    cv::Point3f                        get3DPoint(const cv::Point2f &p2d, double h) const;
-    cv::Point3f                        transformRT(cv::Point3f p);
-    cv::Vec3d                          camToWorldRotation(const cv::Vec3d &vec) const;
-    bool                               isOutsideImage(cv::Point2f p2d) const;
-    inline bool                        isOutsideImage(cv::Point3f p3d) { return isOutsideImage(getImagePoint(p3d)); }
-    inline std::vector<cv::Point3f>    get3DList() const { return points3D; }
-    inline std::vector<cv::Point3f>   &get3DList() { return points3D; }
-    inline void                        set3DList(std::vector<cv::Point3f> list3D) { this->points3D = list3D; }
-    inline std::vector<cv::Point2f>    get2DList() const { return points2D; }
-    inline std::vector<cv::Point2f>   &get2DList() { return points2D; }
-    inline void                        set2DList(std::vector<cv::Point2f> list2D) { this->points2D = list2D; }
-    inline float                       getCamHeight() const { return camHeight; }
-    inline void                        setCamHeight(float cHeight) { this->camHeight = cHeight; }
-    inline ReprojectionError           getReprojectionError()
-    {
-        if(!reprojectionError.isValid())
-        {
-            calcReprojectionError();
-        }
-        return reprojectionError;
-    }
+    virtual cv::Point2f                getImagePoint(cv::Point3f p3d, const ExtrinsicParameters &extrParams) const;
+
+    cv::Point3f get3DPoint(const cv::Point2f &p2d, double h) const;
+    cv::Point3f get3DPoint(const cv::Point2f &p2d, double h, const ExtrinsicParameters &extrParams) const;
+    cv::Point3f transformRT(cv::Point3f p);
+    cv::Vec3d   camToWorldRotation(const cv::Vec3d &vec) const;
+    bool        isOutsideImage(cv::Point2f p2d) const;
+    inline bool isOutsideImage(cv::Point3f p3d) { return isOutsideImage(getImagePoint(p3d)); }
+    inline std::vector<cv::Point3f>  get3DList() const { return points3D; }
+    inline std::vector<cv::Point3f> &get3DList() { return points3D; }
+    inline void                      set3DList(std::vector<cv::Point3f> list3D) { this->points3D = list3D; }
+    inline std::vector<cv::Point2f>  get2DList() const { return points2D; }
+    inline std::vector<cv::Point2f> &get2DList() { return points2D; }
+    inline void                      set2DList(std::vector<cv::Point2f> list2D) { this->points2D = list2D; }
+    inline float                     getCamHeight() const { return camHeight; }
+    inline void                      setCamHeight(float cHeight) { this->camHeight = cHeight; }
+    ReprojectionError                getReprojectionError();
 
 
     void setXml(QDomElement &elem);

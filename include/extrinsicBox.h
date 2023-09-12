@@ -51,6 +51,8 @@ public:
     bool getXml(QDomElement &subSubElem);
     void setXml(QDomElement &subElem) const;
 
+    void loadCalibFile();
+
 signals:
     void enabledChanged(bool enabled);
     void extrinsicChanged();
