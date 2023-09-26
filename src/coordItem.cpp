@@ -51,7 +51,18 @@ CoordItem::CoordItem(QWidget *wParent, QGraphicsItem *parent, CoordinateSystemBo
  */
 QRectF CoordItem::boundingRect() const
 {
-    return mBoundingRect;
+    if(mMainWindow->getImage() != nullptr)
+    {
+        return QRectF(
+            -mMainWindow->getImageBorderSize(),
+            -mMainWindow->getImageBorderSize(),
+            mMainWindow->getImage()->width(),
+            mMainWindow->getImage()->height());
+    }
+    else
+    {
+        return QRectF{0, 0, 0, 0};
+    }
 }
 
 // event, of moving mouse while button is pressed
@@ -159,9 +170,6 @@ void CoordItem::updateData()
     x3D = state.x3D;
     y3D = state.y3D;
     z3D = state.z3D;
-
-    prepareGeometryChange();
-    mBoundingRect = state.boundingRect;
 
     if(!mMainWindow->isLoading())
     {

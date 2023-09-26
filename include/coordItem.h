@@ -37,7 +37,6 @@ private:
     ExtrCalibration     *extCalib;
     Control             *mControlWidget;
     CoordinateSystemBox *mCoordSys;
-    QRectF               mBoundingRect;
     cv::Point3f          x3D, y3D, z3D;
     float                mouse_x, mouse_y;
     int                  coordTrans_x, coordTrans_y;

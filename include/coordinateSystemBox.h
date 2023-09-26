@@ -43,7 +43,6 @@ struct CoordItemState
 {
     bool        isMovable;
     QTransform  matrix;
-    QRectF      boundingRect;
     int         coordDimension;
     cv::Point3f x3D;
     cv::Point3f y3D;
