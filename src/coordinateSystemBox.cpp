@@ -564,8 +564,7 @@ CoordItemState CoordinateSystemBox::getCoordItemState()
         matrix.translate(tX, tY);
         matrix.rotate(ro);
         matrix.scale(sc / 100., sc / 100.);
-        state.matrix       = matrix;
-        state.boundingRect = QRectF(-110., -110., 220., 220.);
+        state.matrix = matrix;
     }
     else // 3D
     {
@@ -632,51 +631,6 @@ CoordItemState CoordinateSystemBox::getCoordItemState()
                     z = mExtrCalib.getImagePoint(z3D);
                 } while(z.x < -bS || z.x > imgSize.width() - bS || z.y < -bS || z.y > imgSize.height() - bS);
                 state.z3D = z3D;
-
-                // bounding box wird in lokalen koordinaten angegeben!!! (+-10 wegen zahl "1")
-                if(mUi->coordShow->isChecked())
-                {
-                    double min_x = std::min(std::min(x.x, y.x), std::min(z.x, ursprung.x));
-                    double max_x = std::max(std::max(x.x, y.x), std::max(z.x, ursprung.x));
-
-                    double min_y = std::min(std::min(x.y, y.y), std::min(z.y, ursprung.y));
-                    double max_y = std::max(std::max(x.y, y.y), std::max(z.y, ursprung.y));
-
-                    if(mUi->extCalibPointsShow->isChecked())
-                    {
-                        cv::Point2f calibPointsMin{50'000, 50'000};
-                        cv::Point2f calibPointsMax{0, 0};
-                        for(const auto &p : mExtrCalib.get2DList())
-                        {
-                            if(p.x > calibPointsMax.x)
-                            {
-                                calibPointsMax.x = p.x;
-                            }
-                            if(p.y > calibPointsMax.y)
-                            {
-                                calibPointsMax.y = p.y;
-                            }
-                            if(p.x < calibPointsMin.x)
-                            {
-                                calibPointsMin.x = p.x;
-                            }
-                            if(p.y < calibPointsMin.y)
-                            {
-                                calibPointsMin.y = p.y;
-                            }
-                        }
-                        min_x = std::min(float(min_x), calibPointsMin.x);
-                        max_x = std::max(float(max_x), calibPointsMax.x);
-
-                        min_y = std::min(float(min_y), calibPointsMin.y);
-                        max_y = std::max(float(max_y), calibPointsMax.y);
-                    }
-                    state.boundingRect = QRectF(min_x - 25, min_y - 25, max_x - min_x + 50, max_y - min_y + 50);
-                }
-                else
-                {
-                    state.boundingRect = QRectF(0., 0., 0., 0.);
-                }
             }
         }
     }
