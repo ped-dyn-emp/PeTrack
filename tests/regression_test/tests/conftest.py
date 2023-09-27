@@ -23,10 +23,19 @@ def pytest_addoption(parser):
     parser.addoption("--path", action="store", default="../../../build/petrack.exe")
 
 
-
-
 # "codeMarker"
-@pytest.fixture(params=["markerCasern", "multicolor", "markerJapan", "multiColorMarkerWithAruco", "multiColorMarkerWithAruco_dictMip36h12", "blackdotMarker"], scope='session')
+@pytest.fixture(
+    params=[
+        "markerCasern",
+        "multicolor",
+        "markerJapan",
+        "multiColorMarkerWithAruco",
+        "multiColorMarkerWithAruco_dictMip36h12",
+        "blackdotMarker",
+        "correct_perspective",
+    ],
+    scope="session",
+)
 def petrack_on_testdata(request, pytestconfig):
     petrack_path = pytestconfig.getoption("path")
 
@@ -36,8 +45,17 @@ def petrack_on_testdata(request, pytestconfig):
     truth_path = "../data/" + request.param + "_truth"
     project = "../data/" + request.param + ".pet"
     output = test_path
-    subprocess.run([petrack_path, "-project", project, "-autotrack", output, "-platform", "offscreen"], check=True)
+    subprocess.run(
+        [
+            petrack_path,
+            "-project",
+            project,
+            "-autotrack",
+            output,
+            "-platform",
+            "offscreen",
+        ],
+        check=True,
+    )
 
     yield test_path, truth_path
-
-

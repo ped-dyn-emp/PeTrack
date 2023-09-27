@@ -197,7 +197,6 @@ int TrackerReal::calculate(
             const auto &person = persons[i];
             addFrames          = 0;
             firstFrame         = person.firstFrame();
-            Vec2F moveDir(0, 0); // used for head direction
 
             if(person.height() < MIN_HEIGHT + 1)
             {
@@ -226,6 +225,7 @@ int TrackerReal::calculate(
             tsize = person.size();
             for(j = 0; (j < tsize); ++j) // ueber trackpoints
             {
+                Vec2F moveDir(0, 0); // used for head direction
                 // ausreisser ausfindig machen (dies geschieht, bevor -1 elemente herausgenommen werden, um die
                 // glaettung beim eliminieren der -1 elemente hier nicht einfluss nehmen zu lassen):
                 if(exportSmooth && (useTrackpoints || alternateHeight) &&
