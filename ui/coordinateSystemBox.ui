@@ -1156,19 +1156,27 @@
   <tabstop>coordShow</tabstop>
   <tabstop>coordFix</tabstop>
   <tabstop>coordTab</tabstop>
+  <tabstop>coord3DTransX</tabstop>
   <tabstop>coord3DTransX_spin</tabstop>
+  <tabstop>coord3DTransY</tabstop>
   <tabstop>coord3DTransY_spin</tabstop>
+  <tabstop>coord3DTransZ</tabstop>
   <tabstop>coord3DTransZ_spin</tabstop>
+  <tabstop>coord3DAxeLen</tabstop>
   <tabstop>coord3DAxeLen_spin</tabstop>
   <tabstop>coord3DSwapX</tabstop>
   <tabstop>coord3DSwapY</tabstop>
   <tabstop>coord3DSwapZ</tabstop>
   <tabstop>extCalibPointsShow</tabstop>
   <tabstop>extVanishPointsShow</tabstop>
+  <tabstop>coordTransX</tabstop>
   <tabstop>coordTransX_spin</tabstop>
+  <tabstop>coordTransY</tabstop>
   <tabstop>coordTransY_spin</tabstop>
-  <tabstop>coordScale_spin</tabstop>
+  <tabstop>coordRotate</tabstop>
   <tabstop>coordRotate_spin</tabstop>
+  <tabstop>coordScale</tabstop>
+  <tabstop>coordScale_spin</tabstop>
   <tabstop>coordAltitude</tabstop>
   <tabstop>coordUnit</tabstop>
   <tabstop>coordUseIntrinsic</tabstop>

@@ -555,6 +555,19 @@
                     </property>
                    </widget>
                   </item>
+                  <item>
+                   <widget class="PSpinBox" name="spin_markerBrightness">
+                    <property name="minimum">
+                     <number>0</number>
+                    </property>
+                    <property name="maximum">
+                     <number>100</number>
+                    </property>
+                    <property name="value">
+                     <number>50</number>
+                    </property>
+                   </widget>
+                  </item>
                  </layout>
                 </item>
                 <item>
@@ -833,6 +846,19 @@
                     </property>
                    </widget>
                   </item>
+                  <item>
+                   <widget class="PSpinBox" name="spin_recoColorZ">
+                    <property name="minimum">
+                     <number>0</number>
+                    </property>
+                    <property name="maximum">
+                     <number>255</number>
+                    </property>
+                    <property name="value">
+                     <number>255</number>
+                    </property>
+                   </widget>
+                  </item>
                  </layout>
                 </item>
                 <item>
@@ -875,6 +901,19 @@
                     </property>
                    </widget>
                   </item>
+                  <item >
+                   <widget class="PSpinBox" name="spin_recoGreyLevel">
+                    <property name="minimum">
+                     <number>0</number>
+                    </property>
+                    <property name="maximum">
+                     <number>100</number>
+                    </property>
+                    <property name="value">
+                     <number>50</number>
+                    </property>
+                   </widget>
+                  </item>
                   <item>
                    <widget class="QLabel" name="label_39">
                     <property name="sizePolicy">
@@ -901,6 +940,19 @@
                     </property>
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="PSpinBox" name="spin_recoSymbolSize">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>100</number>
+                    </property>
+                    <property name="value">
+                     <number>10</number>
                     </property>
                    </widget>
                   </item>
@@ -1001,7 +1053,7 @@
                        <property name="spacing">
                         <number>6</number>
                        </property>
-                       <item row="0" column="3">
+                       <item row="0" column="4">
                         <widget class="QLabel" name="label_42">
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -1033,6 +1085,16 @@
                          </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="0" column="3">
+                        <widget class="PSpinBox" name="spin_mapX">
+                         <property name="minimum">
+                          <number>00</number>
+                         </property>
+                         <property name="maximum">
+                          <number>718</number>
                          </property>
                         </widget>
                        </item>
@@ -1068,7 +1130,7 @@
                          </property>
                         </widget>
                        </item>
-                       <item row="1" column="3">
+                       <item row="1" column="4">
                         <widget class="QLabel" name="label_44">
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -1081,13 +1143,23 @@
                          </property>
                         </widget>
                        </item>
-                       <item row="1" column="4">
+                       <item row="1" column="5">
                         <widget class="PSlider" name="mapH">
                          <property name="maximum">
                           <number>395</number>
                          </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="6">
+                        <widget class="PSpinBox" name="spin_mapH">
+                         <property name="minimum">
+                          <number>0</number>
+                         </property>
+                         <property name="maximum">
+                          <number>395</number>
                          </property>
                         </widget>
                        </item>
@@ -1114,7 +1186,17 @@
                          </property>
                         </widget>
                        </item>
-                       <item row="0" column="4">
+                       <item row="1" column="3">
+                        <widget class="PSpinBox" name="spin_mapW">
+                         <property name="minimum">
+                          <number>0</number>
+                         </property>
+                         <property name="maximum">
+                          <number>395</number>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="0" column="5">
                         <widget class="PSlider" name="mapY">
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -1133,6 +1215,16 @@
                          </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="0" column="6">
+                        <widget class="PSpinBox" name="spin_mapY">
+                         <property name="minimum">
+                          <number>0</number>
+                         </property>
+                         <property name="maximum">
+                          <number>718</number>
                          </property>
                         </widget>
                        </item>
@@ -2289,6 +2381,19 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="0" column="2">
+                   <widget class="PSpinBox" name="spin_trackRegionScale">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>100</number>
+                    </property>
+                    <property name="value">
+                     <number>16</number>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="1" column="0">
                    <widget class="QLabel" name="label_53">
                     <property name="maximumSize">
@@ -2318,6 +2423,19 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="1" column="2">
+                   <widget class="PSpinBox" name="spin_trackRegionLevels">
+                    <property name="minimum">
+                     <number>0</number>
+                    </property>
+                    <property name="maximum">
+                     <number>8</number>
+                    </property>
+                    <property name="value">
+                     <number>3</number>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="2" column="1">
                    <widget class="PSlider" name="trackErrorExponent">
                     <property name="minimum">
@@ -2344,6 +2462,16 @@
                     </property>
                     <property name="text">
                      <string>max. error:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="2">
+                   <widget class="PSpinBox" name="spin_trackErrorExponent">
+                    <property name="minimum">
+                     <number>-10</number>
+                    </property>
+                    <property name="maximum">
+                     <number>10</number>
                     </property>
                    </widget>
                   </item>
@@ -4150,6 +4278,7 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <!-- Tab-order recognition tab -->
   <tabstop>performRecognition</tabstop>
   <tabstop>recoStep</tabstop>
   <tabstop>recoMethod</tabstop>
@@ -4158,6 +4287,8 @@
   <tabstop>roiFix</tabstop>
   <tabstop>recoRoiToFullImageSize</tabstop>
   <tabstop>recoRoiAdjustAutomatically</tabstop>
+  <tabstop>markerBrightness</tabstop>
+  <tabstop>spin_markerBrightness</tabstop>
   <tabstop>markerIgnoreWithout</tabstop>
   <tabstop>recoShowColor</tabstop>
   <tabstop>recoOptimizeColor</tabstop>
@@ -4165,8 +4296,22 @@
   <tabstop>recoAutoWB</tabstop>
   <tabstop>recoColorX</tabstop>
   <tabstop>recoColorY</tabstop>
+  <tabstop>recoColorZ</tabstop>
+  <tabstop>spin_recoColorZ</tabstop>
+  <tabstop>recoGreyLevel</tabstop>
+  <tabstop>spin_recoGreyLevel</tabstop>
+  <tabstop>recoSymbolSize</tabstop>
+  <tabstop>spin_recoSymbolSize</tabstop>
   <tabstop>mapNr</tabstop>
+  <tabstop>mapX</tabstop>
+  <tabstop>spin_mapX</tabstop>
+  <tabstop>mapY</tabstop>
+  <tabstop>spin_mapY</tabstop>
   <tabstop>mapColor</tabstop>
+  <tabstop>mapW</tabstop>
+  <tabstop>spin_mapW</tabstop>
+  <tabstop>mapH</tabstop>
+  <tabstop>spin_mapH</tabstop>
   <tabstop>mapHeight</tabstop>
   <tabstop>mapAdd</tabstop>
   <tabstop>mapDel</tabstop>
@@ -4178,6 +4323,9 @@
   <tabstop>mapResetPos</tabstop>
   <tabstop>mapReadHeights</tabstop>
   <tabstop>mapReadMarkerID</tabstop>
+
+  <!-- Tab-order tracking tab -->
+
   <tabstop>trackOnlineCalc</tabstop>
   <tabstop>trackRepeat</tabstop>
   <tabstop>trackRepeatQual</tabstop>
@@ -4204,6 +4352,12 @@
   <tabstop>exportComment</tabstop>
   <tabstop>exportMarkerID</tabstop>
   <tabstop>missingFramesReset</tabstop>
+  <tabstop>trackRegionScale</tabstop>
+  <tabstop>spin_trackRegionScale</tabstop>
+  <tabstop>trackRegionLevels</tabstop>
+  <tabstop>spin_trackRegionLevels</tabstop>
+  <tabstop>trackErrorExponent</tabstop>
+  <tabstop>spin_trackErrorExponent</tabstop>
   <tabstop>trackShowSearchSize</tabstop>
   <tabstop>adaptiveLevel</tabstop>
   <tabstop>trackShow</tabstop>
@@ -4263,5 +4417,150 @@
   <tabstop>scrollArea_4</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <receiver>markerBrightness</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>spin_markerBrightness</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+  <connection>
+   <receiver>spin_markerBrightness</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>markerBrightness</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+
+  <connection>
+   <receiver>recoColorZ</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>spin_recoColorZ</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+  <connection>
+   <receiver>spin_recoColorZ</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>recoColorZ</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+
+  <connection>
+   <receiver>recoGreyLevel</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>spin_recoGreyLevel</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+  <connection>
+   <receiver>spin_recoGreyLevel</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>recoGreyLevel</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+
+  <connection>
+   <receiver>recoSymbolSize</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>spin_recoSymbolSize</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+  <connection>
+   <receiver>spin_recoSymbolSize</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>recoSymbolSize</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+
+  <connection>
+   <receiver>mapX</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>spin_mapX</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+  <connection>
+   <receiver>spin_mapX</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>mapX</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+
+  <connection>
+  <receiver>mapY</receiver>
+  <signal>valueChanged(int)</signal>
+  <sender>spin_mapY</sender>
+  <slot>setValue(int)</slot>
+ </connection>
+ <connection>
+  <receiver>spin_mapY</receiver>
+  <signal>valueChanged(int)</signal>
+  <sender>mapY</sender>
+  <slot>setValue(int)</slot>
+ </connection>
+
+<connection>
+  <receiver>mapH</receiver>
+  <signal>valueChanged(int)</signal>
+  <sender>spin_mapH</sender>
+  <slot>setValue(int)</slot>
+ </connection>
+ <connection>
+  <receiver>spin_mapH</receiver>
+  <signal>valueChanged(int)</signal>
+  <sender>mapH</sender>
+  <slot>setValue(int)</slot>
+ </connection>
+
+  <connection>
+   <receiver>mapW</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>spin_mapW</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+  <connection>
+   <receiver>spin_mapW</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>mapW</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+
+
+  <connection>
+   <receiver>trackRegionScale</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>spin_trackRegionScale</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+  <connection>
+   <receiver>spin_trackRegionScale</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>trackRegionScale</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+
+  <connection>
+   <receiver>trackRegionLevels</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>spin_trackRegionLevels</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+  <connection>
+   <receiver>spin_trackRegionLevels</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>trackRegionLevels</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+
+  <connection>
+   <receiver>trackErrorExponent</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>spin_trackErrorExponent</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+  <connection>
+   <receiver>spin_trackErrorExponent</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>trackErrorExponent</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+
+ </connections>
 </ui>

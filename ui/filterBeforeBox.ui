@@ -295,6 +295,16 @@
      </property>
     </widget>
    </item>
+   <item row="0" column="2">
+    <widget class="PSpinBox" name="spin_brightness">
+     <property name="minimum">
+      <number>-100</number>
+     </property>
+     <property name="maximum">
+      <number>100</number>
+     </property>
+    </widget>
+   </item>
    <item row="4" column="0" colspan="2">
     <widget class="Line" name="line">
      <property name="orientation">
@@ -382,6 +392,16 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="2">
+    <widget class="PSpinBox" name="spin_contrast">
+     <property name="minimum">
+      <number>-100</number>
+     </property>
+     <property name="maximum">
+      <number>100</number>
+     </property>
+    </widget>
+   </item>
    <item row="2" column="0" colspan="2">
     <widget class="Line" name="line_3">
      <property name="orientation">
@@ -415,7 +435,12 @@
  </customwidgets>
  <tabstops>
   <tabstop>filterBrightContrast</tabstop>
+  <tabstop>filterBrightParam</tabstop>
+  <tabstop>spin_brightness</tabstop>
+  <tabstop>filterContrastParam</tabstop>
+  <tabstop>spin_contrast</tabstop>
   <tabstop>filterBorder</tabstop>
+  <tabstop>filterBorderParamSize</tabstop>
   <tabstop>filterBorderParamSize_spin</tabstop>
   <tabstop>filterBorderParamCol</tabstop>
   <tabstop>filterBg</tabstop>
@@ -463,6 +488,30 @@
      <y>128</y>
     </hint>
    </hints>
+  </connection>
+  <connection>
+   <sender>filterContrastParam</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spin_contrast</receiver>
+   <slot>setValue(int)</slot>
+  </connection>
+  <connection>
+   <receiver>filterContrastParam</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>spin_contrast</sender>
+   <slot>setValue(int)</slot>
+  </connection>
+  <connection>
+   <sender>filterBrightParam</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spin_brightness</receiver>
+   <slot>setValue(int)</slot>
+  </connection>
+  <connection>
+   <receiver>filterBrightParam</receiver>
+   <signal>valueChanged(int)</signal>
+   <sender>spin_brightness</sender>
+   <slot>setValue(int)</slot>
   </connection>
  </connections>
 </ui>
