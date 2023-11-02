@@ -332,6 +332,30 @@ Petrack::Petrack(QString petrackVersion) :
     auto *exportShortCut = new QShortcut{QKeySequence("Ctrl+e"), this};
     connect(exportShortCut, &QShortcut::activated, this, [=]() { exportTracker(); });
 
+    auto *undoShortCut = new QShortcut{QKeySequence("Ctrl+z"), this};
+    connect(
+        undoShortCut,
+        &QShortcut::activated,
+        this,
+        [&]()
+        {
+            mPersonStorage.undo();
+            updateControlWidget();
+            getScene()->views().first()->viewport()->repaint();
+        });
+
+    auto *redoShortcut = new QShortcut{QKeySequence("Ctrl+shift+z"), this};
+    connect(
+        redoShortcut,
+        &QShortcut::activated,
+        this,
+        [&]()
+        {
+            mPersonStorage.redo();
+            updateControlWidget();
+            getScene()->views().first()->viewport()->repaint();
+        });
+
     auto *toggleOnlineTracking = new QShortcut{QKeySequence("Shift+t"), this};
     connect(toggleOnlineTracking, &QShortcut::activated, this, [=]() { mControlWidget->toggleOnlineTracking(); });
 
@@ -1721,8 +1745,10 @@ void Petrack::keyBindings()
     QString arrowRight = "Arrow right →";
 
     const QString out =
-        tr("<p>Beside the space bar all bindings only affect inside the image.</p>"
-           "<dl><dt><kbd>Space bar</kbd></dt><dd>toggles between pause and last play direction</dd>"
+        tr("<p>Beside the space bar and Ctrl+z all bindings only affect inside the image.</p>"
+           "<dl><dt><kbd>%1 + z</kbd></dt><dd>Undo the last manual action on trajectories (e.g. moving point)</dd>"
+           "<dt><kbd>%1 + %2 + z</kbd></dt><dd>Redo the last action that was reverted via <kbd>%1 + z</kbd></dd>"
+           "<dt><kbd>Space bar</kbd></dt><dd>toggles between pause and last play direction</dd>"
            "<dt><kbd>Mouse scroll wheel</kbd></dt><dd>zooms in and out to or from the pixel of the image at the "
            "position "
            "of the mouse pointer</dd>"
@@ -4042,6 +4068,7 @@ void Petrack::selectPersonForMoveTrackPoint(QPointF pos)
 
     if(successfullySelected)
     {
+        mPersonStorage.onManualAction();
         setCursor(QCursor{Qt::CursorShape::DragMoveCursor});
     }
 }
@@ -4049,7 +4076,6 @@ void Petrack::selectPersonForMoveTrackPoint(QPointF pos)
 void Petrack::releaseTrackPoint()
 {
     mManualTrackPointMover.setTrackPoint();
-    mAutosave.trackPersonModified();
     setCursor(QCursor{});
 }
 

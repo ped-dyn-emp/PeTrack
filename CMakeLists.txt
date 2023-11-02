@@ -409,6 +409,7 @@ target_sources(petrack_core PRIVATE
     include/pGroupBox.h
     include/pGroupBoxFrame.h
     include/alignmentGridBox.h
+    include/circularStack.h
 )
 
 target_sources(petrack_core PRIVATE
