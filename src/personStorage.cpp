@@ -34,7 +34,7 @@
  */
 void PersonStorage::splitPerson(size_t pers, int frame)
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
 
     {
         const QSignalBlocker blocker(this);
@@ -65,7 +65,8 @@ void PersonStorage::splitPerson(size_t pers, int frame)
  */
 bool PersonStorage::splitPersonAt(const Vec2F &point, int frame, const QSet<size_t> &onlyVisible)
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     for(size_t i = 0; i < mPersons.size(); ++i)
     { // ueber TrackPerson
         if(((onlyVisible.empty()) || (onlyVisible.contains(i))) &&
@@ -91,7 +92,8 @@ bool PersonStorage::splitPersonAt(const Vec2F &point, int frame, const QSet<size
  */
 bool PersonStorage::delPointOf(int pers, int direction, int frame)
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     if(direction == -1)
     {
         deletePersonFrameRange(pers, mPersons[pers].firstFrame(), frame - 1);
@@ -118,7 +120,8 @@ bool PersonStorage::delPointOf(int pers, int direction, int frame)
  */
 bool PersonStorage::delPoint(const Vec2F &point, int direction, int frame, const QSet<size_t> &onlyVisible)
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     for(int i = 0; i < static_cast<int>(mPersons.size()); ++i)
     { // ueber TrackPerson
         if(((onlyVisible.empty()) || (onlyVisible.contains(i))) &&
@@ -140,7 +143,8 @@ bool PersonStorage::delPoint(const Vec2F &point, int direction, int frame, const
  */
 void PersonStorage::delPointAll(Direction direction, int frame)
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     for(size_t i = 0; i < mPersons.size(); ++i) // ueber TrackPerson
     {
         if(mPersons.at(i).trackPointExist(frame))
@@ -176,7 +180,8 @@ void PersonStorage::delPointAll(Direction direction, int frame)
  */
 void PersonStorage::delPointInsideROI()
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     QRectF rect = mMainWindow.getRecoRoiItem()->rect();
     bool   inside;
 
@@ -210,7 +215,8 @@ void PersonStorage::delPointInsideROI()
  */
 void PersonStorage::delPointROI()
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     int    anz  = 0;
     QRectF rect = mMainWindow.getRecoRoiItem()->rect();
 
@@ -243,7 +249,8 @@ void PersonStorage::delPointROI()
  */
 bool PersonStorage::editTrackPersonComment(const Vec2F &point, int frame, const QSet<size_t> &onlyVisible)
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     for(int i = 0; i < static_cast<int>(mPersons.size()); ++i) // ueber TrackPerson
     {
         if(((onlyVisible.empty()) || (onlyVisible.contains(i))) &&
@@ -298,7 +305,8 @@ bool PersonStorage::editTrackPersonComment(const Vec2F &point, int frame, const 
  */
 bool PersonStorage::setTrackPersonHeight(const Vec2F &point, int frame, const QSet<size_t> &onlyVisible)
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     for(int i = 0; i < static_cast<int>(mPersons.size()); ++i) // ueber TrackPerson
     {
         if(((onlyVisible.empty()) || (onlyVisible.contains(i))) &&
@@ -364,7 +372,8 @@ bool PersonStorage::setTrackPersonHeight(const Vec2F &point, int frame, const QS
  */
 bool PersonStorage::resetTrackPersonHeight(const Vec2F &point, int frame, const QSet<size_t> &onlyVisible)
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     for(int i = 0; i < static_cast<int>(mPersons.size()); ++i) // ueber TrackPerson
     {
         if(((onlyVisible.empty()) || (onlyVisible.contains(i))) &&
@@ -479,7 +488,7 @@ bool PersonStorage::addPoint(
     if(point.qual() > 100)
     {
         // manually added point
-        mAutosave.trackPersonModified();
+        onManualAction();
     }
     bool  found = false;
     int   i, iNearest = 0.;
@@ -750,7 +759,8 @@ PersonStorage::getProximalPersons(const QPointF &pos, QSet<size_t> selected, con
  */
 void PersonStorage::recalcHeight(float altitude)
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     for(auto &person : mPersons)
     {
         person.recalcHeight(altitude);
@@ -760,7 +770,8 @@ void PersonStorage::recalcHeight(float altitude)
 /// optimize color for all persons
 void PersonStorage::optimizeColor()
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     for(auto &person : mPersons)
     {
         if(person.color().isValid())
@@ -773,7 +784,8 @@ void PersonStorage::optimizeColor()
 /// reset the height of all persons, but not the pos of the trackpoints
 void PersonStorage::resetHeight()
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     for(auto &person : mPersons)
     {
         person.resetHeight();
@@ -783,7 +795,8 @@ void PersonStorage::resetHeight()
 /// reset the pos of the tzrackpoints, but not the heights
 void PersonStorage::resetPos()
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     for(auto &person : mPersons)
     {
         for(int frame = person.firstFrame(); frame <= person.lastFrame(); ++frame)
@@ -855,7 +868,8 @@ bool PersonStorage::printHeightDistribution()
  */
 void PersonStorage::setMarkerHeights(const std::unordered_map<int, float> &heights)
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     for(auto &person : mPersons) // over TrackPerson
     {
         for(const auto &point : person) // over TrackPoints
@@ -889,7 +903,7 @@ void PersonStorage::setMarkerID(size_t personIndex, int markerID, bool manual)
 {
     if(manual)
     {
-        mAutosave.trackPersonModified();
+        onManualAction();
     }
     auto &person = mPersons.at(personIndex);
     person.setMarkerID(markerID);
@@ -906,7 +920,8 @@ void PersonStorage::setMarkerID(size_t personIndex, int markerID, bool manual)
  */
 void PersonStorage::setMarkerIDs(const std::unordered_map<int, int> &markerIDs)
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     for(int i = 0; i < static_cast<int>(mPersons.size()); ++i) // over TrackPerson
     {
         // personID of current person
@@ -936,7 +951,8 @@ void PersonStorage::setMarkerIDs(const std::unordered_map<int, int> &markerIDs)
  */
 void PersonStorage::purge(int frame)
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     int   i, j;
     float count; ///< number of trackpoints without recognition
 
@@ -958,6 +974,34 @@ void PersonStorage::purge(int frame)
             }
         }
     }
+}
+
+void PersonStorage::undo()
+{
+    if(!mUndo.empty())
+    {
+        mRedo.push(std::move(mPersons));
+        mPersons = mUndo.pop();
+    }
+}
+
+void PersonStorage::redo()
+{
+    if(!mRedo.empty())
+    {
+        mUndo.push(std::move(mPersons));
+        mPersons = mRedo.pop();
+    }
+}
+
+/**
+ * @brief This function is called on manual actions, i.e. non-tracking changes of trajectories
+ */
+void PersonStorage::onManualAction()
+{
+    mAutosave.trackPersonModified();
+    mUndo.push(mPersons);
+    mRedo.clear();
 }
 
 /**
@@ -1071,7 +1115,8 @@ void PersonStorage::insertFeaturePoint(
  */
 int PersonStorage::merge(int pers1, int pers2)
 {
-    mAutosave.trackPersonModified();
+    onManualAction();
+
     auto      &person      = mPersons.at(pers1);
     auto      &other       = mPersons.at(pers2);
     const bool extrapolate = mMainWindow.getControlWidget()->isTrackExtrapolationChecked();

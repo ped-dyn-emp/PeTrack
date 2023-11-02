@@ -19,6 +19,7 @@
 #ifndef PERSONSTORAGE_H
 #define PERSONSTORAGE_H
 
+#include "circularStack.h"
 #include "frameRange.h"
 #include "tracker.h"
 
@@ -121,6 +122,11 @@ public:
 
     void setNrInBg(size_t idx, int nr) { mPersons[idx].setNrInBg(nr); }
 
+    void undo();
+    void redo();
+    void onManualAction();
+
+
 signals:
     void deletedPerson(size_t index);
     void deletedPersonFrameRange(size_t index, int startFrame, int endFrame);
@@ -131,6 +137,9 @@ private:
     std::vector<TrackPerson> mPersons;
     Petrack                 &mMainWindow;
     Autosave                &mAutosave;
+
+    CircularStack<std::vector<TrackPerson>, 10> mUndo;
+    CircularStack<std::vector<TrackPerson>, 10> mRedo;
 
     std::vector<TrackPerson>::iterator deletePerson(size_t index);
     void                               deletePersonFrameRange(size_t index, int startFrame, int endFrame);
