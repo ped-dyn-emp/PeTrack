@@ -52,14 +52,6 @@ class RecognitionRoiItem;
 class GridItem;
 class WorldImageCorrespondence;
 
-#ifdef STEREO_DISABLED
-enum Camera
-{
-    cameraLeft,
-    cameraRight,
-    cameraUnset
-};
-#endif
 
 // durchschnittliche Kopflaenge in cm (Kopf 21x14)
 inline constexpr double HEAD_SIZE = 21.;
@@ -260,31 +252,12 @@ public:
     inline bool     trackChanged() const { return mTrackChanged; }
     inline QAction *getHideControlActor() { return mHideControlsAct; }
 
-    // Attention: not type save, be care that animation is not stereo
     inline CalibFilter *getCalibFilter() { return &mCalibFilter; }
-#ifdef STEREO
-    // Attention: not type save, be care that animation is stereo
-    inline CalibStereoFilter *getCalibStereoFilter()
-    {
-        return (CalibStereoFilter *) mCalibFilter;
-    }
-#endif
-    inline BrightContrastFilter *getBrightContrastFilter()
-    {
-        return &mBrightContrastFilter;
-    }
-    inline BorderFilter *getBorderFilter()
-    {
-        return &mBorderFilter;
-    }
-    inline SwapFilter *getSwapFilter()
-    {
-        return &mSwapFilter;
-    }
-    inline BackgroundFilter *getBackgroundFilter()
-    {
-        return &mBackgroundFilter;
-    }
+
+    inline BrightContrastFilter *getBrightContrastFilter() { return &mBrightContrastFilter; }
+    inline BorderFilter         *getBorderFilter() { return &mBorderFilter; }
+    inline SwapFilter           *getSwapFilter() { return &mSwapFilter; }
+    inline BackgroundFilter     *getBackgroundFilter() { return &mBackgroundFilter; }
 
     inline int getImageBorderSize()
     {
@@ -297,28 +270,13 @@ public:
             return 0;
         }
     }
-    inline void setImageBorderSize(int sz)
-    {
-        getBorderFilter()->getBorderSize().setValue(sz);
-    }
+    inline void setImageBorderSize(int sz) { getBorderFilter()->getBorderSize().setValue(sz); }
 
-    inline AutoCalib *getAutoCalib()
-    {
-        return &mAutoCalib;
-    }
-    inline ExtrCalibration *getExtrCalibration()
-    {
-        return &mExtrCalibration;
-    }
+    inline AutoCalib               *getAutoCalib() { return &mAutoCalib; }
+    inline ExtrCalibration         *getExtrCalibration() { return &mExtrCalibration; }
     const WorldImageCorrespondence &getWorldImageCorrespondence();
-    inline double                   getStatusFPS() const
-    {
-        return mShowFPS;
-    }
-    inline MoCapController &getMoCapController()
-    {
-        return mMoCapController;
-    }
+    inline double                   getStatusFPS() const { return mShowFPS; }
+    inline MoCapController         &getMoCapController() { return mMoCapController; }
 
     void updateWindowTitle();
 

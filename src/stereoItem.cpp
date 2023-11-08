@@ -70,7 +70,6 @@ void StereoItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
     if(mMainWindow->getStereoContext())
     {
-#ifndef STEREO_DISABLED
         static int lastX = -1, lastY = -1;
         QPointF    pos = event->scenePos();
         pos.setX(pos.x() + mMainWindow->getImageBorderSize());
@@ -92,25 +91,23 @@ void StereoItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 
             // debout <<lastX<<" "<< lastY<<" "<< x << " " << y << " " << z << endl;
         }
-#endif
     }
 
     mMainWindow->setMousePosOnImage(event->scenePos());
     QGraphicsItem::hoverMoveEvent(event);
 }
 
-#ifndef STEREO_DISABLED
-void StereoItem::updateData(IplImage *disp)
+void StereoItem::updateData(cv::Mat disp)
 {
-    if(disp != NULL)
+    if(!disp.empty())
     {
-        if((mImage != NULL) && ((mImage->width() != disp->width) || (mImage->height() != disp->height)))
+        if((mImage != NULL) && ((mImage->width() != disp.cols) || (mImage->height() != disp.rows)))
             delete mImage;
         if(mImage == NULL) // zu Beginn oder wenn sich die Groesse aendert
-            mImage = new QImage(disp->width, disp->height, QImage::Format_ARGB32);
+            mImage = new QImage(disp.cols, disp.rows, QImage::Format_ARGB32);
 
         int             x, y;
-        unsigned short *data  = (unsigned short *) disp->imageData; // char*
+        unsigned short *data  = (unsigned short *) disp.data; // char*
         unsigned short *yData = data;
         char           *p;
         QColor          color;
@@ -127,12 +124,12 @@ void StereoItem::updateData(IplImage *disp)
                 scale = 255. / scale;
         }
 
-        for(y = 0; y < disp->height; y++)
+        for(y = 0; y < disp.rows; y++)
         {
             // Pointer to the data information in the QImage for just one column
             // set pointer to value before, because ++p is faster than p++
             p = ((char *) mImage->scanLine(y)) - 1;
-            for(x = 0; x < disp->width; x++)
+            for(x = 0; x < disp.cols; x++)
             {
                 if(mMainWindow->getStereoContext()->dispValueValid(
                        *data)) //(*data != mMainWindow->getStereoContext()->getSurfaceValue()+65280) && (*data !=
@@ -170,19 +167,20 @@ void StereoItem::updateData(IplImage *disp)
                 // printf("%d ", (int)*(data));
                 ++data;
             }
-            data = (yData += disp->width); // falsch, da nicht mehr char sondern short: (yData += disp->widthStep); //
-                                           // because sometimes widthStep != width
+            data = (yData += disp.step1()); // falsch, da nicht mehr char sondern short: (yData += disp->widthStep); //
+                                            // because sometimes widthStep != width
             // printf("\n");
         }
     }
 }
-#endif
 
-void StereoItem::paint(QPainter * /*painter*/, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
+void StereoItem::paint(
+    [[maybe_unused]] QPainter *painter,
+    const QStyleOptionGraphicsItem * /*option*/,
+    QWidget * /*widget*/)
 {
-#ifndef STEREO_DISABLED
-    IplImage *disp = NULL;
-    bool      mDispNewWhilePainting;
+    cv::Mat disp;
+    bool    mDispNewWhilePainting;
 
     if(mMainWindow->getStereoContext())
         disp = mMainWindow->getStereoContext()->getDisparity(&mDispNewWhilePainting);
@@ -200,7 +198,6 @@ void StereoItem::paint(QPainter * /*painter*/, const QStyleOptionGraphicsItem * 
 
         mDispNew = false;
     }
-#endif
 }
 
 void StereoItem::setDispNew(bool d) // default: d = true

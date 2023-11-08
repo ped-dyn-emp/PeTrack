@@ -56,7 +56,7 @@ public:
     virtual ~StereoAviFile();
 
     /** Open an .avi file for reading. */
-    bool open(const char *pszFilename, IplImage *stereoImgLeft, IplImage *stereoImgRight);
+    bool open(const char *pszFilename, cv::Mat &stereoImgLeft, cv::Mat &stereoImgRight);
 
     //   /**
     //    * Read the next frame from the avi stream.  File must have been opened for
@@ -67,10 +67,10 @@ public:
     //    */
     //   bool readNextFrame();
 
-    IplImage *getFrame(enum Camera camera);
+    cv::Mat getFrame(enum Camera camera);
 
     // return iplImage for using in openCV
-    IplImage *readFrame(int index);
+    cv::Mat readFrame(int index);
 
     /** Close the .avi file.  This is also done by the destructor. */
     bool close();
@@ -112,24 +112,20 @@ protected:
     /** Temporary image buffer. */
     unsigned char *m_pTempBuffer;
 
-    // iplImage for use with openCV
     // IplImage* mImage;
-    IplImage *mImageLeft;
-    IplImage *mImageRight;
-
+    cv::Mat mImageLeft;
+    cv::Mat mImageRight;
     //   /** Temporary buffer for saving .bmps. */
-    //   unsigned char* m_pTempBMPBuffer;
     //
     //   /** Our bitmapinfo structure */
     //   BITMAPINFO* m_pBitmapInfo;
 
     //   /** avi file name */
-    //   char m_szAVIDestFile[ _MAX_PATH ];
 
 private:
     /** Read the opened AVI-File */
     // VideoCapture m_vcReader;
-    CvCapture *m_vcReader;
+    cv::VideoCapture m_vcReader;
 
     /** Writes to the opened AVI-File */
     // VideoWriter m_vcWriter;

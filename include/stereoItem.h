@@ -32,11 +32,9 @@ private:
 
 public:
     StereoItem(QWidget *wParent, QGraphicsItem *parent = nullptr);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
-#ifndef STEREO_DISABLED
-    void updateData(IplImage *disp);
-#endif
+    void   mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void   hoverMoveEvent(QGraphicsSceneHoverEvent *event);
+    void   updateData(cv::Mat disp);
     QRectF boundingRect() const;
     void   paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void   setDispNew(bool d = true);

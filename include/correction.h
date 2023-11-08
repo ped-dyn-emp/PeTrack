@@ -23,6 +23,7 @@
 
 #include <QAbstractTableModel>
 #include <QDomElement>
+#include <QWidget>
 
 namespace Ui
 {

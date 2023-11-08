@@ -2043,6 +2043,18 @@ void Control::getXml(const QDomElement &elem, const QString &version)
                         }
                         mUi->recoMethod->setCurrentIndex(foundIndex);
                     }
+                    else if(newerThanVersion("0.8.6", version))
+                    {
+                        // old default was Hermes-Marker
+                        auto foundIndex =
+                            mUi->recoMethod->findData(QVariant::fromValue(reco::RecognitionMethod::Hermes));
+                        if(foundIndex == -1)
+                        {
+                            throw std::invalid_argument(
+                                "Recognition Method could not be found, please check your input");
+                        }
+                        mUi->recoMethod->setCurrentIndex(foundIndex);
+                    }
                     if(subSubElem.hasAttribute("STEP"))
                     {
                         mUi->recoStep->setValue(subSubElem.attribute("STEP").toInt());

@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef STEREO_DISABLED
 #include <stdio.h>
 
 //=============================================================================
@@ -50,9 +49,6 @@ StereoAviFile::StereoAviFile()
 
     mCamera =
         cameraRight; // wie in petrack.cpp right als default genommen da reference image in triclops auch right ist
-
-    mImageLeft  = NULL;
-    mImageRight = NULL;
 }
 
 
@@ -69,18 +65,18 @@ StereoAviFile::~StereoAviFile()
 
 // if return false there may be some allocated memory left!!!
 // stereoImg is used to use the same img for a bunch of files
-bool StereoAviFile::open(const char *pszFilename, IplImage *stereoImgLeft, IplImage *stereoImgRight)
+bool StereoAviFile::open(const char *pszFilename, cv::Mat &stereoImgLeft, cv::Mat &stereoImgRight)
 {
     if(pszFilename == NULL)
         return false;
 
-    m_vcReader = cvCreateFileCapture(pszFilename);
+    m_vcReader = cv::VideoCapture(pszFilename);
 
     m_iTimeIndex = -1; // damit das erste readframe wirklich einen frame auch bei index=0 liesst
 
-    m_iCols       = cvGetCaptureProperty(m_vcReader, CV_CAP_PROP_FRAME_WIDTH);  // bi.biWidth;
-    m_iRows       = cvGetCaptureProperty(m_vcReader, CV_CAP_PROP_FRAME_HEIGHT); // bi.biHeight;
-    m_iBPP        = 8;                                                          // bi.biBitCount;
+    m_iCols       = m_vcReader.get(cv::CAP_PROP_FRAME_WIDTH);
+    m_iRows       = m_vcReader.get(cv::CAP_PROP_FRAME_HEIGHT);
+    m_iBPP        = 8; // NOTE hardcoded to a BPP which is not currently supported by PeTrack (would need 16)
     m_iRowInc     = m_iCols * (m_iBPP / 8);
     m_iSize       = m_iRows * m_iRowInc;
     m_pTempBuffer = new unsigned char[m_iSize];
@@ -96,35 +92,35 @@ bool StereoAviFile::open(const char *pszFilename, IplImage *stereoImgLeft, IplIm
     return true;
 }
 
-IplImage *StereoAviFile::getFrame(enum Camera camera)
+cv::Mat StereoAviFile::getFrame(enum Camera camera)
 {
     if(camera == cameraLeft)
         return mImageLeft;
     else if(camera == cameraRight)
         return mImageRight;
     else
-        return NULL;
+        return cv::Mat(); // NOTE Error handling
 }
 
-IplImage *StereoAviFile::readFrame(int index)
+cv::Mat StereoAviFile::readFrame(int index)
 {
     if(index != m_iTimeIndex)
     {
         int x, y;
         // Pointer to the data information in the IplImage
         // char *data = mImage->imageData;
-        char *dataLeft   = mImageLeft->imageData;
-        char *dataRight  = mImageRight->imageData;
+        char *dataLeft   = reinterpret_cast<char *>(mImageLeft.data);
+        char *dataRight  = reinterpret_cast<char *>(mImageRight.data);
         char *yDataLeft  = dataLeft;
         char *yDataRight = dataRight;
         char *p          = (char *) m_pTempBuffer;
         // if (mCamera == cameraLeft)
-        //     ++p; //p+=2*mImage->height*mImage->height;
-        //  This loop is optimized so it has to calculate the least amount of indexes
-        //  Optimizing the access to the pointer data is useless (no difference in performance when tested)
-        for(y = 0; y < mImageLeft->height; ++y)
+        //    ++p; //p+=2*mImage->height*mImage->height;
+        // This loop is optimized so it has to calculate the least amount of indexes
+        // Optimizing the access to the pointer data is useless (no difference in performance when tested)
+        for(y = 0; y < mImageLeft.rows; ++y)
         {
-            for(x = 0; x < mImageLeft->width; ++x)
+            for(x = 0; x < mImageLeft.cols; ++x)
             {
                 *dataRight = *p;
                 ++dataRight;
@@ -134,8 +130,8 @@ IplImage *StereoAviFile::readFrame(int index)
                 ++p; // p+=2;
             }
             // p += mImage->width; // die linke oder rechte kamera ueberspringen
-            dataLeft  = (yDataLeft += mImageLeft->widthStep); // because sometimes widthStep != width
-            dataRight = (yDataRight += mImageRight->widthStep);
+            dataLeft  = (yDataLeft += mImageLeft.step); // because sometimes widthStep != width
+            dataRight = (yDataRight += mImageRight.step);
         }
 
         m_iTimeIndex = index;
@@ -178,5 +174,3 @@ void StereoAviFile::setCamera(enum Camera c)
     //        readFrame(m_iTimeIndex); // direktes neulesen des streames
     //    }
 }
-
-#endif

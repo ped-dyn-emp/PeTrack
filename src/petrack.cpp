@@ -894,11 +894,7 @@ void Petrack::saveXml(QDomDocument &doc)
             .arg(mViewWidget->getRotateLevel())
             .arg(mView->horizontalScrollBar()->value())
             .arg(mView->verticalScrollBar()->value()));
-#ifndef STEREO_DISABLED
     elem.setAttribute("CAMERA", mAnimation->getCamera());
-#else
-    elem.setAttribute("CAMERA", cameraUnset);
-#endif
     elem.setAttribute("HIDE_CONTROLS", mHideControlsAct->isChecked());
     root.appendChild(elem);
 
@@ -1084,7 +1080,6 @@ void Petrack::openSequence(QString fileName) // default fileName = ""
         mCameraGroupView->setEnabled(mAnimation->isStereoVideo());
         mCameraMenu->setEnabled(mAnimation->isStereoVideo());
 
-#ifdef STEREO
         if(mAnimation->isStereoVideo())
         {
             if(mStereoContext)
@@ -1092,25 +1087,7 @@ void Petrack::openSequence(QString fileName) // default fileName = ""
             mStereoContext = new pet::StereoContext(this);
         }
 
-        bool lastIsStereoVideo = mAnimation->isStereoVideo();
-        if(mCalibFilter == NULL || (mAnimation->isStereoVideo() != lastIsStereoVideo))
-        {
-            bool lastCalibFilterEnabled = false;
-            if(mCalibFilter != NULL)
-            {
-                lastCalibFilterEnabled = mCalibFilter->getEnabled();
-                delete mCalibFilter;
-            }
-            if(mAnimation->isStereoVideo())
-            {
-                mCalibFilter = new CalibStereoFilter;
-                ((CalibStereoFilter *) mCalibFilter)->setStereoContext(mStereoContext);
-            }
-            else
-                mCalibFilter = new CalibFilter;
-            mCalibFilter->setEnabled(lastCalibFilterEnabled);
-        }
-#endif
+
         mSeqFileName = fileName;
         SPDLOG_INFO(
             "open {} ({} frames; {} fps; {} x {} pixel)",
@@ -1854,7 +1831,6 @@ void Petrack::showLogWindow()
 
 void Petrack::setCamera()
 {
-#ifndef STEREO_DISABLED
     if(mAnimation)
     {
         if(mCameraLeftViewAct->isChecked())
@@ -1882,8 +1858,6 @@ void Petrack::setCamera()
         // mPlayerWidget->skipToFrame(mPlayerWidget->getPos()); // machtpasue!!
         // updateImage(true); // nur dies aufrufen, wenn nicht links rechts gleichzeitig gehalten wird
     }
-
-#endif
 }
 
 /**
@@ -3422,27 +3396,35 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             updateControlImage(mImgFiltered);
         }
 
-#ifndef STEREO_DISABLED
         if(imageChanged || swapChanged || brightContrastChanged || borderChanged || calibChanged)
         {
             if(mStereoContext)
                 mStereoContext->init(mImgFiltered);
         }
-#endif
 
         if(imageChanged || swapChanged || brightContrastChanged || borderChanged || calibChanged)
         {
-            mImgFiltered = mCalibFilter.apply(mImgFiltered);
+            if(mStereoContext)
+            {
+                mImgFiltered = mStereoContext->getRectified(
+                    mAnimation->getCamera()); // getRecified rectifies filtered image set in mStereoContext->init()
+                mCalibFilter.setChanged(false);
+            }
+            else
+            {
+                mImgFiltered = mCalibFilter.apply(mImgFiltered);
+            }
         }
         else
         {
+            // TODO: need to handle this for the stereo case??
             mImgFiltered = mCalibFilter.getLastResult();
         }
 
         if(brightContrastChanged || swapChanged || borderChanged || calibChanged)
         {
-            // abfrage hinzugenommen, damit beim laden von .pet bg-file angegeben werden kann fuer mehrere versuche und
-            // beim nachladen von versuch nicht bg geloescht wird
+            // abfrage hinzugenommen, damit beim laden von .pet bg-file angegeben werden kann fuer mehrere versuche
+            // und beim nachladen von versuch nicht bg geloescht wird
             if(mBackgroundFilter.getFilename() != "")
             {
                 SPDLOG_WARN("no background reset, because of explicit loaded background image!");
@@ -3476,7 +3458,6 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         }
         else
         {
-#ifndef STEREO_DISABLED
             // calculate position in 3D space and height of person for "old" trackPoints, if checked "even"
             if(mStereoContext && mStereoWidget->stereoUseForHeightEver->isChecked() &&
                mStereoWidget->stereoUseForHeight->isChecked())
@@ -3486,7 +3467,6 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
                 mPersonStorage.calcPosition(frameNum);
             }
-#endif
         }
         if(borderChanged)
         {
@@ -3511,11 +3491,9 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
                 mTrackingRoiItem->restoreSize();
             }
-#ifndef STEREO_DISABLED
             // buildt disparity picture if it should be used for height detection
             if(mStereoContext && mStereoWidget->stereoUseForHeight->isChecked())
                 mStereoContext->getDisparity();
-#endif
 
             cv::Rect rect;
             getRoi(mImgFiltered, roi, rect);
@@ -3553,12 +3531,10 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
            mAnimation->isCameraLiveStream() || swapChanged || brightContrastChanged || borderChanged || calibChanged ||
            recognitionChanged())
         {
-#ifndef STEREO_DISABLED
             // buildt disparity picture if it should be used for height detection or recognition
             if(mStereoContext &&
                (mStereoWidget->stereoUseForHeight->isChecked() || mStereoWidget->stereoUseForReco->isChecked()))
                 mStereoContext->getDisparity(); // wird nicht neu berechnet, wenn vor tracking schon berechnet wurde
-#endif
             if(borderChanged)
             {
                 mRecognitionRoiItem->restoreSize();
@@ -3571,8 +3547,9 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                     myRound(mRecognitionRoiItem->rect().y() + getImageBorderSize()),
                     myRound(mRecognitionRoiItem->rect().width()),
                     myRound(mRecognitionRoiItem->rect().height()));
-                QList<TrackPoint> persList;
-                auto              recoMethod = mReco.getRecoMethod();
+                QList<TrackPoint>     persList;
+                [[maybe_unused]] bool markerLess = true;
+                auto                  recoMethod = mReco.getRecoMethod();
 
                 if((recoMethod == reco::RecognitionMethod::Casern) || (recoMethod == reco::RecognitionMethod::Hermes) ||
                    (recoMethod == reco::RecognitionMethod::Color) || (recoMethod == reco::RecognitionMethod::Japan) ||
@@ -3586,14 +3563,13 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
                         getImageBorderSize(),
                         getBackgroundFilter(),
                         mControlWidget->getIntrinsicCameraParams());
+                    markerLess = false;
                 }
-#ifndef STEREO_DISABLED
                 if(mStereoContext && mStereoWidget->stereoUseForReco->isChecked())
                 {
                     PersonList pl;
-                    pl.calcPersonPos(mImgFiltered, rect, &persList, mStereoContext, getBackgroundFilter(), markerLess);
+                    pl.calcPersonPos(mImgFiltered, rect, persList, mStereoContext, getBackgroundFilter(), markerLess);
                 }
-#endif
 
                 mPersonStorage.addPoints(persList, frameNum, mReco.getRecoMethod());
 
@@ -3884,7 +3860,8 @@ QSet<size_t> Petrack::getPedestrianUserSelection()
 /**
  * @brief Splits the given text to get a set of integers.
  *
- * The given text will be split on ',' and then each element will be checked if it is a range. Ranges are marked with
+ * The given text will be split on ',' and then each element will be checked if it is a range. Ranges are marked
+ * with
  * '-' as divider. Only positive integer values are allowed.
  *
  * Examples:

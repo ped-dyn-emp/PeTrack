@@ -63,18 +63,12 @@ public:
     // to use before every new picture pair
     void init(cv::Mat &viewImg);
 
-    void preprocess();
-#ifndef STEREO_DISABLED
-    IplImage *getRectified(enum Camera camera = cameraRight);
-
-    IplImage *getDisparity(bool *dispNew = nullptr);
-#endif
+    void    preprocess();
+    cv::Mat getRectified(enum Camera camera = cameraRight);
+    cv::Mat getDisparity(bool *dispNew = nullptr);
 
     // von person.cpp benoetigt, um frame nummer zu erhalten
-    inline Animation *getAnimation()
-    {
-        return mAnimation;
-    }
+    inline Animation *getAnimation() { return mAnimation; }
 
     // ---------------------------------------------------
 
@@ -131,7 +125,7 @@ public:
         mStatus = clean;
     }
 
-    CvMat *getPointCloud();
+    cv::Mat getPointCloud();
 
     bool exportPointCloud(QString dest = "");
 
@@ -145,19 +139,17 @@ protected:
     TriclopsImage   mTriRectRight;
     TriclopsImage16 mTriDisparity;
 #endif
-    BackgroundFilter *mBackgroundFilterLeft;
-    BackgroundFilter *mBackgroundFilterRight;
-#ifndef STEREO_DISABLED
-    IplImage         mRectLeft;
-    IplImage         mRectRight;
-    IplImage         mDisparity;
-    CvStereoBMState *mBMState;
-#endif
+    BackgroundFilter     *mBackgroundFilterLeft;
+    BackgroundFilter     *mBackgroundFilterRight;
+    cv::Mat               mRectLeft;
+    cv::Mat               mRectRight;
+    cv::Mat               mDisparity;
+    cv::Ptr<cv::StereoBM> mBMState;
 
 
     cv::Ptr<cv::StereoSGBM> mSgbm;
-    CvMat                  *mBMdisparity16;
-    CvMat                  *mPointCloud;
+    cv::Mat                 mBMdisparity16;
+    cv::Mat                 mPointCloud;
     unsigned char           mSurfaceValue;
     unsigned char           mBackForthValue;
     unsigned short int      mMin;

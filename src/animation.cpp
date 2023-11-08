@@ -66,10 +66,8 @@ Animation::Animation(QWidget *wParent)
     mFps              = -1;
     mFirstSec         = -1;
     mFirstMicroSec    = -1;
-#ifndef STEREO_DISABLED
-    mCaptureStereo = nullptr;
-#endif
-    mTimeFileLoaded = false;
+    mCaptureStereo    = nullptr;
+    mTimeFileLoaded   = false;
     // Set image size
     mSize.setHeight(0);
     mSize.setWidth(0);
@@ -563,9 +561,7 @@ void Animation::reset()
     mFps              = -1;
     mFirstSec         = -1;
     mFirstMicroSec    = -1;
-#ifndef STEREO_DISABLED
-    mCaptureStereo = nullptr;
-#endif
+    mCaptureStereo    = nullptr;
 
 
     mTimeFileLoaded = false;
@@ -605,7 +601,6 @@ bool Animation::isCameraLiveStream() const
     return mCameraLiveStream;
 }
 
-#ifndef STEREO_DISABLED
 enum Camera Animation::getCamera()
 {
     if(mCaptureStereo != nullptr)
@@ -622,7 +617,6 @@ void Animation::setCamera(enum Camera c)
     // Warnung ausgegeben wird
     //    debout << "Warning: Setting camera is only allowed for loaded stereo videos!" << endl;
 }
-#endif
 /**********************************************************************/
 /* Sequence of Images implementation                                 **/
 /**********************************************************************/
@@ -817,7 +811,6 @@ void Animation::freePhoto()
 /* Video implementation                                              **/
 /**********************************************************************/
 
-#ifndef STEREO_DISABLED
 // used to get access of both frames only with calibStereoFilter
 #ifdef STEREO
 PgrAviFile *Animation::getCaptureStereo()
@@ -827,15 +820,13 @@ StereoAviFile *Animation::getCaptureStereo()
 {
     return mCaptureStereo;
 }
-#endif
 
 // also cvcamPlayAVI() is available!!!!!
-#ifndef STEREO_DISABLED
 // Implementation of the openAnimation function for videos
 // Opens an animation from a sequence of stereo video file
 // Stereo data from Arena/Messe (hermes) experiments
 // fileNumber indicates the number of the successive files splited while writing
-bool Animation::openAnimationStereoVideo(int fileNumber, IplImage *stereoImgLeft, IplImage *stereoImgRight)
+bool Animation::openAnimationStereoVideo(int fileNumber, cv::Mat &stereoImgLeft, cv::Mat &stereoImgRight)
 {
 #ifdef STEREO
     PgrAviFile *captureStereo = new PgrAviFile;
@@ -850,9 +841,8 @@ bool Animation::openAnimationStereoVideo(int fileNumber, IplImage *stereoImgLeft
         // && (myRound(mFps) == 16)
         if(!((captureStereo->m_iRows == 960) && (captureStereo->m_iCols == 1280) && (captureStereo->m_iBPP == 16)))
         {
-            debout << "Error: Only stereo videos from Hermes experiments with 1280x960 pixel, 16 bits per pixel anf 16 "
-                      "frames per second are supported!"
-                   << endl;
+            SPDLOG_ERROR("Only stereo videos from Hermes experiments with 1280x960 pixel, 16 bits per pixel anf 16 "
+                         "frames per second are supported!");
             delete captureStereo;
             return false;
         }
@@ -872,97 +862,42 @@ bool Animation::openAnimationStereoVideo(int fileNumber, IplImage *stereoImgLeft
         return false;
     }
 }
-bool Animation::openAnimationStereoVideo(int fileNumber, Mat &stereoImgLeft, Mat &stereoImgRight)
-{
-    IplImage *tempStereoImgLeft, *tempStereoImgRight;
-    Size      size;
-    size.width  = stereoImgLeft.cols;
-    size.height = stereoImgRight.rows;
-    tempStereoImgLeft =
-        cvCreateImage(size, 8, 1); // new unsigned char[2*1280*960]; // only stereo from bumblebee xb3 supported!
-    tempStereoImgRight =
-        cvCreateImage(size, 8, 1); // new unsigned char[2*1280*960]; // only stereo from bumblebee xb3 supported!
-                                   //        tempStereoImgLeft.create(size,CV_8UC1);
-                                   //        tempStereoImgRight.create(size,CV_8UC1);
-    bool ret = openAnimationStereoVideo(fileNumber, tempStereoImgLeft, tempStereoImgRight);
-
-    if(ret)
-    {
-        mStereoImgLeft  = cvarrToMat(tempStereoImgLeft);
-        mStereoImgRight = cvarrToMat(tempStereoImgRight);
-    }
-    else
-    {
-        cvReleaseImage(&tempStereoImgLeft);
-        cvReleaseImage(&tempStereoImgRight);
-    }
-
-
-    return ret;
-}
-#endif
-#ifndef STEREO_DISABLED
 // like above for the first time with new filename
 bool Animation::openAnimationStereoVideo(QString fileName)
 {
     bool ret = false;
-    //    IplImage *tempStereoImgLeft, *tempStereoImgRight;
-    //    Mat tempStereoImgLeft,tempStereoImgRight;
     // Accessing to file information and directory information
     QFileInfo   fileInfo(fileName);
     QDir        dir = fileInfo.dir();
     QStringList filters;
-    // QString firstFileName = (fileName.left(fileName.lastIndexOf("cam")+5) + "%1.avi").arg(fileNumber, 4, 10,
-    // QChar('0'));
+
     filters << (fileInfo.fileName()).left((fileInfo.fileName()).lastIndexOf("cam") + 5) +
                    "????.avi"; //"*.cpp" << "*.cxx" << "*.cc";
-    // dir.setNameFilters(filters);
     QStringList tmpList   = mStereoVideoFilesList;
     mStereoVideoFilesList = dir.entryList(filters);
     for(int i = 0; i < mStereoVideoFilesList.size(); i++)
         mStereoVideoFilesList[i] = fileInfo.path() + "/" + mStereoVideoFilesList[i];
 
-    // debout << "getNumFrames: " << getNumFrames() << " mStereoVideoFilesList.len: " << mStereoVideoFilesList.length()
-    // << endl;
     if(((getNumFrames() - 1 /*mNumFrames-1*/) / 640) == (mStereoVideoFilesList.length() - 1))
     {
-        Size size;
+        cv::Size size;
         size.width  = 1280;
         size.height = 960;
         mStereoImgLeft.create(size, CV_8UC1);
         mStereoImgRight.create(size, CV_8UC1);
-        //        tempStereoImgLeft  = cvCreateImage(size, 8, 1); // new unsigned char[2*1280*960]; // only stereo from
-        //        bumblebee xb3 supported! tempStereoImgRight = cvCreateImage(size, 8, 1); // new unsigned
-        //        char[2*1280*960]; // only stereo from bumblebee xb3 supported! tempStereoImgLeft.create(size,CV_8UC1);
-        //        tempStereoImgRight.create(size,CV_8UC1);
+
         ret = openAnimationStereoVideo(0, mStereoImgLeft, mStereoImgRight);
     }
-    // debout << " ret: " << ret << endl;
     if(ret)
     {
-        //        if (mStereoImgLeft)
-        //        {
-        //            cvReleaseImage(&mStereoImgLeft);
-        //            mStereoImgLeft = NULL;
-        //        }
-        //        if (mStereoImgRight)
-        //        {
-        //            cvReleaseImage(&mStereoImgRight);
-        //            mStereoImgRight = NULL;
-        //        }
-        //        mStereoImgLeft  = cvarrToMat(tempStereoImgLeft);
-        //        mStereoImgRight = cvarrToMat(tempStereoImgRight);
     }
     else
     {
         mStereoVideoFilesList = tmpList;
-        //        tempStereoImgLeft = NULL;
-        //        tempStereoImgRight = NULL;
     }
 
     return ret;
 }
-#endif
 
 /// Implementation of the openAnimation function for videos
 /// Opens an animation from a video file
@@ -987,7 +922,7 @@ bool Animation::openAnimationVideo(QString fileName)
     // Check if it was created succesfully
     if(!mVideoCapture.isOpened())
     {
-#if STEREO && not STEREO_DISABLED
+#if STEREO
 
 
         // untersuchen, ob Stereodaten von Arena/Messe-Versuchen
@@ -1014,20 +949,21 @@ bool Animation::openAnimationVideo(QString fileName)
         else
             return false;
 #else
-        SPDLOG_ERROR("Stereo videos temporary not supported!");
+        PCritical(
+            nullptr,
+            "Stereo videos not supported!",
+            "This version of PeTrack was compiled without support for stereo videos!");
         return false;
 
 #endif
     }
     else
     {
-#ifndef STEREO_DISABLED
         if(mCaptureStereo)
         {
             mCaptureStereo->close();
             delete mCaptureStereo;
         }
-#endif
         // Set new video & photo labels
         mStereo           = false;
         mVideo            = true;
@@ -1114,23 +1050,19 @@ cv::Mat Animation::getFrameVideo(int index)
                 return cv::Mat();
             }
         }
-#ifndef STEREO_DISABLED
         else if(mStereo && mCaptureStereo) // stereo video
         {
             if(index / 640 != mCurrentStereoFileNumber) // 640 stereo frames in one file
             {
                 openAnimationStereoVideo(index / 640, mStereoImgLeft, mStereoImgRight);
             }
-            mImage = cvarrToMat(mCaptureStereo->readFrame(index - mCurrentStereoFileNumber * 640));
+            mImage = mCaptureStereo->readFrame(index - mCurrentStereoFileNumber * 640);
         }
-#endif
         // We set the current frame index
         mCurrentFrame = index;
     }
-#ifndef STEREO_DISABLED
     else if(mStereo && (index == mCurrentFrame)) // da mgl anderes Bild rechte/links angefordert wird
-        mImage = cvarrToMat(mCaptureStereo->readFrame(index - mCurrentStereoFileNumber * 640));
-#endif
+        mImage = mCaptureStereo->readFrame(index - mCurrentStereoFileNumber * 640);
     // Return the pointer to the IplImage :-)
     return mImage;
 }
