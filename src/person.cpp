@@ -18,7 +18,9 @@
 
 #include "person.h"
 
+#include "animation.h"
 #include "helper.h"
+#include "logger.h"
 
 //#define SHOWELLIPSES // gibt die einzelnen schritte der personen detektion pyramide graphisch aus
 //#define SAVEELLIPSES // ob alle ellips in datei geschrieben werden sollen
@@ -33,17 +35,16 @@ PersonList::PersonList()
     mSc = nullptr;
 }
 
-#ifndef STEREO_DISABLED
 // searching for ellipses from isolines in a height field
 void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFilter *bgFilter)
 {
     mSc = sc;
 
-    Mat       pointCloud = cvarrToMat(mSc->getPointCloud()).clone();
-    IplImage *disp       = mSc->getDisparity();
-    CvSize    imgSize;
-    imgSize.width  = disp->width;
-    imgSize.height = disp->height;
+    cv::Mat  pointCloud = mSc->getPointCloud().clone();
+    cv::Mat  disp       = mSc->getDisparity();
+    cv::Size imgSize;
+    imgSize.width  = disp.cols;
+    imgSize.height = disp.rows;
 
 
     int    x, y;
@@ -71,7 +72,7 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
             }
             pcData += 3;
         }
-        pcData = (yPcData += pointCloud.cols / sizeof(float));
+        pcData = (yPcData += pointCloud.step1());
     }
     // pcData, min, max sind in Meter !!!!!!!!
 
@@ -84,7 +85,7 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
     // debout << "Minimal distance to camera in foreground: " << min*100 << "cm" <<endl;
     // debout << "Maximal distance to camera in foreground: " << max*100 << "cm" <<endl;
     if(max - min < 1)
-        debout << "Warning: hight field difference is smaller 1m!" << endl;
+        SPDLOG_WARN("height field difference is smaller 1m!");
     //    debout << sc->getCmPerPixel(min) <<endl;
     //    debout << sc->getCmPerPixel(max) <<endl;
     //    debout << sc->getZfromDisp(sc->getMin()) <<endl;
@@ -133,12 +134,12 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
             }
             pcData += 3;
         }
-        pcData = (yPcData += pointCloud.cols / sizeof(float));
+        pcData = (yPcData += pointCloud.step1());
     }
 
     // grauwertbild erstellen zwischen min und max - ungueltige werte auf 255 setzen
-    IplImage      *gray      = cvCreateImage(imgSize, IPL_DEPTH_8U, 1);
-    unsigned char *grayData  = (unsigned char *) gray->imageData;
+    cv::Mat        gray{imgSize, CV_8UC1}; //     = cvCreateImage(imgSize, IPL_DEPTH_8U, 1);
+    unsigned char *grayData  = gray.data;
     unsigned char *yGrayData = grayData;
 
     pcData      = (float *) pointCloud.data;
@@ -156,8 +157,8 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
             pcData += 3;
             ++grayData;
         }
-        pcData   = (yPcData += pointCloud.cols / sizeof(float));
-        grayData = (yGrayData += gray->width);
+        pcData   = (yPcData += pointCloud.step1());
+        grayData = (yGrayData += gray.step1());
     }
 
     //    // umkopieren der pointcloud auf matrix mit nur z-werten
@@ -168,23 +169,19 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
 
     int i, count;
     // int threshold;
-    float     threshold;
-    double    angle;
-    CvSeq    *contours, *firstContour;
-    IplImage *binImg = cvCreateImage(imgSize, IPL_DEPTH_8U, 1);
-    ;
-    CvPoint      *PointArray;
-    CvPoint2D32f *PointArray2D32f;
+    float                               threshold;
+    double                              angle;
+    std::vector<std::vector<cv::Point>> contours;
+    cv::Mat                             binImg{imgSize, CV_8UC1}; //= cvCreateImage(imgSize, IPL_DEPTH_8U, 1);
+
     // CvPoint center;
-    // CvSize sizeTmp;
+    // cv::Size sizeTmp;
     // int expansion;
     double contourArea;
     // double contourLength;
-    CvMemStorage *storage = cvCreateMemStorage(0);
-    float         dist;
-    bool          contourInside; // gigt an, ob die contour ueber den rand der bounding box roi hinweggeht
+    float dist;
+    bool  contourInside; // gigt an, ob die contour ueber den rand der bounding box roi hinweggeht
 
-    int frameNum = mSc->getAnimation()->getCurrentFrameNum();
 #ifdef SHOWELLIPSES
     IplImage *tmpAusgabe  = cvCreateImage(imgSize, IPL_DEPTH_8U, 3); // cvCloneImage(gray); // make a copy
     IplImage *tmpAusgabe2 = cvCreateImage(imgSize, IPL_DEPTH_8U, 3); // cvCloneImage(gray); // make a copy
@@ -194,6 +191,7 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
     cvCvtColor(gray, tmpAusgabe3, CV_GRAY2BGR);
 #endif
 #ifdef SAVEELLIPSES
+    int   frameNum = mSc->getAnimation()->getCurrentFrameNum();
     QFile ellipsFile("ellipses.txt");
     if(!ellipsFile.open(QIODevice::Append | QIODevice::Text))
         debout << "Error: Cannot open ellipses.txt: " << ellipsFile.errorString();
@@ -208,23 +206,17 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
     {
         dist = min * 100 + STEP_SIZE * threshold / step;
         QList<MyEllipse> el; // jeder level neu anlegen
-        cvThreshold(gray, binImg, threshold, 255, CV_THRESH_BINARY);
+        cv::threshold(gray, binImg, threshold, 255, cv::THRESH_BINARY);
         // cvThreshold(zPointCloud, binImg, threshold, 255, CV_THRESH_BINARY);
 
         // find contours and store them all as a list
-        cvFindContours(
-            binImg,
-            storage,
-            &firstContour,
-            sizeof(CvContour),
-            CV_RETR_LIST,
-            CV_CHAIN_APPROX_SIMPLE); // binImg wird auch veraendert!!!
-        contours = firstContour;
+        cv::findContours(binImg, contours, cv::RETR_LIST,
+                         cv::CHAIN_APPROX_SIMPLE); // binImg wird auch veraendert!!!
 
         // test each contour
-        while(contours)
+        for(const auto &contour : contours)
         {
-            count = contours->total; // This is number point in contour
+            count = static_cast<int>(contours.size());
 
             if(count > 5) // fuer ellips fit mind 6 pkte benoetigt
             {
@@ -238,7 +230,7 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
 #if((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 1)))
                 contourArea = cvContourArea(contours, CV_WHOLE_SEQ);
 #else
-                contourArea = cvContourArea(contours, CV_WHOLE_SEQ, true);
+                contourArea = cv::contourArea(contour, true);
 #endif
                 //                        if (contours->flags & CV_SEQ_FLAG_HOLE) == 0)
                 //                            debout << "Negative contourArea! If not using the absolute size, the flag
@@ -254,32 +246,18 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
 
                 if(contourArea > l1 * l1 && contourArea < l2 * l2)
                 {
-                    // Alloc memory for contour point set.
-                    PointArray      = (CvPoint *) malloc(count * sizeof(CvPoint));
-                    PointArray2D32f = (CvPoint2D32f *) malloc(count * sizeof(CvPoint2D32f));
-
-                    // cv::Mat PointMat = cv::Mat(1, count, CV_32SC2, contours);
-                    // debout << cv::contourArea(PointMat) <<endl; // cvContourBoundingRect(...)
-                    // debout << cv::isContourConvex(PointMat) <<endl;
-                    // HoughCircles: Finds circles in a grayscale image using a Hough transform.
-
-                    // Get contour point set.
-                    cvCvtSeqToArray(contours, PointArray, CV_WHOLE_SEQ);
-
                     // Convert CvPoint set to CvBox2D32f set.
                     contourInside = true;
                     for(i = 0; i < count; i++)
                     {
-                        x = PointArray[i].x;
-                        y = PointArray[i].y;
+                        x = contour[i].x;
+                        y = contour[i].y;
                         //                        // delete point at blob border
                         //                        if (!((gray->imageData[x+y*gray->width-1]   == 255) ||
                         //                              (gray->imageData[x+y*gray->width+1]   == 255) ||
                         //                              (gray->imageData[x+(y-1)*gray->width] == 255) ||
                         //                              (gray->imageData[x+(y+1)*gray->width] == 255))) // nicht am rand
-                        //                        {
-                        PointArray2D32f[i].x = (float) x;
-                        PointArray2D32f[i].y = (float) y;
+
                         //                        }
                         //                        else
                         //                        {
@@ -318,17 +296,17 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
                                      // -------------------------------------------------------------------------------
                         CvBox2D32f box;
                         cvFitEllipse(PointArray2D32f, count, &box);
-#elif CV_MAJOR_VERSION == 3
+#else
                         // neuer:
                         //// Fits ellipse to current contour.
                         //                        CvBox2D box = cvFitEllipse2(PointArray2D32f);
-                        Mat mat(count, 2, CV_32F);
+                        cv::Mat mat(count, 2, CV_32F);
                         for(i = 0; i < count; i++)
                         {
-                            mat.at<float>(i, 0) = (float) PointArray[i].x;
-                            mat.at<float>(i, 1) = (float) PointArray[i].y;
+                            mat.at<float>(i, 0) = (float) contour[i].x;
+                            mat.at<float>(i, 1) = (float) contour[i].y;
                         }
-                        RotatedRect box = fitEllipse(mat);
+                        cv::RotatedRect box = cv::fitEllipse(mat);
 #endif
                         // Convert ellipse data from float to integer representation.
                         // center.x = myRound(box.center.x);
@@ -372,12 +350,8 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
                         //                                debout << "ea/ca: " <<box.center.x <<" "<< box.center.y
                         //                                <<endl;
                     }
-                    std::free(PointArray);
-                    std::free(PointArray2D32f);
                 }
             }
-            // take the next contour
-            contours = contours->h_next;
         }
 
         insertEllipses(el, dist);
@@ -401,11 +375,6 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
         //  sprintf(outstr,"c:/%d.png",threshold);
         // cvSaveImage(outstr, tmpAusgabe);
         // cvWaitKey( 0 ); // zahl statt null, wenn nach bestimmter zeit weitergegangen werden soll
-
-        // nicht noetig, aber so kann der neu erzeugte speicherplatz reduziert werden
-        // freigabe des speicherplatz erst bei cvClearMemStorage(storage)
-        if(firstContour)
-            cvClearSeq(firstContour); // not free only available for next push
     }
 
 
@@ -480,9 +449,6 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
 
     //    cvReleaseMat(&pointCloud);
     // cvReleaseImage(&zPointCloud);
-    cvReleaseImage(&gray);
-    cvReleaseImage(&binImg);
-    cvReleaseMemStorage(&storage);
 }
 
 // el liste aller ellipsen eines thresholds der hoehe
@@ -755,7 +721,7 @@ void PersonList::optimize()
 
 // bestimmt kopfposition in markerlosen Ueberkopfaufnahmen aus Hoehenbild
 void PersonList::calcPersonPos(
-    const Mat          &img,
+    const Mat & /*img*/,
     QRect              &roi,
     QList<TrackPoint>  &persList,
     pet::StereoContext *sc,
@@ -766,7 +732,7 @@ void PersonList::calcPersonPos(
 
     if(!bgFilter->getEnabled()) // nur fuer den fall von bgSubtraction durchfuehren
     {
-        debout << "Warning: Person Detection without Background subtraction may cause a lot false detectiones!" << endl;
+        SPDLOG_WARN("Person Detection without Background subtraction may cause a lot false detectiones!");
     }
 
     searchEllipses(sc, roi, bgFilter);
@@ -832,9 +798,9 @@ void PersonList::calcPersonPos(
     double diffMed=0;
 
     sRow = (int *) malloc((frameSize+1)*sizeof(int));
-    CvSize sz = cvSize(mRectRight.width, mRectRight.height);
+    cv::Size sz = cvSize(mRectRight.width, mRectRight.height);
     IplImage *tmpImg = cvCreateImage(sz, 8, 3);
-    CvMat *tmpMat = cvCreateMat(mRectRight.height, mRectRight.width, CV_32FC1);
+    cv::Mat *tmpMat = cvCreateMat(mRectRight.height, mRectRight.width, CV_32FC1);
     //IplImage *tmpImg =  cvCloneImage(&mRectRight); // make a copy
     //debout << tmpImg->width << " " << tmpImg->height <<endl;
     //debout << mDisparity.width << " " << mDisparity.widthStep <<endl;
@@ -1084,4 +1050,3 @@ mDisparity.widthStep); // because sometimes widthStep != width
     }
 */
 }
-#endif // STEREO_DISABLED

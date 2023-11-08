@@ -22,7 +22,7 @@
 #include "control.h"
 #include "ellipse.h"
 #include "helper.h"
-#include "logger.h"
+#include "pMessageBox.h"
 #include "person.h"
 #include "petrack.h"
 #include "stereoWidget.h"
@@ -90,7 +90,7 @@ pet::StereoContext::StereoContext(Petrack *main)
     }
     else
     {
-        SPDLOG_ERROR("no cam1 or cam2 string in video filename to detect used camera!");
+        SPDLOG_ERROR("No cam1 or cam2 string in video filename to detect used camera!");
         return;
     }
     QFile calFpInt(calFileInt);
@@ -102,26 +102,27 @@ pet::StereoContext::StereoContext(Petrack *main)
     calFp.close();
     if(!QFile::exists(calFile))
     {
-        SPDLOG_ERROR("calibration file {} could not be created!", calFile);
+        SPDLOG_ERROR("Calibration file {} could not be created!", calFile.toStdString());
         return;
     }
-    SPDLOG_INFO("Using {} ({}) for calibration.", calFile, version);
+    SPDLOG_INFO("Using {} ({}) for calibration.", calFile.toStdString(), version.toStdString());
 #ifdef STEREO
     TriclopsError triclopsError;
-    triclopsError = triclopsGetDefaultContextFromFile(&mTriclopsContext, (char *) calFile.toLatin1().data());
+    triclopsError =
+        triclopsGetDefaultContextFromFile(&mTriclopsContext, static_cast<char *>(calFile.toLatin1().data()));
     if(triclopsError != TriclopsErrorOk)
-        debout << triclopsErrorToString(triclopsError) << endl;
+        SPDLOG_ERROR(triclopsErrorToString(triclopsError));
 
     triclopsError = triclopsSetResolution(mTriclopsContext, 960, 1280); // 240, 320  // 1536, 2048
     if(triclopsError != TriclopsErrorOk)
-        debout << triclopsErrorToString(triclopsError) << endl;
+        SPDLOG_ERROR(triclopsErrorToString(triclopsError));
     triclopsError = triclopsSetSubpixelInterpolation(mTriclopsContext, 1); // turn on sub-pixel interpolation
     if(triclopsError != TriclopsErrorOk)
-        debout << triclopsErrorToString(triclopsError) << endl;
+        SPDLOG_ERROR(triclopsErrorToString(triclopsError));
     triclopsError =
         triclopsSetStrictSubpixelValidation(mTriclopsContext, 1); // make sure strict subpixel validation is on
     if(triclopsError != TriclopsErrorOk)
-        debout << triclopsErrorToString(triclopsError) << endl;
+        SPDLOG_ERROR(triclopsErrorToString(triclopsError));
 
     //    triclopsError = triclopsSetDisparityMapping(mTriclopsContext, 0,255);
     //    if (triclopsError != TriclopsErrorOk)
@@ -133,46 +134,38 @@ pet::StereoContext::StereoContext(Petrack *main)
     // triclopsSetRectImgQuality(...) entzerrung soll verbessert werden
     triclopsError = triclopsSetStereoQuality(mTriclopsContext, TriStereoQlty_ENHANCED);
     if(triclopsError != TriclopsErrorOk)
-        debout << triclopsErrorToString(triclopsError) << endl;
+        SPDLOG_ERROR(triclopsErrorToString(triclopsError));
 
     // lets turn off all validation except subpixel and surface
     // this works quite well
     triclopsError = triclopsSetTextureValidation(mTriclopsContext, 0);
     if(triclopsError != TriclopsErrorOk)
-        debout << triclopsErrorToString(triclopsError) << endl;
+        SPDLOG_ERROR(triclopsErrorToString(triclopsError));
     triclopsError = triclopsSetUniquenessValidation(mTriclopsContext, 0);
     if(triclopsError != TriclopsErrorOk)
-        debout << triclopsErrorToString(triclopsError) << endl;
+        SPDLOG_ERROR(triclopsErrorToString(triclopsError));
 
     // turn on surface validation
     triclopsError = triclopsSetSurfaceValidation(mTriclopsContext, 1);
     if(triclopsError != TriclopsErrorOk)
-        debout << triclopsErrorToString(triclopsError) << endl;
+        SPDLOG_ERROR(triclopsErrorToString(triclopsError));
     triclopsError = triclopsSetSurfaceValidationSize(mTriclopsContext, 200);
     if(triclopsError != TriclopsErrorOk)
-        debout << triclopsErrorToString(triclopsError) << endl;
+        SPDLOG_ERROR(triclopsErrorToString(triclopsError));
     triclopsError = triclopsSetSurfaceValidationDifference(mTriclopsContext, 0.5);
     if(triclopsError != TriclopsErrorOk)
-        debout << triclopsErrorToString(triclopsError) << endl;
+        SPDLOG_ERROR(triclopsErrorToString(triclopsError));
     // turn on back-forth validation
     triclopsError = triclopsSetBackForthValidation(mTriclopsContext, 1);
     if(triclopsError != TriclopsErrorOk)
-        debout << triclopsErrorToString(triclopsError) << endl;
+        SPDLOG_ERROR(triclopsErrorToString(triclopsError));
 
     triclopsGetSurfaceValidationMapping(mTriclopsContext, &mSurfaceValue);
     triclopsGetBackForthValidationMapping(mTriclopsContext, &mBackForthValue);
 #endif
-    mMin = USHRT_MAX;
-    mMax = 0;
-#ifndef STEREO_DISABLED
-    mBMState = NULL;
-#if CV_MAJOR_VERSION == 2
-    mSgbm = NULL;
-#endif
-    mBMdisparity16 = NULL;
-#endif
-
-    mPointCloud = nullptr;
+    mMin     = USHRT_MAX;
+    mMax     = 0;
+    mBMState = nullptr;
 }
 
 pet::StereoContext::~StereoContext()
@@ -183,7 +176,6 @@ pet::StereoContext::~StereoContext()
 #endif
 }
 
-#ifndef STEREO_DISABLED
 // wenn viewImg NULL dann werden die nativ eingelesenen stereobilder genommen
 // default: IplImage *viewImg = NULL
 void pet::StereoContext::init(Mat &viewImg) //  = NULL
@@ -195,11 +187,11 @@ void pet::StereoContext::init(Mat &viewImg) //  = NULL
 
     if(!viewImg.empty() && (viewImg.cols != 1280 || viewImg.rows != 960))
     {
-        debout << "Warning: no images beside 1280x960!" << endl;
+        SPDLOG_WARN("no images beside 1280x960!");
         return;
     }
 
-    IplImage *leftImg, *rightImg;
+    cv::Mat leftImg, rightImg;
 
 #ifdef STEREO
     TriclopsError triclopsError;
@@ -207,19 +199,17 @@ void pet::StereoContext::init(Mat &viewImg) //  = NULL
 
     if(!viewImg.empty() && (mAnimation->getCaptureStereo()->getCamera() == cameraLeft))
     {
-        leftImg         = cvCreateImage(cvSize(viewImg.cols, viewImg.rows), 8, viewImg.channels());
-        IplImage tmpImg = viewImg;
-        cvCopy(&tmpImg, leftImg);
-        // leftImg = viewImg;
+        leftImg        = cv::Mat(viewImg.size(), viewImg.type());
+        cv::Mat tmpImg = viewImg;
+        tmpImg.copyTo(leftImg);
     }
     else
         leftImg = mAnimation->getCaptureStereo()->getFrame(cameraLeft);
     if(!viewImg.empty() && (mAnimation->getCaptureStereo()->getCamera() == cameraRight))
     {
-        rightImg        = cvCreateImage(cvSize(viewImg.cols, viewImg.rows), 8, viewImg.channels());
-        IplImage tmpImg = viewImg;
-        cvCopy(&tmpImg, rightImg);
-        // rightImg = viewImg;
+        rightImg       = cv::Mat(viewImg.size(), viewImg.type());
+        cv::Mat tmpImg = viewImg;
+        tmpImg.copyTo(rightImg);
     }
     else
         rightImg = mAnimation->getCaptureStereo()->getFrame(cameraRight);
@@ -261,20 +251,19 @@ void pet::StereoContext::init(Mat &viewImg) //  = NULL
 
 
     triclopsError = triclopsBuildRGBTriclopsInput(
-        leftImg->width,
-        leftImg->height,
-        leftImg->widthStep,
+        leftImg.cols,
+        leftImg.rows,
+        static_cast<int>(leftImg.step),
         0,
         0,
-        (unsigned char *) rightImg->imageData,
-        (unsigned char *) leftImg->imageData,
+        rightImg.data,
+        leftImg.data,
         NULL,
         &mTriclopsInput);
     if(triclopsError != TriclopsErrorOk)
-        debout << triclopsErrorToString(triclopsError) << endl;
+        SPDLOG_ERROR(triclopsErrorToString(triclopsError));
 #endif
-    // cvInitImageHeader(&mDisparity, cvSize(mTriDisparity.ncols, mTriDisparity.nrows), 16, 1);
-    cvInitImageHeader(&mDisparity, cvSize(leftImg->width, leftImg->height), 16, 1);
+    mDisparity = cv::Mat(leftImg.size(), CV_16FC1);
 
     setStatus(buildInput);
 
@@ -290,15 +279,15 @@ void pet::StereoContext::preprocess()
 
         triclopsError = triclopsSetEdgeCorrelation(mTriclopsContext, mMain->getStereoWidget()->useEdge->isChecked());
         if(triclopsError != TriclopsErrorOk)
-            debout << triclopsErrorToString(triclopsError) << endl;
+            SPDLOG_ERROR(triclopsErrorToString(triclopsError));
         triclopsError = triclopsSetEdgeMask(mTriclopsContext, mMain->getStereoWidget()->edgeMaskSize->value());
         if(triclopsError != TriclopsErrorOk)
-            debout << triclopsErrorToString(triclopsError) << " for the edge mask size!" << endl;
+            SPDLOG_ERROR("{} for the edge mask size", triclopsErrorToString(triclopsError));
 
         // Preprocessing the images
         triclopsError = triclopsPreprocess(mTriclopsContext, &mTriclopsInput);
         if(triclopsError != TriclopsErrorOk)
-            debout << triclopsErrorToString(triclopsError) << endl;
+            SPDLOG_ERROR(triclopsErrorToString(triclopsError));
         setStatus(preprocessed);
 #endif
         //        TriclopsBool b;
@@ -308,8 +297,13 @@ void pet::StereoContext::preprocess()
 }
 
 // cameraRight is default, da disp mit diesem identisch
-IplImage *pet::StereoContext::getRectified(enum Camera camera)
+cv::Mat pet::StereoContext::getRectified(enum Camera camera)
 {
+#ifdef TIME_MEASUREMENT
+    //        "==========: "
+    debout << "in rectify: " << getElapsedTime() << endl;
+#endif
+
     if((camera != cameraRight) && (camera != cameraLeft))
         camera = mAnimation->getCaptureStereo()->getCamera();
 
@@ -323,17 +317,12 @@ IplImage *pet::StereoContext::getRectified(enum Camera camera)
             triclopsError = triclopsGetImage(mTriclopsContext, TriImg_RECTIFIED, TriCam_LEFT, &mTriRectLeft);
             if(triclopsError != TriclopsErrorOk)
             {
-                debout << triclopsErrorToString(triclopsError) << endl;
-                return NULL;
+                SPDLOG_ERROR(triclopsErrorToString(triclopsError));
+                return cv::Mat(); // NOTE Fehlerbehandlung
             }
 
-            cvInitImageHeader(&mRectLeft, cvSize(mTriRectLeft.ncols, mTriRectLeft.nrows), 8, 1);
-            //        mRectLeft.width = mTriRectLeft.ncols;
-            //        mRectLeft.height = mTriRectLeft.nrows;
-            //        mRectLeft.widthStep = mTriRectLeft.rowinc;
-            mRectLeft.imageData = (char *) mTriRectLeft.data;
-            //        mRectLeft.depth = 8;
-            //        mRectLeft.nChannels = 1;
+            mRectLeft = cv::Mat(cv::Size(mTriRectLeft.ncols, mTriRectLeft.nrows), CV_8UC1, mTriRectLeft.data);
+
             addStatus(rectified); // nicht set, da rectified image kann mehrmals abgefragt werden, wobei die disp schon
                                   // fertig gerechnet wurde
 
@@ -375,23 +364,18 @@ IplImage *pet::StereoContext::getRectified(enum Camera camera)
 #endif
 
 
-            return &mRectLeft;
+            return mRectLeft;
         }
         else if(camera == cameraRight)
         {
             triclopsError = triclopsGetImage(mTriclopsContext, TriImg_RECTIFIED, TriCam_RIGHT, &mTriRectRight);
             if(triclopsError != TriclopsErrorOk)
             {
-                debout << triclopsErrorToString(triclopsError) << endl;
-                return NULL;
+                SPDLOG_ERROR(triclopsErrorToString(triclopsError));
+                return cv::Mat(); // NOTE Fehlerbehandlung
             }
-            cvInitImageHeader(&mRectRight, cvSize(mTriRectRight.ncols, mTriRectRight.nrows), 8, 1);
-            //        mRectRight.width = mTriRectRight.ncols;
-            //        mRectRight.height = mTriRectRight.nrows;
-            //        mRectRight.widthStep = mTriRectRight.rowinc;
-            mRectRight.imageData = (char *) mTriRectRight.data;
-            //        mRectRight.depth = 8;
-            //        mRectRight.nChannels = 1;
+            mRectRight = cv::Mat(cv::Size(mTriRectRight.ncols, mTriRectRight.nrows), CV_8UC1, mTriRectRight.data);
+
             addStatus(rectified);
 
 
@@ -415,14 +399,19 @@ IplImage *pet::StereoContext::getRectified(enum Camera camera)
 #endif
 
 
-            return &mRectRight;
+#ifdef TIME_MEASUREMENT
+            //        "==========: "
+            debout << "ou rectify: " << getElapsedTime() << endl;
+#endif
+
+
+            return mRectRight;
         }
         else
-            return NULL;
+            return cv::Mat(); // NOTE fehlerbehandlung
 #endif
     }
-    else
-        return NULL;
+    return cv::Mat();
 }
 
 //// A function to draw the histogram
@@ -463,8 +452,13 @@ IplImage *pet::StereoContext::getRectified(enum Camera camera)
 //}
 
 
-IplImage *pet::StereoContext::getDisparity(bool *dispNew)
+cv::Mat pet::StereoContext::getDisparity(bool *dispNew)
 {
+#ifdef TIME_MEASUREMENT
+    //        "==========: "
+    debout << "in    disp: " << getElapsedTime() << std::endl;
+#endif
+
     if(dispNew != NULL)
         *dispNew = false;
     if((mStatus & preprocessed) && !(mStatus & genDisparity))
@@ -474,8 +468,8 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
 #endif
         if(mMain->getStereoWidget()->minDisparity->value() >= mMain->getStereoWidget()->maxDisparity->value())
         {
-            debout << "Error: Invalid min/max settings for disparity (min>=max)!" << endl;
-            return NULL;
+            SPDLOG_ERROR("Invalid min/max settings for disparity (min>=max)!");
+            return cv::Mat(); // NOTE ERROR HANDLING
         }
 
         // opencv disp BM block matching
@@ -713,28 +707,28 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
                 mMain->getStereoWidget()->maxDisparity->value()); // ,100// 22, 66); // set disparity range 14..36 bei
                                                                   // mu oder mo  untere kamera
             if(triclopsError != TriclopsErrorOk)
-                debout << triclopsErrorToString(triclopsError) << " for the disparity range!" << endl;
+                SPDLOG_ERROR("{} for the disparity range", triclopsErrorToString(triclopsError));
 
             triclopsError = triclopsSetStereoMask(mTriclopsContext, mMain->getStereoWidget()->stereoMaskSize->value());
             if(triclopsError != TriclopsErrorOk)
-                debout << triclopsErrorToString(triclopsError) << " for the stereo mask size!" << endl;
+                SPDLOG_ERROR("{} for the stereo mask size!", triclopsErrorToString(triclopsError));
 
             // Do stereo processing
             triclopsError = triclopsStereo(mTriclopsContext);
             if(triclopsError != TriclopsErrorOk)
             {
-                debout << triclopsErrorToString(triclopsError) << endl;
-                return NULL;
+                SPDLOG_ERROR(triclopsErrorToString(triclopsError));
+                return cv::Mat(); // NOTE Fehlerbehandlung
             }
 
             triclopsError = triclopsGetImage16(mTriclopsContext, TriImg16_DISPARITY, TriCam_REFERENCE, &mTriDisparity);
             if(triclopsError != TriclopsErrorOk)
             {
-                debout << triclopsErrorToString(triclopsError) << endl;
-                return NULL;
+                SPDLOG_ERROR(triclopsErrorToString(triclopsError));
+                return cv::Mat(); // NOTE Fehlerbehandlung
             }
 
-            mDisparity.imageData = (char *) mTriDisparity.data;
+            mDisparity.data = (uchar *) mTriDisparity.data;
 #endif
         }
         else if(
@@ -746,41 +740,40 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
 
             if(!mBMState) // noch =NULL
             {
-                mBMState = cvCreateStereoBMState(CV_STEREO_BM_BASIC, 64); // 16; durch 16 teilbar
-                if(mBMState == NULL)
-                    debout << "Error: setting up the block matching state!" << endl;
+                mBMState = cv::StereoBM::create(64); // durch 16 teilbar
+                if(mBMState == nullptr)
+                    SPDLOG_ERROR("setting up the block matching state!");
             }
             //        int edgeMaskSize = mMain->getStereoWidget()->edgeMaskSize->value()*4+1; // +1 wg ungerade
             //        mBMState->preFilterSize = (edgeMaskSize>255?255:(edgeMaskSize<5?5:edgeMaskSize));//19; 41
             //        debout << mBMState->preFilterSize << endl;
             //        mBMState->preFilterCap=19; 31
-            mBMState->SADWindowSize = myClip(
-                mMain->getStereoWidget()->stereoMaskSize->value(),
-                5,
-                21); //>=5?mMain->getStereoWidget()->stereoMaskSize->value():5; // minimum 5 erlaubt, ab 21 wird zuviel
-                     // als mindens und maxdens angezeigt!
+
+
+            int blockSize = mMain->getStereoWidget()->stereoMaskSize->value();
+            blockSize     = myClip(blockSize, 5, 21);
+            mBMState->setBlockSize(
+                blockSize); // minimum 5 erlaubt, ab 21 wird zuviel als mindens und maxdens angezeigt!
             //        mBMState->textureThreshold=d; 10
             //        mBMState->uniquenessRatio=e; 15
 
             // umkehrung der disparity, da links und rechts vertauscht werden musste, damit disp fuer rechtes bild
             // berechnet wird
-            mBMState->minDisparity = -(mMain->getStereoWidget()->maxDisparity->value()) +
-                                     1; // +1, weil es dann mit ptgrey fuer min besser passt
-            mBMState->numberOfDisparities =
+            mBMState->setMinDisparity(
+                -(mMain->getStereoWidget()->maxDisparity->value()) +
+                1); // +1, weil es dann mit ptgrey fuer min besser passt
+            mBMState->setNumDisparities(
                 16 *
                 ((mMain->getStereoWidget()->maxDisparity->value() - mMain->getStereoWidget()->minDisparity->value()) /
-                 16);                              // muss durch 16 teilbar sein
-            if(mBMState->numberOfDisparities < 16) // mind 16 ist vorgeschrieben
-                mBMState->numberOfDisparities = 16;
+                 16));                             // muss durch 16 teilbar sein
+            if(mBMState->getNumDisparities() < 16) // mind 16 ist vorgeschrieben
+                mBMState->setNumDisparities(16);
 
-            if(!mBMdisparity16)
+            if(mBMdisparity16.empty())
             {
-                mBMdisparity16 = cvCreateMat(
-                    mDisparity.height,
-                    mDisparity.width,
+                mBMdisparity16 = cv::Mat(
+                    mDisparity.size(),
                     CV_16S); // mRectRight.height, mRectRight.width gehtz nicht da ggf noch nicht vorliegend
-                if(mBMdisparity16 == NULL)
-                    debout << "Error: create matrix for block matching disparity map!" << endl;
             }
 
             // folgendes kann nicht genutzt werden um rechenzeiut zu sparen, da rectified nach erstem durchlauf dieser
@@ -791,11 +784,7 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
             //
             //            cv::StereoBM::compute(getRectified(cameraRight),getRectified(cameraLeft),mBMdisparity16);
 
-            cvFindStereoCorrespondenceBM(
-                getRectified(cameraRight),
-                getRectified(cameraLeft),
-                mBMdisparity16,
-                mBMState); // &mRectRight, &mRectLeft geht nicht, da noch nicht
+            mBMState->compute(getRectified(cameraLeft), getRectified(cameraRight), mBMdisparity16);
 
             //            cvMinMaxLoc(mBMdisparity16, &dMin, &dMax);
             //            debout << (mBMState->minDisparity-1)*16 << " " << dMin << " " << dMax <<endl;
@@ -813,7 +802,7 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
             //            cvShowImage("CVdispBM16", BMdisparity_visual);
 
             // exchange/replace value in mBMdisparity16 so that the error value is the same like in pointgrey
-            short *data16  = (short *) mBMdisparity16->data.s;
+            short *data16  = (short *) mBMdisparity16.data;
             short *yData16 = data16;
 
             //            int noDispAnz1 = 0, noDispAnz2 = 0, noDispAnz3 = 0;
@@ -823,9 +812,9 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
             //            mBMState->minDisparity+mBMState->numberOfDisparities <<endl; debout << dMin << " " << dMax
             //            <<endl;
 
-            for(int y = 0; y < mBMdisparity16->height; ++y)
+            for(int y = 0; y < mBMdisparity16.rows; ++y)
             {
-                for(int x = 0; x < mBMdisparity16->width; ++x)
+                for(int x = 0; x < mBMdisparity16.cols; ++x)
                 {
                     // if ((*data16 < (mBMState->minDisparity)*16) || (*data16 >
                     // (mBMState->minDisparity+mBMState->numberOfDisparities)*16)) // zeigt genau den Bereich, der auch
@@ -833,15 +822,15 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
                     if((-*data16 < (mMain->getStereoWidget()->minDisparity->value()) * 16) ||
                        (-*data16 > (mMain->getStereoWidget()->maxDisparity->value()) *
                                        16) || // laesst nur den Teil ueber, der in gui eingestellt wurde
-                       (*data16 <=
-                        (mBMState->minDisparity) * 16)) // enthaelt auch: (*data16 == (mBMState->minDisparity-1)*16)) //
-                                                        // marker fuer nicht berechneten wert
+                       (*data16 <= (mBMState->getMinDisparity()) *
+                                       16)) // enthaelt auch: (*data16 == (mBMState->minDisparity-1)*16)) // marker fuer
+                                            // nicht berechneten wert
                     {
                         //                        if (*data16 == (mBMState->minDisparity-1)*16)
                         //                            ++noDispAnz1;
                         //                        else
                         //                            ++noDispAnz2;
-                        *data16 = 0xFF00; // fehlercode gemaess ptgrey
+                        *data16 = static_cast<short>(0xFF00); // fehlercode gemaess ptgrey
                     }
                     //                    if (*data16 == (mBMState->minDisparity-1)*16) // eigentlicher fehler-wert,
                     //                    wenn nichts erkannt wird; wird durch vorherige abfrage mit geloescht
@@ -864,7 +853,7 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
                     //                        *data16 = (unsigned int) *data16;
                     ++data16;
                 }
-                data16 = (yData16 += (mBMdisparity16->step / sizeof(short))); // width);
+                data16 = (yData16 += (mBMdisparity16.step1())); // width);
             }
 
             //            debout << noDispAnz1 << " " << noDispAnz2 << " " << noDispAnz3 << " " <<endl;
@@ -875,7 +864,7 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
             //            uu = 0x8000; ss = 0x8000;
             //            debout << uu << " " << ss << endl;
 
-            mDisparity.imageData = (char *) mBMdisparity16->data.ptr;
+            mDisparity.data = mBMdisparity16.data;
         }
         else if(
             mMain->getStereoWidget()->stereoDispAlgo->currentIndex() ==
@@ -883,139 +872,69 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
                // http://opencv.willowgarage.com/documentation/cpp/camera_calibration_and_3d_reconstruction.html#stereosgbm
                // ----------------------------------------------------------------------------------------------------------------------------
         {
-            //            int cn = img1.channels();
-            //            sgbm.preFilterCap = 63;
-            //            sgbm.SADWindowSize = 11;
-            //            sgbm.P1 = 8*cn*sgbm.SADWindowSize*sgbm.SADWindowSize;
-            //            sgbm.P2 = 32*cn*sgbm.SADWindowSize*sgbm.SADWindowSize;
-            //            sgbm.minDisparity = 16;
-            //            sgbm.numberOfDisparities = 64;
-            //            sgbm.uniquenessRatio = 15;
-            //            sgbm.speckleWindowSize = 3;
-            //            sgbm.speckleRange = 3;
-            //            sgbm.disp12MaxDiff = 1;
-            //            sgbm.fullDP = false;
-            //            Mat disp, disp8;
-            //            sgbm(img1, img2, disp);
-
-#if CV_MAJOR_VERSION == 2
-            if(!mSgbm) // noch =NULL
-            {
-                mSgbm = new cv::StereoSGBM; // cvCreateStereoBMState(CV_STEREO_BM_BASIC, 64); // 16; durch 16 teilbar
-
-                if(mSgbm == NULL)
-                    debout << "Error: setting up the semi-global block matching state!" << endl;
-            }
-            mSgbm->SADWindowSize = myClip(mMain->getStereoWidget()->stereoMaskSize->value(), 1, 11);
-
-            // umkehrung der disparity, da links und rechts vertauscht werden musste, damit disp fuer rechtes bild
-            // berechnet wird
-            mSgbm->minDisparity = -(mMain->getStereoWidget()->maxDisparity->value()) +
-                                  1; // +1, weil es dann mit ptgrey fuer min besser passt
-            mSgbm->numberOfDisparities =
-                16 *
-                ((mMain->getStereoWidget()->maxDisparity->value() - mMain->getStereoWidget()->minDisparity->value()) /
-                 16);                           // muss durch 16 teilbar sein
-            if(mSgbm->numberOfDisparities < 16) // mind 16 ist vorgeschrieben
-                mSgbm->numberOfDisparities = 16;
-
-            mSgbm->preFilterCap      = 63;
-            mSgbm->P1                = 8 * mSgbm->SADWindowSize * mSgbm->SADWindowSize;
-            mSgbm->P2                = 4 * mSgbm->P1;
-            mSgbm->uniquenessRatio   = 15;
-            mSgbm->speckleWindowSize = 3;
-            mSgbm->speckleRange      = 3;
-            mSgbm->disp12MaxDiff     = 1;
-#elif CV_MAJOR_VERSION == 3 || CV_MAJOR_VERSION == 4
             int SADWindowSize = 11;
             int nDisparities =
                 (mMain->getStereoWidget()->maxDisparity->value() - mMain->getStereoWidget()->minDisparity->value()) /
                 16;
             // mSgbm = StereoSGBM::create(nDisparities, SADWindowSize);
             mSgbm = StereoSGBM::create(
-                -(mMain->getStereoWidget()->maxDisparity->value()) + 1, // minDisparity
-                16 * nDisparities,                                      // numDisparities
-                11,                                                     // blockSize
-                8 * SADWindowSize * SADWindowSize,                      // P1
-                4 * (8 * SADWindowSize * SADWindowSize),                // P2
-                1,                                                      // disp12MaxDiff
-                63,                                                     // preFilterCap
-                15,                                                     // uniquenessRatio
-                3,                                                      // speckleWindowSize
-                3,                                                      // speckleRange
-                StereoSGBM::MODE_SGBM                                   // mode
+                0,                                       // minDisparity
+                16 * nDisparities,                       // numDisparities
+                11,                                      // blockSize
+                8 * SADWindowSize * SADWindowSize,       // P1
+                4 * (8 * SADWindowSize * SADWindowSize), // P2
+                1,                                       // disp12MaxDiff
+                63,                                      // preFilterCap
+                15,                                      // uniquenessRatio
+                3,                                       // speckleWindowSize
+                3,                                       // speckleRange
+                StereoSGBM::MODE_SGBM                    // mode
             );
-#endif
-            if(!mBMdisparity16)
+
+            if(mBMdisparity16.empty())
             {
-                mBMdisparity16 = cvCreateMat(mDisparity.height, mDisparity.width, CV_16S);
-                if(mBMdisparity16 == NULL)
-                    debout << "Error: create matrix for block matching disparity map!" << endl;
+                mBMdisparity16 = cv::Mat(mDisparity.size(), CV_16S);
             }
 
-#if CV_MAJOR_VERSION == 2
+
             cv::Mat MR(getRectified(cameraRight));
             cv::Mat ML(getRectified(cameraLeft));
-            cv::Mat MD(mBMdisparity16);
-            (*mSgbm)(MR, ML, MD);
-#elif CV_MAJOR_VERSION == 3 || CV_MAJOR_VERSION == 4
-
-            cv::Mat MR(cvarrToMat(getRectified(cameraRight)));
-            cv::Mat ML(cvarrToMat(getRectified(cameraLeft)));
-            cv::Mat MD(cvarrToMat(mBMdisparity16));
-            mSgbm->compute(ML, MR, MD);
-#endif
-            //            debout << mSgbm->preFilterCap <<endl; // default: 0
-            //            debout << mSgbm->SADWindowSize <<endl;
-            //            debout << mSgbm->P1 <<endl; // default: 0
-            //            debout << mSgbm->P2 <<endl; // default: 0
-            //            debout << mSgbm->minDisparity <<endl;
-            //            debout << mSgbm->numberOfDisparities <<endl;
-            //            debout << mSgbm->uniquenessRatio <<endl; // default: 0
-            //            debout << mSgbm->speckleWindowSize <<endl; // default: 0
-            //            debout << mSgbm->speckleRange <<endl; // default: 0
-            //            debout << mSgbm->disp12MaxDiff <<endl; // default: 0
-            //            debout << mSgbm->fullDP <<endl; // default: 0
+            mSgbm->compute(ML, MR, mBMdisparity16);
 
             // exchange/replace value in mBMdisparity16 so that the error value is the same like in pointgrey
-            short *data16  = (short *) mBMdisparity16->data.s;
+            short *data16  = (short *) mBMdisparity16.data;
             short *yData16 = data16;
 
-            for(int y = 0; y < mBMdisparity16->height; ++y)
+            for(int y = 0; y < mBMdisparity16.rows; ++y)
             {
-                for(int x = 0; x < mBMdisparity16->width; ++x)
+                for(int x = 0; x < mBMdisparity16.cols; ++x)
                 {
-                    if((-*data16 < (mMain->getStereoWidget()->minDisparity->value()) * 16) ||
-                       (-*data16 > (mMain->getStereoWidget()->maxDisparity->value()) *
-                                       16) || // laesst nur den Teil ueber, der in gui eingestellt wurde
-#if CV_MAJOR_VERSION == 2
-                       (*data16 <=
-                        (mSgbm->minDisparity) * 16)) // enthaelt auch: (*data16 == (mBMState->minDisparity-1)*16)) //
-                                                     // marker fuer nicht berechneten wert
-#elif CV_MAJOR_VERSION == 3 || CV_MAJOR_VERSION == 4
+                    if((*data16 < (mMain->getStereoWidget()->minDisparity->value()) * 16) ||
+                       (*data16 > (mMain->getStereoWidget()->maxDisparity->value()) *
+                                      16) || // laesst nur den Teil ueber, der in gui eingestellt wurde
+
                        (*data16 <= (-(mMain->getStereoWidget()->maxDisparity->value()) + 1) * 16))
-#endif
                     {
-                        *data16 = 0xFF00; // fehlercode gemaess ptgrey
+                        *data16 = static_cast<short>(0xFF00); // fehlercode gemaess ptgrey
                     }
                     else // vorzeichen umkehren und
                     {
-                        if(-*data16 * 16 > SHRT_MAX)
+                        if(*data16 * 16 > SHRT_MAX)
                         {
                             *data16 = SHRT_MAX;
-                            debout << "Warning: Disparity set to SHRT_MAX for Pixel " << x << "/" << y << endl;
+                            SPDLOG_WARN("Disparity set to SHRT_MAX for Pixel {}/{}", x, y);
                         }
                         else
                             *data16 =
-                                -*data16 *
+                                *data16 *
                                 16; // *16, da cv disp nur faktor 16 fuer subpixelgenauigkeit hat und triclops *256
                     }
                     ++data16;
                 }
-                data16 = (yData16 += (mBMdisparity16->step / sizeof(short)));
+                data16 = (yData16 += (mBMdisparity16.step1()));
             }
 
-            mDisparity.imageData = (char *) mBMdisparity16->data.ptr;
+            mDisparity = mBMdisparity16;
         }
 
         setStatus(genDisparity);
@@ -1023,7 +942,7 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
         if(mMin == USHRT_MAX) // das allererste Mal
             calcMinMax();
 
-        if(dispNew != NULL)
+        if(dispNew != nullptr)
             *dispNew = true;
         mMain->getStereoItem()->setDispNew(true); // das zu zeichnende Bild neu berechnen
 
@@ -1083,30 +1002,40 @@ IplImage *pet::StereoContext::getDisparity(bool *dispNew)
         mMax                 = SHRT_MAX;
 #endif
 
-        return &mDisparity;
+
+#ifdef TIME_MEASUREMENT
+        //        "==========: "
+        debout << "out   disp: " << getElapsedTime() << endl;
+#endif
+
+
+        return mDisparity;
     }
     else if(mStatus & genDisparity)
     {
-        return &mDisparity;
+        return mDisparity;
     }
     else
-        return NULL;
+        return cv::Mat(); // NOTE Error Handling
 }
 
 // gibt die cm pro pixel in der entfernung von z Metern von der Kamera zurueck
-double pet::StereoContext::getCmPerPixel(float z)
+double pet::StereoContext::getCmPerPixel([[maybe_unused]] float z)
 {
+#ifdef STEREO
+
     float row1, row2;
     float col;
     float disp;
 
     // col ist fuer gleiches x identisch
     // exemplarisch wird anzahl an pixel zwischen (1m,1m) bis (1m,2m) bestimmt
-#ifdef STEREO
     triclopsXYZToRCD(mTriclopsContext, 1., 1., z, &row1, &col, &disp);
     triclopsXYZToRCD(mTriclopsContext, 1., 2., z, &row2, &col, &disp);
-#endif
     return 100. / (row2 - row1);
+#else
+    return -1;
+#endif
 }
 
 void pet::StereoContext::calcMinMax()
@@ -1116,13 +1045,13 @@ void pet::StereoContext::calcMinMax()
         mMin = USHRT_MAX;
         mMax = 0;
 
-        unsigned short *data  = (unsigned short *) mDisparity.imageData;
+        unsigned short *data  = (unsigned short *) mDisparity.data;
         unsigned short *yData = data;
         int             x, y;
 
-        for(y = 0; y < mDisparity.height; ++y)
+        for(y = 0; y < mDisparity.rows; ++y)
         {
-            for(x = 0; x < mDisparity.width; ++x)
+            for(x = 0; x < mDisparity.cols; ++x)
             {
                 if(dispValueValid(*data))
                 {
@@ -1133,7 +1062,7 @@ void pet::StereoContext::calcMinMax()
                 }
                 ++data;
             }
-            data = (yData += mDisparity.width);
+            data = (yData += mDisparity.step1());
         }
     }
     // debout << "Set disparity color code min: " << mMin << ", max: " << mMax << endl;
@@ -1152,7 +1081,7 @@ bool pet::StereoContext::getXYZ(int col, int row, float *x, float *y, float *z)
 {
     if(mStatus & genDisparity)
     {
-        unsigned short int disp = *(((unsigned short *) mDisparity.imageData) + mDisparity.width * row + col);
+        unsigned short int disp = *(((unsigned short *) mDisparity.data) + mDisparity.step1() * row + col);
 
         if(dispValueValid(disp))
         {
@@ -1175,16 +1104,18 @@ bool pet::StereoContext::getXYZ(int col, int row, float *x, float *y, float *z)
 
 // liefert zu einer Disparit�t die Entfernung in cm
 // die Entfernung ist fuer jedes Pixel gleich (hier 0,0 genommen)
-float pet::StereoContext::getZfromDisp(unsigned short int disp)
+float pet::StereoContext::getZfromDisp([[maybe_unused]] unsigned short int disp)
 {
+#ifdef STEREO
     float x;
     float y;
     float z;
 
-#ifdef STEREO
     triclopsRCD16ToXYZ(mTriclopsContext, 0, 0, disp, &x, &y, &z);
-#endif
     return z * 100.; // in cm
+#else
+    return -1;
+#endif
 }
 
 // col, row beginnt bei 0, 0
@@ -1201,12 +1132,12 @@ bool pet::StereoContext::getMedianXYZaround(int col, int row, float *x, float *y
         values.fill(65280); // 65280 == 0xff00 ab wo angezeigt wird, dass es fehler sind
 
         // umstellung von row und col von mitte des 5x5x auf ecke oben links und ueberpruefung auf rand
-        row = ((row < 2) ? 0 : ((row > mDisparity.height - 3) ? mDisparity.height - 5 : row - 2));
-        col = ((col < 2) ? 0 : ((col > mDisparity.width - 3) ? mDisparity.width - 5 : col - 2));
+        row = ((row < 2) ? 0 : ((row > mDisparity.rows - 3) ? mDisparity.rows - 5 : row - 2));
+        col = ((col < 2) ? 0 : ((col > mDisparity.cols - 3) ? mDisparity.cols - 5 : col - 2));
 
         unsigned short *data =
             (unsigned short
-                 *) (((unsigned short *) mDisparity.imageData) + mDisparity.width * row + col); // mDisparity.imageData;
+                 *) (((unsigned short *) mDisparity.data) + mDisparity.step1() * row + col); // mDisparity.imageData;
         unsigned short *yData = data;
         int             i, j, nr = 0; // nr zeigt anzahl der gefundenen disp an
 
@@ -1220,12 +1151,12 @@ bool pet::StereoContext::getMedianXYZaround(int col, int row, float *x, float *y
                 }
                 ++data;
             }
-            data = (yData += mDisparity.width);
+            data = (yData += mDisparity.step1());
         }
 
         if(nr != 0)
         {
-            qSort(values.begin(), values.begin() + nr); // sort first nr elements in values
+            std::sort(values.begin(), values.begin() + nr); // sort first nr elements in values
 
             // debout << row+2 << " " << col+2 << " " << nr << " "<< values[nr/2] << endl;
 #ifdef STEREO
@@ -1252,52 +1183,45 @@ bool pet::StereoContext::dispValueValid(unsigned short int disp)
         return false;
 }
 
-CvMat *pet::StereoContext::getPointCloud()
+cv::Mat pet::StereoContext::getPointCloud()
 {
     if(!(mStatus & genDisparity)) // falls disparity noch nicht berechnet wurde
         getDisparity();
 
     if(mStatus & genDisparity)
     {
-        if(mPointCloud == NULL) // Speicherplatz anlegen
+#ifdef STEREO
+
+        if(mPointCloud.empty()) // Speicherplatz anlegen
         {
-            mPointCloud = cvCreateMat(mDisparity.height, mDisparity.width, CV_32FC3); // CvMat*
-            if(mPointCloud == NULL)
-            {
-                debout << "Error: not enaugh memory for pointCloud" << endl;
-                return NULL;
-            }
+            mPointCloud = cv::Mat(mDisparity.rows, mDisparity.cols, CV_32FC3);
+            // NOTE Speicherueberpruefung ggf. auch hier durchfuehren (Exception fangen)
         }
 
-        unsigned short *data    = (unsigned short *) mDisparity.imageData;
-        unsigned short *yData   = data;
-        float          *pcData  = (float *) mPointCloud->data.fl;
-        float          *pcyData = pcData;
+        unsigned short *data   = (unsigned short *) mDisparity.data;
+        float          *pcData = (float *) mPointCloud.data;
+        // float* pcyData = pcData;
         // float x, y, z;
         int i, j;
 
-        for(i = 0; i < mDisparity.height; ++i)
+        for(i = 0; i < mDisparity.rows; ++i)
         {
-            for(j = 0; j < mDisparity.width; ++j)
+            data   = mDisparity.ptr<ushort>(i);
+            pcData = mPointCloud.ptr<float>(i);
+            for(j = 0; j < mDisparity.cols; ++j)
             {
                 if(dispValueValid(*data))
                 {
                     // convert the 16 bit disparity value to floating point x,y,z
-#ifdef STEREO
                     triclopsRCD16ToXYZ(mTriclopsContext, i, j, *data, pcData, pcData + 1, pcData + 2);
-#endif
                 }
                 else
                 {
-                    pcData[0] = pcData[1] = pcData[2] = -1;
+                    mPointCloud.at<cv::Vec3f>(i, j) = {-1, -1, -1};
                 }
-                //                if (i ==100 || i == 101)
-                //                    cout << pcData << " # " << pcData+2 << " ";
                 ++data;
                 pcData += 3;
             }
-            data   = (yData += mDisparity.width);
-            pcData = (pcyData += mPointCloud->step / sizeof(float)); //  ->step);
         }
         //        debout << mDisparity.width << " " << mDisparity.widthStep << endl;
         //        debout << mPointCloud->width << " " << mPointCloud->step << endl;
@@ -1350,13 +1274,13 @@ CvMat *pet::StereoContext::getPointCloud()
             data   = (yData += mDisparity.width);
             pcData = (pcyData += mPointCloud->step / sizeof(float));
         }
-#endif
-
+#endif // TMP_STEREO_SEQ_DISP
+#endif // STEREO
 
         return mPointCloud;
     }
     else
-        return NULL;
+        return cv::Mat(); // NOTE Error Handling
 
 
     //    else // kann nun nicht mehr passieren, da disp berechnet wird, wenn nichjt schon geschehen
@@ -1417,8 +1341,12 @@ CvMat *pet::StereoContext::getPointCloud()
 
 
 // return shows, if export was sucessfull
-bool pet::StereoContext::exportPointCloud(QString dest) // default = ""
+bool pet::StereoContext::exportPointCloud([[maybe_unused]] QString dest) // default = ""
 {
+#ifndef STEREO
+    PCritical(nullptr, "No stereo support", "This version of PeTrack was compiled without stereo support.");
+    return false;
+#else
     static QString lastFile = "";
 
     if(mStatus & genDisparity)
@@ -1439,7 +1367,7 @@ bool pet::StereoContext::exportPointCloud(QString dest) // default = ""
 
         if(!dest.isEmpty())
         {
-            if(dest.endsWith(".pts", Qt::CaseInsensitive))
+            if(dest.right(4) == ".pts")
             {
                 QFile file(dest);
 
@@ -1452,39 +1380,37 @@ bool pet::StereoContext::exportPointCloud(QString dest) // default = ""
                     return false;
                 }
 
-                debout << "export point cloud to " << dest << "..." << endl;
+                SPDLOG_INFO("export point cloud to {}...", dest.toStdString());
                 QTextStream out(&file);
 
-                unsigned short *data  = (unsigned short *) mDisparity.imageData;
+                unsigned short *data  = (unsigned short *) mDisparity.data;
                 unsigned short *yData = data;
                 float           x, y, z;
                 int             i, j, k = 0;
                 int             nPoints = 0;
                 unsigned char   c;
-                unsigned char  *iD = (unsigned char *) getRectified(cameraRight)->imageData;
+                unsigned char  *iD = (unsigned char *) getRectified(cameraRight).data;
 
-                for(i = 0; i < mDisparity.height; ++i)
+                for(i = 0; i < mDisparity.rows; ++i)
                 {
-                    for(j = 0; j < mDisparity.width; ++j)
+                    for(j = 0; j < mDisparity.cols; ++j)
                     {
                         if(dispValueValid(*data) && ((mMain->getBackgroundFilter()->getEnabled() &&
                                                       mMain->getBackgroundFilter()->isForeground(j, i)) ||
                                                      !mMain->getBackgroundFilter()->getEnabled()))
                         {
                             // convert the 16 bit disparity value to floating point x,y,z
-#ifdef STEREO
                             triclopsRCD16ToXYZ(mTriclopsContext, i, j, *data, &x, &y, &z);
-#endif
                             // look at points within a range
                             // if ( z < 5.0 )
                             c = iD[k];
-                            out << x << " " << y << " " << z << " " << c << " " << c << " " << c << endl;
+                            out << x << " " << y << " " << z << " " << c << " " << c << " " << c << Qt::endl;
                             ++nPoints;
                         }
                         ++data;
                         ++k;
                     }
-                    data = (yData += mDisparity.width);
+                    data = (yData += mDisparity.step1());
                 }
 
 
@@ -1515,7 +1441,7 @@ bool pet::StereoContext::exportPointCloud(QString dest) // default = ""
                 //                }
 
                 file.close();
-                cout << " with " << nPoints << " points finished " << endl;
+                std::cout << " with " << nPoints << " points finished " << std::endl;
             }
             else
             {
@@ -1537,6 +1463,5 @@ bool pet::StereoContext::exportPointCloud(QString dest) // default = ""
             QObject::tr("Cannot export point cloud, because disparity has not been generated."));
         return false;
     }
+#endif // STEREO defined
 }
-
-#endif

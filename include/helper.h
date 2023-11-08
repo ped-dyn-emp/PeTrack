@@ -59,16 +59,7 @@ inline constexpr double PI = 3.141592654;
 // Static function that converts an iplImg in a qImg.
 // If the images are not the same size, a new qImg will be created with the same size as the iplImg.
 #include <QImage>
-#ifndef STEREO_DISABLED
-#include "cxcore.h"
-void copyToQImage(QImage *qImg, IplImage *iplImg); // war static functin in animatioln class
-#endif
 void copyToQImage(QImage &qImg, cv::Mat &img);
-
-#include <QLabel>
-#ifndef STEREO_DISABLED
-void showImg(QLabel *l, IplImage *i);
-#endif
 
 cv::Mat getRoi(cv::Mat &img, const QRect &roi, cv::Rect &rect, bool evenPixelNumber = true);
 

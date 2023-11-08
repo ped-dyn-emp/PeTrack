@@ -26,6 +26,7 @@
 #include "pMessageBox.h"
 #include "petrack.h"
 #include "roiItem.h"
+#include "stereoWidget.h"
 
 /**
  * @brief split trajectorie pers before frame frame
@@ -408,19 +409,18 @@ void PersonStorage::moveTrackPoint(int personID, int frame, const Vec2F &newPosi
 
 // used for calculation of 3D point for all points in frame
 // returns number of found points or -1 if no stereoContext available (also points without disp found are counted)
-int PersonStorage::calcPosition(int /*frame*/)
+int PersonStorage::calcPosition(int frame)
 {
-#ifndef STEREO_DISABLED
-    int                 anz = 0, notFoundDisp = 0;
-    pet::StereoContext *sc = mMainWindow.getStereoContext();
+    int                 anz = 0;
+    pet::StereoContext *sc  = mMainWindow.getStereoContext();
     float               x, y, z;
 
     if(sc)
     {
         // for every point of a person, which has already identified at this frame
-        for(int i = 0; i < size(); ++i) // ueber TrackPerson
+        for(auto &person : mPersons) // ueber TrackPerson
         {
-            if(at(i).trackPointExist(frame))
+            if(person.trackPointExist(frame))
             {
                 ++anz;
 
@@ -428,32 +428,24 @@ int PersonStorage::calcPosition(int /*frame*/)
                 //  ACHTUNG: BORDER NICHT BEACHTET bei p.x()...???
                 //  calculate height with disparity map
                 if(sc->getMedianXYZaround(
-                       (int) at(i).trackPointAt(frame).x(),
-                       (int) at(i).trackPointAt(frame).y(),
+                       (int) person.trackPointAt(frame).x(),
+                       (int) person.trackPointAt(frame).y(),
                        &x,
                        &y,
                        &z)) // nicht myRound, da pixel 0 von 0..0.99 in double geht
                 {
                     // hier kommt man nur hinein, wenn x, y, z Wert berechnet werden konnten
                     // statt altitude koennte hier irgendwann die berechnete Bodenhoehe einfliessen
-                    mPersons[i][frame - at(i).firstFrame()].setSp(x, y, z); // setZdistanceToCam(z);
-                    mPersons[i].setHeight(z, mMainWindow.getControlWidget()->getCameraAltitude());
+                    person.updateStereoPoint(frame, {x, y, z}); // setZdistanceToCam(z);
+                    person.setHeight(z, mMainWindow.getControlWidget()->getCameraAltitude());
                 }
-                else
-                    ++notFoundDisp;
-                // else // Meldung zu haeufig
-                //     debout << "Warning: No disparity information for person " << i+1 << "." << endl;
             }
         }
-        // if (notFoundDisp>0) // Meldung zu haeufig
-        //     debout << "Warning: No disparity information found for " << (100.*notFoundDisp)/anz << " percent of
-        //     points." << endl;
+
         return anz;
     }
     else
         return -1;
-#endif
-    return -1;
 }
 
 
@@ -495,7 +487,6 @@ bool PersonStorage::addPoint(
     float scaleHead;
     float dist, minDist = 1000000.;
     float z = -1;
-#ifndef STEREO_DISABLED
     float x = -1, y = -1;
 
     // ACHTUNG: BORDER NICHT BEACHTET bei point.x()...
@@ -504,17 +495,16 @@ bool PersonStorage::addPoint(
     if(mMainWindow.getStereoContext() && mMainWindow.getStereoWidget()->stereoUseForHeight->isChecked())
     {
         if(mMainWindow.getStereoContext()->getMedianXYZaround(
-               (int) p.x(), (int) p.y(), &x, &y, &z)) // nicht myRound, da pixel 0 von 0..0.99 in double geht
+               (int) point.x(), (int) point.y(), &x, &y, &z)) // nicht myRound, da pixel 0 von 0..0.99 in double geht
         {
             // statt altitude koennte hier irgendwann die berechnete Bodenhoehe einfliessen
-            p.setSp(x, y, z); // setZdistanceToCam(z);
+            point.setSp(x, y, z); // setZdistanceToCam(z);
         }
         // cout << " " << point.x()<< " " << point.y() << " " << x << " " << y << " " << z <<endl;
         // if (i == 10)
         //     debout << i << " " << mMainWindow.getControlWidget()->getCameraAltitude() - z << " " << z << " " <<
         //     mPersons[i].height() << endl;
     }
-#endif
     // skalierungsfaktor fuer kopfgroesse
     // fuer multicolor marker groesser, da der schwarze punkt weit am rand liegen kann
     bool multiColorWithDot = false;

@@ -826,7 +826,6 @@ int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int bord
                             // borderSize abziehen, da Trackerdaten am Rand des Originalbildes 0/0 ist
                             // set position relative to original image size
                             v += borderSize2F;
-#ifndef STEREO_DISABLED
                             float x = -1, y = -1;
                             // ACHTUNG: BORDER NICHT BEACHTET bei point.x()...
                             // calculate height with disparity map
@@ -839,7 +838,6 @@ int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int bord
                                     v.setSp(x, y, z);
                                 }
                             }
-#endif
                             // wenn bei punkten, die nicht am rand liegen, der fehler gross ist,
                             // wird geguckt, ob der sprung sich zur vorherigen richtung stark veraendert hat
                             // wenn sprung sehr unterschiedlich, wird lieber interpoliert oder stehen geblieben

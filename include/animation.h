@@ -126,23 +126,19 @@ public:
     bool isImageSequence() const;
     bool isCameraLiveStream() const;
 
-#ifndef STEREO_DISABLED
     enum Camera getCamera();
     void        setCamera(enum Camera);
-#endif
-    int getFirstFrameSec() const;
-    int getFirstFrameMicroSec() const;
+    int         getFirstFrameSec() const;
+    int         getFirstFrameMicroSec() const;
 
     QString   getFileBase();
     QFileInfo getFileInfo();
 
-#ifndef STEREO_DISABLED
     // used to get access of both frames only with calibStereoFilter
 #ifdef STEREO
     PgrAviFile *getCaptureStereo();
 #else
     StereoAviFile *getCaptureStereo();
-#endif
 #endif
 
 private:
@@ -154,11 +150,6 @@ private:
 
     // Indicate if the current animation is a video or a photo or a stereo video
     bool mVideo, mImgSeq, mStereo, mCameraLiveStream;
-
-#ifndef STEREO_DISABLED
-    // indicates which camera is used for stereo video
-    enum Camera mCamera;
-#endif
 
     // Image that will be used by the animation and that will be returned in the public functions
     cv::Mat mImage;
@@ -229,9 +220,6 @@ private:
     // Opens an animation from a sequence of stereo video files
     // fileNumber indicates the number of the successive files splited while writing
     // nur bei einer ganz neuen sequenz ist stereoImgBuffer != 0
-#ifndef STEREO_DISABLED
-    bool openAnimationStereoVideo(int fileNumber, IplImage *stereoImgLeft, IplImage *stereoImgRight);
-#endif
     bool openAnimationStereoVideo(int fileNumber, cv::Mat &stereoImgLeft, cv::Mat &stereoImgRight);
 
     // like above for the first time with new filename
@@ -259,7 +247,6 @@ private:
     cv::VideoCapture mVideoCapture;
 
 
-#ifndef STEREO_DISABLED
     // Capture structure from pgrAviFile for Stereo Videos
 #ifdef STEREO
     PgrAviFile *mCaptureStereo;
@@ -272,7 +259,6 @@ private:
 
     // A list with all the filenames of the stereo video series
     QStringList mStereoVideoFilesList;
-#endif
 };
 
 #endif

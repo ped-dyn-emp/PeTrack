@@ -39,13 +39,12 @@ public:
     void getXml(QDomElement &elem);
 
 private slots:
-#ifndef STEREO_DISABLED
-    void on_stereoUseForHeight_stateChanged(int i)
+    void on_stereoUseForHeight_stateChanged(int /*i*/)
     {
         if(stereoUseForHeightEver->isChecked() && stereoUseForHeight->isChecked())
             mMainWindow->updateImage();
     }
-    void on_stereoUseForHeightEver_stateChanged(int i)
+    void on_stereoUseForHeightEver_stateChanged(int /*i*/)
     {
         if(stereoUseForHeightEver->isChecked() && stereoUseForHeight->isChecked())
             mMainWindow->updateImage();
@@ -56,12 +55,12 @@ private slots:
         mMainWindow->getStereoItem()->setVisible(i);
         mMainWindow->getScene()->update();
     }
-    void on_stereoColor_currentIndexChanged(int i)
+    void on_stereoColor_currentIndexChanged(int /*i*/)
     {
         if(mMainWindow && (mMainWindow->getScene()))
             mMainWindow->getScene()->update();
     }
-    void on_stereoDispAlgo_currentIndexChanged(int i)
+    void on_stereoDispAlgo_currentIndexChanged(int /*i*/)
     {
         if(mMainWindow && (mMainWindow->getScene()) && mMainWindow->getStereoContext())
         {
@@ -69,7 +68,7 @@ private slots:
             mMainWindow->getScene()->update();
         }
     }
-    void on_hideWrong_stateChanged(int i)
+    void on_hideWrong_stateChanged(int /*i*/)
     {
         if(mMainWindow && (mMainWindow->getScene()) && mMainWindow->getStereoContext())
         {
@@ -91,10 +90,7 @@ private slots:
             mMainWindow->getScene()->update();
         }
     }
-    void on_opacity_valueChanged(int i)
-    {
-        mMainWindow->getScene()->update();
-    }
+    void on_opacity_valueChanged(int /*i*/) { mMainWindow->getScene()->update(); }
     void on_edgeMaskSize_valueChanged(int i)
     {
         if(i % 2 == 0)
@@ -102,7 +98,7 @@ private slots:
             edgeMaskSize->setValue(i - 1);
             return;
         }
-        if(mMainWindow->getStereoContext())
+        if(mMainWindow->getStereoContext() && !mMainWindow->isLoading())
         {
             mMainWindow->getStereoContext()->preprocess();
             mMainWindow->getStereoContext()->indicateNewValues();
@@ -111,16 +107,16 @@ private slots:
     }
     // funkioniert noch nicht richtig, da trotz des sprungs nach preprocess
     // zuerst das ergebniss des zuletzt berechneten frames mit edge angezeigt wird!!!!!!!!!
-    void on_useEdge_stateChanged(int i)
+    void on_useEdge_stateChanged(int /*i*/)
     {
-        if(mMainWindow->getStereoContext())
+        if(mMainWindow->getStereoContext() && !mMainWindow->isLoading())
         {
             mMainWindow->getStereoContext()->preprocess();
             mMainWindow->getStereoContext()->indicateNewValues();
             mMainWindow->getScene()->update();
         }
     }
-    void on_maxDisparity_valueChanged(int i)
+    void on_maxDisparity_valueChanged(int /*i*/)
     {
         if(mMainWindow->getStereoContext())
         {
@@ -128,7 +124,7 @@ private slots:
             mMainWindow->getScene()->update();
         }
     }
-    void on_minDisparity_valueChanged(int i)
+    void on_minDisparity_valueChanged(int /*i*/)
     {
         if(mMainWindow->getStereoContext())
         {
@@ -137,11 +133,7 @@ private slots:
         }
     }
 
-    void on_stereoExport_clicked()
-    {
-        mMainWindow->getStereoContext()->exportPointCloud();
-    }
-#endif
+    void on_stereoExport_clicked() { mMainWindow->getStereoContext()->exportPointCloud(); }
 
 private:
     Petrack *mMainWindow;

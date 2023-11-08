@@ -100,14 +100,6 @@ void thresholdHSV(const cv::Mat &src, cv::Mat &bin, const ColorParameters &param
         }
     }
 }
-#ifndef STEREO_DISABLED
-void thresholdHSV(const IplImage *srcIpl, IplImage *binIpl, const ColorParameters &param)
-{
-    const Mat src = cvarrToMat(srcIpl);
-    Mat       bin = cvarrToMat(binIpl);
-    thresholdHSV(src, bin, param);
-}
-#endif
 
 
 void setColorParameter(const QColor &fromColor, const QColor &toColor, bool inversHue, ColorParameters &param)

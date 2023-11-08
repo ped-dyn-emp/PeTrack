@@ -101,9 +101,8 @@ void BackgroundFilter::setFilename(const QString &fn)
 }
 
 // rueckgabe, ob speichern geklappt hat
-bool BackgroundFilter::save(QString /*dest*/) // default = ""
+bool BackgroundFilter::save([[maybe_unused]] QString dest) // default = ""
 {
-#ifndef STEREO_DISABLED
     if(*stereoContext() && !mBgPointCloud.empty())
     {
         // if no destination file or folder is given
@@ -120,7 +119,7 @@ bool BackgroundFilter::save(QString /*dest*/) // default = ""
             if(!dest.endsWith(".png", Qt::CaseInsensitive))
                 dest = dest + ".png";
 
-            Mat bgImg(Size(mBgPointCloud.cols, mBgPointCloud.rows), CV_8UC1);
+            cv::Mat bgImg(cv::Size(mBgPointCloud.cols, mBgPointCloud.rows), CV_8UC1);
             //            IplImage *bgImg = cvCreateImage(cvSize(mBgPointCloud->width, mBgPointCloud->height),
             //            IPL_DEPTH_8U, 1); // CV_8UC1 8, 1
 
@@ -174,7 +173,7 @@ bool BackgroundFilter::save(QString /*dest*/) // default = ""
             // min max in den ersten bytes des bildes verstecken ----------------------------------------
             if(sizeof(float) != 4)
             {
-                debout << "Warning: the height range coded inside the background picture is not portable!" << endl;
+                SPDLOG_WARN("the height range coded inside the background picture is not portable!");
             }
 
 
@@ -197,8 +196,11 @@ bool BackgroundFilter::save(QString /*dest*/) // default = ""
 
             mLastFile = dest;
 
-            debout << "export background subtraction file for stereo mode: " << dest << " (minimal z value " << min
-                   << ", maximal z value " << max << ")." << endl;
+            SPDLOG_INFO(
+                "export background subtraction file for stereo mode: {} (minimal z value {}, maximal z value {}).",
+                dest,
+                min,
+                max);
         }
         else
             return false;
@@ -207,7 +209,6 @@ bool BackgroundFilter::save(QString /*dest*/) // default = ""
     {
         ;
     }
-#endif
     return true;
 }
 
@@ -354,7 +355,6 @@ cv::Mat BackgroundFilter::act(cv::Mat &img, cv::Mat &res)
     if((mBgPointCloud.empty() && mBgModel.empty()) || mForeground.empty() ||
        mForeground.size != img.size) // initialisierung wenn entwerder stereo oder model
     {
-#ifndef STEREO_DISABLED
         // For StereoImaging use heightfiled for foreground extraction
         // -------------------------------------------------------------------------------
         if(*stereoContext())
@@ -366,8 +366,8 @@ cv::Mat BackgroundFilter::act(cv::Mat &img, cv::Mat &res)
             // -> plan view statistic
 
             // bgDisparity = cvCloneImage((*stereoContext())->getDisparity());
-            mBgPointCloud = cvarrToMat((*stereoContext())->getPointCloud())
-                                .clone(); // = cvCloneMat((*stereoContext())->getPointCloud());
+            mBgPointCloud =
+                (*stereoContext())->getPointCloud().clone(); // = cvCloneMat((*stereoContext())->getPointCloud());
 
             // interpolate z-values inbetween innerhalb zeile
             int    x, y;
@@ -425,15 +425,14 @@ cv::Mat BackgroundFilter::act(cv::Mat &img, cv::Mat &res)
                         fPtr[2] = vorPtr[-1];
                     }
                 }
-                bgPcData = (bgyPcData += mBgPointCloud.cols / sizeof(float));
+                bgPcData = (bgyPcData += mBgPointCloud.step1());
             }
 
-            mForeground.create(Size(img.cols, img.rows), CV_8UC1);
+            mForeground.create(cv::Size(img.cols, img.rows), CV_8UC1);
             //            mForeground = cvCreateImage(cvSize(img->width, img->height), IPL_DEPTH_8U, 1); // CV_8UC1 8, 1
         }
 
         else // nicht stereo
-#endif       // STEREO_DISABLED
         {
             // GaussBGStatModel
             // ---------------------------------------------------------------------------------------------------------------------
@@ -469,7 +468,6 @@ cv::Mat BackgroundFilter::act(cv::Mat &img, cv::Mat &res)
         // --------------------------------------------------------------------------------------------------------
         if(*stereoContext())
         {
-#ifndef STEREO_DISABLED
             // fuer update waere bei stereo denkbar: mittelwert der disp/zwerte, aber Achtung: invalidDisp
             // beruecksichtigen!
 
@@ -510,11 +508,11 @@ cv::Mat BackgroundFilter::act(cv::Mat &img, cv::Mat &res)
             float *bgPcData  = (float *) mBgPointCloud.data;
             float *bgyPcData = bgPcData;
 
-            Mat    pointCloud = cvarrToMat((*stereoContext())->getPointCloud());
-            float *pcData     = (float *) pointCloud.data;
-            float *yPcData    = pcData;
+            cv::Mat pointCloud = (*stereoContext())->getPointCloud();
+            float  *pcData     = (float *) pointCloud.data;
+            float  *yPcData    = pcData;
 
-            mForeground = Scalar(0, 0, 0);
+            mForeground = cv::Scalar(0, 0, 0);
             //                cvSet(mForeground, CV_RGB(0,0,0));
             //                cvFillImage(mForeground, 0); //um vorherige foreground-berechungen zu vergessen
 
@@ -535,11 +533,9 @@ cv::Mat BackgroundFilter::act(cv::Mat &img, cv::Mat &res)
                     pcData += 3;
                     bgPcData += 3;
                 }
-                pcData   = (yPcData += pointCloud.cols / sizeof(float));
-                bgPcData = (bgyPcData += mBgPointCloud.cols / sizeof(float));
+                pcData   = (yPcData += pointCloud.step1());
+                bgPcData = (bgyPcData += mBgPointCloud.step1());
             }
-
-#endif
         }
         else // nicht stereo
         {
@@ -653,7 +649,7 @@ void BackgroundFilter::maskBg(cv::Mat &mat, float val)
                 pcData += ch;
             }
             pcData = (yPcData += lineLen);
-            fgData = (yFgData += mForeground.cols);
+            fgData = (yFgData += mForeground.step1());
         }
     }
 }

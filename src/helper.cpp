@@ -118,23 +118,6 @@ void copyToQImage(QImage &qImg, cv::Mat &img) // war static functin in animatiol
     }
 }
 
-#ifndef STEREO_DISABLED
-void copyToQImage(QImage *qImg, IplImage *iplImg)
-{
-    Mat tempMat = cvarrToMat(iplImg);
-    copyToQImage(qImg, tempMat);
-}
-#endif
-
-#ifndef STEREO_DISABLED
-void showImg(QLabel *l, IplImage *i)
-{
-    QImage qImg(i->width, i->height, QImage::Format_RGB32);
-    copyToQImage(&qImg, i);
-    l->setPixmap(QPixmap::fromImage(qImg));
-    l->show();
-}
-#endif
 
 /**
 @brief get roi: copies roi to rect by setting values of roi to correct values inside rect

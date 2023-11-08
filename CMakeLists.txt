@@ -12,9 +12,7 @@
 # -DFAIL_ON_WARNINGS=ON (default OFF) use Werror when building (for CI builds!)
 #
 # currently not supported:
-# -DSTEREO=ON (default OFF)
 # -DAVI=ON (default OFF)
-# -DDISABLE_STEREO=ON (default OFF)
 #
 ################################################################################
 # Project setup
@@ -57,14 +55,11 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ################################################################################
 # Optional features
 ################################################################################
-option(STEREO "Use Point Grey's Triclops SDK? (currently not supported)" OFF)
+option(STEREO "Use Point Grey's Triclops SDK and enable stereo support" OFF)
 print_var(STEREO)
 
-option(AVI "Use Avi File from Point Grey (currently not supported)" OFF)
+option(AVI "Use Avi File from Point Grey (only interal due to license)" OFF)
 print_var(AVI)
-
-option(DISABLE_STEREO "Disable Stereo features (currently must be taken)" ON)
-print_var(DISABLE_STEREO)
 
 option(BUILD_UNIT_TESTS "Build catch2 unit tests" OFF)
 print_var(BUILD_UNIT_TESTS)
@@ -112,13 +107,13 @@ if (USE_3RD_PARTY AND NOT (WIN32 AND MINGW))
 endif()
 
 # Check for currently unavailable options
-if (AVI)
-  message(FATAL_ERROR "Currently the avi File from Point Grey needs to be disabled.")
-endif()
+#if (AVI)
+#  message(FATAL_ERROR "Currently the avi File from Point Grey needs to be disabled.")
+#endif()
 
-# Stero only allowed
-if (NOT DISABLE_STEREO OR STEREO)
-  message(FATAL_ERROR "Currently the stereo feature needs to be disabled.")
+## Stero currently only allowed on windows
+if (STEREO AND NOT WIN32)
+  message(FATAL_ERROR "Currently the stereo feature is only supported on windows.")
 endif()
 
 if (NOT APPLE AND BUILD_BUNDLE)
@@ -221,7 +216,6 @@ target_compile_definitions(petrack PUBLIC PETRACK_VERSION="${PROJECT_VERSION}")
 target_compile_definitions(petrack PUBLIC COMPILE_OS="${CMAKE_SYSTEM_NAME}")
 
 target_compile_options(petrack_core PRIVATE ${COMMON_COMPILE_OPTIONS})
-target_compile_definitions(petrack_core PUBLIC STEREO_DISABLED)
 
 #**********************************************************
 # Linking Qt                                              *
@@ -280,13 +274,14 @@ target_link_libraries(petrack_core PUBLIC ezc3d)
 # Handling of Options                                        *
 #*************************************************************
 
-# TODO currently not available
 if(AVI)
   target_compile_definitions(petrack_core PRIVATE AVI)
   target_sources(petrack_core PUBLIC
       "${CMAKE_SOURCE_DIR}/3rdparty/avifile/aviFile.h"
       "${CMAKE_SOURCE_DIR}/3rdparty/avifile/aviFile.cpp"
   )
+  target_include_directories(petrack_core PRIVATE 3rdparty/avifile)
+  target_link_libraries(petrack_core PUBLIC avifil32 msvfw32)
 else()
   target_sources(petrack_core PRIVATE "src/aviFileWriter.cpp")
 endif(AVI)
@@ -519,26 +514,21 @@ target_sources(petrack PRIVATE
 #*****************************************************************************
 # CODE AUS DER ALTEN .PRO DATEI, DER NOCH NICHT IN DIE CMAKE EINGEBAUT WURDE *
 #*****************************************************************************
-if(${STEREO})
-  # Should not happen at the moment Code below was at this point in .pro
-  # $$STEREO { !build_pass:message(Stereo enabled!) DEFINES += STEREO
+if(STEREO)
+  message("Stereo enabled! (PGR)")
+  target_compile_definitions(petrack_core PRIVATE STEREO)
 
-  # # fuer pgr stereo INCLUDEPATH += $${PGRPATH}/include QMAKE_LIBDIR +=
-  # $${PGRPATH}/bin LIBS += -L$${PGRPATH}/lib #LIBS += -ldl LIBS +=
-  # -ltriclops_v100 #LIBS += -lpnmutils } else { !build_pass:message(Stereo
-  # disabled!) }
+  target_link_libraries(petrack_core PUBLIC avifil32 msvfw32 pnmutils_v100)
+  target_link_libraries(petrack_core PUBLIC triclops_v100)
+  target_link_directories(petrack_core PUBLIC  3rdparty/windows/triclops-3.4/bin64/)
+  target_link_directories(petrack_core PUBLIC 3rdparty/windows/triclops-3.4/lib64/)
+  target_include_directories(petrack_core PRIVATE 3rdparty/windows/triclops-3.4/include)
+  target_include_directories(petrack_core PRIVATE 3rdparty/avifile)
+  target_sources(petrack_core PRIVATE 3rdparty/avifile/pgrAviFile.cpp 3rdparty/avifile/pgrAviFile.h)
+else()
+    target_sources(petrack_core PRIVATE src/stereoAviFile.cpp)
+endif()
 
-  # Auch das spielt hier eine Rolle:
-  # Remark: pgrAviFile.cpp/h can now be found at 3rdparty/avifile
-  # $$STEREO{ SOURCES += src/pgrAviFile.cpp HEADERS += include/pgrAviFile.h
-  # message("Include pgrAviFile") }else{ SOURCES += src/stereoAviFile.cpp
-  # HEADERS += include/stereoAviFile.h message("Include stereoAviFile") }
-endif(${STEREO})
-
-# Sollte das nicht eigentlich nur aktiv sein, wenn Stereo gesetzt wurde?
-
-# # fuer pgrAviFile win32:LIBS += -lavifil32 win32:LIBS += -lmsvfw32 win64:LIBS
-# += -lavifil32 win64:LIBS += -lmsvfw32
 
 #####################################################
 # Installer                                         #
