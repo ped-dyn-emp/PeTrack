@@ -124,7 +124,7 @@ TEST_CASE("IntrinsicCameraParams values")
 
         GIVEN("Some parameters are out of range")
         {
-            params.distortionCoeffs.at<float>(12) = 56468;
+            params.distortionCoeffs.at<float>(12) = 156468;
             auto oldParams                        = intrBox.getIntrinsicCameraParams();
             THEN("An exception is thrown")
             {
@@ -331,17 +331,6 @@ TEST_CASE("ImageSizeChanged")
     auto          intrBox = IntrinsicBox(nullptr, ui, autoCalib, filterCalib, []() {});
     constexpr int width   = 1280;
     constexpr int height  = 720;
-
-    WHEN("the image size changes")
-    {
-        intrBox.imageSizeChanged(width, height, 0);
-
-        THEN("Max cx and cy are updated to the image size")
-        {
-            CHECK(ui->cx->maximum() == Approx(width));
-            CHECK(ui->cy->maximum() == Approx(height));
-        }
-    }
 
     WHEN("the image size changes")
     {

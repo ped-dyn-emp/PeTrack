@@ -117,10 +117,6 @@ void IntrinsicBox::imageSizeChanged(int width, int height, int borderDiff)
     const double cX = mParams.getCx();
     const double cY = mParams.getCy();
 
-    mUi->cx->setMinimum(0.);
-    mUi->cx->setMaximum(width);
-    mUi->cy->setMinimum(0.);
-    mUi->cy->setMaximum(height);
     mCxFixed = (width - 1) / 2.;
     mCyFixed = (height - 1) / 2.;
 
