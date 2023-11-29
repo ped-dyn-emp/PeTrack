@@ -320,7 +320,7 @@ AutoCalib::autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist, bool e
         params.cameraMatrix.at<double>(1, 2) += mMainWindow->getImageBorderSize();
         dist_coeffs.convertTo(params.distortionCoeffs, CV_32F);
         params.reprojectionError = reproj_errs;
-
+        checkParamPlausibility(params);
         return params;
     }
     return std::nullopt;
@@ -390,4 +390,54 @@ int AutoCalib::runCalibration(
 
     code = 1;
     return code;
+}
+
+void AutoCalib::checkParamPlausibility(IntrinsicCameraParams &modelParams)
+{
+    // check camera params
+    auto camParams = modelParams.cameraMatrix;
+    if(camParams.at<double>(0, 0) < 0 || camParams.at<double>(0, 0) > 5000)
+    {
+        PWarning(
+            nullptr,
+            "Warning!",
+            QString("Value %1 for fx might indicate poor calibration results.").arg(camParams.at<double>(0, 0)));
+    }
+    if(camParams.at<double>(1, 1) < 0 || camParams.at<double>(1, 1) > 5000)
+    {
+        PWarning(
+            nullptr,
+            "Warning!",
+            QString("Value %1 for fy might indicate poor calibration results.").arg(camParams.at<double>(1, 1)));
+    }
+    if(camParams.at<double>(0, 2) < 0 || camParams.at<double>(0, 2) > 5000)
+    {
+        PWarning(
+            nullptr,
+            "Warning!",
+            QString("Value %1 for cx might indicate poor calibration results.").arg(camParams.at<double>(0, 2)));
+    }
+    if(camParams.at<double>(1, 2) < 0 || camParams.at<double>(1, 2) > 5000)
+    {
+        PWarning(
+            nullptr,
+            "Warning!",
+            QString("Value %1 for cy might indicate poor calibration results.").arg(camParams.at<double>(1, 2)));
+    }
+    // check distortion params
+    std::vector<std::string> distParamsNames{
+        "r2", "r4", "tx", "ty", "r6", "k4", "k5", "k6", "s1", "s2", "s3", "s4", "taux", "tauy"};
+    auto distParams = modelParams.distortionCoeffs;
+    for(int i = 0; i < distParams.cols; ++i)
+    {
+        if(distParams.at<float>(i) < -5 || distParams.at<float>(i) > 5)
+        {
+            PWarning(
+                nullptr,
+                "Warning!",
+                QString("Value %1 for %2 might indicate poor calibration results.")
+                    .arg(distParams.at<float>(i))
+                    .arg(QString::fromStdString(distParamsNames[i])));
+        }
+    }
 }

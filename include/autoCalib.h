@@ -81,6 +81,7 @@ public:
     }
 
     std::optional<IntrinsicCameraParams> autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist, bool extModel);
+    void                                 checkParamPlausibility(IntrinsicCameraParams &modelParams);
 
 private:
     int runCalibration(
