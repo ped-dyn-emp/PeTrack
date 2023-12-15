@@ -118,7 +118,7 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         bool     height_set_by_user = false;
         QAction *delTrj = nullptr, *delFutureTrj = nullptr, *delPastTrj = nullptr, *creTrj = nullptr,
                 *infoTrj = nullptr, *addComment = nullptr, *setHeight = nullptr, *resetHeight = nullptr,
-                *setMarkerID = nullptr;
+                *setMarkerID = nullptr, *splitTrj = nullptr;
 
         if(found)
         {
@@ -148,6 +148,7 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             delPastTrj   = menu.addAction("Delete future part of the trajectory");
             setHeight    = menu.addAction("Set person height");
             setMarkerID  = menu.addAction("Set marker ID");
+            splitTrj     = menu.addAction("Split trajectory");
             if(height_set_by_user)
             {
                 resetHeight = menu.addAction("Reset height");
@@ -303,6 +304,10 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
                 msgBox.setEscapeButton(QMessageBox::Ok);
                 msgBox.exec();
             }
+        }
+        else if(selectedAction == splitTrj)
+        {
+            mMainWindow->splitTrackPerson(event->scenePos());
         }
     }
     mMainWindow->getScene()->update();
