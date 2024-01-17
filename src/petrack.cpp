@@ -2560,15 +2560,7 @@ void Petrack::updateControlImage(cv::Mat &img)
     const int imgWidth  = img.cols;
     const int imgHeight = img.rows;
 
-    // no direct invocation to have correct order of invocations
-    // (direct invocation gets executed immediately, i.e. before queued connection)
-    QMetaObject::invokeMethod(
-        mControlWidget,
-        "imageSizeChanged",
-        Qt::ConnectionType::QueuedConnection,
-        Q_ARG(int, imgWidth),
-        Q_ARG(int, imgHeight),
-        Q_ARG(int, diffBorderSize));
+    mControlWidget->imageSizeChanged(imgWidth, imgHeight, diffBorderSize);
 }
 
 void Petrack::importTracker(QString dest) // default = ""
