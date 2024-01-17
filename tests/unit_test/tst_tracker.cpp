@@ -113,3 +113,58 @@ TEST_CASE("TrackPerson ranges can be removed", "[TrackPerson]")
         REQUIRE_THROWS_AS(trackPerson.removeFramesBetween(startFrame + 1, lastFrame - 1), std::range_error);
     }
 }
+
+TEST_CASE("TrackPerson insertion, [TrackPerson]")
+{
+    SECTION("Insert with Interpolation")
+    {
+        GIVEN("Insert TrackPoint at a frame more than 1 frame behind the last frame")
+        {
+            TrackPerson person(1, 0, TrackPoint({0.0, 0.0}));
+            TrackPoint  endpoint({10., 10.});
+            REQUIRE(person.insertAtFrame(10, endpoint, 1, false));
+            THEN("All frames in between are present")
+            {
+                REQUIRE(person.firstFrame() == 0);
+                REQUIRE(person.lastFrame() == 10);
+
+                REQUIRE(person.trackPointExist(0));
+                REQUIRE(person.trackPointExist(1));
+                REQUIRE(person.trackPointExist(2));
+                REQUIRE(person.trackPointExist(3));
+                REQUIRE(person.trackPointExist(4));
+                REQUIRE(person.trackPointExist(5));
+                REQUIRE(person.trackPointExist(6));
+                REQUIRE(person.trackPointExist(7));
+                REQUIRE(person.trackPointExist(8));
+                REQUIRE(person.trackPointExist(9));
+                REQUIRE(person.trackPointExist(10));
+                REQUIRE(person.at(10) == endpoint);
+            }
+        }
+        GIVEN("Insert in front with interpolation")
+        {
+            TrackPerson person(1, 10, TrackPoint({10., 10.}));
+            TrackPoint  endpoint({0., 0.});
+            REQUIRE(person.insertAtFrame(0, endpoint, 1, false));
+            THEN("Points for all frames are inserted")
+            {
+                REQUIRE(person.firstFrame() == 0);
+                REQUIRE(person.lastFrame() == 10);
+
+                REQUIRE(person.trackPointExist(0));
+                REQUIRE(person.trackPointExist(1));
+                REQUIRE(person.trackPointExist(2));
+                REQUIRE(person.trackPointExist(3));
+                REQUIRE(person.trackPointExist(4));
+                REQUIRE(person.trackPointExist(5));
+                REQUIRE(person.trackPointExist(6));
+                REQUIRE(person.trackPointExist(7));
+                REQUIRE(person.trackPointExist(8));
+                REQUIRE(person.trackPointExist(9));
+                REQUIRE(person.trackPointExist(10));
+                REQUIRE(person.at(0) == endpoint);
+            }
+        }
+    }
+}
