@@ -345,12 +345,11 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
             tmp.setY((point.y() - mData.last().y()) / (frame - lastFrame()));
             tp = mData.last();
             tp.setQual(0);
-            for(int i = 0; i < frame - lastFrame() - 1; ++i)
+            for(int i = lastFrame() + 1; i <= frame; ++i)
             {
                 tp += tmp;
                 mData.append(tp);
             }
-            mData.append(point);
         }
         else if(extrapolate && ((lastFrame() - mFirstFrame) > 0)) // mind. 2 trackpoints sind in liste!
         {
@@ -409,12 +408,11 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
             tmp.setY((point.y() - mData.first().y()) / (mFirstFrame - frame));
             tp = mData.first();
             tp.setQual(0);
-            for(int i = 0; i < mFirstFrame - frame - 1; ++i)
+            for(int i = firstFrame() - 1; i >= frame; --i)
             {
                 tp += tmp;
                 mData.prepend(tp);
             }
-            mData.prepend(point);
         }
         else if(extrapolate && ((lastFrame() - mFirstFrame) > 0)) // mind. 2 trackpoints sind in liste!
         {
