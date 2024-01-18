@@ -2030,14 +2030,14 @@ void Petrack::createActions()
         mDelPastAct,
         &QAction::triggered,
         this,
-        [this]() { this->deleteTrackPointAll(PersonStorage::Direction::Previous); });
+        [this]() { this->deleteTrackPointAll(PersonStorage::TrajectorySegment::Previous); });
 
     mDelFutureAct = new QAction(tr("&Future part of all trj."), this);
     connect(
         mDelFutureAct,
         &QAction::triggered,
         this,
-        [this]() { this->deleteTrackPointAll(PersonStorage::Direction::Following); });
+        [this]() { this->deleteTrackPointAll(PersonStorage::TrajectorySegment::Following); });
 
     mDelAllRoiAct = new QAction(tr("&Trj. moving through ROI"), this);
     connect(mDelAllRoiAct, &QAction::triggered, this, &Petrack::deleteTrackPointROI);
@@ -3973,9 +3973,11 @@ int Petrack::addOrMoveManualTrackPoint(const QPointF &pos)
     return pers;
 }
 
-// direction zeigt an, ob bis zum aktuellen (-1), ab dem aktuellen (1) oder ganzer trackpath (0)
-// loeschen von Trackpoints einer Trajektorie
-void Petrack::deleteTrackPoint(QPointF pos, int direction) // const QPoint &pos
+/**
+ * Deletes trajectory based on current frame and selected trajectories.
+ * @see PersonStorage::delPoint
+ */
+void Petrack::deleteTrackPoint(QPointF pos, PersonStorage::TrajectorySegment direction) // const QPoint &pos
 {
     mPersonStorage.delPoint((Vec2F) pos, direction, mAnimation->getCurrentFrameNum(), getPedestrianUserSelection());
     updateControlWidget();
@@ -4000,7 +4002,7 @@ void Petrack::resetTrackPersonHeight(QPointF pos)
  * @brief Delete the following, previous or whole trajectory of **all** trajectories
  * @param direction previous, following or whole
  */
-void Petrack::deleteTrackPointAll(PersonStorage::Direction direction) // const QPoint &pos
+void Petrack::deleteTrackPointAll(PersonStorage::TrajectorySegment direction) // const QPoint &pos
 {
     mPersonStorage.delPointAll(direction, mAnimation->getCurrentFrameNum());
     updateControlWidget();

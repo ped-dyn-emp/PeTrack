@@ -170,15 +170,15 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         }
         else if(selectedAction == delTrj)
         {
-            mMainWindow->deleteTrackPoint(event->scenePos(), 0);
+            mMainWindow->deleteTrackPoint(event->scenePos(), PersonStorage::TrajectorySegment::Whole);
         }
         else if(selectedAction == delFutureTrj)
         {
-            mMainWindow->deleteTrackPoint(event->scenePos(), -1);
+            mMainWindow->deleteTrackPoint(event->scenePos(), PersonStorage::TrajectorySegment::Previous);
         }
         else if(selectedAction == delPastTrj)
         {
-            mMainWindow->deleteTrackPoint(event->scenePos(), 1);
+            mMainWindow->deleteTrackPoint(event->scenePos(), PersonStorage::TrajectorySegment::Following);
         }
         else if(selectedAction == addComment)
         {

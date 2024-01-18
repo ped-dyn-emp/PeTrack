@@ -23,6 +23,7 @@
 #include "logger.h"
 #include "multiColorMarkerWidget.h"
 #include "pMessageBox.h"
+#include "personStorage.h"
 #include "petrack.h"
 #include "roiItem.h"
 #include "stereoWidget.h"
@@ -1084,7 +1085,7 @@ int Tracker::track(
     // gemacht
     for(int i = 0; i < trjToDel.size(); ++i) // ueber TrackPerson
     {
-        mPersonStorage.delPointOf(trjToDel[i], 0, -1);
+        mPersonStorage.delPointOf(trjToDel[i], PersonStorage::TrajectorySegment::Whole, -1);
     }
 
     // numOfPeopleToTrack kann trotz nicht retrack > 0 sein auch bei alten pfaden

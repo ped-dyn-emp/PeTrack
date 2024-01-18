@@ -150,8 +150,8 @@ public slots:
     void editTrackPersonComment(QPointF pos);
     void setTrackPersonHeight(QPointF pos);
     void resetTrackPersonHeight(QPointF pos);
-    void deleteTrackPoint(QPointF pos, int direction);
-    void deleteTrackPointAll(PersonStorage::Direction direction);
+    void deleteTrackPoint(QPointF pos, PersonStorage::TrajectorySegment direction);
+    void deleteTrackPointAll(PersonStorage::TrajectorySegment direction);
     void deleteTrackPointROI();
     void deleteTrackPointInsideROI();
     void moveTrackPoint(QPointF pos);

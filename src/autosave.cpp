@@ -114,7 +114,7 @@ void Autosave::loadAutosave()
     {
         const QString trcAutosaveName = autosaveFiles[trcIndex];
         const auto    trcFile         = mPetrack.getTrackFileName();
-        mPetrack.deleteTrackPointAll(PersonStorage::Direction::Whole);
+        mPetrack.deleteTrackPointAll(PersonStorage::TrajectorySegment::Whole);
         mPetrack.importTracker(trcAutosaveName);
         mPetrack.setTrackFileName(trcFile);
     }

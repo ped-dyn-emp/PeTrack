@@ -19,6 +19,7 @@
 #include "view.h"
 
 #include "control.h"
+#include "personStorage.h"
 #include "petrack.h"
 #include "vector.h"
 
@@ -112,30 +113,30 @@ void GraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
     {
         if(event->modifiers() == Qt::ShiftModifier) // nur shift zugelassen ...
         {
-            emit mouseRightDoubleClick(mapToScene(event->pos()), -1);
+            emit mouseRightDoubleClick(mapToScene(event->pos()), PersonStorage::TrajectorySegment::Previous);
         }
         else if(event->modifiers() == Qt::ControlModifier)
         {
-            emit mouseRightDoubleClick(mapToScene(event->pos()), 0);
+            emit mouseRightDoubleClick(mapToScene(event->pos()), PersonStorage::TrajectorySegment::Whole);
         }
         else if(event->modifiers() == Qt::AltModifier)
         {
-            emit mouseRightDoubleClick(mapToScene(event->pos()), 1);
+            emit mouseRightDoubleClick(mapToScene(event->pos()), PersonStorage::TrajectorySegment::Following);
         }
     }
     else if(event->button() == Qt::MiddleButton)
     {
         if(event->modifiers() == Qt::ShiftModifier) // nur shift zugelassen ...
         {
-            emit mouseMiddleDoubleClick(PersonStorage::Direction::Previous);
+            emit mouseMiddleDoubleClick(PersonStorage::TrajectorySegment::Previous);
         }
         else if(event->modifiers() == Qt::ControlModifier)
         {
-            emit mouseMiddleDoubleClick(PersonStorage::Direction::Whole);
+            emit mouseMiddleDoubleClick(PersonStorage::TrajectorySegment::Whole);
         }
         else if(event->modifiers() == Qt::AltModifier)
         {
-            emit mouseMiddleDoubleClick(PersonStorage::Direction::Following);
+            emit mouseMiddleDoubleClick(PersonStorage::TrajectorySegment::Following);
         }
     }
 
