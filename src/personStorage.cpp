@@ -87,23 +87,23 @@ bool PersonStorage::splitPersonAt(const Vec2F &point, int frame, const QSet<size
 /**
  * @brief Deletes points of pers
  * @param pers TrackPerson whose points should be deleted
- * @param direction notes if previous (-1), following(1) or whole(0) trajectory should be deleted
- * @param frame
+ * @param direction the direction in which the trajectory should be deleted
+ * @param frame the frame (exclusive) from which the deletion will happen
  * @return true, if deletion occured
  */
-bool PersonStorage::delPointOf(int pers, int direction, int frame)
+bool PersonStorage::delPointOf(int pers, TrajectorySegment direction, int frame)
 {
     onManualAction();
 
-    if(direction == -1)
+    if(direction == TrajectorySegment::Previous)
     {
         deletePersonFrameRange(pers, mPersons[pers].firstFrame(), frame - 1);
     }
-    else if(direction == 0)
+    else if(direction == TrajectorySegment::Whole)
     {
         deletePerson(pers);
     }
-    else if(direction == 1)
+    else if(direction == TrajectorySegment::Following)
     {
         deletePersonFrameRange(pers, frame + 1, mPersons[pers].lastFrame());
     }
@@ -114,12 +114,16 @@ bool PersonStorage::delPointOf(int pers, int direction, int frame)
 /**
  * @brief Deletes points of a SINGLE person in onlyVisible
  * @param point point which need to be on the person (helpful if onlyVisible is not properly set)
- * @param direction notes if previous (-1), following(1) or whole(0) trajectory should be deleted
- * @param frame
+ * @param direction the direction in which the trajectory should be deleted
+ * @param frame the frame (exclusive) from which the deletion will happen
  * @param onlyVisible set of people whose points could be deleted; empty means everyone
  * @return true if deletion occured
  */
-bool PersonStorage::delPoint(const Vec2F &point, int direction, int frame, const QSet<size_t> &onlyVisible)
+bool PersonStorage::delPoint(
+    const Vec2F        &point,
+    TrajectorySegment   direction,
+    int                 frame,
+    const QSet<size_t> &onlyVisible)
 {
     onManualAction();
 
@@ -142,7 +146,7 @@ bool PersonStorage::delPoint(const Vec2F &point, int direction, int frame, const
  * @param direction notes if previous, following or whole trajectory should be deleted
  * @param frame
  */
-void PersonStorage::delPointAll(Direction direction, int frame)
+void PersonStorage::delPointAll(TrajectorySegment direction, int frame)
 {
     onManualAction();
 
@@ -152,21 +156,21 @@ void PersonStorage::delPointAll(Direction direction, int frame)
         {
             switch(direction)
             {
-                case Direction::Previous:
+                case TrajectorySegment::Previous:
                     deletePersonFrameRange(i, mPersons[i].firstFrame(), frame - 1);
                     break;
-                case Direction::Whole:
+                case TrajectorySegment::Whole:
                     deletePerson(i--); // after deleting the person decrease i by one
                     break;
-                case Direction::Following:
+                case TrajectorySegment::Following:
                     deletePersonFrameRange(i, frame + 1, mPersons[i].lastFrame());
                     break;
             }
         }
         else if(
-            ((direction == Direction::Previous) && (frame > mPersons.at(i).lastFrame())) ||
-            (direction == Direction::Whole) ||
-            ((direction == Direction::Following) && (frame < mPersons.at(i).firstFrame())))
+            ((direction == TrajectorySegment::Previous) && (frame > mPersons.at(i).lastFrame())) ||
+            (direction == TrajectorySegment::Whole) ||
+            ((direction == TrajectorySegment::Following) && (frame < mPersons.at(i).firstFrame())))
         {
             deletePerson(i--); // after deleting the person decrease i by one
         }

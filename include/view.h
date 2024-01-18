@@ -19,7 +19,7 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-#include "personStorage.h" // for Direction
+#include "personStorage.h"
 
 #include <QFrame>
 #include <QGraphicsView>
@@ -57,8 +57,8 @@ signals:
     void mouseShiftControlDoubleClick(QPointF pos);
     void mouseShiftDoubleClick(QPointF pos);
     void mouseControlDoubleClick(QPointF pos);
-    void mouseRightDoubleClick(QPointF pos, int direction);
-    void mouseMiddleDoubleClick(PersonStorage::Direction direction);
+    void mouseRightDoubleClick(QPointF pos, PersonStorage::TrajectorySegment direction);
+    void mouseMiddleDoubleClick(PersonStorage::TrajectorySegment direction);
     void mouseShiftWheel(int delta);
     void mouseCtrlWheel(int delta);
     void mouseAltPressed(QPointF pos);

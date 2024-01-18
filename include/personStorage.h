@@ -39,7 +39,7 @@ class PersonStorage : public QObject
     Q_OBJECT
 
 public:
-    enum class Direction
+    enum class TrajectorySegment
     {
         Previous,
         Following,
@@ -50,9 +50,9 @@ public:
 
     void splitPerson(size_t pers, int frame);
     bool splitPersonAt(const Vec2F &p, int frame, const QSet<size_t> &onlyVisible);
-    bool delPointOf(int pers, int direction, int frame);
-    bool delPoint(const Vec2F &p, int direction, int frame, const QSet<size_t> &onlyVisible);
-    void delPointAll(Direction direction, int frame);
+    bool delPointOf(int pers, TrajectorySegment direction, int frame);
+    bool delPoint(const Vec2F &p, TrajectorySegment direction, int frame, const QSet<size_t> &onlyVisible);
+    void delPointAll(TrajectorySegment direction, int frame);
     void delPointROI();
     void delPointInsideROI();
     bool editTrackPersonComment(const Vec2F &p, int frame, const QSet<size_t> &onlyVisible);
