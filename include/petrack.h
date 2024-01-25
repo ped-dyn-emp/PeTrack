@@ -374,6 +374,8 @@ private:
     QAction      *mSetTo1p75;
     QAction      *mSetTo2p00;
     QAction      *mPlayerLooping;
+    QAction      *mUndoAct;
+    QAction      *mRedoAct;
     QAction      *mDelPastAct;
     QAction      *mDelFutureAct;
     QAction      *mDelAllRoiAct;
@@ -389,7 +391,7 @@ private:
 
     QMenu *mFileMenu;
     QMenu *mViewMenu;
-    QMenu *mDeleteMenu;
+    QMenu *mEditMenu;
     QMenu *mCameraMenu;
     QMenu *mHelpMenu;
 

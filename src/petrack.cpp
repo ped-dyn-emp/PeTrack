@@ -332,29 +332,6 @@ Petrack::Petrack(QString petrackVersion) :
     auto *exportShortCut = new QShortcut{QKeySequence("Ctrl+e"), this};
     connect(exportShortCut, &QShortcut::activated, this, [=]() { exportTracker(); });
 
-    auto *undoShortCut = new QShortcut{QKeySequence("Ctrl+z"), this};
-    connect(
-        undoShortCut,
-        &QShortcut::activated,
-        this,
-        [&]()
-        {
-            mPersonStorage.undo();
-            updateControlWidget();
-            getScene()->views().first()->viewport()->repaint();
-        });
-
-    auto *redoShortcut = new QShortcut{QKeySequence("Ctrl+shift+z"), this};
-    connect(
-        redoShortcut,
-        &QShortcut::activated,
-        this,
-        [&]()
-        {
-            mPersonStorage.redo();
-            updateControlWidget();
-            getScene()->views().first()->viewport()->repaint();
-        });
 
     auto *toggleOnlineTracking = new QShortcut{QKeySequence("Shift+t"), this};
     connect(toggleOnlineTracking, &QShortcut::activated, this, [=]() { mControlWidget->toggleOnlineTracking(); });
@@ -2024,24 +2001,50 @@ void Petrack::createActions()
     connect(mPlayerLooping, &QAction::triggered, mPlayerWidget, &Player::setLooping);
     // -------------------------------------------------------------------------------------------------------
 
+    mUndoAct = new QAction(tr("Undo"), this);
+    mUndoAct->setShortcut(QKeySequence("Ctrl+z"));
+    connect(
+        mUndoAct,
+        &QAction::triggered,
+        this,
+        [&]()
+        {
+            mPersonStorage.undo();
+            updateControlWidget();
+            getScene()->views().first()->viewport()->repaint();
+        });
 
-    mDelPastAct = new QAction(tr("&Past part of all trj."), this);
+
+    mRedoAct = new QAction{"Redo", this};
+    mRedoAct->setShortcut(QKeySequence("Ctrl+shift+z"));
+    connect(
+        mRedoAct,
+        &QAction::triggered,
+        this,
+        [&]()
+        {
+            mPersonStorage.redo();
+            updateControlWidget();
+            getScene()->views().first()->viewport()->repaint();
+        });
+
+    mDelPastAct = new QAction(tr("Delete &past part of all trj."), this);
     connect(
         mDelPastAct,
         &QAction::triggered,
         this,
         [this]() { this->deleteTrackPointAll(PersonStorage::TrajectorySegment::Previous); });
 
-    mDelFutureAct = new QAction(tr("&Future part of all trj."), this);
+    mDelFutureAct = new QAction(tr("Delete &future part of all trj."), this);
     connect(
         mDelFutureAct,
         &QAction::triggered,
         this,
         [this]() { this->deleteTrackPointAll(PersonStorage::TrajectorySegment::Following); });
 
-    mDelAllRoiAct = new QAction(tr("&Trj. moving through ROI"), this);
+    mDelAllRoiAct = new QAction(tr("Delete &trj. moving through ROI"), this);
     connect(mDelAllRoiAct, &QAction::triggered, this, &Petrack::deleteTrackPointROI);
-    mDelPartRoiAct = new QAction(tr("Part of Trj. inside &ROI"), this);
+    mDelPartRoiAct = new QAction(tr("Delete part of trj. inside &ROI"), this);
     connect(mDelPartRoiAct, &QAction::triggered, this, &Petrack::deleteTrackPointInsideROI);
 
     // -------------------------------------------------------------------------------------------------------
@@ -2088,6 +2091,15 @@ void Petrack::createMenus()
     mFileMenu->addSeparator();
     mFileMenu->addAction(mExitAct);
 
+    mEditMenu = new QMenu(tr("&Edit"), this);
+    mEditMenu->addAction(mUndoAct);
+    mEditMenu->addAction(mRedoAct);
+    mEditMenu->addAction(mDelPastAct);
+    mEditMenu->addAction(mDelFutureAct);
+    mEditMenu->addAction(mDelAllRoiAct);
+    mEditMenu->addAction(mDelPartRoiAct);
+
+
     mViewMenu = new QMenu(tr("&View"), this);
     mViewMenu->addAction(mAntialiasAct);
     mViewMenu->addAction(mOpenGLAct);
@@ -2118,11 +2130,6 @@ void Petrack::createMenus()
     mViewMenu->addSeparator();
     mViewMenu->addAction(mShowLogWindowAct);
 
-    mDeleteMenu = new QMenu(tr("&Delete"), this);
-    mDeleteMenu->addAction(mDelPastAct);
-    mDeleteMenu->addAction(mDelFutureAct);
-    mDeleteMenu->addAction(mDelAllRoiAct);
-    mDeleteMenu->addAction(mDelPartRoiAct);
 
     mHelpMenu = new QMenu(tr("&Help"), this);
     mHelpMenu->addAction(mCommandAct);
@@ -2131,8 +2138,8 @@ void Petrack::createMenus()
     mHelpMenu->addAction(mOnlineHelpAct);
 
     menuBar()->addMenu(mFileMenu);
+    menuBar()->addMenu(mEditMenu);
     menuBar()->addMenu(mViewMenu);
-    menuBar()->addMenu(mDeleteMenu);
     menuBar()->addMenu(mHelpMenu);
 
     mCameraMenu->setEnabled(false);
