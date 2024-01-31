@@ -180,7 +180,11 @@ endif()
 # Qt and Misc Stuff                                       *
 #**********************************************************
 set(CMAKE_AUTOUIC ON)
-list(APPEND CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_SOURCE_DIR}/ui" "./src")
+list(APPEND CMAKE_AUTOUIC_SEARCH_PATHS
+    "${CMAKE_SOURCE_DIR}/src/ui/dialogs"
+    "${CMAKE_SOURCE_DIR}/src/ui/helper"
+    "${CMAKE_SOURCE_DIR}/src/ui/main-windows"
+    "./src")
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(AUTOGEN_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/${NAME}_autogen")
@@ -257,8 +261,6 @@ else()
   target_link_libraries(petrack_core PUBLIC Qwt::Qwt)
 endif()
 
-target_sources(petrack_core PRIVATE src/analysePlot.cpp)
-
 #*****************************************************************
 # Linking spdlog                                                    *
 #*****************************************************************
@@ -282,8 +284,6 @@ if(AVI)
   )
   target_include_directories(petrack_core PRIVATE 3rdparty/avifile)
   target_link_libraries(petrack_core PUBLIC avifil32 msvfw32)
-else()
-  target_sources(petrack_core PRIVATE "src/aviFileWriter.cpp")
 endif(AVI)
 
 # WIN32 steht für Windows allgemein, nicht nur 32Bit
@@ -317,203 +317,13 @@ endif(BUILD_UNIT_TESTS)
 #**************************************************************
 # SOURCES                                                     *
 #**************************************************************
-# An sich wäre nur target_include_diretories notwendig, aber AUTOUIC
-# sucht nur in target source nach, ob ein ui header included wurde.
-# Aus bequemlichkeit dann einfach alle aus der alten .pro rüberkopiert
-target_include_directories(petrack_core PUBLIC "./include")
-target_sources(petrack_core PRIVATE
-    include/aboutDialog.h
-    include/petrack.h
-    include/helper.h
-    include/control.h
-    include/compilerInformation.h
-    include/stereoWidget.h
-    include/colorRangeWidget.h
-    include/colorMarkerWidget.h
-    include/codeMarkerWidget.h
-    include/multiColorMarkerWidget.h
-    include/imageItem.h
-    include/logger.h
-    include/logoItem.h
-    include/gridItem.h
-    include/coordItem.h
-    include/trackerItem.h
-    include/view.h
-    include/animation.h
-    include/player.h
-    include/vector.h
-    include/ellipse.h
-    include/markerCasern.h
-    include/markerJapan.h
-    include/markerHermes.h
-    include/tracker.h
-    include/trackerReal.h
-    include/recognition.h
-    include/autoCalib.h
-    include/filter.h
-    include/brightContrastFilter.h
-    include/blurFilter.h
-    include/borderFilter.h
-    include/backgroundFilter.h
-    include/calibFilter.h
-    include/calibStereoFilter.h
-    include/colorPlot.h
-    include/stereoItem.h
-    include/stereoContext.h
-    include/colorMarkerItem.h
-    include/codeMarkerItem.h
-    include/multiColorMarkerItem.h
-    include/backgroundItem.h
-    include/person.h
-    include/qtColorTriangle.h
-    include/swapFilter.h
-    include/extrCalibration.h
-    include/roiItem.h
-    include/analysePlot.h
-    include/IO.h
-    include/skeletonTree.h
-    include/skeletonTreeFactory.h
-    include/moCapPerson.h
-    include/moCapItem.h
-    include/moCapController.h
-    include/openMoCapDialog.h
-    include/moCapPersonMetadata.h
-    include/pMessageBox.h
-    include/moCapSelectionWidget.h
-    include/personStorage.h
-    include/autosave.h
-    include/manualTrackpointMover.h
-    include/frameRange.h
-    include/pdoublespinbox.h
-    include/pspinbox.h
-    include/pSlider.h
-    include/filterBeforeBox.h
-    include/intrinsicBox.h
-    include/intrinsicCameraParams.h
-    include/logwindow.h
-    include/extrinsicBox.h
-    include/extrinsicParameters.h
-    include/coordinateSystemBox.h
-    include/worldImageCorrespondence.h
-    include/autosaveSettings.h
-    include/editMoCapDialog.h
-    include/moCapEditingWidget.h
-    include/plausibility.h
-    include/coordinateStructs.h
-    include/correction.h
-    include/pGroupBox.h
-    include/pGroupBoxFrame.h
-    include/alignmentGridBox.h
-    include/circularStack.h
-)
-
-target_sources(petrack_core PRIVATE
-    src/aboutDialog.cpp
-    src/helper.cpp
-    src/control.cpp
-    src/petrack.cpp
-    src/stereoWidget.cpp
-    src/colorRangeWidget.cpp
-    src/colorMarkerWidget.cpp
-    src/codeMarkerWidget.cpp
-    src/multiColorMarkerWidget.cpp
-    src/imageItem.cpp
-    src/logoItem.cpp
-    src/gridItem.cpp
-    src/coordItem.cpp
-    src/trackerItem.cpp
-    src/view.cpp
-    src/animation.cpp
-    src/player.cpp
-    src/vector.cpp
-    src/ellipse.cpp
-    src/markerCasern.cpp
-    src/markerHermes.cpp
-    src/markerJapan.cpp
-    src/tracker.cpp
-    src/trackerReal.cpp
-    src/recognition.cpp
-    src/autoCalib.cpp
-    src/filter.cpp
-    src/brightContrastFilter.cpp
-    src/blurFilter.cpp
-    src/borderFilter.cpp
-    src/backgroundFilter.cpp
-    src/calibFilter.cpp
-    src/calibStereoFilter.cpp
-    src/stereoContext.cpp
-    src/colorPlot.cpp
-    src/stereoItem.cpp
-    src/colorMarkerItem.cpp
-    src/codeMarkerItem.cpp
-    src/multiColorMarkerItem.cpp
-    src/backgroundItem.cpp
-    src/person.cpp
-    src/qtColorTriangle.cpp
-    src/swapFilter.cpp
-    src/extrCalibration.cpp
-    src/roiItem.cpp
-    src/IO.cpp
-    src/skeletonTree.cpp
-    src/skeletonTreeFactory.cpp
-    src/moCapPerson.cpp
-    src/moCapItem.cpp
-    src/moCapController.cpp
-    src/openMoCapDialog.cpp
-    src/moCapPersonMetadata.cpp
-    src/pMessageBox.cpp
-    src/moCapSelectionWidget.cpp
-    src/personStorage.cpp
-    src/autosave.cpp
-    src/manualTrackpointMover.cpp
-    src/pdoublespinbox.cpp
-    src/pspinbox.cpp
-    src/intrinsicBox.cpp
-    src/filterBeforeBox.cpp
-    src/intrinsicCameraParams.cpp
-    src/logwindow.cpp
-    src/extrinsicBox.cpp
-    src/autosaveSettings.cpp
-    src/coordinateSystemBox.cpp
-    src/editMoCapDialog.cpp
-    src/moCapEditingWidget.cpp
-    src/pGroupBoxFrame.cpp
-    ui/pGroupBoxFrame.ui
-    ui/coordinateSystemBox.ui
-    ui/moCapEditingWidget.ui
-    ui/editMoCapDialog.ui
-    src/plausibility.cpp
-    src/correction.cpp
-    src/pGroupBox.cpp
-    ui/pGroupBox.ui
-    src/alignmentGridBox.cpp
-    ui/alignmentGridBox.ui
-    src/pSlider.cpp
-    ui/about.ui
-    ui/codeMarker.ui
-    ui/colorMarker.ui
-    ui/colorRange.ui
-    ui/multiColorMarker.ui
-    ui/stereo.ui
-    ui/control.ui
-    ui/openMoCapDialog.ui
-    ui/moCapSelectionWidget.ui
-    ui/correction.ui
-    ui/filterBeforeBox.ui
-    ui/intrinsicBox.ui
-    ui/extrinsicBox.ui
-    ui/logwindow.ui
-    ui/autosaveSettings.ui
-)
+add_subdirectory(src)
 
 target_sources(petrack PRIVATE
   petrack.rc
   icons/icons.qrc
 )
 
-#*****************************************************************************
-# CODE AUS DER ALTEN .PRO DATEI, DER NOCH NICHT IN DIE CMAKE EINGEBAUT WURDE *
-#*****************************************************************************
 if(STEREO)
   message("Stereo enabled! (PGR)")
   target_compile_definitions(petrack_core PRIVATE STEREO)
@@ -525,8 +335,6 @@ if(STEREO)
   target_include_directories(petrack_core PRIVATE 3rdparty/windows/triclops-3.4/include)
   target_include_directories(petrack_core PRIVATE 3rdparty/avifile)
   target_sources(petrack_core PRIVATE 3rdparty/avifile/pgrAviFile.cpp 3rdparty/avifile/pgrAviFile.h)
-else()
-    target_sources(petrack_core PRIVATE src/stereoAviFile.cpp)
 endif()
 
 
