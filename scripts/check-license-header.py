@@ -14,13 +14,13 @@ from datetime import datetime
 
 # directories and file endings to search fore license header
 # base directory is given as command line attribute
-directories = ['include', 'src', 'tests']
+directories = ['src', 'tests']
 file_endings = ['h', 'cpp', 'py']
 
 # custom files that should be included
 additional_files = ['.gitlab-ci.yml']
 
-blacklist = ['src/qtColorTriangle.cpp', 'include/qtColorTriangle.h']
+blacklist = ['src/ui/helper/qtColorTriangle.cpp', 'src/ui/helper/qtColorTriangle.h']
 blacklist_dir = ('.pytest_cache', '__pycache__', 'regression_test/data')
 
 # adjust directory path

@@ -1,23 +1,16 @@
 add_executable(petrack_tests)
 
+target_include_directories(petrack_tests PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+
 target_sources(petrack_tests PRIVATE
     main.cpp
-    tst_apptest.cpp
-    tst_control.cpp
-    tst_io.cpp
-    tst_SkeletonTree.cpp
-    tst_moCapController.cpp
-    tst_recognition.cpp
-    tst_codeMarkerWidget.cpp
-    tst_helper.cpp
-    tst_petrack.cpp
-    tst_extrCalibration.cpp
-    tst_filter.cpp
-    tst_intrinsicBox.cpp
     util.h
-    tst_extrinsicBox.cpp
-    tst_coordinateSystemBox.cpp
-    tst_tracker.cpp
-    tst_correction.cpp
-    tst_circularStack.cpp
+    tst_petrack.cpp
 )
+
+add_subdirectory(calibration)
+add_subdirectory(filter)
+add_subdirectory(general)
+add_subdirectory(IO)
+add_subdirectory(recognition)
+add_subdirectory(tracking)
