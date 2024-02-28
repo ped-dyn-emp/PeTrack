@@ -453,7 +453,9 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     QDomElement root = doc.firstChildElement("PETRACK");
     QString     seq;
     int         frame = -1, sourceFrameIn = -1, sourceFrameOut = -1;
-    double      fps              = DEFAULT_FPS;
+    double      playbackFps      = DEFAULT_FPS;
+    double      sequenceFps      = DEFAULT_FPS;
+    double      oldFps           = -1;
     int         onlyPeopleNr     = 1;
     QString     onlyPeopleNrList = "1";
     int         zoom = 250, rotate = 0, hScroll = 0, vScroll = 0;
@@ -549,9 +551,18 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
             {
                 frame = elem.attribute("FRAME").toInt();
             }
+            // handle old projects (prior to 0.10.2), which don't differentiate between sequence fps and playback fps
             if(elem.hasAttribute("FPS"))
             {
-                fps = elem.attribute("FPS").toDouble();
+                oldFps = elem.attribute("FPS").toDouble();
+            }
+            if(elem.hasAttribute("SEQUENCE_FPS"))
+            {
+                sequenceFps = elem.attribute("SEQUENCE_FPS").toDouble();
+            }
+            if(elem.hasAttribute("PLAYBACK_FPS"))
+            {
+                playbackFps = elem.attribute("PLAYBACK_FPS").toDouble();
             }
             if(elem.hasAttribute("SOURCE_FRAME_IN"))
             {
@@ -690,8 +701,16 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
         mCameraRightViewAct->setChecked(true);
     }
     setCamera();
-    mPlayerWidget->setFPS(fps); // erst spaet setzen, damit Wert den des geladenen Videos ueberschreiben kann
-    updateImage();              // needed to undistort, draw border, etc. for first display
+    if(oldFps != -1)
+    {
+        setFPS(oldFps);
+    }
+    else
+    {
+        mPlayerWidget->setPlaybackFPS(playbackFps);
+        setSequenceFPS(sequenceFps); // set here to override the fps from the default fps of the sequence
+    }
+    updateImage(); // needed to undistort, draw border, etc. for first display
     setLoading(false);
 }
 
@@ -852,7 +871,8 @@ void Petrack::saveXml(QDomDocument &doc)
     // player settings (which frame, frame range)
     elem = doc.createElement("PLAYER");
     elem.setAttribute("FRAME", mPlayerWidget->getPos()); // == mAnimation->getCurrentFrameNum()
-    elem.setAttribute("FPS", mAnimation->getFPS());
+    elem.setAttribute("SEQUENCE_FPS", mAnimation->getSequenceFPS());
+    elem.setAttribute("PLAYBACK_FPS", mAnimation->getPlaybackFPS());
     elem.setAttribute("SOURCE_FRAME_IN", mPlayerWidget->getFrameInNum());
     elem.setAttribute("SOURCE_FRAME_OUT", mPlayerWidget->getFrameOutNum());
     elem.setAttribute("PLAYER_SPEED_FIXED", mPlayerWidget->getPlayerSpeedLimited());
@@ -1020,12 +1040,12 @@ void Petrack::openCameraLiveStream(int camID /* =-1*/)
         "open {} ({} frames; {} fps; {} x {} pixel)",
         mSeqFileName,
         mAnimation->getNumFrames(),
-        mAnimation->getFPS(),
+        mAnimation->getSequenceFPS(),
         mAnimation->getSize().width(),
         mAnimation->getSize().height());
     updateSequence();
     updateWindowTitle();
-    mPlayerWidget->setFPS(mAnimation->getFPS());
+    setFPS(mAnimation->getSequenceFPS());
     mLogoItem->fadeOut();
 
     mPlayerWidget->play(PlayerState::FORWARD);
@@ -1070,12 +1090,12 @@ void Petrack::openSequence(QString fileName) // default fileName = ""
             "open {} ({} frames; {} fps; {} x {} pixel)",
             mSeqFileName,
             mAnimation->getNumFrames(),
-            mAnimation->getFPS(),
+            mAnimation->getSequenceFPS(),
             mAnimation->getSize().width(),
             mAnimation->getSize().height());
         updateSequence();
         updateWindowTitle();
-        mPlayerWidget->setFPS(mAnimation->getFPS());
+        setFPS(mAnimation->getSequenceFPS());
         mLogoItem->fadeOut();
         mMissingFrames.reset();
     }
@@ -1119,6 +1139,10 @@ void Petrack::updateWindowTitle()
     {
         title += "sequence: " + mAnimation->getCurrentFileName() + tr(" ... (%1").arg(mAnimation->getNumFrames()) +
                  tr(" frames; %1x%2").arg(size.width()).arg(size.height()) + " pixel)";
+    }
+    if(mAnimation->isVideo() || mAnimation->isImageSequence())
+    {
+        title += tr(" Sequence FPS: %1").arg(mAnimation->getSequenceFPS());
     }
     setWindowTitle(title);
 }
@@ -1241,14 +1265,14 @@ void Petrack::exportSequence(bool exportVideo, bool exportView, QString dest) //
                 outputVideo = cv::VideoWriter(
                     dest.toStdString(),
                     fourcc,
-                    mAnimation->getFPS(),
+                    mAnimation->getSequenceFPS(),
                     cv::Size(viewImage->width(), viewImage->height()));
             }
             else
             {
                 bool colored = (mImg.channels() > 1);
                 outputVideo  = cv::VideoWriter(
-                    dest.toStdString(), fourcc, mAnimation->getFPS(), cv::Size(mImg.cols, mImg.rows), colored);
+                    dest.toStdString(), fourcc, mAnimation->getSequenceFPS(), cv::Size(mImg.cols, mImg.rows), colored);
             }
         }
 
@@ -1658,6 +1682,37 @@ void Petrack::resetSettings()
     mControlWidget->resetCorrection();
 }
 
+void Petrack::setFPS(double fps)
+{
+    mAnimation->setSequenceFPS(fps);
+    mPlayerWidget->setPlaybackFPS(fps);
+    updateWindowTitle();
+}
+
+void Petrack::setSequenceFPS(double fps)
+{
+    mAnimation->setSequenceFPS(fps);
+    updateWindowTitle();
+}
+
+void Petrack::setSequenceFPSDialog()
+{
+    bool   ok;
+    double fps = QInputDialog::getDouble(
+        this,
+        tr("Set Sequence FPS"),
+        tr("Set native FPS of sequence/video (not playback speed):"),
+        mAnimation->getSequenceFPS(),
+        0,
+        100000,
+        2,
+        &ok);
+    if(ok)
+    {
+        setFPS(fps);
+    }
+}
+
 void Petrack::about()
 {
     auto about = new AboutDialog(
@@ -1911,6 +1966,11 @@ void Petrack::createActions()
     mAutosaveSettings = new QAction(tr("Autosave Settings"), this);
     connect(mAutosaveSettings, &QAction::triggered, this, &Petrack::openAutosaveSettings);
 
+    mSetSequenceFPSAct = new QAction(tr("Set Sequence FPS"), this);
+    mSetSequenceFPSAct->setEnabled(false);
+    mSetSequenceFPSAct->setToolTip(tr("Set native FPS of sequence/video (not playback speed)"));
+    connect(mSetSequenceFPSAct, &QAction::triggered, this, &Petrack::setSequenceFPSDialog);
+
     mExitAct = new QAction(tr("Exit"), this);
     mExitAct->setShortcut(tr("Ctrl+Q"));
     connect(mExitAct, SIGNAL(triggered()), this, SLOT(close()));
@@ -2076,6 +2136,7 @@ void Petrack::createMenus()
     mFileMenu->addSeparator();
     mFileMenu->addAction(mOpenSeqAct);
     mFileMenu->addAction(mOpenCameraAct);
+    mFileMenu->addAction(mSetSequenceFPSAct);
     mFileMenu->addAction(mOpenMoCapAct);
     mFileMenu->addAction(mEditMoCapAct);
     mFileMenu->addAction(mExportSeqVidAct);
@@ -2227,7 +2288,7 @@ void Petrack::setStatusFPS()
         QPalette pal = mStatusLabelFPS->palette(); // static moeglich?
         QColor   color;
 
-        double diff    = mShowFPS - mAnimation->getFPS();
+        double diff    = mShowFPS - mAnimation->getPlaybackFPS();
         int    opacity = mPlayerWidget->getPlayerSpeedLimited() ? 128 : 20;
 
         if(diff < -6) // very slow ==> red
@@ -2992,7 +3053,7 @@ void Petrack::exportTracker(QString dest) // default = ""
 
             out << "# PeTrack project: " << QFileInfo(getProFileName()).fileName() << Qt::endl;
             out << "# raw trajectory file: " << QFileInfo(getTrackFileName()).fileName() << Qt::endl;
-            out << "# framerate: " << mAnimation->getFPS() << " fps" << Qt::endl;
+            out << "# framerate: " << mAnimation->getSequenceFPS() << " fps" << Qt::endl;
 
             if(mControlWidget->isExportCommentChecked())
             {
@@ -3159,8 +3220,9 @@ void Petrack::exportTracker(QString dest) // default = ""
             outXml << "        <roomCaption>PeTrack: " << mAnimation->getFileBase() << "</roomCaption>" << Qt::endl;
             outXml << "        <roomID>0</roomID>" << Qt::endl;
             outXml << "        <agents>" << mPersonStorage.nbPersons() << "</agents>" << Qt::endl;
-            outXml << "        <frameRate>" << mAnimation->getFPS() << "</frameRate> <!--per second-->" << Qt::endl;
-            // outXml << "        <timeStep>" << 1000./mAnimation->getFPS() << "</timeStep>   <!--
+            outXml << "        <frameRate>" << mAnimation->getSequenceFPS() << "</frameRate> <!--per second-->"
+                   << Qt::endl;
+            // outXml << "        <timeStep>" << 1000./mAnimation->getPlaybackFPS() << "</timeStep>   <!--
             // millisecond-->"
             // << endl; inverse von
             outXml << "        <timeFirstFrame sec=\"" << mAnimation->getFirstFrameSec() << "\" microsec=\""
@@ -3691,6 +3753,7 @@ void Petrack::updateSequence()
     mExportSeqViewAct->setEnabled(true);
     mExportImageAct->setEnabled(true);
     mExportViewAct->setEnabled(true);
+    mSetSequenceFPSAct->setEnabled(true);
     mPrintAct->setEnabled(true);
     mResetSettingsAct->setEnabled(true);
 }

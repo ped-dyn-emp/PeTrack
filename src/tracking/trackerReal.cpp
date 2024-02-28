@@ -876,7 +876,7 @@ std::vector<std::unordered_map<int, double>> utils::computeDisplacement(
     const std::vector<std::vector<cv::Point2f>> &personsInFrame,
     const std::vector<std::vector<int>>         &idsInFrame)
 {
-    auto fps = petrack->getAnimation()->getFPS();
+    auto fps = petrack->getAnimation()->getSequenceFPS();
 
     petrack->getPlayer()->skipToFrame(minFrameNum);
 

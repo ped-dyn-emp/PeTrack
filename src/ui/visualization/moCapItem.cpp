@@ -56,7 +56,7 @@ void MoCapItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /* opt
     if(mController.getShowMoCap())
     {
         std::vector<SegmentRenderData> allRenderData =
-            mController.getRenderData(mAnimation.getCurrentFrameNum(), mAnimation.getOriginalFPS());
+            mController.getRenderData(mAnimation.getCurrentFrameNum(), mAnimation.getSequenceFPS());
         for(SegmentRenderData &renderData : allRenderData)
         {
             drawLine(painter, renderData);

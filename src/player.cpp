@@ -126,7 +126,8 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mFpsNumValidator = new QDoubleValidator(0.0, 999.99, 2, this);
     mFpsNum->setValidator(mFpsNumValidator);
     mFpsNum->setFont(f);
-    connect(mFpsNum, SIGNAL(editingFinished()), this, SLOT(setFPS()));
+    mFpsNum->setToolTip("Current playback fps");
+    connect(mFpsNum, SIGNAL(editingFinished()), this, SLOT(setPlaybackFPS()));
 
     QFont f2("Courier", 12, QFont::Normal); // Times Helvetica, Normal
     mAtLabel = new QLabel("@");
@@ -140,6 +141,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
 
     mFpsLabel = new QLabel("fps");
     mFpsLabel->setFont(f2);
+    mFpsLabel->setToolTip("Current playback fps");
     // default value
     mPlayerSpeedLimited = false;
 
@@ -169,7 +171,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     setAnim(anim);
 }
 
-void Player::setFPS(double fps) // default: double fps=-1.
+void Player::setPlaybackFPS(double fps) // default: double fps=-1.
 {
     if(fps != -1)
     {
@@ -177,7 +179,7 @@ void Player::setFPS(double fps) // default: double fps=-1.
         mFrameForwardButton->setAutoRepeatInterval(1000. / fps);  // for 1000 ms / 25 fps
         mFrameBackwardButton->setAutoRepeatInterval(1000. / fps); // for 1000 ms / 25 fps
     }
-    mAnimation->setFPS(mFpsNum->text().toDouble());
+    mAnimation->setPlaybackFPS(mFpsNum->text().toDouble());
 }
 void Player::setPlayerSpeedLimited(bool fixed)
 {
@@ -198,6 +200,11 @@ void Player::setPlayerSpeedFixed(bool fixed)
     mPlayerSpeedFixed = fixed;
 }
 
+bool Player::getPlayerSpeedFixed() const
+{
+    return mPlayerSpeedFixed;
+}
+
 void Player::setLooping(bool looping)
 {
     mLooping = looping;
@@ -205,7 +212,7 @@ void Player::setLooping(bool looping)
 
 void Player::setSpeedRelativeToRealtime(double factor)
 {
-    setFPS(mAnimation->getOriginalFPS() * factor);
+    setPlaybackFPS(mAnimation->getSequenceFPS() * factor);
 }
 
 void Player::setAnim(Animation *anim)
@@ -329,7 +336,7 @@ void Player::playVideo()
         // slow down the player speed for extrem fast video sequences (Jiayue China or 16fps cam99 basigo grid video)
         if(mPlayerSpeedLimited || mPlayerSpeedFixed)
         {
-            auto supposedDiff = static_cast<long long int>(1'000 / mAnimation->getFPS());
+            auto supposedDiff = static_cast<long long int>(1'000 / mAnimation->getPlaybackFPS());
 
             if(timer.isValid())
             {
@@ -525,7 +532,11 @@ void Player::recStream()
         else // open video writer
         {
             if(mAviFile.open(
-                   videoTmp.toStdString().c_str(), mImg.cols, mImg.rows, 8 * mImg.channels(), mAnimation->getFPS()))
+                   videoTmp.toStdString().c_str(),
+                   mImg.cols,
+                   mImg.rows,
+                   8 * mImg.channels(),
+                   mAnimation->getPlaybackFPS()))
             {
                 mRec = true;
                 mRecButton->setIcon(QPixmap(":/stop-record"));

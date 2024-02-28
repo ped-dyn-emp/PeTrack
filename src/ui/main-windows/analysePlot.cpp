@@ -206,7 +206,7 @@ void TrackerRealPlotItem::draw(QPainter *p, const QwtScaleMap &mapX, const QwtSc
         QVector<double> velVec(largestLastFrame, 0.);
         int             actFrame = ((AnalysePlot *) plot())->getActFrame();
         bool            markAct  = controlWidget->isAnaMarkActChecked();
-        double          fps      = controlWidget->getMainWindow()->getAnimation()->getFPS();
+        double          fps      = controlWidget->getMainWindow()->getAnimation()->getSequenceFPS();
         if(fps < 0)
         {
             fps = DEFAULT_FPS;

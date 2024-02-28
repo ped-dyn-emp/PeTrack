@@ -63,7 +63,8 @@ Animation::Animation(QWidget *wParent)
     mMaxFrames        = -1;
     mSourceInFrame    = -1;
     mSourceOutFrame   = -1;
-    mFps              = -1;
+    mPlaybackFps      = -1;
+    mSequenceFps      = -1;
     mFirstSec         = -1;
     mFirstMicroSec    = -1;
     mCaptureStereo    = nullptr;
@@ -278,7 +279,7 @@ bool Animation::openTimeFile(QString &timeFileName)
             1. / difMin,
             minFrame,
             minFrame + 1);
-        setFPS(fps);
+        setSequenceFPS(fps);
         mStereo         = true;
         mSourceOutFrame = frame; // mNumFrames = frame+1;
 
@@ -319,10 +320,10 @@ QString Animation::getTimeString(int frame)
     }
     else
     {
-        int   sec = (int) (frame / mFps);
+        int   sec = (int) (frame / mSequenceFps);
         QTime t(0, 0, 0);
         t = t.addSecs(sec);
-        return (t.toString("hh:mm:ss") + ".%1").arg(myRound(((frame / mFps) - sec) * 10000), 4, 10, QChar('0'));
+        return (t.toString("hh:mm:ss") + ".%1").arg(myRound(((frame / mSequenceFps) - sec) * 10000), 4, 10, QChar('0'));
     }
 }
 
@@ -474,28 +475,28 @@ QString Animation::getCurrentFileName()
 }
 
 /// Returns the FPS of the current animation
-double Animation::getFPS()
+double Animation::getPlaybackFPS()
 {
     if(mCameraLiveStream)
     {
         if(mVideoCapture.get(cv::CAP_PROP_FPS))
         {
-            setFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
+            setPlaybackFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
         }
     }
     if(mVideo)
     {
-        return mFps;
+        return mPlaybackFps;
     }
     else if(mImgSeq)
     {
-        if(mFps == -1)
+        if(mPlaybackFps == -1)
         {
             return DEFAULT_FPS; // we assume images from pal video (germany)
         }
         else
         {
-            return mFps; // if we found a corresponding .time file for the bumblebee xb3
+            return mPlaybackFps; // if we found a corresponding .time file for the bumblebee xb3
         }
     }
     else
@@ -504,15 +505,45 @@ double Animation::getFPS()
     }
 }
 
-double Animation::getOriginalFPS() const
+double Animation::getSequenceFPS()
 {
-    return mOriginalFps;
+    if(mCameraLiveStream)
+    {
+        if(mVideoCapture.get(cv::CAP_PROP_FPS))
+        {
+            setSequenceFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
+        }
+    }
+    if(mVideo)
+    {
+        return mSequenceFps;
+    }
+    else if(mImgSeq)
+    {
+        if(mSequenceFps == -1)
+        {
+            return DEFAULT_FPS; // we assume images from pal video (germany)
+        }
+        else
+        {
+            return mSequenceFps; // if we found a corresponding .time file for the bumblebee xb3
+        }
+    }
+    else
+    {
+        return -1;
+    }
 }
 
 // -2 shows, that it is called by widget
-void Animation::setFPS(double fps)
+void Animation::setPlaybackFPS(double fps)
 {
-    mFps = fps;
+    mPlaybackFps = fps;
+}
+
+void Animation::setSequenceFPS(double fps)
+{
+    mSequenceFps = fps;
 }
 
 /// Returns the size of the original frames (could made bigger after filtering)
@@ -558,7 +589,7 @@ void Animation::reset()
     mMaxFrames        = -1;
     mSourceInFrame    = -1;
     mSourceOutFrame   = -1;
-    mFps              = -1;
+    mPlaybackFps      = -1;
     mFirstSec         = -1;
     mFirstMicroSec    = -1;
     mCaptureStereo    = nullptr;
@@ -837,8 +868,9 @@ bool Animation::openAnimationStereoVideo(int fileNumber, cv::Mat &stereoImgLeft,
     if((fileNumber < mStereoVideoFilesList.length()) &&
        (captureStereo->open(mStereoVideoFilesList[fileNumber].toStdString().c_str(), stereoImgLeft, stereoImgRight)))
     {
-        // wird nun schon vorher abgefragt: vor mTimeFileLoaded war mFps == 16 because time file must be loaded before ;
-        // && (myRound(mFps) == 16)
+        // wird nun schon vorher abgefragt: vor mTimeFileLoaded war mPlaybackFps == 16 because time file must be loaded
+        // before ;
+        // && (myRound(mPlaybackFps) == 16)
         if(!((captureStereo->m_iRows == 960) && (captureStereo->m_iCols == 1280) && (captureStereo->m_iBPP == 16)))
         {
             SPDLOG_ERROR("Only stereo videos from Hermes experiments with 1280x960 pixel, 16 bits per pixel anf 16 "
@@ -944,7 +976,7 @@ bool Animation::openAnimationVideo(QString fileName)
             // Set the size in the QSize structure
             mSize.setHeight(mCaptureStereo->m_iRows);
             mSize.setWidth(mCaptureStereo->m_iCols);
-            // mFps = mCaptureStereo->m_frameRate; == 0!!!!
+            // mPlaybackFps = mCaptureStereo->m_frameRate; == 0!!!!
         }
         else
             return false;
@@ -1096,8 +1128,8 @@ bool Animation::getInfoVideo(QString /*fileName*/)
     // Note that this doesn't work if no frame has already retrieved!!
     if(mVideoCapture.get(cv::CAP_PROP_FPS))
     {
-        setFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
-        mOriginalFps = mVideoCapture.get(cv::CAP_PROP_FPS);
+        setPlaybackFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
+        setSequenceFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
     }
     // detect the used video codec
     int  fourCC   = static_cast<int>(mVideoCapture.get(cv::CAP_PROP_FOURCC));
@@ -1187,8 +1219,8 @@ bool Animation::getCameraInfo()
     // Note that this doesn't work if no frame has already retrieved!!
     if(mVideoCapture.get(cv::CAP_PROP_FPS))
     {
-        setFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
-        mOriginalFps = mVideoCapture.get(cv::CAP_PROP_FPS);
+        setPlaybackFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
+        setSequenceFPS(mVideoCapture.get(cv::CAP_PROP_FPS));
     }
 
 

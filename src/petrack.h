@@ -116,6 +116,9 @@ private slots:
     void resetSettings();
     void setGlobalFont();
     void showHideControlWidget();
+    void setFPS(double fps);
+    void setSequenceFPS(double fps);
+    void setSequenceFPSDialog();
     void antialias();
     void opengl();
     void reset();
@@ -353,6 +356,7 @@ private:
     QAction      *mPrintAct;
     QAction      *mResetSettingsAct;
     QAction      *mExitAct;
+    QAction      *mSetSequenceFPSAct;
     QAction      *mFontAct;
     QAction      *mHideControlsAct;
     QAction      *mAntialiasAct;
