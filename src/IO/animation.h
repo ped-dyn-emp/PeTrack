@@ -108,10 +108,11 @@ public:
     QString getCurrentFileName();
 
     // Returns the FPS of the current animation if it is a video
-    double getFPS();
-    double getOriginalFPS() const;
+    double getPlaybackFPS();
+    double getSequenceFPS();
 
-    void setFPS(double fps);
+    void setPlaybackFPS(double fps);
+    void setSequenceFPS(double fps);
 
     // Returns the size of the original frames (could made bigger after filtering)
     QSize getSize();
@@ -161,8 +162,8 @@ private:
     int mMaxFrames;
 
     // Number of frames per second in video
-    double mFps;
-    double mOriginalFps;
+    double mPlaybackFps;
+    double mSequenceFps;
 
     // the time (seconds since 1.1.1970 0 uhr, microseconds (.000001s)) when the first frame was recorded (bumblebee
     // .time file)

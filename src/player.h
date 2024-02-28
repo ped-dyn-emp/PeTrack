@@ -76,11 +76,12 @@ public slots:
     bool skipToFrame(int f);
     bool skipToFrame();
     void update();
-    void setFPS(double fps = -1.);
+    void setPlaybackFPS(double fps = -1.);
     void togglePlayerSpeedLimited();
     void setPlayerSpeedLimited(bool fixed);
     bool getPlayerSpeedLimited() const;
     void setPlayerSpeedFixed(bool fixed);
+    bool getPlayerSpeedFixed() const;
     void setLooping(bool looping);
     void setFrameInNum(int in = -1.);
     void setFrameOutNum(int out = -1.);

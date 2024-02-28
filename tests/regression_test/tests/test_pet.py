@@ -26,6 +26,10 @@ def compare_xml(test: ET.ElementTree, truth: ET.ElementTree):
         for test_attrib, truth_attrib in zip(
             test_elem.attrib.items(), truth_elem.attrib.items()
         ):
+            # skipped when loading a sequence because truth file only contains relative path
+            if test_attrib[0] == "SRC" and test_attrib[1] != "":
+                continue
+
             assert test_attrib[0] == truth_attrib[0]
 
             if test_attrib[0] == "SOURCE_FRAME_IN":
@@ -58,6 +62,56 @@ def test_defaultPet(pytestconfig):
             petrack_path,
             "-project",
             ground_truth,
+            "-autosave",
+            output,
+            "-platform",
+            "offscreen",
+        ],
+        check=True,
+    )
+
+    test_pet = ET.parse(output)
+    truth_pet = ET.parse(ground_truth)
+    compare_xml(test_pet, truth_pet)
+
+
+def test_fps(pytestconfig):
+    """Test if playback fps and sequence fps are saved and loaded correctly"""
+    petrack_path = pytestconfig.getoption("path")
+    ground_truth = "../data/test_Fps_truth.pet"
+    output = "../data/test_Fps_saved.pet"
+
+    # open and save (only saving would write last opened video as SRC)
+    subprocess.run(
+        [
+            petrack_path,
+            "-project",
+            ground_truth,
+            "-autosave",
+            output,
+            "-platform",
+            "offscreen",
+        ],
+        check=True,
+    )
+
+    test_pet = ET.parse(output)
+    truth_pet = ET.parse(ground_truth)
+    compare_xml(test_pet, truth_pet)
+
+
+def test_oldFps(pytestconfig):
+    """Test if project with old format correctly sets playback and sequence fps."""
+    petrack_path = pytestconfig.getoption("path")
+    project = "../data/test_oldFps.pet"
+    output = "../data/test_oldFps_saved.pet"
+    ground_truth = "../data/test_oldFps_truth.pet"
+    # open and save (only saving would write last opened video as SRC)
+    subprocess.run(
+        [
+            petrack_path,
+            "-project",
+            project,
             "-autosave",
             output,
             "-platform",
