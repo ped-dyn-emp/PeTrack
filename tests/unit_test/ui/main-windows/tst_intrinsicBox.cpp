@@ -157,7 +157,8 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
         ui->fixCenter->setChecked(!ui->fixCenter->isChecked());
         ui->tangDist->setChecked(!ui->tangDist->isChecked());
         ui->extModelCheckBox->setChecked(!ui->extModelCheckBox->isChecked());
-
+        // only calibrating or calling this function applies these changes to the pet file
+        intrBox.setCalibSettings();
 
         AND_WHEN("We save the widget into a pet-file")
         {
@@ -193,7 +194,40 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
             }
         }
     }
+    WHEN("We change calibration options checkboxes")
+    {
+        ui->quadAspectRatio->setChecked(!ui->quadAspectRatio->isChecked());
+        ui->fixCenter->setChecked(!ui->fixCenter->isChecked());
+        ui->tangDist->setChecked(!ui->tangDist->isChecked());
 
+        AND_WHEN("We save the widget into a pet-file")
+        {
+            QDomDocument doc;
+            auto         root = doc.createElement("PETRACK");
+            root.setAttribute("VERSION", "0.9.2");
+            doc.appendChild(root);
+            QDomElement elem = doc.createElement("CALIBRATION");
+            root.appendChild(elem);
+            intrBox.setXml(elem);
+            // options only change when you calibrate again
+            THEN("The options aren't actually saved in the pet-file")
+            {
+                AutoCalib         newAutoCalib;
+                CalibFilter       newFilterCalib;
+                Ui::IntrinsicBox *newUi      = new Ui::IntrinsicBox(); // ownership transferred to IntrinsicBox
+                auto              newIntrBox = IntrinsicBox(nullptr, newUi, newAutoCalib, newFilterCalib, []() {});
+
+                for(auto subElem = elem.firstChildElement(); !subElem.isNull(); subElem = subElem.nextSiblingElement())
+                {
+                    newIntrBox.getXml(subElem);
+                }
+                INFO(nodeToString(elem).toStdString())
+                CHECK(newUi->quadAspectRatio->isChecked() == !ui->quadAspectRatio->isChecked());
+                CHECK(newUi->fixCenter->isChecked() == !ui->fixCenter->isChecked());
+                CHECK(newUi->tangDist->isChecked() == !ui->tangDist->isChecked());
+            }
+        }
+    }
     WHEN("We change calculated values")
     {
         // set different parameters:
@@ -240,84 +274,6 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
                     Approx(0).margin(SERIALIZATION_MARGIN));
 
                 CHECK(oldParams.reprojectionError == Approx(newParams.reprojectionError));
-            }
-        }
-    }
-}
-
-TEST_CASE("QuadAspectRatio")
-{
-    AutoCalib   autoCalib;
-    CalibFilter filterCalib;
-    auto       *ui                       = new Ui::IntrinsicBox(); // ownership transferred to IntrinsicBox
-    auto        intrBox                  = IntrinsicBox(nullptr, ui, autoCalib, filterCalib, []() {});
-    auto        params                   = intrBox.getIntrinsicCameraParams();
-    params.cameraMatrix.at<double>(0, 0) = 600;
-    intrBox.setIntrinsicCameraParams(params);
-
-    WHEN("I activate quad aspect ratio")
-    {
-        ui->quadAspectRatio->setChecked(true);
-
-        THEN("fy equals fx")
-        {
-            const auto params = intrBox.getIntrinsicCameraParams();
-            const auto fx     = params.cameraMatrix.at<double>(0, 0);
-            const auto fy     = params.cameraMatrix.at<double>(1, 1);
-            CHECK(fx == fy);
-        }
-
-        AND_WHEN("I deactivate quad aspect ratio afterwards")
-        {
-            ui->quadAspectRatio->setChecked(false);
-
-            THEN("fy does not equal fx")
-            {
-                const auto params = intrBox.getIntrinsicCameraParams();
-                const auto fx     = params.cameraMatrix.at<double>(0, 0);
-                const auto fy     = params.cameraMatrix.at<double>(1, 1);
-                CHECK(fx != fy);
-            }
-        }
-    }
-}
-
-TEST_CASE("FixCenter")
-{
-    AutoCalib   autoCalib;
-    CalibFilter filterCalib;
-    auto       *ui        = new Ui::IntrinsicBox(); // ownership transferred to IntrinsicBox
-    auto        intrBox   = IntrinsicBox(nullptr, ui, autoCalib, filterCalib, []() {});
-    auto        oldParams = intrBox.getIntrinsicCameraParams();
-    // would be called from ImageItem after setting the image
-    constexpr auto width  = 1280;
-    constexpr auto height = 720;
-    intrBox.imageSizeChanged(width, height, 0);
-
-    WHEN("I activate fix center")
-    {
-        ui->fixCenter->setChecked(true);
-
-        THEN("cx and cy are set to the image center")
-        {
-            const auto params = intrBox.getIntrinsicCameraParams();
-            const auto cx     = params.cameraMatrix.at<double>(0, 2);
-            const auto cy     = params.cameraMatrix.at<double>(1, 2);
-            CHECK(cx == Approx((width - 1) / 2.));
-            CHECK(cy == Approx((height - 1) / 2.));
-        }
-
-        AND_WHEN("I deactivate fix center afterwards")
-        {
-            ui->fixCenter->setChecked(false);
-
-            THEN("cx and cy have their old values")
-            {
-                const auto params = intrBox.getIntrinsicCameraParams();
-                const auto cx     = params.cameraMatrix.at<double>(0, 2);
-                const auto cy     = params.cameraMatrix.at<double>(1, 2);
-                CHECK(cx == oldParams.cameraMatrix.at<double>(0, 2));
-                CHECK(cy == oldParams.cameraMatrix.at<double>(1, 2));
             }
         }
     }

@@ -85,22 +85,21 @@ bool AutoCalib::openCalibFiles()
 {
     if(mMainWindow)
     {
-        static QString lastDir;
+        if(!mLastDir.isEmpty())
+        {
+            QStringList calibFiles = QFileDialog::getOpenFileNames(
+                mMainWindow,
+                Petrack::tr("Open calibration sequence"),
+                mLastDir,
+                "All supported types (*.bmp *.dib *.jpeg *.jpg *.jpe *.png *.pbm *.pgm *.ppm *.sr *.ras *.tiff *.tif "
+                "*.exr "
+                "*.jp2);;All files (*.*)");
 
-        if(!mCalibFiles.isEmpty())
-        {
-            lastDir = QFileInfo(mCalibFiles.first()).path();
-        }
-        QStringList calibFiles = QFileDialog::getOpenFileNames(
-            mMainWindow,
-            Petrack::tr("Open calibration sequence"),
-            lastDir,
-            "All supported types (*.bmp *.dib *.jpeg *.jpg *.jpe *.png *.pbm *.pgm *.ppm *.sr *.ras *.tiff *.tif *.exr "
-            "*.jp2);;All files (*.*)");
-        if(!calibFiles.isEmpty())
-        {
-            mCalibFiles = calibFiles;
-            return true;
+            if(!calibFiles.isEmpty())
+            {
+                mCalibFiles = calibFiles;
+                return true;
+            }
         }
     }
     return false;

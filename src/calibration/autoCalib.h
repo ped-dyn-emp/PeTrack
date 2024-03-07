@@ -79,6 +79,8 @@ public:
     {
         return mSquareSize;
     }
+    inline void    setLastDir(QString path) { mLastDir = path; }
+    inline QString getLastDir() const { return mLastDir; }
 
     std::optional<IntrinsicCameraParams> autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist, bool extModel);
     void                                 checkParamPlausibility(IntrinsicCameraParams &modelParams);
@@ -99,6 +101,7 @@ private:
     QStringList mCalibFiles;
     int         mBoardSizeX, mBoardSizeY;
     float       mSquareSize;
+    QString     mLastDir;
 };
 
 #endif

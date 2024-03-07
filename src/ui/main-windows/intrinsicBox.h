@@ -33,6 +33,13 @@ class CalibFilter;
 class AutoCalib;
 class QDomElement;
 
+struct CalibSettings
+{
+    bool quadAspectRatio;
+    bool fixCenter;
+    bool tangDist;
+};
+
 class IntrinsicBox : public QWidget
 {
     Q_OBJECT
@@ -62,13 +69,16 @@ public:
 
     bool getXml(QDomElement &subSubElem);
     void setXml(QDomElement &subSubElem) const;
-
+    void setCalibSettings();
 
 signals:
     void paramsChanged(IntrinsicCameraParams newParams);
 
 private slots:
+    void showRecalibrationDialog();
     void on_extModelCheckBox_stateChanged(int i);
+    void on_quadAspectRatio_stateChanged(int i);
+    void on_fixCenter_stateChanged(int i);
     void on_tangDist_stateChanged(int i);
     void on_fx_valueChanged(double d);
     void on_fy_valueChanged(double d);
@@ -88,8 +98,6 @@ private slots:
     void on_k4_valueChanged(double d);
     void on_k5_valueChanged(double d);
     void on_k6_valueChanged(double d);
-    void on_quadAspectRatio_stateChanged(int i);
-    void on_fixCenter_stateChanged(int i);
     void on_boardSizeX_valueChanged(int x);
     void on_boardSizeY_valueChanged(int y);
     void on_squareSize_valueChanged(double s);
@@ -103,14 +111,13 @@ public slots:
 private:
     Ui::IntrinsicBox     *mUi;
     IntrinsicCameraParams mParams;
+    CalibSettings         mCalibSettings;
     AutoCalib            &mAutoCalib;
     CalibFilter          &mCalibFilter;
     std::function<void()> mUpdateImageCallback;
 
-    double mCxNormal = mParams.getCx();
-    double mCxFixed  = 0;
-    double mCyNormal = mParams.getCy();
-    double mCyFixed  = 0;
+    double mCxFixed = 0;
+    double mCyFixed = 0;
 };
 
 #endif // INTRINSICBOX_H
