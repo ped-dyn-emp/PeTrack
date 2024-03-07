@@ -52,11 +52,14 @@ IntrinsicBox::IntrinsicBox(
     mUi->setupUi(this);
     connect(mUi->extModelCheckBox, &QCheckBox::stateChanged, this, &IntrinsicBox::on_extModelCheckBox_stateChanged);
     connect(mUi->autoCalib, &QPushButton::clicked, this, &IntrinsicBox::runAutoCalib);
+    connect(mUi->quadAspectRatio, &QCheckBox::clicked, this, &IntrinsicBox::showRecalibrationDialog);
+    connect(mUi->fixCenter, &QCheckBox::clicked, this, &IntrinsicBox::showRecalibrationDialog);
+    connect(mUi->tangDist, &QCheckBox::clicked, this, &IntrinsicBox::showRecalibrationDialog);
     // apply intrinsic
     mUi->apply->setCheckState(mCalibFilter.getEnabled() ? Qt::Checked : Qt::Unchecked);
 
     setIntrinsicCameraParams(mCalibFilter.getCamParams().getValue());
-
+    setCalibSettings();
     // FocusPolicy: TabFocus and first ui-element as proxy are needed for tab order
     setFocusProxy(mUi->apply);
 }
@@ -164,7 +167,7 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
         IntrinsicCameraParams params;
         if(subSubElem.hasAttribute("ENABLED"))
         {
-            mUi->apply->setCheckState(subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+            mUi->apply->setChecked(subSubElem.attribute("ENABLED").toInt());
         }
         if(subSubElem.hasAttribute("FX"))
         {
@@ -176,29 +179,11 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
         }
         if(subSubElem.hasAttribute("CX"))
         {
-            double cxVal = subSubElem.attribute("CX").toDouble();
-            if(cxVal < mUi->cx->minimum())
-            {
-                mUi->cx->setMinimum(cxVal - 50);
-            }
-            if(cxVal > mUi->cx->maximum())
-            {
-                mUi->cx->setMaximum(cxVal + 50);
-            }
-            params.setCx(cxVal);
+            params.setCx(subSubElem.attribute("CX").toDouble());
         }
         if(subSubElem.hasAttribute("CY"))
         {
-            double cyVal = subSubElem.attribute("CY").toDouble();
-            if(cyVal < mUi->cy->minimum())
-            {
-                mUi->cy->setMinimum(cyVal - 50);
-            }
-            if(cyVal > mUi->cy->maximum())
-            {
-                mUi->cy->setMaximum(cyVal + 50);
-            }
-            params.setCy(cyVal);
+            params.setCy(subSubElem.attribute("CY").toDouble());
         }
         if(subSubElem.hasAttribute("R2"))
         {
@@ -268,21 +253,19 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
         }
         if(subSubElem.hasAttribute("QUAD_ASPECT_RATIO"))
         {
-            mUi->quadAspectRatio->setCheckState(
-                subSubElem.attribute("QUAD_ASPECT_RATIO").toInt() ? Qt::Checked : Qt::Unchecked);
+            mUi->quadAspectRatio->setChecked(subSubElem.attribute("QUAD_ASPECT_RATIO").toInt());
         }
         if(subSubElem.hasAttribute("FIX_CENTER"))
         {
-            mUi->fixCenter->setCheckState(subSubElem.attribute("FIX_CENTER").toInt() ? Qt::Checked : Qt::Unchecked);
+            mUi->fixCenter->setChecked(subSubElem.attribute("FIX_CENTER").toInt());
         }
         if(subSubElem.hasAttribute("TANG_DIST"))
         {
-            mUi->tangDist->setCheckState(subSubElem.attribute("TANG_DIST").toInt() ? Qt::Checked : Qt::Unchecked);
+            mUi->tangDist->setChecked(subSubElem.attribute("TANG_DIST").toInt());
         }
         if(subSubElem.hasAttribute("EXT_MODEL_ENABLED"))
         {
-            mUi->extModelCheckBox->setCheckState(
-                subSubElem.attribute("EXT_MODEL_ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
+            mUi->extModelCheckBox->setChecked(subSubElem.attribute("EXT_MODEL_ENABLED").toInt());
         }
         if(subSubElem.hasAttribute("CALIB_FILES"))
         {
@@ -336,6 +319,7 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
         }
 
         setIntrinsicCameraParams(params);
+        setCalibSettings();
 
         if(subSubElem.hasAttribute("IMMUTABLE"))
         {
@@ -386,9 +370,9 @@ void IntrinsicBox::setXml(QDomElement &subElem) const
     subSubElem.setAttribute("TAUY", mUi->tauy->value());
     subSubElem.setAttribute("ReprError", mParams.reprojectionError);
 
-    subSubElem.setAttribute("QUAD_ASPECT_RATIO", mUi->quadAspectRatio->isChecked());
-    subSubElem.setAttribute("FIX_CENTER", mUi->fixCenter->isChecked());
-    subSubElem.setAttribute("TANG_DIST", mUi->tangDist->isChecked());
+    subSubElem.setAttribute("QUAD_ASPECT_RATIO", mCalibSettings.quadAspectRatio);
+    subSubElem.setAttribute("FIX_CENTER", mCalibSettings.fixCenter);
+    subSubElem.setAttribute("TANG_DIST", mCalibSettings.tangDist);
     subSubElem.setAttribute("EXT_MODEL_ENABLED", mUi->extModelCheckBox->isChecked());
 
     // in dateiname darf kein , vorkommen - das blank ", " zur uebersich - beim einlesen wird nur ","
@@ -414,13 +398,24 @@ void IntrinsicBox::setXml(QDomElement &subElem) const
     subElem.appendChild(subSubElem);
 }
 
+void IntrinsicBox::showRecalibrationDialog()
+{
+    int ret = PCustom(
+        this,
+        tr("PeTrack"),
+        tr("You have to calibrate again to bring your change into effect"),
+        {"Recalibrate", "Continue with current calibration"},
+        "Recalibrate");
+
+    if(ret == 0)
+    {
+        runAutoCalib();
+    }
+}
+
 void IntrinsicBox::on_fx_valueChanged(double d)
 {
     mParams.setFx(d);
-    if(mUi->quadAspectRatio->isChecked())
-    {
-        mUi->fy->setValue(d);
-    }
     mUi->intrError->setText(QString("invalid"));
     mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
@@ -571,48 +566,6 @@ void IntrinsicBox::on_k6_valueChanged(double d)
 
     emit paramsChanged(mParams);
 }
-void IntrinsicBox::on_quadAspectRatio_stateChanged(int i)
-{
-    static double oldFyValue = 0;
-
-    if(i == Qt::Checked)
-    {
-        oldFyValue = mUi->fy->value();
-        mUi->fy->setValue(mUi->fx->value());
-        mUi->fy->setDisabled(true);
-    }
-    else if(i == Qt::Unchecked)
-    {
-        mUi->fy->setEnabled(true);
-        mUi->fy->setValue(oldFyValue);
-    }
-    mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
-}
-
-void IntrinsicBox::on_fixCenter_stateChanged(int i)
-{
-    if(i == Qt::Checked)
-    {
-        mCxNormal = mUi->cx->value();
-        mCyNormal = mUi->cy->value();
-
-        mUi->cx->setValue(mCxFixed);
-        mUi->cy->setValue(mCyFixed);
-
-        mUi->cx->setDisabled(true);
-        mUi->cy->setDisabled(true);
-    }
-    else if(i == Qt::Unchecked)
-    {
-        mUi->cx->setEnabled(true);
-        mUi->cy->setEnabled(true);
-        mUi->cx->setValue(mCxNormal);
-        mUi->cy->setValue(mCyNormal);
-    }
-    mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
-}
 
 void IntrinsicBox::on_boardSizeX_valueChanged(int x)
 {
@@ -629,6 +582,13 @@ void IntrinsicBox::on_squareSize_valueChanged(double s)
     mAutoCalib.setSquareSize(static_cast<float>(s));
 }
 
+void IntrinsicBox::setCalibSettings()
+{
+    mCalibSettings.quadAspectRatio = mUi->quadAspectRatio->isChecked();
+    mCalibSettings.fixCenter       = mUi->fixCenter->isChecked();
+    mCalibSettings.tangDist        = mUi->tangDist->isChecked();
+}
+
 void IntrinsicBox::runAutoCalib()
 {
     auto params = mAutoCalib.autoCalib(
@@ -639,6 +599,7 @@ void IntrinsicBox::runAutoCalib()
     if(params)
     {
         setIntrinsicCameraParams(params.value());
+        setCalibSettings();
     }
 }
 void IntrinsicBox::on_calibFiles_clicked()
@@ -647,31 +608,6 @@ void IntrinsicBox::on_calibFiles_clicked()
     {
         mUi->autoCalib->setEnabled(true);
     }
-}
-
-void IntrinsicBox::on_tangDist_stateChanged(int i)
-{
-    static double oldTxValue = 0;
-    static double oldTyValue = 0;
-
-    if(i == Qt::Checked)
-    {
-        mUi->tx->setEnabled(true);
-        mUi->ty->setEnabled(true);
-        mUi->tx->setValue(oldTxValue);
-        mUi->ty->setValue(oldTyValue);
-    }
-    else if(i == Qt::Unchecked)
-    {
-        oldTxValue = mUi->tx->value();
-        oldTyValue = mUi->ty->value();
-        mUi->tx->setValue(0.);
-        mUi->ty->setValue(0.);
-        mUi->tx->setDisabled(true);
-        mUi->ty->setDisabled(true);
-    }
-    mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 }
 
 void IntrinsicBox::on_extModelCheckBox_stateChanged(int i)
@@ -702,6 +638,26 @@ void IntrinsicBox::on_extModelCheckBox_stateChanged(int i)
     }
     mUi->intrError->setText(QString("invalid"));
     mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
+}
+
+void IntrinsicBox::on_quadAspectRatio_stateChanged(int)
+{
+    bool checked = mUi->quadAspectRatio->isChecked();
+    mUi->fy->setEnabled(!checked);
+}
+
+void IntrinsicBox::on_fixCenter_stateChanged(int)
+{
+    bool checked = mUi->fixCenter->isChecked();
+    mUi->cx->setEnabled(!checked);
+    mUi->cy->setEnabled(!checked);
+}
+
+void IntrinsicBox::on_tangDist_stateChanged(int)
+{
+    bool checked = mUi->tangDist->isChecked();
+    mUi->tx->setEnabled(checked);
+    mUi->ty->setEnabled(checked);
 }
 
 void IntrinsicBox::on_apply_stateChanged(int i)

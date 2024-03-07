@@ -2459,7 +2459,7 @@ void Petrack::readSettings()
     setProFileName(settings.value("proFilePath", QDir::currentPath()).toString());
     // nicht ganz sauber, da so immer schon zu anfang in calib file list etwas drin steht und somit auto ausgefuehrt
     // werden kann wird aber beim ersten openCalib... ueberschrieben
-    mAutoCalib.addCalibFile(settings.value("calibFile", QDir::currentPath()).toString());
+    mAutoCalib.setLastDir(settings.value("calibFile", QDir::currentPath()).toString());
     auto geometry = settings.value("geometry").toByteArray();
     restoreGeometry(geometry);
     antialias();
