@@ -105,7 +105,7 @@ if(WIN32)
       WriteRegStr HKCR '.pet' '' 'petfile'
       WriteRegStr HKCR 'petfile' '' 'PeTrack Project File'
       WriteRegStr HKCR 'petfile\\\\DefaultIcon' '' '$INSTDIR\\\\bin\\\\petrack.exe,0'
-      WriteRegStr HKCR 'petfile\\\\shell\\\\open\\\\command' '' '$INSTDIR\\\\bin\\\\petrack.exe %1'
+      WriteRegStr HKCR 'petfile\\\\shell\\\\open\\\\command' '' '$INSTDIR\\\\bin\\\\petrack.exe \\\"%1\\\"'
       WriteRegStr HKLM 'Software\\\\RegisteredApplications' 'petrack' '$INSTDIR\\\\petrack.exe'
       WriteRegStr HKCU 'Software\\\\RegisteredApplications' 'petrack' '$INSTDIR\\\\petrack.exe'
       WriteRegStr HKCU 'Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Explorer\\\\FileExts\\\\.pet\\\\OpenWithList' 'a' '$INSTDIR\\\\bin\\\\petrack.exe'
