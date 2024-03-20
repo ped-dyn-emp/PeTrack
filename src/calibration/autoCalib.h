@@ -28,6 +28,7 @@
 
 class Petrack;
 
+
 /**
  * @brief Class for intrinsic calibration
  *
@@ -82,8 +83,8 @@ public:
     inline void    setLastDir(QString path) { mLastDir = path; }
     inline QString getLastDir() const { return mLastDir; }
 
-    std::optional<IntrinsicCameraParams> autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist, bool extModel);
-    void                                 checkParamPlausibility(IntrinsicCameraParams &modelParams);
+    virtual std::optional<IntrinsicModelsParameters> autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist);
+    void                                             checkParamPlausibility(IntrinsicCameraParams &modelParams);
 
 private:
     int runCalibration(
@@ -94,7 +95,7 @@ private:
         float                                 aspect_ratio,
         int                                   flags,
         cv::Mat                              &camera_matrix,
-        cv::Mat                              &dist_coeffs,
+        cv::Mat                              &distortion_coeffs,
         double                               *reproj_errs);
 
     Petrack    *mMainWindow;

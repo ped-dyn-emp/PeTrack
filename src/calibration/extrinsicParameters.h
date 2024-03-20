@@ -34,6 +34,7 @@ struct ExtrinsicParameters
         return lhs.rot1 == rhs.rot1 && lhs.rot2 == rhs.rot2 && lhs.rot3 == rhs.rot3 && lhs.trans1 == rhs.trans1 &&
                lhs.trans2 == rhs.trans2 && lhs.trans3 == rhs.trans3;
     }
+    friend bool operator!=(const ExtrinsicParameters &lhs, const ExtrinsicParameters &rhs) { return !(lhs == rhs); }
 };
 
 #endif // EXTRINSICPARAMETERS_H

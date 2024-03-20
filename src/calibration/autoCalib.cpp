@@ -116,12 +116,10 @@ bool AutoCalib::openCalibFiles()
  * @param quadAspectRatio whether to fix the aspect ratio
  * @param fixCenter whether to fix the center/focal point
  * @param tangDist whether to use non-zero tangential distortion
- * @param extModel whether to use "extended" calibration model
  *
  * @return new parameters or std::nullopt, if no calibration could be done
  */
-std::optional<IntrinsicCameraParams>
-AutoCalib::autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist, bool extModel)
+std::optional<IntrinsicModelsParameters> AutoCalib::autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist)
 {
     if(mMainWindow)
     {
@@ -139,10 +137,13 @@ AutoCalib::autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist, bool e
         int   flags        = 0;
         std::vector<cv::Point2f>              corners;
         std::vector<std::vector<cv::Point2f>> image_points;
-        cv::Mat                               camera_matrix = cv::Mat::eye(3, 3, CV_64F);
-        cv::Mat                               dist_coeffs   = cv::Mat::zeros(1, 14, CV_64F);
+        cv::Mat                               camera_matrix         = cv::Mat::eye(3, 3, CV_64F);
+        cv::Mat                               distortion_coeffs     = cv::Mat::zeros(1, 14, CV_64F);
+        cv::Mat                               camera_matrix_ext     = cv::Mat::eye(3, 3, CV_64F);
+        cv::Mat                               distortion_coeffs_ext = cv::Mat::zeros(1, 14, CV_64F);
         cv::Mat                               extr_params;
         double                                reproj_errs;
+        double                                reproj_errs_ext;
         cv::Mat                               view, view_gray;
         bool                                  found = false;
         cv::Mat                               origImg;
@@ -259,10 +260,6 @@ AutoCalib::autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist, bool e
         {
             flags |= CV_CALIB_ZERO_TANGENT_DIST;
         }
-        if(extModel)
-        {
-            flags |= CV_CALIB_RATIONAL_MODEL + CV_CALIB_THIN_PRISM_MODEL + CV_CALIB_TILTED_MODEL;
-        }
 
         bool ok = runCalibration(
             image_points,
@@ -272,10 +269,10 @@ AutoCalib::autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist, bool e
             aspect_ratio,
             flags,
             camera_matrix,
-            dist_coeffs,
+            distortion_coeffs,
             &reproj_errs);
 
-
+        SPDLOG_INFO("OLD MODEL CALIBRATION");
         SPDLOG_INFO("{}", ok ? "Calibration succeeded." : "Calibration failed.");
         SPDLOG_INFO("Intrinsic reprojection error is: {:f}", reproj_errs);
 
@@ -286,23 +283,68 @@ AutoCalib::autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist, bool e
         SPDLOG_INFO("distortion coefficients:");
         SPDLOG_INFO(
             "r2: {} r4: {} r6: {}",
-            dist_coeffs.at<double>(0, 0),
-            dist_coeffs.at<double>(0, 1),
-            dist_coeffs.at<double>(0, 4));
-        SPDLOG_INFO("tx: {} ty: {}", dist_coeffs.at<double>(0, 2), dist_coeffs.at<double>(0, 3));
+            distortion_coeffs.at<double>(0, 0),
+            distortion_coeffs.at<double>(0, 1),
+            distortion_coeffs.at<double>(0, 4));
+        SPDLOG_INFO("tx: {} ty: {}", distortion_coeffs.at<double>(0, 2), distortion_coeffs.at<double>(0, 3));
         SPDLOG_INFO(
             "k4: {} k5: {} k6: {}",
-            dist_coeffs.at<double>(0, 5),
-            dist_coeffs.at<double>(0, 6),
-            dist_coeffs.at<double>(0, 7));
+            distortion_coeffs.at<double>(0, 5),
+            distortion_coeffs.at<double>(0, 6),
+            distortion_coeffs.at<double>(0, 7));
 
         SPDLOG_INFO(
             "s1: {} s2: {} s3: {} s4: {}",
-            dist_coeffs.at<double>(0, 8),
-            dist_coeffs.at<double>(0, 9),
-            dist_coeffs.at<double>(0, 10),
-            dist_coeffs.at<double>(0, 11));
-        SPDLOG_INFO("taux: {} tauy: {}", dist_coeffs.at<double>(0, 12), dist_coeffs.at<double>(0, 13));
+            distortion_coeffs.at<double>(0, 8),
+            distortion_coeffs.at<double>(0, 9),
+            distortion_coeffs.at<double>(0, 10),
+            distortion_coeffs.at<double>(0, 11));
+        SPDLOG_INFO("taux: {} tauy: {}", distortion_coeffs.at<double>(0, 12), distortion_coeffs.at<double>(0, 13));
+
+
+        flags |= CV_CALIB_RATIONAL_MODEL + CV_CALIB_THIN_PRISM_MODEL + CV_CALIB_TILTED_MODEL;
+
+        bool ok_ext = runCalibration(
+            image_points,
+            view.size(),
+            board_size,
+            square_size,
+            aspect_ratio,
+            flags,
+            camera_matrix_ext,
+            distortion_coeffs_ext,
+            &reproj_errs_ext);
+
+        SPDLOG_INFO("NEW MODEL CALIBRATION");
+        SPDLOG_INFO("{}", ok_ext ? "Calibration succeeded." : "Calibration failed.");
+        SPDLOG_INFO("Intrinsic reprojection error is: {:f}", reproj_errs_ext);
+
+        progress.setValue(mCalibFiles.size());
+
+        SPDLOG_INFO("camera matrix:\n{}", camera_matrix_ext);
+
+        SPDLOG_INFO("distortion coefficients:");
+        SPDLOG_INFO(
+            "r2: {} r4: {} r6: {}",
+            distortion_coeffs_ext.at<double>(0, 0),
+            distortion_coeffs_ext.at<double>(0, 1),
+            distortion_coeffs_ext.at<double>(0, 4));
+        SPDLOG_INFO("tx: {} ty: {}", distortion_coeffs_ext.at<double>(0, 2), distortion_coeffs_ext.at<double>(0, 3));
+        SPDLOG_INFO(
+            "k4: {} k5: {} k6: {}",
+            distortion_coeffs_ext.at<double>(0, 5),
+            distortion_coeffs_ext.at<double>(0, 6),
+            distortion_coeffs_ext.at<double>(0, 7));
+
+        SPDLOG_INFO(
+            "s1: {} s2: {} s3: {} s4: {}",
+            distortion_coeffs_ext.at<double>(0, 8),
+            distortion_coeffs_ext.at<double>(0, 9),
+            distortion_coeffs_ext.at<double>(0, 10),
+            distortion_coeffs_ext.at<double>(0, 11));
+        SPDLOG_INFO(
+            "taux: {} tauy: {}", distortion_coeffs_ext.at<double>(0, 12), distortion_coeffs_ext.at<double>(0, 13));
+
 
 #ifdef SHOW_CALIB_MAINWINDOW
         // reset view to animation image
@@ -313,13 +355,22 @@ AutoCalib::autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist, bool e
 #endif
 
         // set calibration values
-        IntrinsicCameraParams params;
-        params.cameraMatrix = camera_matrix;
-        params.cameraMatrix.at<double>(0, 2) += mMainWindow->getImageBorderSize();
-        params.cameraMatrix.at<double>(1, 2) += mMainWindow->getImageBorderSize();
-        dist_coeffs.convertTo(params.distortionCoeffs, CV_32F);
-        params.reprojectionError = reproj_errs;
-        checkParamPlausibility(params);
+        IntrinsicModelsParameters params;
+
+        params.oldModelParams.cameraMatrix = camera_matrix;
+        params.oldModelParams.cameraMatrix.at<double>(0, 2) += mMainWindow->getImageBorderSize();
+        params.oldModelParams.cameraMatrix.at<double>(1, 2) += mMainWindow->getImageBorderSize();
+        distortion_coeffs.convertTo(params.oldModelParams.distortionCoeffs, CV_32F);
+        params.oldModelParams.reprojectionError = reproj_errs;
+        checkParamPlausibility(params.oldModelParams);
+
+        params.extModelParams.cameraMatrix = camera_matrix_ext;
+        params.extModelParams.cameraMatrix.at<double>(0, 2) += mMainWindow->getImageBorderSize();
+        params.extModelParams.cameraMatrix.at<double>(1, 2) += mMainWindow->getImageBorderSize();
+        distortion_coeffs_ext.convertTo(params.extModelParams.distortionCoeffs, CV_32F);
+        params.extModelParams.reprojectionError = reproj_errs_ext;
+        checkParamPlausibility(params.extModelParams);
+
         return params;
     }
     return std::nullopt;
@@ -337,7 +388,7 @@ AutoCalib::autoCalib(bool quadAspectRatio, bool fixCenter, bool tangDist, bool e
  * @param aspect_ratio
  * @param flags[in] Flags for calibration; user input assembled in autoCalib()
  * @param camera_matrix[out]
- * @param dist_coeffs[out] distortion coefficients
+ * @param distortion_coeffs[out] distortion coefficients
  * @param reproj_errs[out]
  * @return
  */
@@ -349,7 +400,7 @@ int AutoCalib::runCalibration(
     float                                 aspect_ratio,
     int                                   flags,
     cv::Mat                              &camera_matrix,
-    cv::Mat                              &dist_coeffs,
+    cv::Mat                              &distortion_coeffs,
     double                               *reproj_errs)
 {
     int code;
@@ -384,7 +435,7 @@ int AutoCalib::runCalibration(
     // (some methods generate less coefficients than others/ normal vs. extended model)
     for(int i = 0; i < dist_coeffs_out.cols; ++i)
     {
-        dist_coeffs.at<double>(i) = dist_coeffs_out.at<double>(i);
+        distortion_coeffs.at<double>(i) = dist_coeffs_out.at<double>(i);
     }
 
     code = 1;

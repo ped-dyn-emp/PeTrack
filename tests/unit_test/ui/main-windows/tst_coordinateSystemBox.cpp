@@ -42,7 +42,7 @@ TEST_CASE("CoordinateSystemBox: display of values in UI")
     ExtrinsicBox        extrBox(nullptr, extrCalib);
     AutoCalib           autoCalib{};
     CalibFilter         calibFilter;
-    IntrinsicBox        intrBox{&petrack, autoCalib, calibFilter, []() {}};
+    IntrinsicBox        intrBox{&petrack, autoCalib, calibFilter, extrBox, []() {}};
     ImageItem           imageItem{&petrack, nullptr};
     auto               *ui = new Ui::CoordinateSystemBox();
     CoordinateSystemBox coordSysBox{
@@ -142,7 +142,7 @@ TEST_CASE("CoordinateSystemBox: UI logic")
     ExtrinsicBox        extrBox(nullptr, extrCalib);
     AutoCalib           autoCalib{};
     CalibFilter         calibFilter;
-    IntrinsicBox        intrBox{&petrack, autoCalib, calibFilter, []() {}};
+    IntrinsicBox        intrBox{&petrack, autoCalib, calibFilter, extrBox, []() {}};
     ImageItem           imageItem{&petrack, nullptr};
     auto               *ui                     = new Ui::CoordinateSystemBox();
     int                 updateStatusPosCounter = 0;

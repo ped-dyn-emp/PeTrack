@@ -23,6 +23,8 @@
 #include <QString>
 #include <opencv2/opencv.hpp>
 
+class QCheckBox;
+
 extern const QString commandLineOptionsString;
 extern QString       proFileName; ///< Path to the project (.pet) file; defined in helper.cpp
 
@@ -288,6 +290,8 @@ T computeMedian(std::vector<T> data)
     return 0.5 * (data[data.size() / 2] + data[(data.size() - 1) / 2]);
 }
 
+#include <QDomElement>
+
 template <typename T>
 void setValue(T widget, double value)
 {
@@ -299,5 +303,60 @@ void setValue(T widget, double value)
         throw std::domain_error(ss.str());
     }
     widget->setValue(value);
+}
+
+void setValue(QCheckBox *widget, bool value);
+
+template <typename T>
+void loadValue(const QDomElement &elem, const QString &name, T widget)
+{
+    if(elem.hasAttribute(name))
+    {
+        setValue(widget, elem.attribute(name).toDouble());
+    }
+}
+
+void loadValue(const QDomElement &elem, const QString &name, QCheckBox *widget);
+
+template <typename T>
+void setValueBlocked(T widget, double value)
+{
+    if(widget->minimum() > value || widget->maximum() < value)
+    {
+        std::stringstream ss;
+        ss << "Value " << value << " for " << widget->objectName().toStdString() << " is out of range from "
+           << widget->minimum() << " to " << widget->maximum();
+        throw std::domain_error(ss.str());
+    }
+    widget->blockSignals(true);
+    widget->setValue(value);
+    widget->blockSignals(false);
+}
+
+void setValueBlocked(QCheckBox *widget, bool value);
+
+
+template <typename T>
+void loadValueBlocked(const QDomElement &elem, const QString &name, T widget)
+{
+    if(elem.hasAttribute(name))
+    {
+        QSignalBlocker blocker(widget);
+        setValue(widget, elem.attribute(name).toDouble());
+    }
+}
+
+void loadValueBlocked(const QDomElement &elem, const QString &name, QCheckBox *widget);
+
+template <typename T>
+void checkValueValid(T widget, double value)
+{
+    if(widget->minimum() > value || widget->maximum() < value)
+    {
+        std::stringstream ss;
+        ss << "Value " << value << " for " << widget->objectName().toStdString() << " is out of range from "
+           << widget->minimum() << " to " << widget->maximum();
+        throw std::domain_error(ss.str());
+    }
 }
 #endif
