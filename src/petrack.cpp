@@ -142,8 +142,8 @@ Petrack::Petrack(QString petrackVersion) :
         *getSwapFilter(),
         updateImageCallback);
 
-    auto *intrinsicBox = new IntrinsicBox(this, *getAutoCalib(), *getCalibFilter(), updateImageCallback);
     auto *extrinsicBox = new ExtrinsicBox(this, *getExtrCalibration());
+    auto *intrinsicBox = new IntrinsicBox(this, *getAutoCalib(), *getCalibFilter(), *extrinsicBox, updateImageCallback);
     mImageItem         = new ImageItem(this, nullptr);
     auto *coordSysBox  = new CoordinateSystemBox(
         this,
@@ -812,7 +812,6 @@ void Petrack::openProject(QString fileName, bool openSeq) // default fileName=""
             return;
         }
         mLastTrackerExport = mTrcFileName;
-
         updateWindowTitle();
     }
 }

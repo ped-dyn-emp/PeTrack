@@ -18,14 +18,18 @@
 
 #include "autoCalib.h"
 #include "calibFilter.h"
+#include "extrCalibration.h"
+#include "extrinsicBox.h"
 #include "intrinsicBox.h"
+#include "personStorage.h"
+#include "petrack.h"
 #include "ui_intrinsicBox.h"
 #include "util.h"
 
 #include <QDomElement>
 #include <QSignalSpy>
-#include <QTextStream>
 #include <catch2/catch.hpp>
+#include <catch2/trompeloeil.hpp>
 
 
 bool matEq(const cv::Mat &lhs, const cv::Mat &rhs)
@@ -38,33 +42,37 @@ constexpr double SERIALIZATION_MARGIN = 0.01;
 TEST_CASE("IntrinsicCameraParams have value semantics")
 {
     IntrinsicCameraParams testParams;
+    testParams.setFx(1);
+    testParams.setFy(1);
+    testParams.setCx(0);
+    testParams.setCy(0);
     CHECK(matEq(testParams.cameraMatrix, cv::Mat::eye(cv::Size(3, 3), CV_64F)));
     CHECK(matEq(testParams.distortionCoeffs, cv::Mat::zeros(1, 14, CV_32F)));
-    CHECK(std::isnan(testParams.reprojectionError));
-    testParams.cameraMatrix.at<double>(0, 0) = 1000;
-    testParams.distortionCoeffs.at<float>(0) = 2000;
+    CHECK(qIsNaN(testParams.reprojectionError));
+    testParams.setFx(1000);
+    testParams.setR2(2000);
 
     SECTION("Copy Constructor")
     {
         IntrinsicCameraParams copy{testParams};
-        copy.cameraMatrix.at<double>(1, 1)  = -1;
-        copy.distortionCoeffs.at<double>(1) = -1;
-        CHECK(copy.cameraMatrix.at<double>(0, 0) == 1000);
-        CHECK(copy.distortionCoeffs.at<float>(0) == 2000);
-        CHECK(testParams.cameraMatrix.at<double>(1, 1) == 1);
-        CHECK(testParams.distortionCoeffs.at<float>(1) == 0);
+        copy.setFy(-1);
+        copy.setR4(-1);
+        CHECK(copy.getFx() == 1000);
+        CHECK(copy.getR2() == 2000);
+        CHECK(testParams.getFy() == 1);
+        CHECK(testParams.getR4() == 0);
     }
 
     SECTION("Copy Assignment")
     {
         IntrinsicCameraParams copy;
-        copy                                = testParams;
-        copy.cameraMatrix.at<double>(1, 1)  = -1;
-        copy.distortionCoeffs.at<double>(1) = -1;
-        CHECK(copy.cameraMatrix.at<double>(0, 0) == 1000);
-        CHECK(copy.distortionCoeffs.at<float>(0) == 2000);
-        CHECK(testParams.cameraMatrix.at<double>(1, 1) == 1);
-        CHECK(testParams.distortionCoeffs.at<float>(1) == 0);
+        copy = testParams;
+        copy.setFy(-1);
+        copy.setR4(-1);
+        CHECK(copy.getFx() == 1000);
+        CHECK(copy.getR2() == 2000);
+        CHECK(testParams.getFy() == 1);
+        CHECK(testParams.getR4() == 0);
     }
 }
 
@@ -72,60 +80,68 @@ TEST_CASE("IntrinsicCameraParams values")
 {
     AutoCalib         autoCalib;
     CalibFilter       filterCalib;
+    Petrack           petrack{"Unkown"};
+    Autosave          autosave(petrack);
+    PersonStorage     storage(petrack, autosave);
+    ExtrCalibration   calib(storage);
+    ExtrinsicBox      extrBox(nullptr, calib);
     Ui::IntrinsicBox *ui      = new Ui::IntrinsicBox(); // ownership transferred to IntrinsicBox
-    auto              intrBox = IntrinsicBox(nullptr, ui, autoCalib, filterCalib, []() {});
+    auto              intrBox = IntrinsicBox(nullptr, ui, autoCalib, filterCalib, extrBox, []() {});
 
     QSignalSpy spy{&intrBox, &IntrinsicBox::paramsChanged};
     CHECK(spy.isValid());
-
+    IntrinsicModelsParameters params;
     WHEN("I set the values of the IntrinsicParameters (via the setter)")
     {
-        IntrinsicCameraParams params;
-        params.cameraMatrix = (cv::Mat_<double>(3, 3) << 800, 2, 3, 4, 900, 6, 7, 8, 9);
-        std::iota(params.distortionCoeffs.begin<float>(), params.distortionCoeffs.end<float>(), -5);
+        params.oldModelParams.cameraMatrix = (cv::Mat_<double>(3, 3) << 800, 2, 3, 4, 900, 6, 7, 8, 9);
         // values need to be in valid range -5 to 5
-        params.distortionCoeffs.at<float>(10) = 1;
-        params.distortionCoeffs.at<float>(11) = 2;
-        params.distortionCoeffs.at<float>(12) = 3;
-        params.distortionCoeffs.at<float>(13) = 4;
+        params.oldModelParams.distortionCoeffs =
+            (cv::Mat_<float>(1, 14) << -4.5, -4, -3.5, -3, -2.5, -2, -1.5, -1, 1, 1.5, 2, 2.5, 3, 3.5);
 
-        params.reprojectionError = 42;
+        params.oldModelParams.reprojectionError = 42;
+
+        params.extModelParams.cameraMatrix = (cv::Mat_<double>(3, 3) << 600, 2, 3, 4, 800, 6, 7, 8, 9);
+        // values need to be in valid range -5 to 5
+        params.extModelParams.distortionCoeffs =
+            (cv::Mat_<float>(1, 14) << 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, -1, -1.5, -2, -2.5, -3, -3.5);
+        params.extModelParams.reprojectionError = 187;
 
         intrBox.setIntrinsicCameraParams(params);
-
         THEN("The params are changed in the params-struct")
         {
-            auto newParams = intrBox.getIntrinsicCameraParams();
-            CHECK(intrBox.getIntrinsicCameraParams() == params);
+            auto newParams = intrBox.getBothIntrinsicCameraParams();
+            CHECK(newParams.oldModelParams == params.oldModelParams);
+            CHECK(newParams.extModelParams == params.extModelParams);
         }
 
-        THEN("The params are changed in the ui")
+        THEN("The extended model params are shown in the ui")
         {
-            CHECK(ui->fx->value() == params.cameraMatrix.at<double>(0, 0));
-            CHECK(ui->fy->value() == params.cameraMatrix.at<double>(1, 1));
-            CHECK(ui->cx->value() == params.cameraMatrix.at<double>(0, 2));
-            CHECK(ui->cy->value() == params.cameraMatrix.at<double>(1, 2));
+            CHECK(ui->fx->value() == Approx(params.extModelParams.getFx()));
+            CHECK(ui->fy->value() == Approx(params.extModelParams.getFy()));
+            CHECK(ui->cx->value() == Approx(params.extModelParams.getCx()));
+            CHECK(ui->cy->value() == Approx(params.extModelParams.getCy()));
 
-            CHECK(ui->r2->value() == static_cast<double>(params.distortionCoeffs.at<float>(0)));
-            CHECK(ui->r4->value() == static_cast<double>(params.distortionCoeffs.at<float>(1)));
-            CHECK(ui->tx->value() == static_cast<double>(params.distortionCoeffs.at<float>(2)));
-            CHECK(ui->ty->value() == static_cast<double>(params.distortionCoeffs.at<float>(3)));
-            CHECK(ui->r6->value() == static_cast<double>(params.distortionCoeffs.at<float>(4)));
-            CHECK(ui->k4->value() == static_cast<double>(params.distortionCoeffs.at<float>(5)));
-            CHECK(ui->k5->value() == static_cast<double>(params.distortionCoeffs.at<float>(6)));
-            CHECK(ui->k6->value() == static_cast<double>(params.distortionCoeffs.at<float>(7)));
-            CHECK(ui->s1->value() == static_cast<double>(params.distortionCoeffs.at<float>(8)));
-            CHECK(ui->s2->value() == static_cast<double>(params.distortionCoeffs.at<float>(9)));
-            CHECK(ui->s3->value() == static_cast<double>(params.distortionCoeffs.at<float>(10)));
-            CHECK(ui->s4->value() == static_cast<double>(params.distortionCoeffs.at<float>(11)));
-            CHECK(ui->taux->value() == static_cast<double>(params.distortionCoeffs.at<float>(12)));
-            CHECK(ui->tauy->value() == static_cast<double>(params.distortionCoeffs.at<float>(13)));
+            CHECK(ui->r2->value() == Approx(static_cast<double>(params.extModelParams.getR2())));
+            CHECK(ui->r4->value() == Approx(static_cast<double>(params.extModelParams.getR4())));
+            CHECK(ui->tx->value() == Approx(static_cast<double>(params.extModelParams.getTx())));
+            CHECK(ui->ty->value() == Approx(static_cast<double>(params.extModelParams.getTy())));
+            CHECK(ui->r6->value() == Approx(static_cast<double>(params.extModelParams.getR6())));
+            CHECK(ui->k4->value() == Approx(static_cast<double>(params.extModelParams.getK4())));
+            CHECK(ui->k5->value() == Approx(static_cast<double>(params.extModelParams.getK5())));
+            CHECK(ui->k6->value() == Approx(static_cast<double>(params.extModelParams.getK6())));
+            CHECK(ui->s1->value() == Approx(static_cast<double>(params.extModelParams.getS1())));
+            CHECK(ui->s2->value() == Approx(static_cast<double>(params.extModelParams.getS2())));
+            CHECK(ui->s3->value() == Approx(static_cast<double>(params.extModelParams.getS3())));
+            CHECK(ui->s4->value() == Approx(static_cast<double>(params.extModelParams.getS4())));
+            CHECK(ui->taux->value() == Approx(static_cast<double>(params.extModelParams.getTaux())));
+            CHECK(ui->tauy->value() == Approx(static_cast<double>(params.extModelParams.getTauy())));
+            CHECK(
+                ui->intrError->text().toDouble() ==
+                Approx(static_cast<double>(params.extModelParams.reprojectionError)));
         }
-
         GIVEN("Some parameters are out of range")
         {
-            params.distortionCoeffs.at<float>(12) = 156468;
-            auto oldParams                        = intrBox.getIntrinsicCameraParams();
+            params.extModelParams.setS4(156468);
             THEN("An exception is thrown")
             {
                 CHECK_THROWS_AS(intrBox.setIntrinsicCameraParams(params), std::domain_error);
@@ -136,6 +152,37 @@ TEST_CASE("IntrinsicCameraParams values")
         {
             CHECK(spy.count() == 1);
         }
+
+        AND_WHEN("I press the extended model checkbox")
+        {
+            ui->extModelCheckBox->setChecked(false);
+
+            THEN("The old model parameters are shown in the UI")
+            {
+                CHECK(ui->fx->value() == Approx(params.oldModelParams.getFx()));
+                CHECK(ui->fy->value() == Approx(params.oldModelParams.getFy()));
+                CHECK(ui->cx->value() == Approx(params.oldModelParams.getCx()));
+                CHECK(ui->cy->value() == Approx(params.oldModelParams.getCy()));
+
+                CHECK(ui->r2->value() == Approx(static_cast<double>(params.oldModelParams.getR2())));
+                CHECK(ui->r4->value() == Approx(static_cast<double>(params.oldModelParams.getR4())));
+                CHECK(ui->tx->value() == Approx(static_cast<double>(params.oldModelParams.getTx())));
+                CHECK(ui->ty->value() == Approx(static_cast<double>(params.oldModelParams.getTy())));
+                CHECK(ui->r6->value() == Approx(static_cast<double>(params.oldModelParams.getR6())));
+                CHECK(ui->k4->value() == Approx(static_cast<double>(params.oldModelParams.getK4())));
+                CHECK(ui->k5->value() == Approx(static_cast<double>(params.oldModelParams.getK5())));
+                CHECK(ui->k6->value() == Approx(static_cast<double>(params.oldModelParams.getK6())));
+                CHECK(ui->s1->value() == Approx(static_cast<double>(params.oldModelParams.getS1())));
+                CHECK(ui->s2->value() == Approx(static_cast<double>(params.oldModelParams.getS2())));
+                CHECK(ui->s3->value() == Approx(static_cast<double>(params.oldModelParams.getS3())));
+                CHECK(ui->s4->value() == Approx(static_cast<double>(params.oldModelParams.getS4())));
+                CHECK(ui->taux->value() == Approx(static_cast<double>(params.oldModelParams.getTaux())));
+                CHECK(ui->tauy->value() == Approx(static_cast<double>(params.oldModelParams.getTauy())));
+                CHECK(
+                    ui->intrError->text().toDouble() ==
+                    Approx(static_cast<double>(params.oldModelParams.reprojectionError)));
+            }
+        }
     }
 }
 
@@ -143,8 +190,13 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
 {
     AutoCalib         autoCalib;
     CalibFilter       filterCalib;
+    Petrack           petrack{"Unkown"};
+    Autosave          autosave(petrack);
+    PersonStorage     storage(petrack, autosave);
+    ExtrCalibration   calib(storage);
+    ExtrinsicBox      extrBox(nullptr, calib);
     Ui::IntrinsicBox *ui      = new Ui::IntrinsicBox(); // ownership transferred to IntrinsicBox
-    auto              intrBox = IntrinsicBox(nullptr, ui, autoCalib, filterCalib, []() {});
+    auto              intrBox = IntrinsicBox(nullptr, ui, autoCalib, filterCalib, extrBox, []() {});
 
     // spliting, because changing some of these also changes the intrinsic params
     WHEN("We change non-calculated values")
@@ -173,8 +225,8 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
             {
                 AutoCalib         newAutoCalib;
                 CalibFilter       newFilterCalib;
-                Ui::IntrinsicBox *newUi      = new Ui::IntrinsicBox(); // ownership transferred to IntrinsicBox
-                auto              newIntrBox = IntrinsicBox(nullptr, newUi, newAutoCalib, newFilterCalib, []() {});
+                Ui::IntrinsicBox *newUi = new Ui::IntrinsicBox(); // ownership transferred to IntrinsicBox
+                auto newIntrBox         = IntrinsicBox(nullptr, newUi, newAutoCalib, newFilterCalib, extrBox, []() {});
 
                 for(auto subElem = elem.firstChildElement(); !subElem.isNull(); subElem = subElem.nextSiblingElement())
                 {
@@ -191,6 +243,24 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
                 CHECK(newUi->fixCenter->isChecked() == ui->fixCenter->isChecked());
                 CHECK(newUi->tangDist->isChecked() == ui->tangDist->isChecked());
                 CHECK(newUi->extModelCheckBox->isChecked() == ui->extModelCheckBox->isChecked());
+
+                AND_THEN("parameters are correctly disabled")
+                {
+                    CHECK(!newUi->cx->isEnabled());
+                    CHECK(!newUi->cy->isEnabled());
+                    CHECK(!newUi->fy->isEnabled());
+                    CHECK(!newUi->tx->isEnabled());
+                    CHECK(!newUi->ty->isEnabled());
+                    CHECK(!newUi->k4->isEnabled());
+                    CHECK(!newUi->k5->isEnabled());
+                    CHECK(!newUi->k6->isEnabled());
+                    CHECK(!newUi->s1->isEnabled());
+                    CHECK(!newUi->s2->isEnabled());
+                    CHECK(!newUi->s3->isEnabled());
+                    CHECK(!newUi->s4->isEnabled());
+                    CHECK(!newUi->taux->isEnabled());
+                    CHECK(!newUi->tauy->isEnabled());
+                }
             }
         }
     }
@@ -214,8 +284,8 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
             {
                 AutoCalib         newAutoCalib;
                 CalibFilter       newFilterCalib;
-                Ui::IntrinsicBox *newUi      = new Ui::IntrinsicBox(); // ownership transferred to IntrinsicBox
-                auto              newIntrBox = IntrinsicBox(nullptr, newUi, newAutoCalib, newFilterCalib, []() {});
+                Ui::IntrinsicBox *newUi = new Ui::IntrinsicBox(); // ownership transferred to IntrinsicBox
+                auto newIntrBox         = IntrinsicBox(nullptr, newUi, newAutoCalib, newFilterCalib, extrBox, []() {});
 
                 for(auto subElem = elem.firstChildElement(); !subElem.isNull(); subElem = subElem.nextSiblingElement())
                 {
@@ -231,22 +301,25 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
     WHEN("We change calculated values")
     {
         // set different parameters:
-        IntrinsicCameraParams params;
-        params.cameraMatrix = (cv::Mat_<double>(3, 3) << 800, 0, 5, 0, 900, 7, 0, 0, 1);
-        std::iota(params.distortionCoeffs.begin<float>(), params.distortionCoeffs.end<float>(), -5);
+        IntrinsicModelsParameters params;
+        params.oldModelParams.cameraMatrix = (cv::Mat_<double>(3, 3) << 800, 0, 5, 0, 900, 7, 0, 0, 1);
         // values need to be in valid range -5 to 5
-        params.distortionCoeffs.at<float>(10) = 1;
-        params.distortionCoeffs.at<float>(11) = 2;
-        params.distortionCoeffs.at<float>(12) = 3;
-        params.distortionCoeffs.at<float>(13) = 4;
-        params.reprojectionError              = 0.5;
+        params.oldModelParams.distortionCoeffs =
+            (cv::Mat_<float>(1, 14) << -4.5, -4, -3.5, -3, -2.5, -2, -1.5, -1, 1, 1.5, 2, 2.5, 3, 3.5);
+        params.oldModelParams.reprojectionError = 0.5;
+
+        params.extModelParams.cameraMatrix = (cv::Mat_<double>(3, 3) << 600, 0, 5, 0, 800, 7, 0, 0, 1);
+        // values need to be in valid range -5 to 5
+        params.extModelParams.distortionCoeffs =
+            (cv::Mat_<float>(1, 14) << 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, -1, -1.5, -2, -2.5, -3, -3.5);
+        params.extModelParams.reprojectionError = 78.5;
         intrBox.setIntrinsicCameraParams(params);
 
         AND_WHEN("We save the widget into a pet-file")
         {
             QDomDocument doc;
             auto         root = doc.createElement("PETRACK");
-            root.setAttribute("VERSION", "0.9.2");
+            root.setAttribute("VERSION", "0.10.1");
             doc.appendChild(root);
             QDomElement elem = doc.createElement("CALIBRATION");
             root.appendChild(elem);
@@ -255,8 +328,8 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
             {
                 AutoCalib         newAutoCalib;
                 CalibFilter       newFilterCalib;
-                Ui::IntrinsicBox *newUi      = new Ui::IntrinsicBox(); // ownership transferred to IntrinsicBox
-                auto              newIntrBox = IntrinsicBox(nullptr, newUi, newAutoCalib, newFilterCalib, []() {});
+                Ui::IntrinsicBox *newUi = new Ui::IntrinsicBox(); // ownership transferred to IntrinsicBox
+                auto newIntrBox         = IntrinsicBox(nullptr, newUi, newAutoCalib, newFilterCalib, extrBox, []() {});
 
                 for(auto subElem = elem.firstChildElement(); !subElem.isNull(); subElem = subElem.nextSiblingElement())
                 {
@@ -264,16 +337,41 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
                 }
 
                 INFO(nodeToString(elem).toStdString())
-                auto oldParams = intrBox.getIntrinsicCameraParams();
-                auto newParams = newIntrBox.getIntrinsicCameraParams();
+                auto originalParams   = intrBox.getBothIntrinsicCameraParams();
+                auto serializedParams = newIntrBox.getBothIntrinsicCameraParams();
                 CHECK(
-                    cv::norm(oldParams.cameraMatrix - newParams.cameraMatrix) ==
+                    cv::norm(
+                        originalParams.oldModelParams.cameraMatrix - serializedParams.oldModelParams.cameraMatrix) ==
                     Approx(0).margin(SERIALIZATION_MARGIN));
                 CHECK(
-                    cv::norm(oldParams.distortionCoeffs - newParams.distortionCoeffs) ==
-                    Approx(0).margin(SERIALIZATION_MARGIN));
+                    cv::norm(
+                        originalParams.oldModelParams.distortionCoeffs -
+                        serializedParams.oldModelParams.distortionCoeffs) == Approx(0).margin(SERIALIZATION_MARGIN));
 
-                CHECK(oldParams.reprojectionError == Approx(newParams.reprojectionError));
+                CHECK(
+                    originalParams.oldModelParams.reprojectionError ==
+                    Approx(serializedParams.oldModelParams.reprojectionError));
+
+                // check extended model parameters
+                CHECK(
+                    cv::norm(
+                        originalParams.extModelParams.cameraMatrix - serializedParams.extModelParams.cameraMatrix) ==
+                    Approx(0).margin(SERIALIZATION_MARGIN));
+                CHECK(
+                    cv::norm(
+                        originalParams.extModelParams.distortionCoeffs -
+                        serializedParams.extModelParams.distortionCoeffs) == Approx(0).margin(SERIALIZATION_MARGIN));
+
+                if(qIsNaN(originalParams.extModelParams.reprojectionError))
+                {
+                    CHECK(qIsNaN(serializedParams.extModelParams.reprojectionError));
+                }
+                else
+                {
+                    CHECK(
+                        originalParams.extModelParams.reprojectionError ==
+                        Approx(serializedParams.extModelParams.reprojectionError));
+                }
             }
         }
     }
@@ -281,12 +379,17 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
 
 TEST_CASE("ImageSizeChanged")
 {
-    AutoCalib     autoCalib;
-    CalibFilter   filterCalib;
-    auto         *ui      = new Ui::IntrinsicBox(); // ownership transferred to IntrinsicBox
-    auto          intrBox = IntrinsicBox(nullptr, ui, autoCalib, filterCalib, []() {});
-    constexpr int width   = 1280;
-    constexpr int height  = 720;
+    AutoCalib       autoCalib;
+    CalibFilter     filterCalib;
+    Petrack         petrack{"Unkown"};
+    Autosave        autosave(petrack);
+    PersonStorage   storage(petrack, autosave);
+    ExtrCalibration calib(storage);
+    ExtrinsicBox    extrBox(nullptr, calib);
+    auto           *ui      = new Ui::IntrinsicBox(); // ownership transferred to IntrinsicBox
+    auto            intrBox = IntrinsicBox(nullptr, ui, autoCalib, filterCalib, extrBox, []() {});
+    constexpr int   width   = 1280;
+    constexpr int   height  = 720;
 
     WHEN("the image size changes")
     {
@@ -294,10 +397,28 @@ TEST_CASE("ImageSizeChanged")
         {
             ui->fixCenter->setChecked(true);
             intrBox.imageSizeChanged(width, height, 0);
+
+            double cxFixed = (width - 1) / 2.;
+            double cyFixed = (height - 1) / 2.;
             THEN("cx and cy are set to the new image center")
             {
-                CHECK(ui->cx->value() == Approx((width - 1) / 2.));
-                CHECK(ui->cy->value() == Approx((height - 1) / 2.));
+                IntrinsicCameraParams params = intrBox.getIntrinsicCameraParams();
+                CHECK(params.getCx() == Approx(cxFixed));
+                CHECK(params.getCy() == Approx(cyFixed));
+                CHECK(ui->cx->value() == Approx(cxFixed));
+                CHECK(ui->cy->value() == Approx(cyFixed));
+            }
+            AND_WHEN("I switch calibration models")
+            {
+                ui->extModelCheckBox->setChecked(false);
+                IntrinsicCameraParams params = intrBox.getIntrinsicCameraParams();
+                THEN("cx and cy are updated in ui and data accordingly")
+                {
+                    CHECK(params.getCx() == Approx(cxFixed));
+                    CHECK(params.getCy() == Approx(cyFixed));
+                    CHECK(ui->cx->value() == Approx(cxFixed));
+                    CHECK(ui->cy->value() == Approx(cyFixed));
+                }
             }
         }
 

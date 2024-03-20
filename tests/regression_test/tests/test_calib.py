@@ -20,19 +20,14 @@ from pytest import approx
 import subprocess
 import xml.etree.ElementTree as ET
 import numpy as np
+import math
 from dataclasses import dataclass
 from numpy import r_
 
+
 # NOTE: Does not test all options; ie. QuadAspectRatio, Fix Center, Ext. Model, ...
 
-
-def read_intrinsics(tree: ET.ElementTree) -> np.ndarray:
-    # NOTE: needs non-nan reprojection error
-
-    node = tree.find("./CONTROL/CALIBRATION/INTRINSIC_PARAMETERS")
-    if node is None:
-        raise RuntimeError("Invalid pet-File! No Calibration node")
-
+def extract_parameters(node):
     cx = float(node.get("CX", "nan"))
     cy = float(node.get("CY", "nan"))
     fx = float(node.get("FX", "nan"))
@@ -47,14 +42,14 @@ def read_intrinsics(tree: ET.ElementTree) -> np.ndarray:
     s2 = float(node.get("S2", "nan"))
     s3 = float(node.get("S3", "nan"))
     s4 = float(node.get("S4", "nan"))
-    tang_dist = float(node.get("TANG_DIST", "nan"))
     taux = float(node.get("TAUX", "nan"))
     tauy = float(node.get("TAUY", "nan"))
     tx = float(node.get("TX", "nan"))
     ty = float(node.get("TY", "nan"))
-
     # comparison will fail, if this is NaN
     reprojection_error = float(node.get("ReprError", "nan"))
+    if math.isnan(reprojection_error):
+        reprojection_error = float("-inf")
     return np.array(
         [
             cx,
@@ -71,7 +66,6 @@ def read_intrinsics(tree: ET.ElementTree) -> np.ndarray:
             s2,
             s3,
             s4,
-            tang_dist,
             taux,
             tauy,
             tx,
@@ -79,6 +73,27 @@ def read_intrinsics(tree: ET.ElementTree) -> np.ndarray:
             reprojection_error,
         ]
     )
+
+
+def read_intrinsics(tree: ET.ElementTree) -> np.ndarray:
+    # NOTE: needs non-nan reprojection error
+
+    oldModelNode = tree.find("./CONTROL/CALIBRATION/INTRINSIC_PARAMETERS/OLD_MODEL")
+
+    extModelNode = tree.find("./CONTROL/CALIBRATION/INTRINSIC_PARAMETERS/EXT_MODEL")
+
+    if oldModelNode is None or extModelNode is None:
+        raise RuntimeError("Invalid pet-File! No Calibration node")
+
+    node = tree.find("./CONTROL/CALIBRATION/INTRINSIC_PARAMETERS")
+    tang_dist = float(node.get("TANG_DIST", "nan"))
+    fix_center = float(node.get("FIX_CENTER", "nan"))
+    quad_aspect = float(node.get("QUAD_ASPECT_RATIO", "nan"))
+
+    oldModelParams = extract_parameters(oldModelNode)
+    extModelParams = extract_parameters(extModelNode)
+    config = np.array([tang_dist, fix_center, quad_aspect])
+    return np.concatenate([oldModelParams, extModelParams, config])
 
 
 @dataclass
@@ -169,11 +184,10 @@ def test_autoCalib_default_options(pytestconfig):
     compare_intrinsic_calib(test_pet, truth_pet)
 
 
-def test_autoCalib_old_model(pytestconfig):
+def test_load_old_project_old_model(pytestconfig):
     petrack_path = pytestconfig.getoption("path")
-    project = "../data/00_empty.pet"
-    real_intrinsic = "../data/01_intrinsic.pet"
-    intrinsic_dir = "../../../demo/00_files/calibration/intrinsic"
+    project = "../data/01_old_intrinsic_oldModel.pet"
+    real_intrinsic = "../data/01_old_intrinsic_oldModel_truth.pet"
     output = "../data/calibTest.pet"  # same for other test, cannot be run concurrently
 
     # run autocalib on demo project
@@ -182,8 +196,32 @@ def test_autoCalib_old_model(pytestconfig):
             petrack_path,
             "-project",
             project,
-            "-autoIntrinsic",
-            intrinsic_dir,
+            "-autosave",
+            output,
+            "-platform",
+            "offscreen",
+        ],
+        check=True,
+    )
+
+    test_pet = ET.parse(output)
+    truth_pet = ET.parse(real_intrinsic)
+
+    compare_intrinsic_calib(test_pet, truth_pet)
+
+
+def test_load_old_project_ext_model(pytestconfig):
+    petrack_path = pytestconfig.getoption("path")
+    project = "../data/01_old_intrinsic_extModel.pet"
+    real_intrinsic = "../data/01_old_intrinsic_extModel_truth.pet"
+    output = "../data/calibTest.pet"  # same for other test, cannot be run concurrently
+
+    # run autocalib on demo project
+    subprocess.run(
+        [
+            petrack_path,
+            "-project",
+            project,
             "-autosave",
             output,
             "-platform",
@@ -200,9 +238,9 @@ def test_autoCalib_old_model(pytestconfig):
 
 def test_extr_calib(pytestconfig):
     petrack_path = pytestconfig.getoption("path")
-    project = "../data/01_intrinsic.pet"
-    real_extrinsic = "../data/02_extrinsic.pet"
-    extrinsic_file = "../data/before.3dc"
+    project = "../../../demo/01_calibration/01_intrinsic.pet"
+    real_extrinsic = "../../../demo/01_calibration/02_extrinsic.pet"
+    extrinsic_file = "../../../demo/01_calibration/before.3dc"
     output = (
         "../data/extrCalibTest.pet"  # same for other test, cannot be run concurrently
     )

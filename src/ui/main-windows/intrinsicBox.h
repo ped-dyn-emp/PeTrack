@@ -32,6 +32,8 @@ class IntrinsicBox;
 class CalibFilter;
 class AutoCalib;
 class QDomElement;
+class ExtrinsicBox;
+
 
 struct CalibSettings
 {
@@ -49,12 +51,14 @@ public:
         QWidget              *parent,
         AutoCalib            &autoCalib,
         CalibFilter          &calibFilter,
+        ExtrinsicBox         &extrBox,
         std::function<void()> updateImageCallback);
     explicit IntrinsicBox(
         QWidget              *parent,
         Ui::IntrinsicBox     *ui,
         AutoCalib            &autoCalib,
         CalibFilter          &calibFilter,
+        ExtrinsicBox         &extrBox,
         std::function<void()> updateImageCallback);
     IntrinsicBox(const IntrinsicBox &)            = delete;
     IntrinsicBox(IntrinsicBox &&)                 = delete;
@@ -62,24 +66,30 @@ public:
     IntrinsicBox &operator=(IntrinsicBox &&)      = delete;
     ~IntrinsicBox() override;
 
-    IntrinsicCameraParams getIntrinsicCameraParams() const { return mParams; }
-    void                  setIntrinsicCameraParams(const IntrinsicCameraParams &params);
-    void                  imageSizeChanged(int width, int height, int borderDiff);
+    IntrinsicCameraParams     getIntrinsicCameraParams() const;
+    IntrinsicModelsParameters getBothIntrinsicCameraParams() const;
+    void                      setIntrinsicCameraParams(const IntrinsicModelsParameters params);
+    void                      setCurrentIntrinsicCameraParameters(IntrinsicCameraParams params);
+    void                      applyCurrentModelParamsToUi();
+    void                      checkModelParams(const IntrinsicCameraParams &params);
+    void                      imageSizeChanged(int width, int height, int borderDiff);
 
-
-    bool getXml(QDomElement &subSubElem);
-    void setXml(QDomElement &subSubElem) const;
-    void setCalibSettings();
+    IntrinsicCameraParams getXmlParams(const QDomElement &elem);
+    bool                  getXml(QDomElement &subSubElem);
+    void                  setXml(QDomElement &subSubElem) const;
+    void                  setCalibSettings();
+    void                  loadCalibFiles(QDomElement &subSubElem);
 
 signals:
     void paramsChanged(IntrinsicCameraParams newParams);
 
 private slots:
     void showRecalibrationDialog();
-    void on_extModelCheckBox_stateChanged(int i);
-    void on_quadAspectRatio_stateChanged(int i);
-    void on_fixCenter_stateChanged(int i);
-    void on_tangDist_stateChanged(int i);
+    void on_extModelCheckBox_stateChanged(int);
+    void on_extModelCheckBox_clicked(bool);
+    void on_quadAspectRatio_stateChanged(int);
+    void on_fixCenter_stateChanged(int);
+    void on_tangDist_stateChanged(int);
     void on_fx_valueChanged(double d);
     void on_fy_valueChanged(double d);
     void on_cx_valueChanged(double d);
@@ -109,12 +119,13 @@ public slots:
 
 
 private:
-    Ui::IntrinsicBox     *mUi;
-    IntrinsicCameraParams mParams;
-    CalibSettings         mCalibSettings;
-    AutoCalib            &mAutoCalib;
-    CalibFilter          &mCalibFilter;
-    std::function<void()> mUpdateImageCallback;
+    Ui::IntrinsicBox         *mUi;
+    CalibSettings             mCalibSettings;
+    AutoCalib                &mAutoCalib;
+    CalibFilter              &mCalibFilter;
+    ExtrinsicBox             &mExtrBox;
+    std::function<void()>     mUpdateImageCallback;
+    IntrinsicModelsParameters mModelsParams;
 
     double mCxFixed = 0;
     double mCyFixed = 0;

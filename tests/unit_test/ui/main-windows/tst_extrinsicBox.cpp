@@ -21,6 +21,7 @@
 #include "personStorage.h"
 #include "petrack.h"
 #include "ui_extrinsicBox.h"
+#include "util.h"
 
 #include <QDomElement>
 #include <catch2/catch.hpp>
@@ -92,7 +93,7 @@ TEST_CASE("ExtrinsicBox: reading/writing xml")
         params.trans3 = 699;
 
         extrBox.setExtrinsicParameters(params);
-
+        INFO(extrBox.getExtrinsicParameters().trans1);
         AND_WHEN("We save that state into an xml-document")
         {
             QDomDocument doc;
@@ -108,6 +109,7 @@ TEST_CASE("ExtrinsicBox: reading/writing xml")
                 ExtrinsicBox    extrBox(nullptr, calib);
 
                 extrBox.getXml(elem);
+                INFO(nodeToString(elem));
                 CHECK(extrBox.getExtrinsicParameters() == params);
             }
         }

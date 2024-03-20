@@ -151,7 +151,6 @@ Control::Control(
     auto *gridPBox = new PGroupBox(this, "alignment grid", mGrid);
     ui->verticalLayout_13->insertWidget(4, gridPBox);
 
-
     // integrate new widgets in tabbing order
     QWidget::setTabOrder(mFilterBefore, mIntr);
     QWidget::setTabOrder(mIntr, mExtr);

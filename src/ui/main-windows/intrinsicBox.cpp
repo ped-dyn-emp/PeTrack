@@ -20,6 +20,7 @@
 
 #include "autoCalib.h"
 #include "calibFilter.h"
+#include "extrinsicBox.h"
 #include "helper.h"
 #include "pGroupBox.h"
 #include "pMessageBox.h"
@@ -32,8 +33,9 @@ IntrinsicBox::IntrinsicBox(
     QWidget              *parent,
     AutoCalib            &autoCalib,
     CalibFilter          &calibFilter,
+    ExtrinsicBox         &extrBox,
     std::function<void()> updateImageCallback) :
-    IntrinsicBox(parent, new Ui::IntrinsicBox(), autoCalib, calibFilter, updateImageCallback)
+    IntrinsicBox(parent, new Ui::IntrinsicBox(), autoCalib, calibFilter, extrBox, updateImageCallback)
 {
 }
 
@@ -42,15 +44,16 @@ IntrinsicBox::IntrinsicBox(
     Ui::IntrinsicBox     *ui,
     AutoCalib            &autoCalib,
     CalibFilter          &calibFilter,
+    ExtrinsicBox         &extrBox,
     std::function<void()> updateImageCallback) :
     QWidget(parent),
     mUi(ui),
     mAutoCalib(autoCalib),
     mCalibFilter(calibFilter),
+    mExtrBox(extrBox),
     mUpdateImageCallback(std::move(updateImageCallback))
 {
     mUi->setupUi(this);
-    connect(mUi->extModelCheckBox, &QCheckBox::stateChanged, this, &IntrinsicBox::on_extModelCheckBox_stateChanged);
     connect(mUi->autoCalib, &QPushButton::clicked, this, &IntrinsicBox::runAutoCalib);
     connect(mUi->quadAspectRatio, &QCheckBox::clicked, this, &IntrinsicBox::showRecalibrationDialog);
     connect(mUi->fixCenter, &QCheckBox::clicked, this, &IntrinsicBox::showRecalibrationDialog);
@@ -58,7 +61,9 @@ IntrinsicBox::IntrinsicBox(
     // apply intrinsic
     mUi->apply->setCheckState(mCalibFilter.getEnabled() ? Qt::Checked : Qt::Unchecked);
 
-    setIntrinsicCameraParams(mCalibFilter.getCamParams().getValue());
+    mModelsParams.oldModelParams = IntrinsicCameraParams{};
+    mModelsParams.extModelParams = IntrinsicCameraParams{};
+    applyCurrentModelParamsToUi();
     setCalibSettings();
     // FocusPolicy: TabFocus and first ui-element as proxy are needed for tab order
     setFocusProxy(mUi->apply);
@@ -69,71 +74,54 @@ IntrinsicBox::~IntrinsicBox()
     delete mUi;
 }
 
-void IntrinsicBox::setIntrinsicCameraParams(const IntrinsicCameraParams &params)
+void IntrinsicBox::setIntrinsicCameraParams(const IntrinsicModelsParameters params)
 {
-    if(params == mParams)
+    if(params == mModelsParams)
     {
-        // do not send signal if value hasn't changed
         return;
     }
+    mModelsParams = params;
+    applyCurrentModelParamsToUi();
+}
 
+void IntrinsicBox::setCurrentIntrinsicCameraParameters(const IntrinsicCameraParams params)
+{
+    if(mUi->extModelCheckBox->isChecked())
     {
-        // don't want to send signals for intermediate params
-        const QSignalBlocker blocker(this);
-
-        setValue(mUi->fx, params.getFx());
-        setValue(mUi->fy, params.getFy());
-        setValue(mUi->cx, params.getCx());
-        setValue(mUi->cy, params.getCy());
-        setValue(mUi->r2, static_cast<double>(params.distortionCoeffs.at<float>(0)));
-        setValue(mUi->r4, static_cast<double>(params.distortionCoeffs.at<float>(1)));
-        setValue(mUi->tx, static_cast<double>(params.distortionCoeffs.at<float>(2)));
-        setValue(mUi->ty, static_cast<double>(params.distortionCoeffs.at<float>(3)));
-        setValue(mUi->r6, static_cast<double>(params.distortionCoeffs.at<float>(4)));
-        setValue(mUi->k4, static_cast<double>(params.distortionCoeffs.at<float>(5)));
-        setValue(mUi->k5, static_cast<double>(params.distortionCoeffs.at<float>(6)));
-        setValue(mUi->k6, static_cast<double>(params.distortionCoeffs.at<float>(7)));
-        setValue(mUi->s1, static_cast<double>(params.distortionCoeffs.at<float>(8)));
-        setValue(mUi->s2, static_cast<double>(params.distortionCoeffs.at<float>(9)));
-        setValue(mUi->s3, static_cast<double>(params.distortionCoeffs.at<float>(10)));
-        setValue(mUi->s4, static_cast<double>(params.distortionCoeffs.at<float>(11)));
-        setValue(mUi->taux, static_cast<double>(params.distortionCoeffs.at<float>(12)));
-        setValue(mUi->tauy, static_cast<double>(params.distortionCoeffs.at<float>(13)));
-
-        if(params.reprojectionError == std::numeric_limits<float>::quiet_NaN())
-        {
-            mUi->intrError->setText(QString("invalid"));
-        }
-        else
-        {
-            mUi->intrError->setText(QString("%1").arg(params.reprojectionError));
-        }
-
-        // needed here because I surpress signals
-        mParams = params;
+        mModelsParams.extModelParams = params;
     }
-    emit paramsChanged(mParams);
+    else
+    {
+        mModelsParams.oldModelParams = params;
+    }
+    applyCurrentModelParamsToUi();
 }
 
 void IntrinsicBox::imageSizeChanged(int width, int height, int borderDiff)
 {
-    const double cX = mParams.getCx();
-    const double cY = mParams.getCy();
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
 
     mCxFixed = (width - 1) / 2.;
     mCyFixed = (height - 1) / 2.;
-
     if(mUi->fixCenter->isChecked())
     {
-        mUi->cx->setValue(mCxFixed);
-        mUi->cy->setValue(mCyFixed);
+        mModelsParams.oldModelParams.setCx(mCxFixed);
+        mModelsParams.oldModelParams.setCy(mCyFixed);
+        mModelsParams.extModelParams.setCx(mCxFixed);
+        mModelsParams.extModelParams.setCy(mCyFixed);
+        setValueBlocked(mUi->cx, mCxFixed);
+        setValueBlocked(mUi->cy, mCyFixed);
     }
     else
     {
         try
         {
-            setValue(mUi->cx, cX + borderDiff);
-            setValue(mUi->cy, cY + borderDiff);
+            mModelsParams.oldModelParams.setCx(mModelsParams.oldModelParams.getCx() + borderDiff);
+            mModelsParams.oldModelParams.setCy(mModelsParams.oldModelParams.getCy() + borderDiff);
+            mModelsParams.extModelParams.setCx(mModelsParams.extModelParams.getCx() + borderDiff);
+            mModelsParams.extModelParams.setCy(mModelsParams.extModelParams.getCy() + borderDiff);
+            setValueBlocked(mUi->cx, params.getCx() + borderDiff);
+            setValueBlocked(mUi->cy, params.getCy() + borderDiff);
         }
         catch(std::domain_error &)
         {
@@ -141,6 +129,125 @@ void IntrinsicBox::imageSizeChanged(int width, int height, int borderDiff)
                 nullptr,
                 "Image resize invalidated data",
                 "The image has a different size for which the current values for cx and cy are not valid anymore.");
+        }
+    }
+    emit paramsChanged(getIntrinsicCameraParams());
+}
+
+IntrinsicCameraParams IntrinsicBox::getXmlParams(const QDomElement &elem)
+{
+    IntrinsicCameraParams params;
+    if(elem.hasAttribute("FX"))
+    {
+        params.setFx(elem.attribute("FX").toDouble());
+    }
+    if(elem.hasAttribute("FY"))
+    {
+        params.setFy(elem.attribute("FY").toDouble());
+    }
+    if(elem.hasAttribute("CX"))
+    {
+        params.setCx(elem.attribute("CX").toDouble());
+    }
+    if(elem.hasAttribute("CY"))
+    {
+        params.setCy(elem.attribute("CY").toDouble());
+    }
+    if(elem.hasAttribute("R2"))
+    {
+        params.setR2(elem.attribute("R2").toDouble());
+    }
+    if(elem.hasAttribute("R4"))
+    {
+        params.setR4(elem.attribute("R4").toDouble());
+    }
+    if(elem.hasAttribute("R6"))
+    {
+        params.setR6(elem.attribute("R6").toDouble());
+    }
+    if(elem.hasAttribute("TX"))
+    {
+        params.setTx(elem.attribute("TX").toDouble());
+    }
+    if(elem.hasAttribute("TY"))
+    {
+        params.setTy(elem.attribute("TY").toDouble());
+    }
+    if(elem.hasAttribute("K4"))
+    {
+        params.setK4(elem.attribute("K4").toDouble());
+    }
+    if(elem.hasAttribute("K5"))
+    {
+        params.setK5(elem.attribute("K5").toDouble());
+    }
+    if(elem.hasAttribute("K6"))
+    {
+        params.setK6(elem.attribute("K6").toDouble());
+    }
+    if(elem.hasAttribute("S1"))
+    {
+        params.setS1(elem.attribute("S1").toDouble());
+    }
+    if(elem.hasAttribute("S2"))
+    {
+        params.setS2(elem.attribute("S2").toDouble());
+    }
+    if(elem.hasAttribute("S3"))
+    {
+        params.setS3(elem.attribute("S3").toDouble());
+    }
+    if(elem.hasAttribute("S4"))
+    {
+        params.setS4(elem.attribute("S4").toDouble());
+    }
+    if(elem.hasAttribute("TAUX"))
+    {
+        params.setTaux(elem.attribute("TAUX").toDouble());
+    }
+    if(elem.hasAttribute("TAUY"))
+    {
+        params.setTauy(elem.attribute("TAUY").toDouble());
+    }
+    if(elem.hasAttribute("ReprError"))
+    {
+        bool conversionSuccessful;
+        params.reprojectionError = elem.attribute("ReprError").toDouble(&conversionSuccessful);
+        if(!conversionSuccessful)
+        {
+            // Qt sets to inf instead of nan
+            params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
+        }
+    }
+    return params;
+}
+
+void IntrinsicBox::loadCalibFiles(QDomElement &subSubElem)
+{
+    if(subSubElem.hasAttribute("CALIB_FILES"))
+    {
+        QStringList fl = (subSubElem.attribute("CALIB_FILES")).split(",");
+        QString     tmpStr;
+        for(int i = 0; i < fl.size(); ++i)
+        {
+            if((fl[i] = fl[i].trimmed()) == "")
+            {
+                fl.removeAt(i);
+            }
+            else
+            {
+                tmpStr = getExistingFile(fl[i]);
+                if(tmpStr != "")
+                {
+                    fl[i] = tmpStr;
+                }
+            }
+        }
+        // auch setzen, wenn leer, vielleicht ist das ja gewuenscht
+        mAutoCalib.setCalibFiles(fl);
+        if(!fl.isEmpty())
+        {
+            mUi->autoCalib->setEnabled(true);
         }
     }
 }
@@ -164,135 +271,39 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
     }
     else if(subSubElem.tagName() == "INTRINSIC_PARAMETERS")
     {
-        IntrinsicCameraParams params;
-        if(subSubElem.hasAttribute("ENABLED"))
+        loadValue(subSubElem, "ENABLED", mUi->apply);
+        // signals are supposed to change model values; but since we read them in
+        // from a valid file, no changes are neccessary -> can safely block signals
+        loadValue(subSubElem, "QUAD_ASPECT_RATIO", mUi->quadAspectRatio);
+        loadValue(subSubElem, "FIX_CENTER", mUi->fixCenter);
+        loadValue(subSubElem, "TANG_DIST", mUi->tangDist);
+
+        if(subSubElem.elementsByTagName("OLD_MODEL").isEmpty())
         {
-            mUi->apply->setChecked(subSubElem.attribute("ENABLED").toInt());
-        }
-        if(subSubElem.hasAttribute("FX"))
-        {
-            params.setFx(subSubElem.attribute("FX").toDouble());
-        }
-        if(subSubElem.hasAttribute("FY"))
-        {
-            params.setFy(subSubElem.attribute("FY").toDouble());
-        }
-        if(subSubElem.hasAttribute("CX"))
-        {
-            params.setCx(subSubElem.attribute("CX").toDouble());
-        }
-        if(subSubElem.hasAttribute("CY"))
-        {
-            params.setCy(subSubElem.attribute("CY").toDouble());
-        }
-        if(subSubElem.hasAttribute("R2"))
-        {
-            params.distortionCoeffs.at<float>(0) = subSubElem.attribute("R2").toDouble();
-        }
-        if(subSubElem.hasAttribute("R4"))
-        {
-            params.distortionCoeffs.at<float>(1) = subSubElem.attribute("R4").toDouble();
-        }
-        if(subSubElem.hasAttribute("R6"))
-        {
-            params.distortionCoeffs.at<float>(4) = subSubElem.attribute("R6").toDouble();
-        }
-        if(subSubElem.hasAttribute("TX"))
-        {
-            params.distortionCoeffs.at<float>(2) = subSubElem.attribute("TX").toDouble();
-        }
-        if(subSubElem.hasAttribute("TY"))
-        {
-            params.distortionCoeffs.at<float>(3) = subSubElem.attribute("TY").toDouble();
-        }
-        if(subSubElem.hasAttribute("K4"))
-        {
-            params.distortionCoeffs.at<float>(5) = subSubElem.attribute("K4").toDouble();
-        }
-        if(subSubElem.hasAttribute("K5"))
-        {
-            params.distortionCoeffs.at<float>(6) = subSubElem.attribute("K5").toDouble();
-        }
-        if(subSubElem.hasAttribute("K6"))
-        {
-            params.distortionCoeffs.at<float>(7) = subSubElem.attribute("K6").toDouble();
-        }
-        if(subSubElem.hasAttribute("S1"))
-        {
-            params.distortionCoeffs.at<float>(8) = subSubElem.attribute("S1").toDouble();
-        }
-        if(subSubElem.hasAttribute("S2"))
-        {
-            params.distortionCoeffs.at<float>(9) = subSubElem.attribute("S2").toDouble();
-        }
-        if(subSubElem.hasAttribute("S3"))
-        {
-            params.distortionCoeffs.at<float>(10) = subSubElem.attribute("S3").toDouble();
-        }
-        if(subSubElem.hasAttribute("S4"))
-        {
-            params.distortionCoeffs.at<float>(11) = subSubElem.attribute("S4").toDouble();
-        }
-        if(subSubElem.hasAttribute("TAUX"))
-        {
-            params.distortionCoeffs.at<float>(12) = subSubElem.attribute("TAUX").toDouble();
-        }
-        if(subSubElem.hasAttribute("TAUY"))
-        {
-            params.distortionCoeffs.at<float>(13) = subSubElem.attribute("TAUY").toDouble();
-        }
-        if(subSubElem.hasAttribute("ReprError"))
-        {
-            bool conversionSuccessful;
-            params.reprojectionError = subSubElem.attribute("ReprError").toDouble(&conversionSuccessful);
-            if(!conversionSuccessful)
+            // old file with only one model
+            if(subSubElem.hasAttribute("EXT_MODEL_ENABLED") && subSubElem.attribute("EXT_MODEL_ENABLED").toInt())
             {
-                // Qt sets to inf instead of nan
-                params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
+                mModelsParams.extModelParams = getXmlParams(subSubElem);
+                mModelsParams.oldModelParams = IntrinsicCameraParams{};
+            }
+            else
+            {
+                mModelsParams.oldModelParams = getXmlParams(subSubElem);
+                mModelsParams.extModelParams = IntrinsicCameraParams{};
             }
         }
-        if(subSubElem.hasAttribute("QUAD_ASPECT_RATIO"))
+        else
         {
-            mUi->quadAspectRatio->setChecked(subSubElem.attribute("QUAD_ASPECT_RATIO").toInt());
+            // new file with multiple models saved
+            mModelsParams.extModelParams = getXmlParams(subSubElem.firstChildElement("EXT_MODEL"));
+            mModelsParams.oldModelParams = getXmlParams(subSubElem.firstChildElement("OLD_MODEL"));
         }
-        if(subSubElem.hasAttribute("FIX_CENTER"))
-        {
-            mUi->fixCenter->setChecked(subSubElem.attribute("FIX_CENTER").toInt());
-        }
-        if(subSubElem.hasAttribute("TANG_DIST"))
-        {
-            mUi->tangDist->setChecked(subSubElem.attribute("TANG_DIST").toInt());
-        }
-        if(subSubElem.hasAttribute("EXT_MODEL_ENABLED"))
-        {
-            mUi->extModelCheckBox->setChecked(subSubElem.attribute("EXT_MODEL_ENABLED").toInt());
-        }
-        if(subSubElem.hasAttribute("CALIB_FILES"))
-        {
-            QStringList fl = (subSubElem.attribute("CALIB_FILES")).split(",");
-            QString     tmpStr;
-            for(int i = 0; i < fl.size(); ++i)
-            {
-                if((fl[i] = fl[i].trimmed()) == "")
-                {
-                    fl.removeAt(i);
-                }
-                else
-                {
-                    tmpStr = getExistingFile(fl[i]);
-                    if(tmpStr != "")
-                    {
-                        fl[i] = tmpStr;
-                    }
-                }
-            }
-            // auch setzen, wenn leer, vielleicht ist das ja gewuenscht
-            mAutoCalib.setCalibFiles(fl);
-            if(!fl.isEmpty())
-            {
-                mUi->autoCalib->setEnabled(true);
-            }
-        }
+        checkModelParams(mModelsParams.oldModelParams);
+        checkModelParams(mModelsParams.extModelParams);
+
+        loadValue(subSubElem, "EXT_MODEL_ENABLED", mUi->extModelCheckBox);
+
+        loadCalibFiles(subSubElem);
 
         const QDomElement root = subSubElem.ownerDocument().firstChildElement("PETRACK");
 
@@ -317,10 +328,20 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
                 mUi->extModelCheckBox->setChecked(true);
             }
         }
-
-        setIntrinsicCameraParams(params);
+        if(newerThanVersion(QString("0.10.3"), root.attribute("VERSION")))
+        {
+            IntrinsicCameraParams standardParams{};
+            if(mModelsParams.oldModelParams == standardParams || mModelsParams.extModelParams == standardParams)
+            {
+                PWarning(
+                    this,
+                    tr("PeTrack"),
+                    tr("You are using a project version that only uses one calibration model. To use both, you need to "
+                       "recalibrate"));
+            }
+        }
+        applyCurrentModelParamsToUi();
         setCalibSettings();
-
         if(subSubElem.hasAttribute("IMMUTABLE"))
         {
             if(this->parent())
@@ -350,26 +371,52 @@ void IntrinsicBox::setXml(QDomElement &subElem) const
 
     subSubElem = (subElem.ownerDocument()).createElement("INTRINSIC_PARAMETERS");
     subSubElem.setAttribute("ENABLED", mUi->apply->isChecked());
-    subSubElem.setAttribute("FX", mUi->fx->value());
-    subSubElem.setAttribute("FY", mUi->fy->value());
-    subSubElem.setAttribute("CX", mUi->cx->value());
-    subSubElem.setAttribute("CY", mUi->cy->value());
-    subSubElem.setAttribute("R2", mUi->r2->value());
-    subSubElem.setAttribute("R4", mUi->r4->value());
-    subSubElem.setAttribute("R6", mUi->r6->value());
-    subSubElem.setAttribute("TX", mUi->tx->value());
-    subSubElem.setAttribute("TY", mUi->ty->value());
-    subSubElem.setAttribute("K4", mUi->k4->value());
-    subSubElem.setAttribute("K5", mUi->k5->value());
-    subSubElem.setAttribute("K6", mUi->k6->value());
-    subSubElem.setAttribute("S1", mUi->s1->value());
-    subSubElem.setAttribute("S2", mUi->s2->value());
-    subSubElem.setAttribute("S3", mUi->s3->value());
-    subSubElem.setAttribute("S4", mUi->s4->value());
-    subSubElem.setAttribute("TAUX", mUi->taux->value());
-    subSubElem.setAttribute("TAUY", mUi->tauy->value());
-    subSubElem.setAttribute("ReprError", mParams.reprojectionError);
 
+    auto subSubSubElem = (subSubElem.ownerDocument()).createElement("OLD_MODEL");
+    subSubSubElem.setAttribute("FX", mModelsParams.oldModelParams.getFx());
+    subSubSubElem.setAttribute("FY", mModelsParams.oldModelParams.getFy());
+    subSubSubElem.setAttribute("CX", mModelsParams.oldModelParams.getCx());
+    subSubSubElem.setAttribute("CY", mModelsParams.oldModelParams.getCy());
+    subSubSubElem.setAttribute("R2", mModelsParams.oldModelParams.getR2());
+    subSubSubElem.setAttribute("R4", mModelsParams.oldModelParams.getR4());
+    subSubSubElem.setAttribute("R6", mModelsParams.oldModelParams.getR6());
+    subSubSubElem.setAttribute("TX", mModelsParams.oldModelParams.getTx());
+    subSubSubElem.setAttribute("TY", mModelsParams.oldModelParams.getTy());
+    subSubSubElem.setAttribute("K4", mModelsParams.oldModelParams.getK4());
+    subSubSubElem.setAttribute("K5", mModelsParams.oldModelParams.getK5());
+    subSubSubElem.setAttribute("K6", mModelsParams.oldModelParams.getK6());
+    subSubSubElem.setAttribute("S1", mModelsParams.oldModelParams.getS1());
+    subSubSubElem.setAttribute("S2", mModelsParams.oldModelParams.getS2());
+    subSubSubElem.setAttribute("S3", mModelsParams.oldModelParams.getS3());
+    subSubSubElem.setAttribute("S4", mModelsParams.oldModelParams.getS4());
+    subSubSubElem.setAttribute("TAUX", mModelsParams.oldModelParams.getTaux());
+    subSubSubElem.setAttribute("TAUY", mModelsParams.oldModelParams.getTauy());
+    subSubSubElem.setAttribute("ReprError", mModelsParams.oldModelParams.getReprojectionError());
+
+    subSubElem.appendChild(subSubSubElem);
+
+    subSubSubElem = (subSubElem.ownerDocument()).createElement("EXT_MODEL");
+    subSubSubElem.setAttribute("FX", mModelsParams.extModelParams.getFx());
+    subSubSubElem.setAttribute("FY", mModelsParams.extModelParams.getFy());
+    subSubSubElem.setAttribute("CX", mModelsParams.extModelParams.getCx());
+    subSubSubElem.setAttribute("CY", mModelsParams.extModelParams.getCy());
+    subSubSubElem.setAttribute("R2", mModelsParams.extModelParams.getR2());
+    subSubSubElem.setAttribute("R4", mModelsParams.extModelParams.getR4());
+    subSubSubElem.setAttribute("R6", mModelsParams.extModelParams.getR6());
+    subSubSubElem.setAttribute("TX", mModelsParams.extModelParams.getTx());
+    subSubSubElem.setAttribute("TY", mModelsParams.extModelParams.getTy());
+    subSubSubElem.setAttribute("K4", mModelsParams.extModelParams.getK4());
+    subSubSubElem.setAttribute("K5", mModelsParams.extModelParams.getK5());
+    subSubSubElem.setAttribute("K6", mModelsParams.extModelParams.getK6());
+    subSubSubElem.setAttribute("S1", mModelsParams.extModelParams.getS1());
+    subSubSubElem.setAttribute("S2", mModelsParams.extModelParams.getS2());
+    subSubSubElem.setAttribute("S3", mModelsParams.extModelParams.getS3());
+    subSubSubElem.setAttribute("S4", mModelsParams.extModelParams.getS4());
+    subSubSubElem.setAttribute("TAUX", mModelsParams.extModelParams.getTaux());
+    subSubSubElem.setAttribute("TAUY", mModelsParams.extModelParams.getTauy());
+    subSubSubElem.setAttribute("ReprError", mModelsParams.extModelParams.getReprojectionError());
+
+    subSubElem.appendChild(subSubSubElem);
     subSubElem.setAttribute("QUAD_ASPECT_RATIO", mCalibSettings.quadAspectRatio);
     subSubElem.setAttribute("FIX_CENTER", mCalibSettings.fixCenter);
     subSubElem.setAttribute("TANG_DIST", mCalibSettings.tangDist);
@@ -415,156 +462,172 @@ void IntrinsicBox::showRecalibrationDialog()
 
 void IntrinsicBox::on_fx_valueChanged(double d)
 {
-    mParams.setFx(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setFx(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 
 void IntrinsicBox::on_fy_valueChanged(double d)
 {
-    mParams.setFy(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setFy(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 
 void IntrinsicBox::on_cx_valueChanged(double d)
 {
-    mParams.setCx(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setCx(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 
 void IntrinsicBox::on_cy_valueChanged(double d)
 {
-    mParams.setCy(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setCy(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 
 void IntrinsicBox::on_r2_valueChanged(double d)
 {
-    mParams.distortionCoeffs.at<float>(0) = static_cast<float>(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setR2(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 
 void IntrinsicBox::on_r4_valueChanged(double d)
 {
-    mParams.distortionCoeffs.at<float>(1) = static_cast<float>(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setR4(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 
 void IntrinsicBox::on_r6_valueChanged(double d)
 {
-    mParams.distortionCoeffs.at<float>(4) = static_cast<float>(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setR6(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 void IntrinsicBox::on_s1_valueChanged(double d)
 {
-    mParams.distortionCoeffs.at<float>(8) = static_cast<float>(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setS1(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 void IntrinsicBox::on_s2_valueChanged(double d)
 {
-    mParams.distortionCoeffs.at<float>(9) = static_cast<float>(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setS2(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 void IntrinsicBox::on_s3_valueChanged(double d)
 {
-    mParams.distortionCoeffs.at<float>(10) = static_cast<float>(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setS3(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 void IntrinsicBox::on_s4_valueChanged(double d)
 {
-    mParams.distortionCoeffs.at<float>(11) = static_cast<float>(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setS4(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 void IntrinsicBox::on_taux_valueChanged(double d)
 {
-    mParams.distortionCoeffs.at<float>(12) = static_cast<float>(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setTaux(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 void IntrinsicBox::on_tauy_valueChanged(double d)
 {
-    mParams.distortionCoeffs.at<float>(13) = static_cast<float>(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setTauy(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
-
-
 void IntrinsicBox::on_tx_valueChanged(double d)
 {
-    mParams.distortionCoeffs.at<float>(2) = static_cast<float>(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setTx(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 
 void IntrinsicBox::on_ty_valueChanged(double d)
 {
-    mParams.distortionCoeffs.at<float>(3) = static_cast<float>(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setTy(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 void IntrinsicBox::on_k4_valueChanged(double d)
 {
-    mParams.distortionCoeffs.at<float>(5) = static_cast<float>(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setK4(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 void IntrinsicBox::on_k5_valueChanged(double d)
 {
-    mParams.distortionCoeffs.at<float>(6) = static_cast<float>(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setK5(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 void IntrinsicBox::on_k6_valueChanged(double d)
 {
-    mParams.distortionCoeffs.at<float>(7) = static_cast<float>(d);
+    IntrinsicCameraParams params = getIntrinsicCameraParams();
+    params.setK6(d);
+    params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
     mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
 
-    emit paramsChanged(mParams);
+    setCurrentIntrinsicCameraParameters(params);
 }
 
 void IntrinsicBox::on_boardSizeX_valueChanged(int x)
@@ -592,14 +655,14 @@ void IntrinsicBox::setCalibSettings()
 void IntrinsicBox::runAutoCalib()
 {
     auto params = mAutoCalib.autoCalib(
-        mUi->quadAspectRatio->isChecked(),
-        mUi->fixCenter->isChecked(),
-        mUi->tangDist->isChecked(),
-        mUi->extModelCheckBox->isChecked());
+        mUi->quadAspectRatio->isChecked(), mUi->fixCenter->isChecked(), mUi->tangDist->isChecked());
     if(params)
     {
-        setIntrinsicCameraParams(params.value());
         setCalibSettings();
+        IntrinsicModelsParameters validParams = std::move(*params);
+        mModelsParams.oldModelParams          = validParams.oldModelParams;
+        mModelsParams.extModelParams          = validParams.extModelParams;
+        applyCurrentModelParamsToUi();
     }
 }
 void IntrinsicBox::on_calibFiles_clicked()
@@ -610,34 +673,116 @@ void IntrinsicBox::on_calibFiles_clicked()
     }
 }
 
-void IntrinsicBox::on_extModelCheckBox_stateChanged(int i)
+void IntrinsicBox::on_extModelCheckBox_stateChanged(int)
 {
-    if(i == Qt::Checked)
+    bool checked = mUi->extModelCheckBox->isChecked();
+
+    mUi->k4->setEnabled(checked);
+    mUi->k5->setEnabled(checked);
+    mUi->k6->setEnabled(checked);
+    mUi->s1->setEnabled(checked);
+    mUi->s2->setEnabled(checked);
+    mUi->s3->setEnabled(checked);
+    mUi->s4->setEnabled(checked);
+    mUi->taux->setEnabled(checked);
+    mUi->tauy->setEnabled(checked);
+
+    applyCurrentModelParamsToUi();
+}
+
+void IntrinsicBox::on_extModelCheckBox_clicked(bool checked)
+{
+    // clicked only called in user action
+    const ExtrinsicParameters standardExtParams{};
+    if(standardExtParams != mExtrBox.getExtrinsicParameters())
     {
-        mUi->k4->setEnabled(true);
-        mUi->k5->setEnabled(true);
-        mUi->k6->setEnabled(true);
-        mUi->s1->setEnabled(true);
-        mUi->s2->setEnabled(true);
-        mUi->s3->setEnabled(true);
-        mUi->s4->setEnabled(true);
-        mUi->taux->setEnabled(true);
-        mUi->tauy->setEnabled(true);
+        int ret = PCustom(
+            this,
+            tr("PeTrack"),
+            tr("Using different intrinsic calibration would result in a different extrinsic calibration"),
+            {"Delete extrinsic calibration", "Keep intrinsic calibration", "Keep invalid extrinsic calibration"},
+            "Delete extrinsic calibration");
+        if(ret == 0)
+        {
+            mExtrBox.setExtrinsicParameters(standardExtParams);
+        }
+        else if(ret == 1)
+        {
+            mUi->extModelCheckBox->setCheckState(checked ? Qt::Unchecked : Qt::Checked);
+        }
     }
-    else if(i == Qt::Unchecked)
+}
+
+IntrinsicCameraParams IntrinsicBox::getIntrinsicCameraParams() const
+{
+    if(mUi->extModelCheckBox->isChecked())
     {
-        mUi->k4->setDisabled(true);
-        mUi->k5->setDisabled(true);
-        mUi->k6->setDisabled(true);
-        mUi->s1->setDisabled(true);
-        mUi->s2->setDisabled(true);
-        mUi->s3->setDisabled(true);
-        mUi->s4->setDisabled(true);
-        mUi->taux->setDisabled(true);
-        mUi->tauy->setDisabled(true);
+        return mModelsParams.extModelParams;
     }
-    mUi->intrError->setText(QString("invalid"));
-    mParams.reprojectionError = std::numeric_limits<double>::quiet_NaN();
+    else
+    {
+        return mModelsParams.oldModelParams;
+    }
+}
+IntrinsicModelsParameters IntrinsicBox::getBothIntrinsicCameraParams() const
+{
+    return mModelsParams;
+}
+void IntrinsicBox::applyCurrentModelParamsToUi()
+{
+    IntrinsicCameraParams modelParams = getIntrinsicCameraParams();
+
+    setValueBlocked(mUi->fx, modelParams.getFx());
+    setValueBlocked(mUi->fy, modelParams.getFy());
+    setValueBlocked(mUi->cx, modelParams.getCx());
+    setValueBlocked(mUi->cy, modelParams.getCy());
+    setValueBlocked(mUi->r2, static_cast<double>(modelParams.getR2()));
+    setValueBlocked(mUi->r4, static_cast<double>(modelParams.getR4()));
+    setValueBlocked(mUi->tx, static_cast<double>(modelParams.getTx()));
+    setValueBlocked(mUi->ty, static_cast<double>(modelParams.getTy()));
+    setValueBlocked(mUi->r6, static_cast<double>(modelParams.getR6()));
+    setValueBlocked(mUi->k4, static_cast<double>(modelParams.getK4()));
+    setValueBlocked(mUi->k5, static_cast<double>(modelParams.getK5()));
+    setValueBlocked(mUi->k6, static_cast<double>(modelParams.getK6()));
+    setValueBlocked(mUi->s1, static_cast<double>(modelParams.getS1()));
+    setValueBlocked(mUi->s2, static_cast<double>(modelParams.getS2()));
+    setValueBlocked(mUi->s3, static_cast<double>(modelParams.getS3()));
+    setValueBlocked(mUi->s4, static_cast<double>(modelParams.getS4()));
+    setValueBlocked(mUi->taux, static_cast<double>(modelParams.getTaux()));
+    setValueBlocked(mUi->tauy, static_cast<double>(modelParams.getTauy()));
+
+    if(qIsNaN(modelParams.reprojectionError))
+    {
+        mUi->intrError->setText(QString("invalid"));
+    }
+    else
+    {
+        mUi->intrError->setText(QString("%1").arg(modelParams.reprojectionError));
+    }
+
+    emit paramsChanged(modelParams);
+}
+
+void IntrinsicBox::checkModelParams(const IntrinsicCameraParams &modelParams)
+{
+    checkValueValid(mUi->fx, modelParams.getFx());
+    checkValueValid(mUi->fy, modelParams.getFy());
+    checkValueValid(mUi->cx, modelParams.getCx());
+    checkValueValid(mUi->cy, modelParams.getCy());
+    checkValueValid(mUi->r2, static_cast<double>(modelParams.getR2()));
+    checkValueValid(mUi->r4, static_cast<double>(modelParams.getR4()));
+    checkValueValid(mUi->tx, static_cast<double>(modelParams.getTx()));
+    checkValueValid(mUi->ty, static_cast<double>(modelParams.getTy()));
+    checkValueValid(mUi->r6, static_cast<double>(modelParams.getR6()));
+    checkValueValid(mUi->k4, static_cast<double>(modelParams.getK4()));
+    checkValueValid(mUi->k5, static_cast<double>(modelParams.getK5()));
+    checkValueValid(mUi->k6, static_cast<double>(modelParams.getK6()));
+    checkValueValid(mUi->s1, static_cast<double>(modelParams.getS1()));
+    checkValueValid(mUi->s2, static_cast<double>(modelParams.getS2()));
+    checkValueValid(mUi->s3, static_cast<double>(modelParams.getS3()));
+    checkValueValid(mUi->s4, static_cast<double>(modelParams.getS4()));
+    checkValueValid(mUi->taux, static_cast<double>(modelParams.getTaux()));
+    checkValueValid(mUi->tauy, static_cast<double>(modelParams.getTauy()));
 }
 
 void IntrinsicBox::on_quadAspectRatio_stateChanged(int)
