@@ -315,6 +315,8 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
                 tr("You are using a project version lower than 0.9: Therefore, the extended intrinsic calibration "
                    "model is disabled."));
             mUi->extModelCheckBox->setChecked(false);
+            // when using the old model all extended model parameters should be set to zero
+            setExtendedParametersInOldModelToZero();
         }
         else if(newerThanVersion(QString("0.9.2"), root.attribute("VERSION")))
         {
@@ -816,4 +818,24 @@ void IntrinsicBox::on_apply_stateChanged(int i)
         mCalibFilter.disable();
     }
     mUpdateImageCallback();
+}
+/**
+ * @brief Set all extended parameters in the old model to zero
+ *
+ * In older versions the parameters k4, k5 and k6 were part of the ui but didn't have an actual influence on the
+ * calibration. By implementing the extended model these parameters now have an influence and thus old project files
+ * with non-zero values for these parameters lead to incorrect calibrations in the newer versions. Setting all extended
+ * parameters to zero solves that issue.
+ */
+void IntrinsicBox::setExtendedParametersInOldModelToZero()
+{
+    mModelsParams.oldModelParams.setK4(0);
+    mModelsParams.oldModelParams.setK5(0);
+    mModelsParams.oldModelParams.setK6(0);
+    mModelsParams.oldModelParams.setS1(0);
+    mModelsParams.oldModelParams.setS2(0);
+    mModelsParams.oldModelParams.setS3(0);
+    mModelsParams.oldModelParams.setS4(0);
+    mModelsParams.oldModelParams.setTaux(0);
+    mModelsParams.oldModelParams.setTauy(0);
 }
