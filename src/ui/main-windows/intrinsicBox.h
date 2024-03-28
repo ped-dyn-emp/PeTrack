@@ -69,16 +69,20 @@ public:
     IntrinsicCameraParams     getIntrinsicCameraParams() const;
     IntrinsicModelsParameters getBothIntrinsicCameraParams() const;
     void                      setIntrinsicCameraParams(const IntrinsicModelsParameters params);
-    void                      setCurrentIntrinsicCameraParameters(IntrinsicCameraParams params);
-    void                      applyCurrentModelParamsToUi();
-    void                      checkModelParams(const IntrinsicCameraParams &params);
-    void                      imageSizeChanged(int width, int height, int borderDiff);
+
+    void imageSizeChanged(int width, int height, int borderDiff);
+    bool getXml(QDomElement &subSubElem);
+    void setXml(QDomElement &subSubElem) const;
+    void setCalibSettings();
+
+private:
+    void setExtendedParametersInOldModelToZero();
+    void loadCalibFiles(QDomElement &subSubElem);
 
     IntrinsicCameraParams getXmlParams(const QDomElement &elem);
-    bool                  getXml(QDomElement &subSubElem);
-    void                  setXml(QDomElement &subSubElem) const;
-    void                  setCalibSettings();
-    void                  loadCalibFiles(QDomElement &subSubElem);
+    void                  applyCurrentModelParamsToUi();
+    void                  checkModelParams(const IntrinsicCameraParams &params);
+    void                  setCurrentIntrinsicCameraParameters(IntrinsicCameraParams params);
 
 signals:
     void paramsChanged(IntrinsicCameraParams newParams);
