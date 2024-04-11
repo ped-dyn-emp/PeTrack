@@ -9,14 +9,6 @@ Different kinds of markers (e.g. with height information, head direction, indivi
 
 An executable of `PeTrack` is available [here](https://go.fzj.de/petrack-download).
 
-<!-- The brief [documentation](usage/Usage) of using `PeTrack` cannot answer all questions. Thus you may read also the information [workflow](usage/Workflow-for-performing-experiments-to-be-analyzed-with-PeTrack) and [contact the author](https://go.fzj.de/petrack-boltes) before setting up experiments and automatic extraction with `PeTrack`. -->
-
-<!--![Download Video](uploads/9a171c82e9bde1891c2a99eca38ded08/petrackAblaufArena.mp4)
-
-![Download Video](uploads/2c50611b2fdbfcc3e4a33c609b85dffa/petrackArenaResult.mp4)
-
-![Download Video](uploads/31c514747c6ad122b4d27b24a9ccbf67/petrackAblaufLarge.mp4)-->
-
 :::{toctree}
 :maxdepth: 1
 getting_started
