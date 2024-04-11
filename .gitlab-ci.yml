@@ -16,12 +16,39 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 stages:
+  - docs
   - build_environment
   - pre-build-checks
   - build
   - test
   - build_installer
   - deploy
+
+
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+
+# Documentation build, so we know it can be built and can download the website as an artifact
+sphinx:
+  image: python:3.10
+  stage: docs
+  script:
+    - cd docs
+    - pip install -r requirements.txt
+    - make html
+    - mv build/html/ ../public/
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 ###############################################################################
 # Linux CI
