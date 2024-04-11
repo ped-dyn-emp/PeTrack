@@ -1,0 +1,7 @@
+sphinx~=6.2.1
+sphinx_design==0.5.0
+sphinx-book-theme==1.0.1
+sphinx-favicon==1.0.1
+sphinx-notfound-page==1.0.0
+myst-parser==2.0.0
+sphinx-tippy==0.4.1

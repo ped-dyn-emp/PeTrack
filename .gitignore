@@ -797,3 +797,5 @@ MigrationBackup/
 
 ### JetBrains IDE ###
 .idea
+
+docs/build
