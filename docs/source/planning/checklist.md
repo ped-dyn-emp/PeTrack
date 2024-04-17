@@ -1,3 +1,21 @@
-# Checklist
+# Experiment workflow
 
-This is a final checklist in the planning section, being a nice reference for experimenters.
+- Prepare surrounding:
+  - Position constructions
+  - Place marker on ground for extrinsic calibration
+- Prepare cameras on ground: 
+  - Battery or external power supply
+  - Storage media 
+  - Camera parameter settings
+  - Manual focus to head distance
+  - Recordings for intrinsic calibration
+- Mount cameras:
+  - Protection against falling
+  - Adjust and orient
+  - Recordings for extrinsic calibration
+- During experiment:
+  - Record full day or single experiments
+  - Time synchronization between experimental runs
+  - Write down real time schedule and incidents
+- After experiment:
+  - Store and backup video footage
