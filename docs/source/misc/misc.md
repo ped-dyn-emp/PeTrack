@@ -9,5 +9,4 @@ Title page of misc topics, probably just a table of contents
 FAQ
 citation
 batch_processing
-combine
 :::

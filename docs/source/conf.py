@@ -44,7 +44,8 @@ myst_enable_extensions = [
     "html_image",
     "attrs_inline",
     "attrs_block",
-    "dollarmath"
+    "dollarmath",
+    "deflist"
 ]
 
 myst_url_schemes = {
