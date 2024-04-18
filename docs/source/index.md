@@ -9,15 +9,36 @@ Different kinds of markers (e.g. with height information, head direction, indivi
 
 An executable of `PeTrack` is available [here](https://go.fzj.de/petrack-download).
 
+::::{grid} 2
+:::{grid-item-card}  Getting Started
+:class-card: intro-card
+:link: getting_started
+:link-type: doc
+:link-alt: To getting started
+A guide through a small demo project
+:::
+:::{grid-item-card}  Planning of Experiments
+:class-card: intro-card
+:link: planning/planning
+:link-type: doc
+:link-alt: To planning experiments
+A guide to all things to consider **before** using PeTrack or doing the experiments themselves. Recommended reading during planning to get good quality data.
+:::
+::::
+
+
+## Contents
+
 :::{toctree}
 :maxdepth: 1
 getting_started
-user_interface
 planning/planning
+user_interface/user_interface
 calibration/calibration
 recognition/recognition
 tracking/tracking
 correction/correction
+export/export
 misc/misc
 contribute/contribute
 section/MeinTest

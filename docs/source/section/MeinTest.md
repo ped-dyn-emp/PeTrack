@@ -14,10 +14,9 @@ text
 
 With some text asdfjnasöfhaöshf asjföds föijsa följsad kfjsdljflkdsajfjlks jfksa jlkds jösadj föjdsaf ölksj flkajs flksdj fölsaj fölksadj fölkjdsa fölkjdsa fölkdsa fölkadsj fölksaj 
 
-::::{figure-md}
+::::{figure-md} abb
 
 :::{image} ../_static/logo.png
-:name: abb
 :width: 50%
 :::
 
@@ -64,6 +63,8 @@ Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming 
 Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis. 
 
 Test fuer ein paar Referenzen, z.B. auf eine [Abbildung](#abb) oder eine [Notiz](#notiz). Dafuer muss `:name: NAME` mit angegeben werden. Fuer eine Formel sollte man `:label:` verwenden und kriegt eine Referenz der Form [](#formel), [](eqn:test). Fuer Ueberschriften (und Absaetze) kann man mit `(heading-target)=` einen Namen definieren. Dabei kommt diese Markierung **vor** dem Target. Die Referenz sieht so aus: [Ueberschrift](#subheading-target), [Absatz](#absatz-target). Links zu anderen Dokumenten (z.B. [](/getting_started.md), [](/getting_started.md#calibration)) gehen natuerlich auch.
+
+Einen DOI-Link kann man Einbinden mit `<doi:10.1016/j.neucom.2012.01.036>`, das ergibt: <doi:10.1016/j.neucom.2012.01.036>
 
 ::::{grid} 2
 :::{grid-item-card}  Title 1
