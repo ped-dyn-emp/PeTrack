@@ -80,7 +80,7 @@ The second part of the settings for the multicolor marker are part of the recogn
 The mappings from color to height are called `map` in PeTrack. This mapping is used for multiple markers, including e.g. the casern marker. Therefore, some of the options here are not relevant for us.
 
 :::{figure-md} color-plot
-![alt text](imageS/color_plot.png)
+![alt text](images/color_plot.png)
 
 Color Plot: The rectangles are color regions corresponding to a certain color map. The circles are colors corresponding to a detected point. The `X` shows where the color of the pixel under the cursor lies in the plot.
 :::
