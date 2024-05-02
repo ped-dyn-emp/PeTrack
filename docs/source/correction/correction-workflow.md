@@ -46,7 +46,7 @@ If you also want to enable the recognition, check the `perform` box in the recog
 You can correct mildly  misplaced points by being to the corresponding frame,  and moving your cursor to the new location and pressing `STRG + left double click`. Note that you can only move the point inside the head area (circle around the head).
  
 If you would like to move a point further away, you can use `Alt + hold left click` to drag a trajectory point to a new location.
-
+![move-trackpoint](../images/move-trackpoint.gif)
 If you are already seeing many errors, you might want to delete all past or future tracking points and retrack to save you some time.
 
 
