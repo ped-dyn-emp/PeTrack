@@ -649,36 +649,35 @@ double ColorPlot::map(const QColor &col) const
     }
 }
 
-/**
- * @brief Prints the distribution of color-based heights on the console
- * @return false, if no color-based height-distribution exists (e.g. hermes marker)
- */
+// gibt false zurueck, wenn es keine groessenverteilung ueber farbe gab
 bool ColorPlot::printDistribution() const
 {
-    std::map<double, int> dict;
+    QMap<double, int>                 dict;
+    QMap<double, int>::const_iterator j;
+    int                               anz = 0;
 
     for(auto const &person : mPersonStorage->getPersons())
     {
-        // note: manually added TrackPoints do not have color, even for color markers
-        if(person.color().isValid())
+        if(person.color().isValid()) // insbesondere von hand eingefuegte trackpoint/persons haben keine farbe
         {
             ++dict[map(person.color())];
         }
     }
-
-    int count = 0;
-    for(auto it = dict.cbegin(); it != dict.cend(); ++it)
+    j = dict.constBegin();
+    while(j != dict.constEnd())
     {
-        count += it->second;
+        anz += j.value();
+        ++j;
     }
-
-    if(count == 0)
+    if(anz == 0)
     {
         return false;
     }
-    for(auto it = dict.cbegin(); it != dict.cend(); ++it)
+    j = dict.constBegin();
+    while(j != dict.constEnd())
     {
-        SPDLOG_INFO("height: {:3.2f} - number {:3d} ({:2.2f}%)", it->first, it->second, (100. * it->second) / count);
+        SPDLOG_INFO("height: {:5.1f} - number {:3d} ({:4d}%)", j.key(), j.value(), (100. * j.value()) / anz);
+        ++j;
     }
     return true;
 }
