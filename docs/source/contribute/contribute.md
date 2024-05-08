@@ -7,4 +7,5 @@ There are many ways to contribute to PeTrack.
 :::{toctree}
 :maxdepth: 1
 documentation
+code_contribution/code.md
 :::
