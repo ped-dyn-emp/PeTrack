@@ -44,6 +44,7 @@
 #include "helper.h"
 #include "imageItem.h"
 #include "intrinsicBox.h"
+#include "keybindingDialog.h"
 #include "logger.h"
 #include "logoItem.h"
 #include "moCapItem.h"
@@ -1744,63 +1745,48 @@ void Petrack::commandLineOptions()
 
 void Petrack::keyBindings()
 {
-    QString ctrlSign   = (mCompileOS != "Darwin") ? "⌃ Ctrl" : "⌘ Cmd";
-    QString shiftSign  = "⇧ Shift";
-    QString altSign    = (mCompileOS != "Darwin") ? "⎇ Alt" : "⌥ Option";
-    QString arrowUp    = "Arrow up ↑";
-    QString arrowDown  = "Arrow down ↓";
-    QString arrowLeft  = "Arrow left ←";
-    QString arrowRight = "Arrow right →";
+    KeyBindingGroup traj_creation{
+        "trajectory creation/manipulation",
+        {{"Ctrl + double-click left mouse button", "inserts new or moves trajectory point"},
+         {"Shift + double-click left mouse button",
+          "inserts new or moves near trajectory point\nand "
+          "enables showing only the modified trajectory "},
+         {"Alt + holding left mouse button", "moves trajectory point under cursor"},
+         {"Ctrl + shift + double-click left mouse button", "splits trajectory before current frame"}}};
 
-    const QString out =
-        tr("<p>Beside the space bar and Ctrl+z all bindings only affect inside the image.</p>"
-           "<dl><dt><kbd>%1 + z</kbd></dt><dd>Undo the last manual action on trajectories (e.g. moving point)</dd>"
-           "<dt><kbd>%1 + %2 + z</kbd></dt><dd>Redo the last action that was reverted via <kbd>%1 + z</kbd></dd>"
-           "<dt><kbd>Space bar</kbd></dt><dd>toggles between pause and last play direction</dd>"
-           "<dt><kbd>Mouse scroll wheel</kbd></dt><dd>zooms in and out to or from the pixel of the image at the "
-           "position "
-           "of the mouse pointer</dd>"
-           "<dt><kbd>%2 + mouse scroll wheel</kbd></dt><dd>plays forwards or backwards frame by frame</dd>"
-           "<dt><kbd>Holding left mouse button</kbd></dt><dd>moves image</dd>"
-           "<dt><kbd>%4/%5</kbd></dt><dd>zoom in/out</dd>"
-           "<dt><kbd>%6/%7</kbd></dt><dd>frame back/forward</dd>"
-           "<dt><kbd>Double-click left mouse button</kbd></dt><dd>opens video or image sequence</dd>"
-           "<dt><kbd>%1 + double-click left mouse button</kbd></dt><dd>inserts new or moves near trackpoint</dd>"
-           "<dt><kbd>%1 + %2 + double-click left mouse button</kbd></dt><dd>splits near trackpoint before current "
-           "frame</dd>"
-           "<dt><kbd>%1 + double-click right mouse button</kbd></dt><dd>deletes a trajectory of a near trackpoint</dd>"
-           "<dt><kbd>%2 + double-click right mouse button</kbd></dt><dd>deletes the past part of a trajectory of a "
-           "near trackpoint</dd>"
-           "<dt><kbd>%3 + double-click right mouse button</kbd></dt><dd>deletes the future part of a trajectory of a "
-           "near trackpoint</dd>"
-           "<dt><kbd>%1 + double-click middle mouse button</kbd></dt><dd>deletes all trajectories</dd>"
-           "<dt><kbd>%2 + double-click middle mouse button</kbd></dt><dd>deletes the past part of all trajectories</dd>"
-           "<dt><kbd>%3 + double-click middle mouse button</kbd></dt><dd>deletes the future part of all "
-           "trajectories</dd>"
-           "<dt><kbd>%2 + t</kbd></dt><dd>toggles tracking online calculation</dd>"
-           "<dt><kbd>%2 + double-click left mouse button</kbd></dt><dd>inserts new or moves near trackpoint and "
-           "enables showing only the modified trajectory</dd>"
-           "<dt><kbd>%1 + %3 + double-click left mouse button</kbd></dt><dd>jumps to frame of trackpoint under "
-           "cursor</dd>"
-           "<dt><kbd>%3 + holding left mouse button</kbd></dt><dd>moves trackpoint under cursor</dd>"
-           "<dt><kbd>%1 + e</kbd></dt><dd>export trajectories</dd>"
-           "<dt><kbd>%1 + mouse scroll wheel</kbd></dt><dd>change the displayed person (if show only people "
-           "enabled)</dd></dl>"
-           "<p>Further key bindings you will find next to the entries of the menus.</p>")
-            .arg(ctrlSign)
-            .arg(shiftSign)
-            .arg(altSign)
-            .arg(arrowUp)
-            .arg(arrowDown)
-            .arg(arrowLeft)
-            .arg(arrowRight);
+    KeyBindingGroup traj_deletion{
+        "trajectory deletion",
+        {{"Ctrl + double-click right mouse button", "deletes a trajectory"},
+         {"Shift + double-click right mouse button", "deletes the past part of a trajectory"},
+         {"Alt + double-click right mouse button", "deletes the future part of a trajectory"},
+         {"Ctrl + double-click middle mouse button", "deletes all trajectories"},
+         {"Shift + double-click middle mouse button", "deletes the past part of all trajectories"},
+         {"Alt + double-click middle mouse button", "deletes the future part of all trajectories"}}};
 
-    PMessageBox *mb =
-        new PMessageBox(this, tr("Key Bindings"), out, QIcon(), QString(), PMessageBox::StandardButton::Yes);
-    mb->setAttribute(Qt::WA_DeleteOnClose);
-    mb->setModal(false);
+    KeyBindingGroup video_navigation{
+        "video navigation",
+        {{"Space bar", "toggles between pause and last play direction"},
+         {"Ctrl + Alt + double-click left mouse button", "jumps to frame of trajectory point under cursor"},
+         {"Mouse scroll wheel",
+          "zooms in and out to or from the pixel of the image\nat the position of the mouse pointer"},
+         {"Shift + mouse scroll wheel", "plays forwards or backwards frame by frame"},
+         {"Holding left mouse button", "moves image"},
+         {"Arrow up/Arrow down", "zoom in/out"},
+         {"Arrow left/Arrow right", "frame back/forward"},
+         {"Double-click left mouse button", "opens video or image sequence"}
 
-    mb->show();
+        }};
+
+    KeyBindingGroup general{
+        "general",
+        {{"Ctrl + z", "Undo the last manual action on\ntrajectories (e.g. moving point)"},
+         {"Ctrl + Shift + z", "Redo the last action that was reverted\nvia Ctrl + z"},
+         {"Shift + t", "toggles tracking online calculation"},
+         {"Ctrl + e", "export trajectories"},
+         {"Ctrl + mouse scroll wheel", "change the displayed person\n(if show only people enabled)"}}};
+
+    auto *diag = new KeybindingDialog(this, {general, traj_creation, traj_deletion, video_navigation});
+    diag->show();
 }
 
 void Petrack::onlineHelp()
@@ -2023,8 +2009,8 @@ void Petrack::createActions()
     mCameraRightViewAct->setShortcut(tr("Ctrl++Shift+R"));
     mCameraRightViewAct->setCheckable(true);
     connect(mCameraRightViewAct, SIGNAL(triggered()), this, SLOT(setCamera()));
-    mCameraRightViewAct->setChecked(true); // right wird als default genommen, da reference image in triclops auch right
-                                           // ist // erste trj wurden mit left gerechnet
+    mCameraRightViewAct->setChecked(true); // right wird als default genommen, da reference image in triclops auch
+                                           // right ist // erste trj wurden mit left gerechnet
 
     mLimitPlaybackSpeed = new QAction(tr("&Limit playback speed"));
     // Not checkable like Fix since this is also controlled through clicking on FPS and syncing currently would be
@@ -2247,9 +2233,9 @@ void Petrack::resetUI()
     /// ToDo:
     ///
     ///  Reset all UI elements to default settings
-    ///  Noetig damit alle UI Elemente, welche in der neu geladenen Projekt-Datei z.B. noch nicht vorhanden sind, auf
-    ///  sinnvolle Werte gesetzt werden. Anderenfalls kommt es evtl. beim nacheinander laden verschiedener Projekte zu
-    ///  einem Programmabsturz
+    ///  Noetig damit alle UI Elemente, welche in der neu geladenen Projekt-Datei z.B. noch nicht vorhanden sind,
+    ///  auf sinnvolle Werte gesetzt werden. Anderenfalls kommt es evtl. beim nacheinander laden verschiedener
+    ///  Projekte zu einem Programmabsturz
     ///
     return;
 }
@@ -2577,7 +2563,8 @@ void Petrack::keyPressEvent(QKeyEvent *event)
             mViewWidget->zoomIn(1);
             break;
         case Qt::Key_Space:
-            // space wird von buttons, wenn focus drauf ist als Aktivierung vorher abgegriffen und nicht durchgereicht
+            // space wird von buttons, wenn focus drauf ist als Aktivierung vorher abgegriffen und nicht
+            // durchgereicht
             mPlayerWidget->togglePlayPause();
             break;
         case Qt::Key_D:
@@ -2728,7 +2715,8 @@ void Petrack::importTracker(QString dest) // default = ""
             PWarning(
                 this,
                 tr("PeTrack"),
-                tr("Are you sure you want to import 3D data from TXT-File? You have to make sure that the coordinate "
+                tr("Are you sure you want to import 3D data from TXT-File? You have to make sure that the "
+                   "coordinate "
                    "system now is exactly at the same position and orientation than at export time!"));
 
             QFile file(dest);
@@ -2794,7 +2782,8 @@ void Petrack::importTracker(QString dest) // default = ""
                     PCritical(
                         this,
                         "Error importing txt file",
-                        tr("Could not import the data from the provided txt file, as the data for person %1 in frame "
+                        tr("Could not import the data from the provided txt file, as the data for person %1 in "
+                           "frame "
                            "%1 is twice in the txt-file.")
                             .arg(personNr)
                             .arg(frameNr));
