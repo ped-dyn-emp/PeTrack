@@ -38,5 +38,8 @@ target_sources(petrack_core PRIVATE
     pMessageBox.h             
     stereo.ui                 
     stereoWidget.cpp          
-    stereoWidget.h   
+    stereoWidget.h
+    keybindingDialog.h
+    keybindingDialog.cpp
+    keybindingDialog.ui
 )
