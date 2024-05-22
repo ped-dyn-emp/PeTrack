@@ -2428,7 +2428,7 @@ double Petrack::getStatusPosRealHeight()
 }
 
 /**
- * @brief Reads (and applies) settings form platform-independent persistent storage
+ * @brief Reads (and applies) settings from platform-independent persistent storage
  *
  * The saved size and position of the application window get reconstructed. As well as
  * the options about antialiasing and the usage of OpenGL.

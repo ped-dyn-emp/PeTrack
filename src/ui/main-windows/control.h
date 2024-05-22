@@ -139,6 +139,7 @@ public:
     bool       isTrackShowOnlyVisibleChecked() const;
     bool       isTrackShowPointsColoredChecked() const;
     bool       isTrackShowGroundPositionChecked() const;
+    bool       isTrackShowComplPathChecked() const;
 
     QColor getMoCapColor() const;
 
