@@ -74,7 +74,7 @@
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <property name="tabsClosable">
       <bool>false</bool>
@@ -139,8 +139,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>490</width>
-            <height>547</height>
+            <width>494</width>
+            <height>555</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -202,8 +202,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>473</width>
-            <height>1038</height>
+            <width>477</width>
+            <height>948</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -504,7 +504,7 @@
                  <number>0</number>
                 </property>
                 <item>
-                 <layout class="QHBoxLayout" stretch="0,1">
+                 <layout class="QHBoxLayout" stretch="0,1,0">
                   <property name="spacing">
                    <number>6</number>
                   </property>
@@ -728,7 +728,7 @@
                  </layout>
                 </item>
                 <item>
-                 <layout class="QHBoxLayout" stretch="0,0,0,0,0,1">
+                 <layout class="QHBoxLayout" stretch="0,0,0,0,0,1,0">
                   <property name="spacing">
                    <number>6</number>
                   </property>
@@ -901,7 +901,7 @@
                     </property>
                    </widget>
                   </item>
-                  <item >
+                  <item>
                    <widget class="PSpinBox" name="spin_recoGreyLevel">
                     <property name="minimum">
                      <number>0</number>
@@ -1091,7 +1091,7 @@
                        <item row="0" column="3">
                         <widget class="PSpinBox" name="spin_mapX">
                          <property name="minimum">
-                          <number>00</number>
+                          <number>0</number>
                          </property>
                          <property name="maximum">
                           <number>718</number>
@@ -1590,9 +1590,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
-            <width>489</width>
-            <height>1367</height>
+            <y>-394</y>
+            <width>477</width>
+            <height>1248</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -2351,7 +2351,7 @@
               <item>
                <layout class="QVBoxLayout" name="verticalLayout">
                 <item>
-                 <layout class="QGridLayout" name="gridLayout_17" columnstretch="0,1">
+                 <layout class="QGridLayout" name="gridLayout_17" columnstretch="0,1,0">
                   <property name="verticalSpacing">
                    <number>0</number>
                   </property>
@@ -2609,6 +2609,13 @@
                  </widget>
                 </item>
                 <item>
+                 <widget class="Line" name="line_2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <layout class="QHBoxLayout" name="horizontalLayout">
                   <item>
                    <widget class="QCheckBox" name="trackShowOnly">
@@ -2706,6 +2713,23 @@
                  </layout>
                 </item>
                 <item>
+                 <widget class="QCheckBox" name="trackShowComplPath">
+                  <property name="toolTip">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This feature only works, if a subgroup is selected via a) 'show only people' or b) 'show only people list'!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                  <property name="text">
+                   <string>show complete path ('show only people (list)' needs to be selected)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <spacer>
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
@@ -2722,7 +2746,7 @@
                  </spacer>
                 </item>
                 <item>
-                 <layout class="QGridLayout" columnstretch="5,1,1,2">
+                 <layout class="QGridLayout" columnstretch="5,0,0,0">
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
@@ -2741,16 +2765,84 @@
                   <property name="verticalSpacing">
                    <number>0</number>
                   </property>
-                  <item row="6" column="2">
-                   <widget class="PSpinBox" name="trackColorMarkerSize">
-                    <property name="alignment">
-                     <set>Qt::AlignRight</set>
+                  <item row="6" column="1">
+                   <widget class="QLabel" name="label_41">
+                    <property name="maximumSize">
+                     <size>
+                      <width>30</width>
+                      <height>16777215</height>
+                     </size>
                     </property>
-                    <property name="minimum">
-                     <number>1</number>
+                    <property name="text">
+                     <string>size:</string>
                     </property>
-                    <property name="value">
-                     <number>14</number>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLabel" name="label_70">
+                    <property name="text">
+                     <string>line width:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="10" column="0">
+                   <widget class="QCheckBox" name="trackShowGroundPath">
+                    <property name="maximumSize">
+                     <size>
+                      <width>999</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>show ground path</string>
+                    </property>
+                    <property name="checked">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="9" column="0">
+                   <widget class="QCheckBox" name="trackShowGroundPosition">
+                    <property name="maximumSize">
+                     <size>
+                      <width>999</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>show ground position</string>
+                    </property>
+                    <property name="checked">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="0">
+                   <widget class="QCheckBox" name="trackShowColorMarker">
+                    <property name="maximumSize">
+                     <size>
+                      <width>999</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>show color marker</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="10" column="1">
+                   <widget class="QLabel" name="label_68">
+                    <property name="maximumSize">
+                     <size>
+                      <width>30</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>size:</string>
                     </property>
                    </widget>
                   </item>
@@ -2777,24 +2869,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="8" column="3">
-                   <widget class="QCheckBox" name="trackNumberBold">
-                    <property name="maximumSize">
-                     <size>
-                      <width>999</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>bold</string>
-                    </property>
-                    <property name="checked">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="2">
-                   <widget class="PSpinBox" name="trackPointSize">
+                  <item row="9" column="2">
+                   <widget class="PSpinBox" name="trackGroundPositionSize">
                     <property name="alignment">
                      <set>Qt::AlignRight</set>
                     </property>
@@ -2802,48 +2878,22 @@
                      <number>1</number>
                     </property>
                     <property name="value">
-                     <number>7</number>
+                     <number>1</number>
                     </property>
                    </widget>
                   </item>
-                  <item row="7" column="1">
-                   <widget class="QLabel" name="label_69">
-                    <property name="text">
-                     <string>line width</string>
+                  <item row="3" column="2">
+                   <widget class="PSpinBox" name="trackShowPointsLineWidth">
+                    <property name="alignment">
+                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    </property>
+                    <property name="minimum">
+                     <number>1</number>
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="1">
-                   <widget class="QLabel" name="label_13">
-                    <property name="maximumSize">
-                     <size>
-                      <width>30</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>size:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="8" column="0">
-                   <widget class="QCheckBox" name="trackShowNumber">
-                    <property name="maximumSize">
-                     <size>
-                      <width>999</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>show number</string>
-                    </property>
-                    <property name="checked">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="9" column="1">
-                   <widget class="QLabel" name="label_67">
+                  <item row="5" column="1">
+                   <widget class="QLabel" name="label_36">
                     <property name="maximumSize">
                      <size>
                       <width>30</width>
@@ -2868,11 +2918,27 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="0">
-                   <widget class="QCheckBox" name="trackShowPoints">
+                  <item row="4" column="0">
+                   <widget class="QCheckBox" name="trackShowPath">
+                    <property name="maximumSize">
+                     <size>
+                      <width>999</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>show path</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0">
+                   <widget class="QCheckBox" name="trackShowColColor">
                     <property name="minimumSize">
                      <size>
-                      <width>90</width>
+                      <width>124</width>
                       <height>0</height>
                      </size>
                     </property>
@@ -2883,57 +2949,15 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>show points</string>
-                    </property>
-                    <property name="checked">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="9" column="2">
-                   <widget class="PSpinBox" name="trackGroundPositionSize">
-                    <property name="alignment">
-                     <set>Qt::AlignRight</set>
-                    </property>
-                    <property name="minimum">
-                     <number>1</number>
-                    </property>
-                    <property name="value">
-                     <number>1</number>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="1">
-                   <widget class="QLabel" name="label_25">
-                    <property name="maximumSize">
-                     <size>
-                      <width>30</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>size:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="3">
-                   <widget class="QCheckBox" name="trackHeadSized">
-                    <property name="maximumSize">
-                     <size>
-                      <width>999</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>head size</string>
+                     <string>show height/col. color/marker ID</string>
                     </property>
                     <property name="checked">
                      <bool>true</bool>
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="0">
-                   <widget class="QCheckBox" name="trackShowCurrentPoint">
+                  <item row="2" column="3">
+                   <widget class="QCheckBox" name="trackShowPointsColored">
                     <property name="maximumSize">
                      <size>
                       <width>999</width>
@@ -2941,65 +2965,17 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>show current point</string>
+                     <string>colored</string>
                     </property>
                     <property name="checked">
                      <bool>true</bool>
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="1">
-                   <widget class="QLabel" name="label_47">
-                    <property name="maximumSize">
-                     <size>
-                      <width>30</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
+                  <item row="7" column="1">
+                   <widget class="QLabel" name="label_69">
                     <property name="text">
-                     <string>size:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="10" column="0">
-                   <widget class="QCheckBox" name="trackShowGroundPath">
-                    <property name="maximumSize">
-                     <size>
-                      <width>999</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>show ground path</string>
-                    </property>
-                    <property name="checked">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="10" column="1">
-                   <widget class="QLabel" name="label_68">
-                    <property name="maximumSize">
-                     <size>
-                      <width>30</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>size:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="2">
-                   <widget class="PSpinBox" name="trackColColorSize">
-                    <property name="alignment">
-                     <set>Qt::AlignRight</set>
-                    </property>
-                    <property name="minimum">
-                     <number>1</number>
-                    </property>
-                    <property name="value">
-                     <number>11</number>
+                     <string>line width</string>
                     </property>
                    </widget>
                   </item>
@@ -3281,8 +3257,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="10" column="2">
-                   <widget class="PSpinBox" name="trackGroundPathSize">
+                  <item row="5" column="2">
+                   <widget class="PSpinBox" name="trackColColorSize">
                     <property name="alignment">
                      <set>Qt::AlignRight</set>
                     </property>
@@ -3290,7 +3266,90 @@
                      <number>1</number>
                     </property>
                     <property name="value">
+                     <number>11</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="8" column="3">
+                   <widget class="QCheckBox" name="trackNumberBold">
+                    <property name="maximumSize">
+                     <size>
+                      <width>999</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>bold</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="2">
+                   <widget class="PSpinBox" name="trackPointSize">
+                    <property name="alignment">
+                     <set>Qt::AlignRight</set>
+                    </property>
+                    <property name="minimum">
                      <number>1</number>
+                    </property>
+                    <property name="value">
+                     <number>7</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QCheckBox" name="trackShowPoints">
+                    <property name="minimumSize">
+                     <size>
+                      <width>90</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>999</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>show points</string>
+                    </property>
+                    <property name="checked">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="2">
+                   <widget class="PSpinBox" name="trackPathWidth">
+                    <property name="alignment">
+                     <set>Qt::AlignRight</set>
+                    </property>
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>20</number>
+                    </property>
+                    <property name="value">
+                     <number>2</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="3">
+                   <widget class="QCheckBox" name="trackShowHeightIndividual">
+                    <property name="maximumSize">
+                     <size>
+                      <width>999</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>individual</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
@@ -3572,16 +3631,19 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="6" column="1">
-                   <widget class="QLabel" name="label_41">
+                  <item row="0" column="3">
+                   <widget class="QCheckBox" name="trackHeadSized">
                     <property name="maximumSize">
                      <size>
-                      <width>30</width>
+                      <width>999</width>
                       <height>16777215</height>
                      </size>
                     </property>
                     <property name="text">
-                     <string>size:</string>
+                     <string>head size</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
@@ -3595,99 +3657,58 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="4" column="2">
-                   <widget class="PSpinBox" name="trackPathWidth">
+                  <item row="0" column="1">
+                   <widget class="QLabel" name="label_47">
+                    <property name="maximumSize">
+                     <size>
+                      <width>30</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>size:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLabel" name="label_13">
+                    <property name="maximumSize">
+                     <size>
+                      <width>30</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>size:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QCheckBox" name="trackShowCurrentPoint">
+                    <property name="maximumSize">
+                     <size>
+                      <width>999</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>show current point</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="10" column="2">
+                   <widget class="PSpinBox" name="trackGroundPathSize">
                     <property name="alignment">
                      <set>Qt::AlignRight</set>
                     </property>
                     <property name="minimum">
                      <number>1</number>
                     </property>
-                    <property name="maximum">
-                     <number>20</number>
-                    </property>
                     <property name="value">
-                     <number>2</number>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="9" column="0">
-                   <widget class="QCheckBox" name="trackShowGroundPosition">
-                    <property name="maximumSize">
-                     <size>
-                      <width>999</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>show ground position</string>
-                    </property>
-                    <property name="checked">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="6" column="0">
-                   <widget class="QCheckBox" name="trackShowColorMarker">
-                    <property name="maximumSize">
-                     <size>
-                      <width>999</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>show color marker</string>
-                    </property>
-                    <property name="checked">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="0">
-                   <widget class="QCheckBox" name="trackShowPath">
-                    <property name="maximumSize">
-                     <size>
-                      <width>999</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>show path</string>
-                    </property>
-                    <property name="checked">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="3">
-                   <widget class="QCheckBox" name="trackShowHeightIndividual">
-                    <property name="maximumSize">
-                     <size>
-                      <width>999</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>individual</string>
-                    </property>
-                    <property name="checked">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="3">
-                   <widget class="QCheckBox" name="trackShowPointsColored">
-                    <property name="maximumSize">
-                     <size>
-                      <width>999</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>colored</string>
-                    </property>
-                    <property name="checked">
-                     <bool>true</bool>
+                     <number>1</number>
                     </property>
                    </widget>
                   </item>
@@ -3713,21 +3734,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="1">
-                   <widget class="QLabel" name="label_24">
-                    <property name="text">
-                     <string>line width</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="0">
-                   <widget class="QCheckBox" name="trackShowColColor">
-                    <property name="minimumSize">
-                     <size>
-                      <width>124</width>
-                      <height>0</height>
-                     </size>
-                    </property>
+                  <item row="8" column="0">
+                   <widget class="QCheckBox" name="trackShowNumber">
                     <property name="maximumSize">
                      <size>
                       <width>999</width>
@@ -3735,15 +3743,22 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>show height/col. color/marker ID</string>
+                     <string>show number</string>
                     </property>
                     <property name="checked">
                      <bool>true</bool>
                     </property>
                    </widget>
                   </item>
-                  <item row="5" column="1">
-                   <widget class="QLabel" name="label_36">
+                  <item row="1" column="1">
+                   <widget class="QLabel" name="label_24">
+                    <property name="text">
+                     <string>line width</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QLabel" name="label_25">
                     <property name="maximumSize">
                      <size>
                       <width>30</width>
@@ -3755,20 +3770,29 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="3" column="1">
-                   <widget class="QLabel" name="label_70">
-                    <property name="text">
-                     <string>line width:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="2">
-                   <widget class="PSpinBox" name="trackShowPointsLineWidth">
+                  <item row="6" column="2">
+                   <widget class="PSpinBox" name="trackColorMarkerSize">
                     <property name="alignment">
-                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     <set>Qt::AlignRight</set>
                     </property>
                     <property name="minimum">
                      <number>1</number>
+                    </property>
+                    <property name="value">
+                     <number>14</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="9" column="1">
+                   <widget class="QLabel" name="label_67">
+                    <property name="maximumSize">
+                     <size>
+                      <width>30</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>size:</string>
                     </property>
                    </widget>
                   </item>
@@ -4077,8 +4101,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>490</width>
-            <height>547</height>
+            <width>494</width>
+            <height>555</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -4278,7 +4302,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <!-- Tab-order recognition tab -->
   <tabstop>performRecognition</tabstop>
   <tabstop>recoStep</tabstop>
   <tabstop>recoMethod</tabstop>
@@ -4323,9 +4346,6 @@
   <tabstop>mapResetPos</tabstop>
   <tabstop>mapReadHeights</tabstop>
   <tabstop>mapReadMarkerID</tabstop>
-
-  <!-- Tab-order tracking tab -->
-
   <tabstop>trackOnlineCalc</tabstop>
   <tabstop>trackRepeat</tabstop>
   <tabstop>trackRepeatQual</tabstop>
@@ -4371,6 +4391,7 @@
   <tabstop>trackShowOnlyList</tabstop>
   <tabstop>trackShowOnlyNrList</tabstop>
   <tabstop>trackShowOnlyListButton</tabstop>
+  <tabstop>trackShowComplPath</tabstop>
   <tabstop>trackShowCurrentPoint</tabstop>
   <tabstop>trackCurrentPointSize</tabstop>
   <tabstop>trackHeadSized</tabstop>
@@ -4419,148 +4440,356 @@
  <resources/>
  <connections>
   <connection>
-   <receiver>markerBrightness</receiver>
-   <signal>valueChanged(int)</signal>
    <sender>spin_markerBrightness</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>markerBrightness</receiver>
    <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
-   <receiver>spin_markerBrightness</receiver>
-   <signal>valueChanged(int)</signal>
    <sender>markerBrightness</sender>
-   <slot>setValue(int)</slot>
-  </connection>
-
-  <connection>
-   <receiver>recoColorZ</receiver>
    <signal>valueChanged(int)</signal>
+   <receiver>spin_markerBrightness</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>spin_recoColorZ</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>recoColorZ</receiver>
    <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
-   <receiver>spin_recoColorZ</receiver>
-   <signal>valueChanged(int)</signal>
    <sender>recoColorZ</sender>
-   <slot>setValue(int)</slot>
-  </connection>
-
-  <connection>
-   <receiver>recoGreyLevel</receiver>
    <signal>valueChanged(int)</signal>
+   <receiver>spin_recoColorZ</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>spin_recoGreyLevel</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>recoGreyLevel</receiver>
    <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
-   <receiver>spin_recoGreyLevel</receiver>
-   <signal>valueChanged(int)</signal>
    <sender>recoGreyLevel</sender>
-   <slot>setValue(int)</slot>
-  </connection>
-
-  <connection>
-   <receiver>recoSymbolSize</receiver>
    <signal>valueChanged(int)</signal>
+   <receiver>spin_recoGreyLevel</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>spin_recoSymbolSize</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>recoSymbolSize</receiver>
    <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
-   <receiver>spin_recoSymbolSize</receiver>
-   <signal>valueChanged(int)</signal>
    <sender>recoSymbolSize</sender>
-   <slot>setValue(int)</slot>
-  </connection>
-
-  <connection>
-   <receiver>mapX</receiver>
    <signal>valueChanged(int)</signal>
+   <receiver>spin_recoSymbolSize</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>spin_mapX</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>mapX</receiver>
    <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
-   <receiver>spin_mapX</receiver>
-   <signal>valueChanged(int)</signal>
    <sender>mapX</sender>
-   <slot>setValue(int)</slot>
-  </connection>
-
-  <connection>
-  <receiver>mapY</receiver>
-  <signal>valueChanged(int)</signal>
-  <sender>spin_mapY</sender>
-  <slot>setValue(int)</slot>
- </connection>
- <connection>
-  <receiver>spin_mapY</receiver>
-  <signal>valueChanged(int)</signal>
-  <sender>mapY</sender>
-  <slot>setValue(int)</slot>
- </connection>
-
-<connection>
-  <receiver>mapH</receiver>
-  <signal>valueChanged(int)</signal>
-  <sender>spin_mapH</sender>
-  <slot>setValue(int)</slot>
- </connection>
- <connection>
-  <receiver>spin_mapH</receiver>
-  <signal>valueChanged(int)</signal>
-  <sender>mapH</sender>
-  <slot>setValue(int)</slot>
- </connection>
-
-  <connection>
-   <receiver>mapW</receiver>
    <signal>valueChanged(int)</signal>
+   <receiver>spin_mapX</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spin_mapY</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>mapY</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mapY</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spin_mapY</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spin_mapH</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>mapH</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mapH</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spin_mapH</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>spin_mapW</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>mapW</receiver>
    <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
-   <receiver>spin_mapW</receiver>
-   <signal>valueChanged(int)</signal>
    <sender>mapW</sender>
-   <slot>setValue(int)</slot>
-  </connection>
-
-
-  <connection>
-   <receiver>trackRegionScale</receiver>
    <signal>valueChanged(int)</signal>
+   <receiver>spin_mapW</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>spin_trackRegionScale</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>trackRegionScale</receiver>
    <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
-   <receiver>spin_trackRegionScale</receiver>
-   <signal>valueChanged(int)</signal>
    <sender>trackRegionScale</sender>
-   <slot>setValue(int)</slot>
-  </connection>
-
-  <connection>
-   <receiver>trackRegionLevels</receiver>
    <signal>valueChanged(int)</signal>
+   <receiver>spin_trackRegionScale</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>spin_trackRegionLevels</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>trackRegionLevels</receiver>
    <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
-   <receiver>spin_trackRegionLevels</receiver>
-   <signal>valueChanged(int)</signal>
    <sender>trackRegionLevels</sender>
-   <slot>setValue(int)</slot>
-  </connection>
-
-  <connection>
-   <receiver>trackErrorExponent</receiver>
    <signal>valueChanged(int)</signal>
+   <receiver>spin_trackRegionLevels</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>spin_trackErrorExponent</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>trackErrorExponent</receiver>
    <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
   <connection>
-   <receiver>spin_trackErrorExponent</receiver>
-   <signal>valueChanged(int)</signal>
    <sender>trackErrorExponent</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spin_trackErrorExponent</receiver>
    <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
   </connection>
-
  </connections>
 </ui>

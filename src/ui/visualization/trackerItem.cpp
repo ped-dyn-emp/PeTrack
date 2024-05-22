@@ -710,11 +710,14 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
             const bool showPathLike = mControlWidget->isTrackShowPointsChecked() ||
                                       mControlWidget->isTrackShowPathChecked() ||
                                       mControlWidget->isTrackShowGroundPathChecked();
-            const bool personToDraw =
-                !mControlWidget->isTrackShowOnlyVisibleChecked() || person.trackPointExist(curFrame);
+            const bool isVisible       = person.trackPointExist(curFrame);
+            const bool drawOnlyVisible = mControlWidget->isTrackShowOnlyVisibleChecked();
+            const bool personToDraw    = !drawOnlyVisible || isVisible;
             if(showPathLike && personToDraw)
             {
-                if(mControlWidget->getTrackShowBefore() == -1)
+                const bool hasActiveSelection = !pedestrianToPaint.empty();
+                if(mControlWidget->getTrackShowBefore() == -1 ||
+                   (mControlWidget->isTrackShowComplPathChecked() && hasActiveSelection))
                 {
                     from = 0;
                 }
@@ -726,7 +729,8 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         from = 0;
                     }
                 }
-                if(mControlWidget->getTrackShowAfter() == -1)
+                if(mControlWidget->getTrackShowAfter() == -1 ||
+                   (mControlWidget->isTrackShowComplPathChecked() && hasActiveSelection))
                 {
                     to = person.size();
                 }

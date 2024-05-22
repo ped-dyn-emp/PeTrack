@@ -273,6 +273,18 @@ Control::Control(
 
     mCorrectionWidget = new Correction(mMainWindow, mMainWindow->getPersonStorage(), this);
     mUi->tabs->insertTab(3, mCorrectionWidget, "correction");
+
+    connect(
+        mUi->trackShowComplPath,
+        &QCheckBox::stateChanged,
+        this,
+        [this](int)
+        {
+            if(!isLoading())
+            {
+                mScene->update();
+            }
+        });
 }
 
 void Control::setScene(QGraphicsScene *sc)
@@ -558,6 +570,11 @@ bool Control::isTrackShowPointsColoredChecked() const
 bool Control::isTrackShowGroundPositionChecked() const
 {
     return mUi->trackShowGroundPosition->isChecked();
+}
+
+bool Control::isTrackShowComplPathChecked() const
+{
+    return mUi->trackShowComplPath->isChecked();
 }
 
 /**
@@ -1887,6 +1904,7 @@ void Control::setXml(QDomElement &elem)
     subSubElem.setAttribute("ONLY_PEOPLE_LIST", mUi->trackShowOnlyList->isChecked());
     subSubElem.setAttribute("ONLY_PEOPLE_NR", mUi->trackShowOnlyNr->value());
     subSubElem.setAttribute("ONLY_PEOPLE_NR_LIST", mUi->trackShowOnlyNrList->text());
+    subSubElem.setAttribute("SHOW_COMPLETE", mUi->trackShowComplPath->isChecked());
 
     subSubElem.setAttribute("SHOW_CURRENT_POINT", mUi->trackShowCurrentPoint->isChecked());
     subSubElem.setAttribute("SHOW_POINTS", mUi->trackShowPoints->isChecked());
@@ -2534,6 +2552,15 @@ void Control::getXml(const QDomElement &elem, const QString &version)
                     {
                         mUi->trackShow->setCheckState(
                             subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
+                    if(subSubElem.hasAttribute("SHOW_COMPLETE"))
+                    {
+                        mUi->trackShowComplPath->setCheckState(
+                            subSubElem.attribute("SHOW_COMPLETE").toInt() ? Qt::Checked : Qt::Unchecked);
+                    }
+                    else
+                    {
+                        mUi->trackShowComplPath->setCheckState(Qt::Unchecked);
                     }
                     if(subSubElem.hasAttribute("FIX"))
                     {
