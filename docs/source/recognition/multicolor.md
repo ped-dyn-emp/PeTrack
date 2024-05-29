@@ -1,6 +1,6 @@
 # Multicolor Marker
 
-The multicolor marker is a colored hat that pedestrians wear. For a quick rundown on when to use which type of marker, see **TODO ref to Maiks section**. But in a nutshell, the multicolor marker is easy to prepare and works even with low resolution cameras. It can be combined with an code-marker as well, if some cameras are high-resolution and some are not. Then, low-resolution cams fall back to the multicolor marker in case the code cannot be read.
+The multicolor marker is a colored hat that pedestrians wear. The multicolor marker is easy to prepare and works even with low resolution cameras. It can be combined with an code-marker as well, if some cameras are high-resolution and some are not. Then, low-resolution cams fall back to the multicolor marker in case the code cannot be read.
 
 There are two places for settings parameters of the multicolor marker. The parameter window as well as the recognition tab.
 
@@ -17,7 +17,7 @@ In the parameter window, we have a plethora of options:
 The first options concern themselves with combinations of the multicolor marker with other markers, namely the hermes marker and code marker. When the multicolor marker is combined with another marker, first the multicolor detection is run. Afterwards, on the area around the detected head, the other marker is searched. The idea is to combine the robust, but slightly inaccurate multicolor marker with a more accurate and "structured" marker.
 
 use black dot
-: The multicolor marker can be used with a black dot added, essentially creating a combination between the hermes marker and the multicolor marker. **TODO: add picture** This gives a bit more structure for tracking and a smaller specific point in the image to locate. If one does use this, this checkbox should be enabled and the size set to the size of the point in cm. Else, this option can be turned off.
+: The multicolor marker can be used with a black dot added, essentially creating a combination between the hermes marker and the multicolor marker. This gives a bit more structure for tracking and a smaller specific point in the image to locate. If one does use this, this checkbox should be enabled and the size set to the size of the point in cm. Else, this option can be turned off.
 
 use code marker
 : The multicolor marker can be combined with the [code marker](aruco), which is called code marker here. A click onto the `parameter`-button opens the parameter window for the code marker. There the options for the detection of the code marker can be changed. Please refer to the [documentation of the code marker](aruco) for further information on this.
@@ -46,7 +46,7 @@ If you enable `auto correct perspective view`, it is recommended to also enable 
 :::
 
 show mask
-: When enabled, we show a mask visualizing the color selection **TODO: true, what about the other mask?**
+: When enabled, we show a mask visualizing the color selection
 
 close radius
 : Closing is a morphological operation to remove small holes. A larger value means, larger holes will be filled. The filter is only applied if `use` is checked.

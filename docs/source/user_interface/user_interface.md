@@ -82,7 +82,7 @@ Timecode
 : This part of the status bar displays the timecode corresponding to the current frame. Since the timecode is taken from the video file, this does not necessarily correspond to either the real world time nor does it need to start at zero. In stereo recordings, this can also show the time given by a time file.
 
 Current Framerate
-: This shows the framerate at which the player is currently playing. Note that there is sime *intertia* to how fast this display updates. The color indicated whether we play slower than realtime (red) or at realtime or faster (green). (**TODO: we can also click on it to fix speeds... do we want to document that? There now is a more intuitive entry in the menu bar for it**)
+: This shows the framerate at which the player is currently playing. Note that there is sime *intertia* to how fast this display updates. The color indicated whether we play slower than realtime (red) or at realtime or faster (green).
 
 Probing Height
 : The following data fields contain some information about the position of the pixel under the mouse cursor. Due to the perspective projection onto the camera, this information can only be given when assuming a certain height, i.e. the position of the pixel under the cursor is different, if the object under the cursor is 180cm or 150cm high. This box is for changing the height used for the next few fields

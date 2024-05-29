@@ -27,10 +27,10 @@ A guide to all things to consider **before** using PeTrack or doing the experime
 ::::
 
 
-## Contents
-
 :::{toctree}
 :maxdepth: 1
+:hidden:
+
 getting_started
 planning/planning
 user_interface/user_interface
@@ -41,5 +41,4 @@ correction/correction
 export/export
 misc/misc
 contribute/contribute
-section/MeinTest
 :::

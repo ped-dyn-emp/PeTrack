@@ -42,7 +42,7 @@ full image
 adjust automatically
 : Sets the ROI as one head size smaller than the tracking ROI
 
-The ROI can be adjusted in the image, by resizing and moving with the mouse. **TODO: Image or GIF of manipulation of ROI**
+The ROI can be adjusted in the image, by resizing and moving with the mouse.
 
 :::{warning}
 The tracking ROI must be larger than the recognition ROI. Any detection outside the tracking ROI will create an entirely new, one point trajectory. We recommend setting the tracking ROI first and then using `adjust automatically` for the recognition ROI
