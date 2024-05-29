@@ -8,6 +8,7 @@ First of all, based on the research question, it should be determined which data
 :::{toctree}
 :maxdepth: 1
 camera
+calibration
 surrounding
 combining
 workflow
