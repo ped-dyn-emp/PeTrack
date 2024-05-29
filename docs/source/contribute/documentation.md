@@ -8,8 +8,7 @@ is needed.
 
 ## Environment Setup
 
-First of all, you need to have cloned the repository. (**TODO**: link to other
-document, explaining how to clone (and build) PeTrack). Note that you **do not
+First of all, you need to have cloned the repository (for how to do that, see the section [Get the code](../contribute/code_contribution/build_from_source.md#get-the-code) of the source code contribution documentation). Note that you **do not
 need to build PeTrack**, you just need the repository for the documentation
 files. Then you can edit the markdown files in the `docs/source/` directory. Any
 texteditor can be used for this. If you do not have an preferred text editor, we

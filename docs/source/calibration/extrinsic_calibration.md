@@ -45,10 +45,10 @@ into PeTrack.
 
 With the combined image of all coordinate points and the point file created, you can now perform the extrinsic calibration
 in PeTrack. For that, open the image of all combined coordinate points (Figure 1) in PeTrack or drag and drop it into the
-[tab view](/user_interface).
+[tab view](/user_interface/user_interface.md).
 
 ::: {Tip}
-To avoid shifting the coordinate system while clicking and dragging the mouse in the [video tab](/user_interface) it is
+To avoid shifting the coordinate system while clicking and dragging the mouse in the [video tab](/user_interface/user_interface.md) it is
 recommended to check the `fix` checkbox in the `coordinate system` and in the `alignment grid` section
 at the bottom of the `calibration tab`.
 :::
@@ -63,7 +63,7 @@ by zooming into the image. In case you are unhappy with the selected point you c
 
 :::{Tip}
 If the green circles that appear around the chosen points are too large for your taste, go to the `tracking` tab in the
-[tab view](/user_interface) and scroll to the `path` section on the page. Here you can uncheck the `head size` checkbox
+[tab view](/user_interface/user_interface.md) and scroll to the `path` section on the page. Here you can uncheck the `head size` checkbox
 to the right of `show current point` and now you are able to enter a smaller value of your own choosing. This value
 represents the size of the green circles.
 :::

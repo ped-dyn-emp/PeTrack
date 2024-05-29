@@ -10,33 +10,37 @@ copyright = f"{current_year}, Forschungszentrum Jülich GmbH, IAS-7"
 
 import os
 import re
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 with open(f"{dir_path}/../../CMakeLists.txt") as file:
     for line in file:
-        match = re.search("project\(petrack LANGUAGES CXX VERSION ([0-9]+\.[0-9]+\.[0-9]+)\)", line)
+        match = re.search(
+            "project\(petrack LANGUAGES CXX VERSION ([0-9]+\.[0-9]+\.[0-9]+)\)", line
+        )
         if match is not None:
             version = match[1]
             break
     else:
         raise RuntimeError("Version not found")
 
-#version = '0.1.0'
+# version = '0.1.0'
 release = version
 
 # -- General configuration
 
 extensions = [
-    'sphinx.ext.duration',
-    'sphinx.ext.doctest',
-    'sphinx.ext.intersphinx',
+    "sphinx.ext.duration",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
     "sphinx_design",
     "sphinx.ext.napoleon",
     "sphinx.ext.mathjax",
     "sphinx_favicon",
     "notfound.extension",
+    "sphinx_copybutton",
     "myst_parser",
-    "sphinx_tippy"
+    "sphinx_tippy",
 ]
 
 myst_enable_extensions = [
@@ -45,7 +49,7 @@ myst_enable_extensions = [
     "attrs_inline",
     "attrs_block",
     "dollarmath",
-    "deflist"
+    "deflist",
 ]
 
 myst_url_schemes = {
@@ -59,16 +63,16 @@ myst_heading_anchors = 7
 
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3/', None),
-    'sphinx': ('https://www.sphinx-doc.org/en/master/', None),
+    "python": ("https://docs.python.org/3/", None),
+    "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
 }
-intersphinx_disabled_domains = ['std']
+intersphinx_disabled_domains = ["std"]
 
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # -- Options for HTML output
 
-html_theme = 'sphinx_book_theme'
+html_theme = "sphinx_book_theme"
 html_static_path = ["_static"]
 
 html_logo = "_static/logo.png"
@@ -97,7 +101,7 @@ html_theme_options = {
         },
     ],
     "show_toc_level": 3,
-    "announcement": "🚧 This documentation is still under construction! In the meanwhile, please visit <a href='https://go.fzj.de/petrack-wiki'>the wiki</a> instead. 🚧"
+    "announcement": "🚧 This documentation is still under construction! In the meanwhile, please visit <a href='https://go.fzj.de/petrack-wiki'>the wiki</a> instead. 🚧",
 }
 
 html_sidebars = {
@@ -105,4 +109,4 @@ html_sidebars = {
 }
 
 # -- Options for EPUB output
-epub_show_urls = 'footnote'
+epub_show_urls = "footnote"

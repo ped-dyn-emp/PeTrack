@@ -1,5 +1,7 @@
 # Getting Started 
 
+This page goes through an exemplary project. You can download this example project [here](https://go.fzj.de/petrack-demo-download).
+
 ## Experimental Setup
 
 ### Prepare cameras
@@ -23,8 +25,7 @@ We have made good experiences with the practice to measure and mark points on th
 
 Additional helpers to define the positions of the calibration points: ![helper_01](images/helper_02.png)
 
-**TODO: Make calibration manual into part of this docs**
-For additional help, check out our detailed intrinsic & extrinsic calibration manual Calibration_Manual.pdf
+For additional help, check out our detailed documentation on calibration in the "Planning of Experiments" section: [](planning/calibration.md)
 
 ### After the experiments
 
@@ -34,7 +35,7 @@ For additional help, check out our detailed intrinsic & extrinsic calibration ma
 
 ## Using PeTrack
 
-The usage and some settings will be explained with the provided demo project ('demo' folder) , the folder contains all necessary files to set up a PeTrack project. <!--Make sure also to read our [best practices guide](usage/Best-Practices).-->
+The usage and some settings will be explained with the provided demo project ('demo' folder) , the folder contains all necessary files to set up a PeTrack project. You can download this example project [here](https://go.fzj.de/petrack-demo-download). <!--Make sure also to read our [best practices guide](usage/Best-Practices).-->
 
 ### Calibration
 

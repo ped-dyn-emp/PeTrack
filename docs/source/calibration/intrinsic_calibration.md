@@ -12,7 +12,7 @@ side balanced so a particular view is not overrepresented. [More Information...]
 :::
 
 ## PeTrack Workflow
-After opening PeTrack, the calibration tab will be the opened tab in the [tab view](/user_interface).
+After opening PeTrack, the calibration tab will be the opened tab in the [tab view](/user_interface/user_interface.md).
 For the intrinsic calibration we will focus on the `intrinsic parameters` section in the middle
 of the calibration tab. 
 
@@ -25,7 +25,7 @@ Intrinsic calibration section in PeTrack
 
 :::{Tip}
 To be able to see the changes that occur or the quality of the calibration, it can be helpful to load e.g.
-a video of the experiments into PeTrack. For that, drag a video into the [tab view](/user_interface)
+a video of the experiments into PeTrack. For that, drag a video into the [tab view](/user_interface/user_interface.md)
 of PeTrack.
 :::
 <br>
