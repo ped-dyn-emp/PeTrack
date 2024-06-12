@@ -1349,14 +1349,13 @@ QList<TrackPoint> Recognizer::getMarkerPos(
     bool ignoreWithoutMarker = controlWidget->isMarkerIgnoreWithoutChecked();
     bool autoWB              = controlWidget->isRecoAutoWBChecked();
 
-    cv::Mat  tImg;
-    cv::Rect rect;
-    tImg = getRoi(
-        img,
+    auto rect = qRectToCvRect(
         roi,
-        rect,
-        !((mRecoMethod == RecognitionMethod::Color) || (mRecoMethod == RecognitionMethod::MultiColor) ||
-          (mRecoMethod == RecognitionMethod::Code)));
+        img,
+        (mRecoMethod != RecognitionMethod::Color) && (mRecoMethod != RecognitionMethod::MultiColor) &&
+            (mRecoMethod != RecognitionMethod::Code));
+
+    auto tImg = img(rect);
 
     if(tImg.empty())
     {

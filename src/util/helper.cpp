@@ -21,6 +21,7 @@
 #include "logger.h"
 
 #include <QCheckBox>
+#include <algorithm>
 #include <opencv2/opencv.hpp>
 
 QString proFileName; ///< Path to the project (.pet) file; used for saving relative paths via getFileList and
@@ -121,35 +122,23 @@ void copyToQImage(QImage &qImg, cv::Mat &img) // war static functin in animatiol
 
 
 /**
-@brief get roi: copies roi to rect by setting values of roi to correct values inside rect
-
-no copy of data, only new header which allows to access rect
-rect wird veraendert, roi nicht
-
-@param[in] img Mat &img
-@param[in] const QRect &roi
-@param[in] Rect &rect
-@return img(rect)
-*/
-cv::Mat getRoi(cv::Mat &img, const QRect &roi, cv::Rect &rect, bool evenPixelNumber)
+ * Create an opencv Rect from a given QRect
+ * This method creates an opencv Rect by respecting the given QRect dimensions and a given image matrix (for its maximum
+ * size) i. e. if an x or y value is less than zero, the whole rect will be moved such that the value is equal to zero.
+ * Correspondingly, if the width or height is greater than the given image, the rectangle will be trimmed to the maximum
+ * size.
+ *
+ *
+ * @param roi QRect of which a cv::Rect should be made
+ * @param img the image for cutting width and height
+ * @param evenPixelNumber if {@code true}, the rect will be cut to the next lesser even width and height.
+ * @return a cv::Rect matching the position of the QRect by respecting the given image and evenPixelNumber parameter.
+ */
+cv::Rect qRectToCvRect(const QRect &roi, const cv::Mat &img, bool evenPixelNumber)
 {
-    rect.x      = roi.x();
-    rect.y      = roi.y();
-    rect.width  = roi.width();
-    rect.height = roi.height();
-    if(evenPixelNumber)
-    {
-        // roi.width and roi.height must be even
-        if(rect.width % 2 > 0)
-        {
-            --rect.width;
-        }
-        if(rect.height % 2 > 0)
-        {
-            --rect.height;
-        }
-    }
-    // roi.width and roi.height must be >=0
+    cv::Rect rect(roi.x(), roi.y(), roi.width(), roi.height());
+
+    // trim to image dimensions
     if(rect.x < 0)
     {
         rect.width += rect.x;
@@ -162,7 +151,7 @@ cv::Mat getRoi(cv::Mat &img, const QRect &roi, cv::Rect &rect, bool evenPixelNum
     }
     if(rect.x + rect.width > img.cols)
     {
-        rect.width -= (rect.x + rect.width - img.cols);
+        rect.width = img.cols - rect.x;
     }
     if(rect.y < 0)
     {
@@ -176,11 +165,21 @@ cv::Mat getRoi(cv::Mat &img, const QRect &roi, cv::Rect &rect, bool evenPixelNum
     }
     if(rect.y + rect.height > img.rows)
     {
-        rect.height -= (rect.y + rect.height - img.rows);
+        rect.height = img.rows - rect.y;
     }
 
-    return img(rect);
+    rect.height = std::max(0, rect.height);
+    rect.width  = std::max(0, rect.width);
+
+    if(evenPixelNumber)
+    {
+        rect.width -= rect.width % 2;
+        rect.height -= rect.height % 2;
+    }
+
+    return rect;
 }
+
 #include <iostream>
 #include <vector>
 /**

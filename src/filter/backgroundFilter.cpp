@@ -76,7 +76,10 @@ bool BackgroundFilter::isForeground(int coloumn, int row)
     }
 }
 
-/// zuruecksetzen, wenn zB helligkeit veraendert wird oder schaerfe
+/**
+ * Reset the filter.
+ * This will set the changed()-value to true.
+ */
 void BackgroundFilter::reset()
 {
     if(!mForeground.empty())
