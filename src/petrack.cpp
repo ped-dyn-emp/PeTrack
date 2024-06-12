@@ -3382,14 +3382,236 @@ int Petrack::winSize(QPointF *pos, int pers, int frame, int level)
     return (int) ((getHeadSize(pos, pers, frame) / pow(2., level)) * (mControlWidget->getTrackRegionScale() / 10.));
 }
 
-void Petrack::updateImage(bool imageChanged) // default = false (only true for new animation frame)
+/**
+ * Calculates the filtered image based on the values of different filters.
+ * They are passed as parameters, because once read, they return false when checking the changed()-method.
+ *
+ * @param imageChanged bool, if the image has changed since the last usage
+ */
+void Petrack::getFilteredImage(
+    bool imageChanged,
+    bool brightContrastFilterChanged,
+    bool swapFilterChanged,
+    bool borderFilterChanged,
+    bool calibFilterChanged)
+{
+    mImgFiltered = mImg;
+
+    // When applying the filter, the order is important!
+    // Computation heavy filter should be applied early.
+
+    if(imageChanged || swapFilterChanged)
+    {
+        mImgFiltered = mSwapFilter.apply(mImgFiltered);
+    }
+    else
+    {
+        mImgFiltered = mSwapFilter.getLastResult();
+    }
+
+    if(imageChanged || swapFilterChanged || brightContrastFilterChanged)
+    {
+        mImgFiltered = mBrightContrastFilter.apply(mImgFiltered);
+    }
+    else
+    {
+        mImgFiltered = mBrightContrastFilter.getLastResult();
+    }
+
+    if(imageChanged || swapFilterChanged || brightContrastFilterChanged || borderFilterChanged)
+    {
+        mImgFiltered = mBorderFilter.apply(mImgFiltered);
+    }
+    else
+    {
+        mImgFiltered = mBorderFilter.getLastResult();
+    }
+
+    if(borderFilterChanged)
+    {
+        updateControlImage(mImgFiltered);
+    }
+
+    if(imageChanged || swapFilterChanged || brightContrastFilterChanged || borderFilterChanged || calibFilterChanged)
+    {
+        if(mStereoContext)
+            mStereoContext->init(mImgFiltered);
+    }
+
+    if(imageChanged || swapFilterChanged || brightContrastFilterChanged || borderFilterChanged || calibFilterChanged)
+    {
+        if(mStereoContext)
+        {
+            // getRecified rectifies filtered image set in mStereoContext->init()
+            mImgFiltered = mStereoContext->getRectified(mAnimation->getCamera());
+            mCalibFilter.setChanged(false);
+        }
+        else
+        {
+            mImgFiltered = mCalibFilter.apply(mImgFiltered);
+        }
+    }
+    else
+    {
+        // TODO: need to handle this for the stereo case??
+        mImgFiltered = mCalibFilter.getLastResult();
+    }
+
+    if(brightContrastFilterChanged || swapFilterChanged || borderFilterChanged || calibFilterChanged)
+    {
+        // when loading a .pet file, a bg-file may be there.
+        // Only delete the bg-filter if no such file is present
+        if(mBackgroundFilter.getFilename().isEmpty())
+        {
+            // delete all background information and set bg.changed() to true.
+            mBackgroundFilter.reset();
+        }
+        else
+        {
+            SPDLOG_WARN("no background reset, because of explicit loaded background image!");
+        }
+    }
+
+    if(imageChanged || mBackgroundFilter.changed())
+    {
+        mImgFiltered = mBackgroundFilter.apply(mImgFiltered);
+    }
+    else
+    {
+        mImgFiltered = mBackgroundFilter.getLastResult();
+    }
+}
+
+void Petrack::resetExistingPoints()
+{
+    mPersonStorage.clear();
+    mTracker->reset();
+    if(!isLoading())
+    {
+        SPDLOG_WARN("deleted all tracking pathes because intrinsic parameters have changed.");
+    }
+}
+
+/**
+ * Perform the tracking step based on the current image and the Tracker's previous feature points
+ * @see Tracker::track
+ */
+void Petrack::performTracking()
+{
+    // Rect for tracking area
+    QRect roi(
+        myRound(mTrackingRoiItem->rect().x() + getImageBorderSize()),
+        myRound(mTrackingRoiItem->rect().y() + getImageBorderSize()),
+        myRound(mTrackingRoiItem->rect().width()),
+        myRound(mTrackingRoiItem->rect().height()));
+
+    // build disparity picture if it should be used for height detection
+    if(mStereoContext && mStereoWidget->stereoUseForHeight->isChecked())
+    {
+        mStereoContext->getDisparity();
+    }
+
+    cv::Rect rect = qRectToCvRect(roi, mImgFiltered);
+
+    cv::Mat map1 = mCalibFilter.getMap1();
+    int     anz  = mTracker->track(
+        mImgFiltered,
+        rect,
+        map1,
+        mAnimation->getCurrentFrameNum(),
+        mControlWidget->isTrackRepeatChecked(),
+        mControlWidget->getTrackRepeatQual(),
+        getImageBorderSize(),
+        mReco.getRecoMethod(),
+        mControlWidget->getTrackRegionLevels(),
+        getPedestriansToTrack());
+
+    mControlWidget->setTrackNumberNow(QString("%1").arg(anz));
+    mTrackChanged = false;
+}
+
+/**
+ * Perform the recognition (if enabled by the user) of markers in the current image.
+ *
+ * All TrackPoints will be added to the personStorage.
+ */
+void Petrack::performRecognition()
+{
+    int  frameNum        = mAnimation->getCurrentFrameNum();
+    bool isStereoContext = mStereoContext != nullptr;
+
+    // build disparity picture if it should be used for height detection or recognition
+    if(isStereoContext &&
+       (mStereoWidget->stereoUseForHeight->isChecked() || mStereoWidget->stereoUseForReco->isChecked()))
+    {
+        // won't recalculate if already done during tracking
+        mStereoContext->getDisparity();
+    }
+
+    if(mControlWidget->isPerformRecognitionChecked())
+    {
+        QRect rect(
+            myRound(mRecognitionRoiItem->rect().x() + getImageBorderSize()),
+            myRound(mRecognitionRoiItem->rect().y() + getImageBorderSize()),
+            myRound(mRecognitionRoiItem->rect().width()),
+            myRound(mRecognitionRoiItem->rect().height()));
+        QList<TrackPoint>     persList;
+        [[maybe_unused]] bool markerLess = true;
+        auto                  recoMethod = mReco.getRecoMethod();
+
+        if((recoMethod == reco::RecognitionMethod::Casern) || (recoMethod == reco::RecognitionMethod::Hermes) ||
+           (recoMethod == reco::RecognitionMethod::Color) || (recoMethod == reco::RecognitionMethod::Japan) ||
+           (recoMethod == reco::RecognitionMethod::MultiColor) || (recoMethod == reco::RecognitionMethod::Code))
+        {
+            persList = mReco.getMarkerPos(
+                mImgFiltered,
+                rect,
+                mControlWidget,
+                getImageBorderSize(),
+                getBackgroundFilter(),
+                mControlWidget->getIntrinsicCameraParams());
+            markerLess = false;
+        }
+        if(isStereoContext && mStereoWidget->stereoUseForReco->isChecked())
+        {
+            PersonList pl;
+            pl.calcPersonPos(mImgFiltered, rect, persList, mStereoContext, getBackgroundFilter(), markerLess);
+        }
+
+        mPersonStorage.addPoints(persList, frameNum, mReco.getRecoMethod());
+
+        if(isStereoContext && mStereoWidget->stereoUseForReco->isChecked())
+        {
+            mPersonStorage.purge(frameNum);
+        }
+
+        mControlWidget->setRecoNumberNow(QString("%1").arg(persList.size()));
+        mRecognitionChanged = false;
+    }
+    else
+    {
+        mControlWidget->setRecoNumberNow(QString("0"));
+    }
+}
+
+/**
+ * Update the image that petrack shows.
+ * This will not only change the shown image, but also run tracking and recognition if there are changes in the shown
+ * image.
+ * Calling this method without an actual change in the shown image may be useful to run distortion or drawing
+ * tracking border
+ *
+ * @param imageChanged specify if the image has actually changed (a new animation frame is shown). Defaults to false
+ *
+ */
+void Petrack::updateImage(bool imageChanged)
 {
     mCodeMarkerItem->resetSavedMarkers();
 
     static int  lastRecoFrame            = -10000;
     static bool borderChangedForTracking = false;
 
-    // need semaphore to guarrantee that updateImage only called once
+    // need semaphore to guarantee that updateImage only called once
     // updateValue of control automatically calls updateImage!!!
     static QSemaphore semaphore(1);
     if(!mImg.empty() && mImage && semaphore.tryAcquire())
@@ -3400,7 +3622,6 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
         updateShowFPS();
 
-        mImgFiltered = mImg;
 
         // have to store because evaluation sets the filter parameter to unchanged
         bool brightContrastChanged = mBrightContrastFilter.changed();
@@ -3408,102 +3629,12 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         bool borderChanged         = mBorderFilter.changed();
         bool calibChanged          = mCalibFilter.changed();
 
-        // speicherverwaltung wird komplett von filtern ueberneommen
-
-        // Filter anwenden, Reihenfolge wichtig - Rechenintensive moeglichst frueh
-        // fkt so nur mit kopierenden filtern
-
-        if(imageChanged || swapChanged)
-        {
-            mImgFiltered = mSwapFilter.apply(mImgFiltered);
-        }
-        else
-        {
-            mImgFiltered = mSwapFilter.getLastResult();
-        }
-
-        if(imageChanged || swapChanged || brightContrastChanged)
-        {
-            mImgFiltered = mBrightContrastFilter.apply(mImgFiltered);
-        }
-        else
-        {
-            mImgFiltered = mBrightContrastFilter.getLastResult();
-        }
-
-        if(imageChanged || swapChanged || brightContrastChanged || borderChanged)
-        {
-            mImgFiltered = mBorderFilter.apply(mImgFiltered); // mIplImg
-        }
-        else
-        {
-            mImgFiltered = mBorderFilter.getLastResult();
-        }
-
-        if(borderChanged)
-        {
-            updateControlImage(mImgFiltered);
-        }
-
-        if(imageChanged || swapChanged || brightContrastChanged || borderChanged || calibChanged)
-        {
-            if(mStereoContext)
-                mStereoContext->init(mImgFiltered);
-        }
-
-        if(imageChanged || swapChanged || brightContrastChanged || borderChanged || calibChanged)
-        {
-            if(mStereoContext)
-            {
-                mImgFiltered = mStereoContext->getRectified(
-                    mAnimation->getCamera()); // getRecified rectifies filtered image set in mStereoContext->init()
-                mCalibFilter.setChanged(false);
-            }
-            else
-            {
-                mImgFiltered = mCalibFilter.apply(mImgFiltered);
-            }
-        }
-        else
-        {
-            // TODO: need to handle this for the stereo case??
-            mImgFiltered = mCalibFilter.getLastResult();
-        }
-
-        if(brightContrastChanged || swapChanged || borderChanged || calibChanged)
-        {
-            // abfrage hinzugenommen, damit beim laden von .pet bg-file angegeben werden kann fuer mehrere versuche
-            // und beim nachladen von versuch nicht bg geloescht wird
-            if(mBackgroundFilter.getFilename() != "")
-            {
-                SPDLOG_WARN("no background reset, because of explicit loaded background image!");
-            }
-            else
-            {
-                mBackgroundFilter
-                    .reset(); // alle gesammelten hintergrundinfos werden verworfen und bg.changed auf true gesetzt
-            }
-        }
-
-        if(imageChanged || mBackgroundFilter.changed())
-        {
-            mImgFiltered = mBackgroundFilter.apply(mImgFiltered);
-        }
-        else
-        {
-            mImgFiltered = mBackgroundFilter.getLastResult();
-        }
+        getFilteredImage(imageChanged, brightContrastChanged, swapChanged, borderChanged, calibChanged);
 
         // delete track list, if intrinsic param have changed
         if(calibChanged && mPersonStorage.nbPersons() > 0) // mCalibFilter.getEnabled() &&
         {
-            // Evtl. nicht Tracker loeschen sondern entsprechend der neuen Calibration verschieben?!?!?
-            mPersonStorage.clear();
-            mTracker->reset();
-            if(!isLoading())
-            {
-                SPDLOG_WARN("deleted all tracking pathes because intrinsic parameters have changed.");
-            }
+            resetExistingPoints();
         }
         else
         {
@@ -3511,7 +3642,7 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
             if(mStereoContext && mStereoWidget->stereoUseForHeightEver->isChecked() &&
                mStereoWidget->stereoUseForHeight->isChecked())
             {
-                // buildt disparity picture if it should be used for height detection
+                // build disparity picture if it should be used for height detection
                 mStereoContext->getDisparity();
 
                 mPersonStorage.calcPosition(frameNum);
@@ -3521,16 +3652,9 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
         {
             borderChangedForTracking = true;
         }
-        // tracking vor recognition, da dann neu gefundene punkte mit getrackten bereits ueberprueft werden koennen
-        if((trackChanged() || imageChanged) && (mControlWidget->isOnlineTrackingChecked())) // borderChanged ???
+        // tracking before recognition, because new recognized points are checked to match with already tracked ones
+        if((trackChanged() || imageChanged) && (mControlWidget->isOnlineTrackingChecked()))
         {
-            // Rect for tracking area
-            QRect roi(
-                myRound(mTrackingRoiItem->rect().x() + getImageBorderSize()),
-                myRound(mTrackingRoiItem->rect().y() + getImageBorderSize()),
-                myRound(mTrackingRoiItem->rect().width()),
-                myRound(mTrackingRoiItem->rect().height()));
-
             if(borderChangedForTracking)
             {
                 cv::Size size;
@@ -3540,123 +3664,41 @@ void Petrack::updateImage(bool imageChanged) // default = false (only true for n
 
                 mTrackingRoiItem->restoreSize();
             }
-            // buildt disparity picture if it should be used for height detection
-            if(mStereoContext && mStereoWidget->stereoUseForHeight->isChecked())
-                mStereoContext->getDisparity();
-
-            cv::Rect rect;
-            getRoi(mImgFiltered, roi, rect);
-            // Ignore all tracking points outside of rect
-
-            // if (mPrevIplImgFiltered) // wenn ein vorheriges bild vorliegt
-            //  mPrevIplImgFiltered == NULL zeigt an, dass neue bildfolge && mPrevFrame == -1 ebenso
-            //  winSize(), wurde mal uebergeben
-            cv::Mat map1 = mCalibFilter.getMap1();
-            int     anz  = mTracker->track(
-                mImgFiltered,
-                rect,
-                map1,
-                frameNum,
-                mControlWidget->isTrackRepeatChecked(),
-                mControlWidget->getTrackRepeatQual(),
-                getImageBorderSize(),
-                mReco.getRecoMethod(),
-                mControlWidget->getTrackRegionLevels(),
-                getPedestriansToTrack());
-
-            mControlWidget->setTrackNumberNow(QString("%1").arg(anz));
-            mTrackChanged            = false;
             borderChangedForTracking = false;
+
+            performTracking();
         }
         else
         {
             mControlWidget->setTrackNumberNow(QString("0"));
         }
-        // hier muesste fuer ameisen etc allgemeinABC.getPosList(...)
 
-        if(((((lastRecoFrame + mControlWidget->getRecoStep()) <= frameNum) ||
-             ((lastRecoFrame - mControlWidget->getRecoStep()) >= frameNum)) &&
-            imageChanged) ||
-           mAnimation->isCameraLiveStream() || swapChanged || brightContrastChanged || borderChanged || calibChanged ||
-           recognitionChanged())
+        bool recoFrameCondition =
+            ((((lastRecoFrame + mControlWidget->getRecoStep()) <= frameNum) ||
+              ((lastRecoFrame - mControlWidget->getRecoStep()) >= frameNum)) &&
+             imageChanged);
+
+        if(recoFrameCondition || mAnimation->isCameraLiveStream() || swapChanged || brightContrastChanged ||
+           borderChanged || calibChanged || recognitionChanged())
         {
-            // buildt disparity picture if it should be used for height detection or recognition
-            if(mStereoContext &&
-               (mStereoWidget->stereoUseForHeight->isChecked() || mStereoWidget->stereoUseForReco->isChecked()))
-                mStereoContext->getDisparity(); // wird nicht neu berechnet, wenn vor tracking schon berechnet wurde
             if(borderChanged)
             {
                 mRecognitionRoiItem->restoreSize();
             }
-
-            if(mControlWidget->isPerformRecognitionChecked())
-            {
-                QRect rect(
-                    myRound(mRecognitionRoiItem->rect().x() + getImageBorderSize()),
-                    myRound(mRecognitionRoiItem->rect().y() + getImageBorderSize()),
-                    myRound(mRecognitionRoiItem->rect().width()),
-                    myRound(mRecognitionRoiItem->rect().height()));
-                QList<TrackPoint>     persList;
-                [[maybe_unused]] bool markerLess = true;
-                auto                  recoMethod = mReco.getRecoMethod();
-
-                if((recoMethod == reco::RecognitionMethod::Casern) || (recoMethod == reco::RecognitionMethod::Hermes) ||
-                   (recoMethod == reco::RecognitionMethod::Color) || (recoMethod == reco::RecognitionMethod::Japan) ||
-                   (recoMethod == reco::RecognitionMethod::MultiColor) ||
-                   (recoMethod == reco::RecognitionMethod::Code)) // else
-                {
-                    persList = mReco.getMarkerPos(
-                        mImgFiltered,
-                        rect,
-                        mControlWidget,
-                        getImageBorderSize(),
-                        getBackgroundFilter(),
-                        mControlWidget->getIntrinsicCameraParams());
-                    markerLess = false;
-                }
-                if(mStereoContext && mStereoWidget->stereoUseForReco->isChecked())
-                {
-                    PersonList pl;
-                    pl.calcPersonPos(mImgFiltered, rect, persList, mStereoContext, getBackgroundFilter(), markerLess);
-                }
-
-                mPersonStorage.addPoints(persList, frameNum, mReco.getRecoMethod());
-
-                // folgendes lieber im Anschluss, ggf beim exportieren oder statt test direkt del:
-                if(mStereoContext && mStereoWidget->stereoUseForReco->isChecked())
-                {
-                    mPersonStorage.purge(frameNum); // bereinigen wenn weniger als 0.2 recognition und nur getrackt
-                }
-
-                mControlWidget->setRecoNumberNow(QString("%1").arg(persList.size()));
-                mRecognitionChanged = false;
-
-                if(false) // hier muss Abfage hin ob kasernen marker genutzt wird
-                {
-                    mControlWidget->getColorPlot()
-                        ->replot(); // oder nur wenn tab offen oder wenn sich mtracker geaendert hat???
-                }
-            }
-            else
-            {
-                mControlWidget->setRecoNumberNow(QString("0"));
-            }
             lastRecoFrame = frameNum;
+
+            performRecognition();
         }
         else
         {
             mControlWidget->setRecoNumberNow(QString("0"));
         }
 
-        mControlWidget->setTrackNumberAll(
-            QString("%1").arg(mPersonStorage.nbPersons())); // kann sich durch reco und tracker aendern
-        mControlWidget->setTrackShowOnlyNrMaximum(
-            static_cast<int>(MAX(mPersonStorage.nbPersons(), 1))); // kann sich durch reco und tracker aendern
-        mControlWidget->setTrackNumberVisible(
-            QString("%1").arg(mPersonStorage.visible(frameNum))); // kann sich durch reco und tracker aendern
+        // these might change due to reco or tracking
+        mControlWidget->setTrackNumberAll(QString("%1").arg(mPersonStorage.nbPersons()));
+        mControlWidget->setTrackShowOnlyNrMaximum(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
+        mControlWidget->setTrackNumberVisible(QString("%1").arg(mPersonStorage.visible(frameNum)));
 
-        // in anzuzeigendes Bild kopieren
-        // erst hier wird die bildgroesse von mimage an filteredimg mit border angepasst
         copyToQImage(*mImage, mImgFiltered);
 
         if(borderChanged)

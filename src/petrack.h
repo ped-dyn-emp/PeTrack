@@ -310,6 +310,17 @@ public:
     const QString &getLastTrackerExport() const;
     void           setLastTrackerExport(const QString &newLastTrackerExport);
 
+
+    void getFilteredImage(
+        bool imageChanged,
+        bool brightContrastFilterChanged,
+        bool swapFilterChanged,
+        bool borderFilterChanged,
+        bool calibFilterChanged);
+    void resetExistingPoints();
+    void performTracking();
+    void performRecognition();
+
 private slots:
     void openAutosaveSettings();
 

@@ -20,7 +20,9 @@
 #define HELPER_H
 
 #include <QFileInfo>
+#include <QRect>
 #include <QString>
+#include <opencv2/core/types.hpp>
 #include <opencv2/opencv.hpp>
 
 class QCheckBox;
@@ -63,7 +65,8 @@ inline constexpr double PI = 3.141592654;
 #include <QImage>
 void copyToQImage(QImage &qImg, cv::Mat &img);
 
-cv::Mat getRoi(cv::Mat &img, const QRect &roi, cv::Rect &rect, bool evenPixelNumber = true);
+cv::Rect qRectToCvRect(const QRect &roi, const cv::Mat &img, bool evenPixelNumber = true);
+cv::Mat  getRoi(cv::Mat &img, const QRect &roi, cv::Rect &rect, bool evenPixelNumber = true);
 
 inline double getMedianOf3(double a, double b, double c)
 {
