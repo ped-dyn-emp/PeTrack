@@ -85,6 +85,12 @@ Afterwards `PeTrack` can be executed with:
 ```
 [/home/dev/petrack/build] $ ./petrack
 ```
+If you want to develop on PeTrack you need to download the test data, which is stored in the git large file system.
+It can be downloaded with
+```
+[/home/dev/petrack] $ git lfs install --skip-smudge
+[/home/dev/petrack] $ git lfs pull
+```
 
 When you add your building directory to your path (here `/home/dev/petrack/build`). You can call `PeTrack` from anywhere with
 

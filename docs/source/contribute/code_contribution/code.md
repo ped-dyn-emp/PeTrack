@@ -10,6 +10,7 @@ code conventions or how to use the testing framework on the following pages:
 :maxdepth: 1
 coding_guidelines
 build_from_source
+testing
 release_and_versioning
 executionflow
 tracking
