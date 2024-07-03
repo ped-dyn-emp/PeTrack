@@ -19,6 +19,7 @@
 #include "extrCalibration.h"
 
 #include "control.h"
+#include "importHelper.h"
 #include "logger.h"
 #include "pMessageBox.h"
 #include "petrack.h"
@@ -970,70 +971,40 @@ void ExtrCalibration::getXml(QDomElement &elem)
 
 void ReprojectionError::getXml(QDomElement &subElem)
 {
-    if(subElem.hasAttribute("AVG_PH"))
+    mPointHeightAvg    = readDouble(subElem, "AVG_PH", 0);
+    mPointHeightStdDev = readDouble(subElem, "SD_PH", 0);
+    if(mPointHeightStdDev < 0)
     {
-        mPointHeightAvg = subElem.attribute("AVG_PH").toDouble();
+        mPointHeightVariance = -1;
     }
-    if(subElem.hasAttribute("SD_PH"))
+    else
     {
-        mPointHeightStdDev = subElem.attribute("SD_PH").toDouble();
-        if(mPointHeightStdDev < 0)
-        {
-            mPointHeightVariance = -1;
-        }
-        else
-        {
-            mPointHeightVariance = pow(mPointHeightStdDev, 2);
-        }
+        mPointHeightVariance = pow(mPointHeightStdDev, 2);
     }
-    if(subElem.hasAttribute("MAX_PH"))
+    mPointHeightMax      = readDouble(subElem, "MAX_PH", 0);
+    mDefaultHeightAvg    = readDouble(subElem, "AVG_DH", 0);
+    mDefaultHeightStdDev = readDouble(subElem, "SD_DH", 0);
+    if(mDefaultHeightStdDev < 0)
     {
-        mPointHeightMax = subElem.attribute("MAX_PH").toDouble();
+        mDefaultHeightVariance = -1;
     }
-    if(subElem.hasAttribute("AVG_DH"))
+    else
     {
-        mDefaultHeightAvg = subElem.attribute("AVG_DH").toDouble();
+        mDefaultHeightVariance = pow(mDefaultHeightStdDev, 2);
     }
-    if(subElem.hasAttribute("SD_DH"))
+    mDefaultHeightMax = readDouble(subElem, "MAX_DH", 0);
+    mPixelAvg         = readDouble(subElem, "AVG_PX", 0);
+    mPixelStdDev      = readDouble(subElem, "SD_PX", 0);
+    if(mPixelStdDev < 0)
     {
-        mDefaultHeightStdDev = subElem.attribute("SD_DH").toDouble();
-        if(mDefaultHeightStdDev < 0)
-        {
-            mDefaultHeightVariance = -1;
-        }
-        else
-        {
-            mDefaultHeightVariance = pow(mDefaultHeightStdDev, 2);
-        }
+        mPixelVariance = -1;
     }
-    if(subElem.hasAttribute("MAX_DH"))
+    else
     {
-        mDefaultHeightMax = subElem.attribute("MAX_DH").toDouble();
+        mPixelVariance = pow(mPixelStdDev, 2);
     }
-    if(subElem.hasAttribute("AVG_PX"))
-    {
-        mPixelAvg = subElem.attribute("AVG_PX").toDouble();
-    }
-    if(subElem.hasAttribute("SD_PX"))
-    {
-        mPixelStdDev = subElem.attribute("SD_PX").toDouble();
-        if(mPixelStdDev < 0)
-        {
-            mPixelVariance = -1;
-        }
-        else
-        {
-            mPixelVariance = pow(mPixelStdDev, 2);
-        }
-    }
-    if(subElem.hasAttribute("MAX_PX"))
-    {
-        mPixelMax = subElem.attribute("MAX_PX").toDouble();
-    }
-    if(subElem.hasAttribute("USED_HEIGHT"))
-    {
-        mUsedDefaultHeight = subElem.attribute("USED_HEIGHT").toDouble();
-    }
+    mPixelMax          = readDouble(subElem, "MAX_PX", 0);
+    mUsedDefaultHeight = readDouble(subElem, "USED_HEIGHT", 0);
 
     auto data = getData();
     mValid    = !std::any_of(data.begin(), data.end(), [](double a) { return !std::isfinite(a) || a < 0; });

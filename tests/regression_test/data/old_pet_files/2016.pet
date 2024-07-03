@@ -1,0 +1,76 @@
+<?xml version="1.0" ?>
+<!DOCTYPE PETRACK>
+<PETRACK VERSION="0.8">
+    <MAIN SRC="P:/ped/experiments/2016.05.12_Juelich_Rotunde_SensorFusionInertialSensor/export/chair/chair_circle_1.wmv;chair_circle_1.wmv" STATUS_HEIGHT="0"/>
+    <CONTROL TAB="1">
+        <CALIBRATION>
+            <BRIGHTNESS VALUE="0" ENABLED="0"/>
+            <CONTRAST VALUE="0" ENABLED="0"/>
+            <BORDER VALUE="102" COLOR="#000000" ENABLED="1"/>
+            <SWAP VERTICALLY="0" ENABLED="0" HORIZONTALLY="0"/>
+            <BG_SUB FILE="" SHOW="0" DELETE="1" UPDATE="0" ENABLED="0" DELETE_NUMBER="3"/>
+            <PATTERN BOARD_SIZE_Y="8" SQUARE_SIZE="4.6" BOARD_SIZE_X="6"/>
+            <INTRINSIC_PARAMETERS K4="0" FY="850.22" R2="-0.247709" K5="0" FX="849.98" R6="-0.009362000000000001" CY="910.39" K6="0" R4="0.07044400000000001" FIX_CENTER="0" QUAD_ASPECT_RATIO="0" TX="0.000302" TANG_DIST="1" ENABLED="1" CX="1167.03" TY="0.000569" CALIB_FILES="P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_04_18.Standbild002.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_05_02.Standbild001.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_07_23.Standbild003.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_08_12.Standbild004.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_12_14.Standbild006.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_14_23.Standbild005.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_19_06.Standbild007.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_19_21.Standbild008.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_22_09.Standbild009.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_24_17.Standbild010.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_25_17.Standbild011.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_27_17.Standbild012.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_28_00.Standbild013.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_28_11.Standbild014.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_31_12.Standbild015.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_32_16.Standbild016.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_39_00.Standbild017.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_45_15.Standbild018.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_51_24.Standbild019.png, P:/ped/cameras/gopro_4/calibration/6x8_4.6cm/gopro_4.2/calib_frames/GOPR3531.00_00_56_04.Standbild020.png"/>
+            <EXTRINSIC_PARAMETERS EXTR_TRANS_2="-17.34664" EXTR_ROT_1="-0.05002" COORD3D_SWAP_X="0" ALTITUDE="535" TRANS_Y="0" COORD3D_SWAP_Z="0" COORD3D_TRANS_X="0" EXTR_TRANS_3="-376.53916" EXTERNAL_CALIB_FILE="P:/ped/experiments/2016.05.12_Juelich_Rotunde_SensorFusionInertialSensor/data/calibration/gopro_part1/extrinsic/gopro_part1_extrinsic_calib.3dc;../../data/calibration/gopro_part1/extrinsic/gopro_part1_extrinsic_calib.3dc" UNIT="100" COORD3D_TRANS_Y="0" SHOW="0" TRANS_X="0" FIX="0" COORD3D_AXIS_LEN="200" USE_INTRINSIC_CENTER="0" SHOW_CALIB_POINTS="0" SCALE="100" COORD_DIMENSION="0" EXTR_TRANS_1="-16.12053" ROTATE="0" COORD3D_SWAP_Y="0" EXTR_ROT_2="-0.0412" EXTR_ROT_3="0.28595" COORD3D_TRANS_Z="0"/>
+            <ALIGNMENT_GRID GRID3D_TRANS_Z="0" GRID_DIMENSION="0" SHOW="0" TRANS_Y="0" SCALE="100" TRANS_X="0" ROTATE="0" GRID3D_RESOLUTION="60" GRID3D_TRANS_Y="0" FIX="0" GRID3D_TRANS_X="0"/>
+        </CALIBRATION>
+        <RECOGNITION>
+            <PERFORM METHOD="5" STEP="1" ENABLED="0"/>
+            <REGION_OF_INTEREST SHOW="0" WIDTH="2224" X="-164" Y="-78" HEIGHT="1518" FIX="0"/>
+            <MARKER IGNORE_WITHOUT="1" BRIGHTNESS="50"/>
+            <SIZE_COLOR SHOW="1" MAP_NUMBER="0" X="0" GREY_LEVEL="50" AUTO_WB="0" SYMBOL_SIZE="10" MODEL="0" Y="1" Z="255" DEFAULT_HEIGHT="180">
+                <MAP TO_HUE="41" WIDTH="22" MAP_HEIGHT="137" X="19" INV_HUE="0" FROM_HUE="19" FROM_SAT="185" FROM_VAL="171" Y="185" HEIGHT="59" TO_SAT="244" TO_VAL="236" COLORED="1"/>
+            </SIZE_COLOR>
+        </RECOGNITION>
+        <TRACKING>
+            <ONLINE_CALCULATION ENABLED="0"/>
+            <REPEAT_BELOW QUALITY="50" ENABLED="1"/>
+            <EXTRAPOLATION ENABLED="1"/>
+            <MERGE ENABLED="0"/>
+            <ONLY_VISIBLE ENABLED="1"/>
+            <SEARCH_MISSING_FRAMES ENABLED="1"/>
+            <RECALCULATE_MEDIAN_HEIGHT ENABLED="1"/>
+            <ALLOW_ALTERNATE_HEIGHT ENABLED="0"/>
+            <EXPORT_ELIMINATE_TRACKPOINT_WITHOUT_HEIGHT ENABLED="0"/>
+            <EXPORT_ELIMINATE_TRAJECTORY_WITHOUT_HEIGHT ENABLED="0"/>
+            <EXPORT_SMOOTH ENABLED="1"/>
+            <EXPORT_VIEWING_DIRECTION ENABLED="0"/>
+            <EXPORT_ANGLE_OF_VIEW ENABLED="0"/>
+            <EXPORT_USE_METER ENABLED="0"/>
+            <TEST_EQUAL ENABLED="1"/>
+            <TEST_VELOCITY ENABLED="1"/>
+            <TEST_INSIDE ENABLED="1"/>
+            <TEST_LENGTH ENABLED="1"/>
+            <TRACK_FILE FILENAME="P:/ped/experiments/2016.05.12_Juelich_Rotunde_SensorFusionInertialSensor/export/chair/chair_circle_1.trc;chair_circle_1.trc"/>
+            <SEARCH_REGION MAX_ERROR="0" SHOW="0" SCALE="16" LEVELS="3"/>
+            <PATH ONLY_VISIBLE="0" ONLY_PEOPLE_NR="1" NUMBER_BOLD="1" CURRENT_POINT_SIZE="31" NUMBER_SIZE="14" PATH_SIZE="2" HEAD_SIZE="1" BEFORE="25" SHOW_GROUND_PATH="1" TRACK_GROUND_PATH_COLOR="#00ff00" POINTS_COLORED="1" SHOW="1" COLLECTIVE_COLOR_SIZE="11" SHOW_GROUND_POSITION="1" SHOW_COLLECTIVE_COLOR="1" SHOW_POINTS="0" FIX="0" SHOW_NUMBER="1" POINTS_SIZE="7" TRACK_PATH_COLOR="#ff0000" COLOR_MARKER_SIZE="14" GROUND_PATH_SIZE="1" SHOW_COLOR_MARKER="1" GROUND_POSITION_SIZE="1" SHOW_CURRENT_POINT="1" AFTER="25" SHOW_PATH="1" ONLY_PEOPLE="0"/>
+        </TRACKING>
+        <ANALYSIS>
+            <SEARCH_MISSING_FRAMES ENABLED="1"/>
+            <MARK_ACTUAL ENABLED="0"/>
+            <CALCULATION REVERSE="0" CONSIDER_X="0" STEP_SIZE="25" ABSOLUTE="0" CONSIDER_Y="1"/>
+        </ANALYSIS>
+    </CONTROL>
+    <STEREO>
+        <DISPARITY ALGO="0" SHOW="0" HIDE_INVALID="1" COLOR="0" OPACITY="100">
+            <VALUES MAX="100" MIN="0"/>
+            <MASK EDGE_SIZE="5" SIZE="7" USE_EDGE="0"/>
+            <USE CALIB_CENTER="1" EXPORT="0" RECO="0" HEIGHT_EVER="1" HEIGHT="0"/>
+        </DISPARITY>
+    </STEREO>
+    <COLOR_MARKER>
+        <MASK SHOW="0" OPACITY="100" MASK="1"/>
+        <FROM_COLOR HUE="0" VALUE="0" SATURATION="0"/>
+        <TO_COLOR HUE="359" VALUE="255" SATURATION="255"/>
+        <PARAM MAX_RATIO="2" MAX_AREA="5000" MIN_AREA="1000" OPEN_RADIUS="5" OPEN_USED="1" CLOSE_USED="1" CLOSE_RADIUS="2" INVERS_HUE="0"/>
+    </COLOR_MARKER>
+    <MULTI_COLOR_MARKER>
+        <BLACK_DOT USE="0" RESTRICT_POSITION="0" IGNORE_WITHOUT="1" SIZE="5" USE_COLOR="0"/>
+        <AUTO_CORRECT USE="1"/>
+        <MASK SHOW="0" OPACITY="75" MASK="1"/>
+        <PARAM MAX_RATIO="2" MAX_AREA="6500" MIN_AREA="1900" USE_HEAD_SIZE="0" OPEN_RADIUS="5" OPEN_USED="1" CLOSE_USED="1" CLOSE_RADIUS="2"/>
+    </MULTI_COLOR_MARKER>
+    <PLAYER FRAME="0" SOURCE_FRAME_OUT="2870" SOURCE_FRAME_IN="0" FPS="25"/>
+    <VIEW CAMERA="2" SAVE_TRANSFORMED="0" ANTIALIAS="0" TRANSFORMATION="214 0 0 -124" OPENGL="0"/>
+    <AUTO_TRACK OPTIMZE_COLOR="0" BACK_TRACK="1"/>
+</PETRACK>

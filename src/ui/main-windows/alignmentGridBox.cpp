@@ -18,6 +18,7 @@
 
 #include "alignmentGridBox.h"
 
+#include "importHelper.h"
 #include "pGroupBox.h"
 #include "ui_alignmentGridBox.h"
 
@@ -113,54 +114,18 @@ bool AlignmentGridBox::getXml(QDomElement &subSubElem)
 {
     if(subSubElem.tagName() == "ALIGNMENT_GRID")
     {
-        if(subSubElem.hasAttribute("GRID_DIMENSION"))
-        {
-            mUi->gridTab->setCurrentIndex(subSubElem.attribute("GRID_DIMENSION").toInt());
-        }
-        else
-        {
-            mUi->gridTab->setCurrentIndex(1); //  = 2D
-        }
-        if(subSubElem.hasAttribute("SHOW"))
-        {
-            mUi->gridShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
-        if(subSubElem.hasAttribute("FIX"))
-        {
-            mUi->gridFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
-        if(subSubElem.hasAttribute("ROTATE"))
-        {
-            setValue(mUi->gridRotate, subSubElem.attribute("ROTATE").toInt());
-        }
-        if(subSubElem.hasAttribute("TRANS_X"))
-        {
-            setValue(mUi->gridTransX, subSubElem.attribute("TRANS_X").toInt());
-        }
-        if(subSubElem.hasAttribute("TRANS_Y"))
-        {
-            setValue(mUi->gridTransY, subSubElem.attribute("TRANS_Y").toInt());
-        }
-        if(subSubElem.hasAttribute("SCALE"))
-        {
-            setValue(mUi->gridScale, subSubElem.attribute("SCALE").toInt());
-        }
-        if(subSubElem.hasAttribute("GRID3D_TRANS_X"))
-        {
-            setValue(mUi->grid3DTransX, subSubElem.attribute("GRID3D_TRANS_X").toInt());
-        }
-        if(subSubElem.hasAttribute("GRID3D_TRANS_Y"))
-        {
-            setValue(mUi->grid3DTransY, subSubElem.attribute("GRID3D_TRANS_Y").toInt());
-        }
-        if(subSubElem.hasAttribute("GRID3D_TRANS_Z"))
-        {
-            setValue(mUi->grid3DTransZ, subSubElem.attribute("GRID3D_TRANS_Z").toInt());
-        }
-        if(subSubElem.hasAttribute("GRID3D_RESOLUTION"))
-        {
-            setValue(mUi->grid3DResolution, subSubElem.attribute("GRID3D_RESOLUTION").toInt());
-        }
+        loadActiveIndex(subSubElem, "GRID_DIMENSION", mUi->gridTab, 1);
+        loadBoolValue(subSubElem, "SHOW", mUi->gridShow, false);
+        loadBoolValue(subSubElem, "FIX", mUi->gridFix, false);
+        loadIntValue(subSubElem, "ROTATE", mUi->gridRotate, 0);
+        loadIntValue(subSubElem, "TRANS_X", mUi->gridTransX, 0);
+        loadIntValue(subSubElem, "TRANS_Y", mUi->gridTransY, 0);
+        loadIntValue(subSubElem, "SCALE", mUi->gridScale, 100);
+        loadIntValue(subSubElem, "GRID3D_TRANS_X", mUi->grid3DTransX, 0);
+        loadIntValue(subSubElem, "GRID3D_TRANS_Y", mUi->grid3DTransY, 0);
+        loadIntValue(subSubElem, "GRID3D_TRANS_Z", mUi->grid3DTransZ, 0);
+        loadIntValue(subSubElem, "GRID3D_RESOLUTION", mUi->grid3DResolution, 100);
+
         if(subSubElem.hasAttribute("IMMUTABLE"))
         {
             if(this->parent())
@@ -168,7 +133,7 @@ bool AlignmentGridBox::getXml(QDomElement &subSubElem)
                 auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
                 if(parent)
                 {
-                    parent->setImmutable(subSubElem.attribute("IMMUTABLE").toInt());
+                    parent->setImmutable(readBool(subSubElem, "IMMUTABLE", false));
                 }
             }
         }

@@ -18,6 +18,7 @@
 
 #include "codeMarkerWidget.h"
 
+#include "importHelper.h"
 #include "pMessageBox.h"
 #include "recognition.h"
 #include "ui_codeMarker.h"
@@ -172,104 +173,33 @@ void CodeMarkerWidget::getXml(QDomElement &elem)
     {
         if(subElem.tagName() == "DICTIONARY")
         {
-            if(subElem.hasAttribute("ID"))
-            {
-                mUi->dictList->setCurrentIndex(subElem.attribute("ID").toInt());
-            }
+            loadActiveIndex(subElem, "ID", mUi->dictList, 0);
         }
 
         if(subElem.tagName() == "PARAM")
         {
-            if(subElem.hasAttribute("ADAPTIVE_THRESH_WIN_SIZE_MIN"))
-            {
-                mUi->adaptiveThreshWinSizeMin->setValue(subElem.attribute("ADAPTIVE_THRESH_WIN_SIZE_MIN").toInt());
-            }
-            if(subElem.hasAttribute("ADAPTIVE_THRESH_WIN_SIZE_MAX"))
-            {
-                mUi->adaptiveThreshWinSizeMax->setValue(subElem.attribute("ADAPTIVE_THRESH_WIN_SIZE_MAX").toInt());
-            }
-            if(subElem.hasAttribute("ADAPTIVE_THRESH_WIN_SIZE_STEP"))
-            {
-                mUi->adaptiveThreshWinSizeStep->setValue(subElem.attribute("ADAPTIVE_THRESH_WIN_SIZE_STEP").toInt());
-            }
-            if(subElem.hasAttribute("ADAPTIVE_THRESH_CONSTANT"))
-            {
-                mUi->adaptiveThreshConstant->setValue(subElem.attribute("ADAPTIVE_THRESH_CONSTANT").toInt());
-            }
-            if(subElem.hasAttribute("MIN_MARKER_PERIMETER"))
-            {
-                mUi->minMarkerPerimeter->setValue(subElem.attribute("MIN_MARKER_PERIMETER").toDouble());
-            }
-            if(subElem.hasAttribute("MAX_MARKER_PERIMETER"))
-            {
-                mUi->maxMarkerPerimeter->setValue(subElem.attribute("MAX_MARKER_PERIMETER").toDouble());
-            }
-            if(subElem.hasAttribute("MAX_RATIO_ERROR"))
-            {
-                mUi->polygonalApproxAccuracyRate->setValue(subElem.attribute("MAX_RATIO_ERROR").toDouble());
-            }
-            if(subElem.hasAttribute("MIN_CORNER_DISTANCE"))
-            {
-                mUi->minCornerDistance->setValue(subElem.attribute("MIN_CORNER_DISTANCE").toDouble());
-            }
-            if(subElem.hasAttribute("MIN_DISTANCE_TO_BORDER"))
-            {
-                mUi->minDistanceToBorder->setValue(subElem.attribute("MIN_DISTANCE_TO_BORDER").toInt());
-            }
-            if(subElem.hasAttribute("MIN_MARKER_DISTANCE"))
-            {
-                mUi->minMarkerDistance->setValue(subElem.attribute("MIN_MARKER_DISTANCE").toDouble());
-            }
-            if(subElem.hasAttribute("CORNER_REFINEMENT"))
-            {
-                mUi->doCornerRefinement->setChecked(subElem.attribute("CORNER_REFINEMENT").toInt());
-            }
-            if(subElem.hasAttribute("CORNER_REFINEMENT_WIN_SIZE"))
-            {
-                mUi->cornerRefinementWinSize->setValue(subElem.attribute("CORNER_REFINEMENT_WIN_SIZE").toInt());
-            }
-            if(subElem.hasAttribute("CORNER_REFINEMENT_MAX_ITERATIONS"))
-            {
-                mUi->cornerRefinementMaxIterations->setValue(
-                    subElem.attribute("CORNER_REFINEMENT_MAX_ITERATIONS").toInt());
-            }
-            if(subElem.hasAttribute("CORNER_REFINEMENT_MIN_ACCURACY"))
-            {
-                mUi->cornerRefinementMinAccuracy->setValue(
-                    subElem.attribute("CORNER_REFINEMENT_MIN_ACCURACY").toDouble());
-            }
-            if(subElem.hasAttribute("MARKER_BORDER_BITS"))
-            {
-                mUi->markerBorderBits->setValue(subElem.attribute("MARKER_BORDER_BITS").toInt());
-            }
-            if(subElem.hasAttribute("PERSPECTIVE_REMOVE_PIXEL_PER_CELL"))
-            {
-                mUi->perspectiveRemovePixelPerCell->setValue(
-                    subElem.attribute("PERSPECTIVE_REMOVE_PIXEL_PER_CELL").toInt());
-            }
-            if(subElem.hasAttribute("PERSPECTIVE_REMOVE_IGNORED_MARGIN_PER_CELL"))
-            {
-                mUi->perspectiveRemoveIgnoredMarginPerCell->setValue(
-                    subElem.attribute("PERSPECTIVE_REMOVE_IGNORED_MARGIN_PER_CELL").toDouble());
-            }
-            if(subElem.hasAttribute("MAX_ERRONEOUS_BITS_IN_BORDER_RATE"))
-            {
-                mUi->maxErroneousBitsInBorderRate->setValue(
-                    subElem.attribute("MAX_ERRONEOUS_BITS_IN_BORDER_RATE").toDouble());
-            }
-            if(subElem.hasAttribute("MIN_OTSU_STD_DEV"))
-            {
-                mUi->minOtsuStdDev->setValue(subElem.attribute("MIN_OTSU_STD_DEV").toDouble());
-            }
-            if(subElem.hasAttribute("ERROR_CORRECTION_RATE"))
-            {
-                mUi->errorCorrectionRate->setValue(subElem.attribute("ERROR_CORRECTION_RATE").toDouble());
-            }
-            if(subElem.hasAttribute("SHOW_DETECTED_CANDIDATES"))
-            {
-                mUi->showDetectedCandidates->setCheckState(
-                    subElem.attribute("SHOW_DETECTED_CANDIDATES").toInt() ? Qt::Checked : Qt::Unchecked);
-            }
+            loadIntValue(subElem, "ADAPTIVE_THRESH_WIN_SIZE_MIN", mUi->adaptiveThreshWinSizeMin);
+            loadIntValue(subElem, "ADAPTIVE_THRESH_WIN_SIZE_MAX", mUi->adaptiveThreshWinSizeMax);
+            loadIntValue(subElem, "ADAPTIVE_THRESH_WIN_SIZE_STEP", mUi->adaptiveThreshWinSizeStep);
+            loadIntValue(subElem, "ADAPTIVE_THRESH_CONSTANT", mUi->adaptiveThreshConstant);
+            loadDoubleValue(subElem, "MIN_MARKER_PERIMETER", mUi->minMarkerPerimeter);
+            loadDoubleValue(subElem, "MAX_MARKER_PERIMETER", mUi->maxMarkerPerimeter);
+            loadDoubleValue(subElem, "MAX_RATIO_ERROR", mUi->polygonalApproxAccuracyRate);
+            loadDoubleValue(subElem, "MIN_CORNER_DISTANCE", mUi->minCornerDistance);
+            loadIntValue(subElem, "MIN_DISTANCE_TO_BORDER", mUi->minDistanceToBorder);
+            loadDoubleValue(subElem, "MIN_MARKER_DISTANCE", mUi->minMarkerDistance);
+            loadBoolValue(subElem, "CORNER_REFINEMENT", mUi->doCornerRefinement);
+            loadIntValue(subElem, "CORNER_REFINEMENT_WIN_SIZE", mUi->cornerRefinementWinSize);
+            loadIntValue(subElem, "CORNER_REFINEMENT_MAX_ITERATIONS", mUi->cornerRefinementMaxIterations);
+            loadDoubleValue(subElem, "CORNER_REFINEMENT_MIN_ACCURACY", mUi->cornerRefinementMinAccuracy);
+            loadIntValue(subElem, "MARKER_BORDER_BITS", mUi->markerBorderBits);
+            loadIntValue(subElem, "PERSPECTIVE_REMOVE_PIXEL_PER_CELL", mUi->perspectiveRemovePixelPerCell);
+            loadDoubleValue(
+                subElem, "PERSPECTIVE_REMOVE_IGNORED_MARGIN_PER_CELL", mUi->perspectiveRemoveIgnoredMarginPerCell);
+            loadDoubleValue(subElem, "MAX_ERRONEOUS_BITS_IN_BORDER_RATE", mUi->maxErroneousBitsInBorderRate);
+            loadDoubleValue(subElem, "MIN_OTSU_STD_DEV", mUi->minOtsuStdDev);
+            loadDoubleValue(subElem, "ERROR_CORRECTION_RATE", mUi->errorCorrectionRate);
+            loadBoolValue(subElem, "SHOW_DETECTED_CANDIDATES", mUi->showDetectedCandidates);
         }
     }
 }

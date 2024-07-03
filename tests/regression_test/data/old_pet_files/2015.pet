@@ -1,0 +1,71 @@
+<?xml version="1.0" ?>
+<!DOCTYPE PETRACK>
+<PETRACK VERSION="0.8">
+    <MAIN SRC="C:/Ped_Experiment_6_3_2015/Extracted Videos and Frames/Day 2_Afternoon/6_Three exits (b=90cm, Block exit 2)_Half participants_Free speed/Framers/6000.jpg;../../Extracted Videos and Frames/Day 2_Afternoon/6_Three exits (b=90cm, Block exit 2)_Half participants_Free speed/Framers/6000.jpg" STATUS_HEIGHT="0"/>
+    <CONTROL TAB="2">
+        <CALIBRATION>
+            <BRIGHTNESS ENABLED="0" VALUE="0"/>
+            <CONTRAST ENABLED="0" VALUE="0"/>
+            <BORDER ENABLED="0" VALUE="52" COLOR="#000000"/>
+            <SWAP VERTICALLY="0" ENABLED="0" HORIZONTALLY="0"/>
+            <BG_SUB ENABLED="0" UPDATE="0" FILE="" DELETE="1" SHOW="0" DELETE_NUMBER="3"/>
+            <PATTERN BOARD_SIZE_X="6" BOARD_SIZE_Y="8" SQUARE_SIZE="3"/>
+            <INTRINSIC_PARAMETERS FX="843.63" FY="844.03" R2="-0.248841" TANG_DIST="1" CALIB_FILES="O:\calibration\gopro\frames\GOPR0027.MP4.05_19_38_49.Standbild001.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_19_40_41.Standbild002.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_19_49_30.Standbild003.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_19_52_04.Standbild004.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_19_53_48.Standbild005.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_19_57_36.Standbild006.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_20_00_18.Standbild007.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_20_38_49.Standbild008.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_20_41_03.Standbild009.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_20_42_34.Standbild010.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_20_51_16.Standbild011.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_21_00_44.Standbild012.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_21_05_39.Standbild013.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_21_14_01.Standbild014.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_21_16_25.Standbild015.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_21_18_43.Standbild016.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_21_20_39.Standbild017.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_21_23_44.Standbild018.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_21_25_05.Standbild019.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_21_27_22.Standbild020.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_21_28_24.Standbild023.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_21_32_44.Standbild021.png, O:\calibration\gopro\frames\GOPR0027.MP4.05_21_33_41.Standbild022.png" CX="947.11" R4="0.07615" TX="-0.000462" CY="719.09" TY="0.000548" R6="-0.011373" ENABLED="1" K4="0" FIX_CENTER="0" K5="0" QUAD_ASPECT_RATIO="0" K6="0"/>
+            <EXTRINSIC_PARAMETERS SHOW="1" COORD3D_AXIS_LEN="500" UNIT="100" FIX="1" COORD_DIMENSION="0" ROTATE="0" EXTR_TRANS_1="-27.37763" USE_INTRINSIC_CENTER="0" EXTR_ROT_1="3.08211" EXTR_TRANS_2="39.23102" EXTR_ROT_2="0.08334999999999999" EXTR_TRANS_3="-907.97292" EXTR_ROT_3="-0.07198" COORD3D_SWAP_X="0" COORD3D_TRANS_X="0" COORD3D_SWAP_Y="0" COORD3D_TRANS_Y="0" COORD3D_SWAP_Z="0" COORD3D_TRANS_Z="0" EXTERNAL_CALIB_FILE="C:/Ped_Experiment_6_3_2015/day2_afternoon/trajectories/../../calibration/gopro/external/day2_afternoon/day2_afternoon_external.3dc;../../calibration/gopro/external/day2_afternoon/day2_afternoon_external.3dc" SHOW_CALIB_POINTS="0" SCALE="1" TRANS_X="0" ALTITUDE="835" TRANS_Y="0"/>
+            <ALIGNMENT_GRID FIX="1" GRID3D_TRANS_X="0" GRID3D_TRANS_Y="0" GRID3D_RESOLUTION="100" GRID3D_TRANS_Z="0" SCALE="1" TRANS_X="0" TRANS_Y="0" GRID_DIMENSION="0" SHOW="1" ROTATE="0"/>
+        </CALIBRATION>
+        <RECOGNITION>
+            <PERFORM METHOD="3" ENABLED="1" STEP="1"/>
+            <REGION_OF_INTEREST FIX="1" WIDTH="1281" X="313" Y="0" HEIGHT="1149" SHOW="1"/>
+            <MARKER BRIGHTNESS="50" IGNORE_WITHOUT="1"/>
+            <SIZE_COLOR SYMBOL_SIZE="10" AUTO_WB="0" X="0" Y="1" MODEL="0" Z="255" GREY_LEVEL="50" MAP_NUMBER="0" DEFAULT_HEIGHT="170" SHOW="1">
+                <MAP WIDTH="58" TO_SAT="255" X="101" FROM_SAT="64" INV_HUE="0" Y="64" MAP_HEIGHT="170" HEIGHT="191" TO_HUE="159" COLORED="1" FROM_HUE="101" FROM_VAL="138" TO_VAL="255"/>
+            </SIZE_COLOR>
+        </RECOGNITION>
+        <TRACKING>
+            <ONLINE_CALCULATION ENABLED="1"/>
+            <REPEAT_BELOW QUALITY="50" ENABLED="0"/>
+            <EXTRAPOLATION ENABLED="0"/>
+            <MERGE ENABLED="0"/>
+            <ONLY_VISIBLE ENABLED="1"/>
+            <SEARCH_MISSING_FRAMES ENABLED="0"/>
+            <RECALCULATE_MEDIAN_HEIGHT ENABLED="0"/>
+            <ALLOW_ALTERNATE_HEIGHT ENABLED="0"/>
+            <EXPORT_ELIMINATE_TRACKPOINT_WITHOUT_HEIGHT ENABLED="0"/>
+            <EXPORT_ELIMINATE_TRAJECTORY_WITHOUT_HEIGHT ENABLED="0"/>
+            <EXPORT_SMOOTH ENABLED="0"/>
+            <EXPORT_VIEWING_DIRECTION ENABLED="0"/>
+            <TEST_EQUAL ENABLED="1"/>
+            <TEST_VELOCITY ENABLED="1"/>
+            <TEST_INSIDE ENABLED="1"/>
+            <TEST_LENGTH ENABLED="1"/>
+            <TRACK_FILE FILENAME="C:/Ped_Experiment_6_3_2015/day2_afternoon/trajectories/1.trc;1.trc"/>
+            <SEARCH_REGION LEVELS="3" SCALE="16" SHOW="0"/>
+            <PATH SHOW="1" NUMBER_SIZE="20" ONLY_PEOPLE="1" SHOW_CURRENT_POINT="1" AFTER="-1" FIX="0" PATH_SIZE="2" ONLY_VISIBLE="0" COLOR_MARKER_SIZE="14" SHOW_COLLECTIVE_COLOR="0" NUMBER_BOLD="1" CURRENT_POINT_SIZE="6" ONLY_PEOPLE_NR="28" POINTS_COLORED="1" SHOW_POINTS="1" BEFORE="-1" SHOW_COLOR_MARKER="0" SHOW_PATH="1" HEAD_SIZE="0" COLLECTIVE_COLOR_SIZE="11" SHOW_NUMBER="1" POINTS_SIZE="6"/>
+        </TRACKING>
+        <ANALYSIS>
+            <SEARCH_MISSING_FRAMES ENABLED="1"/>
+            <MARK_ACTUAL ENABLED="0"/>
+            <CALCULATION STEP_SIZE="25" CONSIDER_X="0" ABSOLUTE="0" CONSIDER_Y="1" REVERSE="0"/>
+        </ANALYSIS>
+    </CONTROL>
+    <STEREO>
+        <DISPARITY OPACITY="100" ALGO="0" HIDE_INVALID="1" SHOW="0" COLOR="0">
+            <VALUES MIN="0" MAX="100"/>
+            <MASK USE_EDGE="0" SIZE="7" EDGE_SIZE="5"/>
+            <USE CALIB_CENTER="1" HEIGHT_EVER="1" EXPORT="0" HEIGHT="0" RECO="0"/>
+        </DISPARITY>
+    </STEREO>
+    <COLOR_MARKER>
+        <MASK OPACITY="60" SHOW="1" MASK="1"/>
+        <FROM_COLOR HUE="100" SATURATION="34" VALUE="147"/>
+        <TO_COLOR HUE="188" SATURATION="255" VALUE="255"/>
+        <PARAM CLOSE_RADIUS="4" INVERS_HUE="0" CLOSE_USED="1" MAX_AREA="1000" MIN_AREA="200" OPEN_USED="1" MAX_RATIO="2" OPEN_RADIUS="4"/>
+    </COLOR_MARKER>
+    <MULTI_COLOR_MARKER>
+        <MASK OPACITY="60" SHOW="0" MASK="1"/>
+        <PARAM CLOSE_RADIUS="5" CLOSE_USED="1" MAX_AREA="2000" MIN_AREA="500" OPEN_USED="1" MAX_RATIO="2" OPEN_RADIUS="5"/>
+    </MULTI_COLOR_MARKER>
+    <PLAYER FRAME="704"/>
+    <VIEW SAVE_TRANSFORMED="0" TRANSFORMATION="224 0 0 0" CAMERA="2" ANTIALIAS="0" OPENGL="0"/>
+</PETRACK>

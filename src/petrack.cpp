@@ -41,8 +41,8 @@
 #include "extrinsicBox.h"
 #include "filterBeforeBox.h"
 #include "gridItem.h"
-#include "helper.h"
 #include "imageItem.h"
+#include "importHelper.h"
 #include "intrinsicBox.h"
 #include "keybindingDialog.h"
 #include "logger.h"
@@ -356,9 +356,6 @@ Petrack::Petrack(QString petrackVersion) :
     // um im background subtraction filter das hoehenbild zu beruecksichtigen
     mBackgroundFilter.setStereoContext(&mStereoContext);
 
-    mAutoBackTrack          = true;  // ist der default, dann wenn in XML-Datei nicht drin steht
-    mAutoTrackOptimizeColor = false; // ist der default, dann wenn in XML-Datei nicht drin steht
-
     setLoading(false);
 }
 Petrack::~Petrack()
@@ -500,14 +497,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
                     }
                 }
             }
-            if(elem.hasAttribute("STATUS_HEIGHT"))
-            {
-                if(mStatusPosRealHeight) // null kann eigentlich nicht vorkommen, da im constructor von petrack erzeugt
-                                         // wird
-                {
-                    mStatusPosRealHeight->setValue(elem.attribute("STATUS_HEIGHT").toDouble());
-                }
-            }
+            loadDoubleValue(elem, "STATUS_HEIGHT", mStatusPosRealHeight);
         }
         else if(elem.tagName() == "STEREO")
         {
@@ -533,14 +523,8 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
         {
             mControlWidget->getXml(elem, petVersion);
             QDomElement tmpElem = (elem.firstChildElement("TRACKING")).firstChildElement("PATH");
-            if(tmpElem.hasAttribute("ONLY_PEOPLE_NR"))
-            {
-                onlyPeopleNr = tmpElem.attribute("ONLY_PEOPLE_NR").toInt();
-            }
-            if(tmpElem.hasAttribute("ONLY_PEOPLE_NR_LIST"))
-            {
-                onlyPeopleNrList = tmpElem.attribute("ONLY_PEOPLE_NR_LIST");
-            }
+            onlyPeopleNr        = readInt(tmpElem, "ONLY_PEOPLE_NR", 1);
+            onlyPeopleNrList    = readQString(tmpElem, "ONLY_PEOPLE_NR_LIST", "");
         }
         else if(elem.tagName() == "EXTR_CALIBRATION")
         {
@@ -548,75 +532,31 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
         }
         else if(elem.tagName() == "PLAYER")
         {
-            if(elem.hasAttribute("FRAME"))
-            {
-                frame = elem.attribute("FRAME").toInt();
-            }
+            frame = readInt(elem, "FRAME", -1);
             // handle old projects (prior to 0.10.2), which don't differentiate between sequence fps and playback fps
-            if(elem.hasAttribute("FPS"))
-            {
-                oldFps = elem.attribute("FPS").toDouble();
-            }
-            if(elem.hasAttribute("SEQUENCE_FPS"))
-            {
-                sequenceFps = elem.attribute("SEQUENCE_FPS").toDouble();
-            }
-            if(elem.hasAttribute("PLAYBACK_FPS"))
-            {
-                playbackFps = elem.attribute("PLAYBACK_FPS").toDouble();
-            }
-            if(elem.hasAttribute("SOURCE_FRAME_IN"))
-            {
-                sourceFrameIn = elem.attribute("SOURCE_FRAME_IN").toInt();
-            }
-            if(elem.hasAttribute("SOURCE_FRAME_OUT"))
-            {
-                sourceFrameOut = elem.attribute("SOURCE_FRAME_OUT").toInt();
-            }
-            if(elem.hasAttribute("PLAYER_SPEED_FIXED"))
-            {
-                mPlayerWidget->setPlayerSpeedLimited(elem.attribute("PLAYER_SPEED_FIXED").toInt());
-            }
+            oldFps         = readDouble(elem, "FPS", -1);
+            sequenceFps    = readDouble(elem, "SEQUENCE_FPS", -1);
+            playbackFps    = readDouble(elem, "PLAYBACK_FPS", -1);
+            sourceFrameIn  = readInt(elem, "SOURCE_FRAME_IN", -1);
+            sourceFrameOut = readInt(elem, "SOURCE_FRAME_OUT", -1);
+            mPlayerWidget->setPlayerSpeedLimited(readBool(elem, "PLAYER_SPEED_FIXED", false));
         }
         else if(elem.tagName() == "VIEW")
         {
-            if(elem.hasAttribute("ANTIALIAS"))
-            {
-                mAntialiasAct->setChecked(elem.attribute("ANTIALIAS").toInt() == Qt::Checked);
-            }
-            if(elem.hasAttribute("OPENGL"))
-            {
-                mOpenGLAct->setChecked(elem.attribute("OPENGL").toInt() == Qt::Checked);
-            }
-            if(elem.hasAttribute("SAVE_TRANSFORMED"))
-            {
-                mCropZoomViewAct->setChecked(elem.attribute("SAVE_TRANSFORMED") == Qt::Checked);
-            }
-            if(elem.hasAttribute("TRANSFORMATION"))
-            {
-                QString     matStr = elem.attribute("TRANSFORMATION");
-                QTextStream in(&matStr);
-                in >> zoom >> rotate >> hScroll >> vScroll;
-            }
-            if(elem.hasAttribute("CAMERA"))
-            {
-                cam = (enum Camera) elem.attribute("CAMERA").toInt();
-            }
-            if(elem.hasAttribute("HIDE_CONTROLS"))
-            {
-                mHideControlsAct->setChecked(elem.attribute("HIDE_CONTROLS").toInt() == Qt::Checked);
-            }
+            loadBoolValue(elem, "ANTIALIAS", mAntialiasAct, false);
+            loadBoolValue(elem, "OPENGL", mOpenGLAct, false);
+            loadBoolValue(elem, "SAVE_TRANSFORMED", mCropZoomViewAct, false);
+            QString     matStr = readQString(elem, "TRANSFORMATION");
+            QTextStream in(&matStr);
+            in >> zoom >> rotate >> hScroll >> vScroll;
+
+            cam = (enum Camera) readInt(elem, "CAMERA", static_cast<int>(cameraUnset));
+            loadBoolValue(elem, "HIDE_CONTROLS", mHideControlsAct, false);
         }
         else if(elem.tagName() == "AUTO_TRACK")
         {
-            if(elem.hasAttribute("BACK_TRACK"))
-            {
-                mAutoBackTrack = elem.attribute("BACK_TRACK").toInt();
-            }
-            if(elem.hasAttribute("OPTIMZE_COLOR"))
-            {
-                mAutoTrackOptimizeColor = elem.attribute("OPTIMZE_COLOR").toInt();
-            }
+            mAutoBackTrack          = readBool(elem, "BACK_TRACK", true);
+            mAutoTrackOptimizeColor = readBool(elem, "OPTIMIZE_COLOR", false);
         }
         else if(elem.tagName() == "MISSING_FRAMES")
         {
@@ -626,8 +566,8 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
                 auto node             = elem.firstChildElement("FRAME");
                 for(; !node.isNull(); node = node.nextSiblingElement("FRAME"))
                 {
-                    size_t num   = node.attribute("NUM_FRAME").toUInt();
-                    int    count = node.attribute("NUM_MISSING").toInt();
+                    size_t num   = readInt(node, "NUM_FRAME");
+                    int    count = readInt(node, "NUM_MISSING");
                     missingFrames.push_back(MissingFrame{num, count});
                 }
             }

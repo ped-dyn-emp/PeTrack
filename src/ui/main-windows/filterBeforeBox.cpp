@@ -22,7 +22,7 @@
 #include "backgroundItem.h"
 #include "borderFilter.h"
 #include "brightContrastFilter.h"
-#include "helper.h"
+#include "importHelper.h"
 #include "pGroupBox.h"
 #include "pMessageBox.h"
 #include "swapFilter.h"
@@ -88,84 +88,40 @@ bool FilterBeforeBox::getXmlSub(QDomElement &subSubElem)
             auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
             if(parent)
             {
-                parent->setImmutable(subSubElem.attribute("IMMUTABLE").toInt());
+                parent->setImmutable(readBool(subSubElem, "IMMUTABLE", false));
             }
         }
     }
     else if(subSubElem.tagName() == "BRIGHTNESS")
     {
-        if(subSubElem.hasAttribute("ENABLED"))
-        {
-            mUi->filterBrightContrast->setCheckState(
-                subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
-        if(subSubElem.hasAttribute("VALUE"))
-        {
-            mUi->filterBrightParam->setValue(subSubElem.attribute("VALUE").toInt());
-        }
+        loadBoolValue(subSubElem, "ENABLED", mUi->filterBrightContrast);
+        loadIntValue(subSubElem, "VALUE", mUi->filterBrightParam);
     }
     else if(subSubElem.tagName() == "CONTRAST")
     {
-        if(subSubElem.hasAttribute("ENABLED"))
-        {
-            mUi->filterBrightContrast->setCheckState(
-                subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
-        if(subSubElem.hasAttribute("VALUE"))
-        {
-            mUi->filterContrastParam->setValue(subSubElem.attribute("VALUE").toInt());
-        }
+        loadBoolValue(subSubElem, "ENABLED", mUi->filterBrightContrast);
+        loadIntValue(subSubElem, "VALUE", mUi->filterContrastParam);
     }
     else if(subSubElem.tagName() == "BORDER")
     {
-        if(subSubElem.hasAttribute("ENABLED"))
-        {
-            mUi->filterBorder->setCheckState(subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
-        if(subSubElem.hasAttribute("VALUE"))
-        {
-            setValue(mUi->filterBorderParamSize, subSubElem.attribute("VALUE").toInt());
-        }
+        loadBoolValue(subSubElem, "ENABLED", mUi->filterBorder);
+        loadIntValue(subSubElem, "VALUE", mUi->filterBorderParamSize);
         // bgColor still needs to be read by control
         return false;
     }
     else if(subSubElem.tagName() == "SWAP")
     {
-        if(subSubElem.hasAttribute("ENABLED"))
-        {
-            mUi->filterSwap->setCheckState(subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
-        if(subSubElem.hasAttribute("HORIZONTALLY"))
-        {
-            mUi->filterSwapH->setCheckState(subSubElem.attribute("HORIZONTALLY").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
-        if(subSubElem.hasAttribute("VERTICALLY"))
-        {
-            mUi->filterSwapV->setCheckState(subSubElem.attribute("VERTICALLY").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
+        loadBoolValue(subSubElem, "ENABLED", mUi->filterSwap);
+        loadBoolValue(subSubElem, "HORIZONTALLY", mUi->filterSwapH);
+        loadBoolValue(subSubElem, "VERTICALLY", mUi->filterSwapV);
     }
     else if(subSubElem.tagName() == "BG_SUB")
     {
-        if(subSubElem.hasAttribute("ENABLED"))
-        {
-            mUi->filterBg->setCheckState(subSubElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
-        if(subSubElem.hasAttribute("UPDATE"))
-        {
-            mUi->filterBgUpdate->setCheckState(subSubElem.attribute("UPDATE").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
-        if(subSubElem.hasAttribute("SHOW"))
-        {
-            mUi->filterBgShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
-        if(subSubElem.hasAttribute("DELETE"))
-        {
-            mUi->filterBgDeleteTrj->setCheckState(subSubElem.attribute("DELETE").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
-        if(subSubElem.hasAttribute("DELETE_NUMBER"))
-        {
-            mUi->filterBgDeleteNumber->setValue(subSubElem.attribute("DELETE_NUMBER").toInt());
-        }
+        loadBoolValue(subSubElem, "ENABLED", mUi->filterBg);
+        loadBoolValue(subSubElem, "UPDATE", mUi->filterBgUpdate, false);
+        loadBoolValue(subSubElem, "SHOW", mUi->filterBgShow, false);
+        loadBoolValue(subSubElem, "DELETE", mUi->filterBgDeleteTrj, true);
+        loadIntValue(subSubElem, "DELETE_NUMBER", mUi->filterBgDeleteNumber, 3);
         // control still needs to read file
         return false;
     }

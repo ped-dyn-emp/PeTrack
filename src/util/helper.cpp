@@ -20,7 +20,6 @@
 
 #include "logger.h"
 
-#include <QCheckBox>
 #include <algorithm>
 #include <opencv2/opencv.hpp>
 
@@ -254,33 +253,4 @@ bool newerThanVersion(const QString &q1, const QString &q2)
         }
     }
     return false;
-}
-
-
-void loadValueBlocked(const QDomElement &elem, const QString &name, QCheckBox *widget)
-{
-    if(elem.hasAttribute(name))
-    {
-        QSignalBlocker blocker(widget);
-        setValue(widget, bool(elem.attribute(name).toInt()));
-    }
-}
-
-void setValue(QCheckBox *widget, bool value)
-{
-    widget->setChecked(value);
-}
-
-void setValueBlocked(QCheckBox *widget, bool value)
-{
-    QSignalBlocker blocker(widget);
-    widget->setChecked(value);
-}
-
-void loadValue(const QDomElement &elem, const QString &name, QCheckBox *widget)
-{
-    if(elem.hasAttribute(name))
-    {
-        setValue(widget, bool(elem.attribute(name).toInt()));
-    }
 }

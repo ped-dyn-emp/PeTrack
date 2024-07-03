@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<!DOCTYPE PETRACK>
+<PETRACK VERSION="0.6" >
+    <MAIN SRC="H:/labor08/versuchsreihe1/dv/34_95qual.avi" STATUS_HEIGHT="0" />
+    <CONTROL TAB="2" >
+        <CALIBRATION>
+            <BRIGHTNESS ENABLED="0" VALUE="0" />
+            <CONTRAST ENABLED="0" VALUE="0" />
+            <BORDER ENABLED="1" VALUE="10" COLOR="#000000" />
+            <BG_SUB ENABLED="0" />
+            <INTRINSIC_PARAMETERS FX="844.86" FY="867.38" R2="-0.213522" TANG_DIST="1" CALIB_FILES="H:/labor08/pattern/dv/01.bmp, H:/labor08/pattern/dv/18.bmp, H:/labor08/pattern/dv/17.bmp, H:/labor08/pattern/dv/16.bmp, H:/labor08/pattern/dv/15.bmp, H:/labor08/pattern/dv/14.bmp, H:/labor08/pattern/dv/13.bmp, H:/labor08/pattern/dv/12.bmp, H:/labor08/pattern/dv/11.bmp, H:/labor08/pattern/dv/10.bmp, H:/labor08/pattern/dv/09.bmp, H:/labor08/pattern/dv/08.bmp, H:/labor08/pattern/dv/07.bmp, H:/labor08/pattern/dv/06.bmp, H:/labor08/pattern/dv/05.bmp, H:/labor08/pattern/dv/04.bmp, H:/labor08/pattern/dv/03.bmp, H:/labor08/pattern/dv/02.bmp" CX="388.1" R4="0.175628" TX="-0.002302" CY="288.24" TY="-0.002336" ENABLED="1" FIX_CENTER="0" QUAD_ASPECT_RATIO="0" />
+            <EXTRINSIC_PARAMETERS FIX="1" ALTITUDE="535" UNIT="200" USE_INTRINSIC_CENTER="0" SCALE="3600" TILT_X="4000" TILT_Y="4000" TRANS_X="1700" TRANS_Y="5030" SHOW="0" ROTATE="0" />
+            <ALIGNMENT_GRID FIX="0" SCALE="200" TRANS_X="0" TRANS_Y="0" SHOW="0" ROTATE="0" />
+        </CALIBRATION>
+        <RECOGNITION>
+            <PERFORM ENABLED="0" STEP="5" />
+            <REGION_OF_INTEREST FIX="0" WIDTH="720" X="3.378258500303088" Y="-1.69349062472503" HEIGHT="576" SHOW="1" />
+            <MARKER BRIGHTNESS="50" IGNORE_WITHOUT="1" />
+            <SIZE_COLOR SYMBOL_SIZE="5" AUTO_WB="0" X="0" Y="1" MODEL="0" Z="255" GREY_LEVEL="50" MAP_NUMBER="0" DEFAULT_HEIGHT="50" SHOW="1" >
+                <MAP WIDTH="0" X="1" Y="0" MAP_HEIGHT="180" HEIGHT="0" COLORED="1" />
+            </SIZE_COLOR>
+        </RECOGNITION>
+        <TRACKING>
+            <ONLINE_CALCULATION ENABLED="0" />
+            <REPEAT_BELOW QUALITY="50" ENABLED="0" />
+            <SEARCH_MISSING_FRAMES ENABLED="1" />
+            <TRACK_FILE FILENAME="H:/labor08/versuchsreihe1/dv/34_trajectories.JL.trc" />
+            <SEARCH_REGION LEVELS="3" SCALE="16" SHOW="0" />
+            <PATH SHOW="1" NUMBER_SIZE="14" ONLY_PEOPLE="0" SHOW_CURRENT_POINT="1" AFTER="15" FIX="0" PATH_SIZE="2" ONLY_VISIBLE="0" COLOR_MARKER_SIZE="14" SHOW_COLLECTIVE_COLOR="1" NUMBER_BOLD="1" CURRENT_POINT_SIZE="60" ONLY_PEOPLE_NR="1" POINTS_COLORED="1" SHOW_POINTS="0" BEFORE="15" SHOW_COLOR_MARKER="1" SHOW_PATH="1" HEAD_SIZE="0" COLLECTIVE_COLOR_SIZE="11" SHOW_NUMBER="1" POINTS_SIZE="7" />
+        </TRACKING>
+        <ANALYSIS>
+            <SEARCH_MISSING_FRAMES ENABLED="1" />
+            <MARK_ACTUAL ENABLED="0" />
+            <CALCULATION STEP_SIZE="25" CONSIDER_X="0" ABSOLUTE="0" CONSIDER_Y="1" REVERSE="0" />
+        </ANALYSIS>
+    </CONTROL>
+    <PLAYER FRAME="1898" />
+    <VIEW SAVE_TRANSFORMED="0" TRANSFORMATION="262 0 0 0" ANTIALIAS="1" OPENGL="0" />
+</PETRACK>

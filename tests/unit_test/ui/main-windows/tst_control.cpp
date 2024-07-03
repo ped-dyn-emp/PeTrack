@@ -267,7 +267,7 @@ SCENARIO("Open PeTrack check defaults", "[ui][config]")
 
 TEST_CASE("Loading from and saving to XML node", "[config]")
 {
-    Petrack      pet{"0.9.1"};
+    Petrack      pet{"0.10.4"};
     Control     *control = pet.getControlWidget();
     QDomDocument doc;
     QDomElement  save = doc.createElement("CONTROL");

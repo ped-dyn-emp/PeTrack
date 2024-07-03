@@ -20,6 +20,7 @@
 
 #include "animation.h"
 #include "control.h"
+#include "importHelper.h"
 #include "pMessageBox.h"
 #include "personStorage.h"
 #include "player.h"
@@ -198,36 +199,36 @@ bool Correction::getTestEqualChecked() const
 {
     return mUi->chbEqual->isChecked();
 }
-void Correction::setTestEqualCheckState(Qt::CheckState testEqual)
+void Correction::setTestEqualChecked(bool testEqual)
 {
-    mUi->chbEqual->setCheckState(testEqual);
+    mUi->chbEqual->setChecked(testEqual);
 }
 
 bool Correction::getTestVelocityChecked() const
 {
     return mUi->chbVelocity->isChecked();
 }
-void Correction::setTestVelocityCheckState(Qt::CheckState testVelocity)
+void Correction::setTestVelocityChecked(bool testVelocity)
 {
-    mUi->chbVelocity->setCheckState(testVelocity);
+    mUi->chbVelocity->setChecked(testVelocity);
 }
 
 bool Correction::getTestLengthChecked() const
 {
     return mUi->chbLength->isChecked();
 }
-void Correction::setTestLengthCheckState(Qt::CheckState testLength)
+void Correction::setTestLengthChecked(bool testLength)
 {
-    mUi->chbLength->setCheckState(testLength);
+    mUi->chbLength->setChecked(testLength);
 }
 
 bool Correction::getTestInsideChecked() const
 {
     return mUi->chbInside->isChecked();
 }
-void Correction::setTestInsideCheckState(Qt::CheckState testInside)
+void Correction::setTestInsideChecked(bool testInside)
 {
-    mUi->chbInside->setCheckState(testInside);
+    mUi->chbInside->setChecked(testInside);
 }
 
 void Correction::selectedRowChanged()
@@ -545,43 +546,22 @@ bool Correction::getXml(const QDomElement &correctionElem)
     {
         if(subElem.tagName() == "EQUALITY")
         {
-            if(subElem.hasAttribute("ENABLED"))
-            {
-                mUi->chbEqual->setCheckState(subElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-            }
-            if(subElem.hasAttribute("DISTANCE"))
-            {
-                setValue(mUi->spbxEqualityDistance, subElem.attribute("DISTANCE").toDouble());
-            }
+            loadBoolValue(subElem, "ENABLED", mUi->chbEqual);
+            loadDoubleValue(subElem, "DISTANCE", mUi->spbxEqualityDistance);
         }
         else if(subElem.tagName() == "VELOCITY")
         {
-            if(subElem.hasAttribute("ENABLED"))
-            {
-                mUi->chbVelocity->setCheckState(subElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-            }
+            loadBoolValue(subElem, "ENABLED", mUi->chbVelocity);
         }
         else if(subElem.tagName() == "LENGTH")
         {
-            if(subElem.hasAttribute("ENABLED"))
-            {
-                mUi->chbLength->setCheckState(subElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-            }
-            if(subElem.hasAttribute("MIN_LENGTH"))
-            {
-                setValue(mUi->spbxMinFrameLength, subElem.attribute("MIN_LENGTH").toDouble());
-            }
+            loadBoolValue(subElem, "ENABLED", mUi->chbLength);
+            loadDoubleValue(subElem, "MIN_LENGTH", mUi->spbxMinFrameLength);
         }
         else if(subElem.tagName() == "INSIDE")
         {
-            if(subElem.hasAttribute("ENABLED"))
-            {
-                mUi->chbInside->setCheckState(subElem.attribute("ENABLED").toInt() ? Qt::Checked : Qt::Unchecked);
-            }
-            if(subElem.hasAttribute("MARGIN"))
-            {
-                setValue(mUi->spbxInsideMargin, subElem.attribute("MARGIN").toDouble());
-            }
+            loadBoolValue(subElem, "ENABLED", mUi->chbInside);
+            loadIntValue(subElem, "MARGIN", mUi->spbxInsideMargin);
         }
         else
         {

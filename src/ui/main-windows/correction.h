@@ -69,16 +69,16 @@ public:
     ~Correction() override;
 
     bool getTestEqualChecked() const;
-    void setTestEqualCheckState(Qt::CheckState testEqual);
+    void setTestEqualChecked(bool testEqual);
 
     bool getTestVelocityChecked() const;
-    void setTestVelocityCheckState(Qt::CheckState testVelocity);
+    void setTestVelocityChecked(bool testVelocity);
 
     bool getTestLengthChecked() const;
-    void setTestLengthCheckState(Qt::CheckState testLength);
+    void setTestLengthChecked(bool testLength);
 
     bool getTestInsideChecked() const;
-    void setTestInsideCheckState(Qt::CheckState testInside);
+    void setTestInsideChecked(bool testInside);
 
     void setXml(QDomElement &elem) const;
     bool getXml(const QDomElement &elem);

@@ -19,7 +19,7 @@
 #include "moCapController.h"
 
 #include "IO.h"
-#include "helper.h"
+#include "importHelper.h"
 #include "logger.h"
 #include "moCapPerson.h"
 
@@ -317,20 +317,10 @@ void MoCapController::setXml(QDomElement &elem)
 void MoCapController::getXml(const QDomElement &elem)
 {
     // NOTE: Maybe only load the c3d-files once show is activated
-    if(elem.hasAttribute("SHOW"))
-    {
-        bool isVisible = elem.attribute("SHOW").toInt();
-        setShowMoCap(isVisible);
-    }
-    if(elem.hasAttribute("COLOR"))
-    {
-        QColor color(elem.attribute("COLOR"));
-        setColor(color);
-    }
-    if(elem.hasAttribute("SIZE"))
-    {
-        setThickness(elem.attribute("SIZE").toInt());
-    }
+
+    setShowMoCap(readBool(elem, "SHOW"));
+    setColor(readQString(elem, "COLOR"));
+    setThickness(readInt(elem, "SIZE"));
 
     std::vector<MoCapPersonMetadata> savedMetadata;
     try
@@ -340,96 +330,43 @@ void MoCapController::getXml(const QDomElement &elem)
             if(subElem.tagName() == "PERSON")
             {
                 MoCapPersonMetadata metadata;
-                bool                ok;
                 QString             path;
-                if(subElem.hasAttribute("FILE") && subElem.hasAttribute("SYSTEM"))
+                path               = readQString(subElem, "FILE");
+                const QString file = getExistingFile(path);
+                path               = path.split(";").size() == 2 ? path.split(";").at(1) :
+                                                                   "Saved path is invalid"
+                                                                   "";
+                int system         = readInt(subElem, "SYSTEM");
+                if(system < 0 || system >= MoCapSystem::END)
                 {
-                    path               = subElem.attribute("FILE");
-                    const QString file = getExistingFile(path);
-                    path               = path.split(";").size() == 2 ? path.split(";").at(1) :
-                                                                       "Saved path is invalid"
-                                                                       "";
-                    int system         = subElem.attribute("SYSTEM").toInt(&ok);
+                    throw std::invalid_argument(
+                        QString("System index %1 of file %2 is not associated with an implemented MoCap system.")
+                            .arg(system)
+                            .arg(path)
+                            .toStdString());
+                }
+                metadata.setFilepath(file.toStdString(), static_cast<MoCapSystem>(system));
+                metadata.setUserTimeOffset(readDouble(subElem, "TIME_OFFSET", 0));
+                metadata.setSamplerate(readInt(subElem, "SAMPLE_RATE"));
+                metadata.setVisible(readBool(subElem, "VISIBLE", false));
 
-                    if(!ok)
-                    {
-                        std::stringstream ss;
-                        ss << "Element SYSTEM of " << path << " does not contain a valid integer!";
-                        throw std::invalid_argument(ss.str());
-                    }
-                    if(system < 0 || system >= MoCapSystem::END)
-                    {
-                        std::stringstream ss;
-                        ss << "System index " << system << " of file " << path
-                           << " is not associated with an implemented MoCap system.";
-                        throw std::invalid_argument(ss.str());
-                    }
 
-                    metadata.setFilepath(file.toStdString(), static_cast<MoCapSystem>(system));
-                }
-                if(subElem.hasAttribute("TIME_OFFSET"))
+                double angle = readDouble(subElem, "ANGLE", 0);
+                if(abs(angle) > 360)
                 {
-                    metadata.setUserTimeOffset(subElem.attribute("TIME_OFFSET").toDouble(&ok));
-                    std::stringstream ss;
-                    ss << "Element TIME_OFFSET of file " << path << " does not contain a valid floating-point number!";
-                    if(!ok)
-                    {
-                        throw std::invalid_argument(ss.str());
-                    }
+                    throw std::invalid_argument(
+                        QString(
+                            "Element ANGLE of file %1 does not contain a valid angle (should be between -360 and 360)!")
+                            .arg(path)
+                            .toStdString());
                 }
-                if(subElem.hasAttribute("SAMPLE_RATE"))
-                {
-                    metadata.setSamplerate(subElem.attribute("SAMPLE_RATE").toInt(&ok));
-                    std::stringstream ss;
-                    ss << "Element SAMPLE_RATE of file " << path << " does not contain a valid integer!";
-                    if(!ok)
-                    {
-                        throw std::invalid_argument(ss.str());
-                    }
-                }
-                if(subElem.hasAttribute("VISIBLE"))
-                {
-                    metadata.setVisible(subElem.attribute("VISIBLE").toInt(&ok));
-                    std::stringstream ss;
-                    ss << "Element VISIBLE of file " << path
-                       << " does not contain a valid value integer (should be 0 or 1)!";
-                    if(!ok)
-                    {
-                        throw std::invalid_argument(ss.str());
-                    }
-                }
-                if(subElem.hasAttribute("ANGLE"))
-                {
-                    double            angle = subElem.attribute("ANGLE").toDouble(&ok);
-                    std::stringstream ss;
-                    ss << "Element ANGLE of file " << path
-                       << " does not contain a valid angle (should be between -360 and 360)!";
-                    if(!ok || abs(angle) > 360)
-                    {
-                        throw std::invalid_argument(ss.str());
-                    }
-                    metadata.setAngle(angle);
-                }
-                if(subElem.hasAttribute("TRANS_X") && subElem.hasAttribute("TRANS_Y") &&
-                   subElem.hasAttribute("TRANS_Z"))
-                {
-                    bool   allOk  = true;
-                    double transX = subElem.attribute("TRANS_X").toDouble(&ok);
-                    allOk &= ok;
-                    double transY = subElem.attribute("TRANS_Y").toDouble(&ok);
-                    allOk &= ok;
-                    double transZ = subElem.attribute("TRANS_Z").toDouble(&ok);
-                    allOk &= ok;
+                metadata.setAngle(angle);
 
-                    std::stringstream ss;
-                    ss << "Element TRANS of file " << path << " does not contain a valid translation!";
-                    if(!allOk)
-                    {
-                        throw std::invalid_argument(ss.str());
-                    }
-                    metadata.setTranslation(
-                        cv::Affine3f(cv::Mat::eye(3, 3, CV_32F), cv::Vec3f(transX, transY, transZ)));
-                }
+                double transX = readDouble(subElem, "TRANS_X", 0);
+                double transY = readDouble(subElem, "TRANS_Y", 0);
+                double transZ = readDouble(subElem, "TRANS_Z", 0);
+                metadata.setTranslation(cv::Affine3f(cv::Mat::eye(3, 3, CV_32F), cv::Vec3f(transX, transY, transZ)));
+
                 savedMetadata.push_back(metadata);
             }
         }
