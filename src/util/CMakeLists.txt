@@ -7,5 +7,7 @@ target_sources(petrack_core PRIVATE
     helper.h             
     logger.h             
     vector.cpp           
-    vector.h             
+    vector.h
+    importHelper.h
+    importHelper.cpp
 )

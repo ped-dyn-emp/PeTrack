@@ -22,6 +22,7 @@
 #include "extrCalibration.h"
 #include "extrinsicBox.h"
 #include "imageItem.h"
+#include "importHelper.h"
 #include "intrinsicBox.h"
 #include "pGroupBox.h"
 #include "ui_coordinateSystemBox.h"
@@ -378,101 +379,37 @@ bool CoordinateSystemBox::getXml(const QDomElement &subSubElem)
 {
     if(subSubElem.tagName() == "EXTRINSIC_PARAMETERS")
     {
-        if(subSubElem.hasAttribute("SHOW_CALIB_POINTS"))
-        {
-            mUi->extCalibPointsShow->setCheckState(
-                subSubElem.attribute("SHOW_CALIB_POINTS").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
+        loadBoolValue(subSubElem, "SHOW_CALIB_POINTS", mUi->extCalibPointsShow, false);
+        loadActiveIndex(subSubElem, "COORD_DIMENSION", mUi->coordTab, 0);
+        loadBoolValue(subSubElem, "SHOW", mUi->coordShow, false);
+        loadBoolValue(subSubElem, "FIX", mUi->coordFix, false);
+        loadIntValue(subSubElem, "ROTATE", mUi->coordRotate, 0);
 
-        if(subSubElem.hasAttribute("COORD_DIMENSION"))
-        {
-            mUi->coordTab->setCurrentIndex(subSubElem.attribute("COORD_DIMENSION").toInt());
-        }
-        else
-        {
-            mUi->coordTab->setCurrentIndex(1); //  = 2D
-            mExtrBox.setEnabledExtrParams(false);
-        }
 
-        if(subSubElem.hasAttribute("SHOW"))
+        int trans_x = readInt(subSubElem, "TRANS_X", 0);
+        if(trans_x > mUi->coordTransX->maximum())
         {
-            mUi->coordShow->setCheckState(subSubElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
+            setCalibCoordTransXMax(trans_x);
         }
-        if(subSubElem.hasAttribute("FIX"))
+        mUi->coordTransX->setValue(trans_x);
+
+        int trans_y = readInt(subSubElem, "TRANS_Y", 0);
+        if(trans_y > mUi->coord3DTransY->maximum())
         {
-            mUi->coordFix->setCheckState(subSubElem.attribute("FIX").toInt() ? Qt::Checked : Qt::Unchecked);
+            setCalibCoordTransYMax(trans_y);
         }
-        if(subSubElem.hasAttribute("ROTATE"))
-        {
-            mUi->coordRotate->setValue(subSubElem.attribute("ROTATE").toInt());
-        }
-        if(subSubElem.hasAttribute("TRANS_X"))
-        {
-            int trans_x = subSubElem.attribute("TRANS_X").toInt();
-            if(trans_x > mUi->coordTransX->maximum())
-            {
-                setCalibCoordTransXMax(trans_x);
-            }
-            mUi->coordTransX->setValue(trans_x);
-        }
-        if(subSubElem.hasAttribute("TRANS_Y"))
-        {
-            int trans_y = subSubElem.attribute("TRANS_Y").toInt();
-            if(trans_y > mUi->coord3DTransY->maximum())
-            {
-                setCalibCoordTransYMax(trans_y);
-            }
-            mUi->coordTransY->setValue(trans_y);
-        }
-        mUi->coordTransY->setValue(subSubElem.attribute("TRANS_Y").toInt());
-        if(subSubElem.hasAttribute("SCALE"))
-        {
-            mUi->coordScale->setValue(subSubElem.attribute("SCALE").toInt());
-        }
-        if(subSubElem.hasAttribute("ALTITUDE"))
-        {
-            mUi->coordAltitude->setValue(subSubElem.attribute("ALTITUDE").toDouble());
-        }
-        if(subSubElem.hasAttribute("UNIT"))
-        {
-            mUi->coordUnit->setValue(subSubElem.attribute("UNIT").toDouble());
-        }
-        if(subSubElem.hasAttribute("USE_INTRINSIC_CENTER"))
-        {
-            mUi->coordUseIntrinsic->setCheckState(
-                subSubElem.attribute("USE_INTRINSIC_CENTER").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
-        if(subSubElem.hasAttribute("COORD3D_TRANS_X"))
-        {
-            mUi->coord3DTransX->setValue(subSubElem.attribute("COORD3D_TRANS_X").toInt());
-        }
-        if(subSubElem.hasAttribute("COORD3D_TRANS_Y"))
-        {
-            mUi->coord3DTransY->setValue(subSubElem.attribute("COORD3D_TRANS_Y").toInt());
-        }
-        if(subSubElem.hasAttribute("COORD3D_TRANS_Z"))
-        {
-            mUi->coord3DTransZ->setValue(subSubElem.attribute("COORD3D_TRANS_Z").toInt());
-        }
-        if(subSubElem.hasAttribute("COORD3D_AXIS_LEN"))
-        {
-            mUi->coord3DAxeLen->setValue(subSubElem.attribute("COORD3D_AXIS_LEN").toInt());
-        }
-        if(subSubElem.hasAttribute("COORD3D_SWAP_X"))
-        {
-            mUi->coord3DSwapX->setCheckState(
-                subSubElem.attribute("COORD3D_SWAP_X").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
-        if(subSubElem.hasAttribute("COORD3D_SWAP_Y"))
-        {
-            mUi->coord3DSwapY->setCheckState(
-                subSubElem.attribute("COORD3D_SWAP_Y").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
-        if(subSubElem.hasAttribute("COORD3D_SWAP_Z"))
-        {
-            mUi->coord3DSwapZ->setCheckState(
-                subSubElem.attribute("COORD3D_SWAP_Z").toInt() ? Qt::Checked : Qt::Unchecked);
-        }
+        loadIntValue(subSubElem, "TRANS_Y", mUi->coordTransY, 0);
+        loadIntValue(subSubElem, "SCALE", mUi->coordScale, 100);
+        loadDoubleValue(subSubElem, "ALTITUDE", mUi->coordAltitude, 535);
+        loadDoubleValue(subSubElem, "UNIT", mUi->coordUnit, 100);
+        loadBoolValue(subSubElem, "USE_INTRINSIC_CENTER", mUi->coordUseIntrinsic, false);
+        loadIntValue(subSubElem, "COORD3D_TRANS_X", mUi->coord3DTransX, 0);
+        loadIntValue(subSubElem, "COORD3D_TRANS_Y", mUi->coord3DTransY, 0);
+        loadIntValue(subSubElem, "COORD3D_TRANS_Z", mUi->coord3DTransZ, 0);
+        loadIntValue(subSubElem, "COORD3D_AXIS_LEN", mUi->coord3DAxeLen, 200);
+        loadBoolValue(subSubElem, "COORD3D_SWAP_X", mUi->coord3DSwapX, false);
+        loadBoolValue(subSubElem, "COORD3D_SWAP_Y", mUi->coord3DSwapY, false);
+        loadBoolValue(subSubElem, "COORD3D_SWAP_Z", mUi->coord3DSwapZ, false);
 
         if(subSubElem.hasAttribute("IMMUTABLE_COORD_BOX"))
         {
@@ -481,7 +418,7 @@ bool CoordinateSystemBox::getXml(const QDomElement &subSubElem)
                 auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
                 if(parent)
                 {
-                    parent->setImmutable(subSubElem.attribute("IMMUTABLE_COORD_BOX").toInt());
+                    parent->setImmutable(readBool(subSubElem, "IMMUTABLE_COORD_BOX", false));
                 }
             }
         }

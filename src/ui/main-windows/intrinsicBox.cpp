@@ -22,6 +22,7 @@
 #include "calibFilter.h"
 #include "extrinsicBox.h"
 #include "helper.h"
+#include "importHelper.h"
 #include "pGroupBox.h"
 #include "pMessageBox.h"
 #include "ui_intrinsicBox.h"
@@ -137,88 +138,27 @@ void IntrinsicBox::imageSizeChanged(int width, int height, int borderDiff)
 IntrinsicCameraParams IntrinsicBox::getXmlParams(const QDomElement &elem)
 {
     IntrinsicCameraParams params;
-    if(elem.hasAttribute("FX"))
-    {
-        params.setFx(elem.attribute("FX").toDouble());
-    }
-    if(elem.hasAttribute("FY"))
-    {
-        params.setFy(elem.attribute("FY").toDouble());
-    }
-    if(elem.hasAttribute("CX"))
-    {
-        params.setCx(elem.attribute("CX").toDouble());
-    }
-    if(elem.hasAttribute("CY"))
-    {
-        params.setCy(elem.attribute("CY").toDouble());
-    }
-    if(elem.hasAttribute("R2"))
-    {
-        params.setR2(elem.attribute("R2").toDouble());
-    }
-    if(elem.hasAttribute("R4"))
-    {
-        params.setR4(elem.attribute("R4").toDouble());
-    }
-    if(elem.hasAttribute("R6"))
-    {
-        params.setR6(elem.attribute("R6").toDouble());
-    }
-    if(elem.hasAttribute("TX"))
-    {
-        params.setTx(elem.attribute("TX").toDouble());
-    }
-    if(elem.hasAttribute("TY"))
-    {
-        params.setTy(elem.attribute("TY").toDouble());
-    }
-    if(elem.hasAttribute("K4"))
-    {
-        params.setK4(elem.attribute("K4").toDouble());
-    }
-    if(elem.hasAttribute("K5"))
-    {
-        params.setK5(elem.attribute("K5").toDouble());
-    }
-    if(elem.hasAttribute("K6"))
-    {
-        params.setK6(elem.attribute("K6").toDouble());
-    }
-    if(elem.hasAttribute("S1"))
-    {
-        params.setS1(elem.attribute("S1").toDouble());
-    }
-    if(elem.hasAttribute("S2"))
-    {
-        params.setS2(elem.attribute("S2").toDouble());
-    }
-    if(elem.hasAttribute("S3"))
-    {
-        params.setS3(elem.attribute("S3").toDouble());
-    }
-    if(elem.hasAttribute("S4"))
-    {
-        params.setS4(elem.attribute("S4").toDouble());
-    }
-    if(elem.hasAttribute("TAUX"))
-    {
-        params.setTaux(elem.attribute("TAUX").toDouble());
-    }
-    if(elem.hasAttribute("TAUY"))
-    {
-        params.setTauy(elem.attribute("TAUY").toDouble());
-    }
-    if(elem.hasAttribute("ReprError"))
-    {
-        bool conversionSuccessful;
-        params.reprojectionError = elem.attribute("ReprError").toDouble(&conversionSuccessful);
-        if(!conversionSuccessful)
-        {
-            // Qt sets to inf instead of nan
-            params.reprojectionError = std::numeric_limits<double>::quiet_NaN();
-        }
-    }
+
+    params.setFx(readDouble(elem, "FX", 881));
+    params.setFy(readDouble(elem, "FY", 881));
+    params.setCx(readDouble(elem, "CX", 551.5));
+    params.setCy(readDouble(elem, "CY", 383.5));
+    params.setR2(readDouble(elem, "R2", 0));
+    params.setR4(readDouble(elem, "R4", 0));
+    params.setR6(readDouble(elem, "R6", 0));
+    params.setTx(readDouble(elem, "TX", 0));
+    params.setTy(readDouble(elem, "TY", 0));
+    params.setK4(readDouble(elem, "K4", 0));
+    params.setK5(readDouble(elem, "K5", 0));
+    params.setK6(readDouble(elem, "K6", 0));
+    params.setS1(readDouble(elem, "S1", 0));
+    params.setS2(readDouble(elem, "S2", 0));
+    params.setS3(readDouble(elem, "S3", 0));
+    params.setS4(readDouble(elem, "S4", 0));
+    params.setTaux(readDouble(elem, "TAUX", 0));
+    params.setTauy(readDouble(elem, "TAUY", 0));
+    params.reprojectionError = readDouble(elem, "ReprError", std::numeric_limits<double>::quiet_NaN());
+
     return params;
 }
 
@@ -256,32 +196,23 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
 {
     if(subSubElem.tagName() == "PATTERN")
     {
-        if(subSubElem.hasAttribute("BOARD_SIZE_X"))
-        {
-            mUi->boardSizeX->setValue(subSubElem.attribute("BOARD_SIZE_X").toInt());
-        }
-        if(subSubElem.hasAttribute("BOARD_SIZE_Y"))
-        {
-            mUi->boardSizeY->setValue(subSubElem.attribute("BOARD_SIZE_Y").toInt());
-        }
-        if(subSubElem.hasAttribute("SQUARE_SIZE"))
-        {
-            mUi->squareSize->setValue(subSubElem.attribute("SQUARE_SIZE").toDouble());
-        }
+        loadIntValue(subSubElem, "BOARD_SIZE_X", mUi->boardSizeX, 6);
+        loadIntValue(subSubElem, "BOARD_SIZE_Y", mUi->boardSizeY, 8);
+        loadDoubleValue(subSubElem, "SQUARE_SIZE", mUi->squareSize, 4.6);
     }
     else if(subSubElem.tagName() == "INTRINSIC_PARAMETERS")
     {
-        loadValue(subSubElem, "ENABLED", mUi->apply);
+        loadBoolValue(subSubElem, "ENABLED", mUi->apply, false);
         // signals are supposed to change model values; but since we read them in
         // from a valid file, no changes are neccessary -> can safely block signals
-        loadValue(subSubElem, "QUAD_ASPECT_RATIO", mUi->quadAspectRatio);
-        loadValue(subSubElem, "FIX_CENTER", mUi->fixCenter);
-        loadValue(subSubElem, "TANG_DIST", mUi->tangDist);
+        loadBoolValue(subSubElem, "QUAD_ASPECT_RATIO", mUi->quadAspectRatio, false);
+        loadBoolValue(subSubElem, "FIX_CENTER", mUi->fixCenter, false);
+        loadBoolValue(subSubElem, "TANG_DIST", mUi->tangDist, false);
 
         if(subSubElem.elementsByTagName("OLD_MODEL").isEmpty())
         {
             // old file with only one model
-            if(subSubElem.hasAttribute("EXT_MODEL_ENABLED") && subSubElem.attribute("EXT_MODEL_ENABLED").toInt())
+            if(subSubElem.hasAttribute("EXT_MODEL_ENABLED") && readBool(subSubElem, "EXT_MODEL_ENABLED"))
             {
                 mModelsParams.extModelParams = getXmlParams(subSubElem);
                 mModelsParams.oldModelParams = IntrinsicCameraParams{};
@@ -301,7 +232,7 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
         checkModelParams(mModelsParams.oldModelParams);
         checkModelParams(mModelsParams.extModelParams);
 
-        loadValue(subSubElem, "EXT_MODEL_ENABLED", mUi->extModelCheckBox);
+        loadBoolValue(subSubElem, "EXT_MODEL_ENABLED", mUi->extModelCheckBox, false);
 
         loadCalibFiles(subSubElem);
 
@@ -351,7 +282,7 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
                 auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
                 if(parent)
                 {
-                    parent->setImmutable(subSubElem.attribute("IMMUTABLE").toInt());
+                    parent->setImmutable(readBool(subSubElem, "IMMUTABLE", false));
                 }
             }
         }

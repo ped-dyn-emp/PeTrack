@@ -479,8 +479,8 @@ private:
 
     double mShowFPS;
 
-    bool mAutoBackTrack;
-    bool mAutoTrackOptimizeColor;
+    bool mAutoBackTrack          = true;
+    bool mAutoTrackOptimizeColor = false;
     bool mLoading;
 
     MoCapStorage    mMoCapStorage;

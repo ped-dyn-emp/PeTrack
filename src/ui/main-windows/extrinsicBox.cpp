@@ -20,6 +20,7 @@
 
 #include "extrCalibration.h"
 #include "helper.h"
+#include "importHelper.h"
 #include "pGroupBox.h"
 #include "ui_extrinsicBox.h"
 
@@ -241,41 +242,20 @@ bool ExtrinsicBox::getXml(QDomElement &subSubElem)
     if(subSubElem.tagName() == "EXTRINSIC_PARAMETERS")
     {
         ExtrinsicParameters params;
-        if(subSubElem.hasAttribute("EXTR_ROT_1"))
-        {
-            params.rot1 = subSubElem.attribute("EXTR_ROT_1").toDouble();
-        }
-        if(subSubElem.hasAttribute("EXTR_ROT_2"))
-        {
-            params.rot2 = subSubElem.attribute("EXTR_ROT_2").toDouble();
-        }
-        if(subSubElem.hasAttribute("EXTR_ROT_3"))
-        {
-            params.rot3 = subSubElem.attribute("EXTR_ROT_3").toDouble();
-        }
-        if(subSubElem.hasAttribute("EXTR_TRANS_1"))
-        {
-            params.trans1 = subSubElem.attribute("EXTR_TRANS_1").toDouble();
-        }
-        if(subSubElem.hasAttribute("EXTR_TRANS_2"))
-        {
-            params.trans2 = subSubElem.attribute("EXTR_TRANS_2").toDouble();
-        }
-        if(subSubElem.hasAttribute("EXTR_TRANS_3"))
-        {
-            params.trans3 = subSubElem.attribute("EXTR_TRANS_3").toDouble();
-        }
+
+        params.rot1   = readDouble(subSubElem, "EXTR_ROT_1", 0);
+        params.rot2   = readDouble(subSubElem, "EXTR_ROT_2", 0);
+        params.rot3   = readDouble(subSubElem, "EXTR_ROT_3", 0);
+        params.trans1 = readDouble(subSubElem, "EXTR_TRANS_1", 0);
+        params.trans2 = readDouble(subSubElem, "EXTR_TRANS_2", 0);
+        params.trans3 = readDouble(subSubElem, "EXTR_TRANS_3", -500);
         setExtrinsicParameters(params);
 
         if(subSubElem.hasAttribute("EXTERNAL_CALIB_FILE"))
         {
-            if(getExistingFile(QString::fromStdString(subSubElem.attribute("EXTERNAL_CALIB_FILE").toStdString())) != "")
-            {
-                mExtrCalibration.setExtrCalibFile(
-                    getExistingFile(QString::fromStdString(subSubElem.attribute("EXTERNAL_CALIB_FILE").toStdString())));
-                // mMainWindow->isLoading() is true; doesn't perform calibration -> ignore return
-                mExtrCalibration.loadExtrCalibFile();
-            }
+            mExtrCalibration.setExtrCalibFile(getExistingFile(readQString(subSubElem, "EXTERNAL_CALIB_FILE")));
+            // mMainWindow->isLoading() is true; doesn't perform calibration -> ignore return
+            mExtrCalibration.loadExtrCalibFile();
         }
 
         if(subSubElem.hasAttribute("IMMUTABLE_EXTRINSIC_BOX"))
@@ -285,7 +265,7 @@ bool ExtrinsicBox::getXml(QDomElement &subSubElem)
                 auto *parent = dynamic_cast<PGroupBox *>(this->parent()->parent());
                 if(parent)
                 {
-                    parent->setImmutable(subSubElem.attribute("IMMUTABLE_EXTRINSIC_BOX").toInt());
+                    parent->setImmutable(readBool(subSubElem, "IMMUTABLE_EXTRINSIC_BOX", false));
                 }
             }
         }

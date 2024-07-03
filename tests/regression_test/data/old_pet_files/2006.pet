@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<!DOCTYPE PETRACK>
+<PETRACK VERSION="0.6" >
+    <MAIN SRC="D:/Petrack/b090.avi" STATUS_HEIGHT="180" />
+    <CONTROL TAB="2" >
+        <CALIBRATION>
+            <BRIGHTNESS ENABLED="0" VALUE="0" />
+            <CONTRAST ENABLED="0" VALUE="0" />
+            <BORDER ENABLED="1" VALUE="39" COLOR="#000000" />
+            <BG_SUB ENABLED="0" />
+            <INTRINSIC_PARAMETERS FX="882.16" FY="882.16" R2="-0.378664" TANG_DIST="1" CALIB_FILES="C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/22.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/1.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/2.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/3.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/4.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/5.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/6.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/7.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/8.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/9.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/10.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/11.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/12.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/13.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/14.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/15.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/16.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/17.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/18.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/19.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/20.png, C:/Dokumente und Einstellungen/Maik Boltes/Eigene Dateien/diss/src/opencv/calibrate/pattern_usb_tamron_cam2/v2/21.png" CX="589.5" R4="0.158617" TX="-0.000241" CY="461.5" TY="0.000312" ENABLED="1" FIX_CENTER="1" QUAD_ASPECT_RATIO="1" />
+            <EXTRINSIC_PARAMETERS FIX="1" ALTITUDE="537" UNIT="46" USE_INTRINSIC_CENTER="0" SCALE="767" TILT_X="4000" TILT_Y="4000" TRANS_X="5179" TRANS_Y="2170" SHOW="0" ROTATE="27" />
+            <ALIGNMENT_GRID FIX="1" SCALE="768" TRANS_X="245" TRANS_Y="657" SHOW="0" ROTATE="27" />
+        </CALIBRATION>
+        <RECOGNITION>
+            <PERFORM ENABLED="0" STEP="5" />
+            <REGION_OF_INTEREST FIX="1" WIDTH="1008.917665008991" X="9.940092883276023" Y="82.80615101111441" HEIGHT="583.3232280366677" SHOW="1" />
+            <MARKER BRIGHTNESS="50" IGNORE_WITHOUT="1" />
+            <SIZE_COLOR SYMBOL_SIZE="9" AUTO_WB="0" X="0" Y="1" MODEL="0" Z="255" GREY_LEVEL="33" MAP_NUMBER="0" DEFAULT_HEIGHT="180" SHOW="1" >
+                <MAP WIDTH="11" X="0" Y="58.5" MAP_HEIGHT="205.5" HEIGHT="189" COLORED="1" />
+                <MAP WIDTH="33" X="327" Y="58.5" MAP_HEIGHT="200.5" HEIGHT="189" COLORED="1" />
+                <MAP WIDTH="32" X="11" Y="58" MAP_HEIGHT="195.5" HEIGHT="190" COLORED="1" />
+                <MAP WIDTH="63" X="43" Y="23" MAP_HEIGHT="190.5" HEIGHT="225" COLORED="1" />
+                <MAP WIDTH="55" X="106" Y="23" MAP_HEIGHT="185.5" HEIGHT="225" COLORED="1" />
+                <MAP WIDTH="36" X="161" Y="23" MAP_HEIGHT="180.5" HEIGHT="225" COLORED="1" />
+                <MAP WIDTH="40" X="197" Y="23" MAP_HEIGHT="175.5" HEIGHT="225" COLORED="1" />
+                <MAP WIDTH="29" X="213" Y="75" MAP_HEIGHT="170.5" HEIGHT="83" COLORED="0" />
+                <MAP WIDTH="57" X="185" Y="23" MAP_HEIGHT="165.5" HEIGHT="63" COLORED="0" />
+            </SIZE_COLOR>
+        </RECOGNITION>
+        <TRACKING>
+            <ONLINE_CALCULATION ENABLED="0" />
+            <REPEAT_BELOW QUALITY="50" ENABLED="0" />
+            <SEARCH_MISSING_FRAMES ENABLED="1" />
+            <TRACK_FILE FILENAME="D:/Petrack/Matthias/b090MM.trc" />
+            <SEARCH_REGION LEVELS="3" SCALE="16" SHOW="0" />
+            <PATH SHOW="1" NUMBER_SIZE="14" ONLY_PEOPLE="0" SHOW_CURRENT_POINT="1" AFTER="10" FIX="0" PATH_SIZE="3" ONLY_VISIBLE="0" COLOR_MARKER_SIZE="14" SHOW_COLLECTIVE_COLOR="1" NUMBER_BOLD="1" CURRENT_POINT_SIZE="60" ONLY_PEOPLE_NR="1" POINTS_COLORED="1" SHOW_POINTS="0" BEFORE="10" SHOW_COLOR_MARKER="1" SHOW_PATH="1" HEAD_SIZE="1" COLLECTIVE_COLOR_SIZE="11" SHOW_NUMBER="1" POINTS_SIZE="7" />
+        </TRACKING>
+        <ANALYSIS>
+            <SEARCH_MISSING_FRAMES ENABLED="1" />
+            <MARK_ACTUAL ENABLED="0" />
+            <CALCULATION STEP_SIZE="25" CONSIDER_X="0" ABSOLUTE="0" CONSIDER_Y="1" REVERSE="0" />
+        </ANALYSIS>
+    </CONTROL>
+    <PLAYER FRAME="0" />
+    <VIEW SAVE_TRANSFORMED="0" TRANSFORMATION="249 0 0 -77" ANTIALIAS="0" OPENGL="0" />
+</PETRACK>

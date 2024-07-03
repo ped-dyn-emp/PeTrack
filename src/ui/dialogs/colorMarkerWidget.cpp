@@ -18,6 +18,8 @@
 
 #include "colorMarkerWidget.h"
 
+#include "importHelper.h"
+
 ColorMarkerWidget::ColorMarkerWidget(QWidget *parent) : QWidget(parent)
 {
     mMainWindow = (class Petrack *) parent;
@@ -99,33 +101,15 @@ void ColorMarkerWidget::getXml(QDomElement &elem)
     {
         if(subElem.tagName() == "MASK")
         {
-            if(subElem.hasAttribute("SHOW"))
-            {
-                showMask->setCheckState(subElem.attribute("SHOW").toInt() ? Qt::Checked : Qt::Unchecked);
-            }
-            if(subElem.hasAttribute("OPACITY"))
-            {
-                opacity->setValue(subElem.attribute("OPACITY").toInt());
-            }
-            if(subElem.hasAttribute("MASK"))
-            {
-                maskMask->setCheckState(subElem.attribute("MASK").toInt() ? Qt::Checked : Qt::Unchecked);
-            }
+            loadBoolValue(subElem, "SHOW", showMask);
+            loadIntValue(subElem, "OPACITY", opacity);
+            loadBoolValue(subElem, "MASK", maskMask);
         }
         if(subElem.tagName() == "FROM_COLOR")
         {
-            if(subElem.hasAttribute("HUE"))
-            {
-                h = subElem.attribute("HUE").toInt();
-            }
-            if(subElem.hasAttribute("SATURATION"))
-            {
-                s = subElem.attribute("SATURATION").toInt();
-            }
-            if(subElem.hasAttribute("VALUE"))
-            {
-                v = subElem.attribute("VALUE").toInt();
-            }
+            h = readInt(subElem, "HUE");
+            s = readInt(subElem, "SATURATION");
+            v = readInt(subElem, "VALUE");
 
             col.setHsv(h, s, v);
             if(col.isValid())
@@ -140,18 +124,9 @@ void ColorMarkerWidget::getXml(QDomElement &elem)
         }
         if(subElem.tagName() == "TO_COLOR")
         {
-            if(subElem.hasAttribute("HUE"))
-            {
-                h = subElem.attribute("HUE").toInt();
-            }
-            if(subElem.hasAttribute("SATURATION"))
-            {
-                s = subElem.attribute("SATURATION").toInt();
-            }
-            if(subElem.hasAttribute("VALUE"))
-            {
-                v = subElem.attribute("VALUE").toInt();
-            }
+            h = readInt(subElem, "HUE");
+            s = readInt(subElem, "SATURATION");
+            v = readInt(subElem, "VALUE");
 
             col.setHsv(h, s, v);
             if(col.isValid())
@@ -166,38 +141,14 @@ void ColorMarkerWidget::getXml(QDomElement &elem)
         }
         if(subElem.tagName() == "PARAM")
         {
-            if(subElem.hasAttribute("INVERS_HUE"))
-            {
-                inversHue->setCheckState(subElem.attribute("INVERS_HUE").toInt() ? Qt::Checked : Qt::Unchecked);
-            }
-            if(subElem.hasAttribute("CLOSE_RADIUS"))
-            {
-                closeRadius->setValue(subElem.attribute("CLOSE_RADIUS").toInt());
-            }
-            if(subElem.hasAttribute("CLOSE_USED"))
-            {
-                useClose->setCheckState(subElem.attribute("CLOSE_USED").toInt() ? Qt::Checked : Qt::Unchecked);
-            }
-            if(subElem.hasAttribute("OPEN_RADIUS"))
-            {
-                openRadius->setValue(subElem.attribute("OPEN_RADIUS").toInt());
-            }
-            if(subElem.hasAttribute("OPEN_USED"))
-            {
-                useOpen->setCheckState(subElem.attribute("OPEN_USED").toInt() ? Qt::Checked : Qt::Unchecked);
-            }
-            if(subElem.hasAttribute("MIN_AREA"))
-            {
-                minArea->setValue(subElem.attribute("MIN_AREA").toInt());
-            }
-            if(subElem.hasAttribute("MAX_AREA"))
-            {
-                maxArea->setValue(subElem.attribute("MAX_AREA").toInt());
-            }
-            if(subElem.hasAttribute("MAX_RATIO"))
-            {
-                maxRatio->setValue(subElem.attribute("MAX_RATIO").toDouble());
-            }
+            loadBoolValue(subElem, "INVERS_HUE", inversHue);
+            loadIntValue(subElem, "CLOSE_RADIUS", closeRadius);
+            loadBoolValue(subElem, "CLOSE_USED", useClose);
+            loadIntValue(subElem, "OPEN_RADIUS", openRadius);
+            loadBoolValue(subElem, "OPEN_USED", useOpen);
+            loadIntValue(subElem, "MIN_AREA", minArea);
+            loadIntValue(subElem, "MAX_AREA", maxArea);
+            loadDoubleValue(subElem, "MAX_RATIO", maxRatio);
         }
     }
 }

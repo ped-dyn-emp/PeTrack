@@ -35,7 +35,7 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
     const QString testConfig{
         R"(<CONTROL>
                 <CALIBRATION>
-                    <EXTRINSIC_PARAMETERS EXTR_ROT_1="%1" EXTR_ROT_2="%2" EXTR_ROT_3="%3" EXTR_TRANS_1="0" EXTR_TRANS_2="0" EXTR_TRANS_3="0" />
+                    <EXTRINSIC_PARAMETERS COORD3D_SWAP_Y="0" COORD3D_SWAP_Z="0" EXTR_ROT_1="%1" EXTR_ROT_2="%2" EXTR_ROT_3="%3" EXTR_TRANS_1="0" EXTR_TRANS_2="0" EXTR_TRANS_3="0" />
                 </CALIBRATION>
             </CONTROL>)"};
 
