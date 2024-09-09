@@ -1,8 +1,8 @@
 # Multicolor Marker
 
-The multicolor marker is a colored hat that pedestrians wear. The multicolor marker is easy to prepare and works even with low resolution cameras. It can be combined with an code-marker as well, if some cameras are high-resolution and some are not. Then, low-resolution cams fall back to the multicolor marker in case the code cannot be read.
+The multicolor marker is a colored hat that pedestrians wear. The multicolor marker is easy to prepare and works even with low resolution cameras. It can be combined with an code-marker as well, if some cameras are high-resolution and some are not. Then, low-resolution cameras fall back to the multicolor marker in case the code cannot be read.
 
-There are two places for settings parameters of the multicolor marker. The parameter window as well as the recognition tab.
+There are two places for setting parameters of the multicolor marker. The parameter window as well as the recognition tab.
 
 ## Multicolor Parameter Window
 
@@ -20,12 +20,12 @@ use black dot
 : The multicolor marker can be used with a black dot added, essentially creating a combination between the hermes marker and the multicolor marker. This gives a bit more structure for tracking and a smaller specific point in the image to locate. If one does use this, this checkbox should be enabled and the size set to the size of the point in cm. Else, this option can be turned off.
 
 use code marker
-: The multicolor marker can be combined with the [code marker](aruco), which is called code marker here. A click onto the `parameter`-button opens the parameter window for the code marker. There the options for the detection of the code marker can be changed. Please refer to the [documentation of the code marker](aruco) for further information on this.
+: The multicolor marker can be combined with the [code marker](aruco). <!--, which is called code marker here. --> A click onto the `parameter`-button opens the parameter window for the code marker. There the options for the detection of the code marker can be changed. Please refer to the [documentation of the code marker](aruco) for further information on this.
 
 The following three options are all for combinations with either the hermes or the code marker
 
 ignore head without black dot or code marker
-: If this is enabled, all detections where only the colored hat, without the extra feature, was detected will be discarded. If this is not checked, detections on color only are used as well. If e.g. the code cannot always be recognized due to the camera resolution, this should be off. However, in case the extra feature should be recognizable, this could reduce false positives or at least mediocre detections.
+: If this is enabled, all detections where only the colored hat, without the extra feature, was detected will be discarded. If this is not checked, detections on color only are used as well. If e.g. the code cannot always be recognized due to the camera resolution, this should be off. However, in case the extra feature should be recognizable, this could reduce false positives.
 
 use color marker for big error
 : If both, the color point and the feature point (black dot, code marker) are detected and subsequent tracking of the feature point has a high error, enabling this options lets PeTrack redo the tracking, using the color point instead of the feature point.
@@ -39,7 +39,7 @@ auto correct perspective view
 : The multicolor marker always takes the point in the middle of the colored blob in the image. However, since the camera looks at the pedestrian from a certain angle, this is not the same as the middle of the head. Enabling this option activates a correction for this error.
 
 only for export
-: Activating this option means, the correction for perspective view is during the export and not during tracking and recognition.
+: Activating this option means, the correction for perspective view is performed during the export and not during tracking and recognition.
 
 :::{note}
 If you enable `auto correct perspective view`, it is recommended to also enable `only for export`. Otherwise the correction of the perspective view during tracking can lead to the point going to the edge of the visible head, worsening tracking performance.
@@ -112,7 +112,7 @@ Deactivate `open` and `close` while selecting a color. First try to select the c
 :::
 
 :::{tip}
-Activate the `mask` from the multicolor parameters and set the opacity to ca. 50%. This enables you to see how well your color selection works (see screenshots later)
+Activate the `mask` from the multicolor parameters and set the opacity to ca. 50%. This enables you to see how well your color selection works (see screenshots later).
 :::
 
 :::{note}
@@ -126,7 +126,7 @@ When pressing the `color picker` button, the color picker modus is activated. In
 :::{figure-md}
 ![color picker usage example](images/color_picker_example.webp)
 
-Example usage of color picker. With the mask enabled and `perform` checked, we can interactively select the color, looking at different parts of the image to find still uncovered parts. Note that colors which are "close" to each other may not be easy to differentiate with the color picker (here green and yellow). Then the `color range` dialog might be a better option
+Example usage of color picker. With the mask enabled and `perform` checked, we can interactively select the color, looking at different parts of the image to find still uncovered parts. Note that colors which are "close" to each other may not be easy to differentiate with the color picker (here green and yellow). Then the `color range` dialog might be a better option.
 :::
 
 ### Color Range
@@ -136,7 +136,7 @@ When you click on `color range`, a color selection dialog appears:
 :::{figure-md} color-range-dialog
 ![color range dialog](images/color_range_dialog.png)
 
-Color range dialog: The dialogue allows selecting the lower bound and upper bound color via an hsv color picker. 
+Color range dialog: The dialogue allows selecting the lower bound and upper bound color via a hsv color picker. 
 :::
 
 The color detection works in the HSV (Hue, Saturation, Value) color space. Hue is the "color", i.e. redness or greenness of the color. Saturation how saturated it is. And value, how bright it is. The dialog allows you to select to colors from this space. All colors that lie "in between" your selected colors are then part of your selection. It is noteworthy that the hue part is a value in degrees from 0° to 360°, with red being around zero degree. To allow the selection of red-ish colors as well, there is an option `inverse hue`, which changes the direction of this difference. That is we select colors with hue $h$ such that $h_{min} < h < h_{max}$ if `inverse hue` is not selected and colors with $h < h_{min} \lor h > h_{max}$ if `inverse hue` is selected.

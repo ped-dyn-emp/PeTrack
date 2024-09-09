@@ -40,7 +40,7 @@ The calculation of missing/dropped frames is expensive. If you know there are no
 :::
 
 recalc. height
-: This option is only relevant for project using a **stereo** camera. This recalculates the height of the pedestrian using the median height of the measured 3D points.
+: This option is only relevant for projects using a **stereo** camera. This recalculates the height of the pedestrian using the median height of the measured 3D points.
 
 alt. height 
 : This options allows `z` to alternate. This is relevant when alternating height information is available (e.g. when using stereo) and the pedestrians are not at the same height for the whole recording. This could be the case e.g. at staircases. If disabled all `z` coordinates are just the height of the pedestrian.
@@ -78,8 +78,8 @@ add marker ID
 
 The `.trc` files are the internal trajectory file format from PeTrack. They are not meant for consumption by any other program but PeTrack and no guarantees on the stability of the format are made.
 
-The `.trc` files can be exported and imported. They are the only files that contain **all** information PeTrack has about a trajectory and therefore the only file which recreates the original trajectories perfectly in import.
+The `.trc` files can be exported and imported. They are the only files that contain **all** information PeTrack has about a trajectory and therefore the only files which recreate the original trajectories perfectly in import.
 
-When a `.trc` file is exported, its project associated itself with it. If PeTrack find the file when the project is opened again, it is imported automatically. For finding the file PeTrack uses both, the absolute path to the file as well as the relative path of the `.trc` file to the `.pet` project file.
+When a `.trc` file is exported, its project associated itself with it. If PeTrack finds the file when the project is opened again, it is imported automatically. For finding the file PeTrack uses both, the absolute path to the file as well as the relative path of the `.trc` file to the `.pet` project file.
 
 Export options do not apply to `.trc` files.

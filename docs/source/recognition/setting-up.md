@@ -79,7 +79,7 @@ res. pos.
 : Resets the position of all points calculated via a stereo camera
 
 read heights from file
-: This button enables you to load a file with the following format. This file gives assigns a height to each marker id (that is the id from the code marker). That individual height is more accurate than an average height assigned via the color of a hat.
+: This button enables you to load a file with the following format. This file assigns a height to each marker id (that is the id from the code marker). That individual height is more accurate than an average height assigned via the color of a hat.
 
   ```
   # id z/cm
@@ -89,7 +89,7 @@ read heights from file
   ```
 
 import markerIDs
-: This button enables you to load a file to assign a marker id (or code id) to a pedestrian with a given petrack-internal id. That can be used if a select few people in the video have a code marker which is never recognized, but they can be identified by the experimenter visually.
+: This button enables you to load a file to assign a marker id (or code id) to a pedestrian with a given PeTrack-internal id. That can be used if a few people in the video have a code marker which is never recognized, but they can be identified by the experimenter visually.
 
   ```
   # id markerID
