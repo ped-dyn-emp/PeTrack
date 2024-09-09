@@ -6,4 +6,6 @@ Care must be taken to ensure that **clothing** does not influence the recognitio
 
 What is true for the clothing also counts for the **superstructures** and the **floor**. In addition to avoiding marker colors, care must also be taken to ensure that the surfaces are not reflective, as otherwise people may be incorrectly recognized or errors may occur in the disparity calculation of the stereo cameras. In addition, strong contrasts, e.g. due to adhesive strips, should be avoided as the tracking could get stuck there.
 
-**Not involved persons** should be stand away from the experimental area, otherwise their feet will be seen in the head height of the experimental area caused by the perspective view of the cameras. For used wide angle lenses this has to be at least 3 meters.
+During the filming of the experiments, only the participating people should be inside the experimental area.
+
+<!-- **Not involved persons** should be stand away from the experimental area, otherwise their feet will be seen in the head height of the experimental area caused by the perspective view of the cameras. For used wide angle lenses this has to be at least 3 meters. -->

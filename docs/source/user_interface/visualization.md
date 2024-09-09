@@ -18,7 +18,7 @@ show
 Trajectory visualizations are visualizations that show not only information about the current point, but also about the future and past trajectory.
 
 frames before/after actual position
-: These two spin-boxes allow to select how many frames into the future and past all different trajectory visualizations are supposed to draw.
+: These two spin-boxes allow to select how many frames into the future and past all different trajectory visualizations are supposed to be drawn.
 
   :::{image} images/frames_before_after.png
   :::
@@ -99,14 +99,14 @@ show ground position
 There are a few options which allow to select people for visualization and consequently disable visualization for all other pedestrians.
 
 show only visible
-: This option shows disables the visualization for all people that are not visible in the current frame. This way, the past trajectories of these pedestrians is not visible and does not clutter up the image. This option does not count as *selecting*, i.e. `show complete path` and `only selected` do not change their behavior due to this option.
+: This option disables the visualization for all people that are not visible in the current frame. This way, the past trajectories of these pedestrians is not visible and does not clutter up the image. This option does not count as *selecting*, i.e. `show complete path` and `only selected` do not change their behavior due to this option.
 
   :::{image} images/only_visible_example.webp
     :width: 80%
   :::
 
-select only people
-: This spinbox allows to select a person by their PeTrack id. This person is then the only person visualized. If `only selected` is checked for tracking, only this person will get tracked as well.
+show only people
+: This spinbox allows to select a person by their PeTrack id. This person is then the only person visualized. If `only selected` (at the top of the tracking tab) is checked for tracking, only this person will get tracked as well.
 
   :::{warning}
   If `only selected` is not checked, all pedestrians are tracked, even though only one is visualized!
@@ -115,7 +115,7 @@ select only people
   The buttons next to the spinbox allow to jump to certain frames. `goto` jumps into the middle of the trajectory. `begin` jumps to the first frame of the trajectory and `end` jumps to the last frame of the trajectory.
 
 show only people list
-: Select multiple people. One can use a comma-separated list of id's or a range of id's written as e.g. `10-15`. Only the selected people are visualized anymore and if `only selected` is checked for tracking, only the selected people are tracked
+: Visualizes multiple people. One can use a comma-separated list of id's or a range of id's written as e.g. `5-9`. Only the selected people are visualized anymore and if `only selected` is checked for tracking, only the selected people are tracked.
 
   :::{image} images/show_only_people_list_widget.png
   :::
@@ -128,6 +128,10 @@ show only people list
   :::{warning}
     If `only selected` is not checked, all pedestrians are tracked, even though only a few are visualized!
   :::
+
+:::{note}
+All these options visualize the trajectories between the `frames before/after actual position`. If you want to see a larger part of the trajectories, you need to change these values, or use `show complete path` for selected people.
+:::
 
 show complete path
 : This option changes `show path` to show the complete path (i.e. *all* past and future frames), if and only if there is an active selection (i.e. `show only people` or `show only people list` is active). If there is no active selection, this option does nothing.

@@ -54,7 +54,7 @@ Next to these buttons are the boxes labeled `In` and `Out`. If the video is long
 
 Then there is a slider which can be used to scrub through the video.
 
-Last on the line are two boxes `_ @ _ fps`. The first of these boxes shows the current frame and the last shows the framerate at which PeTrack tries to play the video. Both values can be edited by the user, either to jump to a certain frame by changing the current frame or to change th playback speed by changing the fps.
+Last on the line are two boxes `_ @ _ fps`. The first of these boxes shows the current frame and the last shows the framerate at which PeTrack tries to play the video. Both values can be edited by the user, either to jump to a certain frame by changing the current frame or to change the playback speed by changing the fps.
 
 :::{note}
 For changing the fps relative to the original speed, there are options under `View > Playback speed`. The desired playback speed only changes the behavior of PeTrack if `Fix playback speed` or `Limit playback speed` are selected (both under the `View` menu).
@@ -82,7 +82,7 @@ Timecode
 : This part of the status bar displays the timecode corresponding to the current frame. Since the timecode is taken from the video file, this does not necessarily correspond to either the real world time nor does it need to start at zero. In stereo recordings, this can also show the time given by a time file.
 
 Current Framerate
-: This shows the framerate at which the player is currently playing. Note that there is sime *intertia* to how fast this display updates. The color indicated whether we play slower than realtime (red) or at realtime or faster (green).
+: This shows the framerate at which the player is currently playing. Note that there is some *intertia* to how fast this display updates. The color indicates whether we play slower than realtime (red) or at realtime or faster (green).
 
 Probing Height
 : The following data fields contain some information about the position of the pixel under the mouse cursor. Due to the perspective projection onto the camera, this information can only be given when assuming a certain height, i.e. the position of the pixel under the cursor is different, if the object under the cursor is 180cm or 150cm high. This box is for changing the height used for the next few fields

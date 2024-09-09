@@ -94,7 +94,7 @@ original `points.3dc` file again.
 
 :::{Tip}
 You can view the selected and calculated calibration points by checking the `calibration points` checkbox in the `coordinate system`
-section. If you notice a points that is particularly bad in alignment with the calibrated value, you can redo the calibration and exclude
+section. If you notice a point that is particularly bad in alignment with the calibrated value, you can redo the calibration and exclude
 this point. This will minimize your error for the extrinsic calibration.
 :::
 
