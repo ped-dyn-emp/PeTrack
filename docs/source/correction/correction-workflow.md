@@ -71,16 +71,17 @@ Delete future of a trajectory
 Delete past or future of all trajectories
 : This deletes all trajectory points of all persons  after/before the current frame. Accessible through the `Edit-menu`. 
 
-<!-- 
+
 Delete trj. moving through ROI
-: Accessible through the `Edit-menu`. 
+: Deletes the complete trajectories of persons moving through the recognition ROI. Accessible through the `Edit-menu`. 
 
 Delete part of trj. inside ROI
-: Accessible through the `Edit-menu`. 
- -->
+: Deletes the part of a trajectory which is inside the recognition ROI. Accessible through the `Edit-menu`. 
 
+<!-- already in User Interface
 ### Visualization options:
 - jump to frame of track point under curser 
 
  - select nr./show only
 - What visualization options are there and how can they help?
+-->
