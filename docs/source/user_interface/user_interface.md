@@ -22,7 +22,12 @@ Furthermore, one can rotate the image using the upper half of the video side bar
 
 ## Player Control
 
-The player control has the following buttons from left to right
+The player control has the following buttons from left to right:
+
+:::{figure-md}
+![player control](images/PlayerControl.png)
+
+:::
 
 play backwards
 : This button starts a backward playback of the video. 
@@ -95,8 +100,22 @@ Color
 
 ## Menu Bar
 
-The menu bar includes a plethora of menus. Feel free to explore the different options.
+The menu bar includes a plethora of menus. Feel free to explore the different options. Here only the basics are listed.
 
+PeTrack
+: Here you find information about your current installation of PeTrack, e.g. the version.
+
+File
+: Options to open or save projects; or export files (see [Export](/export/video.md))
+
+Edit
+: Some functionalities to edit the trajectories. Those are explained in the section [Possible operations for corrections](/correction/correction-workflow.md).
+
+View
+: Here you can set parameters like the playback speed of the video or the size of the video in the window. 
+
+Help
+: Here you find the `keybindings`. <!-- Link einfügen wenns irgendwann das richtige Unterkapitel dafür gibt -->
 
 ```{toctree}
 :hidden:
