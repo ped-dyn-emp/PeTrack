@@ -15,13 +15,8 @@ For using `PeTrack` following tools and libraries are needed:
 - git
 - CMake (>= 3.16)
 - Qt (>= 5.14, < 6.0)
-- OpenCV (== 4.5)
+- OpenCV (== 4.10)
 - Qwt (>= 6.2)
-
-:::{important}
-If you compile openCV youself, you also need to include openCV-contrib 
-to get the aruco functionality.
-:::
 
 When developing `PeTrack` and using the test framework following additional tools and libraries are used, they are provided as submodules by `PeTrack`:
 - Catch2
