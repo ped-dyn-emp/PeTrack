@@ -23,8 +23,7 @@
 
 #include <QList>
 #include <QObject>
-#include <opencv2/aruco.hpp>
-
+#include <opencv2/objdetect/aruco_detector.hpp>
 
 class TrackPoint;
 class QRect;
@@ -311,7 +310,15 @@ namespace detail
         const CodeMarkerOptions     &opt,
         const IntrinsicCameraParams &intrinsicCameraParams,
         bool                         appendRejectedCodes = false);
-    cv::Ptr<cv::aruco::Dictionary> getDictMip36h12();
+    cv::aruco::Dictionary getDictMip36h12();
+
+    void estimatePoseSingleMarkers(
+        const std::vector<std::vector<cv::Point2f>> &corners,
+        float                                        markerLength,
+        const cv::Mat                               &cameraMatrix,
+        const cv::Mat                               &distCoeff,
+        std::vector<cv::Vec3d>                      &rotationVectors,
+        std::vector<cv::Vec3d>                      &translationVectors);
 
 } // namespace detail
 } // namespace reco

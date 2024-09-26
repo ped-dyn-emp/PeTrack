@@ -17,7 +17,7 @@ from handmade_test import MAX_DIFF, calc_diff, parse_trc, HandmadeComparison
 
 class ComparisonVideoPlayer:
     # TODO: Longterm; Make thread, so we can add UI-Elements via tkinter
-    # These could be e.g. looking at a number of user-chosen trajectories 
+    # These could be e.g. looking at a number of user-chosen trajectories
     # Which could be helpful for the 'no counterpart' case
     def __init__(self, pet: str) -> None:
         # super().__init__()
@@ -35,13 +35,22 @@ class ComparisonVideoPlayer:
         intrinsics = (
             root.find("CONTROL").find("CALIBRATION").find("INTRINSIC_PARAMETERS")
         )
+        assert intrinsics is not None
         self.border = int(
             float(
                 root.find("CONTROL").find("CALIBRATION").find("BORDER").attrib["VALUE"]
             )
             * 2
         )
-        calib = intrinsics.attrib
+
+        if intrinsics.attrib["EXT_MODEL_ENABLED"] == "1":
+            ext_model = intrinsics.find("EXT_MODEL")
+            assert ext_model is not None
+            calib = ext_model.attrib
+        else:
+            old_model = intrinsics.find("OLD_MODEL")
+            assert old_model is not None
+            calib = old_model.attrib
 
         camera = np.array(
             [
@@ -104,8 +113,8 @@ class ComparisonVideoPlayer:
         nearby_people_truth: List[int] = []
         for person in self.test_trajectories:
             if (
-                    seed_person.last_frame < person.first_frame
-                    or seed_person.first_frame > person.last_frame
+                seed_person.last_frame < person.first_frame
+                or seed_person.first_frame > person.last_frame
             ):
                 continue
             if seed_person.first_frame > person.first_frame:
@@ -122,8 +131,8 @@ class ComparisonVideoPlayer:
             nearby_people_test.append(person.id + 1)
         for person in self.truth_trajectories:
             if (
-                    seed_person.last_frame < person.first_frame
-                    or seed_person.first_frame > person.last_frame
+                seed_person.last_frame < person.first_frame
+                or seed_person.first_frame > person.last_frame
             ):
                 continue
             if seed_person.first_frame > person.first_frame:
@@ -141,7 +150,7 @@ class ComparisonVideoPlayer:
         return nearby_people_truth, nearby_people_test
 
     def play_video(
-            self, start: int, end: int, draw_callback: Callable[[np.ndarray, int], None]
+        self, start: int, end: int, draw_callback: Callable[[np.ndarray, int], None]
     ):
         """Plays the video from frame start to frame end, calling the draw_callback each frame
 
@@ -164,10 +173,10 @@ class ComparisonVideoPlayer:
         while (k := cv2.waitKey(20)) != 110:
             frame_to_display = displayed_frame
             if not playing:
-                if k == ord('a') or k == ord('d'):
-                    if k == ord('a'):
+                if k == ord("a") or k == ord("d"):
+                    if k == ord("a"):
                         frame_to_display = max(displayed_frame - 1, start)
-                    if k == ord('d'):
+                    if k == ord("d"):
                         frame_to_display = min(displayed_frame + 1, end)
 
             else:
@@ -201,24 +210,31 @@ class ComparisonVideoPlayer:
                     borderMode=cv2.BORDER_CONSTANT,
                 )
 
-                draw_callback(frame, displayed_frame)
-                cv2.putText(frame, "Frame: {:6d}".format(displayed_frame), self.text_offset, cv2.FONT_HERSHEY_DUPLEX,
-                            self.text_scale, (0, 0, 255),
-                            self.text_thickness, cv2.LINE_8)
+                draw_callback(frame, frame_to_display)
+                cv2.putText(
+                    frame,
+                    "Frame: {:6d}".format(frame_to_display),
+                    self.text_offset,
+                    cv2.FONT_HERSHEY_DUPLEX,
+                    self.text_scale,
+                    (0, 0, 255),
+                    self.text_thickness,
+                    cv2.LINE_8,
+                )
 
                 cv2.imshow("Comparison", frame)
 
                 displayed_frame = frame_to_display
-            if k == ord('p'):
+            if k == ord("p"):
                 playing = not playing
 
     def drawPoints(
-            self,
-            person: Person,
-            currFrame: int,
-            frame: np.ndarray,
-            color: Tuple[int],
-            thickness: int,
+        self,
+        person: Person,
+        currFrame: int,
+        frame: np.ndarray,
+        color: Tuple[int],
+        thickness: int,
     ):
         """Draw indicators at the current and previous and following 10 positions
 
@@ -283,7 +299,7 @@ class ComparisonVideoPlayer:
                 color,
                 marker,
                 thickness=2,
-                line_type=cv2.LINE_AA
+                line_type=cv2.LINE_AA,
             )
 
     def visualize_people(self, idx_truth: int, idx_test: int):
@@ -300,41 +316,81 @@ class ComparisonVideoPlayer:
                 self.truth_trajectories[idx_truth - 1], currFrame, frame, (0, 255, 0), 5
             )
 
-            frame_text_size = cv2.getTextSize("Frame: {:6d}".format(currFrame), fontFace=cv2.FONT_HERSHEY_DUPLEX,
-                                              fontScale=self.text_scale, thickness=self.text_thickness)
+            frame_text_size = cv2.getTextSize(
+                "Frame: {:6d}".format(currFrame),
+                fontFace=cv2.FONT_HERSHEY_DUPLEX,
+                fontScale=self.text_scale,
+                thickness=self.text_thickness,
+            )
 
             if te.first_frame <= currFrame < te.last_frame:
                 text_pos = (
                     int(self.text_offset[0] + 1.25 * frame_text_size[0][0]),
-                    int(self.text_offset[1] + 2 * frame_text_size[0][1]))
+                    int(self.text_offset[1] + 2 * frame_text_size[0][1]),
+                )
 
-                frame = cv2.putText(frame, "Quality: {:7.3f}".format(te.points[currFrame - te.first_frame].qual), text_pos,
-                                    cv2.FONT_HERSHEY_DUPLEX, self.text_scale,
-                                    (255, 0, 0), self.text_thickness, cv2.LINE_8)
+                frame = cv2.putText(
+                    frame,
+                    "Quality: {:7.3f}".format(
+                        te.points[currFrame - te.first_frame].qual
+                    ),
+                    text_pos,
+                    cv2.FONT_HERSHEY_DUPLEX,
+                    self.text_scale,
+                    (255, 0, 0),
+                    self.text_thickness,
+                    cv2.LINE_8,
+                )
             if tr.first_frame <= currFrame < tr.last_frame:
-                text_pos = (int(self.text_offset[0] + 1.25 * frame_text_size[0][0]), int(self.text_offset[1]))
+                text_pos = (
+                    int(self.text_offset[0] + 1.25 * frame_text_size[0][0]),
+                    int(self.text_offset[1]),
+                )
 
-                frame = cv2.putText(frame, "Quality: {:7.3f}".format(tr.points[currFrame - te.first_frame].qual), text_pos,
-                                    cv2.FONT_HERSHEY_DUPLEX, self.text_scale,
-                                    (0, 255, 0), self.text_thickness, cv2.LINE_8)
+                frame = cv2.putText(
+                    frame,
+                    "Quality: {:7.3f}".format(
+                        tr.points[currFrame - te.first_frame].qual
+                    ),
+                    text_pos,
+                    cv2.FONT_HERSHEY_DUPLEX,
+                    self.text_scale,
+                    (0, 255, 0),
+                    self.text_thickness,
+                    cv2.LINE_8,
+                )
 
-            if tr.first_frame <= currFrame < tr.last_frame and te.first_frame <= currFrame < te.last_frame:
+            if (
+                tr.first_frame <= currFrame < tr.last_frame
+                and te.first_frame <= currFrame < te.last_frame
+            ):
                 truth = tr.points[currFrame - tr.first_frame]
                 test = te.points[currFrame - te.first_frame]
                 diff = math.sqrt((truth.x - test.x) ** 2 + (truth.y - test.y) ** 2)
 
-                text_pos = (int(self.text_offset[0]), int(self.text_offset[1] + 2 * frame_text_size[0][1]))
-                frame = cv2.putText(frame, "Diff: {:3.3f}".format(diff), text_pos, cv2.FONT_HERSHEY_DUPLEX,
-                                    self.text_scale, (0, 0, 255), self.text_thickness, cv2.LINE_8)
+                text_pos = (
+                    int(self.text_offset[0]),
+                    int(self.text_offset[1] + 2 * frame_text_size[0][1]),
+                )
+                frame = cv2.putText(
+                    frame,
+                    "Diff: {:3.3f}".format(diff),
+                    text_pos,
+                    cv2.FONT_HERSHEY_DUPLEX,
+                    self.text_scale,
+                    (0, 0, 255),
+                    self.text_thickness,
+                    cv2.LINE_8,
+                )
 
         self.play_video(start, end, draw)
 
     def visualize_many(
-            self,
-            idxs_truth: List[int],
-            idxs_test: List[int],
-            idx_seed: int,
-            is_seed_test: bool,
+        self,
+        idxs_truth: List[int],
+        idxs_test: List[int],
+        idx_seed: int,
+        is_seed_test: bool,
     ):
         # Idea: Try out taking the first first and last last frame, as in two people?
         if is_seed_test:
@@ -400,7 +456,9 @@ class ComparisonVideoPlayer:
         comp_output = comp.run()
         print("To go to the next comparison, press 'n'")
         print("To pause/play press 'p'")
-        print("To navigate frame-wise press 'd' (next frame) or 'a' (previous frame). Note: video should be paused.")
+        print(
+            "To navigate frame-wise press 'd' (next frame) or 'a' (previous frame). Note: video should be paused."
+        )
 
         for line in comp_output:
             print("\r" + " " * 80, end="", flush=True)

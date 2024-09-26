@@ -38,10 +38,9 @@
 #include <QPointF>
 #include <QRect>
 #include <bitset>
-#include <opencv2/aruco.hpp>
+#include <opencv2/objdetect/aruco_detector.hpp>
+#include <opencv2/objdetect/aruco_dictionary.hpp>
 #include <opencv2/opencv.hpp>
-
-
 namespace reco
 {
 using namespace detail;
@@ -1012,6 +1011,70 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *contro
         contours.pop_back();
     }
 }
+
+
+/**
+ * @brief Estimates the pose of detected ArUco markers using the default solvePnP method.
+ *
+ * This function mimics the old `cv::aruco::estimatePoseSingleMarkers` method.
+ * It calculates the rotation and translation vectors (pose) of each detected marker
+ * given their 2D corner points in the image and the known 3D geometry of the markers.
+ *
+ * The method uses the `cv::solvePnP` function to estimate the pose of each marker.
+ *
+ * @param corners           A vector of vectors, where each inner vector contains
+ *                          the 2D corner points of a detected marker in image coordinates.
+ * @param markerLength      The side length of the markers in the same unit as the
+ *                          camera calibration (e.g., meters or centimeters).
+ * @param cameraMatrix      The camera intrinsic matrix (3x3 matrix) obtained from
+ *                          camera calibration.
+ * @param distCoeff         The camera distortion coefficients vector (1x5, 1x8, etc.).
+ * @param rotationVectors   Output vector of 3D rotation vectors (one per marker),
+ *                          where each rotation vector is in Rodrigues form (3x1).
+ * @param translationVectors Output vector of 3D translation vectors (one per marker),
+ *                           which represent the translation from the camera to the marker.
+ *
+ * @note This function assumes that the markers are square and lie flat on the XY plane,
+ *       with the Z-axis pointing out of the plane.
+ *
+ * @see cv::solvePnP
+ */
+void detail::estimatePoseSingleMarkers(
+    const std::vector<std::vector<cv::Point2f>> &corners,
+    float                                        markerLength,
+    const cv::Mat                               &cameraMatrix,
+    const cv::Mat                               &distCoeff,
+    std::vector<cv::Vec3d>                      &rotationVectors,
+    std::vector<cv::Vec3d>                      &translationVectors)
+{
+    // Define the 3D points of a single square marker
+    std::vector<cv::Point3f> markerPoints = {
+        {-markerLength / 2.0f, markerLength / 2.0f, 0}, // Top-left
+        {markerLength / 2.0f, markerLength / 2.0f, 0},  // Top-right
+        {markerLength / 2.0f, -markerLength / 2.0f, 0}, // Bottom-right
+        {-markerLength / 2.0f, -markerLength / 2.0f, 0} // Bottom-left
+    };
+
+    // Clear the output vectors
+    rotationVectors.clear();
+    translationVectors.clear();
+
+    // Iterate over each detected marker
+    for(size_t i = 0; i < corners.size(); ++i)
+    {
+        cv::Vec3d rvec, tvec; // Variables to store rotation and translation vectors
+
+        bool success = cv::solvePnP(markerPoints, corners[i], cameraMatrix, distCoeff, rvec, tvec, false);
+
+        if(success)
+        {
+            // Append the rotation and translation vectors
+            rotationVectors.push_back(rvec);
+            translationVectors.push_back(tvec);
+        }
+    }
+}
+
 /**
  * @brief uses OpenCV libraries to detect Aruco CodeMarkers
  * @param img image to find codes in
@@ -1035,14 +1098,10 @@ QList<TrackPoint> detail::findCodeMarker(
     Control        *controlWidget  = opt.getControlWidget();
     const auto     &parameters     = opt.getDetectorParams();
 
-    cv::Ptr<cv::aruco::Dictionary> dictionary =
-        cv::aruco::getPredefinedDictionary(cv::aruco::PREDEFINED_DICTIONARY_NAME(opt.getIndexOfMarkerDict()));
-
-    if(opt.getIndexOfMarkerDict() == 17) // for usage of DICT_mip_36h12 as it is not predifined in opencv
-    {
-        dictionary = detail::getDictMip36h12();
-    }
-
+    auto dictionary =
+        (opt.getIndexOfMarkerDict() != 17) ?
+            cv::aruco::getPredefinedDictionary(cv::aruco::PredefinedDictionaryType(opt.getIndexOfMarkerDict())) :
+            detail::getDictMip36h12(); // for usage of DICT_mip_36h12 as it is not predifined in opencv
 
     double minMarkerPerimeterRate = std::numeric_limits<double>::quiet_NaN();
     double maxMarkerPerimeterRate = std::numeric_limits<double>::quiet_NaN();
@@ -1100,39 +1159,40 @@ QList<TrackPoint> detail::findCodeMarker(
             std::max(mainWindow->getImage()->width() - borderSize, mainWindow->getImage()->height() - borderSize);
     }
 
-    auto detectorParams = cv::aruco::DetectorParameters::create();
+    cv::aruco::DetectorParameters detectorParams;
 
-    detectorParams->adaptiveThreshWinSizeMin    = parameters.getAdaptiveThreshWinSizeMin();
-    detectorParams->adaptiveThreshWinSizeMax    = parameters.getAdaptiveThreshWinSizeMax();
-    detectorParams->adaptiveThreshWinSizeStep   = parameters.getAdaptiveThreshWinSizeStep();
-    detectorParams->adaptiveThreshConstant      = parameters.getAdaptiveThreshConstant();
-    detectorParams->minMarkerPerimeterRate      = minMarkerPerimeterRate;
-    detectorParams->maxMarkerPerimeterRate      = maxMarkerPerimeterRate;
-    detectorParams->polygonalApproxAccuracyRate = parameters.getPolygonalApproxAccuracyRate();
-    detectorParams->minCornerDistanceRate       = minCornerDistanceRate;
-    detectorParams->minDistanceToBorder         = parameters.getMinDistanceToBorder();
-    detectorParams->minMarkerDistanceRate       = minMarkerDistanceRate;
+    detectorParams.adaptiveThreshWinSizeMin    = parameters.getAdaptiveThreshWinSizeMin();
+    detectorParams.adaptiveThreshWinSizeMax    = parameters.getAdaptiveThreshWinSizeMax();
+    detectorParams.adaptiveThreshWinSizeStep   = parameters.getAdaptiveThreshWinSizeStep();
+    detectorParams.adaptiveThreshConstant      = parameters.getAdaptiveThreshConstant();
+    detectorParams.minMarkerPerimeterRate      = minMarkerPerimeterRate;
+    detectorParams.maxMarkerPerimeterRate      = maxMarkerPerimeterRate;
+    detectorParams.polygonalApproxAccuracyRate = parameters.getPolygonalApproxAccuracyRate();
+    detectorParams.minCornerDistanceRate       = minCornerDistanceRate;
+    detectorParams.minDistanceToBorder         = parameters.getMinDistanceToBorder();
+    detectorParams.minMarkerDistanceRate       = minMarkerDistanceRate;
     // No refinement is default value
-    // TODO Check if this is the best MEthod for our usecase
+    // TODO Check if this is the best method for our usecase
     if(parameters.getDoCornerRefinement())
     {
-        detectorParams->cornerRefinementMethod = cv::aruco::CornerRefineMethod::CORNER_REFINE_SUBPIX;
+        detectorParams.cornerRefinementMethod = cv::aruco::CornerRefineMethod::CORNER_REFINE_SUBPIX;
     }
-    detectorParams->cornerRefinementWinSize               = parameters.getCornerRefinementWinSize();
-    detectorParams->cornerRefinementMaxIterations         = parameters.getCornerRefinementMaxIterations();
-    detectorParams->cornerRefinementMinAccuracy           = parameters.getCornerRefinementMinAccuracy();
-    detectorParams->markerBorderBits                      = parameters.getMarkerBorderBits();
-    detectorParams->perspectiveRemovePixelPerCell         = parameters.getPerspectiveRemovePixelPerCell();
-    detectorParams->perspectiveRemoveIgnoredMarginPerCell = parameters.getPerspectiveRemoveIgnoredMarginPerCell();
-    detectorParams->maxErroneousBitsInBorderRate          = parameters.getMaxErroneousBitsInBorderRate();
-    detectorParams->minOtsuStdDev                         = parameters.getMinOtsuStdDev();
-    detectorParams->errorCorrectionRate                   = parameters.getErrorCorrectionRate();
+    detectorParams.cornerRefinementWinSize               = parameters.getCornerRefinementWinSize();
+    detectorParams.cornerRefinementMaxIterations         = parameters.getCornerRefinementMaxIterations();
+    detectorParams.cornerRefinementMinAccuracy           = parameters.getCornerRefinementMinAccuracy();
+    detectorParams.markerBorderBits                      = parameters.getMarkerBorderBits();
+    detectorParams.perspectiveRemovePixelPerCell         = parameters.getPerspectiveRemovePixelPerCell();
+    detectorParams.perspectiveRemoveIgnoredMarginPerCell = parameters.getPerspectiveRemoveIgnoredMarginPerCell();
+    detectorParams.maxErroneousBitsInBorderRate          = parameters.getMaxErroneousBitsInBorderRate();
+    detectorParams.minOtsuStdDev                         = parameters.getMinOtsuStdDev();
+    detectorParams.errorCorrectionRate                   = parameters.getErrorCorrectionRate();
 
     std::vector<int>                      ids;
     std::vector<std::vector<cv::Point2f>> corners;
     std::vector<std::vector<cv::Point2f>> rejected;
 
-    cv::aruco::detectMarkers(img, dictionary, corners, ids, detectorParams, rejected);
+    const cv::aruco::ArucoDetector arucoDetector(dictionary, detectorParams);
+    arucoDetector.detectMarkers(img, corners, ids, rejected);
 
     codeMarkerItem->addDetectedMarkers(corners, ids, opt.getOffsetCropRect2Roi());
     codeMarkerItem->addRejectedMarkers(rejected, opt.getOffsetCropRect2Roi());
@@ -1153,9 +1213,9 @@ QList<TrackPoint> detail::findCodeMarker(
     float                  markerLength = (float) opt.getDetectorParams().getMinCornerDistance();
     std::vector<cv::Vec3d> rotationVectors;
     std::vector<cv::Vec3d> translationVectors;
-    cv::Mat                cameraMatrix = intrinsicCameraParams.cameraMatrix;
-    cv::Mat                distCoeff    = cv::Mat::zeros(cv::Size(1, 5), CV_32F);
-    cv::aruco::estimatePoseSingleMarkers(
+    const cv::Mat         &cameraMatrix = intrinsicCameraParams.cameraMatrix;
+    const cv::Mat         &distCoeff    = cv::Mat::zeros(cv::Size(1, 5), CV_32F);
+    detail::estimatePoseSingleMarkers(
         corners, markerLength, cameraMatrix, distCoeff, rotationVectors, translationVectors);
 
     // store all detected codes as TrackPoints in a list to return
@@ -1467,7 +1527,7 @@ void CodeMarkerOptions::setIndexOfMarkerDict(int idx)
  * markers consist of 0s and 1s, built from upper left to lower right corner in hexadecimal notation.
  * aruco markers availlable via https://sourceforge.net/projects/aruco/files/
  */
-cv::Ptr<cv::aruco::Dictionary> detail::getDictMip36h12()
+cv::aruco::Dictionary detail::getDictMip36h12()
 {
     std::array<uint64_t, 250> bitListDictMip36h12{
         0xd2b63a09dUL, 0x6001134e5UL, 0x1206fbe72UL, 0xff8ad6cb4UL, 0x85da9bc49UL, 0xb461afe9cUL, 0x6db51fe13UL,
@@ -1507,10 +1567,10 @@ cv::Ptr<cv::aruco::Dictionary> detail::getDictMip36h12()
         0xbdec1bd3cUL, 0xe020b9f7cUL, 0x4b8f35fb0UL, 0xb8165f637UL, 0x33dc88d69UL, 0x10a2f7e4dUL, 0xc8cb5ff53UL,
         0xde259ff6bUL, 0x46d070dd4UL, 0x32d3b9741UL, 0x7075f1c04UL, 0x4d58dbea0UL};
 
-    int                            markerSize = 6;
-    cv::Ptr<cv::aruco::Dictionary> dictionary = new cv::aruco::Dictionary();
-    dictionary->markerSize                    = markerSize;
-    dictionary->maxCorrectionBits             = 3;
+    int                   markerSize = 6;
+    cv::aruco::Dictionary dictionary;
+    dictionary.markerSize        = markerSize;
+    dictionary.maxCorrectionBits = 3;
 
     // transform from hexadecimal notation to format in dictionary class
     for(auto code : bitListDictMip36h12)
@@ -1523,7 +1583,7 @@ cv::Ptr<cv::aruco::Dictionary> detail::getDictMip36h12()
         }
         cv::Mat markerBits(markerSize, markerSize, CV_8UC1, codeAsVector.data());
         cv::Mat markerCompressed = cv::aruco::Dictionary::getByteListFromBits(markerBits);
-        dictionary->bytesList.push_back(markerCompressed);
+        dictionary.bytesList.push_back(markerCompressed);
     }
 
     return dictionary;
