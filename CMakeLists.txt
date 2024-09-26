@@ -137,7 +137,7 @@ set(BUILD_SHARED_LIBS ${DUMMY})
 # if win32 and mingw use in 3rd party
 if (USE_3RD_PARTY)
   # Setting path to OpenCV
-  set(OpenCV_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv-4.2.0_64bit")
+  set(OpenCV_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv-4.10.0")
 
   # Setting path to QWT
   set(QWT_ROOT_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows/Qwt-6.1.4_64bit")
