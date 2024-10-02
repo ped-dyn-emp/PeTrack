@@ -31,7 +31,7 @@ The region of interest (ROI) is the part of the image where a detection is
 performed. For the ROI we see the options
 
 show
-: Shows the ROI as a blue rectangle on the image
+: Shows the ROI as a green rectangle on the image
 
 fix
 : "Fixes" the rectangle, such that it cannot be moved with the mouse
