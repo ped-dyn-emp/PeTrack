@@ -7,6 +7,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.1016/j.neucom.2012.01.036.svg)](https://doi.org/10.1016/j.neucom.2012.01.036)
 [![DOI](https://zenodo.org/badge/doi/10.5078176/zenodo.5078176.svg)](https://doi.org/10.5281/zenodo.5078176)
 [![License](https://img.shields.io/badge/License-GPLv3-blue)](https://opensource.org/license/gpl-3-0)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md) 
 
 ![PeTrack logo](/icons/logo.png)
 
