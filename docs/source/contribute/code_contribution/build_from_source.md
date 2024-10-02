@@ -131,6 +131,7 @@ We extended the options with our own, which allow better configuration of the pr
 - Change of CMake option seem to have no influence
     - Possible solution: It may be necessary to delete the CMakeCache and run CMake again with the new options.
 
+- When compiling OpenCV yourself, make sure you have `ffmpeg` installed, or you won't be able to load any videos.
 ## Using docker for developing
 
 In some cases it may be hard to set up the environment.
