@@ -213,12 +213,10 @@ Petrack::Petrack(QString petrackVersion) :
     mViewWidget = new ViewWidget(this);
     mView       = mViewWidget->view();
     mView->setScene(mScene);
-    connect(mView, &GraphicsView::mouseDoubleClick, this, [this]() { this->openSequence(); });
     connect(mView, &GraphicsView::mouseShiftDoubleClick, this, &Petrack::addManualTrackPointOnlyVisible);
     connect(mView, &GraphicsView::mouseShiftControlDoubleClick, this, &Petrack::splitTrackPerson);
     connect(mView, &GraphicsView::mouseControlDoubleClick, this, &Petrack::addOrMoveManualTrackPoint);
     connect(mView, &GraphicsView::mouseRightDoubleClick, this, &Petrack::deleteTrackPoint);
-    connect(mView, &GraphicsView::mouseMiddleDoubleClick, this, &Petrack::deleteTrackPointAll);
     connect(mView, &GraphicsView::mouseShiftWheel, this, &Petrack::skipToFrameWheel);
     connect(mView, &GraphicsView::mouseCtrlAltDoubleClick, this, &Petrack::skipToFrameFromTrajectory);
     connect(mView, &GraphicsView::mouseAltMoved, this, &Petrack::moveTrackPoint);
@@ -330,12 +328,18 @@ Petrack::Petrack(QString petrackVersion) :
     createMenus();
     createStatusBar();
 
-    auto *exportShortCut = new QShortcut{QKeySequence("Ctrl+e"), this};
+    auto *exportShortCut = new QShortcut{QKeySequence("Shift+e"), this};
     connect(exportShortCut, &QShortcut::activated, this, [=]() { exportTracker(); });
 
 
     auto *toggleOnlineTracking = new QShortcut{QKeySequence("Shift+t"), this};
     connect(toggleOnlineTracking, &QShortcut::activated, this, [=]() { mControlWidget->toggleOnlineTracking(); });
+
+    auto *toggleRecognition = new QShortcut{QKeySequence("Shift+r"), this};
+    connect(toggleRecognition, &QShortcut::activated, this, [=]() { mControlWidget->toggleRecognition(); });
+
+    auto *toggleShowOnly = new QShortcut{QKeySequence("Shift+a"), this};
+    connect(toggleShowOnly, &QShortcut::activated, this, [=]() { mControlWidget->toggleShowOnly(); });
 
     // TODO delete once we get Options to be value only (i.e. no Pointer/Ref anymore)
     mReco.getCodeMarkerOptions().setControlWidget(mControlWidget);
@@ -1698,22 +1702,18 @@ void Petrack::keyBindings()
         "trajectory deletion",
         {{"Ctrl + double-click right mouse button", "deletes a trajectory"},
          {"Shift + double-click right mouse button", "deletes the past part of a trajectory"},
-         {"Alt + double-click right mouse button", "deletes the future part of a trajectory"},
-         {"Ctrl + double-click middle mouse button", "deletes all trajectories"},
-         {"Shift + double-click middle mouse button", "deletes the past part of all trajectories"},
-         {"Alt + double-click middle mouse button", "deletes the future part of all trajectories"}}};
+         {"Alt + double-click right mouse button", "deletes the future part of a trajectory"}}};
 
     KeyBindingGroup video_navigation{
         "video navigation",
-        {{"Space bar", "toggles between pause and last play direction"},
-         {"Ctrl + Alt + double-click left mouse button", "jumps to frame of trajectory point under cursor"},
-         {"Mouse scroll wheel",
-          "zooms in and out to or from the pixel of the image\nat the position of the mouse pointer"},
-         {"Shift + mouse scroll wheel", "plays forwards or backwards frame by frame"},
-         {"Holding left mouse button", "moves image"},
-         {"Arrow up/Arrow down", "zoom in/out"},
-         {"Arrow left/Arrow right", "frame back/forward"},
-         {"Double-click left mouse button", "opens video or image sequence"}
+        {
+            {"Space bar", "toggles between pause and last play direction"},
+            {"Ctrl + Alt + double-click left mouse button", "jumps to frame of trajectory point under cursor"},
+            {"Mouse scroll wheel",
+             "zooms in and out to or from the pixel of the image\nat the position of the mouse pointer"},
+            {"Shift + mouse scroll wheel", "plays forwards or backwards frame by frame"},
+            {"Holding left mouse button", "moves image"},
+            {"Arrow left/Arrow right", "frame back/forward"},
 
         }};
 
@@ -1722,7 +1722,10 @@ void Petrack::keyBindings()
         {{"Ctrl + z", "Undo the last manual action on\ntrajectories (e.g. moving point)"},
          {"Ctrl + Shift + z", "Redo the last action that was reverted\nvia Ctrl + z"},
          {"Shift + t", "toggles tracking online calculation"},
-         {"Ctrl + e", "export trajectories"},
+         {"Shift + r", "toggles recognition"},
+         {"Shift + e", "export trajectories"},
+         {"Shift + a", "toggles \"show only\" or \"show only list\""},
+         {"Arrow up/Arrow down", "change the displayed person\n(if show only people enabled)"},
          {"Ctrl + mouse scroll wheel", "change the displayed person\n(if show only people enabled)"}}};
 
     auto *diag = new KeybindingDialog(this, {general, traj_creation, traj_deletion, video_navigation});
@@ -2497,10 +2500,10 @@ void Petrack::keyPressEvent(QKeyEvent *event)
             mPlayerWidget->frameForward();
             break;
         case Qt::Key_Down:
-            mViewWidget->zoomOut(1);
+            mControlWidget->setTrackShowOnlyNr(mControlWidget->getTrackShowOnlyNr() - 1);
             break;
         case Qt::Key_Up:
-            mViewWidget->zoomIn(1);
+            mControlWidget->setTrackShowOnlyNr(mControlWidget->getTrackShowOnlyNr() + 1);
             break;
         case Qt::Key_Space:
             // space wird von buttons, wenn focus drauf ist als Aktivierung vorher abgegriffen und nicht

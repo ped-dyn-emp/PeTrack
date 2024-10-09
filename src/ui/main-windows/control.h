@@ -91,6 +91,7 @@ public:
     bool isTrackMergeChecked() const;
     bool isTrackExtrapolationChecked() const;
 
+    void       toggleShowOnly();
     QLineEdit *trackShowOnlyNrList();
     void       setTrackNumberNow(const QString &val);
     void       setTrackShowOnlyNr(int val);
@@ -145,12 +146,14 @@ public:
 
     bool isPerformRecognitionChecked() const;
     void setPerformRecognitionChecked(bool checked);
+    void toggleRecognition();
     void setRecoNumberNow(const QString &val);
     int  getRecoStep() const;
     bool getRecoRoiShow() const;
     void setRecoRoiShow(bool b);
     bool getRecoRoiFix() const;
     void setRecoRoiFix(bool b);
+
 
     reco::RecognitionMethod getRecoMethod() const;
 

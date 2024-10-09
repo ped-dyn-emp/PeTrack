@@ -338,6 +338,32 @@ bool Control::isTrackExtrapolationChecked() const
     return mUi->trackExtrapolation->isChecked();
 }
 
+void Control::toggleShowOnly()
+{
+    static bool nrLastToggled = true;
+    if(mUi->trackShowOnly->isChecked())
+    {
+        nrLastToggled = true;
+        mUi->trackShowOnly->toggle();
+        return;
+    }
+    if(mUi->trackShowOnlyList->isChecked())
+    {
+        nrLastToggled = false;
+        mUi->trackShowOnlyList->toggle();
+        return;
+    }
+
+    if(nrLastToggled)
+    {
+        mUi->trackShowOnly->toggle();
+    }
+    else
+    {
+        mUi->trackShowOnlyList->toggle();
+    }
+}
+
 QLineEdit *Control::trackShowOnlyNrList()
 {
     return mUi->trackShowOnlyNrList;
@@ -595,6 +621,11 @@ bool Control::isPerformRecognitionChecked() const
 void Control::setPerformRecognitionChecked(bool checked)
 {
     mUi->performRecognition->setChecked(checked);
+}
+
+void Control::toggleRecognition()
+{
+    mUi->performRecognition->toggle();
 }
 
 void Control::setRecoNumberNow(const QString &val)
