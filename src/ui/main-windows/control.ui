@@ -129,7 +129,7 @@
           <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>
          <property name="sizeAdjustPolicy">
-          <enum>QAbstractScrollArea::AdjustToContents</enum>
+          <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
          </property>
          <property name="widgetResizable">
           <bool>true</bool>
@@ -139,7 +139,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>494</width>
+            <width>490</width>
             <height>555</height>
            </rect>
           </property>
@@ -202,8 +202,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>477</width>
-            <height>948</height>
+            <width>473</width>
+            <height>889</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -433,6 +433,9 @@
                <widget class="QCheckBox" name="roiFix">
                 <property name="text">
                  <string>fix</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -982,7 +985,7 @@
                    <enum>QFrame::StyledPanel</enum>
                   </property>
                   <property name="frameShadow">
-                   <enum>QFrame::Raised</enum>
+                   <enum>QFrame::Shadow::Raised</enum>
                   </property>
                  </widget>
                 </item>
@@ -1578,7 +1581,7 @@
           <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>
          <property name="sizeAdjustPolicy">
-          <enum>QAbstractScrollArea::AdjustToContents</enum>
+          <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
          </property>
          <property name="widgetResizable">
           <bool>true</bool>
@@ -1590,9 +1593,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-394</y>
-            <width>477</width>
-            <height>1248</height>
+            <y>0</y>
+            <width>473</width>
+            <height>1134</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1970,6 +1973,9 @@
                 <property name="text">
                  <string>fix</string>
                 </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
@@ -2060,7 +2066,7 @@
                    <string>insert miss. frames</string>
                   </property>
                   <property name="checked">
-                   <bool>true</bool>
+                   <bool>false</bool>
                   </property>
                  </widget>
                 </item>
@@ -2085,7 +2091,7 @@
                    <string>recalc. height</string>
                   </property>
                   <property name="checked">
-                   <bool>true</bool>
+                   <bool>false</bool>
                   </property>
                  </widget>
                 </item>
@@ -2191,7 +2197,7 @@
                    <string>smooth</string>
                   </property>
                   <property name="checked">
-                   <bool>true</bool>
+                   <bool>false</bool>
                   </property>
                  </widget>
                 </item>
@@ -2258,6 +2264,9 @@
                   </property>
                   <property name="text">
                    <string>use meter</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -2735,7 +2744,7 @@
                    <enum>Qt::Vertical</enum>
                   </property>
                   <property name="sizeType">
-                   <enum>QSizePolicy::Fixed</enum>
+                   <enum>QSizePolicy::Policy::Fixed</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -3804,7 +3813,7 @@
                    <enum>Qt::Vertical</enum>
                   </property>
                   <property name="sizeType">
-                   <enum>QSizePolicy::Fixed</enum>
+                   <enum>QSizePolicy::Policy::Fixed</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -4101,7 +4110,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>494</width>
+            <width>490</width>
             <height>555</height>
            </rect>
           </property>
@@ -4130,7 +4139,7 @@
               <enum>QFrame::StyledPanel</enum>
              </property>
              <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
+              <enum>QFrame::Shadow::Raised</enum>
              </property>
             </widget>
            </item>
