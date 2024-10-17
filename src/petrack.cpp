@@ -1734,7 +1734,7 @@ void Petrack::keyBindings()
 
 void Petrack::onlineHelp()
 {
-    static QUrl url("https://jugit.fz-juelich.de/ped-dyn-emp/petrack/-/wikis/home");
+    static QUrl url("https://go.fzj.de/petrack-docs");
     if(!(QDesktopServices::openUrl(url)))
     {
         PCritical(this, tr("PeTrack"), tr("Cannot open external browser<br>with url ") + url.toString() + "!");
@@ -2047,7 +2047,7 @@ void Petrack::createActions()
     connect(mAboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
     mOnlineHelpAct = new QAction(tr("Online &Help"), this);
-    mOnlineHelpAct->setShortcut(tr("Ctrl+H"));
+    mOnlineHelpAct->setShortcut(tr("F1"));
     connect(mOnlineHelpAct, SIGNAL(triggered()), this, SLOT(onlineHelp()));
 }
 
