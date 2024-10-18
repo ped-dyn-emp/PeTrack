@@ -11,5 +11,5 @@ determined by the optical flow.
 
 :::{toctree}
 :maxdepth: 1
-Setting-up
+setting-up
 :::
