@@ -3,7 +3,7 @@
 After choosing the desired recognition parameters, the
 tracking setting should be adjusted. These settings 
 become especially important when the chosen
-[recognition marker](\recognition) 
+[recognition marker](/recognition/recognition.md) 
 cannot be detected and the current position has to be 
 determined by the optical flow.
 
@@ -11,5 +11,5 @@ determined by the optical flow.
 
 :::{toctree}
 :maxdepth: 1
-setting-up
+Setting-up
 :::
