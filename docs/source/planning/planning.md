@@ -7,9 +7,12 @@ recommendations, which ensure the proper settings so that PeTrack can be
 used successfully.
 
 These include recommendations about
-- [Experiment Location](location.md)
-- [Technical Equipment](technical_equipment.md)
-- [Participant Preparation](participants.md)
-- [Performing Calibrations](calibration.md)
-- [Prepare Data for PeTrack](data_preparation.md)
 
+:::{toctree}
+:maxdepth: 1
+location
+technical_equipment
+participants
+calibration
+data_preparation
+:::
