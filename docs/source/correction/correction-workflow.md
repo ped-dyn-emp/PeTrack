@@ -45,11 +45,14 @@ Retrack with recognition
 : If you also want to enable the recognition, check the `perform` box in the recognition tab again (Note, that this is optional if you already have a recognized person and only want to keep tracking it). Hereby you want to only have this one person visible (otherwise you overwrite the other trajectories again as well and could create new errors). Usually, starting by using the arrow keys to go forward frame by frame until you are sure that PeTrack follows the right way can be helpful. Sometimes PeTrack will start by just following a wrong path and if you move frame by frame you can catch the error right away.
 
 Move trajectory point
-: You can correct mildly  misplaced points by going to the corresponding frame, and moving your cursor to the new location and pressing `STRG + left double click`. Note that you can only move the point inside the head area (circle around the head).
+: You can correct mildly  misplaced points by going to the corresponding 
+frame, and moving your cursor to the new location and pressing `STRG + left double click`. Note that you can only move the point inside the head area (circle around the head).
  
-If you would like to move a point further away, you can use `Alt + hold left click` to drag a trajectory point to a new location.
+: If you would like to move a point further away, you can use `Alt + hold left click` to drag a 
+trajectory point to a new location.
 
-If you are already seeing many errors, you might want to delete all past or future tracking points and retrack to save you some time.
+: If you are already seeing many errors, you might want to delete all past or future tracking 
+points and retrack to save you some time.
 
 
 Split trajectory

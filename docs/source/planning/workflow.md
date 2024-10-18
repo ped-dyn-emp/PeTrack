@@ -1,21 +1,24 @@
 # Experiment workflow
 
-- Prepare surrounding:
-  - Position constructions
+- Research Question (1)
+- Prepare location: (2) 
   - Place marker on ground for extrinsic calibration
-- Prepare cameras on ground: 
+  - Light
+  - Power
+- Prepare cameras on ground: (Preparation of Technical Equipment 3)
+- (Preparation of Participants 4)
   - Battery or external power supply
   - Storage media 
   - Camera parameter settings
   - Manual focus to head distance
   - Recordings for intrinsic calibration
-- Mount cameras:
+- Mount cameras: (during)
   - Protection against falling
   - Adjust and orient
   - Recordings for extrinsic calibration
-- During experiment:
-  - Record full day or single experiments
-  - Time synchronization between experimental runs
-  - Write down real time schedule and incidents
-- After experiment:
+- During experiment (Performing of Experiments 5)
+    - Record full day or single experiments
+    - Time synchronization between experimental runs
+    - Write down real time schedule and incidents
+- After experiment (Analyse Data with PeTrack :) 6)
   - Store and backup video footage

@@ -31,8 +31,7 @@ trajectory is terminated.
 
 merge
 : Allows you to merge two trajectories into one 
-continuous trajectory. See [more](\correction\correction_workflow.md).
-*link to Miras page /correction/workflow/merge/*
+continuous trajectory. See [more](/correction/correction_workflow.md).
 
 only selected
 : Enables that tracking settings will only be applied to 
@@ -74,7 +73,7 @@ adjust automatically
 : Sets the ROI as one head size larger than the 
 recognition ROI
 
-:::{warning}
+:::{Warning}
 The tracking ROI must be larger than the recognition ROI.
 Any detection outside the tracking ROI will create an 
 entirely new, one point trajectory.
@@ -85,7 +84,7 @@ entirely new, one point trajectory.
 In this section, various export settings can be chosen.
 For more information about the settings as well as 
 information on importing and exporting files, check out the 
-[Trajectory Import and Export](\export\trajectory.md) section.
+[Trajectory Import and Export](/export/trajectory.md) section.
 
 
 ## Search Region
@@ -118,7 +117,7 @@ levels of color which are essential to the Lukas-Kanade method.
 :::
 
 
-** After you have set all of these settings, you can 
+**After you have set all of these settings, you can 
 run the tracking with either `online calculation` or 
 `calculate all` as mentioned on top of this page.**
 
