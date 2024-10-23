@@ -1845,7 +1845,7 @@ void Petrack::createActions()
     mExportSeqVidAct->setEnabled(false);
     connect(mExportSeqVidAct, SIGNAL(triggered()), this, SLOT(exportVideo()));
 
-    mExportSeqVidViewAct = new QAction(tr("Export Video View"), this);
+    mExportSeqVidViewAct = new QAction(tr("Export View Video"), this);
     mExportSeqVidViewAct->setEnabled(false);
     connect(mExportSeqVidViewAct, SIGNAL(triggered()), this, SLOT(exportVideoView()));
 
@@ -2068,9 +2068,9 @@ void Petrack::createMenus()
     mFileMenu->addAction(mOpenMoCapAct);
     mFileMenu->addAction(mEditMoCapAct);
     mFileMenu->addAction(mExportSeqVidAct);
-    mFileMenu->addAction(mExportSeqVidViewAct);
     mFileMenu->addAction(mExportImageAct);
     mFileMenu->addAction(mExportSeqImgAct);
+    mFileMenu->addAction(mExportSeqVidViewAct);
     mFileMenu->addAction(mExportViewAct);
     mFileMenu->addAction(mExportSeqViewAct);
     mFileMenu->addAction(mPrintAct);

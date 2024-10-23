@@ -19,14 +19,14 @@ PeTrack allows you to export the video. All of the options related to video expo
 Export Video
 : Export as video as is, i.e. without undistortion or overlays. Can be used to get video out of image sequence.
 
-Export Video View
-: Export as video as is shown in PeTrack. That is undistortion is applied and all visualizations (e.g. trajectories) are part of the exported video
-
 Export Image
 : Export currently shown frame with undistortion and border, but without any overlays
 
 Export Image Sequence
 : Export as image sequence with undistortion and border, but without any overlays. Can be used to get an image sequence out of a video.
+
+Export View Video
+: Export as video as is shown in PeTrack. That is undistortion is applied and all visualizations (e.g. trajectories) are part of the exported video
 
 Export View
 : Export currently shown frame with undistortion and overlays
