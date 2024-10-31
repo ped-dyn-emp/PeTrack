@@ -30,6 +30,7 @@
 #include "calibStereoFilter.h"
 #include "stereoContext.h"
 #endif
+#include "animation.h"
 #include "autoCalib.h"
 #include "autosave.h"
 #include "backgroundFilter.h"
@@ -46,7 +47,6 @@
 #include "swapFilter.h"
 #include "trackerReal.h"
 
-class Animation;
 class RoiItem;
 class RecognitionRoiItem;
 class GridItem;
@@ -243,7 +243,7 @@ public:
     inline RoiItem                *getTrackRoiItem() { return mTrackingRoiItem; }
 
     inline TrackerItem *getTrackerItem() { return mTrackerItem; }
-    inline Animation   *getAnimation() { return mAnimation; }
+    inline Animation   *getAnimation() { return &mAnimation; }
     inline Player      *getPlayer() { return mPlayerWidget; }
 
     inline QPointF getMousePosOnImage() { return mMousePosOnImage; }
@@ -420,7 +420,7 @@ private:
     cv::Mat             mImg;
     cv::Mat             mImgFiltered;
     QImage             *mImage;
-    Animation          *mAnimation;
+    Animation           mAnimation{this};
     pet::StereoContext *mStereoContext;
     Player             *mPlayerWidget;
 
