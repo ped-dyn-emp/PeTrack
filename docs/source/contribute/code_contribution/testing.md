@@ -1,7 +1,7 @@
-## Testing
+# Testing
 In PeTrack we use unit tests and regression tests to ensure PeTrack runs as intended.
 
-### Unit tests
+## Unit tests
 Unit tests are used to test single functions and classes without having to go through the whole workflow
 of setting up a project.
 As a unit testing framework we use [Catch2](https://github.com/catchorg/Catch2). It allows to easily construct
@@ -15,7 +15,8 @@ This may take a few seconds to finish. <br>
 If this doesn't work, it is probably because you didn't compile the unit tests.
 Make sure you compile petrack with the `-DBUILD_UNIT_TESTS=ON` option.
 :::
-### Regression tests
+
+## Regression tests
 :::{important}
 Make sure you cloned the required files via `git lfs pull`.
 :::

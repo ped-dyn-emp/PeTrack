@@ -2,6 +2,19 @@
 
 PeTrack supports a few custom trajectory formats. These formats can be exported from PeTrack as well as re-imported into PeTrack.
 
+
+## TRC-File
+
+The `.trc` files are the internal trajectory file format from PeTrack. They are not meant for consumption by any other program but PeTrack and no guarantees on the stability of the format are made.
+
+The `.trc` files can be exported and imported. They are the only files that contain **all** information PeTrack has about a trajectory and therefore the only files which recreate the original trajectories perfectly in import.
+
+When a `.trc` file is exported, its project associated itself with it. If PeTrack finds the file when the project is opened again, it is imported automatically. For finding the file PeTrack uses both, the absolute path to the file as well as the relative path of the `.trc` file to the `.pet` project file.
+
+:::{Note}
+Export options do not apply to `.trc` files.
+:::
+
 ## TXT-File
 
 ### File Format
@@ -33,7 +46,7 @@ The information you see in the example above is part of any exported `.txt` file
 PeTrack has a lot of export options. They either add output to the exported file or perform some additional calculation on export.
 
 insert miss. frames
-: When this option is enabled, PeTrack uses an algorithm to detect frame drops. These dropped frames are then inserted into the export. The position on these dropped frames is linearly interpolated.
+: When this option is enabled, PeTrack uses an algorithm to detect frame drops. These dropped frames are then inserted into the export. The position on these dropped frames is linearly interpolated. If this has already been calculated once, the checkbox `calculated` in the section `missing frames` will be checked. These missing frames are going to be reused in the next export. If you want the missing frames to be re-computed on export, you can press reset there.
 
 :::{note}
 The calculation of missing/dropped frames is expensive. If you know there are no frame drops in your video, let this option disabled.
@@ -64,6 +77,14 @@ add head direction
 add angle of view
 : Adds the angle between the line from the camera to the point and the line from the camera perpendicularly to the ground in radians
 
+::::{figure-md} angle-of-view
+:::{image} /images/planning_perspectiveViewError.png
+:width: 30%
+:::
+
+The angle alpha in this figure is the angle that is exported by the option `add angle of view`
+::::
+
 use meter
 : Use meter in export instead of centimeter. (**Recommended**)
 
@@ -72,14 +93,3 @@ add comment
 
 add marker ID
 : Adds the ID of code markers to the export as well. Note that the ID of the person will be put at every point in the trajectory, not only at the points at which the marker was recognized
-
-
-## TRC-File
-
-The `.trc` files are the internal trajectory file format from PeTrack. They are not meant for consumption by any other program but PeTrack and no guarantees on the stability of the format are made.
-
-The `.trc` files can be exported and imported. They are the only files that contain **all** information PeTrack has about a trajectory and therefore the only files which recreate the original trajectories perfectly in import.
-
-When a `.trc` file is exported, its project associated itself with it. If PeTrack finds the file when the project is opened again, it is imported automatically. For finding the file PeTrack uses both, the absolute path to the file as well as the relative path of the `.trc` file to the `.pet` project file.
-
-Export options do not apply to `.trc` files.

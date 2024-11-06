@@ -3,7 +3,7 @@
 ## General Settings
 
 At the top of the tracking tab, you can find the general 
-settings (image) of tracking. In the end you have two 
+settings of tracking. In the end you have two 
 options to 
 apply the tracking to your project.
 
@@ -31,7 +31,7 @@ trajectory is terminated.
 
 merge
 : Allows you to merge two trajectories into one 
-continuous trajectory. See [more](/correction/correction_workflow.md).
+continuous trajectory. See [more](/correction/correction-workflow.md).
 
 only selected
 : Enables that tracking settings will only be applied to 
@@ -121,6 +121,9 @@ levels of color which are essential to the Lukas-Kanade method.
 run the tracking with either `online calculation` or 
 `calculate all` as mentioned on top of this page.**
 
+:::{Important}
+You need to manually export the trajectories that resulted from tracking. You should export in the `.trc`-format, since it is the working file format of PeTrack.
+:::
 
 ## Path Settings
 

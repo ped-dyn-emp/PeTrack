@@ -89,7 +89,7 @@ read heights from file
   ```
 
 import markerIDs
-: This button enables you to load a file to assign a marker id (or code id) to a pedestrian with a given PeTrack-internal id. That can be used if a few people in the video have a code marker which is never recognized, but they can be identified by the experimenter visually.
+: This button enables you to load a file to assign a marker id to a pedestrian with a given PeTrack-internal id. That can be used if a few people in the video have a code marker which is never recognized, but they can be identified by the experimenter visually.
 
   ```
   # id markerID

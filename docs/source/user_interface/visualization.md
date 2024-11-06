@@ -138,7 +138,7 @@ show complete path
 
 ## Other Options
 
-Here some information on visualization options which are mostly for old markers. Mostly for completeness sake. This section can be skipped for most people.
+**This section can be skipped for most people.** Here some information on visualization options which are mostly for old markers. Mostly for completeness sake. 
 
 show color marker
 : Helpful option for markers that include the color as extra point, e.g. the casern marker. The circle drawn by this is colored in the color that was detected and drawn around the colored portion of the marker.

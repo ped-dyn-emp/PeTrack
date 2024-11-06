@@ -7,7 +7,7 @@ the appearance of the floor is important. On the one hand, prominent colors
 of the floor should be noted and avoided during the further planning of the 
 experiments (participant clothing, calibration markers). On the other hand, 
 the suitability of the floor to cope with adhesive tape should be discussed, 
-to ensure easy preparation of the [calibration process](/calibration.md)
+to ensure easy preparation of the [calibration process](/calibration/calibration.md)
 For camera recordings it is important to have sufficient light illuminate the
 entire scene in a uniform manner. The light should be as bright as possible
 without influencing the experiment. If possible sunlight should be blocked 

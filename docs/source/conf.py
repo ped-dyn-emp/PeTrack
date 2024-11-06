@@ -79,6 +79,7 @@ html_logo = "_static/logo.png"
 html_favicon = "_static/favicon.svg"
 
 html_css_files = ["css/custom.css", "css/tippy.css"]
+html_js_files = ["js/custom.js"]
 html_context = {"default_mode": "light"}
 
 html_theme_options = {
@@ -101,7 +102,6 @@ html_theme_options = {
         },
     ],
     "show_toc_level": 3,
-    "announcement": "🚧 This documentation is still under construction! In the meanwhile, please visit <a href='https://go.fzj.de/petrack-wiki'>the wiki</a> instead. 🚧",
 }
 
 html_sidebars = {

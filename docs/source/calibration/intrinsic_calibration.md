@@ -49,10 +49,11 @@ Pre intrinsic calibration vs. Post intrinsic calibration.
 
 If you are not happy with the outcome of the calibration you can load different images and trigger
 a new calculation of the calibration. Make sure that your area of interest in the video is well straightened before moving on.
-
+Note that you lose parts of your image in the post-intrinsic image. If you lost too much, you can try to use the `border` in the `filter before` box. This will enlarge your image and give you back some lost parts. Take care that the enlarged image will have a higher calibration error in the outer parts!
 
 :::{Important}
-Note that you have to finalize your intrinsic calibration before moving on!
-<br>
+Note that you have to finalize your intrinsic calibration before moving on!  
 The extrinsic calibration can only be performed if an intrinsic calibration is loaded and applied!
 :::
+
+With the help of the `alignment grid` at the end of the calibration tab you can check whether straight lines in the real world are also straight lines in the image. Note that the alignment grid will only have the real dimension once the extrinsic calibration is done.

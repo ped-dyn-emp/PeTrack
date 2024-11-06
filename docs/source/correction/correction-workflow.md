@@ -1,15 +1,20 @@
 # Correction Workflow
+
 First, open the newly saved PeTrack file (pet.) – you might need to import the .trc file if you have moved the files after the automated tracking. Simply check if the number of tracked people is set to 0 (then you need to import the .trc) or not.
 Uncheck the boxes `Perform` in the recognition tab and `online calculation` in the tracking tab.
+
  :::{Important}
 If you don’t uncheck `Perfom` and `Online Calculation` you will overwrite the previously tracked trajectories!
 :::
+
 Now, go back to the tracking tab and scroll down to the `path` section. Check the `Show only people` box. Here you can select which persons’ path you would like to see in the picture. Usually, it is best to go through the people one by one to better filter out any errors. In specific cases, you can also correct people in batches – enable `show people list` and chose the ID’s of the people that you would like to see – but it is very easy to overlook mistakes when trying to correct multiple people at once.
 
 Start with person 1 and find the corresponding path on the picture on the left-hand side. If there are any large irregularities, you will be able to see this right away. Irregularities can be sharp peaks, uneven spaced tracking points, or just funny looking paths. Note that these can be irregularities, but they don’t have to be!
+
 :::{tip}
 If you have used the multicolor marker, the filled in dots are points at which PeTrack is able to read out the code marker. It is less likely that these points are wrong, but it can still happen. Empty red dots are points where the code marker is not read out. Here the chance of errors is much higher!
 :::
+
 Start by setting the frame bar at the bottom of the page to 0. Now check the start position. It can happen that PeTrack picks a wrong start point for the trajectory on the head! Then you can click through the frames one by one or just press `space` to let the video play in full speed. Clicking on `start`or `end` will set the current frame to the beginning or end of the trajectory, while `go to` will jump to the middle of the trajectory.
 
 If you want to visualize the complete path of a person, you might need to increase the values in `frames before actual position` and `frames after actual position`, or use the option `show complete path`.
@@ -26,8 +31,11 @@ Now, check the trajectory for irregularities. Depending on the kind of errors yo
 
 Repeat these steps for every single identified person in the video. Don’t forget to check the `start` and `end` positions every single time to make sure a good starting/ending point is selected. 
 
-Once all the errors are corrected you can press `export` at the top of the tracking tab. This will ensure that the new trajectories will be saved. Click “yes” to overwrite the old .trj file if desired. In the trc file the pixel coordinates will be saved. If you export a txt file of the trajectories, the real-world coordinates are saved. 
+Throughout the correction process you can press `export` at the top of the tracking tab. This will ensure that the new trajectories will be saved. Click “yes” to overwrite the old trajectory file if desired. `trc` is the working file format of `.trc`. Once all the errors are corrected you can export a `txt` file of the trajectories including various export options, see [](/export/trajectory.md).
 
+:::{Important}
+Do not forget to manually save your progress! You should export in the `.trc`-format, since it is the working file format of PeTrack.
+:::
 
 
 ## Possible Operations for corrections
@@ -46,7 +54,7 @@ Retrack with recognition
 
 Move trajectory point
 : You can correct mildly  misplaced points by going to the corresponding 
-frame, and moving your cursor to the new location and pressing `STRG + left double click`. Note that you can only move the point inside the head area (circle around the head).
+frame, and moving your cursor to the new location and pressing `Ctrl + left double click`. Note that you can only move the point inside the head area (circle around the head).
  
 : If you would like to move a point further away, you can use `Alt + hold left click` to drag a 
 trajectory point to a new location.
