@@ -299,7 +299,6 @@ private slots:
 
 
     void on_trackShow_stateChanged(int i);
-    void on_trackFix_stateChanged(int i);
     void on_trackOnlineCalc_stateChanged(int i);
     void on_trackCalc_clicked();
     void on_trackReset_clicked();
