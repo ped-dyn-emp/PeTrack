@@ -1,6 +1,7 @@
 # Code Marker
 
-The code marker is an aruco marker, a special fiducial tag. This means that not only is the marker designed to be easy and robust to detect, it also contains a code number. Therefore the code marker enables an association of trajectories with other data, e.g. questionnaires. However, the code marker needs a comparatively high resolution. We recommend at least 8 pixels per bit of the code.
+The code marker is an aruco marker, a special fiducial tag. This means that not only is the marker designed to be easy and robust to detect, it also contains a code number. Therefore the code marker enables an association of trajectories with other data, e.g. questionnaires. However, the code marker needs a comparatively high resolution. 
+We recommend testing the detection of code markers with the camera that is going to be used and the same distance between camera and code as in the experimental setup.
 
 ## Marker Options
 
@@ -28,7 +29,7 @@ The only option that is unique to PeTrack is `show detected candidates`. When th
 
 ![code marker candidate viz](images/aruco_viz.png)
 
-Visualization of code marker candidates. Successful detections are green, mark the upper left corner and show the id of the marker. Candidates which did not result in a detection, because of an unreadable code, are shown in red. Accordingly, without id.
+Visualization of code marker candidates. Successful detections are green and show the id of the marker. Candidates which did not result in a detection, because of an unreadable code, are shown in red. Accordingly, without id. For successful detections, PeTrack marks the upper left corner according to the orientation of the marker. 
 :::
 
 ## Extra export options

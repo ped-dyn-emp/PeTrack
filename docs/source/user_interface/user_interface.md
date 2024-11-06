@@ -24,9 +24,7 @@ Furthermore, one can rotate the image using the upper half of the video side bar
 
 The player control has the following buttons from left to right:
 
-:::{figure-md}
-![player control](images/PlayerControl.png)
-
+:::{image} images/PlayerControl.png
 :::
 
 play backwards
@@ -98,12 +96,14 @@ X, Y, Angle to Ground
 Color
 : This shows the color of the pixel under the cursor
 
+## Log-Window
+
+Many helpful comments or error messages are shown in the log window (`View > Show log window`).
+You can also save the log file from the log window.
+
 ## Menu Bar
 
 The menu bar includes a plethora of menus. Feel free to explore the different options. Here only the basics are listed.
-
-PeTrack
-: Here you find information about your current installation of PeTrack, e.g. the version.
 
 File
 : Options to open or save projects; or export files (see [Export](/export/video.md))
@@ -116,6 +116,19 @@ View
 
 Help
 : Here you find the `keybindings`. <!-- Link einfügen wenns irgendwann das richtige Unterkapitel dafür gibt -->
+
+PeTrack (Mac)
+: Here you find information about your current installation of PeTrack, e.g. the version. For Windows/Linux you can find this in `About` under `Help`
+
+## Keybindings
+
+The most up-to-date list of keybinding can be found in PeTrack itself under `Help > Key bindings`. Additionally, you can download our [cheat sheet](images/petrack-cheat-sheet.pdf) to print out.
+
+:::{figure-md}
+![cheat sheet](images/petrack-cheat-sheet.svg)
+
+Cheat sheet for PeTrack. Download [here](images/petrack-cheat-sheet.pdf)
+:::
 
 ```{toctree}
 :hidden:

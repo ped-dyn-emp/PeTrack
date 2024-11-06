@@ -124,10 +124,8 @@ second option is to measure out objects that are in your experimental area and
 use them as your coordinate points. However, sometimes it gets tricky to have
 them cover the entire experimental area and not only the edges.
 :::
-<br>
-Create a sketch of your coordinate grid including measurements. Also note down
-the time at which you are starting the extrinsic calibration. This will help you
-to locate the calibration, especially in longer video recordings.
+
+Create a sketch of your coordinate grid including measurements. You will need this once you perform the extrinsic calibration in PeTrack. Also note down the time at which you are starting the extrinsic calibration. This will help you to locate the calibration, especially in longer video recordings.
 
 ### Performance
 

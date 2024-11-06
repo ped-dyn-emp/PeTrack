@@ -14,21 +14,21 @@ Parameter window of the multicolor marker
 
 In the parameter window, we have a plethora of options:
 
-The first options concern themselves with combinations of the multicolor marker with other markers, namely the hermes marker and code marker. When the multicolor marker is combined with another marker, first the multicolor detection is run. Afterwards, on the area around the detected head, the other marker is searched. The idea is to combine the robust, but slightly inaccurate multicolor marker with a more accurate and "structured" marker.
+The first options concern themselves with combinations of the multicolor marker with other structures, namely a black dot or a code marker. When the multicolor marker is combined with another marker, first the multicolor detection is run. Afterwards, on the area around the detected head, the other marker is searched. The idea is to combine the robust, but slightly inaccurate multicolor marker with a more accurate and "structured" marker.
 
 use black dot
-: The multicolor marker can be used with a black dot added, essentially creating a combination between the hermes marker and the multicolor marker. This gives a bit more structure for tracking and a smaller specific point in the image to locate. If one does use this, this checkbox should be enabled and the size set to the size of the point in cm. Else, this option can be turned off.
+: The multicolor marker can be used with a black dot added. This gives a bit more structure for tracking and a smaller specific point in the image to locate. If one does use this, this checkbox should be enabled and the size set to the size of the point in cm. Else, this option can be turned off.
 
 use code marker
 : The multicolor marker can be combined with the [code marker](aruco). <!--, which is called code marker here. --> A click onto the `parameter`-button opens the parameter window for the code marker. There the options for the detection of the code marker can be changed. Please refer to the [documentation of the code marker](aruco) for further information on this.
 
-The following three options are all for combinations with either the hermes or the code marker
+The following three options are all for combinations with either the black dot or the code marker
 
 ignore head without black dot or code marker
 : If this is enabled, all detections where only the colored hat, without the extra feature, was detected will be discarded. If this is not checked, detections on color only are used as well. If e.g. the code cannot always be recognized due to the camera resolution, this should be off. However, in case the extra feature should be recognizable, this could reduce false positives.
 
 use color marker for big error
-: If both, the color point and the feature point (black dot, code marker) are detected and subsequent tracking of the feature point has a high error, enabling this options lets PeTrack redo the tracking, using the color point instead of the feature point.
+: This option applies if both the color point and the feature point (black dot, code marker) are detected. PeTrack always tracks the feature point first. If this results in a high error and this option is selected, PeTrack tries to track the color point instead.
 
 restrict position of black dot
 : When this option is enabled, the black dot is searched in a smaller area, determined by the expected position of the dot given the angle at which the camera looks at the pedestrian.
@@ -46,13 +46,17 @@ If you enable `auto correct perspective view`, it is recommended to also enable 
 :::
 
 show mask
-: When enabled, we show a mask visualizing the color selection
+: When enabled, we show a mask (i.e. a black overlay) visualizing the color selection
 
 close radius
 : Closing is a morphological operation to remove small holes. A larger value means, larger holes will be filled. The filter is only applied if `use` is checked.
 
 open radius
 : Opening is a morphological operation to remove small dots or specks. The larger the value, the larger the specks which are removed. The filter is only applied if `use` is checked.
+
+:::{tip}
+Deactivate `open` and `close` while selecting a color. First try to select the color best you can and then activate the options to improve upon this selection. Using them while selecting the color means you are optimizing 3 parameters at once.
+:::
 
 The head detection detects blobs of a certain color. It then filters out some of these blobs on a variety of criteria. Here are some options on those:
 
@@ -68,6 +72,8 @@ opacity
 : This sets the opacity of the mask which shows the current color selection. If `mask` is checked, the selected parts of the mask are translucent. Otherwise, they are white.
 
 ## Color Selection
+
+You need to activate `perform` to see updates on changed settings!
 
 :::{figure-md} color-selection
 ![Color Selection part of recognition tab](images/color_selection.png)
@@ -101,22 +107,8 @@ Below the color plot, we see the maps. We see the currently selected map (1 in t
 
 The different sliders are for an old way of color selection. They are not suited for multicolor markers and can safely be ignored. Similarly, the `color` checkbox can be ignored. Instead, we use **either** the `color range` or the `color picker` button to select a color for the multicolor marker (5 and 6 in the [figure](#maps-section)).
 
-:::{note}
-`color picker` and `color range` do not play well together. That is, a color obtained with one cannot be fine tuned with the other.
-:::
-
-Some general remarks hold for either method:
-
-:::{tip}
-Deactivate `open` and `close` while selecting a color. First try to select the color best you can and then activate the options to improve upon this selection. Using them while selecting the color means you are optimizing 3 parameters at once.
-:::
-
 :::{tip}
 Activate the `mask` from the multicolor parameters and set the opacity to ca. 50%. This enables you to see how well your color selection works (see screenshots later).
-:::
-
-:::{note}
-You need to activate `perform` for the color mask to update!
 :::
 
 ### Color Picker
@@ -127,6 +119,10 @@ When pressing the `color picker` button, the color picker modus is activated. In
 ![color picker usage example](images/color_picker_example.webp)
 
 Example usage of color picker. With the mask enabled and `perform` checked, we can interactively select the color, looking at different parts of the image to find still uncovered parts. Note that colors which are "close" to each other may not be easy to differentiate with the color picker (here green and yellow). Then the `color range` dialog might be a better option.
+:::
+
+:::{note}
+`color picker` and `color range` do not play well together. That is, a color obtained with one cannot be fine tuned with the other.
 :::
 
 ### Color Range
@@ -140,6 +136,15 @@ Color range dialog: The dialogue allows selecting the lower bound and upper boun
 :::
 
 The color detection works in the HSV (Hue, Saturation, Value) color space. Hue is the "color", i.e. redness or greenness of the color. Saturation how saturated it is. And value, how bright it is. The dialog allows you to select to colors from this space. All colors that lie "in between" your selected colors are then part of your selection. It is noteworthy that the hue part is a value in degrees from 0° to 360°, with red being around zero degree. To allow the selection of red-ish colors as well, there is an option `inverse hue`, which changes the direction of this difference. That is we select colors with hue $h$ such that $h_{min} < h < h_{max}$ if `inverse hue` is not selected and colors with $h < h_{min} \lor h > h_{max}$ if `inverse hue` is selected.
+
+::::{figure-md} inverse-hue-explanation
+
+:::{image} images/InverseHue.png
+:width: 70%
+:::
+
+The hue range that is selected with or without `inverse hue` checked
+::::
 
 :::{figure-md} color-range-example
 ![usage example of color range dialog](images/color_range_example.webp)

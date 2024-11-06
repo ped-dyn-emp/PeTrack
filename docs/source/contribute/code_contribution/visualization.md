@@ -1,6 +1,6 @@
 # Visualization
 
-Multiple things can be visualized in PeTrack. Detected points, trajectories (projected to the ground), detected markers, etc...
+Multiple things can be visualized in PeTrack. Detected points, trajectories (projected to the ground), detected markers, etc.
 
 The video display is build around the QGraphicsView Framework. Check out the [official Docs](https://doc.qt.io/qt-5/graphicsview.html).
 

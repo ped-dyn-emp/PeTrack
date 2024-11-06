@@ -5,7 +5,6 @@
 This site is about the technical aspect of the tracking functionality for better understanding when
 contributing to the source code.
 If you are a user searching for documentation see [here](/tracking/tracking).
-
 :::
 
 The tracker of PeTrack is implemented on top of the [Lucas-Kanade-Algorithm](https://en.wikipedia.org/wiki/Lucas%E2%80%93Kanade_method) for determining optical flow.

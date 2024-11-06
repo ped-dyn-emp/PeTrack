@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE PETRACK>
 <PETRACK VERSION="0.10.5">
-    <MAIN SRC="" STATUS_HEIGHT="0"/>
+    <MAIN SRC="../../Tue_01_010_noInt.mp4" STATUS_HEIGHT="0"/>
     <CONTROL TAB="0">
         <CALIBRATION>
             <FILTER_BEFORE IMMUTABLE="0"/>

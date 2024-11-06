@@ -16,7 +16,7 @@ the processed points inside one image (Figure 1). To create such an image, a fre
 Figure 1: Enlargement of combined image of all calibration points being processed during the experiments.
 :::
 
-Once the combined image has been created you have to write down the coordinates for each point assigned during the experiment.
+Once the combined image has been created you have to write down the coordinates for each point assigned during the experiment. You can take the coordinates from the sketch that you created during the preparation of the extrinsic calibration on scene. 
 These coordinates need to be collected in a text editor and saved as a `.3dc` file. It does not matter where the point 
 (0,0) is, however, the relations of the point to one another should be represented correctly. 
 The first line of the file contains the total number of coordinates points in the file. Starting from the second row, 
@@ -58,8 +58,10 @@ Now all coordinate points that are listed in the points file need to be selected
 You need to select the points **in the same order** as they appear in the points file!
 <br>
 You can select the points with `Ctrl + double click left mouse button`. Select the points as accurate as possible
-by zooming into the image. In case you are unhappy with the selected point you can unselect it by
-`Ctrl + double click right mouse button`. <br>
+by zooming into the image. If two of your calibration points are close to one another in the image,  `Ctrl + double click left mouse button` might move one of the points instead of adding a new one. In this case, you can create the new calibration point further away and move it to the desired place using `Alt + holding left mouse button`.
+
+In case you are unhappy with the selected point you can unselect it by
+`Ctrl + double click right mouse button`.
 
 :::{Tip}
 If the green circles that appear around the chosen points are too large for your taste, go to the `tracking` tab in the
@@ -97,6 +99,8 @@ You can view the selected and calculated calibration points by checking the `cal
 section. If you notice a point that is particularly bad in alignment with the calibrated value, you can redo the calibration and exclude
 this point. This will minimize your error for the extrinsic calibration.
 :::
+
+To check the resulting origin of the coordinate system (0,0,0) you can `show` the `coordinate system` found in the calibration tab. 
 
 After you are finished with the calibration steps it is recommended that you save the PeTrack project with the current calibration
 status (intrinsic & extrinsic calibration). In case something goes wrong during the following steps, you have a project

@@ -240,7 +240,7 @@ def test_extr_calib(pytestconfig):
     petrack_path = pytestconfig.getoption("path")
     project = "../../../demo/01_calibration/01_intrinsic.pet"
     real_extrinsic = "../../../demo/01_calibration/02_extrinsic.pet"
-    extrinsic_file = "../../../demo/01_calibration/before.3dc"
+    extrinsic_file = "../../../demo/01_calibration/after.3dc"
     output = (
         "../data/extrCalibTest.pet"  # same for other test, cannot be run concurrently
     )

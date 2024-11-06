@@ -6,12 +6,16 @@ a marker. This can either be a colored hat / beanie
 individual marker ([code marker](/recognition/aruco.md)).
 The multicolor marker is easy to prepare and works even with low resolution
 cameras. The code marker is minimally more work to prepare, but it will 
-enable you to link individual information via a codeID to the participants and 
+enable you to link individual information via a markerID to the participants and 
 facilitate the tracking process.
 If the recording of individual information is wanted, it should be done 
 through a questionnaire that participants fill out before the experiments 
 (e.g. age, gender). The code marker should remain identical throughout the 
 entire experiment in order to analyze individuals across experiments.
+
+:::{Important}
+To ensure that your experimental setup, including camera height and camera settings, enables you to detect markers, test your chosen setup in [PeTrack](/recognition/recognition.md) beforehand. For this test of the recognition, no calibration is needed.
+:::
 
 ## Clothing
 

@@ -1,8 +1,8 @@
 # Recognition
 
-It is possible to use PeTrack to do semi-automatic tracking. That means, one does detect the pedestrians manually at the beginning of the experiment and then tracks these automatically. However, it is faster, potentially more accurate and more convenient to let PeTrack handle the detection of pedestrians automatically. For this purpose, the pedestrians usually get a _marker_. That is some kind of special hat, which then gets detected from PeTrack.
+PeTrack can detect the pedestrians using _markers_. That is some special kind of hat. These hats are designed to be detected by the software algorithmically, after the user sets the necessary parameters. 
+While there are plenty of options available, we suggest using the multicolor or code markers, since they are the current State of the Art. Please see their respective sites for more information.
 
-While there are a plethora of options available, we suggest using the multicolor or code markers. Please see their respective sites for more information.
 
 ## Contents
 
