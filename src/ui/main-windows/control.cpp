@@ -443,15 +443,6 @@ void Control::setTrackShow(bool b)
     mUi->trackShow->setChecked(b);
 }
 
-bool Control::getTrackFix() const
-{
-    return mUi->trackFix->isChecked();
-}
-void Control::setTrackFix(bool b)
-{
-    mUi->trackFix->setChecked(b);
-}
-
 QColor Control::getTrackPathColor() const
 {
     return mUi->trackPathColorButton->palette().color(QPalette::Button);
@@ -927,11 +918,6 @@ void Control::on_trackShow_stateChanged(int i)
     {
         mMainWindow->getTrackerItem()->hide();
     }
-}
-
-void Control::on_trackFix_stateChanged(int /*i*/)
-{
-    // TODO only make sense if single points are draggable
 }
 
 void Control::on_trackOnlineCalc_stateChanged(int i)
@@ -1929,7 +1915,6 @@ void Control::setXml(QDomElement &elem)
 
     subSubElem = (elem.ownerDocument()).createElement("PATH");
     subSubElem.setAttribute("SHOW", mUi->trackShow->isChecked());
-    subSubElem.setAttribute("FIX", mUi->trackFix->isChecked());
 
     subSubElem.setAttribute("ONLY_VISIBLE", mUi->trackShowOnlyVisible->isChecked());
     subSubElem.setAttribute("ONLY_PEOPLE", mUi->trackShowOnly->isChecked());
@@ -2348,7 +2333,6 @@ void Control::getXml(const QDomElement &elem, const QString &version)
                 {
                     loadBoolValue(subSubElem, "SHOW_COMPLETE", mUi->trackShowComplPath, false);
                     loadBoolValue(subSubElem, "SHOW", mUi->trackShow, true);
-                    loadBoolValue(subSubElem, "FIX", mUi->trackFix, false);
                     loadBoolValue(subSubElem, "ONLY_VISIBLE", mUi->trackShowOnlyVisible, false);
                     loadBoolValue(subSubElem, "ONLY_PEOPLE", mUi->trackShowOnly, false);
                     loadBoolValue(subSubElem, "ONLY_PEOPLE_LIST", mUi->trackShowOnlyList, false);

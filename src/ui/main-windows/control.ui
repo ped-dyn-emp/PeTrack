@@ -2596,26 +2596,13 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QCheckBox" name="trackFix">
+                   <widget class="QCheckBox" name="trackShowOnlyVisible">
                     <property name="text">
-                     <string>fix</string>
+                     <string>only for visible people</string>
                     </property>
                    </widget>
                   </item>
                  </layout>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="trackShowOnlyVisible">
-                  <property name="maximumSize">
-                   <size>
-                    <width>300</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>only for visible people</string>
-                  </property>
-                 </widget>
                 </item>
                 <item>
                  <widget class="Line" name="line_2">
@@ -4390,7 +4377,6 @@
   <tabstop>trackShowSearchSize</tabstop>
   <tabstop>adaptiveLevel</tabstop>
   <tabstop>trackShow</tabstop>
-  <tabstop>trackFix</tabstop>
   <tabstop>trackShowOnlyVisible</tabstop>
   <tabstop>trackShowOnly</tabstop>
   <tabstop>trackShowOnlyNr</tabstop>
