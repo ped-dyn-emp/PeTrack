@@ -23,7 +23,7 @@ We publish installers for windows. To get the latest installer, visit our
 
 ## How to use PeTrack
 
-To learn how to use PeTrack, please have a look at our documentation in the GitLab wiki [here](https://go.fzj.de/petrack-wiki). We are building up another documentation page right now, that you may want to check out as well at https://petrack.readthedocs.io/. While still WIP, it already contains more detailed information on certain steps in the workflow.
+To learn how to use PeTrack, please have a look at our documentation [here](https://petrack.readthedocs.io/). 
 
 > Note that PeTrack can only be used if some steps are considered **during the planning and execution of the experiments**. This includes, but is not limited to, calibration and selecting hats. See [Planning of Experiments](https://petrack.readthedocs.io/en/latest/planning/planning.html)
 
@@ -40,7 +40,7 @@ A small demo project is provided in the `demo` folder. It contains all necessary
 files for setting up a project with PeTrack. You can download these files via
 [this link](https://go.fzj.de/petrack-demo-download). A tutorial leading through
 all steps can be found in the
-[Wiki](https://jugit.fz-juelich.de/ped-dyn-emp/petrack/-/wikis/home#for-users-of-petrack).
+[Documentation](https://petrack.readthedocs.io/en/latest/getting_started.html).
 The intermediate project files for each step are also included in the `demo`
 folder.
 
