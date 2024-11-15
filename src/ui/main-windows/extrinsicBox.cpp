@@ -69,23 +69,24 @@ void ExtrinsicBox::setExtrinsicParameters(const ExtrinsicParameters &params)
     setValue(mUi->rot3, params.rot3);
 }
 
-void ExtrinsicBox::on_extrCalibFetch_clicked()
+void ExtrinsicBox::on_extrCalibCalc_clicked()
 {
-    auto newCalib = mExtrCalibration.fetch2DPoints();
-    if(newCalib)
-    {
-        setExtrinsicParameters(*newCalib);
-    }
-}
-
-void ExtrinsicBox::on_coordLoad3DCalibPoints_clicked()
-{
-    auto newCalib = mExtrCalibration.openExtrCalibFile();
+    auto newCalib = mExtrCalibration.calibExtrParams();
     if(newCalib)
     {
         setExtrinsicParameters(*newCalib);
     }
     emit extrinsicChanged();
+}
+
+void ExtrinsicBox::on_extrCalibFetch_clicked()
+{
+    mExtrCalibration.fetch2DPoints();
+}
+
+void ExtrinsicBox::on_coordLoad3DCalibPoints_clicked()
+{
+    mExtrCalibration.openExtrCalibFile();
 }
 
 void ExtrinsicBox::on_rot1_valueChanged(double newVal)
@@ -294,7 +295,8 @@ void ExtrinsicBox::setXml(QDomElement &subSubElem) const
 
 void ExtrinsicBox::loadCalibFile()
 {
-    auto newCalib = mExtrCalibration.loadExtrCalibFile();
+    mExtrCalibration.loadExtrCalibFile();
+    auto newCalib = mExtrCalibration.calibExtrParams();
     if(newCalib)
     {
         setExtrinsicParameters(*newCalib);
