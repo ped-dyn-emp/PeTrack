@@ -65,7 +65,7 @@ QString ExtrCalibration::getExtrCalibFile()
     }
 }
 
-std::optional<ExtrinsicParameters> ExtrCalibration::openExtrCalibFile()
+void ExtrCalibration::openExtrCalibFile()
 {
     if(mMainWindow)
     {
@@ -84,10 +84,9 @@ std::optional<ExtrinsicParameters> ExtrCalibration::openExtrCalibFile()
         if(!extrCalibFile.isEmpty())
         {
             mExtrCalibFile = extrCalibFile;
-            return loadExtrCalibFile();
+            loadExtrCalibFile();
         }
     }
-    return std::nullopt;
 }
 
 // following function copied from OpenCV
@@ -140,19 +139,18 @@ static bool isPlanarObjectPoints(cv::InputArray _objectPoints, double threshold 
  *
  * This is just going to be ignored. Comments start with "#".
  *
- * @return
  */
-std::optional<ExtrinsicParameters> ExtrCalibration::loadExtrCalibFile()
+void ExtrCalibration::loadExtrCalibFile()
 {
     if(mExtrCalibFile.isEmpty())
     {
-        return std::nullopt;
+        return;
     }
 
     if(!mExtrCalibFile.endsWith(".3dc", Qt::CaseInsensitive) && !mExtrCalibFile.endsWith(".txt", Qt::CaseInsensitive))
     {
         PWarning(nullptr, "Unsupported File Type", "Unsupported file extension (supported: .3dc, .txt)");
-        return std::nullopt;
+        return;
     }
 
     QFile file(mExtrCalibFile);
@@ -162,7 +160,7 @@ std::optional<ExtrinsicParameters> ExtrCalibration::loadExtrCalibFile()
             mMainWindow,
             QObject::tr("Petrack"),
             QObject::tr("Error: Cannot open %1:\n%2.").arg(mExtrCalibFile, file.errorString()));
-        return std::nullopt;
+        return;
     }
 
     SPDLOG_INFO("Reading 3D calibration data from {} ...", mExtrCalibFile);
@@ -180,11 +178,11 @@ std::optional<ExtrinsicParameters> ExtrCalibration::loadExtrCalibFile()
     // Exit loop when reaching the end of the file
     while(!in.atEnd())
     {
-        // Neue Zeile einlesen
+        // read new line
         line = in.readLine();
         ++line_counter;
 
-        // Kommentare ueberlesen
+        // skip comments
         if(line.startsWith("#", Qt::CaseInsensitive) || line.startsWith(";;", Qt::CaseInsensitive) ||
            line.startsWith("//", Qt::CaseInsensitive) || line.startsWith("!", Qt::CaseInsensitive))
         {
@@ -240,12 +238,12 @@ std::optional<ExtrinsicParameters> ExtrCalibration::loadExtrCalibFile()
             SPDLOG_INFO("Something wrong in line {} ({})! Ignored. (counter={})", line_counter, line, counter);
         }
 
-        // 3D daten abspeichern
+        // save 3D data
         if(with_3D_data && (counter == 3 || counter == 5))
         {
             points3D_tmp.push_back(cv::Point3f(x, y, z));
         }
-        // 2D daten abspeichern
+        // save 2D data
         if(with_2D_data && counter == 5)
         {
             points2D_tmp.push_back(cv::Point2f(px, py));
@@ -261,7 +259,7 @@ std::optional<ExtrinsicParameters> ExtrCalibration::loadExtrCalibFile()
                         "needed!). Please check your extrinsic "
                         "calibration file!")
                 .arg(points3D_tmp.size()));
-        return std::nullopt;
+        return;
     }
 
     // Non-planar points use DLT - we need at least 6 points; not only 4
@@ -274,7 +272,7 @@ std::optional<ExtrinsicParameters> ExtrCalibration::loadExtrCalibFile()
                         "needed!). Please check your extrinsic "
                         "calibration file!")
                 .arg(points3D_tmp.size()));
-        return std::nullopt;
+        return;
     }
 
     // Check if 2D points delivered and if the number of 2D and 3D points agree
@@ -287,7 +285,7 @@ std::optional<ExtrinsicParameters> ExtrCalibration::loadExtrCalibFile()
                 .arg(mExtrCalibFile)
                 .arg(points3D_tmp.size())
                 .arg(points2D_tmp.size()));
-        return std::nullopt;
+        return;
     }
 
     // Check if number of loaded 3D points agree with stored 2D points
@@ -304,12 +302,10 @@ std::optional<ExtrinsicParameters> ExtrCalibration::loadExtrCalibFile()
             PMessageBox::StandardButton::Ok | PMessageBox::StandardButton::Abort);
         if(result != PMessageBox::StandardButton::Ok)
         {
-            return std::nullopt;
+            return;
         }
-        else
-        {
-            points2D.clear();
-        }
+
+        points2D.clear();
     }
 
     if(with_3D_data)
@@ -320,22 +316,16 @@ std::optional<ExtrinsicParameters> ExtrCalibration::loadExtrCalibFile()
     {
         points2D = points2D_tmp;
     }
-
-    if(!mMainWindow->isLoading())
-    {
-        return calibExtrParams();
-    }
-    return std::nullopt;
 }
 
 /**
- * @brief Uses manually set TrackPoints as 2D points for extrinsic calibration
+ * @brief Uses manually set TrackPoints as 2D points for extrinsic calibration. Does not perform extrinsic calibration,
+ * only fetches the 2D points.
  *
  * @pre loaded at least 4 3D-points
  *
- * @return true if calibration did take place
  */
-std::optional<ExtrinsicParameters> ExtrCalibration::fetch2DPoints()
+void ExtrCalibration::fetch2DPoints()
 {
     if(!mMainWindow->getTracker() || mPersonStorage.nbPersons() < 4)
     {
@@ -343,7 +333,7 @@ std::optional<ExtrinsicParameters> ExtrCalibration::fetch2DPoints()
             mMainWindow,
             QObject::tr("Petrack"),
             QObject::tr("Error: At minimum four 3D calibration points needed for 3D calibration."));
-        return std::nullopt;
+        return;
     }
 
     size_t sz_2d = mPersonStorage.nbPersons();
@@ -354,7 +344,7 @@ std::optional<ExtrinsicParameters> ExtrCalibration::fetch2DPoints()
             mMainWindow,
             QObject::tr("Petrack"),
             QObject::tr("Count of 2D-Points (%1) and 3D-Points (%2) disagree").arg(sz_2d).arg(points3D.size()));
-        return std::nullopt;
+        return;
     }
 
     points2D.clear();
@@ -363,9 +353,8 @@ std::optional<ExtrinsicParameters> ExtrCalibration::fetch2DPoints()
         //  Info: Tracker->TrackPerson->TrackPoint->Vec2F
         points2D.push_back(cv::Point2f(mPersonStorage.at(i).at(0).x(), mPersonStorage.at(i).at(0).y()));
     }
-
     mPersonStorage.clear();
-    return calibExtrParams();
+    mMainWindow->getScene()->update();
 }
 
 /**

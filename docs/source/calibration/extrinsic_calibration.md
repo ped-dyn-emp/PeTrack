@@ -81,9 +81,10 @@ Figure 3: Example of a selected points on the combined image in PeTrack.
 
 Now you can click on `load` in the `extrinsic parameters` section of the `calibration tab`. Navigate to your `points.3dc`
 file and select it. Now click on `fetch` and PeTrack will assign the pixel coordinates of your selected points on the
-screen to the real-world coordinates written down in the `points.3dc` file. 
+screen to the real-world coordinates written down in the `points.3dc` file.
 <br>
-You will also note that once you click on fetch your selected points on the screen will disappear.
+You will also note that once you click on `fetch` your selected points on the screen will disappear.
+Then, click on `calc` to perform the extrinsic calibration, which involves calculating the extrinsic parameters and saving them afterward.
 <br>
 Now you have the option to view the error of your extrinsic calibration by clicking `error`. This will give you an idea 
 of e.g. how well you prepared your coordinate system and the accuracy of your point selection in PeTrack. If you are happy

@@ -59,6 +59,7 @@ signals:
 
 private slots:
 
+    void on_extrCalibCalc_clicked();
     void on_extrCalibFetch_clicked();
     void on_coordLoad3DCalibPoints_clicked();
 

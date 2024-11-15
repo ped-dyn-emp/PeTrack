@@ -165,10 +165,10 @@ public:
     bool                               isSetExtrCalib() const { return true; }
     void                               setExtrCalibFile(const QString &f);
     QString                            getExtrCalibFile();
-    std::optional<ExtrinsicParameters> openExtrCalibFile();
-    std::optional<ExtrinsicParameters> loadExtrCalibFile();
+    void                               openExtrCalibFile();
+    void                               loadExtrCalibFile();
     bool                               saveExtrCalibPoints();
-    std::optional<ExtrinsicParameters> fetch2DPoints();
+    void                               fetch2DPoints();
     std::optional<ExtrinsicParameters> calibExtrParams();
     bool                               calcReprojectionError(const ExtrinsicParameters &extrParams);
     virtual cv::Point2f                getImagePoint(cv::Point3f p3d) const;
