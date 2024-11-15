@@ -6,6 +6,8 @@ name: Mirror to Gitlab to trigger CI
 
 on:
   push:
+    branches-ignore:
+        - master
   pull_request_target:
 
 jobs:
