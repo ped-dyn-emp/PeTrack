@@ -19,9 +19,10 @@
 #ifndef STEREOITEM_H
 #define STEREOITEM_H
 
-#include "petrack.h"
+class Petrack;
 
 #include <QGraphicsItem>
+#include <opencv2/core/mat.hpp>
 
 class StereoItem : public QGraphicsItem
 {

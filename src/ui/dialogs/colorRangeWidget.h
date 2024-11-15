@@ -20,10 +20,11 @@
 #define COLORRANGEWIDGET_H
 
 #include "colorPlot.h"
-#include "petrack.h"
 #include "ui_colorRange.h"
 
 #include <QtWidgets>
+
+class Petrack;
 
 class ColorRangeWidget : public QWidget, public Ui::ColorRange
 {

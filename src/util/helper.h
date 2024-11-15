@@ -22,8 +22,8 @@
 #include <QFileInfo>
 #include <QRect>
 #include <QString>
+#include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
-#include <opencv2/opencv.hpp>
 
 extern const QString commandLineOptionsString;
 extern QString       proFileName; ///< Path to the project (.pet) file; defined in helper.cpp
@@ -149,6 +149,7 @@ inline QColor getValue(const cv::Mat &img, int x, int y)
 }
 #include <QColor>
 #include <QTextStream>
+#include <iostream>
 inline std::ostream &operator<<(std::ostream &s, const QColor &col)
 {
     if(col.isValid())
@@ -161,6 +162,8 @@ inline std::ostream &operator<<(std::ostream &s, const QColor &col)
     }
     return s;
 }
+
+
 inline QTextStream &operator<<(QTextStream &s, const QColor &col)
 {
     if(col.isValid())
@@ -173,6 +176,8 @@ inline QTextStream &operator<<(QTextStream &s, const QColor &col)
     }
     return s;
 }
+
+
 inline QTextStream &operator>>(QTextStream &s, QColor &col)
 {
     int i;

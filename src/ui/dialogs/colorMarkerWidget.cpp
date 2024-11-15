@@ -18,7 +18,10 @@
 
 #include "colorMarkerWidget.h"
 
+#include "colorMarkerItem.h"
 #include "importHelper.h"
+#include "petrack.h"
+
 
 ColorMarkerWidget::ColorMarkerWidget(QWidget *parent) : QWidget(parent)
 {
@@ -150,6 +153,94 @@ void ColorMarkerWidget::getXml(QDomElement &elem)
             loadIntValue(subElem, "MAX_AREA", maxArea);
             loadDoubleValue(subElem, "MAX_RATIO", maxRatio);
         }
+    }
+}
+
+void ColorMarkerWidget::on_showMask_stateChanged(int i)
+{
+    mMainWindow->getColorMarkerItem()->setVisible(i);
+    mMainWindow->getScene()->update();
+}
+
+void ColorMarkerWidget::on_maskMask_stateChanged(int)
+{
+    mMainWindow->getScene()->update();
+}
+
+void ColorMarkerWidget::on_opacity_valueChanged(int)
+{
+    mMainWindow->getScene()->update();
+}
+
+void ColorMarkerWidget::on_inversHue_stateChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+}
+
+void ColorMarkerWidget::on_useOpen_stateChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+}
+
+void ColorMarkerWidget::on_useClose_stateChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+}
+
+void ColorMarkerWidget::on_closeRadius_valueChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+}
+
+void ColorMarkerWidget::on_openRadius_valueChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+}
+
+void ColorMarkerWidget::on_minArea_valueChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+}
+
+void ColorMarkerWidget::on_maxArea_valueChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+}
+
+void ColorMarkerWidget::on_maxRatio_valueChanged(double)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
     }
 }
 

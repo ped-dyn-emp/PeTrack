@@ -21,6 +21,7 @@
 
 #include "vector.h"
 
+#include <QColor>
 #include <QList>
 #include <QObject>
 #include <opencv2/objdetect/aruco_detector.hpp>

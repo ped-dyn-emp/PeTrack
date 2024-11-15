@@ -19,8 +19,8 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include "helper.h"
 
+#include <QTextStream>
 #include <QVector3D>
 #include <opencv2/core/types_c.h>
 

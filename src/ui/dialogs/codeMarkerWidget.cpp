@@ -20,6 +20,7 @@
 
 #include "importHelper.h"
 #include "pMessageBox.h"
+#include "petrack.h"
 #include "recognition.h"
 #include "ui_codeMarker.h"
 

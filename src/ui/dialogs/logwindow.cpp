@@ -24,10 +24,10 @@
 #include "ui_logwindow.h"
 
 #include <QFileDialog>
+#include <QTextStream>
 
 LogWindow::LogWindow(QWidget *parent, Ui::LogWindow *ui) : QWidget(parent)
 {
-    mMainWindow = (class Petrack *) parent;
     if(!ui)
     {
         mUi = new Ui::LogWindow();

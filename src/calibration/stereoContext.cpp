@@ -25,6 +25,7 @@
 #include "pMessageBox.h"
 #include "person.h"
 #include "petrack.h"
+#include "stereoItem.h"
 #include "stereoWidget.h"
 
 #include <QDir>

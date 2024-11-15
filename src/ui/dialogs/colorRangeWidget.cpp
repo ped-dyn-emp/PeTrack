@@ -19,6 +19,8 @@
 #include "colorRangeWidget.h"
 
 #include "control.h"
+#include "petrack.h"
+
 
 ColorRangeWidget::ColorRangeWidget(QWidget *parent) : QWidget(parent)
 {
