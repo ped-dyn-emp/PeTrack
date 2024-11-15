@@ -246,10 +246,12 @@ double CoordinateSystemBox::getAngleToGround(float px, float py, float height) c
 
     cv::Point3f a(cam.x - posInImage.x, cam.y - posInImage.y, cam.z - posInImage.z), b(0, 0, 1);
 
+    // NOTE: in C++20 can be replaced with numbers import
+    const double pi = std::atan(1.0) * 4;
     return asin(
                (a.x * b.x + a.y * b.y + a.z * b.z) / (abs(sqrt(pow(a.x, 2) + pow(a.y, 2) + pow(a.z, 2))) *
                                                       abs(sqrt(pow(b.x, 2) + pow(b.y, 2) + pow(b.z, 2))))) *
-           180 / PI;
+           180 / pi;
 }
 
 QPointF CoordinateSystemBox::getPosImage(QPointF pos, float height) const

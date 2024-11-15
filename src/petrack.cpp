@@ -55,6 +55,7 @@
 #include "person.h"
 #include "petrack.h"
 #include "player.h"
+#include "recognition.h"
 #include "roiItem.h"
 #include "stereoItem.h"
 #include "stereoWidget.h"

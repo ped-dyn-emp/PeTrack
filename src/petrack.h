@@ -43,7 +43,6 @@
 #include "moCapController.h"
 #include "moCapPerson.h"
 #include "personStorage.h"
-#include "recognition.h"
 #include "swapFilter.h"
 #include "trackerReal.h"
 

@@ -19,6 +19,7 @@
 #include "moCapController.h"
 
 #include "IO.h"
+#include "helper.h"
 #include "importHelper.h"
 #include "logger.h"
 #include "moCapPerson.h"

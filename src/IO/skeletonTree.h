@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <memory>
+#include <opencv2/core/affine.hpp>
 #include <opencv2/core/matx.hpp>
 #include <opencv2/core/types.hpp>
 #include <stdexcept>

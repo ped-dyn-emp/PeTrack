@@ -19,11 +19,12 @@
 #ifndef COLORMARKERWIDGET_H
 #define COLORMARKERWIDGET_H
 
-#include "colorMarkerItem.h"
-#include "petrack.h"
 #include "ui_colorMarker.h"
 
-#include <QtWidgets>
+#include <QDomElement>
+
+class QDomElement;
+class Petrack;
 
 class ColorMarkerWidget : public QWidget, public Ui::ColorMarker
 {
@@ -48,87 +49,27 @@ public:
 private slots:
 
     // Functions which just modifies the visual
-    void on_showMask_stateChanged(int i)
-    {
-        mMainWindow->getColorMarkerItem()->setVisible(i);
-        mMainWindow->getScene()->update();
-    }
+    void on_showMask_stateChanged(int i);
 
-    void on_maskMask_stateChanged(int /*i*/) { mMainWindow->getScene()->update(); }
-    void on_opacity_valueChanged(int /*i*/) { mMainWindow->getScene()->update(); }
+    void on_maskMask_stateChanged(int /*i*/);
+    void on_opacity_valueChanged(int /*i*/);
 
     // functions which force a new recognition
-    void on_inversHue_stateChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
+    void on_inversHue_stateChanged(int /*i*/);
 
-    void on_useOpen_stateChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
+    void on_useOpen_stateChanged(int /*i*/);
 
-    void on_useClose_stateChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
+    void on_useClose_stateChanged(int /*i*/);
 
-    void on_closeRadius_valueChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
+    void on_closeRadius_valueChanged(int /*i*/);
 
-    void on_openRadius_valueChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
+    void on_openRadius_valueChanged(int /*i*/);
 
-    void on_minArea_valueChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
+    void on_minArea_valueChanged(int /*i*/);
 
-    void on_maxArea_valueChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
+    void on_maxArea_valueChanged(int /*i*/);
 
-    void on_maxRatio_valueChanged(double /*d*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
+    void on_maxRatio_valueChanged(double /*d*/);
 
     void on_fromTriangle_colorChanged(const QColor &col);
     void on_toTriangle_colorChanged(const QColor &col);

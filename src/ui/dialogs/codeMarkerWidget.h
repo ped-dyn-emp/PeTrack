@@ -20,17 +20,16 @@
 #define CODEMARKERWIDGET_H
 
 #include "codeMarkerItem.h"
-#include "petrack.h"
 #include "recognition.h"
 
+#include <QDomElement>
 #include <QtWidgets>
-#include <opencv2/objdetect/aruco_detector.hpp>
 
 namespace Ui
 {
 class CodeMarker;
 }
-
+class Petrack;
 
 class CodeMarkerWidget : public QWidget
 {

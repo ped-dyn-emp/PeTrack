@@ -25,7 +25,6 @@
 #include "spdlog/sinks/qt_sinks.h"
 
 #include <QWidget>
-#include <petrack.h>
 
 namespace Ui
 {
@@ -48,7 +47,6 @@ public:
 
 private:
     Ui::LogWindow                                        *mUi;
-    Petrack                                              *mMainWindow;
     std::shared_ptr<spdlog::sinks::dist_sink<std::mutex>> distSink;
     std::shared_ptr<spdlog::sinks::qt_sink<std::mutex>>   qtSink;
 };

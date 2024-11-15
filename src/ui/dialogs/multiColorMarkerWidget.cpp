@@ -18,7 +18,9 @@
 
 #include "multiColorMarkerWidget.h"
 
+#include "control.h"
 #include "importHelper.h"
+#include "petrack.h"
 
 MultiColorMarkerWidget::MultiColorMarkerWidget(QWidget *parent) : QWidget(parent)
 {
@@ -111,6 +113,177 @@ void MultiColorMarkerWidget::getXml(QDomElement &elem)
             loadBoolValue(subElem, "USE_HEAD_SIZE", useHeadSize, false);
             loadDoubleValue(subElem, "MAX_RATIO", maxRatio);
         }
+    }
+}
+
+void MultiColorMarkerWidget::on_useDot_stateChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->updateImage();
+}
+
+void MultiColorMarkerWidget::on_dotSize_valueChanged(double)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->updateImage();
+}
+
+void MultiColorMarkerWidget::on_useCodeMarker_stateChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true);
+    mMainWindow->updateImage();
+}
+
+void MultiColorMarkerWidget::on_CodeMarkerParameter_clicked()
+{
+    mMainWindow->getCodeMarkerWidget()->show();
+}
+
+void MultiColorMarkerWidget::on_ignoreWithoutDot_stateChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->updateImage();
+}
+
+void MultiColorMarkerWidget::on_useColor_stateChanged(int) // eigentlich nichts noetig, da nur beim Tracing aktiv
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->updateImage();
+}
+
+void MultiColorMarkerWidget::on_restrictPosition_stateChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->updateImage();
+}
+
+void MultiColorMarkerWidget::on_autoCorrect_stateChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->updateImage();
+}
+
+void MultiColorMarkerWidget::on_autoCorrectOnlyExport_stateChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->updateImage();
+}
+
+void MultiColorMarkerWidget::on_showMask_stateChanged(int i)
+{
+    mMainWindow->getMultiColorMarkerItem()->setVisible(i);
+    mMainWindow->getScene()->update();
+}
+
+void MultiColorMarkerWidget::on_maskMask_stateChanged(int)
+{
+    mMainWindow->getScene()->update();
+}
+
+void MultiColorMarkerWidget::on_opacity_valueChanged(int)
+{
+    mMainWindow->getScene()->update();
+}
+
+void MultiColorMarkerWidget::on_useOpen_stateChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+}
+
+void MultiColorMarkerWidget::on_useClose_stateChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+}
+
+void MultiColorMarkerWidget::on_closeRadius_valueChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+}
+
+void MultiColorMarkerWidget::on_openRadius_valueChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+}
+
+void MultiColorMarkerWidget::on_minArea_valueChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+}
+
+void MultiColorMarkerWidget::on_maxArea_valueChanged(int)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
+    }
+}
+
+void MultiColorMarkerWidget::on_useHeadSize_stateChanged(int i)
+{
+    if(i)
+    {
+        if(mMainWindow->getImageItem() && mMainWindow->getImage() && mMainWindow->getControlWidget())
+        {
+            const auto &worldImgCorr = mMainWindow->getWorldImageCorrespondence();
+            QPointF cmPerPixel1 = worldImgCorr.getCmPerPixel(0, 0, mMainWindow->getControlWidget()->getDefaultHeight());
+            QPointF cmPerPixel2 = worldImgCorr.getCmPerPixel(
+                mMainWindow->getImage()->width() - 1,
+                mMainWindow->getImage()->height() - 1,
+                mMainWindow->getControlWidget()->getDefaultHeight());
+            double cmPerPixelAvg = (cmPerPixel1.x() + cmPerPixel1.y() + cmPerPixel2.x() + cmPerPixel2.y()) / 4.;
+            if(cmPerPixelAvg > 0)
+            {
+                double area = PI * 0.25 * HEAD_SIZE / cmPerPixelAvg * 14. /
+                              cmPerPixelAvg; // 14. Kopfbreite // Elipse: A=Pi*a*b (a,b Halbachsen)
+                mOldMinArea = minArea->value();
+                mOldMaxArea = maxArea->value();
+
+                minArea->setValue(area * 0.75);
+                maxArea->setValue(area * 2.5);
+            }
+        }
+        minArea->setDisabled(true);
+        maxArea->setDisabled(true);
+    }
+    else
+    {
+        minArea->setDisabled(false);
+        maxArea->setDisabled(false);
+        minArea->setValue(mOldMinArea);
+        maxArea->setValue(mOldMaxArea);
+    }
+
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->updateImage();
+}
+
+void MultiColorMarkerWidget::on_maxRatio_valueChanged(double)
+{
+    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    if(!mMainWindow->isLoading())
+    {
+        mMainWindow->updateImage();
     }
 }
 

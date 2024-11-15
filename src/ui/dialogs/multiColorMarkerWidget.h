@@ -20,14 +20,13 @@
 #define MULTICOLORMARKERWIDGET_H
 
 #include "codeMarkerWidget.h"
-#include "control.h"
 #include "imageItem.h"
 #include "multiColorMarkerItem.h"
-#include "petrack.h"
 #include "ui_multiColorMarker.h"
 #include "worldImageCorrespondence.h"
 
 #include <QtWidgets>
+class Petrack;
 
 class MultiColorMarkerWidget : public QWidget, public Ui::MultiColorMarker
 {
@@ -44,156 +43,33 @@ public:
 
 private slots:
 
-    void on_useDot_stateChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        mMainWindow->updateImage();
-    }
-    void on_dotSize_valueChanged(double /*d*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        mMainWindow->updateImage();
-    }
-    void on_useCodeMarker_stateChanged(int /* i */)
-    {
-        mMainWindow->setRecognitionChanged(true);
-        mMainWindow->updateImage();
-    }
-    void on_CodeMarkerParameter_clicked() { mMainWindow->getCodeMarkerWidget()->show(); }
-    void on_ignoreWithoutDot_stateChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        mMainWindow->updateImage();
-    }
-    void on_useColor_stateChanged(int /*i*/) // eigentlich nichts noetig, da nur beim Tracing aktiv
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        mMainWindow->updateImage();
-    }
-    void on_restrictPosition_stateChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        mMainWindow->updateImage();
-    }
-    void on_autoCorrect_stateChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        mMainWindow->updateImage();
-    }
-    void on_autoCorrectOnlyExport_stateChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        mMainWindow->updateImage();
-    }
+    void on_useDot_stateChanged(int /*i*/);
+    void on_dotSize_valueChanged(double /*d*/);
+    void on_useCodeMarker_stateChanged(int /* i */);
+    void on_CodeMarkerParameter_clicked();
+    void on_ignoreWithoutDot_stateChanged(int /*i*/);
+    void on_useColor_stateChanged(int /*i*/);
+    void on_restrictPosition_stateChanged(int /*i*/);
+    void on_autoCorrect_stateChanged(int /*i*/);
+    void on_autoCorrectOnlyExport_stateChanged(int /*i*/);
 
     // Functions which just modifies the visual
-    void on_showMask_stateChanged(int i)
-    {
-        mMainWindow->getMultiColorMarkerItem()->setVisible(i);
-        mMainWindow->getScene()->update();
-    }
-    void on_maskMask_stateChanged(int /*i*/) { mMainWindow->getScene()->update(); }
-    void on_opacity_valueChanged(int /*i*/) { mMainWindow->getScene()->update(); }
+    void on_showMask_stateChanged(int i);
+    void on_maskMask_stateChanged(int /*i*/);
+    void on_opacity_valueChanged(int /*i*/);
 
     // functions which force a new recognition
-    void on_useOpen_stateChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
-    void on_useClose_stateChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
+    void on_useOpen_stateChanged(int /*i*/);
+    void on_useClose_stateChanged(int /*i*/);
 
-    void on_closeRadius_valueChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
-    void on_openRadius_valueChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
+    void on_closeRadius_valueChanged(int /*i*/);
+    void on_openRadius_valueChanged(int /*i*/);
 
-    void on_minArea_valueChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
-    void on_maxArea_valueChanged(int /*i*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
-    void on_useHeadSize_stateChanged(int i)
-    {
-        if(i)
-        {
-            if(mMainWindow->getImageItem() && mMainWindow->getImage() && mMainWindow->getControlWidget())
-            {
-                const auto &worldImgCorr = mMainWindow->getWorldImageCorrespondence();
-                QPointF     cmPerPixel1 =
-                    worldImgCorr.getCmPerPixel(0, 0, mMainWindow->getControlWidget()->getDefaultHeight());
-                QPointF cmPerPixel2 = worldImgCorr.getCmPerPixel(
-                    mMainWindow->getImage()->width() - 1,
-                    mMainWindow->getImage()->height() - 1,
-                    mMainWindow->getControlWidget()->getDefaultHeight());
-                double cmPerPixelAvg = (cmPerPixel1.x() + cmPerPixel1.y() + cmPerPixel2.x() + cmPerPixel2.y()) / 4.;
-                if(cmPerPixelAvg > 0)
-                {
-                    double area = PI * 0.25 * HEAD_SIZE / cmPerPixelAvg * 14. /
-                                  cmPerPixelAvg; // 14. Kopfbreite // Elipse: A=Pi*a*b (a,b Halbachsen)
-                    mOldMinArea = minArea->value();
-                    mOldMaxArea = maxArea->value();
+    void on_minArea_valueChanged(int /*i*/);
+    void on_maxArea_valueChanged(int /*i*/);
+    void on_useHeadSize_stateChanged(int i);
 
-                    minArea->setValue(area * 0.75);
-                    maxArea->setValue(area * 2.5);
-                }
-            }
-            minArea->setDisabled(true);
-            maxArea->setDisabled(true);
-        }
-        else
-        {
-            minArea->setDisabled(false);
-            maxArea->setDisabled(false);
-            minArea->setValue(mOldMinArea);
-            maxArea->setValue(mOldMaxArea);
-        }
-
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        mMainWindow->updateImage();
-    }
-
-    void on_maxRatio_valueChanged(double /*d*/)
-    {
-        mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-        if(!mMainWindow->isLoading())
-        {
-            mMainWindow->updateImage();
-        }
-    }
+    void on_maxRatio_valueChanged(double /*d*/);
 
 private:
     Petrack *mMainWindow;
