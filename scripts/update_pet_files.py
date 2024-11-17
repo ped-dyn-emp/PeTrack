@@ -2,9 +2,12 @@
 This Script updates all .pet files used for the tests. Run this if the PeTrack version changed or you made some changes that
 modified .pet files
 How to use:
-Run 'python scripts/update_pet_files.py' from the petrack directory. If the PeTrack version changed it will display a warning
-but just press Enter until the script says "Press any key to continue...".
+Run 'python scripts/update_pet_files.py' from either the petrack root directory, or another directory. If you don't run it from the petrack root directory,
+make sure to pass the relative path to it.
 After that try running the regression_tests again.
+Parameters:
+-r (--root): Relative path to the root petrack directory ('.' per default)
+-p (--path): Path to the build directory relative to root ('build' per default)
 """
 
 import pathlib
@@ -107,7 +110,7 @@ def parse_args():
 
     parser.add_argument(
         "-r", "--root",
-        help="Path to the root petrack directory", required=False,
+        help="Relative path to the root petrack directory", required=False,
         type=str
     )
     parser.add_argument(
