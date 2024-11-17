@@ -12,6 +12,7 @@ coding_guidelines
 build_from_source
 testing
 release_and_versioning
+modify_dependencies
 executionflow
 tracking
 visualization
