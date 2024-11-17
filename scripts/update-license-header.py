@@ -12,7 +12,7 @@ from datetime import datetime
 import fileinput
 
 directories = ['src', 'tests']
-file_endings = ['h', 'cpp', 'py']
+file_endings = ('.h', '.cpp', '.py')
 
 # custom files that should be included
 additional_files = ['.gitlab-ci.yml']
@@ -24,6 +24,7 @@ blacklist_dir = ('.pytest_cache', '__pycache__', 'regression_test/data')
 base_dir = sys.argv[1] if len(sys.argv) > 1 else '.'
 directories = [f'{base_dir}/{directory}' for directory in directories]
 blacklist = [f'{base_dir}/{f}' for f in blacklist]
+additional_files = [f'{base_dir}/{f}' for f in additional_files]
 files = []
 
 for directory in directories:
@@ -36,11 +37,11 @@ for directory in directories:
         else:
             files.append(f'{file}')
 
-filtered = [f for f in files if f not in blacklist]
+filtered = [f for f in files if f not in blacklist and f.endswith(file_endings)]
 filtered.extend(additional_files)
 
 current_year = datetime.now().year
-regex = "Copyright \(C\) \d{4} Forschungszentrum J.*lich GmbH"
+regex = r"Copyright \(C\) \d{4} Forschungszentrum J.*lich GmbH"
 pattern = re.compile(regex)
 error_count = 0
 update_count = 0
@@ -51,7 +52,7 @@ for f in filtered:
             for i, line in enumerate(file, start=0):
                 # Replace the copyright year in the third line
                 if i == 2 and pattern.search(line):
-                    print(re.sub("\d{4}", str(current_year), line), end="")
+                    print(re.sub(r"\d{4}", str(current_year), line), end="")
                     update_count += 1
                 else:
                     print(line, end="")
