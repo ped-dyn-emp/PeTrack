@@ -112,7 +112,7 @@ show only people
   If `only selected` is not checked, all pedestrians are tracked, even though only one is visualized!
   :::
 
-  The buttons next to the spinbox allow to jump to certain frames. `goto` jumps into the middle of the trajectory. `begin` jumps to the first frame of the trajectory and `end` jumps to the last frame of the trajectory.
+  The buttons next to the spinbox allow to jump to certain frames. `begin` jumps to the first frame of the trajectory, `mid` jumps into the middle of the trajectory and `end` jumps to the last frame of the trajectory.
 
 show only people list
 : Visualizes multiple people. One can use a comma-separated list of id's or a range of id's written as e.g. `5-9`. Only the selected people are visualized anymore and if `only selected` is checked for tracking, only the selected people are tracked.

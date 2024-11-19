@@ -15,7 +15,7 @@ Start with person 1 and find the corresponding path on the picture on the left-h
 If you have used the multicolor marker, the filled in dots are points at which PeTrack is able to read out the code marker. It is less likely that these points are wrong, but it can still happen. Empty red dots are points where the code marker is not read out. Here the chance of errors is much higher!
 :::
 
-Start by setting the frame bar at the bottom of the page to 0. Now check the start position. It can happen that PeTrack picks a wrong start point for the trajectory on the head! Then you can click through the frames one by one or just press `space` to let the video play in full speed. Clicking on `start`or `end` will set the current frame to the beginning or end of the trajectory, while `go to` will jump to the middle of the trajectory.
+Start by setting the frame bar at the bottom of the page to 0. Now check the start position. It can happen that PeTrack picks a wrong start point for the trajectory on the head! Then you can click through the frames one by one or just press `space` to let the video play in full speed. Clicking on `start`or `end` will set the current frame to the beginning or end of the trajectory, while `mid` will jump to the middle of the trajectory.
 
 If you want to visualize the complete path of a person, you might need to increase the values in `frames before actual position` and `frames after actual position`, or use the option `show complete path`.
 

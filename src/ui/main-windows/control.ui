@@ -2634,19 +2634,6 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="trackGotoNr">
-                    <property name="maximumSize">
-                     <size>
-                      <width>40</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>goto</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
                    <widget class="QPushButton" name="trackGotoStartNr">
                     <property name="maximumSize">
                      <size>
@@ -2656,6 +2643,19 @@
                     </property>
                     <property name="text">
                      <string>start</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="trackGotoNr">
+                    <property name="maximumSize">
+                     <size>
+                      <width>40</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>mid</string>
                     </property>
                    </widget>
                   </item>
@@ -4380,8 +4380,8 @@
   <tabstop>trackShowOnlyVisible</tabstop>
   <tabstop>trackShowOnly</tabstop>
   <tabstop>trackShowOnlyNr</tabstop>
-  <tabstop>trackGotoNr</tabstop>
   <tabstop>trackGotoStartNr</tabstop>
+  <tabstop>trackGotoNr</tabstop>
   <tabstop>trackGotoEndNr</tabstop>
   <tabstop>trackShowOnlyList</tabstop>
   <tabstop>trackShowOnlyNrList</tabstop>
