@@ -1121,6 +1121,15 @@ void Petrack::exportViewSequence()
 void Petrack::exportSequence(bool exportVideo, bool exportView, QString dest) // default exportView= false, dest=""
 {
     static QString lastDir;
+    // if sequenceFps is not set, show an error message
+    if(exportVideo && mAnimation.getSequenceFPS() <= 0)
+    {
+        PCritical(
+            this,
+            tr("PeTrack"),
+            tr("Sequence FPS is not set.\nCheck your configuration and make sure to set sequence FPS."));
+        return;
+    }
 
     // if no destination file or folder is given
     if(dest.isEmpty())
@@ -1293,7 +1302,7 @@ void Petrack::exportSequence(bool exportVideo, bool exportView, QString dest) //
         {
             if(exportView)
             {
-                progress.setLabelText("Export video view...");
+                progress.setLabelText("Export view video...");
             }
             else
             {
