@@ -120,6 +120,10 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
                 *infoTrj = nullptr, *addComment = nullptr, *setHeight = nullptr, *resetHeight = nullptr,
                 *setMarkerID = nullptr, *splitTrj = nullptr;
 
+
+        QString groupInfo{""};
+        QString groupName{""};
+
         if(found)
         {
             i              = iNearest;
@@ -138,11 +142,21 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
                 height_set_by_user = true;
             }
 
-            infoTrj      = menu.addAction(QString("PersonNr: %1 height: %2 frames: [%3..%4]")
+
+            if(tp.getGroups().getEntry(frame).data >= 0)
+            {
+                const auto groupId = tp.getGroups().getEntry(frame).data;
+                const auto group   = mMainWindow->getGroupManager().getGroup(groupId);
+                groupName          = QString::fromStdString(group.name);
+                groupInfo          = QString("Group: %1").arg(groupName);
+            }
+
+            infoTrj      = menu.addAction(QString("PersonNr: %1 %5 height: %2 frames: [%3..%4]")
                                          .arg(i + 1)
                                          .arg(height)
                                          .arg(tp.firstFrame())
-                                         .arg(tp.lastFrame()));
+                                         .arg(tp.lastFrame())
+                                         .arg(groupInfo));
             delTrj       = menu.addAction("Delete whole trajectory");
             delFutureTrj = menu.addAction("Delete past part of the trajectory");
             delPastTrj   = menu.addAction("Delete future part of the trajectory");
@@ -232,6 +246,7 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
                                   "<tr><td>frames:</td><td>[%1...%2]</td></tr>"
                                   "<tr><td>color:</td><td><font "
                                   "style='display:inline;background:%3;color:#fff;'>%4</font></td></tr>"
+                                  "<tr><td>group:</td><td>%18</td></tr>"
                                   "<tr><td>comment:</td><td>%5</td></tr>"
                                   "<tr><td></td><td></td></tr>");
                 }
@@ -242,6 +257,7 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
                                   "<tr><td>frames:</td><td>[%1...%2]</td></tr>"
                                   "<tr><td>color:</td><td><font "
                                   "style='display:inline;background:%3;color:#fff;'>%4</font></td></tr>"
+                                  "<tr><td>group:</td><td>%18</td></tr>"
                                   "<tr><td>comment:</td><td>%5</td></tr>"
                                   "<tr><td></td><td></td></tr>");
                 }
@@ -273,7 +289,8 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
                                                   .arg(tp.at(tp.size() - 2).y())
                                                   .arg(tp.lastFrame())
                                                   .arg(tp.at(tp.size() - 1).x())
-                                                  .arg(tp.at(tp.size() - 1).y()));
+                                                  .arg(tp.at(tp.size() - 1).y())
+                                                  .arg(groupName));
                 }
                 else
                 {

@@ -43,6 +43,7 @@ class AnalysePlot;
 class MissingFrames;
 class WorldImageCorrespondence;
 class AlignmentGridBox;
+
 namespace Ui
 {
 class Control;

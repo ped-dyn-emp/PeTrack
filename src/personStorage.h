@@ -65,6 +65,9 @@ public:
     void                            addPerson(const TrackPerson &person) { mPersons.push_back(person); }
     const std::vector<TrackPerson> &getPersons() const { return mPersons; }
 
+    IntervalList<int>       &getGroupList(size_t person) { return mPersons.at(person).getGroups(); }
+    const IntervalList<int> &getGroupList(size_t person) const { return mPersons.at(person).getGroups(); }
+
     // used for calculation of 3D point for all points in frame
     // returns number of found points or -1 if no stereoContext available (also points without disp found are counted)
     int calcPosition(int frame);

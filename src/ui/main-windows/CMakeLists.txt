@@ -1,6 +1,9 @@
 target_include_directories(petrack_core PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 target_sources(petrack_core PRIVATE
+    annotationGroups.ui
+    annotationGroupWidget.cpp
+    annotationGroupWidget.h
     alignmentGridBox.cpp   
     alignmentGridBox.h     
     alignmentGridBox.ui    

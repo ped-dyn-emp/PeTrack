@@ -19,6 +19,8 @@
 #ifndef TRACKER_H
 #define TRACKER_H
 
+#include "annotationGrouping.h"
+#include "intervalList.h"
 #include "recognition.h"
 #include "vector.h"
 
@@ -141,7 +143,8 @@ private:
     QString           mComment;       //< comment for person
     int               mNrInBg;        //< number of successive frames in the background
     int               mColorCount;    //< number of colors where mColor is average from
-    QList<TrackPoint> mData{};        //< TrackPoints from mFirstFrame to mLastFrame;
+    QList<TrackPoint> mData{};        //< TrackPoints from mFirstFrame to mLastFrame;;
+    IntervalList<int> mGroups{annotationGroups::NO_GROUP.id};
 
 public:
     TrackPerson(int nr, int frame, const TrackPoint &p);
@@ -218,7 +221,9 @@ public:
     void updateStereoPoint(int frame, Vec3F stereoPoint);
     void updateMarkerID(int frame, int markerID);
 
-    void removeFramesBetween(int startFrame, int endFrame);
+    void                            removeFramesBetween(int startFrame, int endFrame);
+    inline IntervalList<int>       &getGroups() { return mGroups; }
+    inline const IntervalList<int> &getGroups() const { return mGroups; }
 };
 
 // mHeightCount wird nicht e3xportiert und auch nicht wieder eingelesen -> nach import auf 0 obwohl auf height ein wert

@@ -31,6 +31,7 @@
 #include "stereoContext.h"
 #endif
 #include "animation.h"
+#include "annotationGroupManager.h"
 #include "autoCalib.h"
 #include "autosave.h"
 #include "backgroundFilter.h"
@@ -50,6 +51,7 @@ class RoiItem;
 class RecognitionRoiItem;
 class GridItem;
 class WorldImageCorrespondence;
+class AnnotationGroupWidget;
 
 
 // durchschnittliche Kopflaenge in cm (Kopf 21x14)
@@ -89,6 +91,7 @@ class ColorMarkerItem;
 class CodeMarkerItem;
 class MultiColorMarkerItem;
 class BackgroundItem;
+class AnnotationGroupItem;
 class Tracker;
 class TrackerReal;
 class MoCapStorage;
@@ -126,6 +129,7 @@ private slots:
     void commandLineOptions();
     void keyBindings();
     void showLogWindow();
+    void showGroupAnnotationWindow();
     void about();
     void onlineHelp();
     void setCamera();
@@ -261,6 +265,8 @@ public:
     inline SwapFilter           *getSwapFilter() { return &mSwapFilter; }
     inline BackgroundFilter     *getBackgroundFilter() { return &mBackgroundFilter; }
 
+    inline AnnotationGroupManager &getGroupManager() { return mGroupManager; }
+
     inline int getImageBorderSize()
     {
         if(getBorderFilter()->getEnabled())
@@ -349,6 +355,7 @@ private:
     CodeMarkerWidget       *mCodeMarkerWidget;
     MultiColorMarkerWidget *mMultiColorMarkerWidget;
     LogWindow              *mLogWindow;
+    AnnotationGroupWidget  *mGroupingWidget;
 
     QAction      *mOpenSeqAct;
     QAction      *mOpenCameraAct;
@@ -397,6 +404,7 @@ private:
     QAction      *mCommandAct;
     QAction      *mKeyAct;
     QAction      *mShowLogWindowAct;
+    QAction      *mShowGroupAnnotationWindowAct;
     QAction      *mAboutAct;
     QAction      *mOnlineHelpAct;
     QAction      *mAutosaveSettings;
@@ -439,6 +447,7 @@ private:
     MultiColorMarkerItem *mMultiColorMarkerItem;
     BackgroundItem       *mBackgroundItem;
     MoCapItem            *mMoCapItem;
+    AnnotationGroupItem  *mActionGroupItem;
 
     QDoubleSpinBox *mStatusPosRealHeight;
     QLabel         *mStatusLabelStereo;
@@ -484,6 +493,8 @@ private:
 
     MoCapStorage    mMoCapStorage;
     MoCapController mMoCapController{mMoCapStorage, mExtrCalibration};
+
+    AnnotationGroupManager mGroupManager{*this, mAnimation, mPersonStorage};
 
     QString mPetrackVersion{"Unknown"};  ///< Version of PeTrack used to compile
     QString mGitCommitID{"Unknown"};     ///< Commit hash used to compile

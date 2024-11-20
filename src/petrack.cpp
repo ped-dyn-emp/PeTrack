@@ -26,6 +26,8 @@
 #include "alignmentGridBox.h"
 #include "analysePlot.h"
 #include "animation.h"
+#include "annotationGroupItem.h"
+#include "annotationGroupWidget.h"
 #include "autoCalib.h"
 #include "autosaveSettings.h"
 #include "backgroundItem.h"
@@ -228,6 +230,13 @@ Petrack::Petrack(QString petrackVersion) :
     mLogWindow->setWindowFlags(Qt::Window);
     mLogWindow->setWindowTitle("Log");
 
+    mGroupingWidget = new AnnotationGroupWidget(mGroupManager, mAnimation, this);
+    mGroupingWidget->setWindowFlags(Qt::Window);
+    mGroupingWidget->setWindowTitle("Annotation Groups");
+    connect(&mGroupManager, &AnnotationGroupManager::trajectoryAssignmentChanged, [this]() { this->updateImage(); });
+    connect(&mGroupManager, &AnnotationGroupManager::visualizationParameterChanged, [this]() { this->updateImage(); });
+    connect(&mGroupManager, &AnnotationGroupManager::groupsChanged, [this]() { this->updateImage(); });
+
     mPlayerWidget = new Player(&mAnimation, this);
 
     QVBoxLayout *vLayout = new QVBoxLayout;
@@ -241,6 +250,9 @@ Petrack::Petrack(QString petrackVersion) :
     mTrackerReal = new TrackerReal(this, mPersonStorage);
     mTrackerItem = new TrackerItem(this, mPersonStorage);
     mTrackerItem->setZValue(5); // groesser heisst weiter oben
+
+    mActionGroupItem = new AnnotationGroupItem(mGroupManager, *this, mPersonStorage, mAnimation);
+    mActionGroupItem->setZValue(6);
 
     mControlWidget->getColorPlot()->setPersonStorage(&mPersonStorage);
 #ifdef QWT
@@ -288,6 +300,7 @@ Petrack::Petrack(QString petrackVersion) :
     mScene->addItem(mTrackingRoiItem);
     mScene->addItem(mRecognitionRoiItem);
     mScene->addItem(mTrackerItem);
+    mScene->addItem(mActionGroupItem);
     mScene->addItem(mStereoItem);
     mScene->addItem(mColorMarkerItem);
     mScene->addItem(mCodeMarkerItem);
@@ -1796,6 +1809,10 @@ void Petrack::showLogWindow()
 {
     mLogWindow->show();
 }
+void Petrack::showGroupAnnotationWindow()
+{
+    mGroupingWidget->show();
+}
 
 void Petrack::setCamera()
 {
@@ -1924,6 +1941,9 @@ void Petrack::createActions()
 
     mShowLogWindowAct = new QAction(tr("&Show log window"), this);
     connect(mShowLogWindowAct, &QAction::triggered, this, &Petrack::showLogWindow);
+
+    mShowGroupAnnotationWindowAct = new QAction(tr("&Show Group Annotation Window"), this);
+    connect(mShowGroupAnnotationWindowAct, &QAction::triggered, this, &Petrack::showGroupAnnotationWindow);
 
     mCropZoomViewAct = new QAction(tr("&Transform while saving"), this); // Crop and zoom while saving
     mCropZoomViewAct->setCheckable(true);
@@ -2123,6 +2143,7 @@ void Petrack::createMenus()
     mViewMenu->addAction(mHideControlsAct);
     mViewMenu->addSeparator();
     mViewMenu->addAction(mShowLogWindowAct);
+    mViewMenu->addAction(mShowGroupAnnotationWindowAct);
 
 
     mHelpMenu = new QMenu(tr("&Help"), this);
