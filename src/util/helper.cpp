@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <opencv2/opencv.hpp>
+#include <regex>
 
 QString proFileName; ///< Path to the project (.pet) file; used for saving relative paths via getFileList and
 ///< getExistingFile
@@ -253,4 +254,58 @@ bool newerThanVersion(const QString &q1, const QString &q2)
         }
     }
     return false;
+}
+
+std::set<int> splitCompactString(const std::string &input)
+{
+    // string should be numbers or ranges separated by comma (and optionally whitespace
+    const std::regex inputRegex(R"(\s*(\d+\s*(-\s*\d+)?)(,\s*\d+\s*(-\s*\d+)?)*\s*)");
+
+    if(!std::regex_match(input, inputRegex))
+    {
+        throw std::invalid_argument("Invalid input string");
+    }
+
+    std::set<int> result;
+    std::string   noSpace;
+    std::remove_copy_if(input.begin(), input.end(), std::back_inserter(noSpace), ::isspace);
+    std::stringstream ss(noSpace);
+    std::string       segment;
+
+    while(std::getline(ss, segment, ','))
+    {
+        if(segment.find('-') != std::string::npos)
+        {
+            std::vector<int>  rangeBounds;
+            std::stringstream rangeStream(segment);
+            std::string       range;
+
+            while(std::getline(rangeStream, range, '-'))
+            {
+                rangeBounds.push_back(std::stoi(range));
+            }
+
+            if(rangeBounds.size() == 2)
+            {
+                int start = rangeBounds[0];
+                int end   = rangeBounds[1];
+                if(end < start)
+                {
+                    int tmp = start;
+                    start   = end;
+                    end     = tmp;
+                }
+                for(int i = start; i <= end; ++i)
+                {
+                    result.insert(i);
+                }
+            }
+        }
+        else
+        {
+            result.insert(std::stoi(segment));
+        }
+    }
+
+    return result;
 }

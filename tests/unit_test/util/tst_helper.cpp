@@ -186,3 +186,82 @@ TEST_CASE("Test qRectToCvRect", "[helper]")
     }
 
 } // END TESTCASE qRectToCvRect
+
+TEST_CASE("Test split compact string", "[helper][grouping]")
+{
+    std::string input;
+
+    // this test case translates the split result to a vector,
+    // because catch2 offers matchers for quick vector content checking (but not for sets)
+
+    input                = "1, 1";
+    auto             res = splitCompactString(input);
+    std::vector<int> vec(res.begin(), res.end());
+    CHECK_THAT(vec, Catch::Matchers::UnorderedEquals(std::vector<int>{1}));
+
+    input = "1";
+    res   = splitCompactString(input);
+    vec   = std::vector(res.begin(), res.end());
+    CHECK_THAT(vec, Catch::Matchers::UnorderedEquals(std::vector<int>{1}));
+
+    input = "1, 2,   3,                     4,5";
+    res   = splitCompactString(input);
+    vec   = std::vector(res.begin(), res.end());
+    CHECK_THAT(vec, Catch::Matchers::UnorderedEquals(std::vector<int>{1, 2, 3, 4, 5}));
+
+    input = "1-5";
+    res   = splitCompactString(input);
+    vec   = std::vector(res.begin(), res.end());
+    CHECK_THAT(vec, Catch::Matchers::UnorderedEquals(std::vector<int>{1, 2, 3, 4, 5}));
+
+    // leading and trailing whitespace
+    input = "  1-5  ";
+    res   = splitCompactString(input);
+    vec   = std::vector(res.begin(), res.end());
+    CHECK_THAT(vec, Catch::Matchers::UnorderedEquals(std::vector<int>{1, 2, 3, 4, 5}));
+
+    input = "1 - 3, 4, 5";
+    res   = splitCompactString(input);
+    vec   = std::vector(res.begin(), res.end());
+    CHECK_THAT(vec, Catch::Matchers::UnorderedEquals(std::vector<int>{1, 2, 3, 4, 5}));
+
+    input = "1 - 3, 4, 5, 5";
+    res   = splitCompactString(input);
+    vec   = std::vector(res.begin(), res.end());
+    CHECK_THAT(vec, Catch::Matchers::UnorderedEquals(std::vector<int>{1, 2, 3, 4, 5}));
+
+    input = "1 - 1,2-3,2-5, 4, 5, 5";
+    res   = splitCompactString(input);
+    vec   = std::vector(res.begin(), res.end());
+    CHECK_THAT(vec, Catch::Matchers::UnorderedEquals(std::vector<int>{1, 2, 3, 4, 5}));
+
+
+    input = "5 - 1";
+    res   = splitCompactString(input);
+    vec   = std::vector(res.begin(), res.end());
+    CHECK_THAT(vec, Catch::Matchers::UnorderedEquals(std::vector<int>{1, 2, 3, 4, 5}));
+
+    input = "-1 - 3, 4, 5, 5";
+    CHECK_THROWS_AS(splitCompactString(input), std::invalid_argument);
+
+    input = "-1";
+    CHECK_THROWS_AS(splitCompactString(input), std::invalid_argument);
+
+    input = "1 - 3,, 4, 5, 5";
+    CHECK_THROWS_AS(splitCompactString(input), std::invalid_argument);
+
+    input = "1 - 3,e, 4, 5, 5";
+    CHECK_THROWS_AS(splitCompactString(input), std::invalid_argument);
+
+    input = "1. - 3, 4";
+    CHECK_THROWS_AS(splitCompactString(input), std::invalid_argument);
+
+    input = "1.5 - 3, 4";
+    CHECK_THROWS_AS(splitCompactString(input), std::invalid_argument);
+
+    input = "1 --3, 4";
+    CHECK_THROWS_AS(splitCompactString(input), std::invalid_argument);
+
+    input = "1 - 3, 4,";
+    CHECK_THROWS_AS(splitCompactString(input), std::invalid_argument);
+}

@@ -11,6 +11,7 @@ target_sources(petrack_tests PRIVATE
 add_subdirectory(calibration)
 add_subdirectory(filter)
 add_subdirectory(general)
+add_subdirectory(annotationgroups)
 add_subdirectory(IO)
 add_subdirectory(recognition)
 add_subdirectory(tracking)

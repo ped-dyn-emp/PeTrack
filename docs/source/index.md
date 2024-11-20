@@ -60,6 +60,7 @@ calibration/calibration
 recognition/recognition
 tracking/tracking
 correction/correction
+annotationgroups/annotation_grouping
 export/export
 misc/misc
 contribute/contribute

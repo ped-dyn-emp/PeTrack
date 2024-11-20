@@ -24,6 +24,11 @@
 #include <QString>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
+#include <opencv2/opencv.hpp>
+#include <set>
+#include <sstream>
+#include <string>
+#include <vector>
 
 extern const QString commandLineOptionsString;
 extern QString       proFileName; ///< Path to the project (.pet) file; defined in helper.cpp
@@ -296,5 +301,13 @@ T computeMedian(std::vector<T> data)
     return 0.5 * (data[data.size() / 2] + data[(data.size() - 1) / 2]);
 }
 
+
+/**
+ * Utility function to split a compact string of integers (containin intervals written by a-b) into a full list of
+ * integers. Spaces are completely ignored
+ * @param input The string input e. g. "1, 3-6, 7, 10"
+ * @return a list of integers e. g. [1, 3, 4, 5, 6, 7, 10]
+ */
+std::set<int> splitCompactString(const std::string &input);
 
 #endif
