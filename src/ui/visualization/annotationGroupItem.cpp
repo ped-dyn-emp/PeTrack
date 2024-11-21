@@ -24,6 +24,8 @@
 #include "personStorage.h"
 #include "petrack.h"
 
+#include <QPainter>
+
 AnnotationGroupItem::AnnotationGroupItem(
     const AnnotationGroupManager &manager,
     Petrack                      &petrack,
