@@ -210,10 +210,62 @@ def test_load_old_project_old_model(pytestconfig):
     compare_intrinsic_calib(test_pet, truth_pet)
 
 
+def test_load_old_project_old_model_no_flag(pytestconfig):
+    petrack_path = pytestconfig.getoption("path")
+    project = "../data/01_old_intrinsic_oldModel_noFlag.pet"
+    real_intrinsic = "../data/01_old_intrinsic_oldModel_noFlag_truth.pet"
+    output = "../data/calibTest.pet"  # same for other test, cannot be run concurrently
+
+    # run autocalib on demo project
+    subprocess.run(
+        [
+            petrack_path,
+            "-project",
+            project,
+            "-autosave",
+            output,
+            "-platform",
+            "offscreen",
+        ],
+        check=True,
+    )
+
+    test_pet = ET.parse(output)
+    truth_pet = ET.parse(real_intrinsic)
+
+    compare_intrinsic_calib(test_pet, truth_pet)
+
+
 def test_load_old_project_ext_model(pytestconfig):
     petrack_path = pytestconfig.getoption("path")
     project = "../data/01_old_intrinsic_extModel.pet"
     real_intrinsic = "../data/01_old_intrinsic_extModel_truth.pet"
+    output = "../data/calibTest.pet"  # same for other test, cannot be run concurrently
+
+    # run autocalib on demo project
+    subprocess.run(
+        [
+            petrack_path,
+            "-project",
+            project,
+            "-autosave",
+            output,
+            "-platform",
+            "offscreen",
+        ],
+        check=True,
+    )
+
+    test_pet = ET.parse(output)
+    truth_pet = ET.parse(real_intrinsic)
+
+    compare_intrinsic_calib(test_pet, truth_pet)
+
+
+def test_load_old_project_ext_model_no_flag(pytestconfig):
+    petrack_path = pytestconfig.getoption("path")
+    project = "../data/01_old_intrinsic_extModel_noFlag.pet"
+    real_intrinsic = "../data/01_old_intrinsic_extModel_noFlag_truth.pet"
     output = "../data/calibTest.pet"  # same for other test, cannot be run concurrently
 
     # run autocalib on demo project
