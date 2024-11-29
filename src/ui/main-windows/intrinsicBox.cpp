@@ -211,15 +211,26 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
 
         if(subSubElem.elementsByTagName("OLD_MODEL").isEmpty())
         {
-            // old file with only one model
-            if(subSubElem.hasAttribute("EXT_MODEL_ENABLED") && readBool(subSubElem, "EXT_MODEL_ENABLED"))
+            bool useNewModel = true;
+            auto params      = getXmlParams(subSubElem);
+
+            if(subSubElem.hasAttribute("EXT_MODEL_ENABLED"))
             {
-                mModelsParams.extModelParams = getXmlParams(subSubElem);
+                useNewModel = readBool(subSubElem, "EXT_MODEL_ENABLED");
+            }
+            else
+            {
+                useNewModel = params.getS1() != 0.;
+            }
+
+            if(useNewModel)
+            {
+                mModelsParams.extModelParams = params;
                 mModelsParams.oldModelParams = IntrinsicCameraParams{};
             }
             else
             {
-                mModelsParams.oldModelParams = getXmlParams(subSubElem);
+                mModelsParams.oldModelParams = params;
                 mModelsParams.extModelParams = IntrinsicCameraParams{};
             }
         }
