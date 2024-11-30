@@ -51,7 +51,8 @@ public:
     std::vector<plausibility::FailedCheck> getFailedChecks();
     const plausibility::FailedCheck       &getFailedCheck(const QModelIndex &row);
 
-    void updateState(const QModelIndex &row, plausibility::CheckStatus state);
+    void                      updateState(const QModelIndex &row, plausibility::CheckStatus state);
+    plausibility::CheckStatus getState(const QModelIndex &row) const;
 };
 
 
@@ -96,14 +97,15 @@ private:
     std::vector<plausibility::FailedCheck> rerunChecks();
 
 private slots:
-    void selectedRowChanged();
-    void checkButtonClicked();
-    void openContextMenu();
-    void markResolved(QList<QModelIndex> pos);
-    void changePersonState(size_t index);
-    void removePerson(size_t index);
-    void removePersonInFrameRange(size_t index, int startFrame, int endFrame);
-    void splitPerson(size_t, size_t newIndex, int frame);
+    void                      selectedRowChanged();
+    void                      checkButtonClicked();
+    void                      openContextMenu();
+    void                      changeStatus(QList<QModelIndex> pos, plausibility::CheckStatus status);
+    plausibility::CheckStatus getStatus(QList<QModelIndex> pos) const;
+    void                      changePersonState(size_t index);
+    void                      removePerson(size_t index);
+    void                      removePersonInFrameRange(size_t index, int startFrame, int endFrame);
+    void                      splitPerson(size_t, size_t newIndex, int frame);
 };
 
 #endif // CORRECTION_H
