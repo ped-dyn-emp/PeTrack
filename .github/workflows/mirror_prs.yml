@@ -7,20 +7,35 @@ name: Mirror to Gitlab to trigger CI
 on:
   push:
     branches-ignore:
-        - master
+      - master
   pull_request_target:
+    types:
+      [
+        opened,
+        closed,
+        synchronize,
+        reopened,
+        ready_for_review,
+        converted_to_draft,
+        edited,
+        labeled,
+      ]
+
+env:
+  GITLAB_PROJECT_ID: 3227
+  PR_TARGET_BRANCH: "master"
 
 jobs:
   check_permission:
     runs-on: ubuntu-latest
     if: >-
-        (github.repository_owner == 'ped-dyn-emp') &&
-        ((github.event_name == 'push') ||
-         (github.event_name == 'schedule') ||
-         ((github.event_name == 'pull_request_target') &&
-          (contains(github.event.pull_request.labels.*.name, 'gitlab-mirror'))
-         )
-        )
+      (github.repository_owner == 'ped-dyn-emp') &&
+      ((github.event_name == 'push') ||
+       (github.event_name == 'schedule') ||
+       ((github.event_name == 'pull_request_target') &&
+        (contains(github.event.pull_request.labels.*.name, 'gitlab-mirror'))
+       )
+      )
     steps:
       - name: Query permissions of triggering actor
         id: query_permission_triggering_actor
@@ -28,7 +43,7 @@ jobs:
         uses: actions-cool/check-user-permission@v2
         with:
           username: ${{ github.triggering_actor }}
-          require: 'write'
+          require: "write"
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Interpret the queried result
         if: github.event_name == 'pull_request_target'
@@ -49,17 +64,17 @@ jobs:
           (github.event_name == 'push') ||
           (github.event_name == 'schedule')
         run: exit 0
-      
+
   mirror_to_gitlab:
     runs-on: ubuntu-latest
     if: >-
-        (github.repository_owner == 'ped-dyn-emp') &&
-        ((github.event_name == 'push') ||
-         (github.event_name == 'schedule') ||
-         ((github.event_name == 'pull_request_target') &&
-          (contains(github.event.pull_request.labels.*.name, 'gitlab-mirror'))
-         )
-        )
+      (github.repository_owner == 'ped-dyn-emp') &&
+      ((github.event_name == 'push') ||
+       (github.event_name == 'schedule') ||
+       ((github.event_name == 'pull_request_target') &&
+        (contains(github.event.pull_request.labels.*.name, 'gitlab-mirror'))
+       )
+      )
     needs:
       - check_permission
     steps:
@@ -82,9 +97,185 @@ jobs:
       - name: Mirror to GitLab
         uses: jakob-fritz/github2lab_action@main
         env:
-          MODE: 'mirror' # Either 'mirror', 'get_status', 'get_artifact', or 'all'
+          MODE: "mirror" # Either 'mirror', 'get_status', 'get_artifact', or 'all'
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
           FORCE_PUSH: "true"
           GITLAB_HOSTNAME: "jugit.fz-juelich.de"
-          GITLAB_PROJECT_ID: "3227"
+          GITLAB_PROJECT_ID: ${{ env.GITLAB_PROJECT_ID }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Open or update MR
+        if: (github.event.action == 'opened') ||
+          (github.event.action == 'synchronize') ||
+          (github.event.action == 'ready_for_review') ||
+          (github.event.action == 'converted_to_draft') ||
+          (github.event.action == 'edited') ||
+          (github.event.action == 'labeled')
+        shell: bash
+        run: |
+          set -x
+
+          # Define variables
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_SOURCE_BRANCH="PullRequest_${{ github.event.number }}"
+          PR_DRAFT="${{ github.event.pull_request.draft }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_DESCRIPTION_ESCAPED=$(jq -Rsa . <<< "${{ github.event.pull_request.body }}")
+
+          # Fetch the GitLab MR template
+          TEMPLATE_URL="https://juchat.de/api/v4/projects/${{ env.GITLAB_PROJECT_ID }}/repository/files/.gitlab%2Fmerge_request_templates%2Fdefault.md/raw?ref=${{ env.PR_TARGET_BRANCH }}"
+          TEMPLATE_CONTENT=$(curl --silent --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" "${TEMPLATE_URL}")
+
+          # Ensure the template was fetched successfully
+          if [ -z "${TEMPLATE_CONTENT}" ]; then
+            echo "Failed to fetch GitLab MR template"
+            exit 1
+          fi
+
+          # Remove the first line of the template
+          TEMPLATE_CONTENT=$(echo "${TEMPLATE_CONTENT}" | sed '1d')
+
+          # Combine the PR description and the template content
+          FULL_DESCRIPTION=$(printf "Automatically updated from GitHub PR: %s\n\n%s\n\n---\n\n%s" \
+            "${PR_URL}" "$(echo ${PR_DESCRIPTION_ESCAPED} | jq -r)" "${TEMPLATE_CONTENT}")
+
+          # Escape the full description using jq for JSON safety
+          FULL_DESCRIPTION_ESCAPED=$(jq -Rsa . <<< "${FULL_DESCRIPTION}")
+
+          # Define title and WIP status
+          if [ "${PR_DRAFT}" = "true" ]; then
+            MR_TITLE="Draft: ${PR_TITLE}"
+            WIP="true"
+          else
+            MR_TITLE="${PR_TITLE}"
+            WIP="false"
+          fi
+
+          # Check if PR already exists
+          PR_SOURCE_BRANCH="PullRequest_${{ github.event.number }}"
+          MR_ID=$(curl --silent --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
+            "https://jugit.fz-juelich.de/api/v4/projects/${GITLAB_PROJECT_ID}/merge_requests?source_branch=${PR_SOURCE_BRANCH}" | jq '.[0].iid')
+
+          if [ -n "${MR_ID}" ] && [ "${MR_ID}" != "null" ]; then
+            # Update the Merge Request in GitLab
+            echo "Update Merge Request ${MR_ID}"
+
+            RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" \
+              --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
+              --header "Content-Type: application/json" \
+              --data '{
+                "title": "'"${MR_TITLE}"'",
+                "description": '"${FULL_DESCRIPTION_ESCAPED}"',
+                "work_in_progress": "'"${WIP}"'"
+              }' \
+              --request PUT "https://jugit.fz-juelich.de/api/v4/projects/${GITLAB_PROJECT_ID}/merge_requests/${MR_ID}")
+
+            # Extract the HTTP status code
+            HTTP_STATUS=$(echo "${RESPONSE}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+
+            # Log the response for debugging
+            echo "Response: ${RESPONSE}"
+
+            # Validate the response
+            if [ "${HTTP_STATUS}" -ne 200 ]; then
+              echo "Failed to update Merge Request. HTTP Status Code: ${HTTP_STATUS}"
+              exit 1
+            fi
+          else
+            # Create the Merge Request in GitLab
+            echo "Creating new Pull Request"
+            RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" \
+              --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
+              --header "Content-Type: application/json" \
+              --data '{
+                "source_branch": "'"${PR_SOURCE_BRANCH}"'",
+                "target_branch": "'"${PR_TARGET_BRANCH}"'",
+                "title": "'"${MR_TITLE}"'",
+                "description": '"${FULL_DESCRIPTION_ESCAPED}"',
+                "work_in_progress": "'"${WIP}"'"
+              }' "https://jugit.fz-juelich.de/api/v4/projects/${GITLAB_PROJECT_ID}/merge_requests")
+
+            # Extract the HTTP status code
+            HTTP_STATUS=$(echo "${RESPONSE}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+
+            # Log the response for debugging
+            echo "Response: ${RESPONSE}"
+
+            # Validate the response
+            if [ "${HTTP_STATUS}" -ne 201 ]; then
+              echo "Failed to create Merge Request. HTTP Status Code: ${HTTP_STATUS}"
+              exit 1
+            fi
+          fi
+
+      - name: Handle PR reopened
+        if: github.event.action == 'reopened'
+        run: |
+          PR_SOURCE_BRANCH="PullRequest_${{ github.event.number }}"
+          MR_ID=$(curl --silent --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
+            "https://jugit.fz-juelich.de/api/v4/projects/${GITLAB_PROJECT_ID}/merge_requests?source_branch=${PR_SOURCE_BRANCH}" | jq '.[0].iid')
+
+          if [ -n "${MR_ID}" ] && [ "${MR_ID}" != "null" ]; then
+            RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" \
+              --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
+              --header "Content-Type: application/json" \
+              --data '{"state_event": "reopen"}' \
+              --request PUT "https://jugit.fz-juelich.de/api/v4/projects/${GITLAB_PROJECT_ID}/merge_requests/${MR_ID}")
+
+            HTTP_STATUS=$(echo "${RESPONSE}" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+
+            if [ "${HTTP_STATUS}" -ne 200 ]; then
+              exit 1
+            fi
+          else
+            echo "Could not find a MR for this PR, make sure it is created."
+            exit 1
+          fi
+
+      - name: Handle PR closed
+        if: github.event.action == 'closed'
+        shell: bash
+        run: |
+          set -x
+
+          # Define variables
+          PR_SOURCE_BRANCH="PullRequest_${{ github.event.number }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+
+          # Check if the PR is merged or closed
+          if [ "${{ github.event.pull_request.merged }}" == "false" ]; then
+            echo "PR closed without merge. Proceeding to close GitLab MR."
+
+            # Fetch the GitLab MR ID based on the source branch
+            MR_ID=$(curl --silent --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
+              "https://jugit.fz-juelich.de/api/v4/projects/${GITLAB_PROJECT_ID}/merge_requests?source_branch=${PR_SOURCE_BRANCH}" | jq '.[0].iid')
+
+            if [ -n "${MR_ID}" ] && [ "${MR_ID}" != "null" ]; then
+              echo "Found MR ID: ${MR_ID}, closing it..."
+
+              # Close the MR by updating its state to 'closed'
+              RESPONSE=$(curl --silent --write-out "HTTPSTATUS:%{http_code}" \
+                --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" \
+                --header "Content-Type: application/json" \
+                --data '{"state_event": "close"}' \
+                --request PUT "https://jugit.fz-juelich.de/api/v4/projects/${GITLAB_PROJECT_ID}/merge_requests/${MR_ID}")
+
+              HTTP_STATUS=$(echo "$RESPONSE" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+
+              # Log the response
+              echo "Response: ${RESPONSE}"
+
+              # Check if the request was successful
+              if [ "${HTTP_STATUS}" -ne 200 ]; then
+                echo "Failed to close GitLab MR. HTTP Status Code: $HTTP_STATUS"
+                exit 1
+              else
+                echo "Successfully closed GitLab MR."
+              fi
+            else
+              echo "No corresponding GitLab MR found for PR source branch."
+              exit 1
+            fi
+          else
+            echo "PR was merged, not closing GitLab MR."
+          fi
