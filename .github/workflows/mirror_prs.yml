@@ -123,7 +123,7 @@ jobs:
           PR_DESCRIPTION_ESCAPED=$(jq -Rsa . <<< "${{ github.event.pull_request.body }}")
 
           # Fetch the GitLab MR template
-          TEMPLATE_URL="https://juchat.de/api/v4/projects/${{ env.GITLAB_PROJECT_ID }}/repository/files/.gitlab%2Fmerge_request_templates%2Fdefault.md/raw?ref=${{ env.PR_TARGET_BRANCH }}"
+          TEMPLATE_URL="https://jugit.fz-juelich.de/api/v4/projects/${{ env.GITLAB_PROJECT_ID }}/repository/files/.gitlab%2Fmerge_request_templates%2Fdefault.md/raw?ref=${{ env.PR_TARGET_BRANCH }}"
           TEMPLATE_CONTENT=$(curl --silent --header "PRIVATE-TOKEN: ${{ secrets.GITLAB_TOKEN }}" "${TEMPLATE_URL}")
 
           # Ensure the template was fetched successfully
