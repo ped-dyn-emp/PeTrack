@@ -23,8 +23,8 @@ sudo usermod -aG docker $USER
 ### 2. Make your changes in the Dockerfile
 - Modify `Dockerfile` under `container/ubuntu`
 
-### 3. Locate the current Docker Image Version
-In `.gitlab-ci.yml`, locate the image version used in the `build` and `test` stages. We version them incrementally (e.g., if the latest is `v1`, use `v2` later on).
+### 3. Modify the current Docker Image Version
+In `.gitlab-ci.yml`, locate the image version defined in the variable `DOCKER_TAG`. We version them incrementally (e.g., if the latest is `v1`, change it to `v2`).
 
 ### 4. Build the image
 - From the petrack root directory, go to the Dockerfile
