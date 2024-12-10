@@ -166,6 +166,12 @@ void FailedChecksTableModel::updateState(const QModelIndex &row, plausibility::C
     emit layoutChanged();
 }
 
+plausibility::CheckStatus FailedChecksTableModel::getState(const QModelIndex &row) const
+{
+    return mFailedChecks.at(row.row()).status;
+}
+
+
 Correction::Correction(Petrack *petrack, const PersonStorage &personStorage, QWidget *parent) :
     QWidget(parent), mPetrack(petrack), mPersonStorage(personStorage), mUi(new Ui::Correction)
 {
@@ -272,20 +278,33 @@ void Correction::openContextMenu()
         return;
     }
 
-    QMenu   contextMenu(tr("&Correction"), this);
-    QAction markResolvedAction("Mark as resolved", this);
+    QMenu      contextMenu(tr("&Correction"), this);
+    const auto checkStatus = getStatus(selectedIndex);
+    QString    actionText("Mark as resolved");
+    auto       actionStatus = plausibility::CheckStatus::Resolved;
+
+    if(checkStatus == plausibility::CheckStatus::Resolved)
+    {
+        actionText   = "Unresolve";
+        actionStatus = plausibility::CheckStatus::Changed;
+    }
+    QAction markResolvedAction(actionText, this);
     connect(
         &markResolvedAction,
         &QAction::triggered,
         this,
-        [this, &selectedIndex]() { this->markResolved(selectedIndex); });
+        [this, &selectedIndex, &actionStatus]() { this->changeStatus(selectedIndex, actionStatus); });
     contextMenu.addAction(&markResolvedAction);
     contextMenu.exec(QCursor::pos());
 }
 
-void Correction::markResolved(QList<QModelIndex> pos)
+plausibility::CheckStatus Correction::getStatus(QList<QModelIndex> pos) const
 {
-    mTableModel->updateState(pos[0], plausibility::CheckStatus::Resolved);
+    return mTableModel->getState(pos[0]);
+}
+void Correction::changeStatus(QList<QModelIndex> pos, plausibility::CheckStatus status)
+{
+    mTableModel->updateState(pos[0], status);
 }
 
 void Correction::changePersonState(size_t index)
