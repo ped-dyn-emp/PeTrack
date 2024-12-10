@@ -25,9 +25,10 @@ stages:
 
 
 # Change pip's cache directory to be inside the project directory since we can
-# only cache local items.
+# only cache local items. Also set the current docker tag.
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  DOCKER_TAG: "v1"
 
 cache:
   paths:
@@ -52,7 +53,7 @@ sphinx:
 # Build environment for building and testing the program. Uses the Dockerfile
 # from the repository
 pre-build-checks:
-  image: ${CI_REGISTRY_IMAGE}:v1
+  image: ${CI_REGISTRY_IMAGE}:${DOCKER_TAG}
   stage: pre-build-checks
   script:
     - scripts/check-format-cpp.sh
@@ -60,7 +61,7 @@ pre-build-checks:
 
 # Build petrack and petrack unit_tests
 build_linux:
-  image: ${CI_REGISTRY_IMAGE}:v1
+  image: ${CI_REGISTRY_IMAGE}:${DOCKER_TAG}
   stage: build
   script:
     - mkdir build
@@ -74,7 +75,7 @@ build_linux:
 
 # Execute unit tests
 unit_test_linux:
-  image: ${CI_REGISTRY_IMAGE}:v1
+  image: ${CI_REGISTRY_IMAGE}:${DOCKER_TAG}
   stage: test
   script:
     - cd build/tests/unit_test
@@ -89,7 +90,7 @@ unit_test_linux:
 
 # Execute regression tests
 regression_test_linux:
-  image: ${CI_REGISTRY_IMAGE}:v1
+  image: ${CI_REGISTRY_IMAGE}:${DOCKER_TAG}
   stage: test
   script:
     - cd tests/regression_test/tests
