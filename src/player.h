@@ -21,13 +21,6 @@
 
 #include <QTemporaryFile>
 #include <QWidget>
-
-#ifdef AVI
-#include "aviFile.h"
-#else
-#include "aviFileWriter.h"
-#endif
-
 #include <opencv2/opencv.hpp>
 
 class QLabel;
@@ -70,7 +63,6 @@ public:
 public slots:
     bool frameForward();
     bool frameBackward();
-    void recStream();
     void pause();
     void togglePlayPause();
     bool skipToFrame(int f);
@@ -104,18 +96,9 @@ private:
     bool           mPlayerSpeedLimited;
     bool           mPlayerSpeedFixed = false;
     bool           mLooping          = false;
-    bool           mRec;
-
-
-#ifdef AVI
-    AviFile mAviFile;
-#else
-    AviFileWriter mAviFile;
-#endif
 
     // GUI
     QToolButton   *mFrameForwardButton, *mFrameBackwardButton, *mPlayForwardButton, *mPlayBackwardButton, *mPauseButton;
-    QToolButton   *mRecButton;
     cv::Mat        mImg;
     QHBoxLayout   *mPlayerLayout;
     Petrack       *mMainWindow;

@@ -15,13 +15,6 @@ target_sources(petrack_core PRIVATE
     skeletonTreeFactory.h  
 )
 
-if(NOT AVI)
-    target_sources(petrack_core PRIVATE 
-        aviFileWriter.cpp      
-        aviFileWriter.h  
-    )
-endif()
-
 if(NOT STEREO)
     target_sources(petrack_core PRIVATE 
         stereoAviFile.cpp      

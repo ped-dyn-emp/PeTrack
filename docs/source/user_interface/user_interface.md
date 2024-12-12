@@ -46,12 +46,6 @@ single frame forward
 play
 : Plays the video (forward direction)
 
-record
-: This button starts a recording. 
-
-:::{note}
-We recommend using the `Export Video` or `Export Video View` options from the `File` menu in the menu bar instead of the recording button.
-:::
 
 Next to these buttons are the boxes labeled `In` and `Out`. If the video is longer than the experiment, one can use these to specify a different starting frame (`In`) or ending frame (`Out`) for PeTrack. PeTrack then treats the video as if all frames before `In` and after `Out` do not exist. The default values are 0 for `In` and the last frame of the video file for `Out`.
 

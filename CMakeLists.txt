@@ -11,9 +11,6 @@
 # -DBUILD_BUNDLE=ON (default OFF) builds a MacOS Bundle for deployment
 # -DFAIL_ON_WARNINGS=ON (default OFF) use Werror when building (for CI builds!)
 #
-# currently not supported:
-# -DAVI=ON (default OFF)
-#
 ################################################################################
 # Project setup
 ################################################################################
@@ -57,9 +54,6 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ################################################################################
 option(STEREO "Use Point Grey's Triclops SDK and enable stereo support" OFF)
 print_var(STEREO)
-
-option(AVI "Use Avi File from Point Grey (only interal due to license)" OFF)
-print_var(AVI)
 
 option(BUILD_UNIT_TESTS "Build catch2 unit tests" OFF)
 print_var(BUILD_UNIT_TESTS)
@@ -105,11 +99,6 @@ if (USE_3RD_PARTY AND NOT (WIN32 AND MINGW))
   Windows with the MinGW compiler. Please install the required libraries
   yourself." )
 endif()
-
-# Check for currently unavailable options
-#if (AVI)
-#  message(FATAL_ERROR "Currently the avi File from Point Grey needs to be disabled.")
-#endif()
 
 ## Stero currently only allowed on windows
 if (STEREO AND NOT WIN32)
@@ -276,16 +265,6 @@ target_link_libraries(petrack_core PUBLIC ezc3d)
 #*************************************************************
 # Handling of Options                                        *
 #*************************************************************
-
-if(AVI)
-  target_compile_definitions(petrack_core PRIVATE AVI)
-  target_sources(petrack_core PUBLIC
-      "${CMAKE_SOURCE_DIR}/3rdparty/avifile/aviFile.h"
-      "${CMAKE_SOURCE_DIR}/3rdparty/avifile/aviFile.cpp"
-  )
-  target_include_directories(petrack_core PRIVATE 3rdparty/avifile)
-  target_link_libraries(petrack_core PUBLIC avifil32 msvfw32)
-endif(AVI)
 
 # WIN32 steht für Windows allgemein, nicht nur 32Bit
 if(WIN32)
