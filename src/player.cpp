@@ -75,13 +75,6 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mPauseButton->setIconSize(iconSize);
     connect(mPauseButton, SIGNAL(clicked()), this, SLOT(pause()));
 
-    // rec button;
-    mRecButton = new QToolButton;
-    mRecButton->setIcon(QPixmap(":/record"));
-    mRecButton->setIconSize(iconSize);
-    connect(mRecButton, SIGNAL(clicked()), this, SLOT(recStream()));
-    mRec = false;
-
     // slider
     mSlider = new QSlider(Qt::Horizontal);
     mSlider->setTickPosition(QSlider::TicksAbove);
@@ -152,7 +145,6 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mPlayerLayout->addWidget(mPauseButton);
     mPlayerLayout->addWidget(mFrameForwardButton);
     mPlayerLayout->addWidget(mPlayForwardButton);
-    mPlayerLayout->addWidget(mRecButton);
     mPlayerLayout->addWidget(mSourceInLabel);
     mPlayerLayout->addWidget(mFrameInNum);
     mPlayerLayout->addWidget(mSourceOutLabel);
@@ -258,10 +250,6 @@ bool Player::updateImage()
 
     mMainWindow->updateImage(mImg);
 
-    if(mRec)
-    {
-        mAviFile.appendFrame((const unsigned char *) mImg.data, true);
-    }
     mSlider->setValue(
         mAnimation->getCurrentFrameNum()); //(1000*mAnimation->getCurrentFrameNum())/mAnimation->getNumFrames());
     mFrameNum->setText(QString().number(mAnimation->getCurrentFrameNum()));
@@ -451,101 +439,6 @@ void Player::togglePlayPause()
     else
     {
         play(lastState);
-    }
-}
-
-/**
- * @brief Toggles recording and saving of recording
- *
- * If already recording, the method stops the recording and saves it to
- * a user-given file. If recording hasn't started, this method starts it.
- *
- * Actual recording happens in Player::updateImage()
- */
-void Player::recStream()
-{
-    if(mAnimation->isCameraLiveStream() || mAnimation->isVideo() || mAnimation->isImageSequence() ||
-       mAnimation->isStereoVideo())
-    {
-        // video temp path/file name
-        QString videoTmp = QDir::tempPath() + "/petrack-video-record.avi";
-
-        if(mRec) // stop recording and save recorded stream to disk
-        {
-            mRec = false;
-            mRecButton->setIcon(QPixmap(":/record"));
-
-            mAviFile.close();
-
-            QString dest;
-
-            QFileDialog fileDialog(
-                this,
-                tr("Select file for saving video output"),
-                nullptr,
-                tr("Video (*.*);;AVI-File (*.avi);;All supported types (*.avi *.mp4);;All files (*.*)"));
-            fileDialog.setAcceptMode(QFileDialog::AcceptSave);
-            fileDialog.setFileMode(QFileDialog::AnyFile);
-            fileDialog.setDefaultSuffix("");
-
-            if(fileDialog.exec())
-            {
-                dest = fileDialog.selectedFiles().at(0);
-            }
-
-            if(dest == nullptr)
-            {
-                return;
-            }
-
-            if(QFile::exists(dest))
-            {
-                QFile::remove(dest);
-            }
-
-            QProgressDialog progress("Save Video File", nullptr, 0, 2, mMainWindow);
-            progress.setWindowTitle("Save Video File");
-            progress.setWindowModality(Qt::WindowModal);
-            progress.setVisible(true);
-            progress.setValue(0);
-
-            progress.setLabelText(QString("save video ..."));
-
-            qApp->processEvents();
-            progress.setValue(1);
-
-            if(!QFile(videoTmp).copy(dest))
-            {
-                PCritical(this, tr("PeTrack"), tr("Error: Could not save video file!"));
-            }
-            else
-            {
-                mMainWindow->statusBar()->showMessage(tr("Saved video file to %1.").arg(dest), 5000);
-                if(!QFile(videoTmp).remove())
-                {
-                    SPDLOG_WARN("Could not remove tmp-file: {}", videoTmp);
-                }
-
-                progress.setValue(2);
-            }
-        }
-        else // open video writer
-        {
-            if(mAviFile.open(
-                   videoTmp.toStdString().c_str(),
-                   mImg.cols,
-                   mImg.rows,
-                   8 * mImg.channels(),
-                   mAnimation->getPlaybackFPS()))
-            {
-                mRec = true;
-                mRecButton->setIcon(QPixmap(":/stop-record"));
-            }
-            else
-            {
-                SPDLOG_ERROR("could not open video output file!");
-            }
-        }
     }
 }
 

@@ -21,8 +21,6 @@
         <file alias="calibCam2New">calib/new/cam2_7280791.cal</file>
         <file alias="arrowLeft">arrow_left.png</file>
         <file alias="arrowRight">arrow_right.png</file>
-        <file>record.png</file>
-        <file>stop-record.png</file>
         <file>petrack.icns</file>
     </qresource>
 </RCC>
