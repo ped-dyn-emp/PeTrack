@@ -1,6 +1,6 @@
 #
 # PeTrack - Software for tracking pedestrians movement in videos
-# Copyright (C) 2024 Forschungszentrum Jülich GmbH, IAS-7
+# Copyright (C) 2025 Forschungszentrum Jülich GmbH, IAS-7
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
