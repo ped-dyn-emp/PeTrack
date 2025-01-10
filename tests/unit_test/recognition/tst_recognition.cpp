@@ -36,6 +36,7 @@ TEST_CASE("src/recognition", "[recognition]")
         REQUIRE(static_cast<int>(reco::RecognitionMethod::Japan) == 4);
         REQUIRE(static_cast<int>(reco::RecognitionMethod::MultiColor) == 5);
         REQUIRE(static_cast<int>(reco::RecognitionMethod::Code) == 6);
+        REQUIRE(static_cast<int>(reco::RecognitionMethod::MachineLearning) == 7);
     }
 }
 

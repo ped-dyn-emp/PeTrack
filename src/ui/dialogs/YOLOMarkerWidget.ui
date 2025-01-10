@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>YOLOMarkerWidget</class>
+ <widget class="QWidget" name="YOLOMarkerWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>281</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="7" column="0">
+        <widget class="QLabel" name="namesLabel">
+         <property name="text">
+          <string>Pedestrian</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="toolTip">
+          <string>Determines how confident the model has to be in its detection. The higher the value, the less, but presumably better detections</string>
+         </property>
+         <property name="text">
+          <string>confidence threshold</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="PSpinBox" name="imageSize" native="true">
+         <property name="maximum" stdset="0">
+          <number>99999</number>
+         </property>
+         <property name="value" stdset="0">
+          <number>640</number>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>class names:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="PDoubleSpinBox" name="scoreThreshold" native="true">
+         <property name="maximum" stdset="0">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="singleStep" stdset="0">
+          <double>0.010000000000000</double>
+         </property>
+         <property name="value" stdset="0">
+          <double>0.500000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>model:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="toolTip">
+          <string>Determines how confident the model has to be that a given detection belongs to a certain class (only relevant if more than one class exists)</string>
+         </property>
+         <property name="text">
+          <string>score threshold</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="modelLabel">
+         <property name="text">
+          <string>none selected</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QPushButton" name="selectNamesButton">
+         <property name="text">
+          <string>select names file</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="toolTip">
+          <string>Determines how much two detections are allowed to overlap before discarding one of them</string>
+         </property>
+         <property name="text">
+          <string>NMS threshold</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QPushButton" name="selectModelButton">
+         <property name="text">
+          <string>select model file</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="PDoubleSpinBox" name="confThreshold" native="true">
+         <property name="maximum" stdset="0">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="singleStep" stdset="0">
+          <double>0.010000000000000</double>
+         </property>
+         <property name="value" stdset="0">
+          <double>0.500000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="PDoubleSpinBox" name="nmsThreshold" native="true">
+         <property name="maximum" stdset="0">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="singleStep" stdset="0">
+          <double>0.010000000000000</double>
+         </property>
+         <property name="value" stdset="0">
+          <double>0.500000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="toolTip">
+          <string>The image width the model was trained with</string>
+         </property>
+         <property name="text">
+          <string>image width</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>confThreshold</tabstop>
+  <tabstop>nmsThreshold</tabstop>
+  <tabstop>scoreThreshold</tabstop>
+  <tabstop>imageSize</tabstop>
+  <tabstop>selectModelButton</tabstop>
+  <tabstop>selectNamesButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

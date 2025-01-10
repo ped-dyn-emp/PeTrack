@@ -157,6 +157,7 @@ public:
 
 
     reco::RecognitionMethod getRecoMethod() const;
+    reco::MlMethod          getMlMethod() const;
 
     bool getTrackRoiShow() const;
     void setTrackRoiShow(bool b);
@@ -257,7 +258,6 @@ public:
     }
 
     void resetCorrection();
-
 private slots:
     void on_anaCalculate_clicked();
     void on_anaStep_valueChanged(int i);
@@ -497,6 +497,8 @@ private slots:
 
     void on_recoMethod_currentIndexChanged(int index);
     void onRecoMethodChanged(reco::RecognitionMethod method);
+    void on_mlMethod_currentIndexChanged(int index);
+    void onMlMethodChanged(reco::MlMethod method);
     void on_performRecognition_stateChanged(int i);
     void on_markerBrightness_valueChanged(int i);
     void on_markerIgnoreWithout_stateChanged(int i);
@@ -535,6 +537,7 @@ public slots:
 
 signals:
     void userChangedRecoMethod(reco::RecognitionMethod method);
+    void userChangedMlMethod(reco::MlMethod method);
 
 
 private:

@@ -18,6 +18,7 @@
 
 #include "recognition.h"
 
+#include "YOLOMarkerWidget.h"
 #include "codeMarkerItem.h"
 #include "codeMarkerWidget.h"
 #include "colorMarkerItem.h"
@@ -38,6 +39,7 @@
 #include <QPointF>
 #include <QRect>
 #include <bitset>
+#include <iostream>
 #include <opencv2/objdetect/aruco_detector.hpp>
 #include <opencv2/objdetect/aruco_dictionary.hpp>
 #include <opencv2/opencv.hpp>
@@ -1384,6 +1386,178 @@ void findContourMarker(
     }
 }
 
+std::vector<cv::Mat> preProcess(cv::Mat &img, const reco::YOLOMarkerOptions &markerOptions)
+{
+    cv::dnn::Net net = markerOptions.network;
+    cv::Mat      blob;
+    cv::dnn::blobFromImage(
+        img, blob, 1. / 255., cv::Size(markerOptions.imageSize, markerOptions.imageSize), cv::Scalar(), true, false);
+    net.setInput(blob);
+
+    std::vector<cv::Mat> outputs;
+    net.forward(outputs, net.getUnconnectedOutLayersNames());
+    return outputs;
+}
+
+void detectionsToBoxesYOLOv5(
+    cv::Mat                       &img,
+    std::vector<cv::Mat>          &outputs,
+    const reco::YOLOMarkerOptions &markerOptions,
+    std::vector<float>            &confidences,
+    std::vector<cv::Rect>         &boxes)
+{
+    std::vector<int> classIDs;
+    int              stepSize = 5;
+    int              rows     = outputs[0].size().width;
+    // YOLOv5 generates 25200 detections for each class
+    int classAmount = rows / 25200;
+    int dims        = classAmount + stepSize;
+
+    if(static_cast<size_t>(classAmount) != markerOptions.classList.size())
+    {
+        throw std::invalid_argument(
+            "Your model contains a different amount of classes than provided in the class file.");
+    }
+
+    // Resizing factors
+    float xFactor = static_cast<float>(img.cols) / markerOptions.imageSize;
+    float yFactor = static_cast<float>(img.rows) / markerOptions.imageSize;
+
+    // Loop through each detection row in the matrix
+    for(int i = 0; i < rows; i += dims)
+    {
+        float confidence = outputs[0].at<float>(i + 4);
+        if(confidence >= markerOptions.confThreshold)
+        {
+            cv::Mat   scores(1, classAmount, CV_32FC1, &outputs[0].at<float>(i + stepSize));
+            cv::Point classID;
+            double    maxClassScore;
+            cv::minMaxLoc(scores, 0, &maxClassScore, 0, &classID);
+            if(maxClassScore > markerOptions.scoreThreshold)
+            {
+                confidences.push_back(confidence);
+                classIDs.push_back(classID.x);
+
+                float cx = outputs[0].at<float>(i + 0);
+                float cy = outputs[0].at<float>(i + 1);
+                float w  = outputs[0].at<float>(i + 2);
+                float h  = outputs[0].at<float>(i + 3);
+
+                int left   = static_cast<int>((cx - 0.5 * w) * xFactor);
+                int top    = static_cast<int>((cy - 0.5 * h) * yFactor);
+                int width  = static_cast<int>(w * xFactor);
+                int height = static_cast<int>(h * yFactor);
+
+                boxes.push_back(cv::Rect(left, top, width, height));
+            }
+        }
+    }
+}
+
+void detectionsToBoxesYOLOv8(
+    cv::Mat                       &img,
+    std::vector<cv::Mat>          &outputs,
+    const reco::YOLOMarkerOptions &markerOptions,
+    std::vector<float>            &confidences,
+    std::vector<cv::Rect>         &boxes)
+{
+    std::vector<int> classIDs;
+    int              stepSize = 4;
+    int              rows     = outputs[0].size[2];
+    int              dims     = outputs[0].size[1];
+    outputs[0]                = outputs[0].reshape(1, dims);
+    cv::transpose(outputs[0], outputs[0]);
+    int classAmount = dims - stepSize;
+    if(static_cast<size_t>(classAmount) != markerOptions.classList.size())
+    {
+        throw std::invalid_argument(
+            "Your model contains a different amount of classes than provided in the class file.");
+    }
+    // Resizing factors
+    float xFactor = static_cast<float>(img.cols) / markerOptions.imageSize;
+    float yFactor = static_cast<float>(img.rows) / markerOptions.imageSize;
+
+    // Loop through each detection row in the matrix
+    for(int i = 0; i < rows; ++i)
+    {
+        float confidence = outputs[0].at<float>(i, 4);
+        if(confidence >= markerOptions.confThreshold)
+        {
+            cv::Mat   scores(1, classAmount, CV_32FC1, &outputs[0].at<float>(i, stepSize));
+            cv::Point classID;
+            double    maxClassScore;
+            cv::minMaxLoc(scores, 0, &maxClassScore, 0, &classID);
+            if(maxClassScore > markerOptions.scoreThreshold)
+            {
+                confidences.push_back(confidence);
+                classIDs.push_back(classID.x);
+
+                float cx = outputs[0].at<float>(i, 0);
+                float cy = outputs[0].at<float>(i, 1);
+                float w  = outputs[0].at<float>(i, 2);
+                float h  = outputs[0].at<float>(i, 3);
+
+                int left   = static_cast<int>((cx - 0.5 * w) * xFactor);
+                int top    = static_cast<int>((cy - 0.5 * h) * yFactor);
+                int width  = static_cast<int>(w * xFactor);
+                int height = static_cast<int>(h * yFactor);
+
+                boxes.push_back(cv::Rect(left, top, width, height));
+            }
+        }
+    }
+}
+
+QList<TrackPoint> postProcessYOLO(
+    cv::Mat                       &img,
+    std::vector<cv::Mat>          &outputs,
+    const reco::YOLOMarkerOptions &markerOptions,
+    const reco::MlMethod          &method)
+{
+    QList<TrackPoint>     crossList;
+    std::vector<float>    confidences;
+    std::vector<cv::Rect> boxes;
+    const double          nmsThresh   = markerOptions.nmsThreshold;
+    const double          scoreThresh = markerOptions.scoreThreshold;
+
+    if(method == reco::MlMethod::YOLOv5)
+    {
+        detectionsToBoxesYOLOv5(img, outputs, markerOptions, confidences, boxes);
+    }
+    else if(method == reco::MlMethod::YOLOv8)
+    {
+        detectionsToBoxesYOLOv8(img, outputs, markerOptions, confidences, boxes);
+    }
+
+    std::vector<int> indices;
+    cv::dnn::NMSBoxes(boxes, confidences, scoreThresh, nmsThresh, indices);
+
+    for(int idx : indices)
+    {
+        cv::Rect box = boxes[idx];
+        crossList.append(
+            TrackPoint(Vec2F(box.x + box.width / 2, box.y + box.height / 2), TrackPoint::bestDetectionQual));
+    }
+    return crossList;
+}
+
+void findMachineLearningMarker(
+    cv::Mat                 &img,
+    QList<TrackPoint>       &crossList,
+    const YOLOMarkerOptions &markerOptions,
+    reco::MlMethod           method)
+{
+    try
+    {
+        std::vector<cv::Mat> detections;
+        detections = preProcess(img, markerOptions);
+        crossList  = postProcessYOLO(img, detections, markerOptions, method);
+    }
+    catch(cv::Exception &e)
+    {
+        throw std::invalid_argument(e.what());
+    }
+}
 
 /**
  * @brief Detects position of markers from user-chosen type
@@ -1409,6 +1583,7 @@ QList<TrackPoint> Recognizer::getMarkerPos(
     bool ignoreWithoutMarker = controlWidget->isMarkerIgnoreWithoutChecked();
     bool autoWB              = controlWidget->isRecoAutoWBChecked();
 
+
     auto rect = qRectToCvRect(
         roi,
         img,
@@ -1422,10 +1597,15 @@ QList<TrackPoint> Recognizer::getMarkerPos(
         return QList<TrackPoint>{};
     }
 
+    // machine learning model needs to see the whole picture for better detections
+    if(mRecoMethod == RecognitionMethod::MachineLearning)
+    {
+        tImg = img;
+    }
+
     QList<TrackPoint> crossList;
     // offset of rect
     Vec2F v(rect.x - borderSize, rect.y - borderSize);
-
     switch(mRecoMethod)
     {
         case RecognitionMethod::MultiColor:
@@ -1462,7 +1642,22 @@ QList<TrackPoint> Recognizer::getMarkerPos(
         case RecognitionMethod::Stereo:
             throw std::invalid_argument(
                 "Stereo marker are not handled in getMarkerPos, but in PersonList::calcPersonPos");
+        case RecognitionMethod::MachineLearning:
+            try
+            {
+                findMachineLearningMarker(
+                    tImg,
+                    crossList,
+                    controlWidget->getMainWindow()->getYOLOMarkerWidget()->getYOLOMarkerOptions(),
+                    mMlMethod);
+            }
+            catch(std::invalid_argument &e)
+            {
+                controlWidget->setPerformRecognitionChecked(false);
+                PCritical(controlWidget->getMainWindow(), "Error during recognition", e.what());
+            }
     }
+
 
     // must be set because else hovermoveevent of recognitionRec moves also the colorMaskItem
     controlWidget->getMainWindow()->getColorMarkerItem()->setRect(v);
@@ -1471,12 +1666,33 @@ QList<TrackPoint> Recognizer::getMarkerPos(
     // must be set because else hovermoveevent of recognitionRec moves also the colorMaskItem
     controlWidget->getMainWindow()->getCodeMarkerItem()->setRect(v);
 
-    // set cross position relative to original image size
-    for(auto &point : crossList)
+    if(mRecoMethod != RecognitionMethod::MachineLearning)
     {
-        point += v;
-        point.setColPoint(point.colPoint() + v);
+        // set cross position relative to original image size
+        for(auto &point : crossList)
+        {
+            point += v;
+            point.setColPoint(point.colPoint() + v);
+        }
     }
+    else
+    {
+        // ignore points outside of ROI
+        QList<TrackPoint> crossListTmp;
+        Vec2F             offset(-borderSize, -borderSize);
+        for(auto &point : crossList)
+        {
+            if(rect.contains(cv::Point(point.x(), point.y())))
+            {
+                // take border offset into account
+                point += offset;
+                point.setColPoint(point.colPoint() + offset);
+                crossListTmp.append(point);
+            }
+        }
+        crossList = crossListTmp;
+    }
+
 
     if(bgFilter->getEnabled()) // nur fuer den fall von bgSubtraction durchfuehren
     {

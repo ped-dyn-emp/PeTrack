@@ -22,6 +22,7 @@
 
 // Added for Qt5 support
 #include "IO.h"
+#include "YOLOMarkerWidget.h"
 #include "aboutDialog.h"
 #include "alignmentGridBox.h"
 #include "analysePlot.h"
@@ -199,6 +200,8 @@ Petrack::Petrack(QString petrackVersion) :
     mMultiColorMarkerWidget = new MultiColorMarkerWidget(this);
     mMultiColorMarkerWidget->setWindowFlags(Qt::Window);
     mMultiColorMarkerWidget->setWindowTitle("MultiColor marker parameter");
+
+    mYOLOMarkerWidget = new YOLOMarkerWidget(this, nullptr);
 
     mLogoItem = new LogoItem(this); // durch uebergabe von scene wird indirekt ein scene->addItem() aufgerufen
     mLogoItem->setZValue(6);        // groesser heisst weiter oben
@@ -531,6 +534,10 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
         {
             mMultiColorMarkerWidget->getXml(elem);
         }
+        else if(elem.tagName() == "YOLO_MARKER")
+        {
+            mYOLOMarkerWidget->getXML(elem);
+        }
         else if(elem.tagName() == "MOCAP")
         {
             mMoCapController.getXml(elem);
@@ -787,6 +794,11 @@ void Petrack::saveXml(QDomDocument &doc)
 
     elem.setAttribute("SRC", seq);
     elem.setAttribute("STATUS_HEIGHT", mStatusPosRealHeight->value());
+    root.appendChild(elem);
+
+    // settings for YOLO marker
+    elem = doc.createElement("YOLO_MARKER");
+    mYOLOMarkerWidget->setXML(elem);
     root.appendChild(elem);
 
     // control settings (right control widget)
@@ -3530,7 +3542,8 @@ void Petrack::performRecognition()
 
         if((recoMethod == reco::RecognitionMethod::Casern) || (recoMethod == reco::RecognitionMethod::Hermes) ||
            (recoMethod == reco::RecognitionMethod::Color) || (recoMethod == reco::RecognitionMethod::Japan) ||
-           (recoMethod == reco::RecognitionMethod::MultiColor) || (recoMethod == reco::RecognitionMethod::Code))
+           (recoMethod == reco::RecognitionMethod::MultiColor) || (recoMethod == reco::RecognitionMethod::Code) ||
+           (recoMethod == reco::RecognitionMethod::MachineLearning))
         {
             persList = mReco.getMarkerPos(
                 mImgFiltered,
