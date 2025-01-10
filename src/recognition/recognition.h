@@ -24,6 +24,7 @@
 #include <QColor>
 #include <QList>
 #include <QObject>
+#include <opencv2/dnn.hpp>
 #include <opencv2/objdetect/aruco_detector.hpp>
 
 class TrackPoint;
@@ -44,13 +45,20 @@ namespace reco
  */
 enum class RecognitionMethod
 {
-    Casern     = 0,
-    Hermes     = 1,
-    Stereo     = 2,
-    Color      = 3,
-    Japan      = 4,
-    MultiColor = 5,
-    Code       = 6,
+    Casern          = 0,
+    Hermes          = 1,
+    Stereo          = 2,
+    Color           = 3,
+    Japan           = 4,
+    MultiColor      = 5,
+    Code            = 6,
+    MachineLearning = 7,
+};
+
+enum class MlMethod
+{
+    YOLOv5 = 0,
+    YOLOv8 = 1
 };
 
 class ArucoCodeParams
@@ -147,6 +155,18 @@ public:
     void   setErrorCorrectionRate(double newErrorCorrectionRate);
 };
 
+struct YOLOMarkerOptions
+{
+    double                   confThreshold  = 0.5;
+    double                   nmsThreshold   = 0.5;
+    double                   scoreThreshold = 0.5;
+    int                      imageSize      = 640;
+    QString                  modelFile{""};
+    QString                  namesFile{""};
+    cv::dnn::Net             network;
+    std::vector<std::string> classList;
+};
+
 
 class CodeMarkerOptions : public QObject
 {
@@ -195,6 +215,7 @@ private:
 
     // default multicolor marker (until 11/2016 hermes marker)
     RecognitionMethod mRecoMethod = RecognitionMethod::MultiColor;
+    MlMethod          mMlMethod   = MlMethod::YOLOv5;
 
 public:
     QList<TrackPoint> getMarkerPos(
@@ -204,8 +225,8 @@ public:
         int                          borderSize,
         BackgroundFilter            *bgFilter,
         const IntrinsicCameraParams &intrinsicCameraParams);
-
     RecognitionMethod  getRecoMethod() const { return mRecoMethod; }
+    MlMethod           getMlMethod() const { return mMlMethod; }
     CodeMarkerOptions &getCodeMarkerOptions() { return mCodeMarkerOptions; }
 
 public slots:
@@ -217,9 +238,17 @@ public slots:
             emit recoMethodChanged(mRecoMethod);
         }
     }
-
+    void userChangedMlMethod(MlMethod method)
+    {
+        if(method != mMlMethod)
+        {
+            mMlMethod = method;
+            emit mlMethodChanged(mMlMethod);
+        }
+    }
 signals:
     void recoMethodChanged(RecognitionMethod method);
+    void mlMethodChanged(MlMethod method);
 };
 
 // berechnet pixelverschiebung aufgrund von schraegsicht bei einem farbmarker
@@ -320,9 +349,9 @@ namespace detail
         const cv::Mat                               &distCoeff,
         std::vector<cv::Vec3d>                      &rotationVectors,
         std::vector<cv::Vec3d>                      &translationVectors);
-
 } // namespace detail
 } // namespace reco
 
 Q_DECLARE_METATYPE(reco::RecognitionMethod)
+Q_DECLARE_METATYPE(reco::MlMethod)
 #endif

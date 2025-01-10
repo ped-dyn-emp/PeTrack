@@ -82,6 +82,7 @@ class ColorRangeWidget;
 class ColorMarkerWidget;
 class CodeMarkerWidget;
 class MultiColorMarkerWidget;
+class YOLOMarkerWidget;
 class ViewWidget;
 class LogWindow;
 class Player;
@@ -225,6 +226,7 @@ public:
     inline ColorMarkerWidget      *getColorMarkerWidget() { return mColorMarkerWidget; }
     inline CodeMarkerWidget       *getCodeMarkerWidget() { return mCodeMarkerWidget; }
     inline MultiColorMarkerWidget *getMultiColorMarkerWidget() { return mMultiColorMarkerWidget; }
+    inline YOLOMarkerWidget       *getYOLOMarkerWidget() { return mYOLOMarkerWidget; }
     inline LogWindow              *getLogWindow() { return mLogWindow; }
     inline GraphicsView           *getView() { return mView; }
     inline QGraphicsScene         *getScene() { return mScene; }
@@ -354,6 +356,7 @@ private:
     ColorMarkerWidget      *mColorMarkerWidget;
     CodeMarkerWidget       *mCodeMarkerWidget;
     MultiColorMarkerWidget *mMultiColorMarkerWidget;
+    YOLOMarkerWidget       *mYOLOMarkerWidget;
     LogWindow              *mLogWindow;
     AnnotationGroupWidget  *mGroupingWidget;
 

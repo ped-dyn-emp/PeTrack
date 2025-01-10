@@ -49,4 +49,7 @@ target_sources(petrack_core PRIVATE
         keybindingDialog.h
         keybindingDialog.cpp
         keybindingDialog.ui
+        YOLOMarkerWidget.cpp
+        YOLOMarkerWidget.h
+        YOLOMarkerWidget.ui
 )

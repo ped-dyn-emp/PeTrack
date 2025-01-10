@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>520</width>
+    <width>540</width>
     <height>604</height>
    </rect>
   </property>
@@ -74,7 +74,7 @@
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <property name="tabsClosable">
       <bool>false</bool>
@@ -139,8 +139,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>490</width>
-            <height>555</height>
+            <width>516</width>
+            <height>553</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -202,8 +202,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>473</width>
-            <height>889</height>
+            <width>502</width>
+            <height>981</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -266,7 +266,7 @@
                   <number>6</number>
                  </property>
                  <item row="0" column="2">
-                  <widget class="PSpinBox" name="recoStep">
+                  <widget class="PSpinBox" name="recoStep" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -279,16 +279,13 @@
                      <height>0</height>
                     </size>
                    </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight</set>
-                   </property>
-                   <property name="minimum">
+                   <property name="minimum" stdset="0">
                     <number>1</number>
                    </property>
-                   <property name="maximum">
+                   <property name="maximum" stdset="0">
                     <number>9999</number>
                    </property>
-                   <property name="value">
+                   <property name="value" stdset="0">
                     <number>1</number>
                    </property>
                   </widget>
@@ -385,6 +382,9 @@
                 </widget>
                </item>
                <item>
+                <widget class="QComboBox" name="mlMethod"/>
+               </item>
+               <item>
                 <widget class="QPushButton" name="recoStereoShow">
                  <property name="text">
                   <string>parameter</string>
@@ -392,6 +392,9 @@
                 </widget>
                </item>
               </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_3"/>
              </item>
             </layout>
            </item>
@@ -559,14 +562,14 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="PSpinBox" name="spin_markerBrightness">
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="spin_markerBrightness" native="true">
+                    <property name="minimum" stdset="0">
                      <number>0</number>
                     </property>
-                    <property name="maximum">
+                    <property name="maximum" stdset="0">
                      <number>100</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>50</number>
                     </property>
                    </widget>
@@ -850,14 +853,14 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="PSpinBox" name="spin_recoColorZ">
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="spin_recoColorZ" native="true">
+                    <property name="minimum" stdset="0">
                      <number>0</number>
                     </property>
-                    <property name="maximum">
+                    <property name="maximum" stdset="0">
                      <number>255</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>255</number>
                     </property>
                    </widget>
@@ -905,14 +908,14 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="PSpinBox" name="spin_recoGreyLevel">
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="spin_recoGreyLevel" native="true">
+                    <property name="minimum" stdset="0">
                      <number>0</number>
                     </property>
-                    <property name="maximum">
+                    <property name="maximum" stdset="0">
                      <number>100</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>50</number>
                     </property>
                    </widget>
@@ -947,14 +950,14 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="PSpinBox" name="spin_recoSymbolSize">
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="spin_recoSymbolSize" native="true">
+                    <property name="minimum" stdset="0">
                      <number>1</number>
                     </property>
-                    <property name="maximum">
+                    <property name="maximum" stdset="0">
                      <number>100</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>10</number>
                     </property>
                    </widget>
@@ -1092,27 +1095,24 @@
                         </widget>
                        </item>
                        <item row="0" column="3">
-                        <widget class="PSpinBox" name="spin_mapX">
-                         <property name="minimum">
+                        <widget class="PSpinBox" name="spin_mapX" native="true">
+                         <property name="minimum" stdset="0">
                           <number>0</number>
                          </property>
-                         <property name="maximum">
+                         <property name="maximum" stdset="0">
                           <number>718</number>
                          </property>
                         </widget>
                        </item>
                        <item row="0" column="0">
-                        <widget class="PSpinBox" name="mapNr">
+                        <widget class="PSpinBox" name="mapNr" native="true">
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                            <horstretch>0</horstretch>
                            <verstretch>0</verstretch>
                           </sizepolicy>
                          </property>
-                         <property name="alignment">
-                          <set>Qt::AlignRight</set>
-                         </property>
-                         <property name="maximum">
+                         <property name="maximum" stdset="0">
                           <number>0</number>
                          </property>
                         </widget>
@@ -1157,11 +1157,11 @@
                         </widget>
                        </item>
                        <item row="1" column="6">
-                        <widget class="PSpinBox" name="spin_mapH">
-                         <property name="minimum">
+                        <widget class="PSpinBox" name="spin_mapH" native="true">
+                         <property name="minimum" stdset="0">
                           <number>0</number>
                          </property>
-                         <property name="maximum">
+                         <property name="maximum" stdset="0">
                           <number>395</number>
                          </property>
                         </widget>
@@ -1190,11 +1190,11 @@
                         </widget>
                        </item>
                        <item row="1" column="3">
-                        <widget class="PSpinBox" name="spin_mapW">
-                         <property name="minimum">
+                        <widget class="PSpinBox" name="spin_mapW" native="true">
+                         <property name="minimum" stdset="0">
                           <number>0</number>
                          </property>
-                         <property name="maximum">
+                         <property name="maximum" stdset="0">
                           <number>395</number>
                          </property>
                         </widget>
@@ -1222,11 +1222,11 @@
                         </widget>
                        </item>
                        <item row="0" column="6">
-                        <widget class="PSpinBox" name="spin_mapY">
-                         <property name="minimum">
+                        <widget class="PSpinBox" name="spin_mapY" native="true">
+                         <property name="minimum" stdset="0">
                           <number>0</number>
                          </property>
-                         <property name="maximum">
+                         <property name="maximum" stdset="0">
                           <number>718</number>
                          </property>
                         </widget>
@@ -1280,7 +1280,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="PDoubleSpinBox" name="mapHeight">
+                        <widget class="PDoubleSpinBox" name="mapHeight" native="true">
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                            <horstretch>0</horstretch>
@@ -1290,19 +1290,16 @@
                          <property name="toolTip">
                           <string>person height mapped to the selected color</string>
                          </property>
-                         <property name="alignment">
-                          <set>Qt::AlignRight</set>
-                         </property>
-                         <property name="decimals">
+                         <property name="decimals" stdset="0">
                           <number>1</number>
                          </property>
-                         <property name="minimum">
+                         <property name="minimum" stdset="0">
                           <double>0.000000000000000</double>
                          </property>
-                         <property name="maximum">
+                         <property name="maximum" stdset="0">
                           <double>250.000000000000000</double>
                          </property>
-                         <property name="value">
+                         <property name="value" stdset="0">
                           <double>180.000000000000000</double>
                          </property>
                         </widget>
@@ -1428,7 +1425,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="PDoubleSpinBox" name="mapDefaultHeight">
+                   <widget class="PDoubleSpinBox" name="mapDefaultHeight" native="true">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                       <horstretch>0</horstretch>
@@ -1438,19 +1435,16 @@
                     <property name="toolTip">
                      <string>default person height, if no height is measured through color marker or disparity</string>
                     </property>
-                    <property name="alignment">
-                     <set>Qt::AlignRight</set>
-                    </property>
-                    <property name="decimals">
+                    <property name="decimals" stdset="0">
                      <number>1</number>
                     </property>
-                    <property name="minimum">
+                    <property name="minimum" stdset="0">
                      <double>0.000000000000000</double>
                     </property>
-                    <property name="maximum">
+                    <property name="maximum" stdset="0">
                      <double>250.000000000000000</double>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <double>180.000000000000000</double>
                     </property>
                    </widget>
@@ -1594,8 +1588,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>473</width>
-            <height>1134</height>
+            <width>516</width>
+            <height>1293</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1658,7 +1652,7 @@
               </widget>
              </item>
              <item>
-              <widget class="PSpinBox" name="trackRepeatQual">
+              <widget class="PSpinBox" name="trackRepeatQual" native="true">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1674,13 +1668,10 @@
                <property name="layoutDirection">
                 <enum>Qt::LeftToRight</enum>
                </property>
-               <property name="alignment">
-                <set>Qt::AlignRight</set>
-               </property>
-               <property name="maximum">
+               <property name="maximum" stdset="0">
                 <number>100</number>
                </property>
-               <property name="value">
+               <property name="value" stdset="0">
                 <number>50</number>
                </property>
               </widget>
@@ -2391,14 +2382,14 @@
                    </widget>
                   </item>
                   <item row="0" column="2">
-                   <widget class="PSpinBox" name="spin_trackRegionScale">
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="spin_trackRegionScale" native="true">
+                    <property name="minimum" stdset="0">
                      <number>1</number>
                     </property>
-                    <property name="maximum">
+                    <property name="maximum" stdset="0">
                      <number>100</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>16</number>
                     </property>
                    </widget>
@@ -2433,14 +2424,14 @@
                    </widget>
                   </item>
                   <item row="1" column="2">
-                   <widget class="PSpinBox" name="spin_trackRegionLevels">
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="spin_trackRegionLevels" native="true">
+                    <property name="minimum" stdset="0">
                      <number>0</number>
                     </property>
-                    <property name="maximum">
+                    <property name="maximum" stdset="0">
                      <number>8</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>3</number>
                     </property>
                    </widget>
@@ -2475,11 +2466,11 @@
                    </widget>
                   </item>
                   <item row="2" column="2">
-                   <widget class="PSpinBox" name="spin_trackErrorExponent">
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="spin_trackErrorExponent" native="true">
+                    <property name="minimum" stdset="0">
                      <number>-10</number>
                     </property>
-                    <property name="maximum">
+                    <property name="maximum" stdset="0">
                      <number>10</number>
                     </property>
                    </widget>
@@ -2627,8 +2618,8 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="PSpinBox" name="trackShowOnlyNr">
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="trackShowOnlyNr" native="true">
+                    <property name="minimum" stdset="0">
                      <number>1</number>
                     </property>
                    </widget>
@@ -2843,11 +2834,8 @@
                    </widget>
                   </item>
                   <item row="7" column="2">
-                   <widget class="PSpinBox" name="trackColorMarkerLineWidth">
-                    <property name="alignment">
-                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                    </property>
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="trackColorMarkerLineWidth" native="true">
+                    <property name="minimum" stdset="0">
                      <number>1</number>
                     </property>
                    </widget>
@@ -2866,24 +2854,18 @@
                    </widget>
                   </item>
                   <item row="9" column="2">
-                   <widget class="PSpinBox" name="trackGroundPositionSize">
-                    <property name="alignment">
-                     <set>Qt::AlignRight</set>
-                    </property>
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="trackGroundPositionSize" native="true">
+                    <property name="minimum" stdset="0">
                      <number>1</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>1</number>
                     </property>
                    </widget>
                   </item>
                   <item row="3" column="2">
-                   <widget class="PSpinBox" name="trackShowPointsLineWidth">
-                    <property name="alignment">
-                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                    </property>
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="trackShowPointsLineWidth" native="true">
+                    <property name="minimum" stdset="0">
                      <number>1</number>
                     </property>
                    </widget>
@@ -2902,14 +2884,11 @@
                    </widget>
                   </item>
                   <item row="8" column="2">
-                   <widget class="PSpinBox" name="trackNumberSize">
-                    <property name="alignment">
-                     <set>Qt::AlignRight</set>
-                    </property>
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="trackNumberSize" native="true">
+                    <property name="minimum" stdset="0">
                      <number>2</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>14</number>
                     </property>
                    </widget>
@@ -3254,14 +3233,11 @@
                    </widget>
                   </item>
                   <item row="5" column="2">
-                   <widget class="PSpinBox" name="trackColColorSize">
-                    <property name="alignment">
-                     <set>Qt::AlignRight</set>
-                    </property>
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="trackColColorSize" native="true">
+                    <property name="minimum" stdset="0">
                      <number>1</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>11</number>
                     </property>
                    </widget>
@@ -3283,14 +3259,11 @@
                    </widget>
                   </item>
                   <item row="2" column="2">
-                   <widget class="PSpinBox" name="trackPointSize">
-                    <property name="alignment">
-                     <set>Qt::AlignRight</set>
-                    </property>
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="trackPointSize" native="true">
+                    <property name="minimum" stdset="0">
                      <number>1</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>7</number>
                     </property>
                    </widget>
@@ -3318,17 +3291,14 @@
                    </widget>
                   </item>
                   <item row="4" column="2">
-                   <widget class="PSpinBox" name="trackPathWidth">
-                    <property name="alignment">
-                     <set>Qt::AlignRight</set>
-                    </property>
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="trackPathWidth" native="true">
+                    <property name="minimum" stdset="0">
                      <number>1</number>
                     </property>
-                    <property name="maximum">
+                    <property name="maximum" stdset="0">
                      <number>20</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>2</number>
                     </property>
                    </widget>
@@ -3644,11 +3614,8 @@
                    </widget>
                   </item>
                   <item row="1" column="2">
-                   <widget class="PSpinBox" name="trackCurrentPointLineWidth">
-                    <property name="alignment">
-                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                    </property>
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="trackCurrentPointLineWidth" native="true">
+                    <property name="minimum" stdset="0">
                      <number>1</number>
                     </property>
                    </widget>
@@ -3696,20 +3663,17 @@
                    </widget>
                   </item>
                   <item row="10" column="2">
-                   <widget class="PSpinBox" name="trackGroundPathSize">
-                    <property name="alignment">
-                     <set>Qt::AlignRight</set>
-                    </property>
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="trackGroundPathSize" native="true">
+                    <property name="minimum" stdset="0">
                      <number>1</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>1</number>
                     </property>
                    </widget>
                   </item>
                   <item row="0" column="2">
-                   <widget class="PSpinBox" name="trackCurrentPointSize">
+                   <widget class="PSpinBox" name="trackCurrentPointSize" native="true">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
@@ -3719,13 +3683,10 @@
                       <height>16777215</height>
                      </size>
                     </property>
-                    <property name="alignment">
-                     <set>Qt::AlignRight</set>
-                    </property>
-                    <property name="minimum">
+                    <property name="minimum" stdset="0">
                      <number>1</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>60</number>
                     </property>
                    </widget>
@@ -3767,14 +3728,11 @@
                    </widget>
                   </item>
                   <item row="6" column="2">
-                   <widget class="PSpinBox" name="trackColorMarkerSize">
-                    <property name="alignment">
-                     <set>Qt::AlignRight</set>
-                    </property>
-                    <property name="minimum">
+                   <widget class="PSpinBox" name="trackColorMarkerSize" native="true">
+                    <property name="minimum" stdset="0">
                      <number>1</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>14</number>
                     </property>
                    </widget>
@@ -3850,23 +3808,20 @@
                    </widget>
                   </item>
                   <item row="0" column="1">
-                   <widget class="PSpinBox" name="trackShowBefore">
+                   <widget class="PSpinBox" name="trackShowBefore" native="true">
                     <property name="maximumSize">
                      <size>
                       <width>80</width>
                       <height>16777215</height>
                      </size>
                     </property>
-                    <property name="alignment">
-                     <set>Qt::AlignRight</set>
-                    </property>
-                    <property name="minimum">
+                    <property name="minimum" stdset="0">
                      <number>-1</number>
                     </property>
-                    <property name="maximum">
+                    <property name="maximum" stdset="0">
                      <number>99999</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>15</number>
                     </property>
                    </widget>
@@ -3885,23 +3840,20 @@
                    </widget>
                   </item>
                   <item row="1" column="1">
-                   <widget class="PSpinBox" name="trackShowAfter">
+                   <widget class="PSpinBox" name="trackShowAfter" native="true">
                     <property name="maximumSize">
                      <size>
                       <width>80</width>
                       <height>16777215</height>
                      </size>
                     </property>
-                    <property name="alignment">
-                     <set>Qt::AlignRight</set>
-                    </property>
-                    <property name="minimum">
+                    <property name="minimum" stdset="0">
                      <number>-1</number>
                     </property>
-                    <property name="maximum">
+                    <property name="maximum" stdset="0">
                      <number>99999</number>
                     </property>
-                    <property name="value">
+                    <property name="value" stdset="0">
                      <number>15</number>
                     </property>
                    </widget>
@@ -3981,7 +3933,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="PSpinBox" name="moCapSize">
+                 <widget class="PSpinBox" name="moCapSize" native="true">
                   <property name="minimumSize">
                    <size>
                     <width>100</width>
@@ -3994,10 +3946,10 @@
                     <height>25</height>
                    </size>
                   </property>
-                  <property name="minimum">
+                  <property name="minimum" stdset="0">
                    <number>1</number>
                   </property>
-                  <property name="value">
+                  <property name="value" stdset="0">
                    <number>2</number>
                   </property>
                  </widget>
@@ -4097,8 +4049,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>490</width>
-            <height>555</height>
+            <width>362</width>
+            <height>158</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -4163,11 +4115,11 @@
                 </widget>
                </item>
                <item>
-                <widget class="PSpinBox" name="anaStep">
-                 <property name="minimum">
+                <widget class="PSpinBox" name="anaStep" native="true">
+                 <property name="minimum" stdset="0">
                   <number>1</number>
                  </property>
-                 <property name="value">
+                 <property name="value" stdset="0">
                   <number>25</number>
                  </property>
                 </widget>
@@ -4270,19 +4222,19 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>PDoubleSpinBox</class>
+   <extends>QWidget</extends>
+   <header>pdoublespinbox.h</header>
+  </customwidget>
+  <customwidget>
    <class>PSpinBox</class>
-   <extends>QSpinBox</extends>
+   <extends>QWidget</extends>
    <header>pspinbox.h</header>
   </customwidget>
   <customwidget>
    <class>PSlider</class>
    <extends>QSlider</extends>
    <header>pSlider.h</header>
-  </customwidget>
-  <customwidget>
-   <class>PDoubleSpinBox</class>
-   <extends>QDoubleSpinBox</extends>
-   <header>pdoublespinbox.h</header>
   </customwidget>
   <customwidget>
    <class>AnalysePlot</class>
@@ -4427,7 +4379,6 @@
   <tabstop>anaConsiderRev</tabstop>
   <tabstop>showVoronoiCells</tabstop>
   <tabstop>scrollArea_3</tabstop>
-  <tabstop>tabs</tabstop>
   <tabstop>scrollArea</tabstop>
   <tabstop>scrollArea_2</tabstop>
   <tabstop>scrollArea_4</tabstop>

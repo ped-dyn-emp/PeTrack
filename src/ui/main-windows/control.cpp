@@ -19,6 +19,7 @@
 #include "control.h"
 
 #include "IO.h"
+#include "YOLOMarkerWidget.h"
 #include "alignmentGridBox.h"
 #include "analysePlot.h"
 #include "calibFilter.h"
@@ -221,10 +222,18 @@ Control::Control(
     mUi->recoMethod->addItem("marker Japan", QVariant::fromValue(reco::RecognitionMethod::Japan));
     mUi->recoMethod->addItem("multicolor marker", QVariant::fromValue(reco::RecognitionMethod::MultiColor));
     mUi->recoMethod->addItem("code marker", QVariant::fromValue(reco::RecognitionMethod::Code));
+    mUi->recoMethod->addItem("machine learning", QVariant::fromValue(reco::RecognitionMethod::MachineLearning));
 
     connect(&recognizer, &reco::Recognizer::recoMethodChanged, this, &Control::onRecoMethodChanged);
     connect(this, &Control::userChangedRecoMethod, &recognizer, &reco::Recognizer::userChangedRecoMethod);
     mUi->recoMethod->setCurrentIndex(mUi->recoMethod->findData(QVariant::fromValue(recognizer.getRecoMethod())));
+
+    connect(&recognizer, &reco::Recognizer::mlMethodChanged, this, &Control::onMlMethodChanged);
+    connect(this, &Control::userChangedMlMethod, &recognizer, &reco::Recognizer::userChangedMlMethod);
+    mUi->mlMethod->addItem("YOLOv5", QVariant::fromValue(reco::MlMethod::YOLOv5));
+    mUi->mlMethod->addItem("YOLOv8", QVariant::fromValue(reco::MlMethod::YOLOv8));
+    mUi->mlMethod->setCurrentIndex(mUi->mlMethod->findData(QVariant::fromValue(recognizer.getMlMethod())));
+    mUi->mlMethod->hide();
 
     mUi->scrollArea->setMinimumWidth(
         mUi->scrollAreaWidgetContents->sizeHint().width() + 2 * mUi->scrollArea->frameWidth() +
@@ -265,7 +274,6 @@ Control::Control(
 
     connect(mUi->roiFix, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
     connect(mUi->roiShow, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
-
     connect(mUi->trackRoiFix, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
     connect(mUi->trackRoiShow, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
 
@@ -1357,6 +1365,10 @@ void Control::on_recoStereoShow_clicked()
     {
         mMainWindow->getCodeMarkerWidget()->show();
     }
+    else if(selectedRecognitionMethod == reco::RecognitionMethod::MachineLearning)
+    {
+        mMainWindow->getYOLOMarkerWidget()->show();
+    }
     else
     {
         mMainWindow->getStereoWidget()->show();
@@ -1589,15 +1601,28 @@ void Control::on_mapReadMarkerID_clicked()
     mScene->update();
 }
 
-void Control::on_performRecognition_stateChanged(int /*i*/)
+void Control::on_performRecognition_stateChanged(int i)
 {
+    if(i == Qt::Checked && getRecoMethod() == reco::RecognitionMethod::MachineLearning)
+    {
+        try
+        {
+            mMainWindow->getYOLOMarkerWidget()->initialize();
+        }
+        catch(std::invalid_argument &e)
+        {
+            PCritical(mMainWindow, "Could not perform recognition", e.what());
+            mUi->performRecognition->setCheckState(Qt::Unchecked);
+            return;
+        }
+    }
+
     mMainWindow->setRecognitionChanged(true); // flag changes of recognition parameters
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
     }
 }
-
 void Control::on_recoMethod_currentIndexChanged(int /*index*/)
 {
     auto method = mUi->recoMethod->itemData(mUi->recoMethod->currentIndex());
@@ -1607,6 +1632,37 @@ void Control::on_recoMethod_currentIndexChanged(int /*index*/)
 void Control::onRecoMethodChanged(reco::RecognitionMethod method)
 {
     mUi->recoMethod->setCurrentIndex(mUi->recoMethod->findData(QVariant::fromValue(method)));
+    if(method == reco::RecognitionMethod::MachineLearning)
+    {
+        mUi->mlMethod->show();
+        if(isPerformRecognitionChecked())
+        {
+            try
+            {
+                mMainWindow->getYOLOMarkerWidget()->initialize();
+            }
+            catch(std::invalid_argument &e)
+            {
+                PCritical(mMainWindow, "Could not perform recognition", e.what());
+                mUi->performRecognition->setCheckState(Qt::Unchecked);
+            }
+        }
+    }
+    else
+    {
+        mUi->mlMethod->hide();
+    }
+}
+
+void Control::on_mlMethod_currentIndexChanged(int /*index*/)
+{
+    auto method = mUi->mlMethod->itemData(mUi->mlMethod->currentIndex());
+    emit userChangedMlMethod(method.value<reco::MlMethod>());
+}
+
+void Control::onMlMethodChanged(reco::MlMethod method)
+{
+    mUi->mlMethod->setCurrentIndex(mUi->mlMethod->findData(QVariant::fromValue(method)));
 }
 
 void Control::on_markerBrightness_valueChanged(int /*i*/)
@@ -1747,6 +1803,8 @@ void Control::setXml(QDomElement &elem)
     subSubElem.setAttribute(
         "METHOD",
         static_cast<int>(mUi->recoMethod->itemData(mUi->recoMethod->currentIndex()).value<reco::RecognitionMethod>()));
+    subSubElem.setAttribute(
+        "MLMETHOD", static_cast<int>(mUi->mlMethod->itemData(mUi->mlMethod->currentIndex()).value<reco::MlMethod>()));
     subSubElem.setAttribute("STEP", getRecoStep());
     subElem.appendChild(subSubElem);
 
@@ -2074,6 +2132,16 @@ void Control::getXml(const QDomElement &elem, const QString &version)
                         mUi->recoMethod->setCurrentIndex(foundIndex);
                     }
                     loadIntValue(subSubElem, "STEP", mUi->recoStep);
+
+                    auto mlMethod = static_cast<reco::MlMethod>(
+                        readInt(subSubElem, "MLMETHOD", static_cast<int>(reco::MlMethod::YOLOv5)));
+                    int foundMlIndex = mUi->mlMethod->findData(QVariant::fromValue(mlMethod));
+                    if(foundMlIndex == -1)
+                    {
+                        throw std::invalid_argument(
+                            "Machine learning method could not be found, please check .pet file");
+                    }
+                    mUi->mlMethod->setCurrentIndex(foundMlIndex);
                 }
                 else if(subSubElem.tagName() == "REGION_OF_INTEREST")
                 {
@@ -2464,6 +2532,12 @@ reco::RecognitionMethod Control::getRecoMethod() const
 {
     auto method = mUi->recoMethod->itemData(mUi->recoMethod->currentIndex());
     return method.value<reco::RecognitionMethod>();
+}
+
+reco::MlMethod Control::getMlMethod() const
+{
+    auto method = mUi->mlMethod->itemData(mUi->mlMethod->currentIndex());
+    return method.value<reco::MlMethod>();
 }
 
 void Control::on_colorPickerButton_clicked(bool checked)
