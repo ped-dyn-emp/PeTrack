@@ -256,6 +256,7 @@ Control::Control(
         mUi->scrollAreaWidgetContents_4->layout()->spacing() * 2);
 
 
+    trackRoiItem.setFixed(mUi->trackRoiFix->isChecked());
     connect(mUi->trackRoiFix, &QCheckBox::stateChanged, &trackRoiItem, &RoiItem::setFixed);
     connect(mUi->recoRoiToFullImageSize, &QPushButton::clicked, &recoRoiItem, &RoiItem::setToFullImageSize);
     connect(
@@ -264,6 +265,7 @@ Control::Control(
         this,
         [&recoRoiItem, &trackRoiItem]() { recoRoiItem.adjustToOtherROI(trackRoiItem, std::minus<>()); });
 
+    recoRoiItem.setFixed(mUi->roiFix->isChecked());
     connect(mUi->roiFix, &QCheckBox::stateChanged, &recoRoiItem, &RoiItem::setFixed);
     connect(mUi->trackRoiToFullImageSize, &QPushButton::clicked, &trackRoiItem, &RoiItem::setToFullImageSize);
     connect(
@@ -1686,23 +1688,11 @@ void Control::on_roiShow_stateChanged(int i)
 {
     if(i == Qt::Checked)
     {
-        mMainWindow->getRecoRoiItem()->show(); // setVisible
+        mMainWindow->getRecoRoiItem()->show();
     }
     else if(i == Qt::Unchecked)
     {
-        mMainWindow->getRecoRoiItem()->hide(); // setVisible
-    }
-}
-void Control::on_roiFix_stateChanged(int i)
-{
-    if(i == Qt::Checked)
-    {
-        mMainWindow->getRecoRoiItem()->setFlag(QGraphicsItem::ItemIsMovable, false);
-    }
-    else if(i == Qt::Unchecked)
-    {
-        mMainWindow->getRecoRoiItem()->setAcceptHoverEvents(true);
-        mMainWindow->getRecoRoiItem()->setFlag(QGraphicsItem::ItemIsMovable);
+        mMainWindow->getRecoRoiItem()->hide();
     }
 }
 
@@ -1710,24 +1700,11 @@ void Control::on_trackRoiShow_stateChanged(int i)
 {
     if(i == Qt::Checked)
     {
-        mMainWindow->getTrackRoiItem()->show(); // setVisible
+        mMainWindow->getTrackRoiItem()->show();
     }
     else if(i == Qt::Unchecked)
     {
-        mMainWindow->getTrackRoiItem()->hide(); // setVisible
-    }
-}
-
-void Control::on_trackRoiFix_stateChanged(int i)
-{
-    if(i == Qt::Checked)
-    {
-        mMainWindow->getTrackRoiItem()->setFlag(QGraphicsItem::ItemIsMovable, false);
-    }
-    else if(i == Qt::Unchecked)
-    {
-        mMainWindow->getTrackRoiItem()->setAcceptHoverEvents(true);
-        mMainWindow->getTrackRoiItem()->setFlag(QGraphicsItem::ItemIsMovable);
+        mMainWindow->getTrackRoiItem()->hide();
     }
 }
 

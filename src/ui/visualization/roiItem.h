@@ -59,7 +59,8 @@ public:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
     void restoreSize();
-    void setFixed(bool fixed) { mIsFixed = fixed; }
+    void setFixed(bool fixed);
+    bool isFixed() const { return mIsFixed; }
     void setToFullImageSize();
 
     /**
