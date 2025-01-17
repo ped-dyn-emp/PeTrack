@@ -109,8 +109,6 @@ public:
     int        getTrackShowAfter() const;
     bool       getTrackShow() const;
     void       setTrackShow(bool b);
-    bool       getTrackFix() const;
-    void       setTrackFix(bool b);
     QColor     getTrackPathColor() const;
     void       setTrackPathColor(QColor col);
     QColor     getTrackGroundPathColor() const;
@@ -503,7 +501,6 @@ private slots:
     void on_markerBrightness_valueChanged(int i);
     void on_markerIgnoreWithout_stateChanged(int i);
     void on_roiShow_stateChanged(int i);
-    void on_roiFix_stateChanged(int i);
 
     void on_intrinsicParamsChanged(IntrinsicCameraParams params);
 
@@ -522,8 +519,6 @@ private slots:
     void on_trackShowOnlyList_stateChanged(int arg1);
 
     void on_trackRoiShow_stateChanged(int arg1);
-
-    void on_trackRoiFix_stateChanged(int arg1);
 
     void setMoCapShow(bool visibility);
     void setMoCapColor(QColor col);

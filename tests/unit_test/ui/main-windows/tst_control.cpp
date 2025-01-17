@@ -19,6 +19,7 @@
 #include "control.h"
 #include "imageItem.h"
 #include "petrack.h"
+#include "roiItem.h"
 #include "ui_control.h"
 #include "util.h"
 #include "view.h"
@@ -382,5 +383,27 @@ SCENARIO("Change the show only people list", "[ui][config][tracking][path]")
                 }
             }
         }
+    }
+}
+
+TEST_CASE("Control: ROI fixed synchronized")
+{
+    Petrack  pet{"Unknown"};
+    Control *control  = pet.getControlWidget();
+    RoiItem *recoROI  = pet.getRecoRoiItem();
+    RoiItem *trackROI = pet.getTrackRoiItem();
+
+    SECTION("Default values are the same")
+    {
+        CHECK(control->getTrackRoiFix() == trackROI->isFixed());
+        CHECK(control->getRecoRoiFix() == recoROI->isFixed());
+    }
+
+    SECTION("Toggling control also toggles ROI objects")
+    {
+        control->setTrackRoiFix(!control->getTrackRoiFix());
+        CHECK(control->getTrackRoiFix() == trackROI->isFixed());
+        control->setRecoRoiFix(!control->getRecoRoiFix());
+        CHECK(control->getRecoRoiFix() == recoROI->isFixed());
     }
 }

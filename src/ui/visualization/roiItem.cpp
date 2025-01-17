@@ -28,9 +28,9 @@ RoiItem::RoiItem(QWidget *wParent, const QColor &color) : QObject(wParent)
     setRect(0, 0, 0, 0);
     QPen pen(color);
     setPen(pen);
-    setAcceptHoverEvents(true);
-    setFlags(ItemIsMovable); // default in control
-    hide();                  // default in control
+    setAcceptHoverEvents(!mIsFixed);
+    setFlag(ItemIsMovable, !mIsFixed);
+    hide(); // default in control
 }
 
 void RoiItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -234,57 +234,54 @@ void RoiItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 
         if(!mIsFixed)
         {
-            QRect r =
-                QRect(myRound(rect().left()), myRound(rect().top()), myRound(rect().width()), myRound(rect().height()));
-            if((event->pos()).x() < DISTANCE_TO_BORDER + r.x())
+            QRectF r = rect().marginsRemoved(
+                QMarginsF(DISTANCE_TO_BORDER, DISTANCE_TO_BORDER, DISTANCE_TO_BORDER, DISTANCE_TO_BORDER));
+            auto pos = event->pos();
+
+            const bool topEdge    = pos.y() < r.top();
+            const bool bottomEdge = pos.y() > r.bottom();
+            const bool leftEdge   = pos.x() < r.left();
+            const bool rightEdge  = pos.x() > r.right();
+
+            const bool xEdge = leftEdge || rightEdge;
+            const bool yEdge = topEdge || bottomEdge;
+
+            if(xEdge && !yEdge)
             {
-                if((event->pos()).y() < DISTANCE_TO_BORDER + r.y())
-                {
-                    setCursor(Qt::SizeFDiagCursor);
-                }
-                else if((event->pos()).y() > r.height() + r.y() - DISTANCE_TO_BORDER)
-                {
-                    setCursor(Qt::SizeBDiagCursor);
-                }
-                else
-                {
-                    setCursor(Qt::SizeHorCursor);
-                }
+                setCursor(Qt::SizeHorCursor);
             }
-            else if((event->pos()).x() > r.width() + r.x() - DISTANCE_TO_BORDER)
-            {
-                if((event->pos()).y() < DISTANCE_TO_BORDER + r.y())
-                {
-                    setCursor(Qt::SizeBDiagCursor);
-                }
-                else if((event->pos()).y() > r.height() + r.y() - DISTANCE_TO_BORDER)
-                {
-                    setCursor(Qt::SizeFDiagCursor);
-                }
-                else
-                {
-                    setCursor(Qt::SizeHorCursor);
-                }
-            }
-            else if(
-                ((event->pos()).y() < DISTANCE_TO_BORDER + r.y()) ||
-                ((event->pos()).y() > r.height() + r.y() - DISTANCE_TO_BORDER))
+            else if(yEdge && !xEdge)
             {
                 setCursor(Qt::SizeVerCursor);
+            }
+            else if(topEdge && xEdge)
+            {
+                if(leftEdge)
+                {
+                    setCursor(Qt::SizeFDiagCursor);
+                }
+                else
+                {
+                    setCursor(Qt::SizeBDiagCursor);
+                }
+            }
+            else if(bottomEdge && xEdge)
+            {
+                if(leftEdge)
+                {
+                    setCursor(Qt::SizeBDiagCursor);
+                }
+                else
+                {
+                    setCursor(Qt::SizeFDiagCursor);
+                }
             }
             else
             {
                 setCursor(Qt::OpenHandCursor);
             }
         }
-        else // will only be executed once - reset in control.cpp
-        {
-            // if an object underneath would have a different cursor, the cursor will still be set to cross
-            setAcceptHoverEvents(false);
-            setCursor(Qt::CrossCursor);
-        }
     }
-
     QGraphicsRectItem::hoverMoveEvent(event);
 }
 
@@ -340,8 +337,20 @@ void RoiItem::restoreSize()
     }
 }
 
+void RoiItem::setFixed(bool fixed)
+{
+    mIsFixed = fixed;
+    setAcceptHoverEvents(!mIsFixed);
+    setFlag(ItemIsMovable, !mIsFixed);
+    if(mIsFixed)
+    {
+        unsetCursor();
+    }
+}
+
 /**
- * @brief Sets the rect to the top left corner of the image and width/height such that it includes the full image.
+ * @brief Sets the rect to the top left corner of the image and width/height such that it includes the full
+ * image.
  */
 void RoiItem::setToFullImageSize()
 {
