@@ -796,21 +796,6 @@ void Petrack::saveXml(QDomDocument &doc)
     elem.setAttribute("STATUS_HEIGHT", mStatusPosRealHeight->value());
     root.appendChild(elem);
 
-    // settings for YOLO marker
-    elem = doc.createElement("YOLO_MARKER");
-    mYOLOMarkerWidget->setXML(elem);
-    root.appendChild(elem);
-
-    // control settings (right control widget)
-    elem = doc.createElement("CONTROL");
-    mControlWidget->setXml(elem);
-    root.appendChild(elem);
-
-    // Reprojection error extrinsic calib
-    elem = doc.createElement("EXTR_CALIBRATION");
-    mExtrCalibration.setXml(elem);
-    root.appendChild(elem);
-
     // settings for stereo
     elem = doc.createElement("STEREO");
     mStereoWidget->setXml(elem);
@@ -826,9 +811,24 @@ void Petrack::saveXml(QDomDocument &doc)
     mCodeMarkerWidget->setXml(elem);
     root.appendChild(elem);
 
+    // settings for YOLO marker
+    elem = doc.createElement("YOLO_MARKER");
+    mYOLOMarkerWidget->setXML(elem);
+    root.appendChild(elem);
+
+    // control settings (right control widget)
+    elem = doc.createElement("CONTROL");
+    mControlWidget->setXml(elem);
+    root.appendChild(elem);
+
     // settings for multicolor marker
     elem = doc.createElement("MULTI_COLOR_MARKER");
     mMultiColorMarkerWidget->setXml(elem);
+    root.appendChild(elem);
+
+    // Reprojection error extrinsic calib
+    elem = doc.createElement("EXTR_CALIBRATION");
+    mExtrCalibration.setXml(elem);
     root.appendChild(elem);
 
     // settings for MoCap-Visualization
