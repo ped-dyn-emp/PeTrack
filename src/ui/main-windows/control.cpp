@@ -285,6 +285,9 @@ Control::Control(
     mCorrectionWidget = new Correction(mMainWindow, mMainWindow->getPersonStorage(), this);
     mUi->tabs->insertTab(3, mCorrectionWidget, "correction");
 
+    // set calibration as default tab when opening PeTrack
+    mUi->tabs->setCurrentIndex(0);
+
     connect(
         mUi->trackShowComplPath,
         &QCheckBox::stateChanged,
@@ -301,6 +304,11 @@ Control::Control(
 void Control::setScene(QGraphicsScene *sc)
 {
     mScene = sc;
+}
+
+int Control::getCurrentTab() const
+{
+    return mUi->tabs->currentIndex();
 }
 
 void Control::toggleOnlineTracking()
