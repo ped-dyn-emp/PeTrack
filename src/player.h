@@ -65,8 +65,10 @@ public slots:
     bool frameBackward();
     void pause();
     void togglePlayPause();
-    bool skipToFrame(int f);
+    bool skipToFrame(int f, bool pauseBefore = true);
     bool skipToFrame();
+    void jumpSeconds(double seconds);
+    void queueJumpSeconds(double seconds);
     void update();
     void setPlaybackFPS(double fps = -1.);
     void togglePlayerSpeedLimited();
@@ -94,8 +96,9 @@ private:
     QTemporaryFile mTmpFile;
     PlayerState    mState = PlayerState::PAUSE;
     bool           mPlayerSpeedLimited;
-    bool           mPlayerSpeedFixed = false;
-    bool           mLooping          = false;
+    bool           mPlayerSpeedFixed   = false;
+    bool           mLooping            = false;
+    double         mPendingJumpSeconds = 0;
 
     // GUI
     QToolButton   *mFrameForwardButton, *mFrameBackwardButton, *mPlayForwardButton, *mPlayBackwardButton, *mPauseButton;

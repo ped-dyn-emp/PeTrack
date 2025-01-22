@@ -33,6 +33,8 @@
 #include <QStyle>
 #include <QToolButton>
 #include <QVBoxLayout>
+#include <algorithm>
+#include <qtimer.h>
 
 Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
 {
@@ -316,8 +318,7 @@ void Player::play(PlayerState state)
 void Player::playVideo()
 {
     static QElapsedTimer timer;
-    int                  currentFrame = mAnimation->getCurrentFrameNum();
-    long long int        overtime     = 0;
+    long long int        overtime = 0;
 
     while(mState != PlayerState::PAUSE)
     {
@@ -334,9 +335,7 @@ void Player::playVideo()
                     if(overtime >= supposedDiff)
                     {
                         mAnimation->skipFrame(static_cast<int>(overtime / supposedDiff));
-                        overtime = overtime % supposedDiff;
-                        currentFrame =
-                            std::min(mAnimation->getCurrentFrameNum() + 1, mAnimation->getSourceOutFrameNum());
+                        overtime %= supposedDiff;
                     }
                 }
 
@@ -356,22 +355,20 @@ void Player::playVideo()
         switch(mState)
         {
             case PlayerState::FORWARD:
-                mImg = mAnimation->getFrameAtIndex(currentFrame);
-                currentFrame++;
+                mImg = mAnimation->getNextFrame();
                 break;
             case PlayerState::BACKWARD:
-                mImg = mAnimation->getFrameAtIndex(currentFrame);
-                currentFrame--;
+                mImg = mAnimation->getPreviousFrame();
                 break;
             case PlayerState::PAUSE:
                 break;
         }
 
+        int currentFrame = mAnimation->getCurrentFrameNum(); // Fetch current frame directly from mAnimation
         if(!updateImage())
         {
             mState = PlayerState::PAUSE;
-            if(mAnimation->getCurrentFrameNum() != 0 &&
-               mAnimation->getCurrentFrameNum() != mAnimation->getSourceOutFrameNum())
+            if(currentFrame != 0 && currentFrame != mAnimation->getSourceOutFrameNum())
             {
                 SPDLOG_WARN("video unexpectedly finished.");
             }
@@ -389,16 +386,15 @@ void Player::playVideo()
             }
             else if(mLooping)
             {
-                if(mState == PlayerState::FORWARD &&
-                   mAnimation->getCurrentFrameNum() == mAnimation->getSourceOutFrameNum())
+                if(mState == PlayerState::FORWARD && currentFrame == mAnimation->getSourceOutFrameNum())
                 {
-                    currentFrame = mAnimation->getSourceInFrameNum();
+                    mImg = mAnimation->getFrameAtIndex(mAnimation->getSourceInFrameNum());
+                    mAnimation->setCurrentFrameNum(mAnimation->getSourceInFrameNum());
                 }
-                else if(
-                    mState == PlayerState::BACKWARD &&
-                    mAnimation->getCurrentFrameNum() == mAnimation->getSourceInFrameNum())
+                else if(mState == PlayerState::BACKWARD && currentFrame == mAnimation->getSourceInFrameNum())
                 {
-                    currentFrame = mAnimation->getSourceOutFrameNum();
+                    mImg = mAnimation->getFrameAtIndex(mAnimation->getSourceOutFrameNum());
+                    mAnimation->setCurrentFrameNum(mAnimation->getSourceOutFrameNum());
                 }
             }
         }
@@ -442,13 +438,16 @@ void Player::togglePlayPause()
     }
 }
 
-bool Player::skipToFrame(int f) // [0..mAnimation->getNumFrames()-1]
+bool Player::skipToFrame(int f, bool pauseBefore) // [0..mAnimation->getNumFrames()-1]
 {
     if(f == mAnimation->getCurrentFrameNum())
     {
         return false;
     }
-    pause();
+    if(pauseBefore)
+    {
+        pause();
+    }
     mImg = mAnimation->getFrameAtIndex(f);
     return updateImage();
 }
@@ -465,6 +464,38 @@ bool Player::skipToFrame() // [0..mAnimation->getNumFrames()-1]
     }
 
     return skipToFrame(mFrameNum->text().toInt());
+}
+
+void Player::jumpSeconds(double seconds)
+{
+    int curFrame = getPos();
+    // calculate next frame
+    int jumpWidth = static_cast<int>(seconds * mAnimation->getSequenceFPS());
+    int nextFrame = curFrame + jumpWidth;
+    nextFrame     = std::clamp(nextFrame, getFrameInNum(), getFrameOutNum());
+
+    // go to next frame
+    skipToFrame(nextFrame, false);
+}
+
+
+void Player::queueJumpSeconds(double seconds)
+{
+    static QTimer jumpTimer;
+    if(!jumpTimer.isActive())
+    {
+        jumpTimer.setSingleShot(true);
+        connect(
+            &jumpTimer,
+            &QTimer::timeout,
+            [this]()
+            {
+                jumpSeconds(mPendingJumpSeconds);
+                mPendingJumpSeconds = 0;
+            });
+    }
+    mPendingJumpSeconds += seconds;
+    jumpTimer.start(300);
 }
 
 /**

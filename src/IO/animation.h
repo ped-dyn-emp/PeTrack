@@ -94,7 +94,8 @@ public:
     int getMaxFrames() const;
 
     // Returns the index of the current frame
-    int getCurrentFrameNum() const;
+    int  getCurrentFrameNum() const;
+    void setCurrentFrameNum(int index);
 
     // Sets the sourceIn/Out frame numbers
     void updateSourceInFrameNum(int in = -1);
