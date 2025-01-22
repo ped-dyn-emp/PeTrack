@@ -81,6 +81,7 @@ public:
         AlignmentGridBox    *gridBox);
 
     void setScene(QGraphicsScene *sc);
+    int  getCurrentTab() const;
 
     void toggleOnlineTracking();
     bool isOnlineTrackingChecked() const;

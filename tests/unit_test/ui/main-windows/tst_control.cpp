@@ -407,3 +407,10 @@ TEST_CASE("Control: ROI fixed synchronized")
         CHECK(control->getRecoRoiFix() == recoROI->isFixed());
     }
 }
+
+TEST_CASE("Calibration tab is open per default")
+{
+    Petrack  pet{"Unknown"};
+    Control *control = pet.getControlWidget();
+    CHECK(control->getCurrentTab() == 0);
+}

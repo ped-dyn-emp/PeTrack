@@ -74,7 +74,7 @@
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="tabsClosable">
       <bool>false</bool>
@@ -129,7 +129,7 @@
           <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>
          <property name="sizeAdjustPolicy">
-          <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+          <enum>QAbstractScrollArea::AdjustToContents</enum>
          </property>
          <property name="widgetResizable">
           <bool>true</bool>
@@ -988,7 +988,7 @@
                    <enum>QFrame::StyledPanel</enum>
                   </property>
                   <property name="frameShadow">
-                   <enum>QFrame::Shadow::Raised</enum>
+                   <enum>QFrame::Raised</enum>
                   </property>
                  </widget>
                 </item>
@@ -1575,7 +1575,7 @@
           <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>
          <property name="sizeAdjustPolicy">
-          <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+          <enum>QAbstractScrollArea::AdjustToContents</enum>
          </property>
          <property name="widgetResizable">
           <bool>true</bool>
@@ -1589,7 +1589,7 @@
             <x>0</x>
             <y>0</y>
             <width>516</width>
-            <height>1293</height>
+            <height>1266</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -2722,7 +2722,7 @@
                    <enum>Qt::Vertical</enum>
                   </property>
                   <property name="sizeType">
-                   <enum>QSizePolicy::Policy::Fixed</enum>
+                   <enum>QSizePolicy::Fixed</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -3758,7 +3758,7 @@
                    <enum>Qt::Vertical</enum>
                   </property>
                   <property name="sizeType">
-                   <enum>QSizePolicy::Policy::Fixed</enum>
+                   <enum>QSizePolicy::Fixed</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -4078,7 +4078,7 @@
               <enum>QFrame::StyledPanel</enum>
              </property>
              <property name="frameShadow">
-              <enum>QFrame::Shadow::Raised</enum>
+              <enum>QFrame::Raised</enum>
              </property>
             </widget>
            </item>
