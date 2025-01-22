@@ -85,8 +85,8 @@ std::vector<FailedCheck> checkInside(
     progressDialog->setLabelText("Check if trajectories are inside image...");
     qApp->processEvents();
 
-    const int    imgWidth  = sequenceSize.width - 1 - 2 * imageBorderSize - margin;
-    const int    imgHeight = sequenceSize.height - 1 - 2 * imageBorderSize - margin;
+    const int    imgWidth  = sequenceSize.width - 1 - 2 * imageBorderSize - 2 * margin;
+    const int    imgHeight = sequenceSize.height - 1 - 2 * imageBorderSize - 2 * margin;
     const QRectF imgRect(margin, margin, imgWidth, imgHeight);
     const QRectF checkRect = imgRect.intersected(rect);
 
