@@ -1739,14 +1739,14 @@ void Petrack::keyBindings()
 
     KeyBindingGroup video_navigation{
         "video navigation",
-        {
-            {"Space bar", "toggles between pause and last play direction"},
-            {"Ctrl + Alt + double-click left mouse button", "jumps to frame of trajectory point under cursor"},
-            {"Mouse scroll wheel",
-             "zooms in and out to or from the pixel of the image\nat the position of the mouse pointer"},
-            {"Shift + mouse scroll wheel", "plays forwards or backwards frame by frame"},
-            {"Holding left mouse button", "moves image"},
-            {"Arrow left/Arrow right", "frame back/forward"},
+        {{"Space bar", "toggles between pause and last play direction"},
+         {"Ctrl + Alt + double-click left mouse button", "jumps to frame of trajectory point under cursor"},
+         {"Mouse scroll wheel",
+          "zooms in and out to or from the pixel of the image\nat the position of the mouse pointer"},
+         {"Shift + mouse scroll wheel", "plays forwards or backwards frame by frame"},
+         {"Holding left mouse button", "moves image"},
+         {"Arrow left/Arrow right", "frame back/forward"},
+         {"j/l", "jump back/forward"}
 
         }};
 
@@ -2536,6 +2536,12 @@ void Petrack::keyPressEvent(QKeyEvent *event)
             break;
         case Qt::Key_Right:
             mPlayerWidget->frameForward();
+            break;
+        case Qt::Key_L:
+            mPlayerWidget->queueJumpSeconds(3);
+            break;
+        case Qt::Key_J:
+            mPlayerWidget->queueJumpSeconds(-3);
             break;
         case Qt::Key_Down:
             mControlWidget->setTrackShowOnlyNr(mControlWidget->getTrackShowOnlyNr() - 1);

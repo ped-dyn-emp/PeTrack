@@ -44,6 +44,7 @@ they can be represented in QT.
 #include <QStringList>
 #include <QTime>
 #include <QWidget>
+#include <algorithm>
 #include <iomanip>
 #include <opencv2/opencv.hpp>
 #include <sstream>
@@ -418,6 +419,12 @@ int Animation::getCurrentFrameNum() const
 {
     return mCurrentFrame;
 }
+
+void Animation::setCurrentFrameNum(int index)
+{
+    mCurrentFrame = std::clamp(index, mSourceInFrame, mSourceOutFrame);
+}
+
 void Animation::updateSourceInFrameNum(int in)
 {
     mSourceInFrame = in;
