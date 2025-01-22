@@ -11,4 +11,5 @@ While there are plenty of options available, we suggest using the multicolor or 
 setting-up
 multicolor
 aruco
+machine-learning
 :::
