@@ -179,7 +179,7 @@ void ExtrCalibration::loadExtrCalibFile()
     while(!in.atEnd())
     {
         // read new line
-        line = in.readLine();
+        line = in.readLine().trimmed();
         ++line_counter;
 
         // skip comments
