@@ -42,7 +42,7 @@ The first line is the total number of points. Starting from the second line, all
 
 1. Continue with PeTrack after the intrinsic calibration. Load your combined [extrinsic calibration image](/calibration/extrinsic_calibration.md#image-point-file-preparation).
 2. Open the image and mark the points from your `.3dc` file **in the order, they appear in the file**. Markers can be set with `⌃ Ctrl/⌘ Cmd + double left click` and deleted with `⌃ Ctrl/⌘ Cmd + double right click`.
-3. Load the points from the `.3dc` file by pressing load and browsing to the file. Make sure no additional spaces are at the end of each coordinate line in your `.3dc` document. PeTrack won’t be able to read these coordinates and show you an error message in the next step that the 2D points that you have selected in the picture don’t match the number of 3D points in you `.3dc` document!
+3. Load the points from the `.3dc` file by pressing load and browsing to the file.
 4. Click “fetch”. This will use your selected image points and the points from the `.3dc` to calibrate.
 5. You can check the result with the buttons “show” and “error”. Additionally, you can have PeTrack draw the virtual world coordinate system by clicking on the “show” checkbox in the “coordinate system” section.
 6. Click “save” to make PeTrack add the pixel coordinates to the `.3dc` file.
