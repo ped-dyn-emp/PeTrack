@@ -4122,6 +4122,12 @@ void Petrack::selectPersonForMoveTrackPoint(QPointF pos)
     range.before  = mControlWidget->getTrackShowBefore();
     range.after   = mControlWidget->getTrackShowAfter();
     range.current = mPlayerWidget->getPos();
+    if(mControlWidget->isTrackShowComplPathChecked())
+    {
+        // range covers whole trajectory
+        range.before = range.current;
+        range.after  = mAnimation.getNumFrames() - range.current;
+    }
     auto successfullySelected =
         mManualTrackPointMover.selectTrackPoint(pos, mPersonStorage, getPedestrianUserSelection(), range);
 
@@ -4164,10 +4170,16 @@ void Petrack::skipToFrameWheel(int delta)
 
 void Petrack::skipToFrameFromTrajectory(QPointF pos)
 {
-    auto       peds      = getPedestrianUserSelection();
-    const auto before    = mControlWidget->getTrackShowBefore();
-    const auto after     = mControlWidget->getTrackShowAfter();
-    const auto currFrame = mPlayerWidget->getPos();
+    auto      peds      = getPedestrianUserSelection();
+    int       before    = mControlWidget->getTrackShowBefore();
+    int       after     = mControlWidget->getTrackShowAfter();
+    const int currFrame = mPlayerWidget->getPos();
+    if(mControlWidget->isTrackShowComplPathChecked())
+    {
+        // range covers whole trajectory
+        before = currFrame;
+        after  = mAnimation.getNumFrames() - currFrame;
+    }
     FrameRange frameRange{before, after, currFrame};
 
     auto res = mPersonStorage.getProximalPersons(pos, peds, frameRange);
