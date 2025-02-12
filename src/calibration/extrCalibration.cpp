@@ -690,9 +690,7 @@ bool ExtrCalibration::calcReprojectionError(const ExtrinsicParameters &extrParam
         max_px,
         mControlWidget->getDefaultHeight()};
 
-    return reprojectionError.pointHeightAvg() > MAX_AV_ERROR ?
-               false :
-               true; // Falls pixel fehler im schnitt > 20 ist das Ergebnis nicht akzeptabel
+    return reprojectionError.pointHeightAvg() <= MAX_AV_ERROR; // if average error > 20, result is not acceptable
 }
 
 /**
