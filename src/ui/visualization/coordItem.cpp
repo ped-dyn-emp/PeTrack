@@ -199,31 +199,33 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 cv::Point2f p2 = extCalib->get2DList().at(i);
                 painter->drawEllipse(p2.x - 8, p2.y - 8, 16, 16);
 
-                // general configuration
-                painter->setPen(Qt::blue);
-                painter->setBrush(Qt::blue);
-
-                // Projected 3D-Points
-                cv::Point3f p3d   = extCalib->get3DList().at(i);
-                auto        trans = mCoordSys->getCoordTrans3D();
-                p3d -= trans.toCvPoint();
-
-                auto swap = mCoordSys->getSwap3D();
-                p3d.x *= (swap.x ? -1 : 1);
-                p3d.y *= (swap.y ? -1 : 1);
-                p3d.z *= (swap.z ? -1 : 1);
-
-                cv::Point2f p3 = extCalib->getImagePoint(p3d);
-
-                painter->drawEllipse(p3.x - 4, p3.y - 4, 8, 8);
-
-                // Connecting-line Pixel-3D-Points
-                painter->drawLine(QPointF(p2.x, p2.y), QPointF(p3.x, p3.y));
-
                 // Show point number
                 painter->setPen(Qt::black);
                 painter->setBrush(Qt::black);
                 painter->drawText(QPointF(p2.x + 10, p2.y + font.pixelSize()), QObject::tr("%1").arg((i + 1)));
+
+                if(i < extCalib->get3DList().size())
+                {
+                    // general configuration
+                    painter->setPen(Qt::blue);
+                    painter->setBrush(Qt::blue);
+                    // Projected 3D-Points
+                    cv::Point3f p3d   = extCalib->get3DList().at(i);
+                    auto        trans = mCoordSys->getCoordTrans3D();
+                    p3d -= trans.toCvPoint();
+
+                    auto swap = mCoordSys->getSwap3D();
+                    p3d.x *= (swap.x ? -1 : 1);
+                    p3d.y *= (swap.y ? -1 : 1);
+                    p3d.z *= (swap.z ? -1 : 1);
+
+                    cv::Point2f p3 = extCalib->getImagePoint(p3d);
+
+                    painter->drawEllipse(p3.x - 4, p3.y - 4, 8, 8);
+
+                    // Connecting-line Pixel-3D-Points
+                    painter->drawLine(QPointF(p2.x, p2.y), QPointF(p3.x, p3.y));
+                }
             }
         }
     }
