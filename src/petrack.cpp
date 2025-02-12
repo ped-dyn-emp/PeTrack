@@ -630,6 +630,14 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
             // reset background and first skip to selected frame
             mBackgroundFilter.reset();
         }
+        if(frame == mAnimation.getCurrentFrameNum())
+        {
+            //  needed such that e.g. the calibration is marked as known
+            //  else, the first updateImage call would be after loading the trajectories
+            //  and they would be immediately deleted, because the intrinsic is new
+            //  skipToFrame only calls it if we are not already there
+            updateImage();
+        }
         // will call updateImage and update bg
         mPlayerWidget->skipToFrame(frame);
     }
@@ -674,6 +682,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
         mPlayerWidget->setPlaybackFPS(playbackFps);
         setSequenceFPS(sequenceFps); // set here to override the fps from the default fps of the sequence
     }
+
     updateImage(); // needed to undistort, draw border, etc. for first display
     setLoading(false);
 }
@@ -1849,9 +1858,6 @@ void Petrack::setCamera()
     }
     updateImage(mAnimation.getFrameAtIndex(
         mAnimation.getCurrentFrameNum())); // wird nur aufgerufen, wenn left / right sich geaendert hat
-    // mPlayerWidget->updateImage();
-    // mPlayerWidget->skipToFrame(mPlayerWidget->getPos()); // machtpasue!!
-    // updateImage(true); // nur dies aufrufen, wenn nicht links rechts gleichzeitig gehalten wird
 }
 
 /**
