@@ -91,6 +91,7 @@ public:
     inline void setZoomLevel(int l) { mZoomSlider->setValue(l); }
     inline int  getRotateLevel() { return mRotateSlider->value(); }
     inline void setRotateLevel(int l) { mRotateSlider->setValue(l); }
+    void        setZoomLevelBlocked(int l);
 
 public slots:
     void zoomIn(int i = 1);

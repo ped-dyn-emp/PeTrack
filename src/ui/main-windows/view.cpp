@@ -64,15 +64,19 @@ void GraphicsView::wheelEvent(QWheelEvent *event)
     }
     else
     {
-        // Check if horizontal scroll
-        if(event->angleDelta().x() != 0) // warum orienttion?
-        {
-            mViewWidget->zoomIn(numDegrees.x() / 2);
-        }
-        else
-        {
-            mViewWidget->zoomOut(numDegrees.y() / 2);
-        }
+        QPoint  targetPos      = event->position().toPoint();
+        QPointF targetScenePos = mapToScene(targetPos);
+        qreal   factor         = event->angleDelta().y() > 0 ? 0.9 : 1.1;
+        scale(factor, factor);
+        centerOn(targetScenePos);
+        QPointF deltaViewPortPos = targetPos - QPointF(viewport()->width() / 2.0, viewport()->height() / 2.0);
+        QPointF viewPortCenter   = mapFromScene(targetScenePos) - deltaViewPortPos;
+        centerOn(mapToScene(viewPortCenter.toPoint()));
+
+        // set zoom slider without sending signals
+        QTransform matrix = transform();
+        double     scale  = Vec2F(matrix.m11(), matrix.m21()).length();
+        mViewWidget->setZoomLevelBlocked(250. + 50. * log(scale) / log(2.));
     }
 }
 
@@ -392,6 +396,13 @@ void ViewWidget::hideControls(bool hide)
 void ViewWidget::hideShowControls()
 {
     mMainWindow->getHideControlActor()->setChecked(mMainWindow->getControlWidget()->isVisible());
+}
+
+void ViewWidget::setZoomLevelBlocked(int l)
+{
+    mZoomSlider->blockSignals(true);
+    mZoomSlider->setValue(l);
+    mZoomSlider->blockSignals(false);
 }
 
 
