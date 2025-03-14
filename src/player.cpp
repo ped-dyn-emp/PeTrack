@@ -81,7 +81,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mSlider = new QSlider(Qt::Horizontal);
     mSlider->setTickPosition(QSlider::TicksAbove);
     mSlider->setMinimumWidth(100);
-    connect(mSlider, SIGNAL(valueChanged(int)), this, SLOT(skipToFrame(int)));
+    connect(mSlider, &QSlider::valueChanged, this, [this](int val) { skipToFrame(val); });
 
     // frame number
     QFont f("Courier", 12, QFont::Bold); // Times Helvetica, Normal
@@ -165,6 +165,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     setAnim(anim);
 }
 
+
 void Player::setPlaybackFPS(double fps) // default: double fps=-1.
 {
     if(fps != -1)
@@ -223,10 +224,11 @@ void Player::setAnim(Animation *anim)
     }
 }
 
-bool Player::getPaused()
+bool Player::getPaused() const
 {
     return mState == PlayerState::PAUSE;
 }
+
 
 void Player::setSliderMax(int max)
 {
@@ -248,15 +250,13 @@ bool Player::updateImage()
         pause();
         return false;
     }
-    qApp->processEvents();
-
-    mMainWindow->updateImage(mImg);
+    bool successful = mMainWindow->updateImage(mImg);
 
     mSlider->setValue(
         mAnimation->getCurrentFrameNum()); //(1000*mAnimation->getCurrentFrameNum())/mAnimation->getNumFrames());
     mFrameNum->setText(QString().number(mAnimation->getCurrentFrameNum()));
 
-    return true;
+    return successful;
 }
 
 bool Player::forward()
@@ -432,7 +432,7 @@ void Player::togglePlayPause()
         lastState = mState;
         pause();
     }
-    else
+    else if(updateImage()) // only play the video again if there are no pending image updates
     {
         play(lastState);
     }

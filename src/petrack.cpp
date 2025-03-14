@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <QMutex>
 #include <QSignalMapper>
 #include <QtOpenGL>
 #include <QtWidgets>
@@ -3596,20 +3597,29 @@ void Petrack::performRecognition()
  * tracking border
  *
  * @param imageChanged specify if the image has actually changed (a new animation frame is shown). Defaults to false
+ * @return true if updateImage updated the image successfully immediately, false otherwise (call got queued or failed)
  *
  */
-void Petrack::updateImage(bool imageChanged)
+bool Petrack::updateImage(bool imageChanged)
 {
     mCodeMarkerItem->resetSavedMarkers();
 
     static int  lastRecoFrame            = -10000;
     static bool borderChangedForTracking = false;
 
-    // need semaphore to guarantee that updateImage only called once
+    // need mutex to guarantee that updateImage only called once at a time
     // updateValue of control automatically calls updateImage!!!
-    static QSemaphore semaphore(1);
-    if(!mImg.empty() && mImage && semaphore.tryAcquire())
+    static QMutex mutex;
+    if(!mImg.empty() && mImage)
     {
+        if(!mutex.tryLock())
+        {
+            // add the call to the event queue to make sure no valid update is skipped
+            QMetaObject::invokeMethod(
+                this, [this, imageChanged] { updateImage(imageChanged); }, Qt::QueuedConnection);
+            return false;
+        }
+
         int frameNum = mAnimation.getCurrentFrameNum();
 
         setStatusTime();
@@ -3715,14 +3725,16 @@ void Petrack::updateImage(bool imageChanged)
         }
 #endif
 
-        semaphore.release();
+        mutex.unlock();
+        return true;
     }
+    return false;
 }
 
-void Petrack::updateImage(const cv::Mat &img)
+bool Petrack::updateImage(const cv::Mat &img)
 {
     mImg = img;
-    updateImage(true);
+    return updateImage(true);
 }
 
 
