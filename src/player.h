@@ -57,7 +57,7 @@ class Player : public QWidget
 public:
     Player(Animation *anim, QWidget *parent = nullptr);
     void setAnim(Animation *anim);
-    bool getPaused();
+    bool getPaused() const;
     void setSpeedRelativeToRealtime(double factor);
 
 public slots:

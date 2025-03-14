@@ -192,8 +192,8 @@ public:
     void         trackAll();
     void         playAll();
     int          winSize(QPointF *pos = nullptr, int pers = -1, int frame = -1, int level = -1);
-    void         updateImage(bool imageChanged = false);
-    void         updateImage(const cv::Mat &img);
+    bool         updateImage(bool imageChanged = false);
+    bool         updateImage(const cv::Mat &img);
     void         updateSequence();
     QSet<size_t> getPedestrianUserSelection();
     QSet<size_t> getPedestriansToTrack();
