@@ -174,11 +174,11 @@ When making a complete new CMake profile you may want to set some CMake options 
 See the default installation manual for more information.
 :::
 
-**Now you can select the profile and petrack should compile successfully**.   
+**Now you can select the profile and PeTrack should compile successfully**.   
 However, it does not run *yet*. This is because you have to define the display when running the docker container (see [here](https://wiki.archlinux.org/title/docker#Run_graphical_programs_inside_a_container)).
 On you linux machine you have to run `xhost +local:`.
 Then you can add this to the "Container Settings" under "Tollchains" in CLion such that it says:  
 `--entrypoint -v /tmp/.X11-unix:/tmp/.X11-unix --device /dev/dri:/dev/dri --rm`
 
-Now petrack should compile and run successfully.
+Now PeTrack should compile and run successfully.
 

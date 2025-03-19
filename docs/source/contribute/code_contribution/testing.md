@@ -6,14 +6,14 @@ Unit tests are used to test single functions and classes without having to go th
 of setting up a project.
 As a unit testing framework we use [Catch2](https://github.com/catchorg/Catch2). It allows to easily construct
 test cases and uses a simple structure based on plain english to describe the structure of the specific test. <br>
-To run the tests execute the follwing command from the petrack directory:
+To run the tests execute the follwing command from the PeTrack directory:
 ```
 [/home/dev/petrack/build-debug] $ ./tests/unit_test/petrack_tests
 ```
 :::{note}
 This may take a few seconds to finish. <br>
 If this doesn't work, it is probably because you didn't compile the unit tests.
-Make sure you compile petrack with the `-DBUILD_UNIT_TESTS=ON` option.
+Make sure you compile PeTrack with the `-DBUILD_UNIT_TESTS=ON` option.
 :::
 
 ## Regression tests
