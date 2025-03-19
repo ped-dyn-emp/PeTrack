@@ -27,7 +27,7 @@ sudo usermod -aG docker $USER
 In `.gitlab-ci.yml`, locate the image version defined in the variable `DOCKER_TAG`. We version them incrementally (e.g., if the latest is `v1`, change it to `v2`).
 
 ### 4. Build the image
-- From the petrack root directory, go to the Dockerfile
+- From the PeTrack root directory, go to the Dockerfile
 ```bash
 cd container/ubuntu
 ```

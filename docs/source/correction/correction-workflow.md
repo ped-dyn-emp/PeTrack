@@ -54,10 +54,9 @@ Retrack with recognition
 
 Move trajectory point
 : You can correct mildly  misplaced points by going to the corresponding 
-frame, and moving your cursor to the new location and pressing `Ctrl + left double click`. Note that you can only move the point inside the head area (circle around the head).
+frame, and moving your cursor to the new location and pressing `⌃ Ctrl /⌘ Cmd + left double click`. Note that you can only move the point inside the head area (circle around the head).
  
-: If you would like to move a point further away, you can use `Alt + hold left click` to drag a 
-trajectory point to a new location.
+: If you would like to move a point further away, you can use `Alt /⌥ Option + hold left click` to drag a trajectory point to a new location.
 
 : If you are already seeing many errors, you might want to delete all past or future tracking 
 points and retrack to save you some time.
