@@ -116,6 +116,7 @@ private slots:
     void on_boardSizeY_valueChanged(int y);
     void on_squareSize_valueChanged(double s);
     void on_calibFiles_clicked();
+    void onCalibVideoClicked();
     void on_apply_stateChanged(int i);
 
 public slots:

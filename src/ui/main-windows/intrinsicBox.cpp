@@ -59,6 +59,7 @@ IntrinsicBox::IntrinsicBox(
     connect(mUi->quadAspectRatio, &QCheckBox::clicked, this, &IntrinsicBox::showRecalibrationDialog);
     connect(mUi->fixCenter, &QCheckBox::clicked, this, &IntrinsicBox::showRecalibrationDialog);
     connect(mUi->tangDist, &QCheckBox::clicked, this, &IntrinsicBox::showRecalibrationDialog);
+    connect(mUi->calibVideo, &QPushButton::clicked, this, &IntrinsicBox::onCalibVideoClicked);
     // apply intrinsic
     mUi->apply->setCheckState(mCalibFilter.getEnabled() ? Qt::Checked : Qt::Unchecked);
 
@@ -190,6 +191,7 @@ void IntrinsicBox::loadCalibFiles(QDomElement &subSubElem)
             mUi->autoCalib->setEnabled(true);
         }
     }
+    mAutoCalib.setCalibVideo(getExistingFile(readQString(subSubElem, "CALIB_VIDEO", "")));
 }
 
 bool IntrinsicBox::getXml(QDomElement &subSubElem)
@@ -377,6 +379,7 @@ void IntrinsicBox::setXml(QDomElement &subElem) const
         }
     }
     subSubElem.setAttribute("CALIB_FILES", fl.join(", "));
+    subSubElem.setAttribute("CALIB_VIDEO", mAutoCalib.getCalibVideo());
 
     if(this->parent())
     {
@@ -612,6 +615,14 @@ void IntrinsicBox::runAutoCalib()
 void IntrinsicBox::on_calibFiles_clicked()
 {
     if(mAutoCalib.openCalibFiles())
+    {
+        mUi->autoCalib->setEnabled(true);
+    }
+}
+
+void IntrinsicBox::onCalibVideoClicked()
+{
+    if(mAutoCalib.openCalibVideo())
     {
         mUi->autoCalib->setEnabled(true);
     }

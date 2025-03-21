@@ -105,6 +105,376 @@ bool AutoCalib::openCalibFiles()
     return false;
 }
 
+QString AutoCalib::getCalibVideo()
+{
+    return mCalibVideo;
+}
+
+void AutoCalib::setCalibVideo(const QString &v)
+{
+    mCalibVideo = v;
+}
+
+/**
+ * @brief Opens a file dialog to select a calibration video and processes it
+ *
+ * Prompts the user to select a video file, then analyzes it to extract suitable calibration frames.
+ *
+ * @return true if a video was selected and good samples were found, false otherwise
+ */
+bool AutoCalib::openCalibVideo()
+{
+    if(mMainWindow && !mLastDir.isEmpty())
+    {
+        QString calibVideo = QFileDialog::getOpenFileName(
+            mMainWindow,
+            Petrack::tr("Open calibration video"),
+            QFileInfo(mLastDir).dir().path(),
+            "All supported types (*.avi *.mpg *.mts *.m2ts "
+            "*.m2t *.wmv *.mov *.mp4 *.mxf);;All files (*.*)");
+        if(calibVideo.isEmpty())
+        {
+            return false;
+        }
+        mCalibVideo = calibVideo;
+        findGoodCalibrationSamplesFromVideo(cv::Size(mBoardSizeX, mBoardSizeY));
+        return !mCalibFiles.isEmpty();
+    }
+    return false;
+}
+
+/**
+ * @brief Extracts the four outer corners of a chessboard from a set of corners
+ *
+ * @param corners[in] All detected chessboard corners
+ * @param boardSize[in] Size of the chessboard (width x height in squares)
+ * @return Vector containing the four outer corners (top-left, top-right, bottom-right, bottom-left)
+ */
+std::vector<cv::Point2f>
+AutoCalib::getOuterChessboardCorners(const std::vector<cv::Point2f> &corners, cv::Size &boardSize)
+{
+    std::vector<cv::Point2f> outerCorners;
+    auto                     upLeft    = corners[0];
+    auto                     upRight   = corners[boardSize.width - 1];
+    auto                     downRight = corners[corners.size() - 1];
+    auto                     downLeft  = corners[corners.size() - boardSize.width];
+    outerCorners.push_back(upLeft);
+    outerCorners.push_back(upRight);
+    outerCorners.push_back(downRight);
+    outerCorners.push_back(downLeft);
+    return outerCorners;
+}
+
+/**
+ * @brief Calculates the inner area enclosed by the outer chessboard corners
+ *
+ * Uses the shoelace formula to compute the area based on the four outer corners.
+ *
+ * @param outerCorners[in] Four outer corners of the chessboard
+ * @return Area enclosed by the outer corners
+ */
+double AutoCalib::calcInnerAreaOfChessboard(std::vector<cv::Point2f> &outerCorners)
+{
+    // https://mathworld.wolfram.com/Quadrilateral.html
+    cv::Point2f a = outerCorners[1] - outerCorners[0]; // upRight - upLeft
+    cv::Point2f b = outerCorners[2] - outerCorners[1]; // downRight - upRight
+    cv::Point2f c = outerCorners[3] - outerCorners[2]; // downLeft - downRight
+    cv::Point2f p = b + c;
+    cv::Point2f q = a + b;
+    return cv::abs(p.cross(q)) / 2;
+}
+
+/**
+ * @brief Calculates the skew of the chessboard based on outer corners
+ *
+ * Measures the deviation from a 90-degree angle at one corner to assess skewness.
+ *
+ * @param outerCorners[in] Four outer corners of the chessboard
+ * @return Absolute difference between the calculated angle and 90 degrees (in radians)
+ */
+double AutoCalib::calcSkewOfChessboard(std::vector<cv::Point2f> &outerCorners)
+{
+    auto upLeft    = outerCorners[0];
+    auto upRight   = outerCorners[1];
+    auto downRight = outerCorners[2];
+
+    // calculate the angle between two lines and compare to 90°
+    cv::Point2f ab    = upLeft - upRight;
+    cv::Point2f cb    = downRight - upRight;
+    double      angle = std::acos(ab.dot(cb) / (cv::norm(ab) * cv::norm(cb)));
+    return cv::abs((PI / 2.) - angle);
+}
+
+/**
+ * @brief Compares coverage of grid blocks between two coverage vectors
+ *
+ * Determines how many new grid blocks are covered in the `covered` vector compared to `totalCovered`,
+ * useful for assessing the uniqueness of a sample's spatial distribution.
+ *
+ * @param totalCovered[in] Vector representing previously covered grid blocks
+ * @param covered[in] Vector representing grid blocks covered by the current sample
+ * @return Number of newly covered blocks in `covered` that were not in `totalCovered`
+ */
+int AutoCalib::compareCoverage(std::vector<bool> &totalCovered, std::vector<bool> &covered)
+{
+    // calculate how many different blocks are covered compared to the previous samples
+    int amountDiff = 0;
+    for(size_t i = 0; i < totalCovered.size(); i++)
+    {
+        if(covered[i] && !totalCovered[i])
+        {
+            amountDiff++;
+        }
+    }
+    return amountDiff;
+}
+
+/**
+ * @brief Merges two coverage vectors into one
+ *
+ * Combines the coverage information from `covered` into `totalCovered` by performing a logical OR
+ * operation on corresponding elements, updating `totalCovered` in place.
+ *
+ * @param totalCovered[in,out] Vector of previously covered grid blocks, updated with new coverage
+ * @param covered[in] Vector of grid blocks covered by the current sample
+ * @return Updated `totalCovered` vector reflecting the merged coverage
+ */
+std::vector<bool> AutoCalib::mergeCoverages(std::vector<bool> &totalCovered, std::vector<bool> &covered)
+{
+    for(size_t i = 0; i < totalCovered.size(); i++)
+    {
+        totalCovered[i] = totalCovered[i] || covered[i];
+    }
+    return totalCovered;
+}
+
+/**
+ * @brief Counts the number of covered blocks in a coverage vector
+ *
+ * Calculates the total number of grid blocks marked as covered (true) in the provided vector.
+ *
+ * @param covered[in] Vector representing covered grid blocks
+ * @return Number of blocks marked as covered
+ */
+int AutoCalib::getCovered(std::vector<bool> covered)
+{
+    int totalCovered = 0;
+    for(size_t i = 0; i < covered.size(); i++)
+    {
+        if(covered[i])
+        {
+            totalCovered++;
+        }
+    }
+    return totalCovered;
+}
+
+/**
+ * @brief Calculates coverage of chessboard corners across an image grid
+ *
+ * Divides the image into a grid and determines which grid cells contain chessboard corners,
+ * returning a boolean vector indicating coverage per cell.
+ *
+ * @param corners[in] All detected chessboard corners
+ * @param imageSize[in] Size of the image (width x height in pixels)
+ * @param gridSize[in] Number of grid divisions along each axis (e.g., 10 for a 10x10 grid)
+ * @return Vector of booleans indicating which grid cells are covered by corners
+ */
+std::vector<bool> AutoCalib::calcXYCoverage(std::vector<cv::Point2f> &corners, cv::Size imageSize, int gridSize)
+{
+    int               rectWidth  = imageSize.width / gridSize;
+    int               rectHeight = imageSize.height / gridSize;
+    std::vector<bool> covered(gridSize * gridSize);
+
+
+    for(size_t i = 0; i < corners.size(); i++)
+    {
+        cv::Point2f p = corners[i];
+        // calculate according block
+        int colIndex = p.x / rectWidth;
+        int rowIndex = p.y / rectHeight;
+        int idx      = rowIndex * gridSize + colIndex;
+        covered[idx] = true;
+    }
+    return covered;
+}
+
+/**
+ * @brief Evaluates if a sample is sufficiently different from existing good samples
+ *
+ * Assesses whether a new sample is unique enough to be added to the set of good samples by comparing
+ * its area, skew, and grid coverage against existing samples. A sample is good if it differs significantly
+ * in parameters or covers new grid areas.
+ *
+ * @param goodSamples[in] Vector of previously accepted calibration samples
+ * @param sample[in] New sample to evaluate
+ * @param totalCoverage[in,out] Vector tracking total grid coverage across all good samples
+ * @return true if the sample is sufficiently different and should be added, false otherwise
+ */
+bool AutoCalib::isGoodSample(
+    std::vector<calib::Sample> &goodSamples,
+    calib::Sample              &sample,
+    std::vector<bool>          &totalCoverage)
+{
+    if(goodSamples.size() == 0)
+    {
+        return true;
+    }
+    // a sample is considered good if the parameters differ greatly enough from the existing samples
+    int    totalCovered     = getCovered(totalCoverage);
+    int    notCovered       = totalCoverage.size() - totalCovered;
+    int    differentCovered = compareCoverage(totalCoverage, sample.coverage);
+    double diffCoverage     = static_cast<double>(differentCovered) / notCovered;
+
+    double minDifference = std::numeric_limits<double>::max();
+    for(calib::Sample goodSample : goodSamples)
+    {
+        double difference = goodSample.getDifference(sample);
+        if(difference < minDifference)
+        {
+            minDifference = difference;
+        }
+    }
+    return minDifference > 0.1 || diffCoverage > 0.1;
+}
+
+/**
+ * @brief Analyzes a video to find and save frames with good chessboard samples
+ *
+ * Processes the video frame by frame, detects chessboard corners, evaluates their quality,
+ * and saves good samples as images.
+ *
+ * @param boardSize[in] Size of the chessboard (width x height in squares)
+ */
+void AutoCalib::findGoodCalibrationSamplesFromVideo(cv::Size boardSize)
+{
+    cv::Mat                    view, viewGray;
+    bool                       found = false;
+    cv::Mat                    origImg;
+    cv::Size                   imgSize;
+    std::vector<cv::Point2f>   corners;
+    std::vector<calib::Sample> goodSamples;
+    int                        stepSize = 10;
+    cv::VideoCapture           video(mCalibVideo.toStdString());
+    QStringList                calibFiles;
+    QString                    outputDir;
+    if(!mLastDir.isEmpty())
+    {
+        outputDir = QFileDialog::getExistingDirectory(
+            mMainWindow,
+            Petrack::tr("Choose an output directory"),
+            QFileInfo(mLastDir).dir().path(),
+            QFileDialog::ShowDirsOnly);
+    }
+    else
+    {
+        outputDir = QFileDialog::getExistingDirectory(
+            mMainWindow,
+            Petrack::tr("Choose an output directory"),
+            QFileInfo(mCalibVideo).dir().path(),
+            QFileDialog::ShowDirsOnly);
+    }
+
+    qApp->processEvents();
+
+    if(outputDir.isEmpty())
+    {
+        return;
+    }
+    if(!mMainWindow->getImg().empty())
+    {
+        origImg = mMainWindow->getImg().clone();
+    }
+
+    QProgressDialog progress(
+        "Searching for good samples...",
+        "Abort search",
+        0,
+        video.get(cv::CAP_PROP_FRAME_COUNT) / stepSize,
+        mMainWindow);
+    progress.setWindowModality(Qt::WindowModal); // blocks main window
+    int               gridSize = 10;
+    std::vector<bool> totalCovered(gridSize * gridSize);
+    // search for chessbord corners in every image
+    for(int i = 0; i < video.get(cv::CAP_PROP_FRAME_COUNT); i += stepSize)
+    {
+        progress.setValue(i / stepSize);
+        qApp->processEvents();
+        if(progress.wasCanceled())
+        {
+            break;
+        }
+
+        video.set(cv::CAP_PROP_POS_FRAMES, i);
+        video >> view;
+        // cannot load image
+        if(view.empty())
+        {
+            progress.setValue(video.get(cv::CAP_PROP_FRAME_COUNT) / stepSize);
+            // reset view to animation image
+            if(!origImg.empty())
+            {
+                mMainWindow->updateImage(origImg); // now the last view will be deleted
+            }
+            break;
+        }
+        imgSize = cv::Size(video.get(cv::CAP_PROP_FRAME_WIDTH), video.get(cv::CAP_PROP_FRAME_HEIGHT));
+
+        found = cv::findChessboardCorners(view, boardSize, corners, cv::CALIB_CB_ADAPTIVE_THRESH);
+        if(found)
+        {
+            calib::Sample sample;
+            sample.corners = corners;
+            // evaluate how good the frame is (balance between x and y distribution, varying coverage, skew)
+            auto outerCorners = getOuterChessboardCorners(corners, boardSize);
+            sample.area       = calcInnerAreaOfChessboard(outerCorners) / imgSize.area();
+            sample.skew       = calcSkewOfChessboard(outerCorners);
+            sample.coverage   = calcXYCoverage(corners, imgSize, gridSize);
+
+            if(isGoodSample(goodSamples, sample, totalCovered))
+            {
+                cv::cvtColor(view, viewGray, cv::COLOR_BGR2GRAY);
+                cv::cornerSubPix(
+                    viewGray,
+                    sample.corners,
+                    cv::Size(11, 11),
+                    cv::Size(-1, -1),
+                    cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+                goodSamples.push_back(sample);
+                totalCovered = mergeCoverages(totalCovered, sample.coverage);
+
+                // handle Output
+                QString outputPath = QString("%1/%2.png").arg(outputDir).arg(goodSamples.size());
+                cv::imwrite(outputPath.toStdString(), view);
+                calibFiles.push_back(outputPath);
+
+                cv::drawChessboardCorners(view, boardSize, sample.corners, found);
+                progress.setLabelText(
+                    QString("Searching for good samples... \n Samples found: %1").arg(goodSamples.size()));
+                mMainWindow->updateImage(view);
+                qApp->processEvents();
+            }
+        }
+    }
+    if(calibFiles.empty())
+    {
+        PCritical(
+            mMainWindow,
+            Petrack::tr("Petrack"),
+            Petrack::tr("No good samples found in the video! Try again with a better video."));
+    }
+    else
+    {
+        mCalibFiles = calibFiles;
+    }
+    // reset view to animation image
+    if(!origImg.empty())
+    {
+        mMainWindow->updateImage(origImg); // now the last view will be deleted
+    }
+}
+
+
 /**
  * @brief Loads CalibFiles, detects Chessboard corners and calibrates with these
  *

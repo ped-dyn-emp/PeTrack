@@ -775,10 +775,10 @@
      <property name="spacing">
       <number>4</number>
      </property>
-     <item row="0" column="1">
+     <item row="0" column="2">
       <widget class="QPushButton" name="calibFiles">
        <property name="text">
-        <string>files</string>
+        <string>calib from images</string>
        </property>
       </widget>
      </item>
@@ -789,6 +789,13 @@
        </property>
        <property name="text">
         <string>auto</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="calibVideo">
+       <property name="text">
+        <string>calib from video</string>
        </property>
       </widget>
      </item>
@@ -836,6 +843,7 @@
   <tabstop>boardSizeY</tabstop>
   <tabstop>squareSize</tabstop>
   <tabstop>autoCalib</tabstop>
+  <tabstop>calibVideo</tabstop>
   <tabstop>calibFiles</tabstop>
  </tabstops>
  <resources/>
