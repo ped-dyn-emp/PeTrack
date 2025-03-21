@@ -65,7 +65,7 @@ General Paper:
     keywords = {Pedestrian detection, Laboratory experiment},
 }
 ```
-</details><br>
+</details>
 
 Software Version:
 
@@ -76,17 +76,8 @@ You can find the DOI and citing information of you version of PeTrack on https:/
 This project is licensed under the terms of the GPLv3 license. For further information see [LICENSE](./LICENSE).
 
 ## Changelog:
-v0.8 : slanted view for external calibration, coordinate system and grid is possible, introduced multicolor marker with black dot, video support for various codecs <br/>
-v0.7 : introduce stereo cameras; alternate height <br/>
-       background subtraction especially for stereo cameras; recognition of unmarked pedestrians; integration of 4 disparity algorithms <br/>
-       filter to swap picture; more video codecs; color blobs as marker using HSV triangle <br/>
-       marker with two dots added; export of viewing direction <br/>
-v0.6 : bug fixes; improve speed; expand visualization possibilities; add variable tracking region adapted to head size; provide program combine to merge trajectories <br/>
-v0.5 : improve robustness of tracking with interpolation and extrapolation; first analysis functionality <br/>
-v0.4 : tracking import and export; manual adding and deleting of trackpoints <br/>
-v0.3 : recognition; tracking; color mapping <br/>
-v0.2 : add first recognition <br/>
-v0.1 : only camera calibration is supported; import and export of video and image sequence <br/>
+See [CHANEGLOG.md](./CHANGELOG.md)
+
 
 ## Dependencies:
 * Qwt         (https://qwt.sf.net)
