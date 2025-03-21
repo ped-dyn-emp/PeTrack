@@ -36,7 +36,7 @@ cache:
 
 # Documentation build, so we know it can be built and can download the website as an artifact
 sphinx:
-  image: python:3.10
+  image: $CI_REGISTRY/ped-dyn-emp/petrack/python:3.10
   stage: docs
   script:
     - cd docs
