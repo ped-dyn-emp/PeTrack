@@ -28,6 +28,25 @@
 
 class Petrack;
 
+namespace calib
+{
+struct Sample
+{
+    std::vector<cv::Point2f> corners;
+    double                   area;
+    double                   skew;
+    std::vector<bool>        coverage;
+
+    double getDifference(const Sample &other) const
+    {
+        double diff = 0;
+        diff += cv::abs(area - other.area);
+        diff += cv::abs(skew - other.skew);
+        return diff;
+    }
+};
+} // namespace calib
+
 
 /**
  * @brief Class for intrinsic calibration
@@ -54,8 +73,12 @@ public:
     void        addCalibFile(const QString &f);
     QString     getCalibFile(int i);
     QStringList getCalibFiles();
+    QString     getCalibVideo();
+    void        setCalibVideo(const QString &v);
+    bool        openCalibVideo();
     void        setCalibFiles(const QStringList &fl);
-    bool        openCalibFiles();    // return true if at least one file is selected
+    bool        openCalibFiles(); // return true if at least one file is selected
+
     inline void setBoardSizeX(int i) // 6
     {
         mBoardSizeX = i;
@@ -87,19 +110,29 @@ public:
     void                                             checkParamPlausibility(IntrinsicCameraParams &modelParams);
 
 private:
-    int runCalibration(
-        std::vector<std::vector<cv::Point2f>> corners,
-        cv::Size                              img_size,
-        cv::Size                              board_size,
-        float                                 square_size,
-        float                                 aspect_ratio,
-        int                                   flags,
-        cv::Mat                              &camera_matrix,
-        cv::Mat                              &distortion_coeffs,
-        double                               *reproj_errs);
+    std::vector<cv::Point2f> getOuterChessboardCorners(const std::vector<cv::Point2f> &corners, cv::Size &boardSize);
+    double                   calcInnerAreaOfChessboard(std::vector<cv::Point2f> &outerCorners);
+    double                   calcSkewOfChessboard(std::vector<cv::Point2f> &outerCorners);
+    int                      compareCoverage(std::vector<bool> &totalCovered, std::vector<bool> &covered);
+    std::vector<bool>        mergeCoverages(std::vector<bool> &totalCovered, std::vector<bool> &covered);
+    int                      getCovered(std::vector<bool> covered);
+    std::vector<bool>        calcXYCoverage(std::vector<cv::Point2f> &corners, cv::Size imageSize, int gridSize);
+    bool isGoodSample(std::vector<calib::Sample> &goodSamples, calib::Sample &sample, std::vector<bool> &totalCoverage);
+    void findGoodCalibrationSamplesFromVideo(cv::Size boardSize);
+    int  runCalibration(
+         std::vector<std::vector<cv::Point2f>> corners,
+         cv::Size                              img_size,
+         cv::Size                              board_size,
+         float                                 square_size,
+         float                                 aspect_ratio,
+         int                                   flags,
+         cv::Mat                              &camera_matrix,
+         cv::Mat                              &distortion_coeffs,
+         double                               *reproj_errs);
 
     Petrack    *mMainWindow;
     QStringList mCalibFiles;
+    QString     mCalibVideo;
     int         mBoardSizeX, mBoardSizeY;
     float       mSquareSize;
     QString     mLastDir;

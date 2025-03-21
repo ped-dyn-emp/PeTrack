@@ -5,6 +5,7 @@ During the experiments, a [calibration pattern](/planning/calibration.md) was fi
 settings as used during the experiment. In order to use this pattern for the intrinsic calibration, screenshots
 have to be taken out of the video. A free tool as e.g. [Gimp](https://www.gimp.org/) can be used to
 take screenshots out of the video with identical pixel dimensions as the video recording.
+If you are inexperienced, it is also possible to let PeTrack choose screenshots from your video for the calibration.
 
 :::{Important}
 Make sure to select images that together fill out the entire area of interest from the video! Keep the images per
@@ -28,10 +29,14 @@ a video of the experiments into PeTrack. For that, drag a video into the [tab vi
 of PeTrack.
 :::
 
-To select the images of the intrinsic calibration, click on the `files` button at the bottom of the
+To select the images of the intrinsic calibration, click on the `calib from images` button at the bottom of the
 `intrinsic parameters` section. Now select your intrinsic calibration images from your local storage.
-After the images have been selected, click on the `auto` button at the bottom of the
-`intrinsic calibration` section. By click on the `auto` button, the intrinsic calibration will be started.
+If you only have a video and no screenshots of your calibration, click on the `calib from video` button next 
+to the `calib from images` button. After selecting the video first, you are prompted to choose a directory to save
+the generated screenshots of your calibration. A popup including a progress bar shows up, indicating how far the 
+generation process is from finishing and how many good samples were found in the video.
+After the images have been selected/generated, click on the `auto` button at the bottom of the
+`intrinsic calibration` section. By clicking on the `auto` button, the intrinsic calibration will be started.
 During the calculation you might see your calibration images appearing in the video view with a 
 colored grid over them.
 
