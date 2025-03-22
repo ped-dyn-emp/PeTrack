@@ -211,25 +211,28 @@
            <bool>true</bool>
           </property>
           <property name="plainText">
-           <string>@software{boltes_maik_2021_5126562,
+           <string>@software{boltes_2024_14056465,
   author       = {Boltes, Maik and
-                  Boomers, Ann Katrin and
                   Adrian, Juliane and
+                  Arens, Tobias and
+                  Boomers, Ann Katrin and
                   Brualla, Ricardo Martin and
+                  Dreßen, Luke and
                   Graf, Arne and
                   Häger, Paul and
                   Hillebrand, Daniel and
                   Kilic, Deniz and
+                  Klein, Janine and
                   Lieberenz, Paul and
                   Salden, Daniel and
                   Schrödter, Tobias},
   title        = {PeTrack},
-  month        = jul,
-  year         = 2021,
+  month        = nov,
+  year         = 2024,
   publisher    = {Zenodo},
-  version      = {v0.9},
-  doi          = {10.5281/zenodo.5126562},
-  url          = {https://doi.org/10.5281/zenodo.5126562}
+  version      = {v0.10},
+  doi          = {10.5281/zenodo.14056465},
+  url          = {https://doi.org/10.5281/zenodo.14056465},
 }</string>
           </property>
          </widget>
