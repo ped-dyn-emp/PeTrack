@@ -167,7 +167,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Please cite the general paper and the corresponding software version in your publications, if PeTrack helps your research. More information can found in the &lt;a href=&quot;https://jugit.fz-juelich.de/ped-dyn-emp/petrack/-/wikis/home#how-to-cite&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Wiki.&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Please cite the general paper and the corresponding software version in your publications, if PeTrack helps your research. More information can found in the &lt;a href=&quot;https://go.fzj.de/petrack-cite&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;documentation.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -211,25 +211,28 @@
            <bool>true</bool>
           </property>
           <property name="plainText">
-           <string>@software{boltes_maik_2021_5126562,
+           <string>@software{boltes_2024_14056465,
   author       = {Boltes, Maik and
-                  Boomers, Ann Katrin and
                   Adrian, Juliane and
+                  Arens, Tobias and
+                  Boomers, Ann Katrin and
                   Brualla, Ricardo Martin and
+                  Dreßen, Luke and
                   Graf, Arne and
                   Häger, Paul and
                   Hillebrand, Daniel and
                   Kilic, Deniz and
+                  Klein, Janine and
                   Lieberenz, Paul and
                   Salden, Daniel and
                   Schrödter, Tobias},
   title        = {PeTrack},
-  month        = jul,
-  year         = 2021,
+  month        = nov,
+  year         = 2024,
   publisher    = {Zenodo},
-  version      = {v0.9},
-  doi          = {10.5281/zenodo.5126562},
-  url          = {https://doi.org/10.5281/zenodo.5126562}
+  version      = {v0.10},
+  doi          = {10.5281/zenodo.14056465},
+  url          = {https://doi.org/10.5281/zenodo.14056465},
 }</string>
           </property>
          </widget>
