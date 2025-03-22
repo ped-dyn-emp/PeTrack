@@ -63,5 +63,6 @@ correction/correction
 annotationgroups/annotation_grouping
 export/export
 misc/misc
+citation/citation
 contribute/contribute
 :::
