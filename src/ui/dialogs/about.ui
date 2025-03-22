@@ -167,7 +167,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Please cite the general paper and the corresponding software version in your publications, if PeTrack helps your research. More information can found in the &lt;a href=&quot;https://jugit.fz-juelich.de/ped-dyn-emp/petrack/-/wikis/home#how-to-cite&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Wiki.&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Please cite the general paper and the corresponding software version in your publications, if PeTrack helps your research. More information can found in the &lt;a href=&quot;https://go.fzj.de/petrack-cite&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;documentation.&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
