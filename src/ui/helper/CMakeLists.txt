@@ -14,5 +14,7 @@ target_sources(petrack_core PRIVATE
     pspinbox.cpp       
     pspinbox.h         
     qtColorTriangle.cpp
-    qtColorTriangle.h  
+    qtColorTriangle.h
+    pInputDialog.h
+    pInputDialog.cpp
 )
