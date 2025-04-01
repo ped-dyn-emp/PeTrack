@@ -7,6 +7,5 @@ Title page of misc topics, probably just a table of contents
 :::{toctree}
 :maxdepth: 1
 FAQ
-citation
 batch_processing
 :::

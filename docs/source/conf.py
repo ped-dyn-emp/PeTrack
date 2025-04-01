@@ -2,6 +2,7 @@
 
 # -- Project information
 import datetime
+import subprocess
 
 current_year = datetime.datetime.today().year
 
@@ -50,6 +51,7 @@ myst_enable_extensions = [
     "attrs_block",
     "dollarmath",
     "deflist",
+    "substitution",
 ]
 
 myst_url_schemes = {
@@ -110,3 +112,22 @@ html_sidebars = {
 
 # -- Options for EPUB output
 epub_show_urls = "footnote"
+
+# Inject PeTrack Version and Software Citation into docs
+def generate_bibtex():
+    result = subprocess.run(["python", "_scripts/generate-bibtex.py"], capture_output=True, text=True)
+    return result.stdout.strip()
+
+bibtex = generate_bibtex()
+
+# Add the code block here, otherwise the substitution will not work
+citation_block = f"""\
+```
+{bibtex}
+```
+"""
+
+myst_substitutions = {
+    'petrack_version': release,
+    'petrack_citation': citation_block, 
+}
