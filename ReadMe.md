@@ -69,7 +69,38 @@ General Paper:
 
 Software Version:
 
-You can find the DOI and citing information of you version of PeTrack on https://helmholtz.software/software/petrack. To find your corresponding version, check the `about` menu or look into the terminal output of PeTrack. To cite PeTrack as software without specifying a version, use the DOI [10.5281/zenodo.5078176](https://doi.org/10.5281/zenodo.5078176).
+<details><summary>BibTeX for current version</summary>
+
+```
+@software{boltes_2025_15119517,
+  author       = {Boltes, Maik and
+                  Kilic, Deniz and
+                  Schrödter, Tobias and
+                  Arens, Tobias and
+                  Dreßen, Luke and
+                  Adrian, Juliane and
+                  Boomers, Ann Katrin and
+                  Kandler, Alica and
+                  Küpper, Mira and
+                  Graf, Arne and
+                  Salden, Daniel and
+                  Brualla, Ricardo Martin and
+                  Häger, Paul and
+                  Hillebrand, Daniel and
+                  Lieberenz, Paul and
+                  Klein, Janine},
+  title        = {PeTrack},
+  month        = apr,
+  year         = 2025,
+  publisher    = {Zenodo},
+  version      = {v1.0},
+  doi          = {10.5281/zenodo.15119517},
+  url          = {https://doi.org/10.5281/zenodo.15119517},
+}
+```
+</details>
+
+To find your corresponding version, check the `about` menu or look into the terminal output of PeTrack. To cite PeTrack as software without specifying a version, use the DOI [10.5281/zenodo.5078176](https://doi.org/10.5281/zenodo.5078176).
 
 
 ## License
