@@ -42,8 +42,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="../icons/icons.qrc">:/icon</pixmap>
-   </property>
+    <pixmap resource="../icons/icons.qrc">:/icon</pixmap>   </property>
    <property name="scaledContents">
     <bool>true</bool>
    </property>
@@ -211,28 +210,30 @@
            <bool>true</bool>
           </property>
           <property name="plainText">
-           <string>@software{boltes_2024_14056465,
+           <string>@software{boltes_2025_15119517,
   author       = {Boltes, Maik and
-                  Adrian, Juliane and
+                  Kilic, Deniz and
+                  Schrödter, Tobias and
                   Arens, Tobias and
-                  Boomers, Ann Katrin and
-                  Brualla, Ricardo Martin and
                   Dreßen, Luke and
+                  Adrian, Juliane and
+                  Boomers, Ann Katrin and
+                  Kandler, Alica and
+                  Küpper, Mira and
                   Graf, Arne and
+                  Salden, Daniel and
+                  Brualla, Ricardo Martin and
                   Häger, Paul and
                   Hillebrand, Daniel and
-                  Kilic, Deniz and
-                  Klein, Janine and
                   Lieberenz, Paul and
-                  Salden, Daniel and
-                  Schrödter, Tobias},
+                  Klein, Janine},
   title        = {PeTrack},
-  month        = nov,
-  year         = 2024,
+  month        = apr,
+  year         = 2025,
   publisher    = {Zenodo},
-  version      = {v0.10},
-  doi          = {10.5281/zenodo.14056465},
-  url          = {https://doi.org/10.5281/zenodo.14056465},
+  version      = {v1.0},
+  doi          = {10.5281/zenodo.15119517},
+  url          = {https://doi.org/10.5281/zenodo.15119517},
 }</string>
           </property>
          </widget>
@@ -294,9 +295,10 @@
   <tabstop>plainTextEdit</tabstop>
   <tabstop>plainTextEdit_2</tabstop>
  </tabstops>
- <resources>
+  <resources>
   <include location="../icons/icons.qrc"/>
  </resources>
+
  <connections>
   <connection>
    <sender>buttonBox</sender>
