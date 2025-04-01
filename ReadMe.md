@@ -76,7 +76,7 @@ You can find the DOI and citing information of you version of PeTrack on https:/
 This project is licensed under the terms of the GPLv3 license. For further information see [LICENSE](./LICENSE).
 
 ## Changelog:
-See [CHANEGLOG.md](./CHANGELOG.md)
+See [CHANGELOG.md](./CHANGELOG.md)
 
 
 ## Dependencies:
