@@ -2734,8 +2734,8 @@ void Petrack::importTracker(QString dest) // default = ""
             bool    unitFound            = false;
             double  conversionFactorToCM = 1.0;
 
-            std::unordered_map<int, std::map<int, Vec3F>> personData;
-            QString                                       headerline;
+            std::map<int, std::map<int, Vec3F>> personData;
+            QString                             headerline;
 
             while(in.readLineInto(&line))
             {
