@@ -23,6 +23,7 @@
 #include "control.h"
 #include "logger.h"
 #include "multiColorMarkerWidget.h"
+#include "pInputDialog.h"
 #include "pMessageBox.h"
 #include "petrack.h"
 #include "roiItem.h"
@@ -276,7 +277,7 @@ bool PersonStorage::editTrackPersonComment(const Vec2F &point, int frame, const 
             }
 
             bool    ok      = false;
-            QString comment = QInputDialog::getMultiLineText(
+            QString comment = PInputDialog::getMultiLineText(
                 &mMainWindow, QObject::tr("Add Comment"), QObject::tr("Comment:"), displayedComment, &ok);
 
             if(ok)
