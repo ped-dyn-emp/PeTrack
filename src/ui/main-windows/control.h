@@ -257,6 +257,7 @@ public:
     }
 
     void resetCorrection();
+    void on_trackGotoStartNr_clicked();
 private slots:
     void on_anaCalculate_clicked();
     void on_anaStep_valueChanged(int i);
@@ -324,7 +325,7 @@ private slots:
         }
     }
     void on_trackGotoNr_clicked();
-    void on_trackGotoStartNr_clicked();
+
     void on_trackGotoEndNr_clicked();
 
     void on_trackHeadSized_stateChanged(int i);
