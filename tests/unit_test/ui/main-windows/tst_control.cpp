@@ -27,7 +27,8 @@
 #include <QGraphicsScene>
 #include <QSignalSpy>
 #include <QTestEventList>
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <iostream>
 #include <memory>
 
@@ -55,22 +56,22 @@ void checkSelectedColor(
     QColor fromColor = con->getColorPlot()->getMapItem()->getActMapFromColor();
 
     // Hue
-    REQUIRE(toColor.hue() == Approx(toHue).margin(1));
-    REQUIRE(fromColor.hue() == Approx(fromHue).margin(1));
+    REQUIRE(toColor.hue() == Catch::Approx(toHue).margin(1));
+    REQUIRE(fromColor.hue() == Catch::Approx(fromHue).margin(1));
 
     // Saturation
-    REQUIRE(toColor.saturation() == Approx(toSat).margin(1));
-    REQUIRE(fromColor.saturation() == Approx(fromSat).margin(1));
+    REQUIRE(toColor.saturation() == Catch::Approx(toSat).margin(1));
+    REQUIRE(fromColor.saturation() == Catch::Approx(fromSat).margin(1));
 
     // Value
-    REQUIRE(toColor.value() == Approx(toVal).margin(1));
-    REQUIRE(fromColor.value() == Approx(fromVal).margin(1));
+    REQUIRE(toColor.value() == Catch::Approx(toVal).margin(1));
+    REQUIRE(fromColor.value() == Catch::Approx(fromVal).margin(1));
 
     // Sliders
-    REQUIRE(con->getMapX() == Approx(mapX).margin(2));
-    REQUIRE(con->getMapW() == Approx(mapW).margin(2));
-    REQUIRE(con->getMapY() == Approx(mapY).margin(2));
-    REQUIRE(con->getMapH() == Approx(mapH).margin(2));
+    REQUIRE(con->getMapX() == Catch::Approx(mapX).margin(2));
+    REQUIRE(con->getMapW() == Catch::Approx(mapW).margin(2));
+    REQUIRE(con->getMapY() == Catch::Approx(mapY).margin(2));
+    REQUIRE(con->getMapH() == Catch::Approx(mapH).margin(2));
 }
 
 

@@ -20,7 +20,8 @@
 #include "petrack.h"
 
 #include <QDomDocument>
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 
 // use margin for absolute difference, as epsilon would be relative which is useless when comparing to 0
@@ -47,11 +48,11 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
     {
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 0, 0)) - cv::Vec3d(1, 0, 0)) ==
-            Approx(0).margin(VEC_MARGIN));
+            Catch::Approx(0).margin(VEC_MARGIN));
 
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 2, 3)) - cv::Vec3d(1, 2, 3)) ==
-            Approx(0).margin(VEC_MARGIN));
+            Catch::Approx(0).margin(VEC_MARGIN));
     }
 
     SECTION("Rotated around z-axis")
@@ -61,30 +62,30 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
         control->getXml(doc.documentElement(), QString("0.10.0"));
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 0, 0)) - cv::Vec3d(0, -1, 0)) ==
-            Approx(0).margin(VEC_MARGIN));
+            Catch::Approx(0).margin(VEC_MARGIN));
 
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(0, 1, 0)) - cv::Vec3d(1, 0, 0)) ==
-            Approx(0).margin(VEC_MARGIN));
+            Catch::Approx(0).margin(VEC_MARGIN));
 
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 2, 3)) - cv::Vec3d(2, -1, 3)) ==
-            Approx(0).margin(VEC_MARGIN));
+            Catch::Approx(0).margin(VEC_MARGIN));
 
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(-5, 5, -2)) - cv::Vec3d(5, 5, -2)) ==
-            Approx(0).margin(VEC_MARGIN));
+            Catch::Approx(0).margin(VEC_MARGIN));
 
         // negative rotation
         doc.setContent(testConfig.arg("0", "0", QString::number(-PI)));
         control->getXml(doc.documentElement(), QString("0.10.0"));
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 0, 0)) - cv::Vec3d(-1, 0, 0)) ==
-            Approx(0).margin(VEC_MARGIN));
+            Catch::Approx(0).margin(VEC_MARGIN));
 
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 2, -3)) - cv::Vec3d(-1, -2, -3)) ==
-            Approx(0).margin(VEC_MARGIN));
+            Catch::Approx(0).margin(VEC_MARGIN));
     }
 
     SECTION("Wild rotation")
@@ -95,15 +96,15 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
 
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 1, 1)) - cv::Vec3d(1, 1, 1)) ==
-            Approx(0).margin(VEC_MARGIN));
+            Catch::Approx(0).margin(VEC_MARGIN));
 
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 0, 0)) - cv::Vec3d(0.33, -0.24, 0.91)) ==
-            Approx(0).margin(VEC_MARGIN));
+            Catch::Approx(0).margin(VEC_MARGIN));
 
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 2, 3)) - cv::Vec3d(1.42, 3.15, 1.42)) ==
-            Approx(0).margin(VEC_MARGIN));
+            Catch::Approx(0).margin(VEC_MARGIN));
 
         SECTION("Translation should not matter")
         {
@@ -117,11 +118,11 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
             control->getXml(doc.documentElement(), QString("0.10.0"));
             REQUIRE(
                 cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 0, 0)) - cv::Vec3d(0.33, -0.24, 0.91)) ==
-                Approx(0).margin(VEC_MARGIN));
+                Catch::Approx(0).margin(VEC_MARGIN));
 
             REQUIRE(
                 cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 2, 3)) - cv::Vec3d(1.42, 3.15, 1.42)) ==
-                Approx(0).margin(VEC_MARGIN));
+                Catch::Approx(0).margin(VEC_MARGIN));
         }
     }
 
@@ -132,11 +133,11 @@ TEST_CASE("src/extrCalibration/camToWorldRotation", "[extrCalibration]")
 
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, 1, 1)) - cv::Vec3d(0.2, -0.63, -1.6)) ==
-            Approx(0).margin(VEC_MARGIN));
+            Catch::Approx(0).margin(VEC_MARGIN));
 
         REQUIRE(
             cv::norm(calib->camToWorldRotation(cv::Vec3d(1, -2, 3)) - cv::Vec3d(1.69, -3.33, 0.27)) ==
-            Approx(0).margin(VEC_MARGIN));
+            Catch::Approx(0).margin(VEC_MARGIN));
     }
 }
 

@@ -20,7 +20,7 @@
 #include "petrack.h"
 
 #include <QAbstractItemModelTester>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 SCENARIO("Verify FailedChecksTableModel", "[correction]")
 {

@@ -23,7 +23,7 @@
 #include "ui_YOLOMarkerWidget.h"
 #include "ui_control.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 SCENARIO("The user opens the YOLOMarkerWidget", "[ui]")
 {

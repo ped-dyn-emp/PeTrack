@@ -21,7 +21,8 @@
 #include "recognition.h"
 #include "ui_codeMarker.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 SCENARIO("The user opens the CodeMarkerWidget", "[ui]")
 {
@@ -50,7 +51,7 @@ SCENARIO("The user opens the CodeMarkerWidget", "[ui]")
 
         THEN("The options-object is updated")
         {
-            REQUIRE(options.getDetectorParams().getMinMarkerDistance() == Approx(newMinMarkerDistance));
+            REQUIRE(options.getDetectorParams().getMinMarkerDistance() == Catch::Approx(newMinMarkerDistance));
             REQUIRE(options.getIndexOfMarkerDict() == newListIndex);
         }
     }
@@ -78,7 +79,7 @@ SCENARIO("The user opens the CodeMarkerWidget", "[ui]")
         THEN("It is not changed")
         {
             REQUIRE(view->adaptiveThreshWinSizeMin->value() == oldValues.getAdaptiveThreshWinSizeMin());
-            REQUIRE(view->minMarkerPerimeter->value() == Approx(oldValues.getMinMarkerPerimeter()));
+            REQUIRE(view->minMarkerPerimeter->value() == Catch::Approx(oldValues.getMinMarkerPerimeter()));
         }
     }
 
@@ -93,7 +94,7 @@ SCENARIO("The user opens the CodeMarkerWidget", "[ui]")
         THEN("It is not changed")
         {
             REQUIRE(view->adaptiveThreshWinSizeMax->value() == oldValues.getAdaptiveThreshWinSizeMax());
-            REQUIRE(view->maxMarkerPerimeter->value() == Approx(oldValues.getMaxMarkerPerimeter()));
+            REQUIRE(view->maxMarkerPerimeter->value() == Catch::Approx(oldValues.getMaxMarkerPerimeter()));
         }
     }
 
@@ -120,7 +121,7 @@ SCENARIO("The user opens the CodeMarkerWidget", "[ui]")
         view->cornerRefinementMinAccuracy->setValue(-3);
         THEN("It is set to 0.01")
         {
-            REQUIRE(view->cornerRefinementMinAccuracy->value() == Approx(0.01));
+            REQUIRE(view->cornerRefinementMinAccuracy->value() == Catch::Approx(0.01));
         }
     }
 
@@ -138,7 +139,7 @@ SCENARIO("The user opens the CodeMarkerWidget", "[ui]")
         view->minOtsuStdDev->setValue(-2);
         THEN("The value is set to 0.01")
         {
-            REQUIRE(view->minOtsuStdDev->value() == Approx(0.01));
+            REQUIRE(view->minOtsuStdDev->value() == Catch::Approx(0.01));
         }
     }
 
@@ -174,7 +175,7 @@ SCENARIO("The user opens the CodeMarkerWidget", "[ui]")
         view->minMarkerPerimeter->setValue(0);
         THEN("The value is set to 0.1")
         {
-            REQUIRE(view->minMarkerPerimeter->value() == Approx(0.1));
+            REQUIRE(view->minMarkerPerimeter->value() == Catch::Approx(0.1));
         }
     }
 
@@ -185,7 +186,7 @@ SCENARIO("The user opens the CodeMarkerWidget", "[ui]")
         view->maxMarkerPerimeter->setValue(0);
         THEN("The value is not changed")
         {
-            REQUIRE(view->maxMarkerPerimeter->value() == Approx(oldVal));
+            REQUIRE(view->maxMarkerPerimeter->value() == Catch::Approx(oldVal));
         }
     }
 
@@ -194,7 +195,7 @@ SCENARIO("The user opens the CodeMarkerWidget", "[ui]")
         view->cornerRefinementMinAccuracy->setValue(0);
         THEN("The value is set to 0.01")
         {
-            REQUIRE(view->cornerRefinementMinAccuracy->value() == Approx(0.01));
+            REQUIRE(view->cornerRefinementMinAccuracy->value() == Catch::Approx(0.01));
         }
     }
 
@@ -203,7 +204,7 @@ SCENARIO("The user opens the CodeMarkerWidget", "[ui]")
         view->minCornerDistance->setValue(-1);
         THEN("The value is set to 1")
         {
-            REQUIRE(view->minCornerDistance->value() == Approx(0));
+            REQUIRE(view->minCornerDistance->value() == Catch::Approx(0));
         }
     }
 
