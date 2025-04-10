@@ -20,7 +20,8 @@
 #include "recognition.h"
 
 #include <QSignalSpy>
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace reco;
 
@@ -82,7 +83,7 @@ SCENARIO("I use the setter/getter of ArucoCodeParams")
             REQUIRE_THROWS(params.setAdaptiveThreshWinSizeMin(newAdaptiveThreshWinSizeMin));
             REQUIRE(params.getAdaptiveThreshWinSizeMin() == oldAdaptiveThreshWinSizeMin);
             REQUIRE_THROWS(params.setMinMarkerPerimeter(newMinMarkerPerimeter));
-            REQUIRE(params.getMinMarkerPerimeter() == Approx(oldMinMarkerPerimeter));
+            REQUIRE(params.getMinMarkerPerimeter() == Catch::Approx(oldMinMarkerPerimeter));
         }
     }
 
@@ -97,7 +98,7 @@ SCENARIO("I use the setter/getter of ArucoCodeParams")
             REQUIRE_THROWS(params.setAdaptiveThreshWinSizeMax(newAdaptiveThreshSizeMax));
             REQUIRE(params.getAdaptiveThreshWinSizeMax() == oldAdaptiveThreshWinSizeMax);
             REQUIRE_THROWS(params.setMaxMarkerPerimeter(newMaxMarkerPerimeter));
-            REQUIRE(params.getMaxMarkerPerimeter() == Approx(oldMaxMarkerPerimeter));
+            REQUIRE(params.getMaxMarkerPerimeter() == Catch::Approx(oldMaxMarkerPerimeter));
         }
     }
 
@@ -130,7 +131,7 @@ SCENARIO("I use the setter/getter of ArucoCodeParams")
         THEN("An exception is thrown and value isn't changed")
         {
             REQUIRE_THROWS(params.setCornerRefinementMinAccuracy(newCornerRefinementMinAccuracy));
-            REQUIRE(params.getCornerRefinementMinAccuracy() == Approx(oldCornerRefinementMinAccuracy));
+            REQUIRE(params.getCornerRefinementMinAccuracy() == Catch::Approx(oldCornerRefinementMinAccuracy));
         }
     }
 
@@ -152,7 +153,7 @@ SCENARIO("I use the setter/getter of ArucoCodeParams")
         THEN("An exception is thrown and value isn't changed")
         {
             REQUIRE_THROWS(params.setMinOtsuStdDev(newMinOtsuStdDev));
-            REQUIRE(params.getMinOtsuStdDev() == Approx(oldMinOtsuStdDev));
+            REQUIRE(params.getMinOtsuStdDev() == Catch::Approx(oldMinOtsuStdDev));
         }
     }
 
@@ -196,7 +197,7 @@ SCENARIO("I use the setter/getter of ArucoCodeParams")
         THEN("An exception is thrown and value isn't changed")
         {
             REQUIRE_THROWS(params.setMinMarkerPerimeter(newMinMarkerPerimeter));
-            REQUIRE(params.getMinMarkerPerimeter() == Approx(oldMinMarkerPerimeter));
+            REQUIRE(params.getMinMarkerPerimeter() == Catch::Approx(oldMinMarkerPerimeter));
         }
     }
 
@@ -207,7 +208,7 @@ SCENARIO("I use the setter/getter of ArucoCodeParams")
         THEN("An exception is thrown and value isn't changed")
         {
             REQUIRE_THROWS(params.setMaxMarkerPerimeter(newMaxMarkerPerimeter));
-            REQUIRE(params.getMaxMarkerPerimeter() == Approx(oldMaxMarkerPerimeter));
+            REQUIRE(params.getMaxMarkerPerimeter() == Catch::Approx(oldMaxMarkerPerimeter));
         }
     }
 
@@ -218,7 +219,7 @@ SCENARIO("I use the setter/getter of ArucoCodeParams")
         THEN("An exception is thrown and value isn't changed")
         {
             REQUIRE_THROWS(params.setCornerRefinementMinAccuracy(newMinAccuracy));
-            REQUIRE(params.getCornerRefinementMinAccuracy() == Approx(oldMinAccuracy));
+            REQUIRE(params.getCornerRefinementMinAccuracy() == Catch::Approx(oldMinAccuracy));
         }
     }
 
@@ -229,7 +230,7 @@ SCENARIO("I use the setter/getter of ArucoCodeParams")
         THEN("An exception is thrown and value isn't changed")
         {
             REQUIRE_THROWS(params.setMinCornerDistance(newMinCornerDistance));
-            REQUIRE(params.getMinCornerDistance() == Approx(oldMinCornerDistance));
+            REQUIRE(params.getMinCornerDistance() == Catch::Approx(oldMinCornerDistance));
         }
     }
 

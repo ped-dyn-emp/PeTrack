@@ -26,7 +26,7 @@
 #include "qsignalspy.h"
 #include "ui_coordinateSystemBox.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 bool operator==(const CoordPose2D &lhs, const CoordPose2D &rhs)
 {

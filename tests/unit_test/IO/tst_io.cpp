@@ -19,7 +19,9 @@
 #include "IO.h"
 #include "moCapPerson.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_string.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 #include <fstream>
 #include <ostream>
 
@@ -212,7 +214,7 @@ TEST_CASE("src/IO", "[tracking][io]")
                 std::unordered_map<int, float>     markerHeights = std::get<std::unordered_map<int, float>>(ret);
                 std::vector<std::pair<int, float>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerHeights), std::end(markerHeights));
-                CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
+                CHECK_THAT(markerHeightsVec, Catch::Matchers::UnorderedEquals(referenceValuesVec));
             }
 
             SECTION("empty line at end of file")
@@ -230,7 +232,7 @@ TEST_CASE("src/IO", "[tracking][io]")
                 std::unordered_map<int, float>     markerHeights = std::get<std::unordered_map<int, float>>(ret);
                 std::vector<std::pair<int, float>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerHeights), std::end(markerHeights));
-                CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
+                CHECK_THAT(markerHeightsVec, Catch::Matchers::UnorderedEquals(referenceValuesVec));
             }
 
             SECTION("empty lines throughout the file")
@@ -247,7 +249,7 @@ TEST_CASE("src/IO", "[tracking][io]")
                 std::unordered_map<int, float>     markerHeights = std::get<std::unordered_map<int, float>>(ret);
                 std::vector<std::pair<int, float>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerHeights), std::end(markerHeights));
-                CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
+                CHECK_THAT(markerHeightsVec, Catch::Matchers::UnorderedEquals(referenceValuesVec));
             }
 
 
@@ -266,7 +268,7 @@ TEST_CASE("src/IO", "[tracking][io]")
                 std::unordered_map<int, float>     markerHeights = std::get<std::unordered_map<int, float>>(ret);
                 std::vector<std::pair<int, float>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerHeights), std::end(markerHeights));
-                CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
+                CHECK_THAT(markerHeightsVec, Catch::Matchers::UnorderedEquals(referenceValuesVec));
             }
 
             SECTION("z-coordinate in m")
@@ -285,7 +287,7 @@ TEST_CASE("src/IO", "[tracking][io]")
                 std::vector<std::pair<int, float>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerHeights), std::end(markerHeights));
 
-                CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
+                CHECK_THAT(markerHeightsVec, Catch::Matchers::UnorderedEquals(referenceValuesVec));
             }
 
             SECTION("z-coordinate unit not specified")
@@ -303,7 +305,7 @@ TEST_CASE("src/IO", "[tracking][io]")
                 std::unordered_map<int, float>     markerHeights = std::get<std::unordered_map<int, float>>(ret);
                 std::vector<std::pair<int, float>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerHeights), std::end(markerHeights));
-                CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
+                CHECK_THAT(markerHeightsVec, Catch::Matchers::UnorderedEquals(referenceValuesVec));
             }
 
             std::remove(heigtFileName.c_str());
@@ -494,7 +496,7 @@ TEST_CASE("src/IO", "[tracking][io]")
                 auto                             markerIDs = std::get<std::unordered_map<int, int>>(ret);
                 std::vector<std::pair<int, int>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerIDs), std::end(markerIDs));
-                CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
+                CHECK_THAT(markerHeightsVec, Catch::Matchers::UnorderedEquals(referenceValuesVec));
             }
 
             SECTION("empty line at end of file")
@@ -511,7 +513,7 @@ TEST_CASE("src/IO", "[tracking][io]")
                 auto                             markerIDs = std::get<std::unordered_map<int, int>>(ret);
                 std::vector<std::pair<int, int>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerIDs), std::end(markerIDs));
-                CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
+                CHECK_THAT(markerHeightsVec, Catch::Matchers::UnorderedEquals(referenceValuesVec));
             }
 
             SECTION("empty lines throughout the file")
@@ -527,7 +529,7 @@ TEST_CASE("src/IO", "[tracking][io]")
                 auto                             markerIDs = std::get<std::unordered_map<int, int>>(ret);
                 std::vector<std::pair<int, int>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerIDs), std::end(markerIDs));
-                CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
+                CHECK_THAT(markerHeightsVec, Catch::Matchers::UnorderedEquals(referenceValuesVec));
             }
 
             SECTION("with comments")
@@ -546,7 +548,7 @@ TEST_CASE("src/IO", "[tracking][io]")
                 auto                             markerIDs = std::get<std::unordered_map<int, int>>(ret);
                 std::vector<std::pair<int, int>> markerHeightsVec;
                 markerHeightsVec.assign(std::begin(markerIDs), std::end(markerIDs));
-                CHECK_THAT(markerHeightsVec, Catch::UnorderedEquals(referenceValuesVec));
+                CHECK_THAT(markerHeightsVec, Catch::Matchers::UnorderedEquals(referenceValuesVec));
             }
 
             std::remove(markerFileName.c_str());

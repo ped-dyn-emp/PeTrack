@@ -16,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#define CATCH_CONFIG_RUNNER
 #include "logger.h"
 
 #include <QApplication>
 #include <QtTest>
-#include <catch2/catch.hpp>
+#include <catch2/catch_session.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <vector>
 
 int main(int argc, char *argv[])

@@ -19,7 +19,7 @@
 #include "skeletonTree.h"
 #include "skeletonTreeFactory.h"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 const XSenseStruct XSENSE_DUMMY_DATA = {
     {0, 0, 0},    {1, 1, 1},    {2, 2, 2},    {3, 3, 3},    {4, 4, 4},    {5, 5, 5},    {6, 6, 6},

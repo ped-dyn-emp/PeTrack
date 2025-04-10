@@ -284,7 +284,7 @@ if(BUILD_UNIT_TESTS)
 
     target_compile_definitions(petrack_tests PUBLIC PETRACK_VERSION="${PROJECT_VERSION}")
 
-    target_link_libraries(petrack_tests PRIVATE Catch2::Catch2 Qt5::Test trompeloeil::trompeloeil)
+    target_link_libraries(petrack_tests PRIVATE Catch2::Catch2WithMain Qt5::Test trompeloeil::trompeloeil)
     target_include_directories(petrack_tests PRIVATE
       "${CMAKE_CURRENT_BINARY_DIR}/petrack_core_autogen/include")
 

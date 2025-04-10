@@ -28,7 +28,8 @@
 
 #include <QDomElement>
 #include <QSignalSpy>
-#include <catch2/catch.hpp>
+#include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <catch2/trompeloeil.hpp>
 
 
@@ -116,28 +117,28 @@ TEST_CASE("IntrinsicCameraParams values")
 
         THEN("The extended model params are shown in the ui")
         {
-            CHECK(ui->fx->value() == Approx(params.extModelParams.getFx()));
-            CHECK(ui->fy->value() == Approx(params.extModelParams.getFy()));
-            CHECK(ui->cx->value() == Approx(params.extModelParams.getCx()));
-            CHECK(ui->cy->value() == Approx(params.extModelParams.getCy()));
+            CHECK(ui->fx->value() == Catch::Approx(params.extModelParams.getFx()));
+            CHECK(ui->fy->value() == Catch::Approx(params.extModelParams.getFy()));
+            CHECK(ui->cx->value() == Catch::Approx(params.extModelParams.getCx()));
+            CHECK(ui->cy->value() == Catch::Approx(params.extModelParams.getCy()));
 
-            CHECK(ui->r2->value() == Approx(static_cast<double>(params.extModelParams.getR2())));
-            CHECK(ui->r4->value() == Approx(static_cast<double>(params.extModelParams.getR4())));
-            CHECK(ui->tx->value() == Approx(static_cast<double>(params.extModelParams.getTx())));
-            CHECK(ui->ty->value() == Approx(static_cast<double>(params.extModelParams.getTy())));
-            CHECK(ui->r6->value() == Approx(static_cast<double>(params.extModelParams.getR6())));
-            CHECK(ui->k4->value() == Approx(static_cast<double>(params.extModelParams.getK4())));
-            CHECK(ui->k5->value() == Approx(static_cast<double>(params.extModelParams.getK5())));
-            CHECK(ui->k6->value() == Approx(static_cast<double>(params.extModelParams.getK6())));
-            CHECK(ui->s1->value() == Approx(static_cast<double>(params.extModelParams.getS1())));
-            CHECK(ui->s2->value() == Approx(static_cast<double>(params.extModelParams.getS2())));
-            CHECK(ui->s3->value() == Approx(static_cast<double>(params.extModelParams.getS3())));
-            CHECK(ui->s4->value() == Approx(static_cast<double>(params.extModelParams.getS4())));
-            CHECK(ui->taux->value() == Approx(static_cast<double>(params.extModelParams.getTaux())));
-            CHECK(ui->tauy->value() == Approx(static_cast<double>(params.extModelParams.getTauy())));
+            CHECK(ui->r2->value() == Catch::Approx(static_cast<double>(params.extModelParams.getR2())));
+            CHECK(ui->r4->value() == Catch::Approx(static_cast<double>(params.extModelParams.getR4())));
+            CHECK(ui->tx->value() == Catch::Approx(static_cast<double>(params.extModelParams.getTx())));
+            CHECK(ui->ty->value() == Catch::Approx(static_cast<double>(params.extModelParams.getTy())));
+            CHECK(ui->r6->value() == Catch::Approx(static_cast<double>(params.extModelParams.getR6())));
+            CHECK(ui->k4->value() == Catch::Approx(static_cast<double>(params.extModelParams.getK4())));
+            CHECK(ui->k5->value() == Catch::Approx(static_cast<double>(params.extModelParams.getK5())));
+            CHECK(ui->k6->value() == Catch::Approx(static_cast<double>(params.extModelParams.getK6())));
+            CHECK(ui->s1->value() == Catch::Approx(static_cast<double>(params.extModelParams.getS1())));
+            CHECK(ui->s2->value() == Catch::Approx(static_cast<double>(params.extModelParams.getS2())));
+            CHECK(ui->s3->value() == Catch::Approx(static_cast<double>(params.extModelParams.getS3())));
+            CHECK(ui->s4->value() == Catch::Approx(static_cast<double>(params.extModelParams.getS4())));
+            CHECK(ui->taux->value() == Catch::Approx(static_cast<double>(params.extModelParams.getTaux())));
+            CHECK(ui->tauy->value() == Catch::Approx(static_cast<double>(params.extModelParams.getTauy())));
             CHECK(
                 ui->intrError->text().toDouble() ==
-                Approx(static_cast<double>(params.extModelParams.reprojectionError)));
+                Catch::Approx(static_cast<double>(params.extModelParams.reprojectionError)));
         }
         GIVEN("Some parameters are out of range")
         {
@@ -159,28 +160,28 @@ TEST_CASE("IntrinsicCameraParams values")
 
             THEN("The old model parameters are shown in the UI")
             {
-                CHECK(ui->fx->value() == Approx(params.oldModelParams.getFx()));
-                CHECK(ui->fy->value() == Approx(params.oldModelParams.getFy()));
-                CHECK(ui->cx->value() == Approx(params.oldModelParams.getCx()));
-                CHECK(ui->cy->value() == Approx(params.oldModelParams.getCy()));
+                CHECK(ui->fx->value() == Catch::Approx(params.oldModelParams.getFx()));
+                CHECK(ui->fy->value() == Catch::Approx(params.oldModelParams.getFy()));
+                CHECK(ui->cx->value() == Catch::Approx(params.oldModelParams.getCx()));
+                CHECK(ui->cy->value() == Catch::Approx(params.oldModelParams.getCy()));
 
-                CHECK(ui->r2->value() == Approx(static_cast<double>(params.oldModelParams.getR2())));
-                CHECK(ui->r4->value() == Approx(static_cast<double>(params.oldModelParams.getR4())));
-                CHECK(ui->tx->value() == Approx(static_cast<double>(params.oldModelParams.getTx())));
-                CHECK(ui->ty->value() == Approx(static_cast<double>(params.oldModelParams.getTy())));
-                CHECK(ui->r6->value() == Approx(static_cast<double>(params.oldModelParams.getR6())));
-                CHECK(ui->k4->value() == Approx(static_cast<double>(params.oldModelParams.getK4())));
-                CHECK(ui->k5->value() == Approx(static_cast<double>(params.oldModelParams.getK5())));
-                CHECK(ui->k6->value() == Approx(static_cast<double>(params.oldModelParams.getK6())));
-                CHECK(ui->s1->value() == Approx(static_cast<double>(params.oldModelParams.getS1())));
-                CHECK(ui->s2->value() == Approx(static_cast<double>(params.oldModelParams.getS2())));
-                CHECK(ui->s3->value() == Approx(static_cast<double>(params.oldModelParams.getS3())));
-                CHECK(ui->s4->value() == Approx(static_cast<double>(params.oldModelParams.getS4())));
-                CHECK(ui->taux->value() == Approx(static_cast<double>(params.oldModelParams.getTaux())));
-                CHECK(ui->tauy->value() == Approx(static_cast<double>(params.oldModelParams.getTauy())));
+                CHECK(ui->r2->value() == Catch::Approx(static_cast<double>(params.oldModelParams.getR2())));
+                CHECK(ui->r4->value() == Catch::Approx(static_cast<double>(params.oldModelParams.getR4())));
+                CHECK(ui->tx->value() == Catch::Approx(static_cast<double>(params.oldModelParams.getTx())));
+                CHECK(ui->ty->value() == Catch::Approx(static_cast<double>(params.oldModelParams.getTy())));
+                CHECK(ui->r6->value() == Catch::Approx(static_cast<double>(params.oldModelParams.getR6())));
+                CHECK(ui->k4->value() == Catch::Approx(static_cast<double>(params.oldModelParams.getK4())));
+                CHECK(ui->k5->value() == Catch::Approx(static_cast<double>(params.oldModelParams.getK5())));
+                CHECK(ui->k6->value() == Catch::Approx(static_cast<double>(params.oldModelParams.getK6())));
+                CHECK(ui->s1->value() == Catch::Approx(static_cast<double>(params.oldModelParams.getS1())));
+                CHECK(ui->s2->value() == Catch::Approx(static_cast<double>(params.oldModelParams.getS2())));
+                CHECK(ui->s3->value() == Catch::Approx(static_cast<double>(params.oldModelParams.getS3())));
+                CHECK(ui->s4->value() == Catch::Approx(static_cast<double>(params.oldModelParams.getS4())));
+                CHECK(ui->taux->value() == Catch::Approx(static_cast<double>(params.oldModelParams.getTaux())));
+                CHECK(ui->tauy->value() == Catch::Approx(static_cast<double>(params.oldModelParams.getTauy())));
                 CHECK(
                     ui->intrError->text().toDouble() ==
-                    Approx(static_cast<double>(params.oldModelParams.reprojectionError)));
+                    Catch::Approx(static_cast<double>(params.oldModelParams.reprojectionError)));
             }
         }
     }
@@ -234,11 +235,11 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
                 }
 
 
-                INFO(nodeToString(elem).toStdString())
+                INFO(nodeToString(elem).toStdString());
                 CHECK(newUi->apply->isChecked() == ui->apply->isChecked());
                 CHECK(newUi->boardSizeX->value() == ui->boardSizeX->value());
                 CHECK(newUi->boardSizeY->value() == ui->boardSizeY->value());
-                CHECK(newUi->squareSize->value() == Approx(ui->squareSize->value()));
+                CHECK(newUi->squareSize->value() == Catch::Approx(ui->squareSize->value()));
                 CHECK(newUi->quadAspectRatio->isChecked() == ui->quadAspectRatio->isChecked());
                 CHECK(newUi->fixCenter->isChecked() == ui->fixCenter->isChecked());
                 CHECK(newUi->tangDist->isChecked() == ui->tangDist->isChecked());
@@ -291,7 +292,7 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
                 {
                     newIntrBox.getXml(subElem);
                 }
-                INFO(nodeToString(elem).toStdString())
+                INFO(nodeToString(elem).toStdString());
                 CHECK(newUi->quadAspectRatio->isChecked() == !ui->quadAspectRatio->isChecked());
                 CHECK(newUi->fixCenter->isChecked() == !ui->fixCenter->isChecked());
                 CHECK(newUi->tangDist->isChecked() == !ui->tangDist->isChecked());
@@ -336,31 +337,33 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
                     newIntrBox.getXml(subElem);
                 }
 
-                INFO(nodeToString(elem).toStdString())
+                INFO(nodeToString(elem).toStdString());
                 auto originalParams   = intrBox.getBothIntrinsicCameraParams();
                 auto serializedParams = newIntrBox.getBothIntrinsicCameraParams();
                 CHECK(
                     cv::norm(
                         originalParams.oldModelParams.cameraMatrix - serializedParams.oldModelParams.cameraMatrix) ==
-                    Approx(0).margin(SERIALIZATION_MARGIN));
+                    Catch::Approx(0).margin(SERIALIZATION_MARGIN));
                 CHECK(
                     cv::norm(
                         originalParams.oldModelParams.distortionCoeffs -
-                        serializedParams.oldModelParams.distortionCoeffs) == Approx(0).margin(SERIALIZATION_MARGIN));
+                        serializedParams.oldModelParams.distortionCoeffs) ==
+                    Catch::Approx(0).margin(SERIALIZATION_MARGIN));
 
                 CHECK(
                     originalParams.oldModelParams.reprojectionError ==
-                    Approx(serializedParams.oldModelParams.reprojectionError));
+                    Catch::Approx(serializedParams.oldModelParams.reprojectionError));
 
                 // check extended model parameters
                 CHECK(
                     cv::norm(
                         originalParams.extModelParams.cameraMatrix - serializedParams.extModelParams.cameraMatrix) ==
-                    Approx(0).margin(SERIALIZATION_MARGIN));
+                    Catch::Approx(0).margin(SERIALIZATION_MARGIN));
                 CHECK(
                     cv::norm(
                         originalParams.extModelParams.distortionCoeffs -
-                        serializedParams.extModelParams.distortionCoeffs) == Approx(0).margin(SERIALIZATION_MARGIN));
+                        serializedParams.extModelParams.distortionCoeffs) ==
+                    Catch::Approx(0).margin(SERIALIZATION_MARGIN));
 
                 if(qIsNaN(originalParams.extModelParams.reprojectionError))
                 {
@@ -370,7 +373,7 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
                 {
                     CHECK(
                         originalParams.extModelParams.reprojectionError ==
-                        Approx(serializedParams.extModelParams.reprojectionError));
+                        Catch::Approx(serializedParams.extModelParams.reprojectionError));
                 }
             }
         }
@@ -403,10 +406,10 @@ TEST_CASE("ImageSizeChanged")
             THEN("cx and cy are set to the new image center")
             {
                 IntrinsicCameraParams params = intrBox.getIntrinsicCameraParams();
-                CHECK(params.getCx() == Approx(cxFixed));
-                CHECK(params.getCy() == Approx(cyFixed));
-                CHECK(ui->cx->value() == Approx(cxFixed));
-                CHECK(ui->cy->value() == Approx(cyFixed));
+                CHECK(params.getCx() == Catch::Approx(cxFixed));
+                CHECK(params.getCy() == Catch::Approx(cyFixed));
+                CHECK(ui->cx->value() == Catch::Approx(cxFixed));
+                CHECK(ui->cy->value() == Catch::Approx(cyFixed));
             }
             AND_WHEN("I switch calibration models")
             {
@@ -414,10 +417,10 @@ TEST_CASE("ImageSizeChanged")
                 IntrinsicCameraParams params = intrBox.getIntrinsicCameraParams();
                 THEN("cx and cy are updated in ui and data accordingly")
                 {
-                    CHECK(params.getCx() == Approx(cxFixed));
-                    CHECK(params.getCy() == Approx(cyFixed));
-                    CHECK(ui->cx->value() == Approx(cxFixed));
-                    CHECK(ui->cy->value() == Approx(cyFixed));
+                    CHECK(params.getCx() == Catch::Approx(cxFixed));
+                    CHECK(params.getCy() == Catch::Approx(cyFixed));
+                    CHECK(ui->cx->value() == Catch::Approx(cxFixed));
+                    CHECK(ui->cy->value() == Catch::Approx(cyFixed));
                 }
             }
         }
@@ -435,8 +438,8 @@ TEST_CASE("ImageSizeChanged")
 
             THEN("cx and cy are updated accordingly")
             {
-                CHECK(ui->cx->value() == Approx(cx + 20));
-                CHECK(ui->cy->value() == Approx(cy + 20));
+                CHECK(ui->cx->value() == Catch::Approx(cx + 20));
+                CHECK(ui->cy->value() == Catch::Approx(cy + 20));
             }
         }
     }
