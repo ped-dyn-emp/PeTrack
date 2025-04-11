@@ -21,6 +21,8 @@
 
 #include <QDomElement>
 #include <QFileInfo>
+#include <QTextStream>
+#include <optional>
 #include <sstream>
 
 class QCheckBox;
@@ -157,6 +159,23 @@ void checkValueValid(T widget, double value)
            << widget->minimum() << " to " << widget->maximum();
         throw std::domain_error(ss.str());
     }
+}
+
+/**
+ * @brief Reads the next stream value safely.
+ * @param stream
+ * @return stream value if it can be converted to T. Nullopt otherwise.
+ */
+template <typename T>
+static std::optional<T> readStreamValue(QTextStream &stream)
+{
+    T value;
+    stream >> value;
+    if(stream.status() == QTextStream::Ok)
+    {
+        return value;
+    }
+    return std::nullopt;
 }
 
 #endif // IMPORTHELPER_H

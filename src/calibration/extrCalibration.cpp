@@ -26,6 +26,7 @@
 
 #include <QFileDialog>
 #include <QtWidgets>
+#include <optional>
 
 #define MAX_AV_ERROR 20
 
@@ -168,12 +169,13 @@ void ExtrCalibration::loadExtrCalibFile()
     std::vector<cv::Point3f> points3D_tmp;
     std::vector<cv::Point2f> points2D_tmp;
 
-    QTextStream in(&file);
-    QString     line;
-    int         line_counter = 0, counter;
-    float       x, y, z, px, py;
-    float       zahl;
-    bool        with_2D_data = false, with_3D_data = false, end_loop = false;
+    QTextStream            in(&file);
+    QString                line;
+    int                    line_counter = 0, counter;
+    float                  x, y, z, px, py;
+    float                  number;
+    bool                   with_2D_data = false, with_3D_data = false, end_loop = false;
+    std::optional<QString> errorMessage;
 
     // Exit loop when reaching the end of the file
     while(!in.atEnd())
@@ -195,13 +197,24 @@ void ExtrCalibration::loadExtrCalibFile()
 
         while(!stream.atEnd() && !end_loop)
         {
-            stream >> zahl;
+            // check if next number is a valid float
+            std::optional<float> maybeFloat = readStreamValue<float>(stream);
+            if(maybeFloat)
+            {
+                number = maybeFloat.value();
+            }
+            else
+            {
+                errorMessage =
+                    QString("Invalid input at line %1 (%2)! It will be ignored.").arg(line_counter).arg(line);
+                break;
+            }
             ++counter;
 
             switch(counter)
             {
                 case 1:
-                    x = zahl;
+                    x = number;
                     if(!with_3D_data)
                     {
                         points3D_tmp.clear();
@@ -209,13 +222,13 @@ void ExtrCalibration::loadExtrCalibFile()
                     }
                     break;
                 case 2:
-                    y = zahl;
+                    y = number;
                     break;
                 case 3:
-                    z = zahl;
+                    z = number;
                     break;
                 case 4:
-                    px = zahl;
+                    px = number;
                     if(!with_2D_data)
                     {
                         points2D_tmp.clear();
@@ -223,19 +236,29 @@ void ExtrCalibration::loadExtrCalibFile()
                     }
                     break;
                 case 5:
-                    py = zahl;
+                    py = number;
                     break;
                 default:
                     end_loop = true;
             }
         }
-        if(counter == 1)
+        if(errorMessage)
+        {
+            PWarning(nullptr, "Warning!", errorMessage.value());
+            errorMessage.reset();
+        }
+        else if(counter == 1)
         {
             SPDLOG_INFO("Optional number of points in line {} ignored.", line_counter);
         }
         else if(counter != 3 && counter != 5)
         {
-            SPDLOG_INFO("Something wrong in line {} ({})! Ignored. (counter={})", line_counter, line, counter);
+            PWarning(
+                nullptr,
+                "Warning!",
+                QString("Incorrect number of columns in line %1 (%2)! It will be ignored.")
+                    .arg(line_counter)
+                    .arg(line));
         }
 
         // save 3D data
