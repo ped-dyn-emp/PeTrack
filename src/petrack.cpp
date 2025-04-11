@@ -1262,7 +1262,11 @@ void Petrack::exportSequence(bool exportVideo, bool exportView, QString dest) //
             {
                 bool colored = (mImg.channels() > 1);
                 outputVideo  = cv::VideoWriter(
-                    dest.toStdString(), fourcc, mAnimation.getSequenceFPS(), cv::Size(mImg.cols, mImg.rows), colored);
+                    dest.toStdString(),
+                    fourcc,
+                    mAnimation.getSequenceFPS(),
+                    cv::Size(mImgFiltered.cols, mImgFiltered.rows),
+                    colored);
             }
         }
 
@@ -1400,7 +1404,7 @@ void Petrack::exportSequence(bool exportVideo, bool exportView, QString dest) //
                 }
                 else
                 {
-                    cv::Mat frame = mImg.clone();
+                    cv::Mat frame = mImgFiltered.clone();
                     outputVideo.write(frame);
                     writeFrameRet = true;
                 }

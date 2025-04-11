@@ -17,7 +17,7 @@ PeTrack internally uses [ffmpeg](https://ffmpeg.org/) for reading video files. T
 PeTrack allows you to export the video. All of the options related to video export are in the `File` menu from the menu bar.
 
 Export Video
-: Export as video as is, i.e. without undistortion or overlays. Can be used to get video out of image sequence.
+: Export video with undistortion and border, but without any overlays
 
 Export Image
 : Export currently shown frame with undistortion and border, but without any overlays
