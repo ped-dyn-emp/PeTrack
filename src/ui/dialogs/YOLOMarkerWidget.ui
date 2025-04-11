@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>281</height>
+    <height>336</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,6 +18,13 @@
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <layout class="QGridLayout" name="gridLayout">
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>model:</string>
+         </property>
+        </widget>
+       </item>
        <item row="7" column="0">
         <widget class="QLabel" name="namesLabel">
          <property name="text">
@@ -25,23 +32,33 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_4">
          <property name="toolTip">
-          <string>Determines how confident the model has to be in its detection. The higher the value, the less, but presumably better detections</string>
+          <string>Determines how confident the model has to be that a given detection belongs to a certain class (only relevant if more than one class exists)</string>
          </property>
          <property name="text">
-          <string>confidence threshold</string>
+          <string>score threshold</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="PSpinBox" name="imageSize" native="true">
+       <item row="7" column="1">
+        <widget class="QPushButton" name="selectNamesButton">
+         <property name="text">
+          <string>select names file</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="PDoubleSpinBox" name="confThreshold" native="true">
          <property name="maximum" stdset="0">
-          <number>99999</number>
+          <double>1.000000000000000</double>
+         </property>
+         <property name="singleStep" stdset="0">
+          <double>0.010000000000000</double>
          </property>
          <property name="value" stdset="0">
-          <number>640</number>
+          <double>0.500000000000000</double>
          </property>
         </widget>
        </item>
@@ -65,23 +82,6 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>model:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="toolTip">
-          <string>Determines how confident the model has to be that a given detection belongs to a certain class (only relevant if more than one class exists)</string>
-         </property>
-         <property name="text">
-          <string>score threshold</string>
-         </property>
-        </widget>
-       </item>
        <item row="5" column="0">
         <widget class="QLabel" name="modelLabel">
          <property name="text">
@@ -89,40 +89,10 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
-        <widget class="QPushButton" name="selectNamesButton">
-         <property name="text">
-          <string>select names file</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="toolTip">
-          <string>Determines how much two detections are allowed to overlap before discarding one of them</string>
-         </property>
-         <property name="text">
-          <string>NMS threshold</string>
-         </property>
-        </widget>
-       </item>
        <item row="5" column="1">
         <widget class="QPushButton" name="selectModelButton">
          <property name="text">
           <string>select model file</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="PDoubleSpinBox" name="confThreshold" native="true">
-         <property name="maximum" stdset="0">
-          <double>1.000000000000000</double>
-         </property>
-         <property name="singleStep" stdset="0">
-          <double>0.010000000000000</double>
-         </property>
-         <property name="value" stdset="0">
-          <double>0.500000000000000</double>
          </property>
         </widget>
        </item>
@@ -149,12 +119,95 @@
          </property>
         </widget>
        </item>
+       <item row="3" column="1">
+        <widget class="PSpinBox" name="imageSize" native="true">
+         <property name="maximum" stdset="0">
+          <number>99999</number>
+         </property>
+         <property name="value" stdset="0">
+          <number>640</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="toolTip">
+          <string>Determines how much two detections are allowed to overlap before discarding one of them</string>
+         </property>
+         <property name="text">
+          <string>NMS threshold</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="toolTip">
+          <string>Determines how confident the model has to be in its detection. The higher the value, the less, but presumably better detections</string>
+         </property>
+         <property name="text">
+          <string>confidence threshold</string>
+         </property>
+        </widget>
+       </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;
+&lt;body&gt;
+&lt;p&gt;
+If you don't have a model, you can find some pre-trained models
+&lt;a href=&quot;https://go.fzj.de/mlMarkerDocs&quot;&gt;here&lt;/a&gt;
+&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::AutoText</enum>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+       <property name="openExternalLinks">
+        <bool>true</bool>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::TextBrowserInteraction</set>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PSpinBox</class>
+   <extends>QWidget</extends>
+   <header>pspinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PDoubleSpinBox</class>
+   <extends>QWidget</extends>
+   <header>pdoublespinbox.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>confThreshold</tabstop>
   <tabstop>nmsThreshold</tabstop>
