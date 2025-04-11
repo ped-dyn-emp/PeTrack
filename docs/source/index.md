@@ -31,7 +31,7 @@ All things to consider **before** using PeTrack.
 
 :::{grid-item-card}  How to cite
 :class-card: intro-card
-:link: misc/citation
+:link: citation/citation
 :link-type: doc
 :link-alt: Publications to cite when using PeTrack
 

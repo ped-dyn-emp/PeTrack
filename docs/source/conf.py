@@ -17,7 +17,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 with open(f"{dir_path}/../../CMakeLists.txt") as file:
     for line in file:
         match = re.search(
-            "project\(petrack LANGUAGES CXX VERSION ([0-9]+\.[0-9]+\.[0-9]+)\)", line
+            r"project\(petrack LANGUAGES CXX VERSION ([0-9]+\.[0-9]+\.[0-9]+)\)", line
         )
         if match is not None:
             version = match[1]
