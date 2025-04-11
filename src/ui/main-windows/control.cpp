@@ -231,7 +231,7 @@ Control::Control(
     connect(&recognizer, &reco::Recognizer::mlMethodChanged, this, &Control::onMlMethodChanged);
     connect(this, &Control::userChangedMlMethod, &recognizer, &reco::Recognizer::userChangedMlMethod);
     mUi->mlMethod->addItem("YOLOv5", QVariant::fromValue(reco::MlMethod::YOLOv5));
-    mUi->mlMethod->addItem("YOLOv8", QVariant::fromValue(reco::MlMethod::YOLOv8));
+    mUi->mlMethod->addItem("YOLOv8-11", QVariant::fromValue(reco::MlMethod::YOLOv8));
     mUi->mlMethod->setCurrentIndex(mUi->mlMethod->findData(QVariant::fromValue(recognizer.getMlMethod())));
     mUi->mlMethod->hide();
 

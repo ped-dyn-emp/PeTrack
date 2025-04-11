@@ -2,7 +2,11 @@
 
 The machine learning marker uses neural networks to detect the pedestrians. Therefore, the type of pedestrians that are detected depends on what the machine learning model was trained on. 
 To keep it flexible, the user has to provide a model himself. For example, if he provides a model that was only trained on people wearing colored hats, then only pedestrians with colored hats are detected.
-For a general purpose, you can find a model that was trained on many different experiments on our data archive. (TODO: Link einfügen)
+
+## Downloads
+If you don't want to provide your own model, below there are 2 pretrained models compatible with PeTrack.
+- Model trained on pedestrians without hats: [download](https://go.fzj.de/yolov8fieldDetection)
+- Model trained on pedestrians in experiments wearing different types of hats: [download](https://go.fzj.de/yolov11pedExpDetection)
 
 ## Selecting the model version
 :::{figure-md} model-version-selection
@@ -12,7 +16,7 @@ Model version selection
 :::
 
 After selecting machine learning as your preferred method for recognition, you have to choose which pretrained model your model is based on.
-Currently supported are YOLOv5 and YOLOv8.
+Currently supported are YOLOv5 and YOLOv8-YOLOv11.
 
 ## Machine learning parameter window
 :::{figure-md} machine-learning-parameter-window
