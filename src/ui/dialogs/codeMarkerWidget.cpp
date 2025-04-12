@@ -92,7 +92,11 @@ CodeMarkerWidget::CodeMarkerWidget(QWidget *parent, reco::CodeMarkerOptions &cod
             readDetectorParams();
         }
     };
-
+    connect(
+        mUi->showDetectedCandidates,
+        &QCheckBox::stateChanged,
+        this,
+        &CodeMarkerWidget::onShowDetectedCandidatesStateChanged);
     connect(mUi->minMarkerPerimeter, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
     connect(mUi->maxMarkerPerimeter, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
 
@@ -120,6 +124,12 @@ CodeMarkerWidget::CodeMarkerWidget(QWidget *parent, reco::CodeMarkerOptions &cod
     connect(mUi->maxErroneousBitsInBorderRate, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
     connect(mUi->errorCorrectionRate, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
     connect(mUi->minOtsuStdDev, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);
+    connect(mUi->moreInfosButton, &QPushButton::clicked, this, &CodeMarkerWidget::onMoreInfosButtonClicked);
+    connect(
+        mUi->dictList,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        &CodeMarkerWidget::onDictListCurrentIndexChanged);
 }
 
 //<COLOR_MARKER>
@@ -236,7 +246,7 @@ bool CodeMarkerWidget::showDetectedCandidates()
     return mUi->showDetectedCandidates->isChecked();
 }
 
-void CodeMarkerWidget::on_showDetectedCandidates_stateChanged(int i)
+void CodeMarkerWidget::onShowDetectedCandidatesStateChanged(int i)
 {
     mMainWindow->getCodeMarkerItem()->setVisible(i);
     if(!mMainWindow->isLoading())
@@ -245,7 +255,7 @@ void CodeMarkerWidget::on_showDetectedCandidates_stateChanged(int i)
     }
 }
 
-void CodeMarkerWidget::on_moreInfosButton_clicked()
+void CodeMarkerWidget::onMoreInfosButtonClicked()
 {
 #define CV_NUMERIC_VERSION                                                                                             \
     CVAUX_STR(CV_VERSION_MAJOR) "." CVAUX_STR(CV_VERSION_MINOR) "." CVAUX_STR(CV_VERSION_REVISION)
@@ -256,7 +266,7 @@ void CodeMarkerWidget::on_moreInfosButton_clicked()
         QUrl("http://docs.opencv.org/" CV_NUMERIC_VERSION "/d5/dae/tutorial_aruco_detection.html", QUrl::TolerantMode));
 }
 
-void CodeMarkerWidget::on_dictList_currentIndexChanged(int i)
+void CodeMarkerWidget::onDictListCurrentIndexChanged(int i)
 {
     mCodeMarkerOpt.setIndexOfMarkerDict(i);
     notifyChanged();

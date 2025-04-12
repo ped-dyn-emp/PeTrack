@@ -37,6 +37,23 @@ ExtrinsicBox::ExtrinsicBox(QWidget *parent, Ui::extr *ui, ExtrCalibration &extrC
     setFocusProxy(mUi->rot1);
     // use default values from struct as default for UI
     setExtrinsicParameters(mParams);
+    connect(mUi->extrCalibCalc, &QPushButton::clicked, this, &ExtrinsicBox::onExtrCalibCalcClicked);
+    connect(mUi->extrCalibFetch, &QPushButton::clicked, this, &ExtrinsicBox::onExtrCalibFetchClicked);
+    connect(mUi->coordLoad3DCalibPoints, &QPushButton::clicked, this, &ExtrinsicBox::onCoordLoad3DCalibPointsClicked);
+
+    connect(mUi->rot1, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &ExtrinsicBox::onRot1ValueChanged);
+    connect(mUi->rot2, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &ExtrinsicBox::onRot2ValueChanged);
+    connect(mUi->rot3, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &ExtrinsicBox::onRot3ValueChanged);
+    connect(
+        mUi->trans1, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &ExtrinsicBox::onTrans1ValueChanged);
+    connect(
+        mUi->trans2, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &ExtrinsicBox::onTrans2ValueChanged);
+    connect(
+        mUi->trans3, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &ExtrinsicBox::onTrans3ValueChanged);
+
+    connect(mUi->extrCalibSave, &QPushButton::clicked, this, &ExtrinsicBox::onExtrCalibSaveClicked);
+    connect(mUi->extrCalibShowPoints, &QPushButton::clicked, this, &ExtrinsicBox::onExtrCalibShowPointsClicked);
+    connect(mUi->extrCalibShowError, &QPushButton::clicked, this, &ExtrinsicBox::onExtrCalibShowErrorClicked);
 }
 
 ExtrinsicBox::ExtrinsicBox(QWidget *parent, ExtrCalibration &extrCalib) : ExtrinsicBox(parent, new Ui::extr, extrCalib)
@@ -69,7 +86,7 @@ void ExtrinsicBox::setExtrinsicParameters(const ExtrinsicParameters &params)
     setValue(mUi->rot3, params.rot3);
 }
 
-void ExtrinsicBox::on_extrCalibCalc_clicked()
+void ExtrinsicBox::onExtrCalibCalcClicked()
 {
     auto newCalib = mExtrCalibration.calibExtrParams();
     if(newCalib)
@@ -79,58 +96,58 @@ void ExtrinsicBox::on_extrCalibCalc_clicked()
     emit extrinsicChanged();
 }
 
-void ExtrinsicBox::on_extrCalibFetch_clicked()
+void ExtrinsicBox::onExtrCalibFetchClicked()
 {
     mExtrCalibration.fetch2DPoints();
 }
 
-void ExtrinsicBox::on_coordLoad3DCalibPoints_clicked()
+void ExtrinsicBox::onCoordLoad3DCalibPointsClicked()
 {
     mExtrCalibration.openExtrCalibFile();
 }
 
-void ExtrinsicBox::on_rot1_valueChanged(double newVal)
+void ExtrinsicBox::onRot1ValueChanged(double newVal)
 {
     mParams.rot1 = newVal;
     emit extrinsicChanged();
 }
 
-void ExtrinsicBox::on_rot2_valueChanged(double newVal)
+void ExtrinsicBox::onRot2ValueChanged(double newVal)
 {
     mParams.rot2 = newVal;
     emit extrinsicChanged();
 }
 
-void ExtrinsicBox::on_rot3_valueChanged(double newVal)
+void ExtrinsicBox::onRot3ValueChanged(double newVal)
 {
     mParams.rot3 = newVal;
     emit extrinsicChanged();
 }
 
-void ExtrinsicBox::on_trans1_valueChanged(double newVal)
+void ExtrinsicBox::onTrans1ValueChanged(double newVal)
 {
     mParams.trans1 = newVal;
     emit extrinsicChanged();
 }
 
-void ExtrinsicBox::on_trans2_valueChanged(double newVal)
+void ExtrinsicBox::onTrans2ValueChanged(double newVal)
 {
     mParams.trans2 = newVal;
     emit extrinsicChanged();
 }
 
-void ExtrinsicBox::on_trans3_valueChanged(double newVal)
+void ExtrinsicBox::onTrans3ValueChanged(double newVal)
 {
     mParams.trans3 = newVal;
     emit extrinsicChanged();
 }
 
-void ExtrinsicBox::on_extrCalibSave_clicked()
+void ExtrinsicBox::onExtrCalibSaveClicked()
 {
     mExtrCalibration.saveExtrCalibPoints();
 }
 
-void ExtrinsicBox::on_extrCalibShowError_clicked()
+void ExtrinsicBox::onExtrCalibShowErrorClicked()
 {
     QString      out;
     QDialog      msgBox;
@@ -190,7 +207,7 @@ void ExtrinsicBox::on_extrCalibShowError_clicked()
     msgBox.exec();
 }
 
-void ExtrinsicBox::on_extrCalibShowPoints_clicked()
+void ExtrinsicBox::onExtrCalibShowPointsClicked()
 {
     QString     out_str;
     QTextStream out(&out_str);

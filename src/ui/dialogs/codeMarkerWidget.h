@@ -48,10 +48,9 @@ public:
 
 private slots:
 
-    void on_showDetectedCandidates_stateChanged(int i);
-
-    void on_moreInfosButton_clicked();
-    void on_dictList_currentIndexChanged(int /*index*/);
+    void onShowDetectedCandidatesStateChanged(int i);
+    void onMoreInfosButtonClicked();
+    void onDictListCurrentIndexChanged(int i);
 
 private:
     void notifyChanged();

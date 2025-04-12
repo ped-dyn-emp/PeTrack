@@ -29,6 +29,18 @@ AlignmentGridBox::AlignmentGridBox(QWidget *parent) : QWidget(parent), mUi(new U
     mUi->setupUi(this);
 
     setFocusProxy(mUi->gridShow);
+
+    connect(mUi->gridShow, &QCheckBox::stateChanged, this, &AlignmentGridBox::onGridShowStateChanged);
+    connect(mUi->gridFix, &QCheckBox::stateChanged, this, &AlignmentGridBox::onGridFixStateChanged);
+    connect(mUi->gridRotate, &PSlider::valueChanged, this, &AlignmentGridBox::onGridRotateValueChanged);
+    connect(mUi->gridTransX, &PSlider::valueChanged, this, &AlignmentGridBox::onGridTransXValueChanged);
+    connect(mUi->gridTransY, &PSlider::valueChanged, this, &AlignmentGridBox::onGridTransYValueChanged);
+    connect(mUi->gridScale, &PSlider::valueChanged, this, &AlignmentGridBox::onGridScaleValueChanged);
+    connect(mUi->gridTab, &QTabWidget::currentChanged, this, &AlignmentGridBox::onGridTabCurrentChanged);
+    connect(mUi->grid3DTransX, &PSlider::valueChanged, this, &AlignmentGridBox::onGrid3DTransXValueChanged);
+    connect(mUi->grid3DTransY, &PSlider::valueChanged, this, &AlignmentGridBox::onGrid3DTransYValueChanged);
+    connect(mUi->grid3DTransZ, &PSlider::valueChanged, this, &AlignmentGridBox::onGrid3DTransZValueChanged);
+    connect(mUi->grid3DResolution, &PSlider::valueChanged, this, &AlignmentGridBox::onGrid3DResolutionValueChanged);
 }
 
 AlignmentGridBox::~AlignmentGridBox()
@@ -167,57 +179,57 @@ Grid AlignmentGridBox::assembleGrid()
     }
 }
 
-void AlignmentGridBox::on_gridTab_currentChanged(int /*index*/)
+void AlignmentGridBox::onGridTabCurrentChanged()
 {
     emit gridChanged();
 }
 
-void AlignmentGridBox::on_gridShow_stateChanged(int /*i*/)
+void AlignmentGridBox::onGridShowStateChanged()
 {
     emit gridChanged();
 }
 
-void AlignmentGridBox::on_gridFix_stateChanged(int /*i*/)
+void AlignmentGridBox::onGridFixStateChanged()
 {
     emit gridChanged();
 }
 
-void AlignmentGridBox::on_gridRotate_valueChanged(int /*i*/)
+void AlignmentGridBox::onGridRotateValueChanged()
 {
     emit gridChanged();
 }
 
-void AlignmentGridBox::on_gridTransX_valueChanged(int /*i*/)
+void AlignmentGridBox::onGridTransXValueChanged()
 {
     emit gridChanged();
 }
 
-void AlignmentGridBox::on_gridTransY_valueChanged(int /*i*/)
+void AlignmentGridBox::onGridTransYValueChanged()
 {
     emit gridChanged();
 }
 
-void AlignmentGridBox::on_gridScale_valueChanged(int /*i*/)
+void AlignmentGridBox::onGridScaleValueChanged()
 {
     emit gridChanged();
 }
 
-void AlignmentGridBox::on_grid3DTransX_valueChanged(int /*value*/)
+void AlignmentGridBox::onGrid3DTransXValueChanged()
 {
     emit gridChanged();
 }
 
-void AlignmentGridBox::on_grid3DTransY_valueChanged(int /*value*/)
+void AlignmentGridBox::onGrid3DTransYValueChanged()
 {
     emit gridChanged();
 }
 
-void AlignmentGridBox::on_grid3DTransZ_valueChanged(int /*value*/)
+void AlignmentGridBox::onGrid3DTransZValueChanged()
 {
     emit gridChanged();
 }
 
-void AlignmentGridBox::on_grid3DResolution_valueChanged(int /*value*/)
+void AlignmentGridBox::onGrid3DResolutionValueChanged()
 {
     emit gridChanged();
 }

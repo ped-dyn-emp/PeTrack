@@ -298,13 +298,13 @@ ViewWidget::ViewWidget(QWidget *parent) : QFrame(parent)
     topLayout->addLayout(sliderLayout, 0, 1);
     setLayout(topLayout);
 
-    connect(mZoomSlider, SIGNAL(valueChanged(int)), this, SLOT(setupMatrix()));
-    connect(mRotateSlider, SIGNAL(valueChanged(int)), this, SLOT(setupMatrix()));
-    connect(hideShowControlsButton, SIGNAL(clicked()), this, SLOT(hideShowControls()));
-    connect(rotateLeftIcon, SIGNAL(clicked()), this, SLOT(rotateLeft()));
-    connect(rotateRightIcon, SIGNAL(clicked()), this, SLOT(rotateRight()));
-    connect(zoomInIcon, SIGNAL(clicked()), this, SLOT(zoomIn()));
-    connect(zoomOutIcon, SIGNAL(clicked()), this, SLOT(zoomOut()));
+    connect(mZoomSlider, &QSlider::valueChanged, this, &ViewWidget::setupMatrix);
+    connect(mRotateSlider, &QSlider::valueChanged, this, &ViewWidget::setupMatrix);
+    connect(hideShowControlsButton, &QToolButton::clicked, this, &ViewWidget::hideShowControls);
+    connect(rotateLeftIcon, &QToolButton::clicked, this, &ViewWidget::rotateLeft);
+    connect(rotateRightIcon, &QToolButton::clicked, this, &ViewWidget::rotateRight);
+    connect(zoomInIcon, &QToolButton::clicked, this, &ViewWidget::zoomIn);
+    connect(zoomOutIcon, &QToolButton::clicked, this, &ViewWidget::zoomOut);
 
     setupMatrix();
 }

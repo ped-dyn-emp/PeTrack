@@ -28,6 +28,47 @@ MultiColorMarkerWidget::MultiColorMarkerWidget(QWidget *parent) : QWidget(parent
     setupUi(this);
     mOldMinArea = minArea->value();
     mOldMaxArea = maxArea->value();
+
+    connect(useDot, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onUseDotStateChanged);
+    connect(
+        dotSize,
+        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+        this,
+        &MultiColorMarkerWidget::onDotSizeValueChanged);
+    connect(useCodeMarker, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onUseCodeMarkerStateChanged);
+    connect(CodeMarkerParameter, &QPushButton::clicked, this, &MultiColorMarkerWidget::onCodeMarkerParameterClicked);
+    connect(ignoreWithoutDot, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onIgnoreWithoutDotStateChanged);
+    connect(useColor, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onUseColorStateChanged);
+    connect(restrictPosition, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onRestrictPositionStateChanged);
+    connect(autoCorrect, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onAutoCorrectStateChanged);
+    connect(
+        autoCorrectOnlyExport,
+        &QCheckBox::stateChanged,
+        this,
+        &MultiColorMarkerWidget::onAutoCorrectOnlyExportStateChanged);
+    connect(showMask, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onShowMaskStateChanged);
+    connect(maskMask, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onMaskMaskStateChanged);
+    connect(opacity, QOverload<int>::of(&QSpinBox::valueChanged), this, &MultiColorMarkerWidget::onOpacityValueChanged);
+    connect(useOpen, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onUseOpenStateChanged);
+    connect(useClose, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onUseCloseStateChanged);
+    connect(
+        closeRadius,
+        QOverload<int>::of(&QSpinBox::valueChanged),
+        this,
+        &MultiColorMarkerWidget::onCloseRadiusValueChanged);
+    connect(
+        openRadius,
+        QOverload<int>::of(&QSpinBox::valueChanged),
+        this,
+        &MultiColorMarkerWidget::onOpenRadiusValueChanged);
+    connect(minArea, QOverload<int>::of(&QSpinBox::valueChanged), this, &MultiColorMarkerWidget::onMinAreaValueChanged);
+    connect(maxArea, QOverload<int>::of(&QSpinBox::valueChanged), this, &MultiColorMarkerWidget::onMaxAreaValueChanged);
+    connect(useHeadSize, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onUseHeadSizeStateChanged);
+    connect(
+        maxRatio,
+        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+        this,
+        &MultiColorMarkerWidget::onMaxRatioValueChanged);
 }
 
 // store data in xml node
@@ -116,130 +157,130 @@ void MultiColorMarkerWidget::getXml(QDomElement &elem)
     }
 }
 
-void MultiColorMarkerWidget::on_useDot_stateChanged(int)
-{
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-    mMainWindow->updateImage();
-}
-
-void MultiColorMarkerWidget::on_dotSize_valueChanged(double)
-{
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
-    mMainWindow->updateImage();
-}
-
-void MultiColorMarkerWidget::on_useCodeMarker_stateChanged(int)
+void MultiColorMarkerWidget::onUseDotStateChanged()
 {
     mMainWindow->setRecognitionChanged(true);
     mMainWindow->updateImage();
 }
 
-void MultiColorMarkerWidget::on_CodeMarkerParameter_clicked()
+void MultiColorMarkerWidget::onDotSizeValueChanged()
+{
+    mMainWindow->setRecognitionChanged(true);
+    mMainWindow->updateImage();
+}
+
+void MultiColorMarkerWidget::onUseCodeMarkerStateChanged()
+{
+    mMainWindow->setRecognitionChanged(true);
+    mMainWindow->updateImage();
+}
+
+void MultiColorMarkerWidget::onCodeMarkerParameterClicked()
 {
     mMainWindow->getCodeMarkerWidget()->show();
 }
 
-void MultiColorMarkerWidget::on_ignoreWithoutDot_stateChanged(int)
+void MultiColorMarkerWidget::onIgnoreWithoutDotStateChanged()
 {
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->setRecognitionChanged(true);
     mMainWindow->updateImage();
 }
 
-void MultiColorMarkerWidget::on_useColor_stateChanged(int) // eigentlich nichts noetig, da nur beim Tracing aktiv
+void MultiColorMarkerWidget::onUseColorStateChanged()
 {
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->setRecognitionChanged(true);
     mMainWindow->updateImage();
 }
 
-void MultiColorMarkerWidget::on_restrictPosition_stateChanged(int)
+void MultiColorMarkerWidget::onRestrictPositionStateChanged()
 {
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->setRecognitionChanged(true);
     mMainWindow->updateImage();
 }
 
-void MultiColorMarkerWidget::on_autoCorrect_stateChanged(int)
+void MultiColorMarkerWidget::onAutoCorrectStateChanged()
 {
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->setRecognitionChanged(true);
     mMainWindow->updateImage();
 }
 
-void MultiColorMarkerWidget::on_autoCorrectOnlyExport_stateChanged(int)
+void MultiColorMarkerWidget::onAutoCorrectOnlyExportStateChanged()
 {
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->setRecognitionChanged(true);
     mMainWindow->updateImage();
 }
 
-void MultiColorMarkerWidget::on_showMask_stateChanged(int i)
+void MultiColorMarkerWidget::onShowMaskStateChanged(int i)
 {
     mMainWindow->getMultiColorMarkerItem()->setVisible(i);
     mMainWindow->getScene()->update();
 }
 
-void MultiColorMarkerWidget::on_maskMask_stateChanged(int)
+void MultiColorMarkerWidget::onMaskMaskStateChanged()
 {
     mMainWindow->getScene()->update();
 }
 
-void MultiColorMarkerWidget::on_opacity_valueChanged(int)
+void MultiColorMarkerWidget::onOpacityValueChanged()
 {
     mMainWindow->getScene()->update();
 }
 
-void MultiColorMarkerWidget::on_useOpen_stateChanged(int)
+void MultiColorMarkerWidget::onUseOpenStateChanged()
 {
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->setRecognitionChanged(true);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
     }
 }
 
-void MultiColorMarkerWidget::on_useClose_stateChanged(int)
+void MultiColorMarkerWidget::onUseCloseStateChanged()
 {
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->setRecognitionChanged(true);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
     }
 }
 
-void MultiColorMarkerWidget::on_closeRadius_valueChanged(int)
+void MultiColorMarkerWidget::onCloseRadiusValueChanged()
 {
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->setRecognitionChanged(true);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
     }
 }
 
-void MultiColorMarkerWidget::on_openRadius_valueChanged(int)
+void MultiColorMarkerWidget::onOpenRadiusValueChanged()
 {
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->setRecognitionChanged(true);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
     }
 }
 
-void MultiColorMarkerWidget::on_minArea_valueChanged(int)
+void MultiColorMarkerWidget::onMinAreaValueChanged()
 {
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->setRecognitionChanged(true);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
     }
 }
 
-void MultiColorMarkerWidget::on_maxArea_valueChanged(int)
+void MultiColorMarkerWidget::onMaxAreaValueChanged()
 {
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->setRecognitionChanged(true);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
     }
 }
 
-void MultiColorMarkerWidget::on_useHeadSize_stateChanged(int i)
+void MultiColorMarkerWidget::onUseHeadSizeStateChanged(int i)
 {
     if(i)
     {
@@ -274,13 +315,13 @@ void MultiColorMarkerWidget::on_useHeadSize_stateChanged(int i)
         maxArea->setValue(mOldMaxArea);
     }
 
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->setRecognitionChanged(true);
     mMainWindow->updateImage();
 }
 
-void MultiColorMarkerWidget::on_maxRatio_valueChanged(double)
+void MultiColorMarkerWidget::onMaxRatioValueChanged()
 {
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->setRecognitionChanged(true);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();

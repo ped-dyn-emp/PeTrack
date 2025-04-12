@@ -119,8 +119,8 @@ private slots:
     void resetSettings();
     void setGlobalFont();
     void showHideControlWidget();
-    void setFPS(double fps);
-    void setSequenceFPS(double fps);
+
+
     void setSequenceFPSDialog();
     void antialias();
     void opengl();
@@ -136,27 +136,19 @@ private slots:
     void setCamera();
 
 public slots:
-    void openXml(QDomDocument &doc, bool openSequence = true);
     void openProject(QString fileName = "", bool openSequence = true);
-    void saveXml(QDomDocument &doc);
     bool saveSameProject();
     bool saveProjectAs();
-    bool saveProject(QString fileName = "");
-    void writeXmlElement(QXmlStreamWriter &xmlStream, QDomElement element);
     void openSequence(QString fileName = "");
     void openCameraLiveStream(int camID = -1);
     void openMoCapFile();
     void editMoCapSettings();
-    void exportSequence(bool saveVideo, bool saveView = false, QString dest = "");
     void exportView(QString dest = "");
     void exportImage(QString dest = "");
     void setStatusPosReal();
     void addManualTrackPointOnlyVisible(const QPointF &pos);
     void splitTrackPerson(QPointF pos);
     int  addOrMoveManualTrackPoint(const QPointF &pos);
-    void editTrackPersonComment(QPointF pos);
-    void setTrackPersonHeight(QPointF pos);
-    void resetTrackPersonHeight(QPointF pos);
     void deleteTrackPoint(QPointF pos, PersonStorage::TrajectorySegment direction);
     void deleteTrackPointAll(PersonStorage::TrajectorySegment direction);
     void deleteTrackPointROI();
@@ -164,12 +156,22 @@ public slots:
     void moveTrackPoint(QPointF pos);
     void selectPersonForMoveTrackPoint(QPointF pos);
     void releaseTrackPoint();
-    void updateSourceInOutFrames();
     void skipToFrameWheel(int delta);
     void skipToFrameFromTrajectory(QPointF pos);
     void scrollShowOnly(int delta);
 
 public:
+    void         openXml(QDomDocument &doc, bool openSequence = true);
+    void         saveXml(QDomDocument &doc);
+    void         writeXmlElement(QXmlStreamWriter &xmlStream, QDomElement element);
+    bool         saveProject(QString fileName = "");
+    void         exportSequence(bool saveVideo, bool saveView = false, QString dest = "");
+    void         editTrackPersonComment(QPointF pos);
+    void         setTrackPersonHeight(QPointF pos);
+    void         resetTrackPersonHeight(QPointF pos);
+    void         updateSourceInOutFrames();
+    void         setFPS(double fps);
+    void         setSequenceFPS(double fps);
     void         updateControlWidget();
     void         dragEnterEvent(QDragEnterEvent *event);
     void         dropEvent(QDropEvent *event);

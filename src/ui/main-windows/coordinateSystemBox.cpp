@@ -87,6 +87,50 @@ CoordinateSystemBox::CoordinateSystemBox(
     mPose2D.unit        = mUi->coordUnit->value();
     mPose2D.position[0] = mUi->coordTransX->value();
     mPose2D.position[1] = mUi->coordTransY->value();
+
+    connect(mUi->coordTab, &QTabWidget::currentChanged, this, &CoordinateSystemBox::onCoordTabCurrentChanged);
+    connect(mUi->coordShow, &QCheckBox::stateChanged, this, &CoordinateSystemBox::onCoordShowStateChanged);
+    connect(mUi->coordFix, &QCheckBox::stateChanged, this, &CoordinateSystemBox::onCoordFixStateChanged);
+
+    // 2D coordinates
+    connect(mUi->coordRotate, &PSlider::valueChanged, this, &CoordinateSystemBox::onCoordRotateValueChanged);
+    connect(mUi->coordTransX, &PSlider::valueChanged, this, &CoordinateSystemBox::onCoordTransXValueChanged);
+    connect(mUi->coordTransY, &PSlider::valueChanged, this, &CoordinateSystemBox::onCoordTransYValueChanged);
+    connect(mUi->coordScale, &PSlider::valueChanged, this, &CoordinateSystemBox::onCoordScaleValueChanged);
+    connect(
+        mUi->coordAltitude,
+        QOverload<double>::of(&PDoubleSpinBox::valueChanged),
+        this,
+        &CoordinateSystemBox::onCoordAltitudeValueChanged);
+    connect(
+        mUi->coordUnit,
+        QOverload<double>::of(&PDoubleSpinBox::valueChanged),
+        this,
+        &CoordinateSystemBox::onCoordUnitValueChanged);
+    connect(
+        mUi->coordUseIntrinsic, &QCheckBox::stateChanged, this, &CoordinateSystemBox::onCoordUseIntrinsicStateChanged);
+
+    // 3D coordinates
+    connect(mUi->coord3DTransX, &PSlider::valueChanged, this, &CoordinateSystemBox::onCoord3DTransXValueChanged);
+    connect(mUi->coord3DTransY, &PSlider::valueChanged, this, &CoordinateSystemBox::onCoord3DTransYValueChanged);
+    connect(mUi->coord3DTransZ, &PSlider::valueChanged, this, &CoordinateSystemBox::onCoord3DTransZValueChanged);
+    connect(mUi->coord3DAxeLen, &PSlider::valueChanged, this, &CoordinateSystemBox::onCoord3DAxeLenValueChanged);
+
+    connect(mUi->coord3DSwapX, &QCheckBox::stateChanged, this, &CoordinateSystemBox::onCoord3DSwapXStateChanged);
+    connect(mUi->coord3DSwapY, &QCheckBox::stateChanged, this, &CoordinateSystemBox::onCoord3DSwapYStateChanged);
+    connect(mUi->coord3DSwapZ, &QCheckBox::stateChanged, this, &CoordinateSystemBox::onCoord3DSwapZStateChanged);
+
+    // Extrinsic calibration display
+    connect(
+        mUi->extCalibPointsShow,
+        &QCheckBox::stateChanged,
+        this,
+        &CoordinateSystemBox::onExtCalibPointsShowStateChanged);
+    connect(
+        mUi->extVanishPointsShow,
+        &QCheckBox::stateChanged,
+        this,
+        &CoordinateSystemBox::onExtVanishPointsShowStateChanged);
 }
 
 CoordinateSystemBox::~CoordinateSystemBox()
@@ -578,7 +622,7 @@ CoordItemState CoordinateSystemBox::getCoordItemState()
     return state;
 }
 
-void CoordinateSystemBox::on_coordTab_currentChanged(int index)
+void CoordinateSystemBox::onCoordTabCurrentChanged(int index)
 {
     if(index == 1)
     {
@@ -591,38 +635,37 @@ void CoordinateSystemBox::on_coordTab_currentChanged(int index)
     updateCoordItem();
 }
 
-void CoordinateSystemBox::on_coordShow_stateChanged(int /*i*/)
+void CoordinateSystemBox::onCoordShowStateChanged()
 {
     updateCoordItem();
-    setMeasuredAltitude(); // da measured nicht aktualisiert wird, waehrend scale verschoben und show
-                           // deaktiviert und beim aktivieren sonst ein falscher wert zum angezeigten koord
-                           // waere
+    setMeasuredAltitude(); // measured isn't updated, when scale is moved and show deactivated
+                           // and would have lead to a false value in the coord system when activating
 }
 
-void CoordinateSystemBox::on_coordFix_stateChanged(int /*i*/)
+void CoordinateSystemBox::onCoordFixStateChanged()
 {
     updateCoordItem();
 }
 
-void CoordinateSystemBox::on_coordRotate_valueChanged(int newAngle)
+void CoordinateSystemBox::onCoordRotateValueChanged(int newAngle)
 {
     mPose2D.angle = newAngle;
     updateCoordItem();
 }
 
-void CoordinateSystemBox::on_coordTransX_valueChanged(int newX)
+void CoordinateSystemBox::onCoordTransXValueChanged(int newX)
 {
     mPose2D.position[0] = newX;
     updateCoordItem();
 }
 
-void CoordinateSystemBox::on_coordTransY_valueChanged(int newY)
+void CoordinateSystemBox::onCoordTransYValueChanged(int newY)
 {
     mPose2D.position[1] = newY;
     updateCoordItem();
 }
 
-void CoordinateSystemBox::on_coordScale_valueChanged(int newScale)
+void CoordinateSystemBox::onCoordScaleValueChanged(int newScale)
 {
     mPose2D.scale = newScale;
     setMeasuredAltitude();
@@ -630,13 +673,13 @@ void CoordinateSystemBox::on_coordScale_valueChanged(int newScale)
     updateCoordItem();
 }
 
-void CoordinateSystemBox::on_coordAltitude_valueChanged(double /*d*/)
+void CoordinateSystemBox::onCoordAltitudeValueChanged()
 {
     mUpdateHeadSize();
     updateCoordItem();
 }
 
-void CoordinateSystemBox::on_coordUnit_valueChanged(double newUnit)
+void CoordinateSystemBox::onCoordUnitValueChanged(double newUnit)
 {
     mPose2D.unit = newUnit;
     setMeasuredAltitude();
@@ -644,47 +687,47 @@ void CoordinateSystemBox::on_coordUnit_valueChanged(double newUnit)
     updateCoordItem();
 }
 
-void CoordinateSystemBox::on_coordUseIntrinsic_stateChanged(int /*i*/)
+void CoordinateSystemBox::onCoordUseIntrinsicStateChanged()
 {
     mUpdateStatusPos();
 }
 
-void CoordinateSystemBox::on_coord3DTransX_valueChanged(int newX)
+void CoordinateSystemBox::onCoord3DTransXValueChanged(int newX)
 {
     mPose3D.position[0] = newX;
     updateCoordItem();
 }
 
-void CoordinateSystemBox::on_coord3DTransY_valueChanged(int newY)
+void CoordinateSystemBox::onCoord3DTransYValueChanged(int newY)
 {
     mPose3D.position[1] = newY;
     updateCoordItem();
 }
 
-void CoordinateSystemBox::on_coord3DTransZ_valueChanged(int newZ)
+void CoordinateSystemBox::onCoord3DTransZValueChanged(int newZ)
 {
     mPose3D.position[2] = newZ;
     updateCoordItem();
 }
 
-void CoordinateSystemBox::on_coord3DAxeLen_valueChanged(int /*value*/)
+void CoordinateSystemBox::onCoord3DAxeLenValueChanged()
 {
     updateCoordItem();
 }
 
-void CoordinateSystemBox::on_coord3DSwapX_stateChanged(int newSwap)
+void CoordinateSystemBox::onCoord3DSwapXStateChanged(int newSwap)
 {
     mPose3D.swap.x = newSwap == Qt::Checked;
     updateCoordItem();
 }
 
-void CoordinateSystemBox::on_coord3DSwapY_stateChanged(int newSwap)
+void CoordinateSystemBox::onCoord3DSwapYStateChanged(int newSwap)
 {
     mPose3D.swap.y = newSwap == Qt::Checked;
     updateCoordItem();
 }
 
-void CoordinateSystemBox::on_coord3DSwapZ_stateChanged(int newSwap)
+void CoordinateSystemBox::onCoord3DSwapZStateChanged(int newSwap)
 {
     mPose3D.swap.z = newSwap == Qt::Checked;
     updateCoordItem();
@@ -698,13 +741,13 @@ void CoordinateSystemBox::setMeasuredAltitude()
     mUi->coordAltitudeMeasured->setText(QString("(measured: %1)").arg((fx + fy) / 2. * getCmPerPixel(), 6, 'f', 1));
 }
 
-void CoordinateSystemBox::on_extCalibPointsShow_stateChanged(int /*arg1*/)
+void CoordinateSystemBox::onExtCalibPointsShowStateChanged()
 {
     updateCoordItem();
 }
 
 
-void CoordinateSystemBox::on_extVanishPointsShow_stateChanged(int /*arg1*/)
+void CoordinateSystemBox::onExtVanishPointsShowStateChanged()
 {
     updateCoordItem();
 }

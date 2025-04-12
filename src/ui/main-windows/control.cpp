@@ -104,20 +104,17 @@ Control::Control(
 
     // Observers for moCapShow, moCapSize and moCapColor in moCapController;
     // updates UI value when changed.
-    QObject::connect(
-        &mMainWindow->getMoCapController(), &MoCapController::showMoCapChanged, this, &Control::setMoCapShow);
-    QObject::connect(
-        &mMainWindow->getMoCapController(), &MoCapController::thicknessChanged, this, &Control::setMoCapSize);
-    QObject::connect(&mMainWindow->getMoCapController(), &MoCapController::colorChanged, this, &Control::setMoCapColor);
+    connect(&mMainWindow->getMoCapController(), &MoCapController::showMoCapChanged, this, &Control::setMoCapShow);
+    connect(&mMainWindow->getMoCapController(), &MoCapController::thicknessChanged, this, &Control::setMoCapSize);
+    connect(&mMainWindow->getMoCapController(), &MoCapController::colorChanged, this, &Control::setMoCapColor);
     // Pulls all observable attributes
     mMainWindow->getMoCapController().notifyAllObserver();
 
     mUi->missingFramesCalculated->setAttribute(Qt::WA_TransparentForMouseEvents);
     mUi->missingFramesCalculated->setFocusPolicy(Qt::NoFocus);
 
-    QObject::connect(mUi->missingFramesReset, &QPushButton::clicked, &missingFrames, &MissingFrames::reset);
-    QObject::connect(
-        &missingFrames, &MissingFrames::executeChanged, mUi->missingFramesCalculated, &QCheckBox::setChecked);
+    connect(mUi->missingFramesReset, &QPushButton::clicked, &missingFrames, &MissingFrames::reset);
+    connect(&missingFrames, &MissingFrames::executeChanged, mUi->missingFramesCalculated, &QCheckBox::setChecked);
 
     // layout reparents widget
     auto *filterBeforePBox = new PGroupBox(this, "filter before", mFilterBefore);
@@ -160,7 +157,7 @@ Control::Control(
     QWidget::setTabOrder(mCoordSys, mGrid);
 
     connect(mExtr, &ExtrinsicBox::extrinsicChanged, mCoordSys, &CoordinateSystemBox::updateCoordItem);
-    connect(mIntr, &IntrinsicBox::paramsChanged, this, &Control::on_intrinsicParamsChanged);
+    connect(mIntr, &IntrinsicBox::paramsChanged, this, &Control::onIntrinsicParamsChanged);
     connect(
         mExtr,
         &ExtrinsicBox::enabledChanged,
@@ -206,7 +203,7 @@ Control::Control(
 
     mColorChanging = false;
 
-    on_recoColorModel_currentIndexChanged(0);
+    onRecoColorModelCurrentIndexChanged(0);
 
     // damit eine rectMap vorliegt, die angezeigt werden kann
     mUi->colorPlot->getMapItem()->addMap();
@@ -230,6 +227,7 @@ Control::Control(
 
     connect(&recognizer, &reco::Recognizer::mlMethodChanged, this, &Control::onMlMethodChanged);
     connect(this, &Control::userChangedMlMethod, &recognizer, &reco::Recognizer::userChangedMlMethod);
+
     mUi->mlMethod->addItem("YOLOv5", QVariant::fromValue(reco::MlMethod::YOLOv5));
     mUi->mlMethod->addItem("YOLOv8-11", QVariant::fromValue(reco::MlMethod::YOLOv8));
     mUi->mlMethod->setCurrentIndex(mUi->mlMethod->findData(QVariant::fromValue(recognizer.getMlMethod())));
@@ -274,6 +272,180 @@ Control::Control(
         this,
         [&recoRoiItem, &trackRoiItem]() { trackRoiItem.adjustToOtherROI(recoRoiItem, std::plus<>()); });
 
+    connect(mUi->roiFix, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
+    connect(mUi->roiShow, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
+    connect(mUi->trackRoiFix, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
+    connect(mUi->trackRoiShow, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
+    connect(
+        mUi->recoMethod,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        &Control::onRecoMethodCurrentIndexChanged);
+    connect(
+        mUi->mlMethod,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        &Control::onMlMethodCurrentIndexChanged);
+    connect(mUi->anaCalculate, &QPushButton::clicked, this, &Control::onAnaCalculateClicked);
+    connect(mUi->anaStep, QOverload<int>::of(&PSpinBox::valueChanged), this, &Control::onAnaStepValueChanged);
+    connect(mUi->anaMarkAct, &QCheckBox::stateChanged, this, &Control::onAnaMarkActStateChanged);
+    connect(mUi->anaConsiderX, &QCheckBox::stateChanged, this, &Control::onAnaConsiderXStateChanged);
+    connect(mUi->anaConsiderY, &QCheckBox::stateChanged, this, &Control::onAnaConsiderYStateChanged);
+    connect(mUi->anaConsiderAbs, &QCheckBox::stateChanged, this, &Control::onAnaConsiderAbsStateChanged);
+    connect(mUi->anaConsiderRev, &QCheckBox::stateChanged, this, &Control::onAnaConsiderRevStateChanged);
+    connect(mUi->showVoronoiCells, &QCheckBox::stateChanged, this, &Control::onShowVoronoiCellsStateChanged);
+    connect(mUi->trackShow, &QCheckBox::stateChanged, this, &Control::onTrackShowStateChanged);
+    connect(mUi->trackOnlineCalc, &QCheckBox::stateChanged, this, &Control::onTrackOnlineCalcStateChanged);
+    connect(mUi->trackCalc, &QPushButton::clicked, this, &Control::onTrackCalcClicked);
+    connect(mUi->trackReset, &QPushButton::clicked, this, &Control::onTrackResetClicked);
+    connect(mUi->trackExport, &QPushButton::clicked, this, &Control::onTrackExportClicked);
+    connect(mUi->trackImport, &QPushButton::clicked, this, &Control::onTrackImportClicked);
+    connect(mUi->trackPathColorButton, &QPushButton::clicked, this, &Control::onTrackPathColorButtonClicked);
+    connect(
+        mUi->trackGroundPathColorButton, &QPushButton::clicked, this, &Control::onTrackGroundPathColorButtonClicked);
+    connect(mUi->moCapColorButton, &QPushButton::clicked, this, &Control::onMoCapColorButtonClicked);
+    connect(mUi->trackRegionScale, &PSlider::valueChanged, this, &Control::onTrackRegionScaleValueChanged);
+    connect(mUi->trackRegionLevels, &PSlider::valueChanged, this, &Control::onTrackRegionLevelsValueChanged);
+    connect(mUi->trackShowSearchSize, &QCheckBox::stateChanged, this, &Control::onTrackShowSearchSizeStateChanged);
+    connect(mUi->trackShowOnly, &QCheckBox::stateChanged, this, &Control::onTrackShowOnlyStateChanged);
+    connect(mUi->trackShowOnlyList, &QCheckBox::stateChanged, this, &Control::onTrackShowOnlyListStateChanged);
+    connect(
+        mUi->trackShowOnlyNr,
+        QOverload<int>::of(&PSpinBox::valueChanged),
+        this,
+        &Control::onTrackShowOnlyNrValueChanged);
+    connect(mUi->trackShowOnlyNrList, &QLineEdit::textChanged, this, &Control::onTrackShowOnlyNrListTextChanged);
+    connect(mUi->trackShowOnlyListButton, &QPushButton::clicked, this, &Control::onTrackShowOnlyListButtonClicked);
+    connect(mUi->trackShowOnlyVisible, &QCheckBox::stateChanged, this, &Control::onTrackShowOnlyVisibleStateChanged);
+    connect(mUi->trackGotoNr, &QPushButton::clicked, this, &Control::onTrackGotoNrClicked);
+    connect(mUi->trackGotoStartNr, &QPushButton::clicked, this, &Control::onTrackGotoStartNrClicked);
+    connect(mUi->trackGotoEndNr, &QPushButton::clicked, this, &Control::onTrackGotoEndNrClicked);
+    connect(mUi->trackHeadSized, &QCheckBox::stateChanged, this, &Control::onTrackHeadSizedStateChanged);
+    connect(mUi->showMoCap, &QCheckBox::stateChanged, this, &Control::onShowMoCapStateChanged);
+    connect(mUi->moCapSize, QOverload<int>::of(&PSpinBox::valueChanged), this, &Control::onMoCapSizeValueChanged);
+    connect(mUi->trackShowCurrentPoint, &QCheckBox::stateChanged, this, &Control::onTrackShowCurrentPointStateChanged);
+    connect(mUi->trackShowPoints, &QCheckBox::stateChanged, this, &Control::onTrackShowPointsStateChanged);
+    connect(
+        mUi->trackShowPointsColored, &QCheckBox::stateChanged, this, &Control::onTrackShowPointsColoredStateChanged);
+    connect(mUi->trackShowPath, &QCheckBox::stateChanged, this, &Control::onTrackShowPathStateChanged);
+    connect(mUi->trackShowColColor, &QCheckBox::stateChanged, this, &Control::onTrackShowColColorStateChanged);
+    connect(mUi->trackShowColorMarker, &QCheckBox::stateChanged, this, &Control::onTrackShowColorMarkerStateChanged);
+    connect(mUi->trackShowNumber, &QCheckBox::stateChanged, this, &Control::onTrackShowNumberStateChanged);
+    connect(
+        mUi->trackShowGroundPosition, &QCheckBox::stateChanged, this, &Control::onTrackShowGroundPositionStateChanged);
+    connect(mUi->trackShowGroundPath, &QCheckBox::stateChanged, this, &Control::onTrackShowGroundPathStateChanged);
+    connect(
+        mUi->trackShowHeightIndividual,
+        &QCheckBox::stateChanged,
+        this,
+        &Control::onTrackShowHeightIndividualStateChanged);
+    connect(mUi->trackNumberBold, &QCheckBox::stateChanged, this, &Control::onTrackNumberBoldStateChanged);
+    connect(
+        mUi->trackCurrentPointSize,
+        QOverload<int>::of(&PSpinBox::valueChanged),
+        this,
+        &Control::onTrackCurrentPointSizeValueChanged);
+    connect(
+        mUi->trackCurrentPointLineWidth,
+        QOverload<int>::of(&PSpinBox::valueChanged),
+        this,
+        &Control::onTrackCurrentPointLineWidthValueChanged);
+    connect(
+        mUi->trackPointSize, QOverload<int>::of(&PSpinBox::valueChanged), this, &Control::onTrackPointSizeValueChanged);
+    connect(
+        mUi->trackShowPointsLineWidth,
+        QOverload<int>::of(&PSpinBox::valueChanged),
+        this,
+        &Control::onTrackShowPointsLineWidthValueChanged);
+    connect(
+        mUi->trackPathWidth, QOverload<int>::of(&PSpinBox::valueChanged), this, &Control::onTrackPathWidthValueChanged);
+    connect(
+        mUi->trackColColorSize,
+        QOverload<int>::of(&PSpinBox::valueChanged),
+        this,
+        &Control::onTrackColColorSizeValueChanged);
+    connect(
+        mUi->trackColorMarkerSize,
+        QOverload<int>::of(&PSpinBox::valueChanged),
+        this,
+        &Control::onTrackColorMarkerSizeValueChanged);
+    connect(
+        mUi->trackColorMarkerLineWidth,
+        QOverload<int>::of(&PSpinBox::valueChanged),
+        this,
+        &Control::onTrackColorMarkerLineWidthValueChanged);
+    connect(
+        mUi->trackNumberSize,
+        QOverload<int>::of(&PSpinBox::valueChanged),
+        this,
+        &Control::onTrackNumberSizeValueChanged);
+    connect(
+        mUi->trackGroundPositionSize,
+        QOverload<int>::of(&PSpinBox::valueChanged),
+        this,
+        &Control::onTrackGroundPositionSizeValueChanged);
+    connect(
+        mUi->trackGroundPathSize,
+        QOverload<int>::of(&PSpinBox::valueChanged),
+        this,
+        &Control::onTrackGroundPathSizeValueChanged);
+    connect(
+        mUi->trackShowBefore,
+        QOverload<int>::of(&PSpinBox::valueChanged),
+        this,
+        &Control::onTrackShowBeforeValueChanged);
+    connect(
+        mUi->trackShowAfter, QOverload<int>::of(&PSpinBox::valueChanged), this, &Control::onTrackShowAfterValueChanged);
+    connect(mUi->recoShowColor, &QCheckBox::stateChanged, this, &Control::onRecoShowColorStateChanged);
+    connect(mUi->recoOptimizeColor, &QPushButton::clicked, this, &Control::onRecoOptimizeColorClicked);
+    connect(
+        mUi->recoColorModel,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        &Control::onRecoColorModelCurrentIndexChanged);
+    connect(
+        mUi->recoColorX,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        &Control::onRecoColorXCurrentIndexChanged);
+    connect(
+        mUi->recoColorY,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        &Control::onRecoColorYCurrentIndexChanged);
+    connect(mUi->recoColorZ, &PSlider::valueChanged, this, &Control::onRecoColorZValueChanged);
+    connect(mUi->recoGreyLevel, &PSlider::valueChanged, this, &Control::onRecoGreyLevelValueChanged);
+    connect(mUi->recoSymbolSize, &PSlider::valueChanged, this, &Control::onRecoSymbolSizeValueChanged);
+    connect(mUi->recoStereoShow, &QPushButton::clicked, this, &Control::onRecoStereoShowClicked);
+    connect(mUi->mapColorRange, &QPushButton::clicked, this, &Control::onMapColorRangeClicked);
+    connect(mUi->colorPickerButton, &QPushButton::clicked, this, &Control::onColorPickerButtonClicked);
+    connect(mUi->mapReadHeights, &QPushButton::clicked, this, &Control::onMapReadHeightsClicked);
+    connect(mUi->mapReadMarkerID, &QPushButton::clicked, this, &Control::onMapReadMarkerIDClicked);
+    connect(mUi->mapNr, QOverload<int>::of(&PSpinBox::valueChanged), this, &Control::onMapNrValueChanged);
+    connect(mUi->mapX, &PSlider::valueChanged, this, &Control::onMapXValueChanged);
+    connect(mUi->mapY, &PSlider::valueChanged, this, &Control::onMapYValueChanged);
+    connect(mUi->mapW, &PSlider::valueChanged, this, &Control::onMapWValueChanged);
+    connect(mUi->mapH, &PSlider::valueChanged, this, &Control::onMapHValueChanged);
+    connect(mUi->mapColor, &QCheckBox::stateChanged, this, &Control::onMapColorStateChanged);
+    connect(
+        mUi->mapHeight, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &Control::onMapHeightValueChanged);
+    connect(mUi->mapHeight, &PDoubleSpinBox::editingFinished, this, &Control::onMapHeightEditingFinished);
+    connect(mUi->mapAdd, &QPushButton::clicked, this, &Control::onMapAddClicked);
+    connect(mUi->mapDel, &QPushButton::clicked, this, &Control::onMapDelClicked);
+    connect(mUi->mapDistribution, &QPushButton::clicked, this, &Control::onMapDistributionClicked);
+    connect(mUi->mapResetHeight, &QPushButton::clicked, this, &Control::onMapResetHeightClicked);
+    connect(mUi->mapResetPos, &QPushButton::clicked, this, &Control::onMapResetPosClicked);
+    connect(
+        mUi->mapDefaultHeight,
+        QOverload<double>::of(&PDoubleSpinBox::valueChanged),
+        this,
+        &Control::onMapDefaultHeightValueChanged);
+    connect(mUi->performRecognition, &QCheckBox::stateChanged, this, &Control::onPerformRecognitionStateChanged);
+    connect(mUi->markerBrightness, &PSlider::valueChanged, this, &Control::onMarkerBrightnessValueChanged);
+    connect(mUi->markerIgnoreWithout, &QCheckBox::stateChanged, this, &Control::onMarkerIgnoreWithoutStateChanged);
+    // ROI connections
+    connect(mUi->roiShow, &QCheckBox::stateChanged, this, &Control::onRoiShowStateChanged);
+    connect(mUi->trackRoiShow, &QCheckBox::stateChanged, this, &Control::onTrackRoiShowStateChanged);
     connect(mUi->roiFix, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
     connect(mUi->roiShow, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
     connect(mUi->trackRoiFix, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
@@ -825,7 +997,7 @@ int Control::getCalibCoordScale()
 }
 
 //-------------------- analysis
-void Control::on_anaCalculate_clicked()
+void Control::onAnaCalculateClicked()
 {
     mMainWindow->calculateRealTracker();
     mUi->analysePlot->setScale();
@@ -835,7 +1007,7 @@ void Control::on_anaCalculate_clicked()
     }
 }
 
-void Control::on_anaStep_valueChanged(int /*i*/)
+void Control::onAnaStepValueChanged()
 {
     if(!isLoading())
     {
@@ -843,7 +1015,7 @@ void Control::on_anaStep_valueChanged(int /*i*/)
     }
 }
 
-void Control::on_anaMarkAct_stateChanged(int /*i*/)
+void Control::onAnaMarkActStateChanged()
 {
     if(!isLoading())
     {
@@ -851,7 +1023,7 @@ void Control::on_anaMarkAct_stateChanged(int /*i*/)
     }
 }
 
-void Control::on_anaConsiderX_stateChanged(int i)
+void Control::onAnaConsiderXStateChanged(int i)
 {
     if((i == Qt::Checked) && (mUi->anaConsiderY->isChecked()))
     {
@@ -876,7 +1048,7 @@ void Control::on_anaConsiderX_stateChanged(int i)
     }
 }
 
-void Control::on_anaConsiderY_stateChanged(int i)
+void Control::onAnaConsiderYStateChanged(int i)
 {
     if((i == Qt::Checked) && (mUi->anaConsiderX->isChecked()))
     {
@@ -901,7 +1073,7 @@ void Control::on_anaConsiderY_stateChanged(int i)
     }
 }
 
-void Control::on_anaConsiderAbs_stateChanged(int /*i*/)
+void Control::onAnaConsiderAbsStateChanged()
 {
     if(!isLoading())
     {
@@ -909,7 +1081,7 @@ void Control::on_anaConsiderAbs_stateChanged(int /*i*/)
     }
 }
 
-void Control::on_anaConsiderRev_stateChanged(int /*i*/)
+void Control::onAnaConsiderRevStateChanged()
 {
     if(!isLoading())
     {
@@ -917,7 +1089,7 @@ void Control::on_anaConsiderRev_stateChanged(int /*i*/)
     }
 }
 
-void Control::on_showVoronoiCells_stateChanged(int /*arg1*/)
+void Control::onShowVoronoiCellsStateChanged()
 {
     if(!isLoading())
     {
@@ -926,7 +1098,7 @@ void Control::on_showVoronoiCells_stateChanged(int /*arg1*/)
 }
 
 //------------------- tracking
-void Control::on_trackShow_stateChanged(int i)
+void Control::onTrackShowStateChanged(int i)
 {
     if(i == Qt::Checked)
     {
@@ -938,7 +1110,7 @@ void Control::on_trackShow_stateChanged(int i)
     }
 }
 
-void Control::on_trackOnlineCalc_stateChanged(int i)
+void Control::onTrackOnlineCalcStateChanged(int i)
 {
     if(i == Qt::Checked)
     {
@@ -951,12 +1123,12 @@ void Control::on_trackOnlineCalc_stateChanged(int i)
     }
 }
 
-void Control::on_trackCalc_clicked()
+void Control::onTrackCalcClicked()
 {
     mMainWindow->trackAll();
 }
 
-void Control::on_trackReset_clicked()
+void Control::onTrackResetClicked()
 {
     if(mMainWindow->getImage())
     {
@@ -973,17 +1145,17 @@ void Control::on_trackReset_clicked()
     }
 }
 
-void Control::on_trackExport_clicked()
+void Control::onTrackExportClicked()
 {
     mMainWindow->exportTracker();
 }
 
-void Control::on_trackImport_clicked()
+void Control::onTrackImportClicked()
 {
     mMainWindow->importTracker();
 }
 
-void Control::on_trackPathColorButton_clicked()
+void Control::onTrackPathColorButtonClicked()
 {
     QColor col = QColorDialog::getColor(getTrackPathColor(), this);
     if(col.isValid())
@@ -996,7 +1168,7 @@ void Control::on_trackPathColorButton_clicked()
     }
 }
 
-void Control::on_trackGroundPathColorButton_clicked()
+void Control::onTrackGroundPathColorButtonClicked()
 {
     QColor col = QColorDialog::getColor(getTrackGroundPathColor(), this);
     if(col.isValid())
@@ -1009,7 +1181,7 @@ void Control::on_trackGroundPathColorButton_clicked()
     }
 }
 
-void Control::on_moCapColorButton_clicked()
+void Control::onMoCapColorButtonClicked()
 {
     QColor col = QColorDialog::getColor(getMoCapColor(), this);
     if(col.isValid())
@@ -1023,7 +1195,7 @@ void Control::on_moCapColorButton_clicked()
     }
 }
 
-void Control::on_trackRegionScale_valueChanged(int /*i*/)
+void Control::onTrackRegionScaleValueChanged()
 {
     mMainWindow->setTrackChanged(true);
     mMainWindow->getTracker()->reset();
@@ -1033,7 +1205,7 @@ void Control::on_trackRegionScale_valueChanged(int /*i*/)
     }
 }
 
-void Control::on_trackRegionLevels_valueChanged(int /*i*/)
+void Control::onTrackRegionLevelsValueChanged()
 {
     mMainWindow->setTrackChanged(true);
     mMainWindow->getTracker()->reset();
@@ -1043,12 +1215,12 @@ void Control::on_trackRegionLevels_valueChanged(int /*i*/)
     }
 }
 
-void Control::on_trackShowSearchSize_stateChanged(int /*i*/)
+void Control::onTrackShowSearchSizeStateChanged()
 {
     mScene->update();
 }
 
-void Control::on_trackShowOnly_stateChanged(int i)
+void Control::onTrackShowOnlyStateChanged(int i)
 {
     if(i > 0 && mUi->trackShowOnlyList->checkState() == Qt::Checked)
     {
@@ -1061,7 +1233,7 @@ void Control::on_trackShowOnly_stateChanged(int i)
     }
 }
 
-void Control::on_trackShowOnlyList_stateChanged(int i)
+void Control::onTrackShowOnlyListStateChanged(int i)
 {
     if(i > 0 && mUi->trackShowOnly->checkState() == Qt::Checked)
     {
@@ -1077,23 +1249,17 @@ void Control::on_trackShowOnlyList_stateChanged(int i)
     }
 }
 
-void Control::on_trackShowOnlyNr_valueChanged(int /*i*/)
+void Control::onTrackShowOnlyNrValueChanged()
 {
-    if(!mMainWindow->isLoading())
-    {
-        mScene->update();
-    }
+    updateUi();
 }
 
-void Control::on_trackShowOnlyNrList_textChanged(const QString & /*arg1*/)
+void Control::onTrackShowOnlyNrListTextChanged()
 {
-    if(!mMainWindow->isLoading())
-    {
-        mScene->update();
-    }
+    updateUi();
 }
 
-void Control::on_trackGotoNr_clicked()
+void Control::onTrackGotoNrClicked()
 {
     if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= mUi->trackShowOnlyNr->value())
     {
@@ -1104,7 +1270,7 @@ void Control::on_trackGotoNr_clicked()
     }
 }
 
-void Control::on_trackGotoStartNr_clicked()
+void Control::onTrackGotoStartNrClicked()
 {
     if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= mUi->trackShowOnlyNr->value())
     {
@@ -1113,7 +1279,7 @@ void Control::on_trackGotoStartNr_clicked()
     }
 }
 
-void Control::on_trackGotoEndNr_clicked()
+void Control::onTrackGotoEndNrClicked()
 {
     if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= mUi->trackShowOnlyNr->value())
     {
@@ -1122,7 +1288,7 @@ void Control::on_trackGotoEndNr_clicked()
     }
 }
 
-void Control::on_trackShowOnlyListButton_clicked()
+void Control::onTrackShowOnlyListButtonClicked()
 {
     QMessageBox nrListBox(mMainWindow);
 
@@ -1200,7 +1366,7 @@ void Control::on_trackShowOnlyListButton_clicked()
     }
 }
 
-void Control::on_trackHeadSized_stateChanged(int i)
+void Control::onTrackHeadSizedStateChanged(int i)
 {
     static int oldHeadSize = 60;
     if(i == Qt::Checked)
@@ -1217,20 +1383,20 @@ void Control::on_trackHeadSized_stateChanged(int i)
     mScene->update();
 }
 
-void Control::on_showMoCap_stateChanged(int i)
+void Control::onShowMoCapStateChanged(int i)
 {
     mMainWindow->getMoCapController().setShowMoCap(i == Qt::Checked);
     mScene->update();
 }
 
-void Control::on_moCapSize_valueChanged(int i)
+void Control::onMoCapSizeValueChanged(int i)
 {
     mMainWindow->getMoCapController().setThickness(i);
     mScene->update();
 }
 
 //------------------- recognition
-void Control::on_recoShowColor_stateChanged(int i)
+void Control::onRecoShowColorStateChanged(int i)
 {
     mUi->colorPlot->getTrackerItem()->setVisible(i == Qt::Checked);
     if(!isLoading())
@@ -1239,14 +1405,14 @@ void Control::on_recoShowColor_stateChanged(int i)
     }
 }
 
-void Control::on_recoOptimizeColor_clicked()
+void Control::onRecoOptimizeColorClicked()
 {
     mMainWindow->getPersonStorage().optimizeColor();
     replotColorplot();
     mScene->update(); // damit mgl angezeige farbpunkte geaendert/weggenommen werden
 }
 
-void Control::on_recoColorModel_currentIndexChanged(int index)
+void Control::onRecoColorModelCurrentIndexChanged(int index)
 {
     static int xHsvIndex = 0; // H
     static int yHsvIndex = 1; // S
@@ -1304,7 +1470,7 @@ void Control::on_recoColorModel_currentIndexChanged(int index)
     }
 }
 
-void Control::on_recoColorX_currentIndexChanged(int /*index*/)
+void Control::onRecoColorXCurrentIndexChanged()
 {
     if(mColorChanging == false)
     {
@@ -1318,7 +1484,7 @@ void Control::on_recoColorX_currentIndexChanged(int /*index*/)
     // TODO schoen waere hier das gegenstueck bei y zu disablen, aber combobox bietet dies nicht auf einfachem weg
 }
 
-void Control::on_recoColorY_currentIndexChanged(int /*index*/)
+void Control::onRecoColorYCurrentIndexChanged()
 {
     if(mColorChanging == false)
     {
@@ -1331,7 +1497,7 @@ void Control::on_recoColorY_currentIndexChanged(int /*index*/)
     }
 }
 
-void Control::on_recoColorZ_valueChanged(int /*index*/)
+void Control::onRecoColorZValueChanged()
 {
     if(mColorChanging == false)
     {
@@ -1343,7 +1509,7 @@ void Control::on_recoColorZ_valueChanged(int /*index*/)
     }
 }
 
-void Control::on_recoGreyLevel_valueChanged(int index)
+void Control::onRecoGreyLevelValueChanged(int index)
 {
     mUi->colorPlot->setGreyDiff(index);
     if(!isLoading())
@@ -1352,7 +1518,7 @@ void Control::on_recoGreyLevel_valueChanged(int index)
     }
 }
 
-void Control::on_recoSymbolSize_valueChanged(int index)
+void Control::onRecoSymbolSizeValueChanged(int index)
 {
     mUi->colorPlot->setSymbolSize(index);
     if(!isLoading())
@@ -1360,7 +1526,7 @@ void Control::on_recoSymbolSize_valueChanged(int index)
         replotColorplot();
     }
 }
-void Control::on_recoStereoShow_clicked()
+void Control::onRecoStereoShowClicked()
 {
     auto selectedRecognitionMethod = getRecoMethod();
     if(selectedRecognitionMethod == reco::RecognitionMethod::MultiColor)
@@ -1385,12 +1551,12 @@ void Control::on_recoStereoShow_clicked()
     }
 }
 
-void Control::on_mapColorRange_clicked()
+void Control::onMapColorRangeClicked()
 {
     mMainWindow->getColorRangeWidget()->show();
 }
 
-void Control::on_mapNr_valueChanged(int i)
+void Control::onMapNrValueChanged(int i)
 {
     RectMap map = mUi->colorPlot->getMapItem()->getMap(i);
 
@@ -1419,7 +1585,7 @@ void Control::on_mapNr_valueChanged(int i)
     }
 }
 
-void Control::on_mapX_valueChanged(int /*i*/)
+void Control::onMapXValueChanged()
 {
     mUi->colorPlot->getMapItem()->changeMap(
         mUi->mapNr->value(),
@@ -1434,7 +1600,7 @@ void Control::on_mapX_valueChanged(int /*i*/)
         replotColorplot();
     }
 }
-void Control::on_mapY_valueChanged(int /*i*/)
+void Control::onMapYValueChanged()
 {
     mUi->colorPlot->getMapItem()->changeMap(
         mUi->mapNr->value(),
@@ -1449,7 +1615,7 @@ void Control::on_mapY_valueChanged(int /*i*/)
         replotColorplot();
     }
 }
-void Control::on_mapW_valueChanged(int /*i*/)
+void Control::onMapWValueChanged()
 {
     mUi->colorPlot->getMapItem()->changeMap(
         mUi->mapNr->value(),
@@ -1464,7 +1630,7 @@ void Control::on_mapW_valueChanged(int /*i*/)
         replotColorplot();
     }
 }
-void Control::on_mapH_valueChanged(int /*i*/)
+void Control::onMapHValueChanged()
 {
     mUi->colorPlot->getMapItem()->changeMap(
         mUi->mapNr->value(),
@@ -1479,7 +1645,7 @@ void Control::on_mapH_valueChanged(int /*i*/)
         replotColorplot();
     }
 }
-void Control::on_mapColor_stateChanged(int /*i*/)
+void Control::onMapColorStateChanged()
 {
     mUi->colorPlot->getMapItem()->changeMap(
         mUi->mapNr->value(),
@@ -1494,7 +1660,7 @@ void Control::on_mapColor_stateChanged(int /*i*/)
         replotColorplot();
     }
 }
-void Control::on_mapHeight_valueChanged(double /*d*/)
+void Control::onMapHeightValueChanged()
 {
     mUi->colorPlot->getMapItem()->changeMap(
         mUi->mapNr->value(),
@@ -1506,7 +1672,7 @@ void Control::on_mapHeight_valueChanged(double /*d*/)
         mUi->mapHeight->value());
 }
 
-void Control::on_mapHeight_editingFinished()
+void Control::onMapHeightEditingFinished()
 {
     if(mUi->mapHeight->value() < 100)
     {
@@ -1517,13 +1683,13 @@ void Control::on_mapHeight_editingFinished()
     }
 }
 
-void Control::on_mapAdd_clicked()
+void Control::onMapAddClicked()
 {
     mUi->mapNr->setMaximum(mUi->mapNr->maximum() + 1);
     mUi->colorPlot->getMapItem()->addMap();
     mUi->mapNr->setValue(mUi->mapNr->maximum());
 }
-void Control::on_mapDel_clicked()
+void Control::onMapDelClicked()
 {
     mUi->colorPlot->getMapItem()->delMap(mUi->mapNr->value());
     if(mUi->mapNr->value() == mUi->mapNr->maximum())
@@ -1538,30 +1704,30 @@ void Control::on_mapDel_clicked()
         replotColorplot();
     }
 }
-void Control::on_mapDistribution_clicked()
+void Control::onMapDistributionClicked()
 {
     if(!mUi->colorPlot->printDistribution())
     {
         mMainWindow->getPersonStorage().printHeightDistribution();
     }
 }
-void Control::on_mapResetHeight_clicked()
+void Control::onMapResetHeightClicked()
 {
     mMainWindow->getPersonStorage().resetHeight();
     mScene->update();
 }
-void Control::on_mapResetPos_clicked()
+void Control::onMapResetPosClicked()
 {
     mMainWindow->getPersonStorage().resetPos();
     mScene->update();
 }
-void Control::on_mapDefaultHeight_valueChanged(double d)
+void Control::onMapDefaultHeightValueChanged(double d)
 {
     mMainWindow->setHeadSize();
     mMainWindow->getBackgroundFilter()->setDefaultHeight(d);
 }
 
-void Control::on_mapReadHeights_clicked()
+void Control::onMapReadHeightsClicked()
 {
     QString heightFile = QFileDialog::getOpenFileName(
         mMainWindow,
@@ -1586,7 +1752,7 @@ void Control::on_mapReadHeights_clicked()
     mScene->update();
 }
 
-void Control::on_mapReadMarkerID_clicked()
+void Control::onMapReadMarkerIDClicked()
 {
     QString markerFile = QFileDialog::getOpenFileName(
         mMainWindow,
@@ -1611,7 +1777,7 @@ void Control::on_mapReadMarkerID_clicked()
     mScene->update();
 }
 
-void Control::on_performRecognition_stateChanged(int i)
+void Control::onPerformRecognitionStateChanged(int i)
 {
     if(i == Qt::Checked && getRecoMethod() == reco::RecognitionMethod::MachineLearning)
     {
@@ -1633,7 +1799,7 @@ void Control::on_performRecognition_stateChanged(int i)
         mMainWindow->updateImage();
     }
 }
-void Control::on_recoMethod_currentIndexChanged(int /*index*/)
+void Control::onRecoMethodCurrentIndexChanged()
 {
     auto method = mUi->recoMethod->itemData(mUi->recoMethod->currentIndex());
     emit userChangedRecoMethod(method.value<reco::RecognitionMethod>());
@@ -1664,7 +1830,7 @@ void Control::onRecoMethodChanged(reco::RecognitionMethod method)
     }
 }
 
-void Control::on_mlMethod_currentIndexChanged(int /*index*/)
+void Control::onMlMethodCurrentIndexChanged()
 {
     auto method = mUi->mlMethod->itemData(mUi->mlMethod->currentIndex());
     emit userChangedMlMethod(method.value<reco::MlMethod>());
@@ -1675,7 +1841,7 @@ void Control::onMlMethodChanged(reco::MlMethod method)
     mUi->mlMethod->setCurrentIndex(mUi->mlMethod->findData(QVariant::fromValue(method)));
 }
 
-void Control::on_markerBrightness_valueChanged(int /*i*/)
+void Control::onMarkerBrightnessValueChanged()
 {
     mMainWindow->setRecognitionChanged(true); // flag changes of recognition parameters
     if(!mMainWindow->isLoading())
@@ -1683,7 +1849,7 @@ void Control::on_markerBrightness_valueChanged(int /*i*/)
         mMainWindow->updateImage();
     }
 }
-void Control::on_markerIgnoreWithout_stateChanged(int /*i*/)
+void Control::onMarkerIgnoreWithoutStateChanged()
 {
     mMainWindow->setRecognitionChanged(true); // flag changes of recognition parameters
     if(!mMainWindow->isLoading())
@@ -1692,7 +1858,7 @@ void Control::on_markerIgnoreWithout_stateChanged(int /*i*/)
     }
 }
 
-void Control::on_roiShow_stateChanged(int i)
+void Control::onRoiShowStateChanged(int i)
 {
     if(i == Qt::Checked)
     {
@@ -1704,7 +1870,7 @@ void Control::on_roiShow_stateChanged(int i)
     }
 }
 
-void Control::on_trackRoiShow_stateChanged(int i)
+void Control::onTrackRoiShowStateChanged(int i)
 {
     if(i == Qt::Checked)
     {
@@ -1719,7 +1885,7 @@ void Control::on_trackRoiShow_stateChanged(int i)
 //---------------------- calibration
 
 
-void Control::on_intrinsicParamsChanged(IntrinsicCameraParams params)
+void Control::onIntrinsicParamsChanged(IntrinsicCameraParams params)
 {
     mMainWindow->getCalibFilter()->getCamParams().setValue(params);
     mMainWindow->setStatusPosReal();
@@ -2163,7 +2329,7 @@ void Control::getXml(const QDomElement &elem, const QString &version)
                     if(mUi->recoColorModel->currentIndex() == readInt(subSubElem, "MODEL"))
                     {
                         mIndexChanging = false;
-                        on_recoColorModel_currentIndexChanged(mUi->recoColorModel->currentIndex());
+                        onRecoColorModelCurrentIndexChanged(mUi->recoColorModel->currentIndex());
                     }
                     else
                     {
@@ -2224,7 +2390,7 @@ void Control::getXml(const QDomElement &elem, const QString &version)
                         subSubElem,
                         "MAP_NUMBER",
                         mUi->mapNr); // here conversion from map data structure to real map, therefore at the end
-                    on_mapNr_valueChanged(readInt(
+                    onMapNrValueChanged(readInt(
                         subSubElem,
                         "MAP_NUMBER")); // explicitely called if 0, otherwise the signal wouldn't fire
                     loadDoubleValue(subSubElem, "DEFAULT_HEIGHT", mUi->mapDefaultHeight);
@@ -2525,19 +2691,18 @@ reco::MlMethod Control::getMlMethod() const
     return method.value<reco::MlMethod>();
 }
 
-void Control::on_colorPickerButton_clicked(bool checked)
+void Control::onColorPickerButtonClicked(bool checked)
 {
-    // true wenn neu gechecked, false wenn wieder abgewählt
     GraphicsView *view = mMainWindow->getView();
     if(checked)
     {
-        connect(view, &GraphicsView::colorSelected, this, &Control::on_expandColor);
-        connect(view, &GraphicsView::setColorEvent, this, &Control::on_setColor);
+        connect(view, &GraphicsView::colorSelected, this, &Control::onExpandColor);
+        connect(view, &GraphicsView::setColorEvent, this, &Control::onSetColor);
     }
     else
     {
-        disconnect(view, &GraphicsView::colorSelected, this, &Control::on_expandColor);
-        disconnect(view, &GraphicsView::setColorEvent, this, &Control::on_setColor);
+        disconnect(view, &GraphicsView::colorSelected, this, &Control::onExpandColor);
+        disconnect(view, &GraphicsView::setColorEvent, this, &Control::onSetColor);
     }
 }
 
@@ -2776,7 +2941,7 @@ double Control::getCameraAltitude() const
  * @param p
  * @param graphicsView
  */
-void Control::on_expandColor()
+void Control::onExpandColor()
 {
     QColor        fromColor, toColor;
     RectPlotItem *map;
@@ -2797,7 +2962,7 @@ void Control::on_expandColor()
  * @param p
  * @param graphicsView
  */
-void Control::on_setColor()
+void Control::onSetColor()
 {
     constexpr int BUFFER = 5;
 

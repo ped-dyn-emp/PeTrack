@@ -46,13 +46,19 @@ ColorRangeWidget::ColorRangeWidget(QWidget *parent) : QWidget(parent)
     fromTriangle->setColor(col);
     col.setHsv(mToHue, mToSat, mToVal);
     toTriangle->setColor(col);
+
+    connect(inversHue, &QCheckBox::stateChanged, this, &ColorRangeWidget::onInversHueStateChanged);
+    connect(fromTriangle, &QtColorTriangle::colorChanged, this, &ColorRangeWidget::onFromTriangleColorChanged);
+    connect(toTriangle, &QtColorTriangle::colorChanged, this, &ColorRangeWidget::onToTriangleColorChanged);
+    connect(fromColor, &QPushButton::clicked, this, &ColorRangeWidget::onFromColorClicked);
+    connect(toColor, &QPushButton::clicked, this, &ColorRangeWidget::onToColorClicked);
 }
 
 // functions which force a new recognition
-void ColorRangeWidget::on_inversHue_stateChanged(int i)
+void ColorRangeWidget::onInversHueStateChanged(int i)
 {
     mColorPlot->getMapItem()->changeActMapInvHue(i == Qt::Checked);
-    mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
+    mMainWindow->setRecognitionChanged(true);
     if(!mMainWindow->isLoading())
     {
         mMainWindow->updateImage();
@@ -95,7 +101,7 @@ void ColorRangeWidget::setControlWidget(int toHue, int fromHue, int toSat, int f
     mMainWindow->getControlWidget()->setMapH((tS - fS));
 }
 
-void ColorRangeWidget::on_fromTriangle_colorChanged(const QColor &col)
+void ColorRangeWidget::onFromTriangleColorChanged(const QColor &col)
 {
     mFromHue            = col.hue();
     mFromSat            = col.saturation();
@@ -112,7 +118,7 @@ void ColorRangeWidget::on_fromTriangle_colorChanged(const QColor &col)
         mMainWindow->updateImage();
     }
 }
-void ColorRangeWidget::on_toTriangle_colorChanged(const QColor &col)
+void ColorRangeWidget::onToTriangleColorChanged(const QColor &col)
 {
     mToHue              = col.hue();
     mToSat              = col.saturation();
@@ -130,7 +136,7 @@ void ColorRangeWidget::on_toTriangle_colorChanged(const QColor &col)
     }
 }
 
-void ColorRangeWidget::on_fromColor_clicked()
+void ColorRangeWidget::onFromColorClicked()
 {
     // QWindowsXpStyle uses native theming engine which causes some palette modifications not to have any effect.
     // ueber palette war der button ausser initial nicht zu aendern!!!
@@ -141,12 +147,12 @@ void ColorRangeWidget::on_fromColor_clicked()
                      .convertTo(QColor::Hsv);
     if(col.isValid() && col != colBefore)
     {
-        on_fromTriangle_colorChanged(col);
+        onFromTriangleColorChanged(col);
         fromTriangle->setColor(col);
     }
 }
 
-void ColorRangeWidget::on_toColor_clicked()
+void ColorRangeWidget::onToColorClicked()
 {
     // QWindowsXpStyle uses native theming engine which causes some palette modifications not to have any effect.
     // ueber palette war der button ausser initial nicht zu aendern!!!
@@ -156,7 +162,7 @@ void ColorRangeWidget::on_toColor_clicked()
                      .convertTo(QColor::Hsv);
     if(col.isValid() && col != colBefore)
     {
-        on_toTriangle_colorChanged(col);
+        onToTriangleColorChanged(col);
         toTriangle->setColor(col);
     }
 }

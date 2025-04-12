@@ -52,6 +52,12 @@ public:
 
     bool                       isExecuted() const { return mExecuted; }
     std::vector<MissingFrame> &getMissingFrames() { return mMissingFrames; }
+    void                       setExecuted(bool executed)
+    {
+        mExecuted = executed;
+        emit executeChanged(executed);
+    }
+    void setMissingFrames(std::vector<MissingFrame> missingFrames) { mMissingFrames = std::move(missingFrames); }
 
 public slots: // NOLINT (Qt needs the public slots, so the keyword public repeats)
     void reset()
@@ -59,13 +65,6 @@ public slots: // NOLINT (Qt needs the public slots, so the keyword public repeat
         setExecuted(false);
         mMissingFrames.clear();
     }
-
-    void setExecuted(bool executed)
-    {
-        mExecuted = executed;
-        emit executeChanged(executed);
-    }
-    void setMissingFrames(std::vector<MissingFrame> missingFrames) { mMissingFrames = std::move(missingFrames); }
 
 signals:
     void executeChanged(bool); // NOLINT (Qt signals don't need an implementation)

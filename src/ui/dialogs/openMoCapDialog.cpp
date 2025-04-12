@@ -44,7 +44,7 @@ OpenMoCapDialog::OpenMoCapDialog(QWidget *parent, MoCapController &controller) :
 
     connect(mUi->pushButtonOK, &QPushButton::clicked, this, &OpenMoCapDialog::clickedOk);
     connect(mUi->pushButtonCancel, &QPushButton::clicked, this, &OpenMoCapDialog::close);
-
+    connect(mUi->btnAddSelection, &QPushButton::clicked, this, &OpenMoCapDialog::onBtnAddSelectionClicked);
     mUi->moCapSelections->setMinimumSize(mUi->moCapSelections->minimumSizeHint());
     // Scroll Area needs to be set manually; should respect minimum size of widget, but does not
     // add some extra width for the frame and scrollbar
@@ -111,7 +111,7 @@ OpenMoCapDialog::~OpenMoCapDialog()
     delete mUi;
 }
 
-void OpenMoCapDialog::on_btnAddSelection_clicked()
+void OpenMoCapDialog::onBtnAddSelectionClicked()
 {
     static QString lastSelectedDir = QDir::currentPath();
 

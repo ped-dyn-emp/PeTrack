@@ -36,6 +36,30 @@ StereoWidget::StereoWidget(QWidget *parent) : QWidget(parent)
     stereoDispAlgo->addItem("ptGrey");
     stereoDispAlgo->addItem("openCV block matching");
     stereoDispAlgo->addItem("openCV semi-global block matching");
+
+    connect(stereoUseForHeight, &QCheckBox::stateChanged, this, &StereoWidget::onStereoUseForHeightStateChanged);
+    connect(
+        stereoUseForHeightEver, &QCheckBox::stateChanged, this, &StereoWidget::onStereoUseForHeightEverStateChanged);
+    connect(stereoShowDisparity, &QCheckBox::stateChanged, this, &StereoWidget::onStereoShowDisparityStateChanged);
+    connect(
+        stereoColor,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        &StereoWidget::onStereoColorCurrentIndexChanged);
+    connect(
+        stereoDispAlgo,
+        QOverload<int>::of(&QComboBox::currentIndexChanged),
+        this,
+        &StereoWidget::onStereoDispAlgoCurrentIndexChanged);
+    connect(hideWrong, &QCheckBox::stateChanged, this, &StereoWidget::onHideWrongStateChanged);
+    connect(
+        stereoMaskSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &StereoWidget::onStereoMaskSizeValueChanged);
+    connect(opacity, QOverload<int>::of(&QSpinBox::valueChanged), this, &StereoWidget::onOpacityValueChanged);
+    connect(edgeMaskSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &StereoWidget::onEdgeMaskSizeValueChanged);
+    connect(useEdge, &QCheckBox::stateChanged, this, &StereoWidget::onUseEdgeStateChanged);
+    connect(maxDisparity, QOverload<int>::of(&QSpinBox::valueChanged), this, &StereoWidget::onMaxDisparityValueChanged);
+    connect(minDisparity, QOverload<int>::of(&QSpinBox::valueChanged), this, &StereoWidget::onMinDisparityValueChanged);
+    connect(stereoExport, &QPushButton::clicked, this, &StereoWidget::onStereoExportClicked);
 }
 
 //---------------------------------------
@@ -127,50 +151,49 @@ void StereoWidget::getXml(QDomElement &elem)
     }
 }
 
-void StereoWidget::on_stereoUseForHeight_stateChanged(int)
+void StereoWidget::onStereoUseForHeightStateChanged()
 {
     if(stereoUseForHeightEver->isChecked() && stereoUseForHeight->isChecked())
         mMainWindow->updateImage();
 }
 
-void StereoWidget::on_stereoUseForHeightEver_stateChanged(int)
+void StereoWidget::onStereoUseForHeightEverStateChanged()
 {
     if(stereoUseForHeightEver->isChecked() && stereoUseForHeight->isChecked())
         mMainWindow->updateImage();
 }
 
-void StereoWidget::on_stereoShowDisparity_stateChanged(int i)
+void StereoWidget::onStereoShowDisparityStateChanged(int i)
 {
     mMainWindow->getStereoItem()->setVisible(i);
     mMainWindow->getScene()->update();
 }
 
-void StereoWidget::on_stereoColor_currentIndexChanged(int)
+void StereoWidget::onStereoColorCurrentIndexChanged()
 {
-    if(mMainWindow && (mMainWindow->getScene()))
+    if(mMainWindow && mMainWindow->getScene())
         mMainWindow->getScene()->update();
 }
 
-void StereoWidget::on_stereoDispAlgo_currentIndexChanged(int)
+void StereoWidget::onStereoDispAlgoCurrentIndexChanged()
 {
-    if(mMainWindow && (mMainWindow->getScene()) && mMainWindow->getStereoContext())
+    if(mMainWindow && mMainWindow->getScene() && mMainWindow->getStereoContext())
     {
         mMainWindow->getStereoContext()->indicateNewValues();
         mMainWindow->getScene()->update();
     }
 }
 
-void StereoWidget::on_hideWrong_stateChanged(int)
+void StereoWidget::onHideWrongStateChanged()
 {
-    if(mMainWindow && (mMainWindow->getScene()) && mMainWindow->getStereoContext())
+    if(mMainWindow && mMainWindow->getScene() && mMainWindow->getStereoContext())
     {
         mMainWindow->getStereoContext()->indicateNewValues();
         mMainWindow->getScene()->update();
     }
-    // mMainWindow->getScene()->update();
 }
 
-void StereoWidget::on_stereoMaskSize_valueChanged(int i)
+void StereoWidget::onStereoMaskSizeValueChanged(int i)
 {
     if(i % 2 == 0)
     {
@@ -184,12 +207,12 @@ void StereoWidget::on_stereoMaskSize_valueChanged(int i)
     }
 }
 
-void StereoWidget::on_opacity_valueChanged(int)
+void StereoWidget::onOpacityValueChanged()
 {
     mMainWindow->getScene()->update();
 }
 
-void StereoWidget::on_edgeMaskSize_valueChanged(int i)
+void StereoWidget::onEdgeMaskSizeValueChanged(int i)
 {
     if(i % 2 == 0)
     {
@@ -204,7 +227,7 @@ void StereoWidget::on_edgeMaskSize_valueChanged(int i)
     }
 }
 
-void StereoWidget::on_useEdge_stateChanged(int)
+void StereoWidget::onUseEdgeStateChanged()
 {
     if(mMainWindow->getStereoContext() && !mMainWindow->isLoading())
     {
@@ -214,7 +237,7 @@ void StereoWidget::on_useEdge_stateChanged(int)
     }
 }
 
-void StereoWidget::on_maxDisparity_valueChanged(int)
+void StereoWidget::onMaxDisparityValueChanged()
 {
     if(mMainWindow->getStereoContext())
     {
@@ -223,7 +246,7 @@ void StereoWidget::on_maxDisparity_valueChanged(int)
     }
 }
 
-void StereoWidget::on_minDisparity_valueChanged(int)
+void StereoWidget::onMinDisparityValueChanged()
 {
     if(mMainWindow->getStereoContext())
     {
@@ -232,7 +255,7 @@ void StereoWidget::on_minDisparity_valueChanged(int)
     }
 }
 
-void StereoWidget::on_stereoExport_clicked()
+void StereoWidget::onStereoExportClicked()
 {
     mMainWindow->getStereoContext()->exportPointCloud();
 }

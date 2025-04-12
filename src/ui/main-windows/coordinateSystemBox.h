@@ -124,33 +124,32 @@ public slots:
 
 private slots:
     // selection
-    void on_coordTab_currentChanged(int index);
-    void on_coordShow_stateChanged(int i);
-    void on_coordFix_stateChanged(int i);
+    void onCoordTabCurrentChanged(int index);
+    void onCoordShowStateChanged();
+    void onCoordFixStateChanged();
 
     // 2D
-    void on_coordRotate_valueChanged(int newAngle);
-    void on_coordTransX_valueChanged(int newX);
-    void on_coordTransY_valueChanged(int newY);
-    void on_coordScale_valueChanged(int newScale);
-    void on_coordAltitude_valueChanged(double d);
-    void on_coordUnit_valueChanged(double newUnit);
-    void on_coordUseIntrinsic_stateChanged(int i);
-
+    void onCoordRotateValueChanged(int newAngle);
+    void onCoordTransXValueChanged(int newX);
+    void onCoordTransYValueChanged(int newY);
+    void onCoordScaleValueChanged(int newScale);
+    void onCoordAltitudeValueChanged();
+    void onCoordUnitValueChanged(double newUnit);
+    void onCoordUseIntrinsicStateChanged();
 
     // 3D
-    void on_coord3DTransX_valueChanged(int newX);
-    void on_coord3DTransY_valueChanged(int newY);
-    void on_coord3DTransZ_valueChanged(int newZ);
-    void on_coord3DAxeLen_valueChanged(int value);
+    void onCoord3DTransXValueChanged(int newX);
+    void onCoord3DTransYValueChanged(int newY);
+    void onCoord3DTransZValueChanged(int newZ);
+    void onCoord3DAxeLenValueChanged();
 
-    void on_coord3DSwapX_stateChanged(int newSwap);
-    void on_coord3DSwapY_stateChanged(int newSwap);
-    void on_coord3DSwapZ_stateChanged(int newSwap);
+    void onCoord3DSwapXStateChanged(int newSwap);
+    void onCoord3DSwapYStateChanged(int newSwap);
+    void onCoord3DSwapZStateChanged(int newSwap);
 
     // display of extrinsic calibration
-    void on_extCalibPointsShow_stateChanged(int arg1);
-    void on_extVanishPointsShow_stateChanged(int arg1);
+    void onExtCalibPointsShowStateChanged();
+    void onExtVanishPointsShowStateChanged();
 
 signals:
     void coordDataChanged();

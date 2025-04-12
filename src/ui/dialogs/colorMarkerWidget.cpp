@@ -46,6 +46,28 @@ ColorMarkerWidget::ColorMarkerWidget(QWidget *parent) : QWidget(parent)
     fromTriangle->setColor(col);
     col.setHsv(toHue, toSat, toVal);
     toTriangle->setColor(col);
+
+    connect(showMask, &QCheckBox::stateChanged, this, &ColorMarkerWidget::onShowMaskStateChanged);
+    connect(maskMask, &QCheckBox::stateChanged, this, &ColorMarkerWidget::onMaskMaskStateChanged);
+    connect(opacity, QOverload<int>::of(&QSpinBox::valueChanged), this, &ColorMarkerWidget::onOpacityValueChanged);
+    connect(inversHue, &QCheckBox::stateChanged, this, &ColorMarkerWidget::onInversHueStateChanged);
+    connect(useOpen, &QCheckBox::stateChanged, this, &ColorMarkerWidget::onUseOpenStateChanged);
+    connect(useClose, &QCheckBox::stateChanged, this, &ColorMarkerWidget::onUseCloseStateChanged);
+    connect(
+        closeRadius, QOverload<int>::of(&QSpinBox::valueChanged), this, &ColorMarkerWidget::onCloseRadiusValueChanged);
+    connect(
+        openRadius, QOverload<int>::of(&QSpinBox::valueChanged), this, &ColorMarkerWidget::onOpenRadiusValueChanged);
+    connect(minArea, QOverload<int>::of(&QSpinBox::valueChanged), this, &ColorMarkerWidget::onMinAreaValueChanged);
+    connect(maxArea, QOverload<int>::of(&QSpinBox::valueChanged), this, &ColorMarkerWidget::onMaxAreaValueChanged);
+    connect(
+        maxRatio,
+        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+        this,
+        &ColorMarkerWidget::onMaxRatioValueChanged);
+    connect(fromTriangle, &QtColorTriangle::colorChanged, this, &ColorMarkerWidget::onFromTriangleColorChanged);
+    connect(toTriangle, &QtColorTriangle::colorChanged, this, &ColorMarkerWidget::onToTriangleColorChanged);
+    connect(fromColor, &QPushButton::clicked, this, &ColorMarkerWidget::onFromColorClicked);
+    connect(toColor, &QPushButton::clicked, this, &ColorMarkerWidget::onToColorClicked);
 }
 
 // store data in xml node, as:
@@ -156,23 +178,23 @@ void ColorMarkerWidget::getXml(QDomElement &elem)
     }
 }
 
-void ColorMarkerWidget::on_showMask_stateChanged(int i)
+void ColorMarkerWidget::onShowMaskStateChanged(int i)
 {
     mMainWindow->getColorMarkerItem()->setVisible(i);
     mMainWindow->getScene()->update();
 }
 
-void ColorMarkerWidget::on_maskMask_stateChanged(int)
+void ColorMarkerWidget::onMaskMaskStateChanged()
 {
     mMainWindow->getScene()->update();
 }
 
-void ColorMarkerWidget::on_opacity_valueChanged(int)
+void ColorMarkerWidget::onOpacityValueChanged()
 {
     mMainWindow->getScene()->update();
 }
 
-void ColorMarkerWidget::on_inversHue_stateChanged(int)
+void ColorMarkerWidget::onInversHueStateChanged()
 {
     mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
     if(!mMainWindow->isLoading())
@@ -181,7 +203,7 @@ void ColorMarkerWidget::on_inversHue_stateChanged(int)
     }
 }
 
-void ColorMarkerWidget::on_useOpen_stateChanged(int)
+void ColorMarkerWidget::onUseOpenStateChanged()
 {
     mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
     if(!mMainWindow->isLoading())
@@ -190,7 +212,7 @@ void ColorMarkerWidget::on_useOpen_stateChanged(int)
     }
 }
 
-void ColorMarkerWidget::on_useClose_stateChanged(int)
+void ColorMarkerWidget::onUseCloseStateChanged()
 {
     mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
     if(!mMainWindow->isLoading())
@@ -199,7 +221,7 @@ void ColorMarkerWidget::on_useClose_stateChanged(int)
     }
 }
 
-void ColorMarkerWidget::on_closeRadius_valueChanged(int)
+void ColorMarkerWidget::onCloseRadiusValueChanged()
 {
     mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
     if(!mMainWindow->isLoading())
@@ -208,7 +230,7 @@ void ColorMarkerWidget::on_closeRadius_valueChanged(int)
     }
 }
 
-void ColorMarkerWidget::on_openRadius_valueChanged(int)
+void ColorMarkerWidget::onOpenRadiusValueChanged()
 {
     mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
     if(!mMainWindow->isLoading())
@@ -217,7 +239,7 @@ void ColorMarkerWidget::on_openRadius_valueChanged(int)
     }
 }
 
-void ColorMarkerWidget::on_minArea_valueChanged(int)
+void ColorMarkerWidget::onMinAreaValueChanged()
 {
     mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
     if(!mMainWindow->isLoading())
@@ -226,7 +248,7 @@ void ColorMarkerWidget::on_minArea_valueChanged(int)
     }
 }
 
-void ColorMarkerWidget::on_maxArea_valueChanged(int)
+void ColorMarkerWidget::onMaxAreaValueChanged()
 {
     mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
     if(!mMainWindow->isLoading())
@@ -235,7 +257,7 @@ void ColorMarkerWidget::on_maxArea_valueChanged(int)
     }
 }
 
-void ColorMarkerWidget::on_maxRatio_valueChanged(double)
+void ColorMarkerWidget::onMaxRatioValueChanged()
 {
     mMainWindow->setRecognitionChanged(true); // flag indicates that changes of recognition parameters happens
     if(!mMainWindow->isLoading())
@@ -244,7 +266,7 @@ void ColorMarkerWidget::on_maxRatio_valueChanged(double)
     }
 }
 
-void ColorMarkerWidget::on_fromTriangle_colorChanged(const QColor &col)
+void ColorMarkerWidget::onFromTriangleColorChanged(const QColor &col)
 {
     fromHue             = col.hue();
     fromSat             = col.saturation();
@@ -257,7 +279,7 @@ void ColorMarkerWidget::on_fromTriangle_colorChanged(const QColor &col)
         mMainWindow->updateImage();
     }
 }
-void ColorMarkerWidget::on_toTriangle_colorChanged(const QColor &col)
+void ColorMarkerWidget::onToTriangleColorChanged(const QColor &col)
 {
     toHue               = col.hue();
     toSat               = col.saturation();
@@ -271,7 +293,7 @@ void ColorMarkerWidget::on_toTriangle_colorChanged(const QColor &col)
     }
 }
 
-void ColorMarkerWidget::on_fromColor_clicked()
+void ColorMarkerWidget::onFromColorClicked()
 {
     // QWindowsXpStyle uses native theming engine which causes some palette modifications not to have any effect.
     // ueber palette war der button ausser initial nicht zu aendern!!!
@@ -281,12 +303,12 @@ void ColorMarkerWidget::on_fromColor_clicked()
                      .convertTo(QColor::Hsv);
     if(col.isValid() && col != colBefore)
     {
-        on_fromTriangle_colorChanged(col);
+        onFromTriangleColorChanged(col);
         fromTriangle->setColor(col);
     }
 }
 
-void ColorMarkerWidget::on_toColor_clicked()
+void ColorMarkerWidget::onToColorClicked()
 {
     // QWindowsXpStyle uses native theming engine which causes some palette modifications not to have any effect.
     // ueber palette war der button ausser initial nicht zu aendern!!!
@@ -296,7 +318,7 @@ void ColorMarkerWidget::on_toColor_clicked()
                      .convertTo(QColor::Hsv);
     if(col.isValid() && col != colBefore)
     {
-        on_toTriangle_colorChanged(col);
+        onToTriangleColorChanged(col);
         toTriangle->setColor(col);
     }
 }
