@@ -55,11 +55,42 @@ IntrinsicBox::IntrinsicBox(
     mUpdateImageCallback(std::move(updateImageCallback))
 {
     mUi->setupUi(this);
-    connect(mUi->autoCalib, &QPushButton::clicked, this, &IntrinsicBox::runAutoCalib);
-    connect(mUi->quadAspectRatio, &QCheckBox::clicked, this, &IntrinsicBox::showRecalibrationDialog);
-    connect(mUi->fixCenter, &QCheckBox::clicked, this, &IntrinsicBox::showRecalibrationDialog);
-    connect(mUi->tangDist, &QCheckBox::clicked, this, &IntrinsicBox::showRecalibrationDialog);
+    connect(mUi->extModelCheckBox, &QCheckBox::stateChanged, this, &IntrinsicBox::onExtModelCheckBoxStateChanged);
+    connect(mUi->extModelCheckBox, &QCheckBox::clicked, this, &IntrinsicBox::onExtModelCheckBoxClicked);
+    connect(mUi->quadAspectRatio, &QCheckBox::stateChanged, this, &IntrinsicBox::onQuadAspectRatioStateChanged);
+    connect(mUi->fixCenter, &QCheckBox::stateChanged, this, &IntrinsicBox::onFixCenterStateChanged);
+    connect(mUi->tangDist, &QCheckBox::stateChanged, this, &IntrinsicBox::onTangDistStateChanged);
+    connect(mUi->apply, &QCheckBox::stateChanged, this, &IntrinsicBox::onApplyStateChanged);
+    connect(mUi->fx, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onFxValueChanged);
+    connect(mUi->fy, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onFyValueChanged);
+    connect(mUi->cx, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onCxValueChanged);
+    connect(mUi->cy, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onCyValueChanged);
+    connect(mUi->r2, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onR2ValueChanged);
+    connect(mUi->r4, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onR4ValueChanged);
+    connect(mUi->r6, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onR6ValueChanged);
+    connect(mUi->s1, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onS1ValueChanged);
+    connect(mUi->s2, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onS2ValueChanged);
+    connect(mUi->s3, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onS3ValueChanged);
+    connect(mUi->s4, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onS4ValueChanged);
+    connect(mUi->taux, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onTauxValueChanged);
+    connect(mUi->tauy, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onTauyValueChanged);
+    connect(mUi->tx, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onTxValueChanged);
+    connect(mUi->ty, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onTyValueChanged);
+    connect(mUi->k4, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onK4ValueChanged);
+    connect(mUi->k5, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onK5ValueChanged);
+    connect(mUi->k6, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onK6ValueChanged);
+    connect(
+        mUi->squareSize,
+        QOverload<double>::of(&PDoubleSpinBox::valueChanged),
+        this,
+        &IntrinsicBox::onSquareSizeValueChanged);
+    connect(
+        mUi->boardSizeX, QOverload<int>::of(&QSpinBox::valueChanged), this, &IntrinsicBox::onBoardSizeXValueChanged);
+    connect(
+        mUi->boardSizeY, QOverload<int>::of(&QSpinBox::valueChanged), this, &IntrinsicBox::onBoardSizeYValueChanged);
+    connect(mUi->calibFiles, &QPushButton::clicked, this, &IntrinsicBox::onCalibFilesClicked);
     connect(mUi->calibVideo, &QPushButton::clicked, this, &IntrinsicBox::onCalibVideoClicked);
+    connect(mUi->autoCalib, &QPushButton::clicked, this, &IntrinsicBox::runAutoCalib);
     // apply intrinsic
     mUi->apply->setCheckState(mCalibFilter.getEnabled() ? Qt::Checked : Qt::Unchecked);
 
@@ -407,7 +438,7 @@ void IntrinsicBox::showRecalibrationDialog()
     }
 }
 
-void IntrinsicBox::on_fx_valueChanged(double d)
+void IntrinsicBox::onFxValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setFx(d);
@@ -417,7 +448,7 @@ void IntrinsicBox::on_fx_valueChanged(double d)
     setCurrentIntrinsicCameraParameters(params);
 }
 
-void IntrinsicBox::on_fy_valueChanged(double d)
+void IntrinsicBox::onFyValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setFy(d);
@@ -427,7 +458,7 @@ void IntrinsicBox::on_fy_valueChanged(double d)
     setCurrentIntrinsicCameraParameters(params);
 }
 
-void IntrinsicBox::on_cx_valueChanged(double d)
+void IntrinsicBox::onCxValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setCx(d);
@@ -437,7 +468,7 @@ void IntrinsicBox::on_cx_valueChanged(double d)
     setCurrentIntrinsicCameraParameters(params);
 }
 
-void IntrinsicBox::on_cy_valueChanged(double d)
+void IntrinsicBox::onCyValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setCy(d);
@@ -447,7 +478,7 @@ void IntrinsicBox::on_cy_valueChanged(double d)
     setCurrentIntrinsicCameraParameters(params);
 }
 
-void IntrinsicBox::on_r2_valueChanged(double d)
+void IntrinsicBox::onR2ValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setR2(d);
@@ -457,7 +488,7 @@ void IntrinsicBox::on_r2_valueChanged(double d)
     setCurrentIntrinsicCameraParameters(params);
 }
 
-void IntrinsicBox::on_r4_valueChanged(double d)
+void IntrinsicBox::onR4ValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setR4(d);
@@ -467,7 +498,7 @@ void IntrinsicBox::on_r4_valueChanged(double d)
     setCurrentIntrinsicCameraParameters(params);
 }
 
-void IntrinsicBox::on_r6_valueChanged(double d)
+void IntrinsicBox::onR6ValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setR6(d);
@@ -476,7 +507,7 @@ void IntrinsicBox::on_r6_valueChanged(double d)
 
     setCurrentIntrinsicCameraParameters(params);
 }
-void IntrinsicBox::on_s1_valueChanged(double d)
+void IntrinsicBox::onS1ValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setS1(d);
@@ -485,7 +516,7 @@ void IntrinsicBox::on_s1_valueChanged(double d)
 
     setCurrentIntrinsicCameraParameters(params);
 }
-void IntrinsicBox::on_s2_valueChanged(double d)
+void IntrinsicBox::onS2ValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setS2(d);
@@ -494,7 +525,7 @@ void IntrinsicBox::on_s2_valueChanged(double d)
 
     setCurrentIntrinsicCameraParameters(params);
 }
-void IntrinsicBox::on_s3_valueChanged(double d)
+void IntrinsicBox::onS3ValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setS3(d);
@@ -503,7 +534,7 @@ void IntrinsicBox::on_s3_valueChanged(double d)
 
     setCurrentIntrinsicCameraParameters(params);
 }
-void IntrinsicBox::on_s4_valueChanged(double d)
+void IntrinsicBox::onS4ValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setS4(d);
@@ -512,7 +543,7 @@ void IntrinsicBox::on_s4_valueChanged(double d)
 
     setCurrentIntrinsicCameraParameters(params);
 }
-void IntrinsicBox::on_taux_valueChanged(double d)
+void IntrinsicBox::onTauxValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setTaux(d);
@@ -521,7 +552,7 @@ void IntrinsicBox::on_taux_valueChanged(double d)
 
     setCurrentIntrinsicCameraParameters(params);
 }
-void IntrinsicBox::on_tauy_valueChanged(double d)
+void IntrinsicBox::onTauyValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setTauy(d);
@@ -530,7 +561,7 @@ void IntrinsicBox::on_tauy_valueChanged(double d)
 
     setCurrentIntrinsicCameraParameters(params);
 }
-void IntrinsicBox::on_tx_valueChanged(double d)
+void IntrinsicBox::onTxValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setTx(d);
@@ -540,7 +571,7 @@ void IntrinsicBox::on_tx_valueChanged(double d)
     setCurrentIntrinsicCameraParameters(params);
 }
 
-void IntrinsicBox::on_ty_valueChanged(double d)
+void IntrinsicBox::onTyValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setTy(d);
@@ -549,7 +580,7 @@ void IntrinsicBox::on_ty_valueChanged(double d)
 
     setCurrentIntrinsicCameraParameters(params);
 }
-void IntrinsicBox::on_k4_valueChanged(double d)
+void IntrinsicBox::onK4ValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setK4(d);
@@ -558,7 +589,7 @@ void IntrinsicBox::on_k4_valueChanged(double d)
 
     setCurrentIntrinsicCameraParameters(params);
 }
-void IntrinsicBox::on_k5_valueChanged(double d)
+void IntrinsicBox::onK5ValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setK5(d);
@@ -567,7 +598,7 @@ void IntrinsicBox::on_k5_valueChanged(double d)
 
     setCurrentIntrinsicCameraParameters(params);
 }
-void IntrinsicBox::on_k6_valueChanged(double d)
+void IntrinsicBox::onK6ValueChanged(double d)
 {
     IntrinsicCameraParams params = getIntrinsicCameraParams();
     params.setK6(d);
@@ -577,17 +608,17 @@ void IntrinsicBox::on_k6_valueChanged(double d)
     setCurrentIntrinsicCameraParameters(params);
 }
 
-void IntrinsicBox::on_boardSizeX_valueChanged(int x)
+void IntrinsicBox::onBoardSizeXValueChanged(int x)
 {
     mAutoCalib.setBoardSizeX(x);
 }
 
-void IntrinsicBox::on_boardSizeY_valueChanged(int y)
+void IntrinsicBox::onBoardSizeYValueChanged(int y)
 {
     mAutoCalib.setBoardSizeY(y);
 }
 
-void IntrinsicBox::on_squareSize_valueChanged(double s)
+void IntrinsicBox::onSquareSizeValueChanged(double s)
 {
     mAutoCalib.setSquareSize(static_cast<float>(s));
 }
@@ -612,7 +643,7 @@ void IntrinsicBox::runAutoCalib()
         applyCurrentModelParamsToUi();
     }
 }
-void IntrinsicBox::on_calibFiles_clicked()
+void IntrinsicBox::onCalibFilesClicked()
 {
     if(mAutoCalib.openCalibFiles())
     {
@@ -628,7 +659,7 @@ void IntrinsicBox::onCalibVideoClicked()
     }
 }
 
-void IntrinsicBox::on_extModelCheckBox_stateChanged(int)
+void IntrinsicBox::onExtModelCheckBoxStateChanged()
 {
     bool checked = mUi->extModelCheckBox->isChecked();
 
@@ -645,8 +676,9 @@ void IntrinsicBox::on_extModelCheckBox_stateChanged(int)
     applyCurrentModelParamsToUi();
 }
 
-void IntrinsicBox::on_extModelCheckBox_clicked(bool checked)
+void IntrinsicBox::onExtModelCheckBoxClicked()
 {
+    bool checked = mUi->extModelCheckBox->isChecked();
     // clicked only called in user action
     const ExtrinsicParameters standardExtParams{};
     if(standardExtParams != mExtrBox.getExtrinsicParameters())
@@ -740,27 +772,27 @@ void IntrinsicBox::checkModelParams(const IntrinsicCameraParams &modelParams)
     checkValueValid(mUi->tauy, static_cast<double>(modelParams.getTauy()));
 }
 
-void IntrinsicBox::on_quadAspectRatio_stateChanged(int)
+void IntrinsicBox::onQuadAspectRatioStateChanged()
 {
     bool checked = mUi->quadAspectRatio->isChecked();
     mUi->fy->setEnabled(!checked);
 }
 
-void IntrinsicBox::on_fixCenter_stateChanged(int)
+void IntrinsicBox::onFixCenterStateChanged()
 {
     bool checked = mUi->fixCenter->isChecked();
     mUi->cx->setEnabled(!checked);
     mUi->cy->setEnabled(!checked);
 }
 
-void IntrinsicBox::on_tangDist_stateChanged(int)
+void IntrinsicBox::onTangDistStateChanged()
 {
     bool checked = mUi->tangDist->isChecked();
     mUi->tx->setEnabled(checked);
     mUi->ty->setEnabled(checked);
 }
 
-void IntrinsicBox::on_apply_stateChanged(int i)
+void IntrinsicBox::onApplyStateChanged(int i)
 {
     if(i == Qt::Checked)
     {

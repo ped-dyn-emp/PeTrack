@@ -43,33 +43,30 @@ public:
 
 private slots:
 
-    void on_useDot_stateChanged(int /*i*/);
-    void on_dotSize_valueChanged(double /*d*/);
-    void on_useCodeMarker_stateChanged(int /* i */);
-    void on_CodeMarkerParameter_clicked();
-    void on_ignoreWithoutDot_stateChanged(int /*i*/);
-    void on_useColor_stateChanged(int /*i*/);
-    void on_restrictPosition_stateChanged(int /*i*/);
-    void on_autoCorrect_stateChanged(int /*i*/);
-    void on_autoCorrectOnlyExport_stateChanged(int /*i*/);
+    void onUseDotStateChanged();
+    void onDotSizeValueChanged();
+    void onUseCodeMarkerStateChanged();
+    void onCodeMarkerParameterClicked();
+    void onIgnoreWithoutDotStateChanged();
+    void onUseColorStateChanged();
+    void onRestrictPositionStateChanged();
+    void onAutoCorrectStateChanged();
+    void onAutoCorrectOnlyExportStateChanged();
 
-    // Functions which just modifies the visual
-    void on_showMask_stateChanged(int i);
-    void on_maskMask_stateChanged(int /*i*/);
-    void on_opacity_valueChanged(int /*i*/);
+    // functions which just modify the visual
+    void onShowMaskStateChanged(int i);
+    void onMaskMaskStateChanged();
+    void onOpacityValueChanged();
 
     // functions which force a new recognition
-    void on_useOpen_stateChanged(int /*i*/);
-    void on_useClose_stateChanged(int /*i*/);
-
-    void on_closeRadius_valueChanged(int /*i*/);
-    void on_openRadius_valueChanged(int /*i*/);
-
-    void on_minArea_valueChanged(int /*i*/);
-    void on_maxArea_valueChanged(int /*i*/);
-    void on_useHeadSize_stateChanged(int i);
-
-    void on_maxRatio_valueChanged(double /*d*/);
+    void onUseOpenStateChanged();
+    void onUseCloseStateChanged();
+    void onCloseRadiusValueChanged();
+    void onOpenRadiusValueChanged();
+    void onMinAreaValueChanged();
+    void onMaxAreaValueChanged();
+    void onUseHeadSizeStateChanged(int i);
+    void onMaxRatioValueChanged();
 
 private:
     Petrack *mMainWindow;

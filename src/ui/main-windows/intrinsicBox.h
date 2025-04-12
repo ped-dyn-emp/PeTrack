@@ -83,41 +83,41 @@ private:
     void                  applyCurrentModelParamsToUi();
     void                  checkModelParams(const IntrinsicCameraParams &params);
     void                  setCurrentIntrinsicCameraParameters(IntrinsicCameraParams params);
+    void                  showRecalibrationDialog();
 
 signals:
     void paramsChanged(IntrinsicCameraParams newParams);
 
 private slots:
-    void showRecalibrationDialog();
-    void on_extModelCheckBox_stateChanged(int);
-    void on_extModelCheckBox_clicked(bool);
-    void on_quadAspectRatio_stateChanged(int);
-    void on_fixCenter_stateChanged(int);
-    void on_tangDist_stateChanged(int);
-    void on_fx_valueChanged(double d);
-    void on_fy_valueChanged(double d);
-    void on_cx_valueChanged(double d);
-    void on_cy_valueChanged(double d);
-    void on_r2_valueChanged(double d);
-    void on_r4_valueChanged(double d);
-    void on_r6_valueChanged(double d);
-    void on_s1_valueChanged(double d);
-    void on_s2_valueChanged(double d);
-    void on_s3_valueChanged(double d);
-    void on_s4_valueChanged(double d);
-    void on_taux_valueChanged(double d);
-    void on_tauy_valueChanged(double d);
-    void on_tx_valueChanged(double d);
-    void on_ty_valueChanged(double d);
-    void on_k4_valueChanged(double d);
-    void on_k5_valueChanged(double d);
-    void on_k6_valueChanged(double d);
-    void on_boardSizeX_valueChanged(int x);
-    void on_boardSizeY_valueChanged(int y);
-    void on_squareSize_valueChanged(double s);
-    void on_calibFiles_clicked();
+    void onExtModelCheckBoxStateChanged();
+    void onExtModelCheckBoxClicked();
+    void onQuadAspectRatioStateChanged();
+    void onFixCenterStateChanged();
+    void onTangDistStateChanged();
+    void onFxValueChanged(double d);
+    void onFyValueChanged(double d);
+    void onCxValueChanged(double d);
+    void onCyValueChanged(double d);
+    void onR2ValueChanged(double d);
+    void onR4ValueChanged(double d);
+    void onR6ValueChanged(double d);
+    void onS1ValueChanged(double d);
+    void onS2ValueChanged(double d);
+    void onS3ValueChanged(double d);
+    void onS4ValueChanged(double d);
+    void onTauxValueChanged(double d);
+    void onTauyValueChanged(double d);
+    void onTxValueChanged(double d);
+    void onTyValueChanged(double d);
+    void onK4ValueChanged(double d);
+    void onK5ValueChanged(double d);
+    void onK6ValueChanged(double d);
+    void onBoardSizeXValueChanged(int x);
+    void onBoardSizeYValueChanged(int y);
+    void onSquareSizeValueChanged(double s);
+    void onCalibFilesClicked();
     void onCalibVideoClicked();
-    void on_apply_stateChanged(int i);
+    void onApplyStateChanged(int i);
 
 public slots:
     void runAutoCalib();

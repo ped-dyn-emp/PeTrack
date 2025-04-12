@@ -358,7 +358,7 @@ Petrack::Petrack(QString petrackVersion) :
     connect(toggleShowOnly, &QShortcut::activated, this, [=]() { mControlWidget->toggleShowOnly(); });
 
     auto *goToStart = new QShortcut{QKeySequence("Shift+s"), this};
-    connect(goToStart, &QShortcut::activated, this, [=]() { mControlWidget->on_trackGotoStartNr_clicked(); });
+    connect(goToStart, &QShortcut::activated, this, [=]() { mControlWidget->onTrackGotoStartNrClicked(); });
 
     // TODO delete once we get Options to be value only (i.e. no Pointer/Ref anymore)
     mReco.getCodeMarkerOptions().setControlWidget(mControlWidget);
@@ -1877,12 +1877,12 @@ void Petrack::createActions()
 {
     mOpenSeqAct = new QAction(tr("&Open Sequence"), this);
     mOpenSeqAct->setShortcut(tr("Ctrl+Shift+O"));
-    connect(mOpenSeqAct, SIGNAL(triggered()), this, SLOT(openSequence()));
+    connect(mOpenSeqAct, &QAction::triggered, this, [this] { openSequence(); });
 
     mOpenCameraAct = new QAction(tr("Open Camera Stream"), this);
     // mOpenCameraAct->setShortcut(tr("Ctrl+C")); // because of some reason it is sometimes fired with
     // Ctrl+LeftMouseButton ==> so disabled (it's also not really needed)
-    connect(mOpenCameraAct, SIGNAL(triggered()), this, SLOT(openCameraLiveStream()));
+    connect(mOpenCameraAct, &QAction::triggered, this, &Petrack::openCameraLiveStream);
 
     mOpenMoCapAct = new QAction(tr("Manage MoCap Files"), this);
     connect(mOpenMoCapAct, &QAction::triggered, this, &Petrack::openMoCapFile);
@@ -1892,25 +1892,25 @@ void Petrack::createActions()
 
     mExportSeqVidAct = new QAction(tr("Export Video"), this);
     mExportSeqVidAct->setEnabled(false);
-    connect(mExportSeqVidAct, SIGNAL(triggered()), this, SLOT(exportVideo()));
+    connect(mExportSeqVidAct, &QAction::triggered, this, &Petrack::exportVideo);
 
     mExportSeqVidViewAct = new QAction(tr("Export View Video"), this);
     mExportSeqVidViewAct->setEnabled(false);
-    connect(mExportSeqVidViewAct, SIGNAL(triggered()), this, SLOT(exportVideoView()));
+    connect(mExportSeqVidViewAct, &QAction::triggered, this, &Petrack::exportVideoView);
 
     mExportSeqImgAct = new QAction(tr("Export Image Sequence"), this);
     mExportSeqImgAct->setShortcut(tr("Ctrl+F"));
     mExportSeqImgAct->setEnabled(false);
-    connect(mExportSeqImgAct, SIGNAL(triggered()), this, SLOT(exportImageSequence()));
+    connect(mExportSeqImgAct, &QAction::triggered, this, &Petrack::exportImageSequence);
 
     mExportSeqViewAct = new QAction(tr("Export View Sequence"), this);
     //    mSaveSeqViewAct->setShortcut(tr("Ctrl+F"));
     mExportSeqViewAct->setEnabled(false);
-    connect(mExportSeqViewAct, SIGNAL(triggered()), this, SLOT(exportViewSequence()));
+    connect(mExportSeqViewAct, &QAction::triggered, this, &Petrack::exportViewSequence);
 
     mOpenPrAct = new QAction(tr("&Open Project"), this);
     mOpenPrAct->setShortcut(tr("Ctrl+O"));
-    connect(mOpenPrAct, SIGNAL(triggered()), this, SLOT(openProject()));
+    connect(mOpenPrAct, &QAction::triggered, this, [this] { openProject(); });
 
     mSavePrAct = new QAction(tr("&Save Project As"), this);
     mSavePrAct->setShortcut(tr("Ctrl+Shift+S"));
@@ -1918,27 +1918,27 @@ void Petrack::createActions()
 
     mSaveAct = new QAction(tr("&Save Project"), this);
     mSaveAct->setShortcut(tr("Ctrl+S"));
-    connect(mSaveAct, SIGNAL(triggered()), this, SLOT(saveSameProject()));
+    connect(mSaveAct, &QAction::triggered, this, &Petrack::saveSameProject);
 
     mExportImageAct = new QAction(tr("Export Image"), this);
     mExportImageAct->setShortcut(tr("Ctrl+I"));
     mExportImageAct->setEnabled(false);
-    connect(mExportImageAct, SIGNAL(triggered()), this, SLOT(exportImage()));
+    connect(mExportImageAct, &QAction::triggered, this, [this] { exportImage(); });
 
     mExportViewAct = new QAction(tr("Export View"), this);
     mExportViewAct->setShortcut(tr("Ctrl+V"));
     mExportViewAct->setEnabled(false);
-    connect(mExportViewAct, SIGNAL(triggered()), this, SLOT(exportView()));
+    connect(mExportViewAct, &QAction::triggered, this, [this] { exportView(); });
 
     mPrintAct = new QAction(tr("&Print"), this);
     mPrintAct->setShortcut(tr("Ctrl+P"));
     mPrintAct->setEnabled(false);
-    connect(mPrintAct, SIGNAL(triggered()), this, SLOT(print()));
+    connect(mPrintAct, &QAction::triggered, this, &Petrack::print);
 
     mResetSettingsAct = new QAction(tr("&Reset Settings"), this);
     //    mResetSettingsAct->setShortcut(tr("Ctrl+R"));
     mResetSettingsAct->setEnabled(false); // da es noch nicht fehlerfrei funktioniert
-    connect(mResetSettingsAct, SIGNAL(triggered()), this, SLOT(resetSettings()));
+    connect(mResetSettingsAct, &QAction::triggered, this, &Petrack::resetSettings);
 
     mAutosaveSettings = new QAction(tr("Autosave Settings"), this);
     connect(mAutosaveSettings, &QAction::triggered, this, &Petrack::openAutosaveSettings);
@@ -1950,21 +1950,21 @@ void Petrack::createActions()
 
     mExitAct = new QAction(tr("Exit"), this);
     mExitAct->setShortcut(tr("Ctrl+Q"));
-    connect(mExitAct, SIGNAL(triggered()), this, SLOT(close()));
+    connect(mExitAct, &QAction::triggered, this, &Petrack::close);
 
     mAntialiasAct = new QAction(tr("&Antialias"), this);
     mAntialiasAct->setShortcut(tr("Ctrl+A"));
     mAntialiasAct->setCheckable(true);
-    connect(mAntialiasAct, SIGNAL(triggered()), this, SLOT(antialias()));
+    connect(mAntialiasAct, &QAction::triggered, this, &Petrack::antialias);
 
     mFontAct = new QAction(tr("&Font"), this);
-    connect(mFontAct, SIGNAL(triggered()), this, SLOT(setGlobalFont()));
+    connect(mFontAct, &QAction::triggered, this, &Petrack::setGlobalFont);
 
     mHideControlsAct = new QAction(tr("&Hide controls"), this);
     mHideControlsAct->setShortcut(tr("Ctrl+H"));
     mHideControlsAct->setCheckable(true);
-    connect(mHideControlsAct, SIGNAL(triggered()), this, SLOT(showHideControlWidget()));
-    connect(mHideControlsAct, SIGNAL(changed()), this, SLOT(showHideControlWidget()));
+    connect(mHideControlsAct, &QAction::triggered, this, &Petrack::showHideControlWidget);
+    connect(mHideControlsAct, &QAction::changed, this, &Petrack::showHideControlWidget);
 
     mShowLogWindowAct = new QAction(tr("&Show log window"), this);
     connect(mShowLogWindowAct, &QAction::triggered, this, &Petrack::showLogWindow);
@@ -1978,20 +1978,20 @@ void Petrack::createActions()
     mOpenGLAct = new QAction(tr("Open&GL"), this);
     mOpenGLAct->setShortcut(tr("Ctrl+G"));
     mOpenGLAct->setCheckable(true);
-    connect(mOpenGLAct, SIGNAL(triggered()), this, SLOT(opengl()));
+    connect(mOpenGLAct, &QAction::triggered, this, &Petrack::opengl);
 
     mResetAct = new QAction(tr("&Reset"), this);
     mResetAct->setShortcut(tr("Ctrl+R"));
-    connect(mResetAct, SIGNAL(triggered()), this, SLOT(reset()));
+    connect(mResetAct, &QAction::triggered, this, &Petrack::reset);
 
     mFitViewAct =
         new QAction(tr("Fit in window"), this); // Resize to window; fit in view; show all; in fenster einpassen
     mFitViewAct->setShortcut(tr("Ctrl+0"));
-    connect(mFitViewAct, SIGNAL(triggered()), this, SLOT(fitInView()));
+    connect(mFitViewAct, &QAction::triggered, this, &Petrack::fitInView);
 
     mFitROIAct = new QAction(tr("Fit in region of interest"), this); // Resize ROI to window; fit in view;
     mFitROIAct->setShortcut(tr("Ctrl+1"));
-    connect(mFitROIAct, SIGNAL(triggered()), this, SLOT(fitInROI()));
+    connect(mFitROIAct, &QAction::triggered, this, &Petrack::fitInROI);
 
     mCameraGroupView = new QActionGroup(this);
     // mCameraGroupView->addAction(mCameraLeftViewAct);
@@ -1999,11 +1999,11 @@ void Petrack::createActions()
     mCameraLeftViewAct = new QAction(tr("&Left"), mCameraGroupView);
     mCameraLeftViewAct->setShortcut(tr("Ctrl++Shift+L"));
     mCameraLeftViewAct->setCheckable(true);
-    connect(mCameraLeftViewAct, SIGNAL(triggered()), this, SLOT(setCamera()));
+    connect(mCameraLeftViewAct, &QAction::triggered, this, &Petrack::setCamera);
     mCameraRightViewAct = new QAction(tr("&Right"), mCameraGroupView);
     mCameraRightViewAct->setShortcut(tr("Ctrl++Shift+R"));
     mCameraRightViewAct->setCheckable(true);
-    connect(mCameraRightViewAct, SIGNAL(triggered()), this, SLOT(setCamera()));
+    connect(mCameraRightViewAct, &QAction::triggered, this, &Petrack::setCamera);
     mCameraRightViewAct->setChecked(true); // right wird als default genommen, da reference image in triclops auch
                                            // right ist // erste trj wurden mit left gerechnet
 
@@ -2090,17 +2090,17 @@ void Petrack::createActions()
     // -------------------------------------------------------------------------------------------------------
 
     mCommandAct = new QAction(tr("&Command line options"), this);
-    connect(mCommandAct, SIGNAL(triggered()), this, SLOT(commandLineOptions()));
+    connect(mCommandAct, &QAction::triggered, this, &Petrack::commandLineOptions);
 
     mKeyAct = new QAction(tr("&Key bindings"), this);
-    connect(mKeyAct, SIGNAL(triggered()), this, SLOT(keyBindings()));
+    connect(mKeyAct, &QAction::triggered, this, &Petrack::keyBindings);
 
     mAboutAct = new QAction(tr("&About"), this);
-    connect(mAboutAct, SIGNAL(triggered()), this, SLOT(about()));
+    connect(mAboutAct, &QAction::triggered, this, &Petrack::about);
 
     mOnlineHelpAct = new QAction(tr("Online &Help"), this);
     mOnlineHelpAct->setShortcut(tr("F1"));
-    connect(mOnlineHelpAct, SIGNAL(triggered()), this, SLOT(onlineHelp()));
+    connect(mOnlineHelpAct, &QAction::triggered, this, &Petrack::onlineHelp);
 }
 
 /**
@@ -2199,7 +2199,11 @@ void Petrack::createStatusBar()
     statusBar()->addPermanentWidget(mStatusLabelTime = new QLabel(" "));
     statusBar()->addPermanentWidget(mStatusLabelFPS = new QLabel(" "));
     statusBar()->addPermanentWidget(mStatusPosRealHeight = new QDoubleSpinBox());
-    connect(mStatusPosRealHeight, SIGNAL(valueChanged(double)), this, SLOT(setStatusPosReal()));
+    connect(
+        mStatusPosRealHeight,
+        QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+        this,
+        static_cast<void (Petrack::*)()>(&Petrack::setStatusPosReal));
 
     statusBar()->addPermanentWidget(mStatusLabelPosReal = new QLabel(" "));
     statusBar()->addPermanentWidget(mStatusLabelPos = new QLabel(" "));

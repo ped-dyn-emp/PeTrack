@@ -46,14 +46,11 @@ public:
     void setControlWidget(int toHue, int fromHue, int toSat, int fromSat);
 
 private slots:
-    // functions which force a new recognition
-    void on_inversHue_stateChanged(int i);
-
-    void on_fromTriangle_colorChanged(const QColor &col);
-    void on_toTriangle_colorChanged(const QColor &col);
-
-    void on_fromColor_clicked();
-    void on_toColor_clicked();
+    void onInversHueStateChanged(int i);
+    void onFromTriangleColorChanged(const QColor &col);
+    void onToTriangleColorChanged(const QColor &col);
+    void onFromColorClicked();
+    void onToColorClicked();
 
 private:
     Petrack   *mMainWindow;

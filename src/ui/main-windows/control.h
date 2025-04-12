@@ -256,271 +256,208 @@ public:
         return mMainWindow;
     }
 
-    void resetCorrection();
-    void on_trackGotoStartNr_clicked();
+    void        resetCorrection();
+    void        onTrackGotoStartNrClicked();
+    inline void updateUi()
+    {
+        if(!isLoading())
+        {
+            mScene->update();
+        }
+    }
+
+private:
+    void onTrackShowOnlyVisibleStateChanged()
+    {
+        updateUi();
+    }
 private slots:
-    void on_anaCalculate_clicked();
-    void on_anaStep_valueChanged(int i);
-    void on_anaMarkAct_stateChanged(int i);
-    void on_anaConsiderX_stateChanged(int i);
-    void on_anaConsiderY_stateChanged(int i);
-    void on_anaConsiderAbs_stateChanged(int i);
-    void on_anaConsiderRev_stateChanged(int i);
+    void onAnaCalculateClicked();
+    void onAnaStepValueChanged();
+    void onAnaMarkActStateChanged();
+    void onAnaConsiderXStateChanged(int i);
+    void onAnaConsiderYStateChanged(int i);
+    void onAnaConsiderAbsStateChanged();
+    void onAnaConsiderRevStateChanged();
 
-    void on_recoShowColor_stateChanged(int i);
-    void on_recoOptimizeColor_clicked();
-    void on_recoColorModel_currentIndexChanged(int index);
-    void on_recoColorX_currentIndexChanged(int index);
-    void on_recoColorY_currentIndexChanged(int index);
-    void on_recoColorZ_valueChanged(int index);
-    void on_recoGreyLevel_valueChanged(int index);
-    void on_recoSymbolSize_valueChanged(int index);
-    void on_recoStereoShow_clicked();
-    void on_mapColorRange_clicked();
-    void on_colorPickerButton_clicked(bool checked);
-    void on_mapReadHeights_clicked();
-    void on_mapReadMarkerID_clicked();
+    void onRecoShowColorStateChanged(int i);
+    void onRecoOptimizeColorClicked();
+    void onRecoColorModelCurrentIndexChanged(int index);
+    void onRecoColorXCurrentIndexChanged();
+    void onRecoColorYCurrentIndexChanged();
+    void onRecoColorZValueChanged();
+    void onRecoGreyLevelValueChanged(int index);
+    void onRecoSymbolSizeValueChanged(int index);
+    void onRecoStereoShowClicked();
+    void onMapColorRangeClicked();
+    void onColorPickerButtonClicked(bool checked);
+    void onMapReadHeightsClicked();
+    void onMapReadMarkerIDClicked();
 
-    void on_mapNr_valueChanged(int i);
-    void on_mapX_valueChanged(int i);
-    void on_mapY_valueChanged(int i);
-    void on_mapW_valueChanged(int i);
-    void on_mapH_valueChanged(int i);
-    void on_mapColor_stateChanged(int i);
-    void on_mapHeight_valueChanged(double d);
-    void on_mapHeight_editingFinished();
-    void on_mapAdd_clicked();
-    void on_mapDel_clicked();
-    void on_mapDistribution_clicked();
-    void on_mapResetHeight_clicked();
-    void on_mapResetPos_clicked();
-    void on_mapDefaultHeight_valueChanged(double d);
-    void on_expandColor();
-    void on_setColor();
-
-
-    void on_trackShow_stateChanged(int i);
-    void on_trackOnlineCalc_stateChanged(int i);
-    void on_trackCalc_clicked();
-    void on_trackReset_clicked();
-    void on_trackExport_clicked();
-    void on_trackImport_clicked();
-
-    void on_trackRegionScale_valueChanged(int i);
-    void on_trackRegionLevels_valueChanged(int i);
-    void on_trackShowSearchSize_stateChanged(int i);
-
-    void on_trackShowOnlyVisible_stateChanged(int /*i*/)
-    {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
-    }
-    void on_trackShowCurrentPoint_stateChanged(int /*i*/)
-    {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
-    }
-    void on_trackGotoNr_clicked();
-
-    void on_trackGotoEndNr_clicked();
-
-    void on_trackHeadSized_stateChanged(int i);
+    void onMapNrValueChanged(int i);
+    void onMapXValueChanged();
+    void onMapYValueChanged();
+    void onMapWValueChanged();
+    void onMapHValueChanged();
+    void onMapColorStateChanged();
+    void onMapHeightValueChanged();
+    void onMapHeightEditingFinished();
+    void onMapAddClicked();
+    void onMapDelClicked();
+    void onMapDistributionClicked();
+    void onMapResetHeightClicked();
+    void onMapResetPosClicked();
+    void onMapDefaultHeightValueChanged(double d);
+    void onExpandColor();
+    void onSetColor();
 
 
-    void on_trackShowPoints_stateChanged(int /*i*/)
-    {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
-    }
-    void on_trackShowPointsColored_stateChanged(int /*i*/)
-    {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
-    }
-    void on_trackShowPath_stateChanged(int /*i*/)
-    {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
-    }
-    void on_trackShowColColor_stateChanged(int /*i*/)
-    {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
-    }
-    void on_trackShowColorMarker_stateChanged(int /*i*/)
-    {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
-    }
-    void on_trackShowNumber_stateChanged(int /*i*/)
-    {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
-    }
-    void on_trackShowGroundPosition_stateChanged(int /*i*/)
-    {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
-    }
-    void on_trackShowGroundPath_stateChanged(int /*i*/)
-    {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
-    }
-    void on_trackShowHeightIndividual_stateChanged(int /*i*/)
-    {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
-    }
-    void on_trackNumberBold_stateChanged(int /*i*/)
-    {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
-    }
-    void on_showMoCap_stateChanged(int i);
+    void onTrackShowStateChanged(int i);
+    void onTrackOnlineCalcStateChanged(int i);
+    void onTrackCalcClicked();
+    void onTrackResetClicked();
+    void onTrackExportClicked();
+    void onTrackImportClicked();
 
-    void on_trackCurrentPointSize_valueChanged(int /*i*/)
+    void onTrackRegionScaleValueChanged();
+    void onTrackRegionLevelsValueChanged();
+    void onTrackShowSearchSizeStateChanged();
+
+
+    void onTrackShowCurrentPointStateChanged()
     {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
+        updateUi();
     }
-    void on_trackCurrentPointLineWidth_valueChanged(int /*i*/)
+    void onTrackGotoNrClicked();
+    void onTrackGotoEndNrClicked();
+
+    void onTrackHeadSizedStateChanged(int i);
+
+
+    void onTrackShowPointsStateChanged()
     {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
+        updateUi();
+    }
+    void onTrackShowPointsColoredStateChanged()
+    {
+        updateUi();
+    }
+    void onTrackShowPathStateChanged()
+    {
+        updateUi();
+    }
+    void onTrackShowColColorStateChanged()
+    {
+        updateUi();
+    }
+    void onTrackShowColorMarkerStateChanged()
+    {
+        updateUi();
+    }
+    void onTrackShowNumberStateChanged()
+    {
+        updateUi();
+    }
+    void onTrackShowGroundPositionStateChanged()
+    {
+        updateUi();
+    }
+    void onTrackShowGroundPathStateChanged()
+    {
+        updateUi();
+    }
+    void onTrackShowHeightIndividualStateChanged()
+    {
+        updateUi();
+    }
+    void onTrackNumberBoldStateChanged()
+    {
+        updateUi();
+    }
+    void onShowMoCapStateChanged(int i);
+
+    void onTrackCurrentPointSizeValueChanged()
+    {
+        updateUi();
+    }
+    void onTrackCurrentPointLineWidthValueChanged()
+    {
+        updateUi();
     }
 
-    void on_trackPointSize_valueChanged(int /*i*/)
+    void onTrackPointSizeValueChanged()
     {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
+        updateUi();
     }
-    void on_trackShowPointsLineWidth_valueChanged(int /*i*/)
+    void onTrackShowPointsLineWidthValueChanged()
     {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
+        updateUi();
     }
 
-    void on_trackPathWidth_valueChanged(int /*i*/)
+    void onTrackPathWidthValueChanged()
     {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
+        updateUi();
     }
-    void on_trackColColorSize_valueChanged(int /*i*/)
+    void onTrackColColorSizeValueChanged()
     {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
+        updateUi();
     }
-    void on_trackColorMarkerSize_valueChanged(int /*i*/)
+    void onTrackColorMarkerSizeValueChanged()
     {
-        mScene->update();
+        updateUi();
     }
-    void on_trackColorMarkerLineWidth_valueChanged(int /*i*/)
+    void onTrackColorMarkerLineWidthValueChanged()
     {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
+        updateUi();
     }
-    void on_trackNumberSize_valueChanged(int /*i*/)
+    void onTrackNumberSizeValueChanged()
     {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
+        updateUi();
     }
-    void on_trackGroundPositionSize_valueChanged(int /*i*/)
+    void onTrackGroundPositionSizeValueChanged()
     {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
+        updateUi();
     }
-    void on_trackGroundPathSize_valueChanged(int /*i*/)
+    void onTrackGroundPathSizeValueChanged()
     {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
+        updateUi();
     }
-    void on_trackShowBefore_valueChanged(int /*i*/)
+    void onTrackShowBeforeValueChanged()
     {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
+        updateUi();
     }
-    void on_trackShowAfter_valueChanged(int /*i*/)
+    void onTrackShowAfterValueChanged()
     {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
+        updateUi();
     }
-    void on_moCapSize_valueChanged(int i);
+    void onMoCapSizeValueChanged(int i);
 
-    void on_recoMethod_currentIndexChanged(int index);
+    void onRecoMethodCurrentIndexChanged();
     void onRecoMethodChanged(reco::RecognitionMethod method);
-    void on_mlMethod_currentIndexChanged(int index);
+    void onMlMethodCurrentIndexChanged();
     void onMlMethodChanged(reco::MlMethod method);
-    void on_performRecognition_stateChanged(int i);
-    void on_markerBrightness_valueChanged(int i);
-    void on_markerIgnoreWithout_stateChanged(int i);
-    void on_roiShow_stateChanged(int i);
+    void onPerformRecognitionStateChanged(int i);
+    void onMarkerBrightnessValueChanged();
+    void onMarkerIgnoreWithoutStateChanged();
+    void onRoiShowStateChanged(int i);
 
-    void on_intrinsicParamsChanged(IntrinsicCameraParams params);
+    void onIntrinsicParamsChanged(IntrinsicCameraParams params);
 
-    void on_trackPathColorButton_clicked();
-    void on_trackGroundPathColorButton_clicked();
-    void on_moCapColorButton_clicked();
+    void onTrackPathColorButtonClicked();
+    void onTrackGroundPathColorButtonClicked();
+    void onMoCapColorButtonClicked();
 
-    void on_showVoronoiCells_stateChanged(int arg1);
+    void onShowVoronoiCellsStateChanged();
 
-    void on_trackShowOnlyNr_valueChanged(int i);
-    void on_trackShowOnlyNrList_textChanged(const QString &arg1);
+    void onTrackShowOnlyNrValueChanged();
+    void onTrackShowOnlyNrListTextChanged();
 
-    void on_trackShowOnlyListButton_clicked();
+    void onTrackShowOnlyListButtonClicked();
 
-    void on_trackShowOnly_stateChanged(int arg1);
-    void on_trackShowOnlyList_stateChanged(int arg1);
+    void onTrackShowOnlyStateChanged(int arg1);
+    void onTrackShowOnlyListStateChanged(int arg1);
 
-    void on_trackRoiShow_stateChanged(int arg1);
+    void onTrackRoiShowStateChanged(int arg1);
 
     void setMoCapShow(bool visibility);
     void setMoCapColor(QColor col);

@@ -60,7 +60,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mFrameForwardButton->setAutoRepeatInterval(1000. / DEFAULT_FPS); // war: 40 // for 1000 ms / 25 fps
     mFrameForwardButton->setIcon(QPixmap(":/skipF"));
     mFrameForwardButton->setIconSize(iconSize);
-    connect(mFrameForwardButton, SIGNAL(clicked()), this, SLOT(frameForward()));
+    connect(mFrameForwardButton, &QToolButton::clicked, this, &Player::frameForward);
 
     // frame backward Button
     mFrameBackwardButton = new QToolButton;
@@ -69,13 +69,13 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mFrameBackwardButton->setAutoRepeatInterval(1000. / DEFAULT_FPS); // war: 40 // for 1000 ms / 25 fps
     mFrameBackwardButton->setIcon(QPixmap(":/skipB"));
     mFrameBackwardButton->setIconSize(iconSize);
-    connect(mFrameBackwardButton, SIGNAL(clicked()), this, SLOT(frameBackward()));
+    connect(mFrameBackwardButton, &QToolButton::clicked, this, &Player::frameBackward);
 
     // pause button;
     mPauseButton = new QToolButton;
     mPauseButton->setIcon(QPixmap(":/pause"));
     mPauseButton->setIconSize(iconSize);
-    connect(mPauseButton, SIGNAL(clicked()), this, SLOT(pause()));
+    connect(mPauseButton, &QToolButton::clicked, this, &Player::pause);
 
     // slider
     mSlider = new QSlider(Qt::Horizontal);
@@ -95,7 +95,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mFrameInNum->setAlignment(Qt::AlignRight);
     mFrameInNum->setValidator(mFrameInNumValidator);
     mFrameInNum->setFont(f);
-    connect(mFrameInNum, SIGNAL(editingFinished()), this, SLOT(update()));
+    connect(mFrameInNum, &QLineEdit::editingFinished, this, &Player::update);
 
     mFrameOutNum = new QLineEdit("");
     mFrameOutNum->setMaxLength(8);
@@ -103,7 +103,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mFrameOutNum->setAlignment(Qt::AlignRight);
     mFrameOutNum->setValidator(mFrameOutNumValidator);
     mFrameOutNum->setFont(f);
-    connect(mFrameOutNum, SIGNAL(editingFinished()), this, SLOT(update()));
+    connect(mFrameOutNum, &QLineEdit::editingFinished, this, &Player::update);
 
     mFrameNum = new QLineEdit("0");
     mFrameNum->setMaxLength(8);     // bedeutet maxminal 1,1 stunden
@@ -111,7 +111,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mFrameNum->setAlignment(Qt::AlignRight);
     mFrameNum->setValidator(mFrameNumValidator);
     mFrameNum->setFont(f);
-    connect(mFrameNum, SIGNAL(editingFinished()), this, SLOT(skipToFrame()));
+    connect(mFrameNum, &QLineEdit::editingFinished, this, static_cast<bool (Player::*)()>(&Player::skipToFrame));
 
     // frame number
     mFpsNum = new QLineEdit(QString::number(DEFAULT_FPS));
@@ -122,7 +122,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mFpsNum->setValidator(mFpsNumValidator);
     mFpsNum->setFont(f);
     mFpsNum->setToolTip("Current playback fps");
-    connect(mFpsNum, SIGNAL(editingFinished()), this, SLOT(setPlaybackFPS()));
+    connect(mFpsNum, &QLineEdit::editingFinished, this, [this] { setPlaybackFPS(mFpsNum->text().toDouble()); });
 
     QFont f2("Courier", 12, QFont::Normal); // Times Helvetica, Normal
     mAtLabel = new QLabel("@");

@@ -59,31 +59,30 @@ public:
     void setAnim(Animation *anim);
     bool getPaused() const;
     void setSpeedRelativeToRealtime(double factor);
-
-public slots:
-    bool frameForward();
-    bool frameBackward();
-    void pause();
     void togglePlayPause();
-    bool skipToFrame(int f, bool pauseBefore = true);
-    bool skipToFrame();
     void jumpSeconds(double seconds);
     void queueJumpSeconds(double seconds);
-    void update();
-    void setPlaybackFPS(double fps = -1.);
     void togglePlayerSpeedLimited();
     void setPlayerSpeedLimited(bool fixed);
     bool getPlayerSpeedLimited() const;
-    void setPlayerSpeedFixed(bool fixed);
     bool getPlayerSpeedFixed() const;
-    void setLooping(bool looping);
     void setFrameInNum(int in = -1.);
     void setFrameOutNum(int out = -1.);
     int  getFrameInNum();
     int  getFrameOutNum();
     int  getPos();
-    void play(PlayerState state);
 
+public slots:
+    bool frameForward();
+    bool frameBackward();
+    void pause();
+    bool skipToFrame(int f, bool pauseBefore = true);
+    bool skipToFrame();
+    void update();
+    void setPlaybackFPS(double fps = -1.);
+    void setPlayerSpeedFixed(bool fixed);
+    void setLooping(bool looping);
+    void play(PlayerState state);
 
 private:
     void setSliderMax(int max);

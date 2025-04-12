@@ -52,6 +52,31 @@ FilterBeforeBox::FilterBeforeBox(
 
     // FocusPolicy: TabFocus and first ui-element as proxy are needed for tab order
     setFocusProxy(mUi->filterBrightContrast);
+
+    connect(
+        mUi->filterBrightContrast,
+        &QCheckBox::stateChanged,
+        this,
+        &FilterBeforeBox::onFilterBrightContrastStateChanged);
+    connect(
+        mUi->filterContrastParam, &PSlider::valueChanged, this, &FilterBeforeBox::onFilterContrastParamValueChanged);
+    connect(mUi->filterBrightParam, &PSlider::valueChanged, this, &FilterBeforeBox::onFilterBrightParamValueChanged);
+    connect(mUi->filterBorder, &QCheckBox::stateChanged, this, &FilterBeforeBox::onFilterBorderStateChanged);
+    connect(
+        mUi->filterBorderParamSize,
+        &PSlider::valueChanged,
+        this,
+        &FilterBeforeBox::onFilterBorderParamSizeValueChanged);
+    connect(mUi->filterBorderParamCol, &QPushButton::clicked, this, &FilterBeforeBox::onFilterBorderParamColClicked);
+    connect(mUi->filterBg, &QCheckBox::stateChanged, this, &FilterBeforeBox::onFilterBgStateChanged);
+    connect(mUi->filterBgShow, &QCheckBox::stateChanged, this, &FilterBeforeBox::onFilterBgShowStateChanged);
+    connect(mUi->filterBgUpdate, &QCheckBox::stateChanged, this, &FilterBeforeBox::onFilterBgUpdateStateChanged);
+    connect(mUi->filterBgReset, &QPushButton::clicked, this, &FilterBeforeBox::onFilterBgResetClicked);
+    connect(mUi->filterBgSave, &QPushButton::clicked, this, &FilterBeforeBox::onFilterBgSaveClicked);
+    connect(mUi->filterBgLoad, &QPushButton::clicked, this, &FilterBeforeBox::onFilterBgLoadClicked);
+    connect(mUi->filterSwap, &QCheckBox::stateChanged, this, &FilterBeforeBox::onFilterSwapStateChanged);
+    connect(mUi->filterSwapH, &QCheckBox::stateChanged, this, &FilterBeforeBox::onFilterSwapHStateChanged);
+    connect(mUi->filterSwapV, &QCheckBox::stateChanged, this, &FilterBeforeBox::onFilterSwapVStateChanged);
 }
 
 FilterBeforeBox::~FilterBeforeBox()
@@ -242,7 +267,7 @@ void FilterBeforeBox::toggleBackgroundUi(Qt::CheckState state)
     }
 }
 
-void FilterBeforeBox::on_filterBrightContrast_stateChanged(int i)
+void FilterBeforeBox::onFilterBrightContrastStateChanged(int i)
 {
     if(i == Qt::Checked)
     {
@@ -255,19 +280,19 @@ void FilterBeforeBox::on_filterBrightContrast_stateChanged(int i)
     mUpdateImageCallback();
 }
 
-void FilterBeforeBox::on_filterContrastParam_valueChanged(int i)
+void FilterBeforeBox::onFilterContrastParamValueChanged(int i)
 {
     mBrightContrastFilter.getContrast().setValue(i);
     mUpdateImageCallback();
 }
 
-void FilterBeforeBox::on_filterBrightParam_valueChanged(int i)
+void FilterBeforeBox::onFilterBrightParamValueChanged(int i)
 {
     mBrightContrastFilter.getBrightness().setValue(i);
     mUpdateImageCallback();
 }
 
-void FilterBeforeBox::on_filterBorder_stateChanged(int i)
+void FilterBeforeBox::onFilterBorderStateChanged(int i)
 {
     if(i == Qt::Checked)
     {
@@ -280,14 +305,14 @@ void FilterBeforeBox::on_filterBorder_stateChanged(int i)
     mUpdateImageCallback();
 }
 
-void FilterBeforeBox::on_filterBorderParamSize_valueChanged(int i)
+void FilterBeforeBox::onFilterBorderParamSizeValueChanged(int i)
 {
     // 2* because undistored has problem with sizes not dividable  of 4
     mBorderFilter.getBorderSize().setValue(2 * i);
     mUpdateImageCallback();
 }
 
-void FilterBeforeBox::on_filterBorderParamCol_clicked()
+void FilterBeforeBox::onFilterBorderParamColClicked()
 {
     QColor color = QColorDialog::getColor(
         QColor(
@@ -301,7 +326,7 @@ void FilterBeforeBox::on_filterBorderParamCol_clicked()
     mUpdateImageCallback();
 }
 
-void FilterBeforeBox::on_filterSwap_stateChanged(int i)
+void FilterBeforeBox::onFilterSwapStateChanged(int i)
 {
     if(i == Qt::Checked)
     {
@@ -314,21 +339,21 @@ void FilterBeforeBox::on_filterSwap_stateChanged(int i)
     mUpdateImageCallback();
 }
 
-void FilterBeforeBox::on_filterSwapH_stateChanged(int i)
+void FilterBeforeBox::onFilterSwapHStateChanged(int i)
 {
     mSwapFilter.getSwapHorizontally().setValue(i == Qt::Checked);
 
     mUpdateImageCallback();
 }
 
-void FilterBeforeBox::on_filterSwapV_stateChanged(int i)
+void FilterBeforeBox::onFilterSwapVStateChanged(int i)
 {
     mSwapFilter.getSwapVertically().setValue(i == Qt::Checked);
 
     mUpdateImageCallback();
 }
 
-void FilterBeforeBox::on_filterBg_stateChanged(int i)
+void FilterBeforeBox::onFilterBgStateChanged(int i)
 {
     toggleBackgroundUi(static_cast<Qt::CheckState>(i));
     if(i == Qt::Checked)
@@ -342,7 +367,7 @@ void FilterBeforeBox::on_filterBg_stateChanged(int i)
     mUpdateImageCallback();
 }
 
-void FilterBeforeBox::on_filterBgUpdate_stateChanged(int i)
+void FilterBeforeBox::onFilterBgUpdateStateChanged(int i)
 {
     if(i == Qt::Checked)
     {
@@ -354,13 +379,13 @@ void FilterBeforeBox::on_filterBgUpdate_stateChanged(int i)
     }
 }
 
-void FilterBeforeBox::on_filterBgReset_clicked()
+void FilterBeforeBox::onFilterBgResetClicked()
 {
     mBgFilter.reset();
     mUpdateImageCallback();
 }
 
-void FilterBeforeBox::on_filterBgShow_stateChanged(int i)
+void FilterBeforeBox::onFilterBgShowStateChanged(int i)
 {
     if(mBgItem)
     {
@@ -369,12 +394,12 @@ void FilterBeforeBox::on_filterBgShow_stateChanged(int i)
     }
 }
 
-void FilterBeforeBox::on_filterBgSave_clicked()
+void FilterBeforeBox::onFilterBgSaveClicked()
 {
     mBgFilter.save();
 }
 
-void FilterBeforeBox::on_filterBgLoad_clicked()
+void FilterBeforeBox::onFilterBgLoadClicked()
 {
     mBgFilter.load();
     mUpdateImageCallback();

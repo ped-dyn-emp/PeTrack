@@ -39,23 +39,19 @@ public:
     void getXml(QDomElement &elem);
 
 private slots:
-    void on_stereoUseForHeight_stateChanged(int /*i*/);
-    void on_stereoUseForHeightEver_stateChanged(int /*i*/);
-
-    void on_stereoShowDisparity_stateChanged(int i);
-    void on_stereoColor_currentIndexChanged(int /*i*/);
-    void on_stereoDispAlgo_currentIndexChanged(int /*i*/);
-    void on_hideWrong_stateChanged(int /*i*/);
-    void on_stereoMaskSize_valueChanged(int i);
-    void on_opacity_valueChanged(int /*i*/);
-    void on_edgeMaskSize_valueChanged(int i);
-    // funkioniert noch nicht richtig, da trotz des sprungs nach preprocess
-    // zuerst das ergebniss des zuletzt berechneten frames mit edge angezeigt wird!!!!!!!!!
-    void on_useEdge_stateChanged(int /*i*/);
-    void on_maxDisparity_valueChanged(int /*i*/);
-    void on_minDisparity_valueChanged(int /*i*/);
-
-    void on_stereoExport_clicked();
+    void onStereoUseForHeightStateChanged();
+    void onStereoUseForHeightEverStateChanged();
+    void onStereoShowDisparityStateChanged(int i);
+    void onStereoColorCurrentIndexChanged();
+    void onStereoDispAlgoCurrentIndexChanged();
+    void onHideWrongStateChanged();
+    void onStereoMaskSizeValueChanged(int i);
+    void onOpacityValueChanged();
+    void onEdgeMaskSizeValueChanged(int i);
+    void onUseEdgeStateChanged();
+    void onMaxDisparityValueChanged();
+    void onMinDisparityValueChanged();
+    void onStereoExportClicked();
 
 private:
     Petrack *mMainWindow;

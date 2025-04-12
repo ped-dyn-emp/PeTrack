@@ -48,34 +48,24 @@ public:
 
 private slots:
 
-    // Functions which just modifies the visual
-    void on_showMask_stateChanged(int i);
+    void onShowMaskStateChanged(int state);
+    void onMaskMaskStateChanged();
+    void onOpacityValueChanged();
 
-    void on_maskMask_stateChanged(int /*i*/);
-    void on_opacity_valueChanged(int /*i*/);
+    void onInversHueStateChanged();
+    void onUseOpenStateChanged();
+    void onUseCloseStateChanged();
+    void onCloseRadiusValueChanged();
+    void onOpenRadiusValueChanged();
+    void onMinAreaValueChanged();
+    void onMaxAreaValueChanged();
+    void onMaxRatioValueChanged();
 
-    // functions which force a new recognition
-    void on_inversHue_stateChanged(int /*i*/);
+    void onFromTriangleColorChanged(const QColor &color);
+    void onToTriangleColorChanged(const QColor &color);
 
-    void on_useOpen_stateChanged(int /*i*/);
-
-    void on_useClose_stateChanged(int /*i*/);
-
-    void on_closeRadius_valueChanged(int /*i*/);
-
-    void on_openRadius_valueChanged(int /*i*/);
-
-    void on_minArea_valueChanged(int /*i*/);
-
-    void on_maxArea_valueChanged(int /*i*/);
-
-    void on_maxRatio_valueChanged(double /*d*/);
-
-    void on_fromTriangle_colorChanged(const QColor &col);
-    void on_toTriangle_colorChanged(const QColor &col);
-
-    void on_fromColor_clicked();
-    void on_toColor_clicked();
+    void onFromColorClicked();
+    void onToColorClicked();
 
 private:
     Petrack *mMainWindow;

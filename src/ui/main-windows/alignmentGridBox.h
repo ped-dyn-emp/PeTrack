@@ -74,19 +74,19 @@ signals:
     void gridChanged();
 
 private slots:
-    void on_gridShow_stateChanged(int i);
-    void on_gridFix_stateChanged(int i);
-    void on_gridRotate_valueChanged(int i);
-    void on_gridTransX_valueChanged(int i);
-    void on_gridTransY_valueChanged(int i);
-    void on_gridScale_valueChanged(int i);
+    void onGridShowStateChanged();
+    void onGridFixStateChanged();
+    void onGridRotateValueChanged();
+    void onGridTransXValueChanged();
+    void onGridTransYValueChanged();
+    void onGridScaleValueChanged();
 
-    void on_gridTab_currentChanged(int index);
+    void onGridTabCurrentChanged();
 
-    void on_grid3DTransX_valueChanged(int value);
-    void on_grid3DTransY_valueChanged(int value);
-    void on_grid3DTransZ_valueChanged(int value);
-    void on_grid3DResolution_valueChanged(int value);
+    void onGrid3DTransXValueChanged();
+    void onGrid3DTransYValueChanged();
+    void onGrid3DTransZValueChanged();
+    void onGrid3DResolutionValueChanged();
 
 private:
     Grid2D assemble2DGrid();

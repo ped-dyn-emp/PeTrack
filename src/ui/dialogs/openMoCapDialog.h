@@ -54,7 +54,7 @@ public:
     void clickedOk();
 
 private slots:
-    void on_btnAddSelection_clicked();
+    void onBtnAddSelectionClicked();
 
 private:
     Ui::OpenMoCapDialog       *mUi;

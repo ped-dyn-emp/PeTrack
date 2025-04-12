@@ -59,21 +59,20 @@ signals:
 
 private slots:
 
-    void on_extrCalibCalc_clicked();
-    void on_extrCalibFetch_clicked();
-    void on_coordLoad3DCalibPoints_clicked();
+    void onExtrCalibCalcClicked();
+    void onExtrCalibFetchClicked();
+    void onCoordLoad3DCalibPointsClicked();
 
-    void on_rot1_valueChanged(double newVal);
-    void on_rot2_valueChanged(double newVal);
-    void on_rot3_valueChanged(double newVal);
-    void on_trans1_valueChanged(double newVal);
-    void on_trans2_valueChanged(double newVal);
-    void on_trans3_valueChanged(double newVal);
+    void onRot1ValueChanged(double newVal);
+    void onRot2ValueChanged(double newVal);
+    void onRot3ValueChanged(double newVal);
+    void onTrans1ValueChanged(double newVal);
+    void onTrans2ValueChanged(double newVal);
+    void onTrans3ValueChanged(double newVal);
 
-
-    void on_extrCalibSave_clicked();
-    void on_extrCalibShowPoints_clicked();
-    void on_extrCalibShowError_clicked();
+    void onExtrCalibSaveClicked();
+    void onExtrCalibShowPointsClicked();
+    void onExtrCalibShowErrorClicked();
 
 private:
     Ui::extr           *mUi;
