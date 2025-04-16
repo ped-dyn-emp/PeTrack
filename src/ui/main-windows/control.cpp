@@ -3168,6 +3168,10 @@ void Control::expandRange(QColor &fromColor, QColor &toColor, const QColor &clic
 
 void Control::toggleRecoROIButtons()
 {
+    if(!mUi->roiShow->isChecked())
+    {
+        mUi->roiFix->setChecked(true);
+    }
     bool enabled = (!mUi->roiFix->isChecked()) && mUi->roiShow->isChecked();
     mUi->recoRoiAdjustAutomatically->setEnabled(enabled);
     mUi->recoRoiToFullImageSize->setEnabled(enabled);
@@ -3175,6 +3179,10 @@ void Control::toggleRecoROIButtons()
 
 void Control::toggleTrackROIButtons()
 {
+    if(!mUi->trackRoiShow->isChecked())
+    {
+        mUi->trackRoiFix->setChecked(true);
+    }
     bool enabled = (!mUi->trackRoiFix->isChecked()) && mUi->trackRoiShow->isChecked();
     mUi->trackRoiAdjustAutomatically->setEnabled(enabled);
     mUi->trackRoiToFullImageSize->setEnabled(enabled);

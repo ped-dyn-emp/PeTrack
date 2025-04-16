@@ -170,4 +170,12 @@ TEST_CASE("CoordinateSystemBox: UI logic")
         ui->coordTab->setCurrentIndex(index3D);
         CHECK(extrChangedSpy.count() == 2);
     }
+    SECTION("Setting show to false should imply fixing the coordinate system")
+    {
+        // ensure show is checked and fix is unchecked
+        ui->coordShow->setChecked(true);
+        ui->coordFix->setChecked(false);
+        ui->coordShow->setChecked(false);
+        CHECK(ui->coordFix->isChecked());
+    }
 }

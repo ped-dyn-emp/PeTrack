@@ -407,6 +407,19 @@ TEST_CASE("Control: ROI fixed synchronized")
         control->setRecoRoiFix(!control->getRecoRoiFix());
         CHECK(control->getRecoRoiFix() == recoROI->isFixed());
     }
+    SECTION("Setting show to false should imply fixing the ROI objects")
+    {
+        // reco ROI
+        control->setRecoRoiShow(true);
+        control->setRecoRoiFix(false);
+        control->setRecoRoiShow(false);
+        CHECK(control->getRecoRoiFix());
+        // track ROI
+        control->setTrackRoiShow(true);
+        control->setTrackRoiFix(false);
+        control->setTrackRoiShow(false);
+        CHECK(control->getTrackRoiFix());
+    }
 }
 
 TEST_CASE("Calibration tab is open per default")

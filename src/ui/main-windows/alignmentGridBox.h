@@ -55,7 +55,9 @@ public:
 
     Grid getGridParameters();
     bool isShow();
+    void setShow(bool b);
     bool isFix();
+    void setFix(bool b);
 
     void setTrans3DX(double x);
     void setTrans3DY(double y);
