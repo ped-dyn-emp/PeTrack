@@ -637,6 +637,10 @@ void CoordinateSystemBox::onCoordTabCurrentChanged(int index)
 
 void CoordinateSystemBox::onCoordShowStateChanged()
 {
+    if(!mUi->coordShow->isChecked())
+    {
+        mUi->coordFix->setChecked(true);
+    }
     updateCoordItem();
     setMeasuredAltitude(); // measured isn't updated, when scale is moved and show deactivated
                            // and would have lead to a false value in the coord system when activating

@@ -58,10 +58,21 @@ bool AlignmentGridBox::isShow()
     return mUi->gridShow->isChecked();
 }
 
+void AlignmentGridBox::setShow(bool b)
+{
+    mUi->gridShow->setChecked(b);
+}
+
 bool AlignmentGridBox::isFix()
 {
     return mUi->gridFix->isChecked();
 }
+
+void AlignmentGridBox::setFix(bool b)
+{
+    mUi->gridFix->setChecked(b);
+}
+
 
 void AlignmentGridBox::setTrans3DX(double x)
 {
@@ -186,6 +197,10 @@ void AlignmentGridBox::onGridTabCurrentChanged()
 
 void AlignmentGridBox::onGridShowStateChanged()
 {
+    if(!isShow())
+    {
+        setFix(true);
+    }
     emit gridChanged();
 }
 
