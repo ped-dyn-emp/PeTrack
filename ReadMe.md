@@ -17,9 +17,9 @@ The program deals with wide angle lenses and a high density of pedestrians. Lens
 Different kinds of markers (e.g. with height information, head direction, individual code) are implemented. With a stereo camera more accurate height measurements and also markerless tracking is possible.
 
 
-## Installation:
-We publish installers for windows. To get the latest installer, visit our
-[registration form](https://go.fzj.de/petrack-download) and download the current installer. 
+## Download & installation:
+We publish installers for windows. To get the latest installer, visit this
+[webpage](https://go.fzj.de/petrack-download) and download the current installer. 
 
 ## How to use PeTrack
 
