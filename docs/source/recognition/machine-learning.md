@@ -44,7 +44,7 @@ image width
 : The image width refers to the image size used when **training** the model. When you use the default model, 640 is already the correct value.
 
 model
-: Here you can upload your preferred model for recognition. The default model can be found here. (TODO: Link einfügen)
+: Here you can upload your preferred model for recognition. The default models can be found in the [Downloads](#downloads) section. 
 The model has to be in the `.onnx` format and either be trained on YOLOv5 or YOLOv8.
 
 class names
