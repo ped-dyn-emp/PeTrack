@@ -215,7 +215,7 @@ private:
 
     // default multicolor marker (until 11/2016 hermes marker)
     RecognitionMethod mRecoMethod = RecognitionMethod::MultiColor;
-    MlMethod          mMlMethod   = MlMethod::YOLOv5;
+    MlMethod          mMlMethod   = MlMethod::YOLOv8;
 
 public:
     QList<TrackPoint> getMarkerPos(

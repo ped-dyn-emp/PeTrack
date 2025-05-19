@@ -159,6 +159,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="toolTip">
+        <string>Here you can find pretrained models trained on field data and experiment data</string>
+       </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
        </property>
@@ -169,7 +172,7 @@
         <string>&lt;html&gt;
 &lt;body&gt;
 &lt;p&gt;
-If you don't have a model, you can find some pre-trained models
+Pre-trained models
 &lt;a href=&quot;https://go.fzj.de/mlMarkerDocs&quot;&gt;here&lt;/a&gt;
 &lt;/p&gt;
 &lt;/body&gt;
