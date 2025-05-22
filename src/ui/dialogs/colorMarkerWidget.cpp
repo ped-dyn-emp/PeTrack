@@ -47,12 +47,12 @@ ColorMarkerWidget::ColorMarkerWidget(QWidget *parent) : QWidget(parent)
     col.setHsv(toHue, toSat, toVal);
     toTriangle->setColor(col);
 
-    connect(showMask, &QCheckBox::stateChanged, this, &ColorMarkerWidget::onShowMaskStateChanged);
-    connect(maskMask, &QCheckBox::stateChanged, this, &ColorMarkerWidget::onMaskMaskStateChanged);
+    connect(showMask, &QCheckBox::checkStateChanged, this, &ColorMarkerWidget::onShowMaskStateChanged);
+    connect(maskMask, &QCheckBox::checkStateChanged, this, &ColorMarkerWidget::onMaskMaskStateChanged);
     connect(opacity, QOverload<int>::of(&QSpinBox::valueChanged), this, &ColorMarkerWidget::onOpacityValueChanged);
-    connect(inversHue, &QCheckBox::stateChanged, this, &ColorMarkerWidget::onInversHueStateChanged);
-    connect(useOpen, &QCheckBox::stateChanged, this, &ColorMarkerWidget::onUseOpenStateChanged);
-    connect(useClose, &QCheckBox::stateChanged, this, &ColorMarkerWidget::onUseCloseStateChanged);
+    connect(inversHue, &QCheckBox::checkStateChanged, this, &ColorMarkerWidget::onInversHueStateChanged);
+    connect(useOpen, &QCheckBox::checkStateChanged, this, &ColorMarkerWidget::onUseOpenStateChanged);
+    connect(useClose, &QCheckBox::checkStateChanged, this, &ColorMarkerWidget::onUseCloseStateChanged);
     connect(
         closeRadius, QOverload<int>::of(&QSpinBox::valueChanged), this, &ColorMarkerWidget::onCloseRadiusValueChanged);
     connect(

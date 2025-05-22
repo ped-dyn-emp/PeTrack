@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef IO_H
-#define IO_H
+#ifndef PIO_H
+#define PIO_H
 
 #include <QString>
 #include <ezc3d_all.h>

@@ -21,18 +21,22 @@
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
 
 #include <QString>
+#include <opencv2/core.hpp>
+#include <opencv2/core/mat.hpp>
+#include <opencv2/core/operations.hpp>
 #include <spdlog/fmt/bundled/format.h>
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/sinks/ringbuffer_sink.h>
 #include <spdlog/sinks/stdout_sinks.h>
 #include <spdlog/spdlog.h>
+#include <sstream>
 
 namespace logger
 {
 // Note: when changing this, also adapt messageBoxLogFormat accordingly!
-const std::string logFormat            = "[%s:%#:%!][%l] %v";
-const std::string messageBoxLoggerName = "pMessageBox";
-const std::string messageBoxLogFormat  = "[{}:{}:{}][{}] {}";
+const std::string LOG_FORMAT              = "[%s:%#:%!][%l] %v";
+const std::string MESSAGE_BOX_LOGGER_NAME = "pMessageBox";
+const std::string MESSAGE_BOX_LOG_FORMAT  = "[{}:{}:{}][{}] {}";
 
 inline void setupLogger()
 {
@@ -43,7 +47,7 @@ inline void setupLogger()
     // setup global logger, which should be used to display message on the command line only
     spdlog::set_level(spdlog::level::trace);
 
-    spdlog::set_pattern(logFormat);
+    spdlog::set_pattern(LOG_FORMAT);
 
     // setup logger, which is used when also a dialog is displayed to the user
     auto messageBoxLogger = spdlog::stdout_logger_mt("pMessageBox");
@@ -57,10 +61,25 @@ struct fmt::formatter<QString>
     constexpr auto parse(format_parse_context &ctx) -> decltype(ctx.begin()) { return ctx.end(); }
 
     template <typename FormatContext>
-    auto format(const QString &input, FormatContext &ctx) -> decltype(ctx.out())
+    auto format(const QString &input, FormatContext &ctx) const -> decltype(ctx.out())
     {
         return format_to(ctx.out(), "{}", input.toStdString());
     }
 };
+
+template <>
+struct fmt::formatter<cv::Mat>
+{
+    constexpr auto parse(format_parse_context &ctx) -> decltype(ctx.begin()) { return ctx.end(); }
+
+    template <typename FormatContext>
+    auto format(const cv::Mat &mat, FormatContext &ctx) const -> decltype(ctx.out())
+    {
+        std::ostringstream s;
+        s << cv::format(mat, cv::Formatter::FMT_NUMPY);
+        return format_to(ctx.out(), "{}", s.str());
+    }
+};
+
 
 #endif

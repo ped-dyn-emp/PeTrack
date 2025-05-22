@@ -53,11 +53,11 @@ public:
     {
         static int lastX = -1;
         static int lastY = -1;
-        int        dx    = e->x() - lastX;
-        int        dy    = e->y() - lastY;
+        int        dx    = e->position().x() - lastX;
+        int        dy    = e->position().y() - lastY;
 
-        lastX = e->x();
-        lastY = e->y();
+        lastX = e->position().x();
+        lastY = e->position().y();
 
         // if (e->button() == Qt::MidButton) fkt bei move nicht
         if(e->buttons() == Qt::MiddleButton)
@@ -70,13 +70,11 @@ public:
                     const QwtScaleMap map = plot()->canvasMap(axis);
 
                     const int i1 =
-                        map.transform(plot()
-                                          ->axisScaleDiv(axis)
-                                          .lowerBound()); // war in alter qwt version: axisScaleDiv(axis)->lBound()
+                        map.transform(plot()->axisScaleDiv(axis).lowerBound()); // war in alter qwt version:
+                                                                                // axisScaleDiv(axis)->lBound()
                     const int i2 =
-                        map.transform(plot()
-                                          ->axisScaleDiv(axis)
-                                          .upperBound()); // war in alter qwt version: axisScaleDiv(axis)->hBound()
+                        map.transform(plot()->axisScaleDiv(axis).upperBound()); // war in alter qwt version:
+                                                                                // axisScaleDiv(axis)->hBound()
 
                     double d1, d2;
                     if(axis == QwtPlot::xBottom || axis == QwtPlot::xTop)

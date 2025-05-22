@@ -784,10 +784,13 @@ void QtColorTriangle::drawTrigon(
     QVarLengthArray<double, 2000>      leftX;
     QVarLengthArray<double, 2000>      rightX;
 
-    leftColors.resize(int(floor(p3->point.y() + 1)));
-    rightColors.resize(int(floor(p3->point.y() + 1)));
-    leftX.resize(int(floor(p3->point.y() + 1)));
-    rightX.resize(int(floor(p3->point.y() + 1)));
+    // make sure to always stay positive ;)
+    int size = std::max(0, int(std::floor(p3->point.y() + 1)));
+
+    leftColors.resize(size);
+    rightColors.resize(size);
+    leftX.resize(size);
+    rightX.resize(size);
 
     // Scan longy - find all left and right colors and X-values for
     // the tallest edge (p1-p3).

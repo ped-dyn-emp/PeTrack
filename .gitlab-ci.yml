@@ -28,7 +28,7 @@ stages:
 # only cache local items. Also set the current docker tag.
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  DOCKER_TAG: "v1"
+  DOCKER_TAG: "v2"
 
 cache:
   paths:
@@ -58,6 +58,7 @@ pre-build-checks:
   script:
     - scripts/check-format-cpp.sh
     - python3 scripts/check-license-header.py .
+    - python3 scripts/check-pet-files.py .
 
 # Build petrack and petrack unit_tests
 build_linux:
@@ -113,6 +114,7 @@ build_windows:
     - windows
   script:
     - mkdir -Force build
+    - $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     - $env:Path += ";C:\Program Files\CMake\bin"
     - cd build
     - cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -DUSE_3RD_PARTY=ON -DFAIL_ON_WARNINGS=ON ..
@@ -129,6 +131,7 @@ unit_test_windows:
   tags:
     - windows
   script:
+    - $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     - cd build/tests/unit_test
     - ./petrack_tests.exe -r junit -o unit_test_report.xml
   artifacts:
@@ -145,6 +148,7 @@ regression_test_windows:
   tags:
     - windows
   script:
+    - $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     - cd tests/regression_test/tests
     - python -m pytest --junitxml=pytest_report.xml | Tee-Object -FilePath "RegressionTestLog.txt"
   artifacts:
@@ -164,6 +168,7 @@ build_installer_windows:
   tags:
     - windows
   script:
+    - $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     - $env:Path += ";C:\Program Files\CMake\bin"
     - cd build
     - cpack -C Release
@@ -182,6 +187,7 @@ make_release_windows:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   needs: ["build_installer_windows"]
   script:
+    - $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     - cd build
     - winInst=$(echo petrack-installer-*)
     - curl -k -T $winInst -u "${SCIEBO_WIN_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$winInst --fail-with-body
@@ -201,6 +207,8 @@ build_macos:
       -DBUILD_BUNDLE=ON
       -DBUILD_UNIT_TESTS=ON
       -DFAIL_ON_WARNINGS=ON
+      -DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH
+      -DQWT_INCLUDE_DIR=$QWT_INCLUDE_DIR
       -DCatch2_DIR=$Catch2_DIR
       -Dtrompeloeil_DIR=$trompeloeil_DIR
       -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0

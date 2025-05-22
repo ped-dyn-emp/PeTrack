@@ -172,8 +172,8 @@ void ExtrCalibration::loadExtrCalibFile()
     QTextStream            in(&file);
     QString                line;
     int                    line_counter = 0, counter;
-    float                  x, y, z, px, py;
-    float                  number;
+    float                  x{0}, y{0}, z{0}, px{0}, py{0};
+    float                  number{0};
     bool                   with_2D_data = false, with_3D_data = false, end_loop = false;
     std::optional<QString> errorMessage;
 

@@ -129,18 +129,18 @@ if (USE_3RD_PARTY)
   set(OpenCV_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv-4.10.0")
 
   # Setting path to QWT
-  set(QWT_ROOT_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows/Qwt-6.1.4_64bit")
+  set(QWT_ROOT_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows/Qwt-6.3.0")
   set(QWT_INCLUDE_DIR "${QWT_ROOT_DIR}/include")
   set(QWT_LIBRARY "${QWT_ROOT_DIR}/lib/libqwt.a")
 endif ()
 
 # Qt
 find_package(
-  Qt5 5.14
-  COMPONENTS Widgets OpenGL Xml Core PrintSupport Concurrent Test
+  Qt6 6.8.3
+  COMPONENTS Widgets OpenGL OpenGLWidgets Xml Core PrintSupport Concurrent Test
   REQUIRED
 )
-message("Building with Qt${QT_DEFAULT_MAJOR_VERSION} (${Qt5Core_VERSION_STRING})")
+message("Building with Qt${QT_DEFAULT_MAJOR_VERSION} (${Qt6Core_VERSION_STRING})")
 
 # OpenCV
 find_package(
@@ -151,19 +151,7 @@ find_package(
 message("Building with OpenCV${OpenCV_VERSION_MAJOR} (${OpenCV_VERSION})")
 
 # QWT
-if(APPLE)
-    set(CMAKE_FIND_FRAMEWORK ONLY)
-    find_library(QWT
-        NAMES qwt
-        HINTS /usr/local/opt/qwt/lib/
-        REQUIRED)
-    if(QWT)
-        include_directories(${QWT}/Headers)
-        link_libraries(${QWT})
-    endif()
-else()
-  find_package(Qwt REQUIRED)
-endif()
+find_package(Qwt REQUIRED)
 
 #**********************************************************
 # Qt and Misc Stuff                                       *
@@ -215,12 +203,13 @@ target_compile_definitions(petrack_core PUBLIC COMPILE_OS="${CMAKE_SYSTEM_NAME}"
 # Linking Qt                                              *
 #**********************************************************
 target_link_libraries(petrack_core PUBLIC
-  Qt5::Widgets
-  Qt5::OpenGL
-  Qt5::Xml
-  Qt5::Core
-  Qt5::PrintSupport
-  Qt5::Concurrent
+  Qt6::Widgets
+  Qt6::OpenGL
+  Qt6::OpenGLWidgets
+  Qt6::Xml
+  Qt6::Core
+  Qt6::PrintSupport
+  Qt6::Concurrent
 )
 
 target_include_directories(petrack_core PRIVATE "${CMAKE_SOURCE_DIR}/ui")
@@ -240,16 +229,12 @@ target_link_libraries(petrack_core PUBLIC ${OpenCV_LIBS})
 #*****************************************************************
 # Linking QWT                                                    *
 #*****************************************************************
-if(APPLE)
-  target_link_directories(petrack_core PUBLIC "${QWT}")
-else()
-  target_compile_definitions(
-    petrack_core PRIVATE
-    $<$<AND:$<PLATFORM_ID:Windows>,$<BOOL:USE_3RD_PARTY>>:QWT QWT_DLL>)
+target_compile_definitions(
+  petrack_core PRIVATE
+  $<$<AND:$<PLATFORM_ID:Windows>,$<BOOL:USE_3RD_PARTY>>:QWT QWT_DLL>)
 
-  target_include_directories(petrack_core PUBLIC "${QWT_INCLUDE_DIR}")
-  target_link_libraries(petrack_core PUBLIC Qwt::Qwt)
-endif()
+target_include_directories(petrack_core PUBLIC "${QWT_INCLUDE_DIR}")
+target_link_libraries(petrack_core PUBLIC Qwt::Qwt)
 
 #*****************************************************************
 # Linking spdlog                                                    *
@@ -284,7 +269,7 @@ if(BUILD_UNIT_TESTS)
 
     target_compile_definitions(petrack_tests PUBLIC PETRACK_VERSION="${PROJECT_VERSION}")
 
-    target_link_libraries(petrack_tests PRIVATE Catch2::Catch2WithMain Qt5::Test trompeloeil::trompeloeil)
+    target_link_libraries(petrack_tests PRIVATE Catch2::Catch2WithMain Qt6::Test trompeloeil::trompeloeil)
     target_include_directories(petrack_tests PRIVATE
       "${CMAKE_CURRENT_BINARY_DIR}/petrack_core_autogen/include")
 

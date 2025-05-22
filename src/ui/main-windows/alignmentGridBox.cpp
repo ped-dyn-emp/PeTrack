@@ -30,8 +30,8 @@ AlignmentGridBox::AlignmentGridBox(QWidget *parent) : QWidget(parent), mUi(new U
 
     setFocusProxy(mUi->gridShow);
 
-    connect(mUi->gridShow, &QCheckBox::stateChanged, this, &AlignmentGridBox::onGridShowStateChanged);
-    connect(mUi->gridFix, &QCheckBox::stateChanged, this, &AlignmentGridBox::onGridFixStateChanged);
+    connect(mUi->gridShow, &QCheckBox::checkStateChanged, this, &AlignmentGridBox::onGridShowStateChanged);
+    connect(mUi->gridFix, &QCheckBox::checkStateChanged, this, &AlignmentGridBox::onGridFixStateChanged);
     connect(mUi->gridRotate, &PSlider::valueChanged, this, &AlignmentGridBox::onGridRotateValueChanged);
     connect(mUi->gridTransX, &PSlider::valueChanged, this, &AlignmentGridBox::onGridTransXValueChanged);
     connect(mUi->gridTransY, &PSlider::valueChanged, this, &AlignmentGridBox::onGridTransYValueChanged);

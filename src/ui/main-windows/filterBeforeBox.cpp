@@ -55,28 +55,28 @@ FilterBeforeBox::FilterBeforeBox(
 
     connect(
         mUi->filterBrightContrast,
-        &QCheckBox::stateChanged,
+        &QCheckBox::checkStateChanged,
         this,
         &FilterBeforeBox::onFilterBrightContrastStateChanged);
     connect(
         mUi->filterContrastParam, &PSlider::valueChanged, this, &FilterBeforeBox::onFilterContrastParamValueChanged);
     connect(mUi->filterBrightParam, &PSlider::valueChanged, this, &FilterBeforeBox::onFilterBrightParamValueChanged);
-    connect(mUi->filterBorder, &QCheckBox::stateChanged, this, &FilterBeforeBox::onFilterBorderStateChanged);
+    connect(mUi->filterBorder, &QCheckBox::checkStateChanged, this, &FilterBeforeBox::onFilterBorderStateChanged);
     connect(
         mUi->filterBorderParamSize,
         &PSlider::valueChanged,
         this,
         &FilterBeforeBox::onFilterBorderParamSizeValueChanged);
     connect(mUi->filterBorderParamCol, &QPushButton::clicked, this, &FilterBeforeBox::onFilterBorderParamColClicked);
-    connect(mUi->filterBg, &QCheckBox::stateChanged, this, &FilterBeforeBox::onFilterBgStateChanged);
-    connect(mUi->filterBgShow, &QCheckBox::stateChanged, this, &FilterBeforeBox::onFilterBgShowStateChanged);
-    connect(mUi->filterBgUpdate, &QCheckBox::stateChanged, this, &FilterBeforeBox::onFilterBgUpdateStateChanged);
+    connect(mUi->filterBg, &QCheckBox::checkStateChanged, this, &FilterBeforeBox::onFilterBgStateChanged);
+    connect(mUi->filterBgShow, &QCheckBox::checkStateChanged, this, &FilterBeforeBox::onFilterBgShowStateChanged);
+    connect(mUi->filterBgUpdate, &QCheckBox::checkStateChanged, this, &FilterBeforeBox::onFilterBgUpdateStateChanged);
     connect(mUi->filterBgReset, &QPushButton::clicked, this, &FilterBeforeBox::onFilterBgResetClicked);
     connect(mUi->filterBgSave, &QPushButton::clicked, this, &FilterBeforeBox::onFilterBgSaveClicked);
     connect(mUi->filterBgLoad, &QPushButton::clicked, this, &FilterBeforeBox::onFilterBgLoadClicked);
-    connect(mUi->filterSwap, &QCheckBox::stateChanged, this, &FilterBeforeBox::onFilterSwapStateChanged);
-    connect(mUi->filterSwapH, &QCheckBox::stateChanged, this, &FilterBeforeBox::onFilterSwapHStateChanged);
-    connect(mUi->filterSwapV, &QCheckBox::stateChanged, this, &FilterBeforeBox::onFilterSwapVStateChanged);
+    connect(mUi->filterSwap, &QCheckBox::checkStateChanged, this, &FilterBeforeBox::onFilterSwapStateChanged);
+    connect(mUi->filterSwapH, &QCheckBox::checkStateChanged, this, &FilterBeforeBox::onFilterSwapHStateChanged);
+    connect(mUi->filterSwapV, &QCheckBox::checkStateChanged, this, &FilterBeforeBox::onFilterSwapVStateChanged);
 }
 
 FilterBeforeBox::~FilterBeforeBox()

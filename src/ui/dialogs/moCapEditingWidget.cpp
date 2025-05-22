@@ -41,7 +41,7 @@ MoCapEditingWidget::MoCapEditingWidget(QWidget *parent, MoCapPerson &moCapPerson
         qOverload<double>(&PDoubleSpinBox::valueChanged),
         this,
         &MoCapEditingWidget::onTimeOffsetChanged);
-    connect(mUi->showPerson, &QCheckBox::stateChanged, this, &MoCapEditingWidget::onVisibleChanged);
+    connect(mUi->showPerson, &QCheckBox::checkStateChanged, this, &MoCapEditingWidget::onVisibleChanged);
     connect(mUi->angle, qOverload<double>(&PDoubleSpinBox::valueChanged), this, &MoCapEditingWidget::onRotationChanged);
     connect(
         mUi->trans_x,

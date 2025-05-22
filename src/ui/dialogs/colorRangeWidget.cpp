@@ -47,7 +47,7 @@ ColorRangeWidget::ColorRangeWidget(QWidget *parent) : QWidget(parent)
     col.setHsv(mToHue, mToSat, mToVal);
     toTriangle->setColor(col);
 
-    connect(inversHue, &QCheckBox::stateChanged, this, &ColorRangeWidget::onInversHueStateChanged);
+    connect(inversHue, &QCheckBox::checkStateChanged, this, &ColorRangeWidget::onInversHueStateChanged);
     connect(fromTriangle, &QtColorTriangle::colorChanged, this, &ColorRangeWidget::onFromTriangleColorChanged);
     connect(toTriangle, &QtColorTriangle::colorChanged, this, &ColorRangeWidget::onToTriangleColorChanged);
     connect(fromColor, &QPushButton::clicked, this, &ColorRangeWidget::onFromColorClicked);

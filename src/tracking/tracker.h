@@ -113,7 +113,7 @@ struct fmt::formatter<TrackPoint>
     constexpr auto parse(format_parse_context &ctx) -> decltype(ctx.begin()) { return ctx.end(); }
 
     template <typename FormatContext>
-    auto format(const TrackPoint &input, FormatContext &ctx) -> decltype(ctx.out())
+    auto format(const TrackPoint &input, FormatContext &ctx) const -> decltype(ctx.out())
     {
         std::stringstream stream;
         stream << input;

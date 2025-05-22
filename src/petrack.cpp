@@ -19,10 +19,10 @@
 #include <QMutex>
 #include <QSignalMapper>
 #include <QtOpenGL>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtWidgets>
 
 // Added for Qt5 support
-#include "IO.h"
 #include "YOLOMarkerWidget.h"
 #include "aboutDialog.h"
 #include "alignmentGridBox.h"
@@ -55,6 +55,7 @@
 #include "multiColorMarkerItem.h"
 #include "multiColorMarkerWidget.h"
 #include "openMoCapDialog.h"
+#include "pIO.h"
 #include "pMessageBox.h"
 #include "person.h"
 #include "petrack.h"
@@ -217,6 +218,10 @@ Petrack::Petrack(QString petrackVersion) :
 
     mViewWidget = new ViewWidget(this);
     mView       = mViewWidget->view();
+
+    // Remove border from view (purple glitch at top left)
+    mView->setFrameShape(QFrame::NoFrame);
+
     mView->setScene(mScene);
     connect(mView, &GraphicsView::mouseShiftDoubleClick, this, &Petrack::addManualTrackPointOnlyVisible);
     connect(mView, &GraphicsView::mouseShiftControlDoubleClick, this, &Petrack::splitTrackPerson);
@@ -315,7 +320,7 @@ Petrack::Petrack(QString petrackVersion) :
     //---------------------------
 
     mCentralLayout = new QHBoxLayout;
-    mCentralLayout->setMargin(space);
+    mCentralLayout->setContentsMargins(space, space, space, space);
     mCentralWidget = new QFrame;
     mCentralWidget->setFrameStyle(QFrame::Sunken | QFrame::StyledPanel);
     mCentralWidget->setLayout(mCentralLayout);
@@ -1798,7 +1803,7 @@ void Petrack::antialias()
 }
 void Petrack::opengl()
 {
-    mView->setViewport(mOpenGLAct->isChecked() ? new QGLWidget(QGLFormat(QGL::SampleBuffers)) : new QWidget);
+    mView->setViewport(mOpenGLAct->isChecked() ? new QOpenGLWidget(mView) : new QWidget);
     // need full viewport update for fade out animation of LogoItem to work
     mView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 }

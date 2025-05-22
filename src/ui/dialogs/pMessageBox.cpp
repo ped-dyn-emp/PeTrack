@@ -242,8 +242,8 @@ int PMessageBox::information(
     PMessageBox::StandardButtons buttons,
     PMessageBox::StandardButton  defaultButton)
 {
-    auto logger = spdlog::get(logger::messageBoxLoggerName);
-    SPDLOG_LOGGER_INFO(logger, logger::messageBoxLogFormat, file_name(file), line, func, "info", text);
+    auto logger = spdlog::get(logger::MESSAGE_BOX_LOGGER_NAME);
+    SPDLOG_LOGGER_INFO(logger, logger::MESSAGE_BOX_LOG_FORMAT, file_name(file), line, func, "info", text);
 
     // if no GUI gets displayed and no button except OK is used (no return Value used)
     // Then only log it
@@ -288,8 +288,8 @@ int PMessageBox::warning(
     PMessageBox::StandardButtons buttons,
     PMessageBox::StandardButton  defaultButton)
 {
-    auto logger = spdlog::get(logger::messageBoxLoggerName);
-    SPDLOG_LOGGER_WARN(logger, logger::messageBoxLogFormat, file_name(file), line, func, "warning", text);
+    auto logger = spdlog::get(logger::MESSAGE_BOX_LOGGER_NAME);
+    SPDLOG_LOGGER_WARN(logger, logger::MESSAGE_BOX_LOG_FORMAT, file_name(file), line, func, "warning", text);
 
     // if no GUI gets displayed and no button except OK is used (no return Value used)
     // Then only log it
@@ -334,8 +334,8 @@ int PMessageBox::critical(
     PMessageBox::StandardButtons buttons,
     PMessageBox::StandardButton  defaultButton)
 {
-    auto logger = spdlog::get(logger::messageBoxLoggerName);
-    SPDLOG_LOGGER_ERROR(logger, logger::messageBoxLogFormat, file_name(file), line, func, "error", text);
+    auto logger = spdlog::get(logger::MESSAGE_BOX_LOGGER_NAME);
+    SPDLOG_LOGGER_ERROR(logger, logger::MESSAGE_BOX_LOG_FORMAT, file_name(file), line, func, "error", text);
 
     // if no GUI gets displayed and no button except OK is used (no return Value used)
     // Then only log it

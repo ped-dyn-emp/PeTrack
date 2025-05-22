@@ -5,8 +5,8 @@ target_sources(petrack_core PRIVATE
     animation.h            
     autosave.cpp           
     autosave.h                   
-    IO.cpp                 
-    IO.h                   
+    pIO.cpp                 
+    pIO.h                   
     moCapPersonMetadata.cpp
     moCapPersonMetadata.h  
     skeletonTree.cpp       

@@ -19,25 +19,44 @@
 #ifndef PSLIDER_H
 #define PSLIDER_H
 
-
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QPoint>
 #include <QScrollEvent>
 #include <QSlider>
+#include <QTimer>
+
 
 /**
- * Custom Slider-class that changes scrolling behaviour.
+ * Custom Slider-class that changes scrolling behaviour and adds a throttling option.
  *
  * To prevent an unwanted change in value when scrolling on the UI, this custom
  * implementation of the Slider only scrolls, if it has focus.
- */
+ * To throttle the amount of updates during a mouse event this slider has a custom throttling system
+ * that only sends signals when a timer has run out.
+ * This implementation keeps proper handling of keyboard navigation and fixes track clicks */
 class PSlider : public QSlider
 {
     Q_OBJECT
+signals:
+    void throttledValueChanged(int value);
+
 public:
-    PSlider(QWidget *parent = nullptr) : QSlider(parent){};
+    PSlider(QWidget *parent = nullptr);
+    void setThrottleInterval(int interval);
+    int  throttleInterval() const;
+    void directEmit(int value);
 
 protected:
     void wheelEvent(QWheelEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+private slots:
+    void onThrottleTimerTimeout();
+
+private:
+    QTimer mThrottleTimer;
+    QPoint mLastMousePos;
 };
-
-
 #endif // PSLIDER_H

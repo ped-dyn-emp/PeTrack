@@ -10,17 +10,17 @@ install(TARGETS petrack
 
 if (WIN32)
     # Install Qt dlls
-    set (WINDEPLOYQT_APP \"${Qt5Core_DIR}/../../../bin/windeployqt\")
+    set (WINDEPLOYQT_APP \"${Qt6Core_DIR}/../../../bin/windeployqt\")
     install(CODE "
         message(\"\${CMAKE_INSTALL_PREFIX}/petrack.exe\")
         execute_process(COMMAND ${WINDEPLOYQT_APP} \"\${CMAKE_INSTALL_PREFIX}/bin/petrack.exe\")
     ")
-    set(OFFSCREEN_PLUGIN "${Qt5Core_DIR}/../../../plugins/platforms/qoffscreen.dll")
+    set(OFFSCREEN_PLUGIN "${Qt6Core_DIR}/../../../plugins/platforms/qoffscreen.dll")
 
     install(FILES "${OpenCV_LIB_PATH}/../bin/opencv_videoio_ffmpeg${OpenCV_VERSION_MAJOR}${OpenCV_VERSION_MINOR}${OpenCV_VERSION_PATCH}_64.dll" DESTINATION ${CMAKE_INSTALL_BINDIR})
 
     # NOTE: Paths might be platform specific
-    install(DIRECTORY "${Qt5Core_DIR}/../../../../../Licenses" DESTINATION "Licenses/Qt_Licenses")
+    install(DIRECTORY "${Qt6Core_DIR}/../../../../../Licenses" DESTINATION "Licenses/Qt_Licenses")
     install(DIRECTORY "${OpenCV_DIR}/etc/licenses" DESTINATION "Licenses/OpenCV_Licenses")
     install(FILES "${OpenCV_DIR}/LICENSE/" DESTINATION "Licenses/OpenCV_Licenses")
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/deps/ezc3d/LICENSE" DESTINATION "Licenses/ezc3d_license/")
@@ -55,11 +55,11 @@ elseif(APPLE)
 
         # copy the needed plugins
         file(INSTALL DESTINATION "${_outdir}"
-            TYPE FILE FILES "$<TARGET_FILE:Qt5::QCocoaIntegrationPlugin>" "$<TARGET_FILE:Qt5::QOffscreenIntegrationPlugin>")
+            TYPE FILE FILES "$<TARGET_FILE:Qt6::QCocoaIntegrationPlugin>" "$<TARGET_FILE:Qt6::QOffscreenIntegrationPlugin>")
 
         fixup_bundle(
             "${_appdir}/Contents/MacOS/petrack"
-            "${_outdir}/$<TARGET_FILE_NAME:Qt5::QCocoaIntegrationPlugin>;${_outdir}/$<TARGET_FILE_NAME:Qt5::QOffscreenIntegrationPlugin>"
+            "${_outdir}/$<TARGET_FILE_NAME:Qt6::QCocoaIntegrationPlugin>;${_outdir}/$<TARGET_FILE_NAME:Qt6::QOffscreenIntegrationPlugin>"
             ""
         )
     ]] COMPONENT Runtime)

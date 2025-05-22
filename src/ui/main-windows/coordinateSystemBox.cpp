@@ -89,8 +89,8 @@ CoordinateSystemBox::CoordinateSystemBox(
     mPose2D.position[1] = mUi->coordTransY->value();
 
     connect(mUi->coordTab, &QTabWidget::currentChanged, this, &CoordinateSystemBox::onCoordTabCurrentChanged);
-    connect(mUi->coordShow, &QCheckBox::stateChanged, this, &CoordinateSystemBox::onCoordShowStateChanged);
-    connect(mUi->coordFix, &QCheckBox::stateChanged, this, &CoordinateSystemBox::onCoordFixStateChanged);
+    connect(mUi->coordShow, &QCheckBox::checkStateChanged, this, &CoordinateSystemBox::onCoordShowStateChanged);
+    connect(mUi->coordFix, &QCheckBox::checkStateChanged, this, &CoordinateSystemBox::onCoordFixStateChanged);
 
     // 2D coordinates
     connect(mUi->coordRotate, &PSlider::valueChanged, this, &CoordinateSystemBox::onCoordRotateValueChanged);
@@ -108,7 +108,10 @@ CoordinateSystemBox::CoordinateSystemBox(
         this,
         &CoordinateSystemBox::onCoordUnitValueChanged);
     connect(
-        mUi->coordUseIntrinsic, &QCheckBox::stateChanged, this, &CoordinateSystemBox::onCoordUseIntrinsicStateChanged);
+        mUi->coordUseIntrinsic,
+        &QCheckBox::checkStateChanged,
+        this,
+        &CoordinateSystemBox::onCoordUseIntrinsicStateChanged);
 
     // 3D coordinates
     connect(mUi->coord3DTransX, &PSlider::valueChanged, this, &CoordinateSystemBox::onCoord3DTransXValueChanged);
@@ -116,19 +119,19 @@ CoordinateSystemBox::CoordinateSystemBox(
     connect(mUi->coord3DTransZ, &PSlider::valueChanged, this, &CoordinateSystemBox::onCoord3DTransZValueChanged);
     connect(mUi->coord3DAxeLen, &PSlider::valueChanged, this, &CoordinateSystemBox::onCoord3DAxeLenValueChanged);
 
-    connect(mUi->coord3DSwapX, &QCheckBox::stateChanged, this, &CoordinateSystemBox::onCoord3DSwapXStateChanged);
-    connect(mUi->coord3DSwapY, &QCheckBox::stateChanged, this, &CoordinateSystemBox::onCoord3DSwapYStateChanged);
-    connect(mUi->coord3DSwapZ, &QCheckBox::stateChanged, this, &CoordinateSystemBox::onCoord3DSwapZStateChanged);
+    connect(mUi->coord3DSwapX, &QCheckBox::checkStateChanged, this, &CoordinateSystemBox::onCoord3DSwapXStateChanged);
+    connect(mUi->coord3DSwapY, &QCheckBox::checkStateChanged, this, &CoordinateSystemBox::onCoord3DSwapYStateChanged);
+    connect(mUi->coord3DSwapZ, &QCheckBox::checkStateChanged, this, &CoordinateSystemBox::onCoord3DSwapZStateChanged);
 
     // Extrinsic calibration display
     connect(
         mUi->extCalibPointsShow,
-        &QCheckBox::stateChanged,
+        &QCheckBox::checkStateChanged,
         this,
         &CoordinateSystemBox::onExtCalibPointsShowStateChanged);
     connect(
         mUi->extVanishPointsShow,
-        &QCheckBox::stateChanged,
+        &QCheckBox::checkStateChanged,
         this,
         &CoordinateSystemBox::onExtVanishPointsShowStateChanged);
 }
@@ -241,8 +244,8 @@ double CoordinateSystemBox::getCmPerPixel() const
     // das sollte nur einmal berechne werden, wenn einfliessende daten sich aendern
     auto       boderTransform = QTransform::fromTranslate(-mGetBorderSize(), -mGetBorderSize());
     auto       imgToWorld     = boderTransform * mCoordTransform.inverted();
-    QPointF    p1             = imgToWorld * QPointF(0, 0);
-    QPointF    p2             = imgToWorld * QPointF(1, 0);
+    QPointF    p1             = imgToWorld.map(QPointF(0, 0));
+    QPointF    p2             = imgToWorld.map(QPointF(1, 0));
     const auto coordUnit      = mUi->coordUnit->value();
     return coordUnit * sqrt(pow(p1.x() - p2.x(), 2) + pow(p1.y() - p2.y(), 2)) / 100.;
     // durch 100., da coordsys so gezeichnet, dass 1 bei 100 liegt
@@ -323,7 +326,7 @@ QPointF CoordinateSystemBox::getPosImage(QPointF pos, float height) const
 
             auto borderTransforms = QTransform::fromTranslate(-mGetBorderSize(), -mGetBorderSize());
             auto imgToWorld       = borderTransforms * mCoordTransform.inverted();
-            pos                   = imgToWorld.inverted() * pos;
+            pos                   = imgToWorld.inverted().map(pos);
             // mImageItem.mapFromItem(&mCoordItem, pos); // Einheit anpassen...
             if(isCoordUseIntrinsicChecked())
             {
@@ -413,7 +416,7 @@ QPointF CoordinateSystemBox::getPosReal(QPointF pos, double height) const
             // Old 2D mapping of Pixelpoints to RealPositions
             auto borderTransform = QTransform::fromTranslate(-mGetBorderSize(), -mGetBorderSize());
             auto imgToWorld      = borderTransform * mCoordTransform.inverted();
-            pos                  = imgToWorld * pos;
+            pos                  = imgToWorld.map(pos);
             pos *= mUi->coordUnit->value() / 100.; // durch 100., da coordsys so gezeichnet, dass 1 bei 100 liegt
             pos.setY(-pos.y());
         }

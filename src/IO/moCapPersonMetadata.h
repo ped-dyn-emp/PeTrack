@@ -18,7 +18,7 @@
 #ifndef MOCAPPERSONMETADATA_H
 #define MOCAPPERSONMETADATA_H
 
-#include "IO.h"
+#include "pIO.h"
 
 enum MoCapSystem
 {

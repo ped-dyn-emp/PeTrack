@@ -22,6 +22,7 @@
 #include "control.h"
 #include "logger.h"
 #include "pMessageBox.h"
+#include "pSlider.h"
 #include "petrack.h"
 
 #include <QApplication>
@@ -78,10 +79,12 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     connect(mPauseButton, &QToolButton::clicked, this, &Player::pause);
 
     // slider
-    mSlider = new QSlider(Qt::Horizontal);
+    mSlider = new PSlider;
+    mSlider->setOrientation(Qt::Horizontal);
     mSlider->setTickPosition(QSlider::TicksAbove);
     mSlider->setMinimumWidth(100);
-    connect(mSlider, &QSlider::valueChanged, this, [this](int val) { skipToFrame(val); });
+    mSlider->setThrottleInterval(100);
+    connect(mSlider, &PSlider::throttledValueChanged, this, [this](int val) { skipToFrame(val); });
 
     // frame number
     QFont f("Courier", 12, QFont::Bold); // Times Helvetica, Normal
@@ -156,7 +159,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mPlayerLayout->addWidget(mAtLabel);
     mPlayerLayout->addWidget(mFpsNum);
     mPlayerLayout->addWidget(mFpsLabel);
-    mPlayerLayout->setMargin(0);
+    mPlayerLayout->setContentsMargins(0, 0, 0, 0);
 
     mMainWindow = (class Petrack *) parent;
 
