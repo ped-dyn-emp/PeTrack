@@ -55,12 +55,12 @@ IntrinsicBox::IntrinsicBox(
     mUpdateImageCallback(std::move(updateImageCallback))
 {
     mUi->setupUi(this);
-    connect(mUi->extModelCheckBox, &QCheckBox::stateChanged, this, &IntrinsicBox::onExtModelCheckBoxStateChanged);
+    connect(mUi->extModelCheckBox, &QCheckBox::checkStateChanged, this, &IntrinsicBox::onExtModelCheckBoxStateChanged);
     connect(mUi->extModelCheckBox, &QCheckBox::clicked, this, &IntrinsicBox::onExtModelCheckBoxClicked);
-    connect(mUi->quadAspectRatio, &QCheckBox::stateChanged, this, &IntrinsicBox::onQuadAspectRatioStateChanged);
-    connect(mUi->fixCenter, &QCheckBox::stateChanged, this, &IntrinsicBox::onFixCenterStateChanged);
-    connect(mUi->tangDist, &QCheckBox::stateChanged, this, &IntrinsicBox::onTangDistStateChanged);
-    connect(mUi->apply, &QCheckBox::stateChanged, this, &IntrinsicBox::onApplyStateChanged);
+    connect(mUi->quadAspectRatio, &QCheckBox::checkStateChanged, this, &IntrinsicBox::onQuadAspectRatioStateChanged);
+    connect(mUi->fixCenter, &QCheckBox::checkStateChanged, this, &IntrinsicBox::onFixCenterStateChanged);
+    connect(mUi->tangDist, &QCheckBox::checkStateChanged, this, &IntrinsicBox::onTangDistStateChanged);
+    connect(mUi->apply, &QCheckBox::checkStateChanged, this, &IntrinsicBox::onApplyStateChanged);
     connect(mUi->fx, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onFxValueChanged);
     connect(mUi->fy, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onFyValueChanged);
     connect(mUi->cx, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onCxValueChanged);

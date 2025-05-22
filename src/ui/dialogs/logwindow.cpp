@@ -53,7 +53,7 @@ LogWindow::LogWindow(QWidget *parent, Ui::LogWindow *ui) : QWidget(parent)
     qtSink   = std::make_shared<spdlog::sinks::qt_sink_mt>(mUi->logText, "appendPlainText");
     distSink->add_sink(qtSink);
     spdlog::default_logger()->sinks().push_back(distSink);
-    spdlog::default_logger()->set_pattern(logger::logFormat);
+    spdlog::default_logger()->set_pattern(logger::LOG_FORMAT);
     connect(mUi->saveLogButton, &QPushButton::clicked, this, &LogWindow::saveLog);
 }
 void LogWindow::saveLog()

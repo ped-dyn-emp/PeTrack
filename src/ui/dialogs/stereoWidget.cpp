@@ -37,10 +37,13 @@ StereoWidget::StereoWidget(QWidget *parent) : QWidget(parent)
     stereoDispAlgo->addItem("openCV block matching");
     stereoDispAlgo->addItem("openCV semi-global block matching");
 
-    connect(stereoUseForHeight, &QCheckBox::stateChanged, this, &StereoWidget::onStereoUseForHeightStateChanged);
+    connect(stereoUseForHeight, &QCheckBox::checkStateChanged, this, &StereoWidget::onStereoUseForHeightStateChanged);
     connect(
-        stereoUseForHeightEver, &QCheckBox::stateChanged, this, &StereoWidget::onStereoUseForHeightEverStateChanged);
-    connect(stereoShowDisparity, &QCheckBox::stateChanged, this, &StereoWidget::onStereoShowDisparityStateChanged);
+        stereoUseForHeightEver,
+        &QCheckBox::checkStateChanged,
+        this,
+        &StereoWidget::onStereoUseForHeightEverStateChanged);
+    connect(stereoShowDisparity, &QCheckBox::checkStateChanged, this, &StereoWidget::onStereoShowDisparityStateChanged);
     connect(
         stereoColor,
         QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -51,12 +54,12 @@ StereoWidget::StereoWidget(QWidget *parent) : QWidget(parent)
         QOverload<int>::of(&QComboBox::currentIndexChanged),
         this,
         &StereoWidget::onStereoDispAlgoCurrentIndexChanged);
-    connect(hideWrong, &QCheckBox::stateChanged, this, &StereoWidget::onHideWrongStateChanged);
+    connect(hideWrong, &QCheckBox::checkStateChanged, this, &StereoWidget::onHideWrongStateChanged);
     connect(
         stereoMaskSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &StereoWidget::onStereoMaskSizeValueChanged);
     connect(opacity, QOverload<int>::of(&QSpinBox::valueChanged), this, &StereoWidget::onOpacityValueChanged);
     connect(edgeMaskSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &StereoWidget::onEdgeMaskSizeValueChanged);
-    connect(useEdge, &QCheckBox::stateChanged, this, &StereoWidget::onUseEdgeStateChanged);
+    connect(useEdge, &QCheckBox::checkStateChanged, this, &StereoWidget::onUseEdgeStateChanged);
     connect(maxDisparity, QOverload<int>::of(&QSpinBox::valueChanged), this, &StereoWidget::onMaxDisparityValueChanged);
     connect(minDisparity, QOverload<int>::of(&QSpinBox::valueChanged), this, &StereoWidget::onMinDisparityValueChanged);
     connect(stereoExport, &QPushButton::clicked, this, &StereoWidget::onStereoExportClicked);

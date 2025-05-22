@@ -39,7 +39,7 @@ they can be represented in QT.
 
 #include <QDir>
 #include <QFileInfo>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QSize>
 #include <QStringList>
 #include <QTime>
@@ -230,7 +230,7 @@ bool Animation::openTimeFile(QString &timeFileName)
             {
                 fcycSec   = cycSec;
                 fcycCount = cycCount;
-                dt.setTime_t(sec);
+                dt.setSecsSinceEpoch(sec);
                 SPDLOG_INFO("Recording starts at {}{:06d}", dt.toString("dd.MM.yyyy hh:mm:ss."), microSec);
                 mFirstSec      = sec;
                 mFirstMicroSec = microSec;
@@ -263,7 +263,7 @@ bool Animation::openTimeFile(QString &timeFileName)
             lcycCount = cycCount;
             in >> dum;
         }
-        dt.setTime_t(sec);
+        dt.setSecsSinceEpoch(sec);
         fps = frame / ((cycSec - fcycSec + add) + (cycCount - fcycCount) / 8000.);
 
         // entspricht nicht der in statusbar angezeigten zeit des letzten frames, da
@@ -316,7 +316,7 @@ QString Animation::getTimeString(int frame)
     {
         QDateTime dt;
         int       deziMilliSec = frame % 16 * 625 + mFirstMicroSec / 100; // 625 = 10000/16
-        dt.setTime_t(mFirstSec + frame / 16 + deziMilliSec / 10000);
+        dt.setSecsSinceEpoch(mFirstSec + frame / 16 + deziMilliSec / 10000);
         return (dt.toString("dd.MM.yyyy hh:mm:ss") + ".%1").arg(deziMilliSec % 10000, 4, 10, QChar('0'));
     }
     else
@@ -694,13 +694,15 @@ bool Animation::openAnimationPhoto(QString fileName)
 
     // series1_0002-left => split into series1_|0002|-left
     // regexp is greedy - from left to right try to get the most characters
-    QRegExp regExp("(?:[0-9]*)([^0-9]*)$"); //(?: ) zum ignorieren
-    QString front, back;
-    int     frontLen, frontLenList;
-    if((frontLen = regExp.indexIn(mFileInfo.completeBaseName())) > -1)
+    QRegularExpression      regExp("(?:[0-9]*)([^0-9]*)$"); //(?: ) to ignore
+    QString                 front, back;
+    int                     frontLen, frontLenList;
+    QRegularExpressionMatch match = regExp.match(mFileInfo.completeBaseName());
+    if(match.hasMatch())
     {
-        front = mFileInfo.completeBaseName().left(frontLen);
-        back  = regExp.cap(1);
+        frontLen = static_cast<int>(match.capturedStart(0));
+        front    = mFileInfo.completeBaseName().left(frontLen);
+        back     = match.captured(1);
     }
     else // does not match regExp at all
     {
@@ -710,15 +712,20 @@ bool Animation::openAnimationPhoto(QString fileName)
 
     // Create a new image files list
     mImgFilesList.clear();
-    for(int i = 0; i < fileList.size(); i++)
+    for(const auto &file : fileList)
     {
-        if((frontLenList = regExp.indexIn(fileList.at(i).completeBaseName())) > -1)
+        QString                 currentBasename = file.completeBaseName();
+        QRegularExpressionMatch listMatch       = regExp.match(currentBasename);
+        if(listMatch.hasMatch())
         {
+            frontLenList         = static_cast<int>(listMatch.capturedStart(0));
+            QString currentFront = currentBasename.left(frontLenList);
+            QString currentBack  = listMatch.captured(1);
+
             // Is the file in the series?
-            if((fileList.at(i).completeBaseName().left(frontLenList) == front) && (regExp.cap(1) == back) &&
-               (fileList.at(i).suffix() == mFileInfo.suffix()))
+            if(currentFront == front && currentBack == back && file.suffix() == mFileInfo.suffix())
             {
-                mImgFilesList << fileList.at(i).filePath();
+                mImgFilesList << file.filePath();
             }
         }
     }

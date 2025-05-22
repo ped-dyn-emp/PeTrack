@@ -221,6 +221,8 @@ public:
     int  getRecoColorModel() const;
     int  getMapNr() const;
 
+    void setScrollAreaMinimumWidth(QScrollArea *scrollArea, QWidget *scrollAreaWidgetContents);
+
     int  getMarkerBrightness() const;
     bool isMarkerIgnoreWithoutChecked() const;
     bool isRecoAutoWBChecked() const;

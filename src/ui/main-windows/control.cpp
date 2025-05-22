@@ -18,7 +18,6 @@
 
 #include "control.h"
 
-#include "IO.h"
 #include "YOLOMarkerWidget.h"
 #include "alignmentGridBox.h"
 #include "analysePlot.h"
@@ -37,6 +36,7 @@
 #include "logger.h"
 #include "multiColorMarkerWidget.h"
 #include "pGroupBox.h"
+#include "pIO.h"
 #include "pMessageBox.h"
 #include "petrack.h"
 #include "player.h"
@@ -233,29 +233,14 @@ Control::Control(
     mUi->mlMethod->setCurrentIndex(mUi->mlMethod->findData(QVariant::fromValue(recognizer.getMlMethod())));
     mUi->mlMethod->hide();
 
-    mUi->scrollArea->setMinimumWidth(
-        mUi->scrollAreaWidgetContents->sizeHint().width() + 2 * mUi->scrollArea->frameWidth() +
-        mUi->scrollArea->verticalScrollBar()->sizeHint().width() +
-        mUi->scrollAreaWidgetContents->layout()->margin() * 2 + mUi->scrollAreaWidgetContents->layout()->spacing() * 2);
-    mUi->scrollArea_2->setMinimumWidth(
-        mUi->scrollAreaWidgetContents_2->sizeHint().width() + 2 * mUi->scrollArea_2->frameWidth() +
-        mUi->scrollArea_2->verticalScrollBar()->sizeHint().width() +
-        mUi->scrollAreaWidgetContents_2->layout()->margin() * 2 +
-        mUi->scrollAreaWidgetContents_2->layout()->spacing() * 2);
-    mUi->scrollArea_3->setMinimumWidth(
-        mUi->scrollAreaWidgetContents_3->sizeHint().width() + 2 * mUi->scrollArea_3->frameWidth() +
-        mUi->scrollArea_3->verticalScrollBar()->sizeHint().width() +
-        mUi->scrollAreaWidgetContents_3->layout()->margin() * 2 +
-        mUi->scrollAreaWidgetContents_3->layout()->spacing() * 2);
-    mUi->scrollArea_4->setMinimumWidth(
-        mUi->scrollAreaWidgetContents_4->sizeHint().width() + 2 * mUi->scrollArea_4->frameWidth() +
-        mUi->scrollArea_4->verticalScrollBar()->sizeHint().width() +
-        mUi->scrollAreaWidgetContents_4->layout()->margin() * 2 +
-        mUi->scrollAreaWidgetContents_4->layout()->spacing() * 2);
+    setScrollAreaMinimumWidth(mUi->scrollArea, mUi->scrollAreaWidgetContents);
+    setScrollAreaMinimumWidth(mUi->scrollArea_2, mUi->scrollAreaWidgetContents_2);
+    setScrollAreaMinimumWidth(mUi->scrollArea_3, mUi->scrollAreaWidgetContents_3);
+    setScrollAreaMinimumWidth(mUi->scrollArea_4, mUi->scrollAreaWidgetContents_4);
 
 
     trackRoiItem.setFixed(mUi->trackRoiFix->isChecked());
-    connect(mUi->trackRoiFix, &QCheckBox::stateChanged, &trackRoiItem, &RoiItem::setFixed);
+    connect(mUi->trackRoiFix, &QCheckBox::checkStateChanged, &trackRoiItem, &RoiItem::setFixed);
     connect(mUi->recoRoiToFullImageSize, &QPushButton::clicked, &recoRoiItem, &RoiItem::setToFullImageSize);
     connect(
         mUi->recoRoiAdjustAutomatically,
@@ -264,7 +249,7 @@ Control::Control(
         [&recoRoiItem, &trackRoiItem]() { recoRoiItem.adjustToOtherROI(trackRoiItem, std::minus<>()); });
 
     recoRoiItem.setFixed(mUi->roiFix->isChecked());
-    connect(mUi->roiFix, &QCheckBox::stateChanged, &recoRoiItem, &RoiItem::setFixed);
+    connect(mUi->roiFix, &QCheckBox::checkStateChanged, &recoRoiItem, &RoiItem::setFixed);
     connect(mUi->trackRoiToFullImageSize, &QPushButton::clicked, &trackRoiItem, &RoiItem::setToFullImageSize);
     connect(
         mUi->trackRoiAdjustAutomatically,
@@ -272,10 +257,10 @@ Control::Control(
         this,
         [&recoRoiItem, &trackRoiItem]() { trackRoiItem.adjustToOtherROI(recoRoiItem, std::plus<>()); });
 
-    connect(mUi->roiFix, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
-    connect(mUi->roiShow, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
-    connect(mUi->trackRoiFix, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
-    connect(mUi->trackRoiShow, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
+    connect(mUi->roiFix, &QCheckBox::checkStateChanged, this, &Control::toggleRecoROIButtons);
+    connect(mUi->roiShow, &QCheckBox::checkStateChanged, this, &Control::toggleRecoROIButtons);
+    connect(mUi->trackRoiFix, &QCheckBox::checkStateChanged, this, &Control::toggleTrackROIButtons);
+    connect(mUi->trackRoiShow, &QCheckBox::checkStateChanged, this, &Control::toggleTrackROIButtons);
     connect(
         mUi->recoMethod,
         QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -288,14 +273,14 @@ Control::Control(
         &Control::onMlMethodCurrentIndexChanged);
     connect(mUi->anaCalculate, &QPushButton::clicked, this, &Control::onAnaCalculateClicked);
     connect(mUi->anaStep, QOverload<int>::of(&PSpinBox::valueChanged), this, &Control::onAnaStepValueChanged);
-    connect(mUi->anaMarkAct, &QCheckBox::stateChanged, this, &Control::onAnaMarkActStateChanged);
-    connect(mUi->anaConsiderX, &QCheckBox::stateChanged, this, &Control::onAnaConsiderXStateChanged);
-    connect(mUi->anaConsiderY, &QCheckBox::stateChanged, this, &Control::onAnaConsiderYStateChanged);
-    connect(mUi->anaConsiderAbs, &QCheckBox::stateChanged, this, &Control::onAnaConsiderAbsStateChanged);
-    connect(mUi->anaConsiderRev, &QCheckBox::stateChanged, this, &Control::onAnaConsiderRevStateChanged);
-    connect(mUi->showVoronoiCells, &QCheckBox::stateChanged, this, &Control::onShowVoronoiCellsStateChanged);
-    connect(mUi->trackShow, &QCheckBox::stateChanged, this, &Control::onTrackShowStateChanged);
-    connect(mUi->trackOnlineCalc, &QCheckBox::stateChanged, this, &Control::onTrackOnlineCalcStateChanged);
+    connect(mUi->anaMarkAct, &QCheckBox::checkStateChanged, this, &Control::onAnaMarkActStateChanged);
+    connect(mUi->anaConsiderX, &QCheckBox::checkStateChanged, this, &Control::onAnaConsiderXStateChanged);
+    connect(mUi->anaConsiderY, &QCheckBox::checkStateChanged, this, &Control::onAnaConsiderYStateChanged);
+    connect(mUi->anaConsiderAbs, &QCheckBox::checkStateChanged, this, &Control::onAnaConsiderAbsStateChanged);
+    connect(mUi->anaConsiderRev, &QCheckBox::checkStateChanged, this, &Control::onAnaConsiderRevStateChanged);
+    connect(mUi->showVoronoiCells, &QCheckBox::checkStateChanged, this, &Control::onShowVoronoiCellsStateChanged);
+    connect(mUi->trackShow, &QCheckBox::checkStateChanged, this, &Control::onTrackShowStateChanged);
+    connect(mUi->trackOnlineCalc, &QCheckBox::checkStateChanged, this, &Control::onTrackOnlineCalcStateChanged);
     connect(mUi->trackCalc, &QPushButton::clicked, this, &Control::onTrackCalcClicked);
     connect(mUi->trackReset, &QPushButton::clicked, this, &Control::onTrackResetClicked);
     connect(mUi->trackExport, &QPushButton::clicked, this, &Control::onTrackExportClicked);
@@ -306,9 +291,9 @@ Control::Control(
     connect(mUi->moCapColorButton, &QPushButton::clicked, this, &Control::onMoCapColorButtonClicked);
     connect(mUi->trackRegionScale, &PSlider::valueChanged, this, &Control::onTrackRegionScaleValueChanged);
     connect(mUi->trackRegionLevels, &PSlider::valueChanged, this, &Control::onTrackRegionLevelsValueChanged);
-    connect(mUi->trackShowSearchSize, &QCheckBox::stateChanged, this, &Control::onTrackShowSearchSizeStateChanged);
-    connect(mUi->trackShowOnly, &QCheckBox::stateChanged, this, &Control::onTrackShowOnlyStateChanged);
-    connect(mUi->trackShowOnlyList, &QCheckBox::stateChanged, this, &Control::onTrackShowOnlyListStateChanged);
+    connect(mUi->trackShowSearchSize, &QCheckBox::checkStateChanged, this, &Control::onTrackShowSearchSizeStateChanged);
+    connect(mUi->trackShowOnly, &QCheckBox::checkStateChanged, this, &Control::onTrackShowOnlyStateChanged);
+    connect(mUi->trackShowOnlyList, &QCheckBox::checkStateChanged, this, &Control::onTrackShowOnlyListStateChanged);
     connect(
         mUi->trackShowOnlyNr,
         QOverload<int>::of(&PSpinBox::valueChanged),
@@ -316,30 +301,39 @@ Control::Control(
         &Control::onTrackShowOnlyNrValueChanged);
     connect(mUi->trackShowOnlyNrList, &QLineEdit::textChanged, this, &Control::onTrackShowOnlyNrListTextChanged);
     connect(mUi->trackShowOnlyListButton, &QPushButton::clicked, this, &Control::onTrackShowOnlyListButtonClicked);
-    connect(mUi->trackShowOnlyVisible, &QCheckBox::stateChanged, this, &Control::onTrackShowOnlyVisibleStateChanged);
+    connect(
+        mUi->trackShowOnlyVisible, &QCheckBox::checkStateChanged, this, &Control::onTrackShowOnlyVisibleStateChanged);
     connect(mUi->trackGotoNr, &QPushButton::clicked, this, &Control::onTrackGotoNrClicked);
     connect(mUi->trackGotoStartNr, &QPushButton::clicked, this, &Control::onTrackGotoStartNrClicked);
     connect(mUi->trackGotoEndNr, &QPushButton::clicked, this, &Control::onTrackGotoEndNrClicked);
-    connect(mUi->trackHeadSized, &QCheckBox::stateChanged, this, &Control::onTrackHeadSizedStateChanged);
-    connect(mUi->showMoCap, &QCheckBox::stateChanged, this, &Control::onShowMoCapStateChanged);
+    connect(mUi->trackHeadSized, &QCheckBox::checkStateChanged, this, &Control::onTrackHeadSizedStateChanged);
+    connect(mUi->showMoCap, &QCheckBox::checkStateChanged, this, &Control::onShowMoCapStateChanged);
     connect(mUi->moCapSize, QOverload<int>::of(&PSpinBox::valueChanged), this, &Control::onMoCapSizeValueChanged);
-    connect(mUi->trackShowCurrentPoint, &QCheckBox::stateChanged, this, &Control::onTrackShowCurrentPointStateChanged);
-    connect(mUi->trackShowPoints, &QCheckBox::stateChanged, this, &Control::onTrackShowPointsStateChanged);
     connect(
-        mUi->trackShowPointsColored, &QCheckBox::stateChanged, this, &Control::onTrackShowPointsColoredStateChanged);
-    connect(mUi->trackShowPath, &QCheckBox::stateChanged, this, &Control::onTrackShowPathStateChanged);
-    connect(mUi->trackShowColColor, &QCheckBox::stateChanged, this, &Control::onTrackShowColColorStateChanged);
-    connect(mUi->trackShowColorMarker, &QCheckBox::stateChanged, this, &Control::onTrackShowColorMarkerStateChanged);
-    connect(mUi->trackShowNumber, &QCheckBox::stateChanged, this, &Control::onTrackShowNumberStateChanged);
+        mUi->trackShowCurrentPoint, &QCheckBox::checkStateChanged, this, &Control::onTrackShowCurrentPointStateChanged);
+    connect(mUi->trackShowPoints, &QCheckBox::checkStateChanged, this, &Control::onTrackShowPointsStateChanged);
     connect(
-        mUi->trackShowGroundPosition, &QCheckBox::stateChanged, this, &Control::onTrackShowGroundPositionStateChanged);
-    connect(mUi->trackShowGroundPath, &QCheckBox::stateChanged, this, &Control::onTrackShowGroundPathStateChanged);
+        mUi->trackShowPointsColored,
+        &QCheckBox::checkStateChanged,
+        this,
+        &Control::onTrackShowPointsColoredStateChanged);
+    connect(mUi->trackShowPath, &QCheckBox::checkStateChanged, this, &Control::onTrackShowPathStateChanged);
+    connect(mUi->trackShowColColor, &QCheckBox::checkStateChanged, this, &Control::onTrackShowColColorStateChanged);
+    connect(
+        mUi->trackShowColorMarker, &QCheckBox::checkStateChanged, this, &Control::onTrackShowColorMarkerStateChanged);
+    connect(mUi->trackShowNumber, &QCheckBox::checkStateChanged, this, &Control::onTrackShowNumberStateChanged);
+    connect(
+        mUi->trackShowGroundPosition,
+        &QCheckBox::checkStateChanged,
+        this,
+        &Control::onTrackShowGroundPositionStateChanged);
+    connect(mUi->trackShowGroundPath, &QCheckBox::checkStateChanged, this, &Control::onTrackShowGroundPathStateChanged);
     connect(
         mUi->trackShowHeightIndividual,
-        &QCheckBox::stateChanged,
+        &QCheckBox::checkStateChanged,
         this,
         &Control::onTrackShowHeightIndividualStateChanged);
-    connect(mUi->trackNumberBold, &QCheckBox::stateChanged, this, &Control::onTrackNumberBoldStateChanged);
+    connect(mUi->trackNumberBold, &QCheckBox::checkStateChanged, this, &Control::onTrackNumberBoldStateChanged);
     connect(
         mUi->trackCurrentPointSize,
         QOverload<int>::of(&PSpinBox::valueChanged),
@@ -396,7 +390,7 @@ Control::Control(
         &Control::onTrackShowBeforeValueChanged);
     connect(
         mUi->trackShowAfter, QOverload<int>::of(&PSpinBox::valueChanged), this, &Control::onTrackShowAfterValueChanged);
-    connect(mUi->recoShowColor, &QCheckBox::stateChanged, this, &Control::onRecoShowColorStateChanged);
+    connect(mUi->recoShowColor, &QCheckBox::checkStateChanged, this, &Control::onRecoShowColorStateChanged);
     connect(mUi->recoOptimizeColor, &QPushButton::clicked, this, &Control::onRecoOptimizeColorClicked);
     connect(
         mUi->recoColorModel,
@@ -426,7 +420,7 @@ Control::Control(
     connect(mUi->mapY, &PSlider::valueChanged, this, &Control::onMapYValueChanged);
     connect(mUi->mapW, &PSlider::valueChanged, this, &Control::onMapWValueChanged);
     connect(mUi->mapH, &PSlider::valueChanged, this, &Control::onMapHValueChanged);
-    connect(mUi->mapColor, &QCheckBox::stateChanged, this, &Control::onMapColorStateChanged);
+    connect(mUi->mapColor, &QCheckBox::checkStateChanged, this, &Control::onMapColorStateChanged);
     connect(
         mUi->mapHeight, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &Control::onMapHeightValueChanged);
     connect(mUi->mapHeight, &PDoubleSpinBox::editingFinished, this, &Control::onMapHeightEditingFinished);
@@ -440,16 +434,16 @@ Control::Control(
         QOverload<double>::of(&PDoubleSpinBox::valueChanged),
         this,
         &Control::onMapDefaultHeightValueChanged);
-    connect(mUi->performRecognition, &QCheckBox::stateChanged, this, &Control::onPerformRecognitionStateChanged);
+    connect(mUi->performRecognition, &QCheckBox::checkStateChanged, this, &Control::onPerformRecognitionStateChanged);
     connect(mUi->markerBrightness, &PSlider::valueChanged, this, &Control::onMarkerBrightnessValueChanged);
-    connect(mUi->markerIgnoreWithout, &QCheckBox::stateChanged, this, &Control::onMarkerIgnoreWithoutStateChanged);
+    connect(mUi->markerIgnoreWithout, &QCheckBox::checkStateChanged, this, &Control::onMarkerIgnoreWithoutStateChanged);
     // ROI connections
-    connect(mUi->roiShow, &QCheckBox::stateChanged, this, &Control::onRoiShowStateChanged);
-    connect(mUi->trackRoiShow, &QCheckBox::stateChanged, this, &Control::onTrackRoiShowStateChanged);
-    connect(mUi->roiFix, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
-    connect(mUi->roiShow, &QCheckBox::stateChanged, this, &Control::toggleRecoROIButtons);
-    connect(mUi->trackRoiFix, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
-    connect(mUi->trackRoiShow, &QCheckBox::stateChanged, this, &Control::toggleTrackROIButtons);
+    connect(mUi->roiShow, &QCheckBox::checkStateChanged, this, &Control::onRoiShowStateChanged);
+    connect(mUi->trackRoiShow, &QCheckBox::checkStateChanged, this, &Control::onTrackRoiShowStateChanged);
+    connect(mUi->roiFix, &QCheckBox::checkStateChanged, this, &Control::toggleRecoROIButtons);
+    connect(mUi->roiShow, &QCheckBox::checkStateChanged, this, &Control::toggleRecoROIButtons);
+    connect(mUi->trackRoiFix, &QCheckBox::checkStateChanged, this, &Control::toggleTrackROIButtons);
+    connect(mUi->trackRoiShow, &QCheckBox::checkStateChanged, this, &Control::toggleTrackROIButtons);
 
     // "Hide" analysis tab until it is fixed
     mUi->tabs->removeTab(3);
@@ -462,7 +456,7 @@ Control::Control(
 
     connect(
         mUi->trackShowComplPath,
-        &QCheckBox::stateChanged,
+        &QCheckBox::checkStateChanged,
         this,
         [this](int)
         {
@@ -472,6 +466,20 @@ Control::Control(
             }
         });
 }
+void Control::setScrollAreaMinimumWidth(QScrollArea *scrollArea, QWidget *scrollAreaWidgetContents)
+{
+    int frameWidth             = scrollArea->frameWidth();
+    int verticalScrollBarWidth = scrollArea->verticalScrollBar()->sizeHint().width();
+    int leftMargin             = scrollAreaWidgetContents->layout()->contentsMargins().left();
+    int rightMargin            = scrollAreaWidgetContents->layout()->contentsMargins().right();
+    int spacing                = scrollAreaWidgetContents->layout()->spacing();
+
+    int minimumWidth = scrollAreaWidgetContents->sizeHint().width() + (2 * frameWidth) + verticalScrollBarWidth +
+                       leftMargin + rightMargin + (2 * spacing);
+
+    scrollArea->setMinimumWidth(minimumWidth);
+}
+
 
 void Control::setScene(QGraphicsScene *sc)
 {

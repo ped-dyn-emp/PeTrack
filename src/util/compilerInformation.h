@@ -18,6 +18,8 @@
 
 #ifndef COMPILERINFORMATION_H
 #define COMPILERINFORMATION_H
+#include <sstream>
+#include <string>
 
 // Taken from:
 //  https://stackoverflow.com/questions/38530981/output-compiler-version-in-a-c-program#38531037

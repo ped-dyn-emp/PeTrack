@@ -75,14 +75,24 @@ RUN cd /opt && \
     ldconfig && \
     rm -rf /opt/opencv-${OPENCV_VERSION}
 
-# Install Qt 5.15
-RUN pip install pytest numpy aqtinstall && aqt install-qt linux desktop 5.15.2 && \
+# Install Qt 6.8.3
+RUN pip install pytest numpy aqtinstall && aqt install-qt linux desktop 6.8.3 -O /opt/qt6 && \
     rm -rf /root/.cache/pip
-ENV PATH="/5.15.2/gcc_64/lib/cmake/Qt5:${PATH}"
+ENV PATH="/opt/qt6/6.8.3/gcc_64/bin:${PATH}"
 
 # Install Qwt
-RUN apt-get update && apt-get install -y \
-    libqwt-qt5-dev 
+ARG QWT_VERSION=6.3.0
+RUN cd /opt && \
+    wget https://sourceforge.net/projects/qwt/files/qwt/${QWT_VERSION}/qwt-${QWT_VERSION}.zip && \
+    unzip qwt-${QWT_VERSION}.zip && \
+    rm qwt-${QWT_VERSION}.zip && \
+    cd qwt-${QWT_VERSION} && \
+    sed -i "s+QWT_INSTALL_PREFIX[[:space:]]*=.*$+QWT_INSTALL_PREFIX=/usr+g" qwtconfig.pri && \
+    qmake qwt.pro && \
+    make -j$(nproc) && \
+    make install && \
+    cd / && rm -rf /opt/qwt-${QWT_VERSION}
+
 
 # create the ci user
 RUN ["useradd", "ci"]

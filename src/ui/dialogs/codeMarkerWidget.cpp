@@ -94,7 +94,7 @@ CodeMarkerWidget::CodeMarkerWidget(QWidget *parent, reco::CodeMarkerOptions &cod
     };
     connect(
         mUi->showDetectedCandidates,
-        &QCheckBox::stateChanged,
+        &QCheckBox::checkStateChanged,
         this,
         &CodeMarkerWidget::onShowDetectedCandidatesStateChanged);
     connect(mUi->minMarkerPerimeter, QOverload<double>::of(&QDoubleSpinBox::valueChanged), changedParams);

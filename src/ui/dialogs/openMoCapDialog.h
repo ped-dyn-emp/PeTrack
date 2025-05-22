@@ -18,9 +18,9 @@
 #ifndef OPENMOCAPDIALOG_H
 #define OPENMOCAPDIALOG_H
 
-#include "IO.h"
 #include "moCapController.h"
 #include "moCapPersonMetadata.h"
+#include "pIO.h"
 
 #include <QDialog>
 #include <QMap>

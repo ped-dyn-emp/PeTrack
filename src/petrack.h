@@ -471,6 +471,8 @@ private:
     BackgroundFilter     mBackgroundFilter;
 
     AutoCalib                       mAutoCalib;
+    Autosave                        mAutosave{*this};
+    PersonStorage                   mPersonStorage{*this, mAutosave};
     ExtrCalibration                 mExtrCalibration;
     const WorldImageCorrespondence *mWorldImageCorrespondence;
 
@@ -480,13 +482,11 @@ private:
     reco::Recognizer mReco;
 
     QDomDocument mDefaultSettings;
-    Autosave     mAutosave{*this};
 
-    PersonStorage mPersonStorage{*this, mAutosave};
-    Tracker      *mTracker;
-    TrackerReal  *mTrackerReal;
-    double        mHeadSize;
-    double        mCmPerPixel;
+    Tracker     *mTracker;
+    TrackerReal *mTrackerReal;
+    double       mHeadSize;
+    double       mCmPerPixel;
 
     ManualTrackpointMover mManualTrackPointMover;
 

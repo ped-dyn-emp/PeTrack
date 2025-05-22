@@ -29,28 +29,30 @@ MultiColorMarkerWidget::MultiColorMarkerWidget(QWidget *parent) : QWidget(parent
     mOldMinArea = minArea->value();
     mOldMaxArea = maxArea->value();
 
-    connect(useDot, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onUseDotStateChanged);
+    connect(useDot, &QCheckBox::checkStateChanged, this, &MultiColorMarkerWidget::onUseDotStateChanged);
     connect(
         dotSize,
         QOverload<double>::of(&QDoubleSpinBox::valueChanged),
         this,
         &MultiColorMarkerWidget::onDotSizeValueChanged);
-    connect(useCodeMarker, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onUseCodeMarkerStateChanged);
+    connect(useCodeMarker, &QCheckBox::checkStateChanged, this, &MultiColorMarkerWidget::onUseCodeMarkerStateChanged);
     connect(CodeMarkerParameter, &QPushButton::clicked, this, &MultiColorMarkerWidget::onCodeMarkerParameterClicked);
-    connect(ignoreWithoutDot, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onIgnoreWithoutDotStateChanged);
-    connect(useColor, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onUseColorStateChanged);
-    connect(restrictPosition, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onRestrictPositionStateChanged);
-    connect(autoCorrect, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onAutoCorrectStateChanged);
+    connect(
+        ignoreWithoutDot, &QCheckBox::checkStateChanged, this, &MultiColorMarkerWidget::onIgnoreWithoutDotStateChanged);
+    connect(useColor, &QCheckBox::checkStateChanged, this, &MultiColorMarkerWidget::onUseColorStateChanged);
+    connect(
+        restrictPosition, &QCheckBox::checkStateChanged, this, &MultiColorMarkerWidget::onRestrictPositionStateChanged);
+    connect(autoCorrect, &QCheckBox::checkStateChanged, this, &MultiColorMarkerWidget::onAutoCorrectStateChanged);
     connect(
         autoCorrectOnlyExport,
-        &QCheckBox::stateChanged,
+        &QCheckBox::checkStateChanged,
         this,
         &MultiColorMarkerWidget::onAutoCorrectOnlyExportStateChanged);
-    connect(showMask, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onShowMaskStateChanged);
-    connect(maskMask, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onMaskMaskStateChanged);
+    connect(showMask, &QCheckBox::checkStateChanged, this, &MultiColorMarkerWidget::onShowMaskStateChanged);
+    connect(maskMask, &QCheckBox::checkStateChanged, this, &MultiColorMarkerWidget::onMaskMaskStateChanged);
     connect(opacity, QOverload<int>::of(&QSpinBox::valueChanged), this, &MultiColorMarkerWidget::onOpacityValueChanged);
-    connect(useOpen, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onUseOpenStateChanged);
-    connect(useClose, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onUseCloseStateChanged);
+    connect(useOpen, &QCheckBox::checkStateChanged, this, &MultiColorMarkerWidget::onUseOpenStateChanged);
+    connect(useClose, &QCheckBox::checkStateChanged, this, &MultiColorMarkerWidget::onUseCloseStateChanged);
     connect(
         closeRadius,
         QOverload<int>::of(&QSpinBox::valueChanged),
@@ -63,7 +65,7 @@ MultiColorMarkerWidget::MultiColorMarkerWidget(QWidget *parent) : QWidget(parent
         &MultiColorMarkerWidget::onOpenRadiusValueChanged);
     connect(minArea, QOverload<int>::of(&QSpinBox::valueChanged), this, &MultiColorMarkerWidget::onMinAreaValueChanged);
     connect(maxArea, QOverload<int>::of(&QSpinBox::valueChanged), this, &MultiColorMarkerWidget::onMaxAreaValueChanged);
-    connect(useHeadSize, &QCheckBox::stateChanged, this, &MultiColorMarkerWidget::onUseHeadSizeStateChanged);
+    connect(useHeadSize, &QCheckBox::checkStateChanged, this, &MultiColorMarkerWidget::onUseHeadSizeStateChanged);
     connect(
         maxRatio,
         QOverload<double>::of(&QDoubleSpinBox::valueChanged),

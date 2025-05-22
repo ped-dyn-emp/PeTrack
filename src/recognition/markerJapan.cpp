@@ -322,28 +322,34 @@ void MarkerJapan::organize(const cv::Mat &img, bool autoWB)
         }
     }
 
-    int  fromColor   = (SPOT_COLOR + 340) % 360;
-    int  toColor     = (SPOT_COLOR + 20) % 360;
-    bool corectColor = false;
-    int  hue         = mCol.hue();
+    int  fromColor    = (SPOT_COLOR + 340) % 360;
+    int  toColor      = (SPOT_COLOR + 20) % 360;
+    bool correctColor = false;
+    int  hue          = mCol.hue();
     if(fromColor > toColor) // geht ueber farbrad 359 hinaus, alo 0..toColor + fromColor..359
     {
         if((hue <= toColor) || (hue >= fromColor))
         {
-            corectColor = true;
+            correctColor = true;
         }
     }
     else
     {
         if((hue >= fromColor) && (hue <= toColor))
         {
-            corectColor = true;
+            correctColor = true;
         }
     }
-    if(!corectColor) // spots loeschen, wenn nicht die richtige farbe, dadurch wird marker spaeter aussortiert
+    if(!correctColor) // delete spots if color is wrong, marker is sorted out later
     {
-        deleteSpot(0);
-        deleteSpot(1);
+        if(mSpots.size() > 0 && mSpotCount.size() > 0)
+        {
+            deleteSpot(0);
+        }
+        if(mSpots.size() > 1 && mSpotCount.size() > 1)
+        {
+            deleteSpot(1);
+        }
     }
 
     if(autoWB)
@@ -444,10 +450,7 @@ MyEllipse MarkerJapan::getCenterSpot() const
     {
         return mHead; // good fallback ?
     }
-    else
-    {
-        return mSpots[mCenterIndex];
-    }
+    return mSpots[mCenterIndex];
 }
 
 MyEllipse MarkerJapan::getColorSpot() const
@@ -456,10 +459,7 @@ MyEllipse MarkerJapan::getColorSpot() const
     {
         return mHead; // good fallback ?
     }
-    else
-    {
-        return mSpots[mColorIndex];
-    }
+    return mSpots[mColorIndex];
 }
 
 void MarkerJapan::draw(cv::Mat &img) const

@@ -292,7 +292,7 @@ ViewWidget::ViewWidget(QWidget *parent) : QFrame(parent)
     sliderLayout->addWidget(zoomOutIcon);
 
     QGridLayout *topLayout = new QGridLayout;
-    topLayout->setMargin(0);
+    topLayout->setContentsMargins(0, 0, 0, 0);
     topLayout->setSpacing(2);
     topLayout->addWidget(mGraphicsView, 0, 0);
     topLayout->addLayout(sliderLayout, 0, 1);

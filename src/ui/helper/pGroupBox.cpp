@@ -25,7 +25,7 @@ PGroupBox::PGroupBox(QWidget *parent, const QString &title, QWidget *content) : 
     mUi->setupUi(this);
     mUi->title->setText(title);
 
-    connect(mUi->immutable, &QCheckBox::stateChanged, mUi->frame, &QFrame::setDisabled);
+    connect(mUi->immutable, &QCheckBox::checkStateChanged, mUi->frame, &QFrame::setDisabled);
     mUi->frame->layout()->addWidget(content);
 }
 

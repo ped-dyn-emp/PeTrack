@@ -226,7 +226,14 @@ SCENARIO("I open PeTrack with a red image", "[ui][config]")
             newTestImage.at<cv::Vec3b>(cv::Point(25, 25)) = cv::Vec3b(100, 255, 255);
             cv::cvtColor(newTestImage, newTestImage, cv::COLOR_HSV2BGR);
             pet.updateImage(newTestImage);
-            QMouseEvent event{QEvent::HoverMove, QPoint(25, 25), Qt::NoButton, Qt::NoButton, Qt::NoModifier};
+            QMouseEvent event(
+                QEvent::HoverMove,
+                QPointF(25, 25),
+                QPointF(25, 25),
+                QPointF(25, 25),
+                Qt::NoButton,
+                Qt::NoButton,
+                Qt::NoModifier);
 
             QPointF pointOnScene    = pet.getImageItem()->mapToScene(QPoint(25, 25));
             QPoint  pointOnViewport = pet.getView()->mapFromScene(pointOnScene);

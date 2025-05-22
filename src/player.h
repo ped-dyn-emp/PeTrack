@@ -24,7 +24,7 @@
 #include <opencv2/opencv.hpp>
 
 class QLabel;
-class QSlider;
+class PSlider;
 class QToolButton;
 class QHBoxLayout;
 class QLineEdit;
@@ -104,7 +104,7 @@ private:
     cv::Mat        mImg;
     QHBoxLayout   *mPlayerLayout;
     Petrack       *mMainWindow;
-    QSlider       *mSlider;
+    PSlider       *mSlider;
     QLineEdit     *mFrameNum;
     QLineEdit     *mFrameInNum;
     QLineEdit     *mFrameOutNum;
