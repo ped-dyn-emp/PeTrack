@@ -356,5 +356,13 @@ int main(int argc, char *argv[])
         return EXIT_SUCCESS;
     }
 
+    if(std::strcmp(COMPILE_OS, "Darwin") == 0)
+    {
+        // Native file dialog on Mac does not work after MacOS update
+        // workaround is using Qt's own dialog, which still works
+        QApplication::setAttribute(Qt::AA_DontUseNativeDialogs);
+    }
+
+
     return app.exec();
 }
