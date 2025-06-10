@@ -38,7 +38,7 @@ First, tracking occurs in `Tracker::track`. As one of the last statement in this
 For clarification: The point that gets tracked is already part of a trajectory and the new one gets added to the same trajectory.
 
 ### Recognition
-For teh following section: If no class is mentioned, the function probably lies in recognition.cpp
+For the following section: If no class is mentioned, the function probably lies in recognition.cpp
 
 First the markers are detected in their respective `find*Marker`-function. These points have coordinates respective to the reco-ROI. This difference gets corrected in the `getMarkerPos`-function. If the background-filter is enabled, it is enforced in `getMarkerPos` as well, deleting detected points which are in the background.
 
