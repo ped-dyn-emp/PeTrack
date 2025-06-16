@@ -25,6 +25,7 @@ if (WIN32)
     install(FILES "${OpenCV_DIR}/LICENSE/" DESTINATION "Licenses/OpenCV_Licenses")
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/deps/ezc3d/LICENSE" DESTINATION "Licenses/ezc3d_license/")
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/deps/spdlog/LICENSE" DESTINATION "Licenses/spdlog_license/")
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/deps/hdf5/COPYING" DESTINATION "Licenses/hdf5_license/")
     install(FILES "${CMAKE_SOURCE_DIR}/.zenodo.json" DESTINATION "bin")
     install(FILES "${OFFSCREEN_PLUGIN}" DESTINATION "bin/platforms")
 

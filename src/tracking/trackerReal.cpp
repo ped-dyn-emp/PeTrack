@@ -29,6 +29,7 @@
 #include "recognition.h"
 #include "worldImageCorrespondence.h"
 
+#include <H5Cpp.h>
 #include <fstream>
 #include <opencv2/highgui.hpp>
 
@@ -86,13 +87,14 @@ double TrackPersonReal::distanceToNextFrame(int frame) const
         return -1;
     }
 }
-void TrackPersonReal::init(int firstFrame, double height, int markerID)
+void TrackPersonReal::init(int firstFrame, double height, int markerID, const QString &comment)
 {
     clear();
     mFirstFrame = firstFrame;
     mLastFrame  = firstFrame - 1;
     mHeight     = height;
     mMarkerID   = markerID;
+    mComment    = comment;
 }
 
 void TrackPersonReal::addEnd(const QPointF &pos, int frame)
@@ -190,6 +192,7 @@ int TrackerReal::calculate(
         int             extrapolated;
         QPointF         colPos;
         float           angle;
+        QString         comment;
 
         const auto &persons = mPersonStorage.getPersons();
         for(size_t i = 0; i < persons.size(); ++i) // ueber trajektorien
@@ -197,7 +200,7 @@ int TrackerReal::calculate(
             const auto &person = persons[i];
             addFrames          = 0;
             firstFrame         = person.firstFrame();
-
+            comment            = person.comment();
             if(person.height() < MIN_HEIGHT + 1)
             {
                 height = colorPlot->map(person.color());
@@ -220,8 +223,7 @@ int TrackerReal::calculate(
             }
 
             int markerID = person.getMarkerID();
-
-            trackPersonReal.init(firstFrame + addFrames, height, markerID);
+            trackPersonReal.init(firstFrame + addFrames, height, markerID, comment);
             tsize = person.size();
             for(j = 0; (j < tsize); ++j) // ueber trackpoints
             {
@@ -677,6 +679,173 @@ void TrackerReal::exportTxt(
         }
     }
 }
+
+void TrackerReal::createHdf5Attribute(H5::H5Object &obj, const std::string &name, const std::string &description)
+{
+    try
+    {
+        H5::StrType varLenStrType(H5::PredType::C_S1, H5T_VARIABLE);
+        varLenStrType.setCset(H5T_CSET_UTF8);
+        H5::DataSpace dataSpace(H5S_SCALAR);
+        H5::Attribute attr               = obj.createAttribute(name, varLenStrType, dataSpace);
+        const char   *descriptionPointer = description.c_str();
+        attr.write(varLenStrType, static_cast<const void *>(&descriptionPointer));
+    }
+    catch(const H5::AttributeIException &e)
+    {
+        SPDLOG_ERROR("Failed to create/write attribute '{}': {}", name, e.getCDetailMsg());
+    }
+}
+
+void TrackerReal::exportHdf5(
+    const QString &filename,
+    float          fps,
+    bool           alternateHeight,
+    bool           useTrackpoints,
+    bool           exportViewingDirection,
+    bool           exportAngleOfView,
+    bool           exportMarkerID,
+    bool           exportComment)
+{
+    try
+    {
+        float           scale = .01f; // should always export meters
+        QProgressDialog progress("Export HDF5-File", nullptr, 0, size(), mMainWindow);
+        progress.setWindowTitle("Export .hdf5-File");
+        progress.setWindowModality(Qt::WindowModal);
+        progress.setVisible(true);
+        progress.setValue(0);
+        progress.setLabelText(QString("Export tracking data ..."));
+        qApp->processEvents();
+        std::vector<TrackPointInfoHdf5>  data;
+        std::vector<PersonalDetailsHdf5> personalDetailsData;
+
+        for(int i = 0; i < size(); ++i)
+        {
+            qApp->processEvents();
+            progress.setLabelText(QString("Export person %1 of %2 ...").arg(i + 1).arg(size()));
+            progress.setValue(i + 1);
+            const auto person = at(i);
+            for(int j = 0; j < person.size(); ++j)
+            {
+                TrackPointInfoHdf5 point;
+                point.id    = i + 1;
+                point.frame = person.firstFrame() + j;
+                point.x     = person.at(j).x() * scale;
+                point.y     = person.at(j).y() * scale;
+                if(alternateHeight || useTrackpoints)
+                {
+                    point.z = static_cast<float>(person.at(j).z() * scale);
+                }
+                else
+                {
+                    point.z = person.height() * scale;
+                }
+                if(exportViewingDirection)
+                {
+                    point.viewDirX = person.at(j).viewDir().x();
+                    point.viewDirY = person.at(j).viewDir().y();
+                }
+                if(exportAngleOfView)
+                {
+                    point.viewAngle = person.at(j).angleOfView();
+                }
+                data.push_back(point);
+            }
+
+            // personal details
+            PersonalDetailsHdf5 details;
+            details.id       = i + 1;
+            details.markerId = person.getMarkerID();
+            details.height   = person.height() * scale;
+            details.comment  = person.getComment().toStdString();
+            personalDetailsData.push_back(details);
+        }
+
+        H5::Exception::dontPrint();
+        H5::H5File   file(filename.toStdString(), H5F_ACC_TRUNC);
+        H5::CompType datatype(sizeof(TrackPointInfoHdf5));
+        datatype.insertMember("id", HOFFSET(TrackPointInfoHdf5, id), H5::PredType::NATIVE_INT);
+        datatype.insertMember("frame", HOFFSET(TrackPointInfoHdf5, frame), H5::PredType::NATIVE_INT);
+        datatype.insertMember("x", HOFFSET(TrackPointInfoHdf5, x), H5::PredType::NATIVE_FLOAT);
+        datatype.insertMember("y", HOFFSET(TrackPointInfoHdf5, y), H5::PredType::NATIVE_FLOAT);
+        datatype.insertMember("z", HOFFSET(TrackPointInfoHdf5, z), H5::PredType::NATIVE_FLOAT);
+        if(exportViewingDirection)
+        {
+            datatype.insertMember("viewDirX", HOFFSET(TrackPointInfoHdf5, viewDirX), H5::PredType::NATIVE_FLOAT);
+            datatype.insertMember("viewDirY", HOFFSET(TrackPointInfoHdf5, viewDirY), H5::PredType::NATIVE_FLOAT);
+        }
+        if(exportAngleOfView)
+        {
+            datatype.insertMember("viewAngle", HOFFSET(TrackPointInfoHdf5, viewAngle), H5::PredType::NATIVE_FLOAT);
+        }
+
+        hsize_t       dims[1] = {data.size()};
+        H5::DataSpace dataspace(1, dims);
+
+        H5::DataSet   dataset = file.createDataSet("trajectory", datatype, dataspace);
+        H5::Attribute fpsAttribute =
+            dataset.createAttribute("fps", H5::PredType::NATIVE_FLOAT, H5::DataSpace(H5S_SCALAR));
+        fpsAttribute.write(H5::PredType::NATIVE_FLOAT, &fps);
+        H5::StrType var_str_type(H5::PredType::C_S1, H5T_VARIABLE);
+        var_str_type.setCset(H5T_CSET_UTF8);
+
+        createHdf5Attribute(dataset, "id", "unique identifier for pedestrian");
+        createHdf5Attribute(dataset, "frame", "frame number");
+        createHdf5Attribute(dataset, "x", "pedestrian x-coordinate (meter [m])");
+        createHdf5Attribute(dataset, "y", "pedestrian y-coordinate (meter [m])");
+        createHdf5Attribute(dataset, "z", "pedestrian z-coordinate (meter [m])");
+
+        dataset.write(data.data(), datatype);
+
+        // personal details dataset
+        H5::CompType personalDatatype(sizeof(PersonalDetailsHdf5));
+        personalDatatype.insertMember("id", HOFFSET(PersonalDetailsHdf5, id), H5::PredType::NATIVE_INT);
+        if(exportMarkerID)
+        {
+            personalDatatype.insertMember("markerId", HOFFSET(PersonalDetailsHdf5, markerId), H5::PredType::NATIVE_INT);
+        }
+        personalDatatype.insertMember("height", HOFFSET(PersonalDetailsHdf5, height), H5::PredType::NATIVE_FLOAT);
+        if(exportComment)
+        {
+            personalDatatype.insertMember("comment", HOFFSET(PersonalDetailsHdf5, comment), var_str_type);
+        }
+        hsize_t       personalDims[1] = {personalDetailsData.size()};
+        H5::DataSpace personalDataspace(1, personalDims);
+        H5::DataSet   personalDataset = file.createDataSet("personal_details", personalDatatype, personalDataspace);
+
+        createHdf5Attribute(personalDataset, "id", "unique identifier for pedestrian");
+        createHdf5Attribute(personalDataset, "markerId", "marker identifier for pedestrian");
+        createHdf5Attribute(personalDataset, "height", "pedestrian height (meter[m])");
+        createHdf5Attribute(personalDataset, "comment", "comment about pedestrian");
+
+        personalDataset.write(personalDetailsData.data(), personalDatatype);
+
+        SPDLOG_INFO("Finished");
+    }
+
+    catch(const H5::FileIException &e)
+    {
+        throw std::runtime_error("HDF5 File error: " + std::string(e.getCDetailMsg()));
+    }
+    catch(const H5::DataSetIException &e)
+    {
+        throw std::runtime_error("HDF5 Dataset error: " + std::string(e.getCDetailMsg()));
+    }
+    catch(const H5::DataSpaceIException &e)
+    {
+        throw std::runtime_error("HDF5 Dataspace error: " + std::string(e.getCDetailMsg()));
+    }
+    catch(const H5::AttributeIException &e)
+    {
+        throw std::runtime_error("HDF5 Attribute error: " + std::string(e.getCDetailMsg()));
+    }
+    catch(const H5::Exception &e)
+    {
+        throw std::runtime_error("HDF5 Error: " + std::string(e.getCDetailMsg()));
+    }
+}
+
 
 // old - not all export options supported!!!!
 void TrackerReal::exportDat(QTextStream &out, bool alternateHeight, bool useTrackpoints) // fuer gnuplot

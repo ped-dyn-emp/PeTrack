@@ -3110,6 +3110,44 @@ void Petrack::exportTracker(QString dest) // default = ""
 
             SPDLOG_INFO("finished");
         }
+        else if(dest.endsWith(".h5", Qt::CaseInsensitive))
+        {
+            try
+            {
+                mTrackerReal->calculate(
+                    this,
+                    mTracker,
+                    mWorldImageCorrespondence,
+                    mControlWidget->getColorPlot(),
+                    mMissingFrames,
+                    getImageBorderSize(),
+                    mControlWidget->isTrackMissingFramesChecked(),
+                    mStereoWidget->stereoUseForExport->isChecked(),
+                    mControlWidget->getTrackAlternateHeight(),
+                    mControlWidget->getCameraAltitude(),
+                    mStereoWidget->stereoUseCalibrationCenter->isChecked(),
+                    mControlWidget->isExportElimTpChecked(),
+                    mControlWidget->isExportElimTrjChecked(),
+                    mControlWidget->isExportSmoothChecked(),
+                    mControlWidget->isExportViewDirChecked(),
+                    mControlWidget->isExportAngleOfViewChecked(),
+                    mControlWidget->isExportMarkerIDChecked(),
+                    autoCorrectOnlyExport);
+                mTrackerReal->exportHdf5(
+                    dest,
+                    mAnimation.getSequenceFPS(),
+                    mControlWidget->getTrackAlternateHeight(),
+                    mStereoWidget->stereoUseForExport->isChecked(),
+                    mControlWidget->isExportViewDirChecked(),
+                    mControlWidget->isExportAngleOfViewChecked(),
+                    mControlWidget->isExportMarkerIDChecked(),
+                    mControlWidget->isExportCommentChecked());
+            }
+            catch(std::runtime_error &e)
+            {
+                PCritical(this, tr("PeTrack"), tr(e.what()));
+            }
+        }
         else if(dest.endsWith(".dat", Qt::CaseInsensitive))
         {
             QTemporaryFile fileDat;

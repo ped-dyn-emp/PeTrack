@@ -14,7 +14,7 @@
 ################################################################################
 # Project setup
 ################################################################################
-cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 project(petrack LANGUAGES CXX VERSION 1.0.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -123,6 +123,15 @@ add_subdirectory(deps/ezc3d/ EXCLUDE_FROM_ALL)
 target_compile_options(ezc3d PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/w>)
 set(BUILD_SHARED_LIBS ${DUMMY})
 
+# HDF5
+set(HDF5_BUILD_CPP_LIB ON CACHE BOOL "Build HDF5 C++ Library" FORCE)
+set(HDF5_BUILD_TOOLS OFF CACHE BOOL "Build HDF5 tools")
+set(HDF5_BUILD_EXAMPLES OFF CACHE BOOL "Build HDF5 examples")
+set(HDF5_TEST OFF CACHE BOOL "Build HDF5 tests")
+set(HDF5_ENABLE_HL OFF CACHE BOOL "Enable HDF5 High-Level library")
+set(HDF5_ENABLE_Z_LIB_SUPPORT OFF CACHE BOOL "Enable Zlib support")
+set(HDF5_ENABLE_SZIP_SUPPORT OFF CACHE BOOL "Enable SZIP support")
+add_subdirectory(deps/hdf5 EXCLUDE_FROM_ALL)
 # if win32 and mingw use in 3rd party
 if (USE_3RD_PARTY)
   # Setting path to OpenCV
@@ -247,6 +256,11 @@ target_link_libraries(petrack PUBLIC spdlog::spdlog)
 #*****************************************************************
 target_link_libraries(petrack_core PUBLIC ezc3d)
 
+#*****************************************************************
+# Linking hdf5                                             *
+#*****************************************************************
+target_link_libraries(petrack_core PUBLIC hdf5-static hdf5_cpp-static)
+target_include_directories(petrack_core PUBLIC "${CMAKE_SOURCE_DIR}/deps/hdf5/src" "${CMAKE_SOURCE_DIR}/deps/hdf5/c++/src")
 #*************************************************************
 # Handling of Options                                        *
 #*************************************************************
