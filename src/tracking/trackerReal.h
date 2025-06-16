@@ -30,6 +30,31 @@
 class PersonStorage;
 class WorldImageCorrespondence;
 
+namespace H5
+{
+class H5Object;
+}
+
+struct TrackPointInfoHdf5
+{
+    int   id;
+    int   frame;
+    float x;
+    float y;
+    float z;
+    float viewDirX;
+    float viewDirY;
+    float viewAngle;
+};
+
+struct PersonalDetailsHdf5
+{
+    int         id;
+    int         markerId;
+    float       height;
+    std::string comment;
+};
+
 struct MissingFrame
 {
     size_t mNumber; ///< frame number, where mCount of frames are missing
@@ -106,10 +131,11 @@ inline QTextStream &operator<<(QTextStream &s, const TrackPointReal &tp)
 class TrackPersonReal : public QList<TrackPointReal>
 {
 private:
-    double mHeight;        // height of the person
-    int    mFirstFrame;    // 0.. frame where the person was tracked the first time
-    int    mLastFrame;     // 0..
-    int    mMarkerID = -1; // set to -1 as -1 does not naturally occur as a ArucoMarkerNumber-value
+    double  mHeight;        // height of the person
+    int     mFirstFrame;    // 0.. frame where the person was tracked the first time
+    int     mLastFrame;     // 0..
+    int     mMarkerID = -1; // set to -1 as -1 does not naturally occur as a ArucoMarkerNumber-value
+    QString mComment;
 
 public:
     TrackPersonReal();
@@ -127,11 +153,12 @@ public:
     const TrackPointReal &trackPointAt(int frame) const; // & macht bei else probleme, sonst mit [] zugreifbar
     // gibt -1 zurueck, wenn frame oder naechster frame nicht existiert
     // entfernung ist absolut
-    double distanceToNextFrame(int frame) const;
-    void   init(int firstFrame, double height, int markerID);
-    void   addEnd(const QPointF &pos, int frame);
-    void   addEnd(const Vec3F &pos, int frame);
-    void   addEnd(const QPointF &pos, int frame, const QPointF &dir);
+    double  distanceToNextFrame(int frame) const;
+    void    init(int firstFrame, double height, int markerID, const QString &comment);
+    void    addEnd(const QPointF &pos, int frame);
+    void    addEnd(const Vec3F &pos, int frame);
+    void    addEnd(const QPointF &pos, int frame, const QPointF &dir);
+    QString getComment() const { return mComment; }
 };
 
 inline QTextStream &operator<<(QTextStream &s, const TrackPersonReal &tp)
@@ -214,8 +241,18 @@ public:
         bool         exportAngleOfView,
         bool         exportUseM,
         bool         exportMarkerID);
-    void                      exportDat(QTextStream &out, bool alternateHeight, bool useTrackpoints); // fuer gnuplot
-    void                      exportXml(QTextStream &outXml, bool alternateHeight, bool useTrackpoints);
+    void exportDat(QTextStream &out, bool alternateHeight, bool useTrackpoints); // fuer gnuplot
+    void exportXml(QTextStream &outXml, bool alternateHeight, bool useTrackpoints);
+    void exportHdf5(
+        const QString &filename,
+        float          fps,
+        bool           alternateHeight,
+        bool           useTrackpoints,
+        bool           exportViewingDirection,
+        bool           exportAngleOfView,
+        bool           exportMarkerID,
+        bool           exportComment);
+    void createHdf5Attribute(H5::H5Object &obj, const std::string &name, const std::string &description);
     std::vector<MissingFrame> computeDroppedFrames(Petrack *petrack);
 };
 

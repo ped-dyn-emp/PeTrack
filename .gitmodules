@@ -14,3 +14,6 @@
 [submodule "Catch2"]
 	path = deps/Catch2
 	url = https://github.com/catchorg/Catch2
+[submodule "deps/hdf5"]
+	path = deps/hdf5
+	url = https://github.com/HDFGroup/hdf5.git
