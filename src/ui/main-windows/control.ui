@@ -430,6 +430,9 @@
                 <property name="text">
                  <string>show</string>
                 </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
@@ -1956,6 +1959,9 @@
                <widget class="QCheckBox" name="trackRoiShow">
                 <property name="text">
                  <string>show</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>

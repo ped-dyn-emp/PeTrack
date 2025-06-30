@@ -429,6 +429,14 @@ TEST_CASE("Control: ROI fixed synchronized")
     }
 }
 
+TEST_CASE("Control: ROI show default set to true for reco and tracking")
+{
+    Petrack  pet{"Unknown"};
+    Control *control = pet.getControlWidget();
+    CHECK(control->getRecoRoiShow());
+    CHECK(control->getTrackRoiShow());
+}
+
 TEST_CASE("Calibration tab is open per default")
 {
     Petrack  pet{"Unknown"};
