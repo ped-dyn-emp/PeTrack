@@ -2909,8 +2909,9 @@ void Petrack::exportTracker(QString dest) // default = ""
                 this,
                 tr("Select file for exporting tracking paths"),
                 mLastTrackerExport,
-                tr("Tracker (*.*);;Petrack tracker (*.trc);;Text (*.txt);;Text for gnuplot(*.dat);;XML Travisto "
-                   "(*.trav);;All supported types (*.txt *.trc *.dat *.trav *.);;All files (*.*)"));
+                tr("Tracker (*.*);;Petrack tracker (*.trc);;Text (*.txt);; HDF5 format (*.h5);;Text for "
+                   "gnuplot(*.dat);;XML Travisto "
+                   "(*.trav);;All supported types (*.txt *.trc *.h5 *.dat *.trav *.);;All files (*.*)"));
             fileDialog.setAcceptMode(QFileDialog::AcceptSave);
             fileDialog.setFileMode(QFileDialog::AnyFile);
             fileDialog.setDefaultSuffix("");
@@ -3112,6 +3113,21 @@ void Petrack::exportTracker(QString dest) // default = ""
         }
         else if(dest.endsWith(".h5", Qt::CaseInsensitive))
         {
+            if(!mControlWidget->isExportUseMeterChecked())
+            {
+                int ret = PCustom(
+                    this,
+                    tr("PeTrack"),
+                    tr("Use meter has to selected for HDF5 export"),
+                    {"Continue using meters", "Abort export"},
+                    "Continue using meters");
+
+                if(ret == 1)
+                {
+                    return;
+                }
+                mControlWidget->setExportUseMeter(true);
+            }
             try
             {
                 mTrackerReal->calculate(

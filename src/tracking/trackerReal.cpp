@@ -697,6 +697,34 @@ void TrackerReal::createHdf5Attribute(H5::H5Object &obj, const std::string &name
     }
 }
 
+template <typename T>
+void TrackerReal::createGroupHdf5Attribute(H5::H5Object &object, const std::string &name, const T &value) const
+{
+    H5::DataSpace attrSpace(H5S_SCALAR);
+    H5::Attribute attribute;
+
+    if(std::is_same_v<T, int>)
+    {
+        attribute = object.createAttribute(name, H5::PredType::NATIVE_INT, attrSpace);
+        attribute.write(H5::PredType::NATIVE_INT, &value);
+    }
+    else if(std::is_same_v<T, float>)
+    {
+        attribute = object.createAttribute(name, H5::PredType::NATIVE_FLOAT, attrSpace);
+        attribute.write(H5::PredType::NATIVE_FLOAT, &value);
+    }
+    else if constexpr(std::is_same_v<T, std::string>)
+    {
+        H5::StrType strType(H5::PredType::C_S1, H5T_VARIABLE);
+        attribute = object.createAttribute(name, strType, attrSpace);
+        attribute.write(strType, value);
+    }
+    else
+    {
+        throw std::runtime_error("Unsupported attribute type");
+    }
+}
+
 void TrackerReal::exportHdf5(
     const QString &filename,
     float          fps,
@@ -761,9 +789,36 @@ void TrackerReal::exportHdf5(
             details.comment  = person.getComment().toStdString();
             personalDetailsData.push_back(details);
         }
-
         H5::Exception::dontPrint();
-        H5::H5File   file(filename.toStdString(), H5F_ACC_TRUNC);
+        H5::H5File  file(filename.toStdString(), H5F_ACC_TRUNC);
+        H5::StrType var_str_type(H5::PredType::C_S1, H5T_VARIABLE);
+        var_str_type.setCset(H5T_CSET_UTF8);
+
+        H5::Group rootGroup = file.createGroup("/metadata");
+        createGroupHdf5Attribute(rootGroup, ".pet file", mMainWindow->getProFileName().toStdString());
+        createGroupHdf5Attribute(rootGroup, "video file", mMainWindow->getSeqFileName().toStdString());
+        createGroupHdf5Attribute(rootGroup, "fps", fps);
+        createGroupHdf5Attribute(
+            rootGroup, "reco method", static_cast<int>(mMainWindow->getRecognizer().getRecoMethod()));
+
+        ReprojectionError reprError = mMainWindow->getExtrCalibration()->getReprojectionError();
+        createGroupHdf5Attribute(
+            rootGroup, "extrCalibError [default height avg.]", static_cast<float>(reprError.defaultHeightAvg()));
+        createGroupHdf5Attribute(
+            rootGroup,
+            "extrCalibError [default height std. dev.]",
+            static_cast<float>(reprError.defaultHeightStdDev()));
+        createGroupHdf5Attribute(
+            rootGroup, "extrCalibError [default height]", static_cast<float>(reprError.usedDefaultHeight()));
+
+        Animation *animation     = mMainWindow->getAnimation();
+        int        firstSec      = animation->getFirstFrameSec();
+        int        firstMicroSec = animation->getFirstFrameMicroSec();
+        if(firstSec != -1 && firstMicroSec != -1)
+        {
+            createGroupHdf5Attribute(rootGroup, "timestamp", firstSec + (static_cast<float>(firstMicroSec) / 1000000));
+        }
+
         H5::CompType datatype(sizeof(TrackPointInfoHdf5));
         datatype.insertMember("id", HOFFSET(TrackPointInfoHdf5, id), H5::PredType::NATIVE_INT);
         datatype.insertMember("frame", HOFFSET(TrackPointInfoHdf5, frame), H5::PredType::NATIVE_INT);
@@ -782,13 +837,7 @@ void TrackerReal::exportHdf5(
 
         hsize_t       dims[1] = {data.size()};
         H5::DataSpace dataspace(1, dims);
-
         H5::DataSet   dataset = file.createDataSet("trajectory", datatype, dataspace);
-        H5::Attribute fpsAttribute =
-            dataset.createAttribute("fps", H5::PredType::NATIVE_FLOAT, H5::DataSpace(H5S_SCALAR));
-        fpsAttribute.write(H5::PredType::NATIVE_FLOAT, &fps);
-        H5::StrType var_str_type(H5::PredType::C_S1, H5T_VARIABLE);
-        var_str_type.setCset(H5T_CSET_UTF8);
 
         createHdf5Attribute(dataset, "id", "unique identifier for pedestrian");
         createHdf5Attribute(dataset, "frame", "frame number");
