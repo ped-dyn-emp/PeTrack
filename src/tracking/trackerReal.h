@@ -253,6 +253,8 @@ public:
         bool           exportMarkerID,
         bool           exportComment);
     void createHdf5Attribute(H5::H5Object &obj, const std::string &name, const std::string &description);
+    template <typename T>
+    void createGroupHdf5Attribute(H5::H5Object &object, const std::string &name, const T &value) const;
     std::vector<MissingFrame> computeDroppedFrames(Petrack *petrack);
 };
 

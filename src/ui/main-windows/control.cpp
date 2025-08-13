@@ -2919,6 +2919,11 @@ bool Control::isExportCommentChecked() const
     return mUi->exportComment->isChecked();
 }
 
+void Control::setExportUseMeter(bool b)
+{
+    mUi->exportUseM->setChecked(b);
+}
+
 IntrinsicCameraParams Control::getIntrinsicCameraParams() const
 {
     return mIntr->getIntrinsicCameraParams();

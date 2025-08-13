@@ -210,6 +210,7 @@ public:
 
     inline pet::StereoContext *getStereoContext() { return mStereoContext; }
     inline QString             getProFileName() { return mProFileName; }
+    inline QString             getSeqFileName() const { return mSeqFileName; }
 
     void setProFileName(const QString &fileName);
 

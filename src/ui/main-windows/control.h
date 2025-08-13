@@ -239,6 +239,7 @@ public:
     bool           isTrackMissingFramesChecked() const;
     bool           isExportUseMeterChecked() const;
     bool           isExportCommentChecked() const;
+    void           setExportUseMeter(bool b);
 
     IntrinsicCameraParams getIntrinsicCameraParams() const;
     void                  runAutoCalib();
