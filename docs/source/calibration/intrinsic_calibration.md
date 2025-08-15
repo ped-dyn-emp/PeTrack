@@ -47,7 +47,7 @@ original setup are now being displayed straight in PeTrack as well. If you have 
 effect of the lense should be gone as well.
 
 :::{figure-md} pre_post_intrinsic
-![pre_post_intrinsic](images/pre_post_intrinsic.jpg)
+![pre_post_intrinsic](images/pre_post_intrinsic_new.jpg)
 
 Pre intrinsic calibration vs. Post intrinsic calibration.
 :::

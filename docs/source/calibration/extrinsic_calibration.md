@@ -11,9 +11,9 @@ If you decided on a [3D calibration](/planning/calibration.md) where you place e
 the processed points inside one image (Figure 1). To create such an image, a free programme as e.g. [Gimp](https://gimp.org) can be helpful.
 
 :::{figure-md} extrinsic_all_enlarged
-![extrinsic_all_enlarged](images/extrinsic_all_enlarged.png)
+![extrinsic_all_enlarged](images/extrinsic_all_new.png)
 
-Figure 1: Enlargement of combined image of all calibration points being processed during the experiments.
+Figure 1: Combined image of all calibration points being processed during the experiments.
 :::
 
 Once the combined image has been created you have to write down the coordinates for each point assigned during the experiment. You can take the coordinates from the sketch that you created during the preparation of the extrinsic calibration on scene. 
@@ -33,7 +33,7 @@ Since we have chosen to mark a coordinate system on the floor and create a 3D sy
 <br>
 
 :::{figure-md} extrinsic_grid_and_points
-![extrinsic_grid_and_points](images/extrinsic_grid_and_points.png){width=950}
+![extrinsic_grid_and_points](images/extrinsic_grid_and_points_new.png){width=950}
 
 Figure 2: Example of a possible coordinate system and the corresponding point file.
 :::
@@ -74,7 +74,7 @@ Once you have selected all points in the same order as your points file, your ch
 the example in Figure 3. 
 
 :::{figure-md} extrinsic_select_points
-![extrinsic_select_points](images/extrinsic_select_points.png){width=950}
+![extrinsic_select_points](images/extrinsic_select_points_new.png){width=950}
 
 Figure 3: Example of a selected points on the combined image in PeTrack.
 :::
