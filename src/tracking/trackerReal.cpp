@@ -795,21 +795,23 @@ void TrackerReal::exportHdf5(
         var_str_type.setCset(H5T_CSET_UTF8);
 
         H5::Group rootGroup = file.createGroup("/metadata");
-        createGroupHdf5Attribute(rootGroup, ".pet file", mMainWindow->getProFileName().toStdString());
-        createGroupHdf5Attribute(rootGroup, "video file", mMainWindow->getSeqFileName().toStdString());
+        createGroupHdf5Attribute(rootGroup, "pet_file", mMainWindow->getProFileName().toStdString());
+        createGroupHdf5Attribute(rootGroup, "video_file", mMainWindow->getSeqFileName().toStdString());
         createGroupHdf5Attribute(rootGroup, "fps", fps);
         createGroupHdf5Attribute(
-            rootGroup, "reco method", static_cast<int>(mMainWindow->getRecognizer().getRecoMethod()));
+            rootGroup, "reco_method", static_cast<int>(mMainWindow->getRecognizer().getRecoMethod()));
 
         ReprojectionError reprError = mMainWindow->getExtrCalibration()->getReprojectionError();
         createGroupHdf5Attribute(
-            rootGroup, "extrCalibError [default height avg.]", static_cast<float>(reprError.defaultHeightAvg()));
+            rootGroup,
+            "extr_calib_error [default height avg. in cm]",
+            static_cast<float>(reprError.defaultHeightAvg()));
         createGroupHdf5Attribute(
             rootGroup,
-            "extrCalibError [default height std. dev.]",
+            "extr_calib_error [default height std. dev. in cm]",
             static_cast<float>(reprError.defaultHeightStdDev()));
         createGroupHdf5Attribute(
-            rootGroup, "extrCalibError [default height]", static_cast<float>(reprError.usedDefaultHeight()));
+            rootGroup, "extr_calib_error [default height in cm]", static_cast<float>(reprError.usedDefaultHeight()));
 
         Animation *animation     = mMainWindow->getAnimation();
         int        firstSec      = animation->getFirstFrameSec();
@@ -827,12 +829,12 @@ void TrackerReal::exportHdf5(
         datatype.insertMember("z", HOFFSET(TrackPointInfoHdf5, z), H5::PredType::NATIVE_FLOAT);
         if(exportViewingDirection)
         {
-            datatype.insertMember("viewDirX", HOFFSET(TrackPointInfoHdf5, viewDirX), H5::PredType::NATIVE_FLOAT);
-            datatype.insertMember("viewDirY", HOFFSET(TrackPointInfoHdf5, viewDirY), H5::PredType::NATIVE_FLOAT);
+            datatype.insertMember("view_dir_x", HOFFSET(TrackPointInfoHdf5, viewDirX), H5::PredType::NATIVE_FLOAT);
+            datatype.insertMember("view_dir_y", HOFFSET(TrackPointInfoHdf5, viewDirY), H5::PredType::NATIVE_FLOAT);
         }
         if(exportAngleOfView)
         {
-            datatype.insertMember("viewAngle", HOFFSET(TrackPointInfoHdf5, viewAngle), H5::PredType::NATIVE_FLOAT);
+            datatype.insertMember("view_angle", HOFFSET(TrackPointInfoHdf5, viewAngle), H5::PredType::NATIVE_FLOAT);
         }
 
         hsize_t       dims[1] = {data.size()};
@@ -852,7 +854,8 @@ void TrackerReal::exportHdf5(
         personalDatatype.insertMember("id", HOFFSET(PersonalDetailsHdf5, id), H5::PredType::NATIVE_INT);
         if(exportMarkerID)
         {
-            personalDatatype.insertMember("markerId", HOFFSET(PersonalDetailsHdf5, markerId), H5::PredType::NATIVE_INT);
+            personalDatatype.insertMember(
+                "marker_id", HOFFSET(PersonalDetailsHdf5, markerId), H5::PredType::NATIVE_INT);
         }
         personalDatatype.insertMember("height", HOFFSET(PersonalDetailsHdf5, height), H5::PredType::NATIVE_FLOAT);
         if(exportComment)
@@ -864,7 +867,7 @@ void TrackerReal::exportHdf5(
         H5::DataSet   personalDataset = file.createDataSet("personal_details", personalDatatype, personalDataspace);
 
         createHdf5Attribute(personalDataset, "id", "unique identifier for pedestrian");
-        createHdf5Attribute(personalDataset, "markerId", "marker identifier for pedestrian");
+        createHdf5Attribute(personalDataset, "marker_id", "marker identifier for pedestrian");
         createHdf5Attribute(personalDataset, "height", "pedestrian height (meter[m])");
         createHdf5Attribute(personalDataset, "comment", "comment about pedestrian");
 
