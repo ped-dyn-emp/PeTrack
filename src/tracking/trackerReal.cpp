@@ -797,7 +797,6 @@ void TrackerReal::exportHdf5(
         H5::Group rootGroup = file.createGroup("/metadata");
         createGroupHdf5Attribute(rootGroup, "pet_file", mMainWindow->getProFileName().toStdString());
         createGroupHdf5Attribute(rootGroup, "video_file", mMainWindow->getSeqFileName().toStdString());
-        createGroupHdf5Attribute(rootGroup, "fps", fps);
         createGroupHdf5Attribute(
             rootGroup, "reco_method", static_cast<int>(mMainWindow->getRecognizer().getRecoMethod()));
 
@@ -841,6 +840,7 @@ void TrackerReal::exportHdf5(
         H5::DataSpace dataspace(1, dims);
         H5::DataSet   dataset = file.createDataSet("trajectory", datatype, dataspace);
 
+        createGroupHdf5Attribute(dataset, "fps", fps);
         createHdf5Attribute(dataset, "id", "unique identifier for pedestrian");
         createHdf5Attribute(dataset, "frame", "frame number");
         createHdf5Attribute(dataset, "x", "pedestrian x-coordinate (meter [m])");
