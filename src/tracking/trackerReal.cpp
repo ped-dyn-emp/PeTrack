@@ -30,6 +30,9 @@
 #include "worldImageCorrespondence.h"
 
 #include <H5Cpp.h>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QVariantMap>
 #include <fstream>
 #include <opencv2/highgui.hpp>
 
@@ -794,32 +797,37 @@ void TrackerReal::exportHdf5(
         H5::StrType var_str_type(H5::PredType::C_S1, H5T_VARIABLE);
         var_str_type.setCset(H5T_CSET_UTF8);
 
-        H5::Group rootGroup = file.createGroup("/metadata");
-        createGroupHdf5Attribute(rootGroup, "file_version", Petrack::hdf5FileVersion);
-        createGroupHdf5Attribute(rootGroup, "pet_file", mMainWindow->getProFileName().toStdString());
-        createGroupHdf5Attribute(rootGroup, "video_file", mMainWindow->getSeqFileName().toStdString());
-        createGroupHdf5Attribute(
-            rootGroup, "reco_method", static_cast<int>(mMainWindow->getRecognizer().getRecoMethod()));
+        createGroupHdf5Attribute(file, "file_version", Petrack::hdf5FileVersion);
+        createGroupHdf5Attribute(file, "source", mMainWindow->getProFileName().toStdString());
 
         ReprojectionError reprError = mMainWindow->getExtrCalibration()->getReprojectionError();
-        createGroupHdf5Attribute(
-            rootGroup,
-            "extr_calib_error [default height avg. in cm]",
-            static_cast<float>(reprError.defaultHeightAvg()));
-        createGroupHdf5Attribute(
-            rootGroup,
-            "extr_calib_error [default height std. dev. in cm]",
-            static_cast<float>(reprError.defaultHeightStdDev()));
-        createGroupHdf5Attribute(
-            rootGroup, "extr_calib_error [default height in cm]", static_cast<float>(reprError.usedDefaultHeight()));
+        QVariantMap       metadataMap;
+        metadataMap["video_file"]  = mMainWindow->getSeqFileName();
+        metadataMap["reco_method"] = static_cast<int>(mMainWindow->getRecognizer().getRecoMethod());
+
+        metadataMap["avg. extr_calib_error [m] at default height"] =
+            static_cast<float>(reprError.defaultHeightAvg() / 100);
+
+        metadataMap["std. dev. extr_calib_error [m] at default height"] =
+            static_cast<float>(reprError.defaultHeightStdDev() / 100);
+
+        metadataMap["extr_calib_error used default height [m]"] =
+            static_cast<float>(reprError.usedDefaultHeight() / 100);
+
 
         Animation *animation     = mMainWindow->getAnimation();
         int        firstSec      = animation->getFirstFrameSec();
         int        firstMicroSec = animation->getFirstFrameMicroSec();
         if(firstSec != -1 && firstMicroSec != -1)
         {
-            createGroupHdf5Attribute(rootGroup, "timestamp", firstSec + (static_cast<float>(firstMicroSec) / 1000000));
+            float timestamp          = firstSec + (static_cast<float>(firstMicroSec) / 1000000);
+            metadataMap["timestamp"] = timestamp;
         }
+        QJsonObject   metadataJson = QJsonObject::fromVariantMap(metadataMap);
+        QJsonDocument jsonDoc(metadataJson);
+        QString       jsonString = jsonDoc.toJson(QJsonDocument::Compact);
+
+        createGroupHdf5Attribute(file, "petrack_metadata", jsonString.toStdString());
 
         H5::CompType datatype(sizeof(TrackPointInfoHdf5));
         datatype.insertMember("id", HOFFSET(TrackPointInfoHdf5, id), H5::PredType::NATIVE_INT);
