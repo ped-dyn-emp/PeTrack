@@ -79,7 +79,8 @@
 #include <opencv2/opencv.hpp>
 
 
-int Petrack::trcVersion = 0;
+int         Petrack::trcVersion      = 0;
+std::string Petrack::hdf5FileVersion = "3.0.0";
 
 // Reihenfolge des anlegens der objekte ist sehr wichtig
 Petrack::Petrack(QString petrackVersion) :
