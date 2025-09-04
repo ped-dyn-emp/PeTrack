@@ -795,6 +795,7 @@ void TrackerReal::exportHdf5(
         var_str_type.setCset(H5T_CSET_UTF8);
 
         H5::Group rootGroup = file.createGroup("/metadata");
+        createGroupHdf5Attribute(rootGroup, "file_version", Petrack::hdf5FileVersion);
         createGroupHdf5Attribute(rootGroup, "pet_file", mMainWindow->getProFileName().toStdString());
         createGroupHdf5Attribute(rootGroup, "video_file", mMainWindow->getSeqFileName().toStdString());
         createGroupHdf5Attribute(
