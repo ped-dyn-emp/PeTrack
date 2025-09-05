@@ -2861,6 +2861,8 @@ void Petrack::importTracker(QString dest) // default = ""
         }
         lastFile = dest;
     }
+
+    updateImage();
 }
 
 int Petrack::calculateRealTracker()
