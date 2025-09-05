@@ -807,8 +807,10 @@ void TrackerReal::exportHdf5(
 
         ReprojectionError reprError = mMainWindow->getExtrCalibration()->getReprojectionError();
         QVariantMap       metadataMap;
-        metadataMap["video_file"]  = mMainWindow->getSeqFileName();
-        metadataMap["reco_method"] = static_cast<int>(mMainWindow->getRecognizer().getRecoMethod());
+        metadataMap["petrack_version"] = mMainWindow->getPetrackVersion();
+        metadataMap["video_file"]      = mMainWindow->getSeqFileName();
+        metadataMap["reco_method"] =
+            QString::fromStdString(reco::getRecoMethodName(mMainWindow->getRecognizer().getRecoMethod()));
 
         metadataMap["avg. extr_calib_error [m] at default height"] =
             static_cast<float>(reprError.defaultHeightAvg() / 100);

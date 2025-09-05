@@ -216,6 +216,7 @@ public:
     void setProFileName(const QString &fileName);
 
 public:
+    inline QString getPetrackVersion() const { return mPetrackVersion; }
     inline QString getTrackFileName() { return mTrcFileName; }
     inline void    setTrackFileName(const QString &fn) { mTrcFileName = fn; }
     inline QString getHeightFileName() { return mHeightFileName; }

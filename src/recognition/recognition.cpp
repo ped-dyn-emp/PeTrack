@@ -1707,6 +1707,30 @@ QList<TrackPoint> Recognizer::getMarkerPos(
     return crossList;
 }
 
+std::string getRecoMethodName(RecognitionMethod recoMethod)
+{
+    switch(recoMethod)
+    {
+        case RecognitionMethod::Casern:
+            return "marker casern";
+        case RecognitionMethod::Code:
+            return "code marker";
+        case RecognitionMethod::Color:
+            return "color marker";
+        case RecognitionMethod::MultiColor:
+            return "multicolor marker";
+        case RecognitionMethod::Hermes:
+            return "marker hermes";
+        case RecognitionMethod::Japan:
+            return "marker japan";
+        case RecognitionMethod::Stereo:
+            return "stereo";
+        case RecognitionMethod::MachineLearning:
+            return "machine learning";
+    }
+    return {};
+}
+
 const Vec2F &CodeMarkerOptions::getOffsetCropRect2Roi() const
 {
     return offsetCropRect2Roi;

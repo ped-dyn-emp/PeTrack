@@ -54,6 +54,7 @@ enum class RecognitionMethod
     Code            = 6,
     MachineLearning = 7,
 };
+std::string getRecoMethodName(RecognitionMethod recoMethod);
 
 enum class MlMethod
 {
