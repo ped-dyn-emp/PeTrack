@@ -482,7 +482,7 @@ bool PersonStorage::addPoint(
     reco::RecognitionMethod method,
     int                    *pers)
 {
-    if(point.qual() > 100)
+    if(point.qual() > TrackPoint::bestDetectionQual)
     {
         // manually added point
         onManualAction();
@@ -493,6 +493,8 @@ bool PersonStorage::addPoint(
     float dist, minDist = 1000000.;
     float z = -1;
     float x = -1, y = -1;
+
+    double trackPointSize = mMainWindow.getControlWidget()->getTrackCurrentPointSize(); // size for manual actions
 
     // ACHTUNG: BORDER NICHT BEACHTET bei point.x()...
     // hier wird farbe nur bei reco bestimmt gegebenfalls auch beim tracken interessant
@@ -531,13 +533,20 @@ bool PersonStorage::addPoint(
         if(((onlyVisible.empty()) || (onlyVisible.contains(i))) && mPersons.at(i).trackPointExist(frame))
         {
             dist = mPersons.at(i).trackPointAt(frame).distanceToPoint(point);
-            if((dist < scaleHead * mMainWindow.getHeadSize(nullptr, i, frame) / 2.) ||
+
+            bool useTrackpointSize = point.qual() > TrackPoint::bestDetectionQual &&
+                                     !mMainWindow.getControlWidget()->isTrackHeadSizedChecked();
+            double headSize =
+                useTrackpointSize ?
+                    trackPointSize :
+                    mMainWindow.getHeadSize(nullptr, i, frame); // manually added trackpoint affected by *visible* track
+                                                                // point size; more intuitive and adaptable
+            if((dist < scaleHead * headSize / 2.) ||
                // fuer multifarbmarker mit schwarzem punkt wird nur farbmarker zur Abstandbetrachtung herangezogen
                // at(i).trackPointAt(frame).colPoint() existiert nicht an dieser stelle, da bisher nur getrackt
                // wurde!!!!
                (multiColorWithDot && point.color().isValid() &&
-                (mPersons.at(i).trackPointAt(frame).distanceToPoint(point.colPoint()) <
-                 mMainWindow.getHeadSize(nullptr, i, frame) / 2.)))
+                (mPersons.at(i).trackPointAt(frame).distanceToPoint(point.colPoint()) < headSize / 2.)))
             {
                 if(found)
                 {
@@ -597,12 +606,12 @@ bool PersonStorage::addPoint(
     {
         iNearest = static_cast<int>(mPersons.size());
 
-        if(point.qual() > 100) // manual add
+        if(point.qual() > TrackPoint::bestDetectionQual) // manual add
         {
-            point.setQual(100);
+            point.setQual(TrackPoint::bestDetectionQual);
         }
-        mPersons.push_back(TrackPerson(
-            0, frame, point, point.getMarkerID())); // 0 is person number/markerID; newReco is set to true by default
+        mPersons.emplace_back(
+            0, frame, point, point.getMarkerID()); // 0 is person number/markerID; newReco is set to true by default
     }
     if((z > 0) && ((onlyVisible.empty()) || found))
     {
