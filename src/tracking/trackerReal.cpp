@@ -748,8 +748,9 @@ void TrackerReal::exportHdf5(
         progress.setValue(0);
         progress.setLabelText(QString("Export tracking data ..."));
         qApp->processEvents();
-        std::vector<TrackPointInfoHdf5>  data;
-        std::vector<PersonalDetailsHdf5> personalDetailsData;
+        std::vector<TrackPointInfoHdf5>         data;
+        std::vector<TrackPointOptionalInfoHdf5> optionalData;
+        std::vector<PersonalDetailsHdf5>        personalDetailsData;
 
         for(int i = 0; i < size(); ++i)
         {
@@ -759,7 +760,7 @@ void TrackerReal::exportHdf5(
             const auto person = at(i);
             for(int j = 0; j < person.size(); ++j)
             {
-                TrackPointInfoHdf5 point;
+                TrackPointInfoHdf5 point{};
                 point.id    = i + 1;
                 point.frame = person.firstFrame() + j;
                 point.x     = person.at(j).x() * scale;
@@ -772,16 +773,20 @@ void TrackerReal::exportHdf5(
                 {
                     point.z = person.height() * scale;
                 }
+                TrackPointOptionalInfoHdf5 optionalInfo{};
+                optionalInfo.id    = i + 1;
+                optionalInfo.frame = person.firstFrame() + j;
                 if(exportViewingDirection)
                 {
-                    point.viewDirX = person.at(j).viewDir().x();
-                    point.viewDirY = person.at(j).viewDir().y();
+                    optionalInfo.viewDirX = person.at(j).viewDir().x();
+                    optionalInfo.viewDirY = person.at(j).viewDir().y();
                 }
                 if(exportAngleOfView)
                 {
-                    point.viewAngle = person.at(j).angleOfView();
+                    optionalInfo.viewAngle = person.at(j).angleOfView();
                 }
                 data.push_back(point);
+                optionalData.push_back(optionalInfo);
             }
 
             // personal details
@@ -835,15 +840,7 @@ void TrackerReal::exportHdf5(
         datatype.insertMember("x", HOFFSET(TrackPointInfoHdf5, x), H5::PredType::NATIVE_FLOAT);
         datatype.insertMember("y", HOFFSET(TrackPointInfoHdf5, y), H5::PredType::NATIVE_FLOAT);
         datatype.insertMember("z", HOFFSET(TrackPointInfoHdf5, z), H5::PredType::NATIVE_FLOAT);
-        if(exportViewingDirection)
-        {
-            datatype.insertMember("view_dir_x", HOFFSET(TrackPointInfoHdf5, viewDirX), H5::PredType::NATIVE_FLOAT);
-            datatype.insertMember("view_dir_y", HOFFSET(TrackPointInfoHdf5, viewDirY), H5::PredType::NATIVE_FLOAT);
-        }
-        if(exportAngleOfView)
-        {
-            datatype.insertMember("view_angle", HOFFSET(TrackPointInfoHdf5, viewAngle), H5::PredType::NATIVE_FLOAT);
-        }
+
 
         hsize_t       dims[1] = {data.size()};
         H5::DataSpace dataspace(1, dims);
@@ -857,6 +854,42 @@ void TrackerReal::exportHdf5(
         createHdf5Attribute(dataset, "z", "pedestrian z-coordinate (meter [m])");
 
         dataset.write(data.data(), datatype);
+
+        // optional trackpoint info dataset
+        H5::CompType optionalDatatype(sizeof(TrackPointOptionalInfoHdf5));
+        optionalDatatype.insertMember("id", HOFFSET(TrackPointOptionalInfoHdf5, id), H5::PredType::NATIVE_INT);
+        optionalDatatype.insertMember("frame", HOFFSET(TrackPointOptionalInfoHdf5, frame), H5::PredType::NATIVE_INT);
+        if(exportViewingDirection)
+        {
+            optionalDatatype.insertMember(
+                "view_dir_x", HOFFSET(TrackPointOptionalInfoHdf5, viewDirX), H5::PredType::NATIVE_FLOAT);
+            optionalDatatype.insertMember(
+                "view_dir_y", HOFFSET(TrackPointOptionalInfoHdf5, viewDirY), H5::PredType::NATIVE_FLOAT);
+        }
+        if(exportAngleOfView)
+        {
+            optionalDatatype.insertMember(
+                "view_angle", HOFFSET(TrackPointOptionalInfoHdf5, viewAngle), H5::PredType::NATIVE_FLOAT);
+        }
+
+        hsize_t       optionalDims[1] = {optionalData.size()};
+        H5::DataSpace optionalDataspace(1, optionalDims);
+        H5::DataSet   optionalDataset = file.createDataSet("petrack_data", optionalDatatype, optionalDataspace);
+
+        createGroupHdf5Attribute(optionalDataset, "fps", fps);
+        createHdf5Attribute(optionalDataset, "id", "unique identifier for pedestrian");
+        createHdf5Attribute(optionalDataset, "frame", "frame number");
+        createHdf5Attribute(
+            optionalDataset, "view_dir_x", "x component of view direction unit vector [(0, 0) if not present]");
+        createHdf5Attribute(
+            optionalDataset, "view_dir_y", "y component of view direction unit vector [(0, 0) if not present]");
+        createHdf5Attribute(
+            optionalDataset,
+            "view_angle",
+            "angle [rad] between the line from the camera to the point and the line from the camera perpendicularly to "
+            "the ground");
+
+        optionalDataset.write(optionalData.data(), optionalDatatype);
 
         // personal details dataset
         H5::CompType personalDatatype(sizeof(PersonalDetailsHdf5));

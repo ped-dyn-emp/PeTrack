@@ -42,6 +42,12 @@ struct TrackPointInfoHdf5
     float x;
     float y;
     float z;
+};
+
+struct TrackPointOptionalInfoHdf5
+{
+    int   id;
+    int   frame;
     float viewDirX;
     float viewDirY;
     float viewAngle;
