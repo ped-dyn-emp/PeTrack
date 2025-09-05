@@ -212,14 +212,30 @@ Control::Control(
 
     mIndexChanging = true;
 
-    mUi->recoMethod->addItem("marker casern", QVariant::fromValue(reco::RecognitionMethod::Casern));
-    mUi->recoMethod->addItem("marker hermes", QVariant::fromValue(reco::RecognitionMethod::Hermes));
-    mUi->recoMethod->addItem("stereo", QVariant::fromValue(reco::RecognitionMethod::Stereo));
-    mUi->recoMethod->addItem("color marker", QVariant::fromValue(reco::RecognitionMethod::Color));
-    mUi->recoMethod->addItem("marker Japan", QVariant::fromValue(reco::RecognitionMethod::Japan));
-    mUi->recoMethod->addItem("multicolor marker", QVariant::fromValue(reco::RecognitionMethod::MultiColor));
-    mUi->recoMethod->addItem("code marker", QVariant::fromValue(reco::RecognitionMethod::Code));
-    mUi->recoMethod->addItem("machine learning", QVariant::fromValue(reco::RecognitionMethod::MachineLearning));
+    mUi->recoMethod->addItem(
+        QString::fromStdString(reco::getRecoMethodName(reco::RecognitionMethod::Casern)),
+        QVariant::fromValue(reco::RecognitionMethod::Casern));
+    mUi->recoMethod->addItem(
+        QString::fromStdString(reco::getRecoMethodName(reco::RecognitionMethod::Hermes)),
+        QVariant::fromValue(reco::RecognitionMethod::Hermes));
+    mUi->recoMethod->addItem(
+        QString::fromStdString(reco::getRecoMethodName(reco::RecognitionMethod::Stereo)),
+        QVariant::fromValue(reco::RecognitionMethod::Stereo));
+    mUi->recoMethod->addItem(
+        QString::fromStdString(reco::getRecoMethodName(reco::RecognitionMethod::Color)),
+        QVariant::fromValue(reco::RecognitionMethod::Color));
+    mUi->recoMethod->addItem(
+        QString::fromStdString(reco::getRecoMethodName(reco::RecognitionMethod::Japan)),
+        QVariant::fromValue(reco::RecognitionMethod::Japan));
+    mUi->recoMethod->addItem(
+        QString::fromStdString(reco::getRecoMethodName(reco::RecognitionMethod::MultiColor)),
+        QVariant::fromValue(reco::RecognitionMethod::MultiColor));
+    mUi->recoMethod->addItem(
+        QString::fromStdString(reco::getRecoMethodName(reco::RecognitionMethod::Code)),
+        QVariant::fromValue(reco::RecognitionMethod::Code));
+    mUi->recoMethod->addItem(
+        QString::fromStdString(reco::getRecoMethodName(reco::RecognitionMethod::MachineLearning)),
+        QVariant::fromValue(reco::RecognitionMethod::MachineLearning));
 
     connect(&recognizer, &reco::Recognizer::recoMethodChanged, this, &Control::onRecoMethodChanged);
     connect(this, &Control::userChangedRecoMethod, &recognizer, &reco::Recognizer::userChangedRecoMethod);
