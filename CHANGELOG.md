@@ -1,3 +1,19 @@
+# 1.1
+
+- Export trajectories and metadata to hdf5. For file format infos see [here](https://ped.fz-juelich.de/dataarchive/doku.php?id=info)
+- Fix crash on windows on loading a machine learning model
+- Update to Qt6
+- Fix arrow of spinbox `show only` not updating after importing trajectories
+- Creating manual trackpoints or calibration points is now more intuitive
+- Regions of interest are now visible per default
+- Minor improvements to machine learning marker
+- `show` set to false implies `fix` is true now
+- Better warnings on incorrect 3dc files
+- Video export now exports the undistorted video
+- Add shortctut for jumping to start of trajectory
+- Text is not automatically selected anymore on input dialogs
+- Numbering for pedestrians on txt import is now always the same
+
 # 1.0
 
 - Downloads are now available on GitLab and GitHub without prior registration
@@ -43,7 +59,6 @@ For complete comparison see [here](https://github.com/ped-dyn-emp/PeTrack/compar
 
 **Highlights**
 
-
 - Option to show complete trajectory of selected person
 - Change shortcuts
 - Adapt default export settings
@@ -57,9 +72,10 @@ For complete comparison see [here](https://github.com/ped-dyn-emp/PeTrack/compar
 **Highlights**
 
 - Updated Layout of keybinding window
-- Start Sphinx-Documentation inside of repository, accessible on <https://go.fzj.de/petrack-docs> 
+- Start Sphinx-Documentation inside of repository, accessible on <https://go.fzj.de/petrack-docs>
 
 ## 0.10.2
+
 For complete comparison see [here](https://github.com/ped-dyn-emp/PeTrack/compare/8f17e1af...4dca7dbc)
 
 **Highlights**
@@ -69,6 +85,7 @@ For complete comparison see [here](https://github.com/ped-dyn-emp/PeTrack/compar
 - Add "Sequence FPS" used for export of txt-files, independent of playback FPS
 
 ## 0.10.1
+
 For complete comparison see [here](https://github.com/ped-dyn-emp/PeTrack/compare/e8b5afad...8f17e1af)
 
 **Highlights**
@@ -78,6 +95,7 @@ For complete comparison see [here](https://github.com/ped-dyn-emp/PeTrack/compar
 - Misc. bug fixes concerning intrinsic calibration
 
 ## 0.10.0
+
 For complete comparison see [here](https://github.com/ped-dyn-emp/PeTrack/compare/ac443ac3...e8b5afad)
 
 **Highlights**
@@ -85,11 +103,12 @@ For complete comparison see [here](https://github.com/ped-dyn-emp/PeTrack/compar
 - Add new tab `correction` for quick sanity checks on the trajectories
 - `immutable` checkbox in the calibration tab
   - can be used to prevent accidental changes to the calibration values
-- Fixed freezing of GUI on Mac 
+- Fixed freezing of GUI on Mac
 
 # v0.9
 
 ## v0.9.4
+
 For complete comparison see [here](https://github.com/ped-dyn-emp/PeTrack/compare/3c490af3...ac443ac3)
 
 **Highlights**
@@ -111,6 +130,7 @@ For complete comparison see [here](https://github.com/ped-dyn-emp/PeTrack/compar
 - Missing frames computation is cached in .pet-file
 
 ## v0.9.2
+
 For complete comparison see [here](https://github.com/ped-dyn-emp/PeTrack/compare/aa0534e6...42a8a21b)
 
 **Highlights**
@@ -155,7 +175,7 @@ For complete comparison see [here](https://github.com/ped-dyn-emp/PeTrack/compar
 - Slanted view for external calibration
 - Coordinate system and grid is possible
 - Introduced multicolor marker with black dot
-- Video support for various codecs  
+- Video support for various codecs
 - Visualization of motion capturing files
 - Improvements to re-tracking
 - Implement code marker
@@ -175,27 +195,32 @@ For complete comparison see [here](https://github.com/ped-dyn-emp/PeTrack/compar
 - Some performance improvements
 
 # v0.7
+
 introduce stereo cameras; alternate height  
 background subtraction especially for stereo cameras; recognition of unmarked pedestrians; integration of 4 disparity algorithms  
 filter to swap picture; more video codecs; color blobs as marker using HSV triangle  
-marker with two dots added; export of viewing direction  
+marker with two dots added; export of viewing direction
 
-# v0.6 
-bug fixes; improve speed; expand visualization possibilities; add variable tracking region adapted to head size; provide program combine to merge trajectories  
+# v0.6
 
+bug fixes; improve speed; expand visualization possibilities; add variable tracking region adapted to head size; provide program combine to merge trajectories
 
 # v0.5
-improve robustness of tracking with interpolation and extrapolation; first analysis functionality  
 
+improve robustness of tracking with interpolation and extrapolation; first analysis functionality
 
 # v0.4
-tracking import and export; manual adding and deleting of trackpoints  
+
+tracking import and export; manual adding and deleting of trackpoints
 
 # v0.3
-recognition; tracking; color mapping  
+
+recognition; tracking; color mapping
 
 # v0.2
-add first recognition  
+
+add first recognition
 
 # v0.1
-only camera calibration is supported; import and export of video and image sequence  
+
+only camera calibration is supported; import and export of video and image sequence
