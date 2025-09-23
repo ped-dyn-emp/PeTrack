@@ -2711,7 +2711,7 @@
                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This feature only works, if a subgroup is selected via a) 'show only people' or b) 'show only people list'!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                   <property name="text">
-                   <string>show complete path ('show only people (list)' needs to be selected)</string>
+                   <string>show complete path</string>
                   </property>
                  </widget>
                 </item>
