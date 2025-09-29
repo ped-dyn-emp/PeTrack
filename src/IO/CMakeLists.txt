@@ -17,7 +17,6 @@ target_sources(petrack_core PRIVATE
 
 if(NOT STEREO)
     target_sources(petrack_core PRIVATE 
-        stereoAviFile.cpp      
         stereoAviFile.h   
     )
 endif()

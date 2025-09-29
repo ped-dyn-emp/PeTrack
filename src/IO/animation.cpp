@@ -639,21 +639,24 @@ bool Animation::isCameraLiveStream() const
     return mCameraLiveStream;
 }
 
-enum Camera Animation::getCamera()
+Camera Animation::getCamera()
 {
     if(mCaptureStereo != nullptr)
+    {
         return mCaptureStereo->getCamera();
+    }
     else
-        return cameraUnset;
+    {
+        return Camera::cameraUnset;
+    }
 }
 
-void Animation::setCamera(enum Camera c)
+void Animation::setCamera(Camera c)
 {
     if(mCaptureStereo != nullptr)
+    {
         return mCaptureStereo->setCamera(c);
-    // else   //keine Warnung, damit bei Projekt ohne direkt geladenem Video aber setzen von Stereo-Einstellungen keine
-    // Warnung ausgegeben wird
-    //    debout << "Warning: Setting camera is only allowed for loaded stereo videos!" << endl;
+    }
 }
 /**********************************************************************/
 /* Sequence of Images implementation                                 **/
@@ -882,11 +885,11 @@ bool Animation::openAnimationStereoVideo(int fileNumber, cv::Mat &stereoImgLeft,
     if((fileNumber < mStereoVideoFilesList.length()) &&
        (captureStereo->open(mStereoVideoFilesList[fileNumber].toStdString().c_str(), stereoImgLeft, stereoImgRight)))
     {
-        // wird nun schon vorher abgefragt: vor mTimeFileLoaded war mPlaybackFps == 16 because time file must be loaded
-        // before ;
+        // already checked on loading the time file
         // && (myRound(mPlaybackFps) == 16)
-        if(!((captureStereo->m_iRows == 960) && (captureStereo->m_iCols == 1280) && (captureStereo->m_iBPP == 16)))
+        if(!((captureStereo->m_iRows == 960) && (captureStereo->m_iCols == 1280)))
         {
+            // 16 bits per pixel is just assumed (old impl. using Windows AVI API checked the file)
             SPDLOG_ERROR("Only stereo videos from Hermes experiments with 1280x960 pixel, 16 bits per pixel anf 16 "
                          "frames per second are supported!");
             delete captureStereo;

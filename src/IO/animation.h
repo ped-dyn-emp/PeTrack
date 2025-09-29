@@ -27,7 +27,8 @@
 #include <QStringList>
 #include <QTime>
 #include <QWidget>
-#include <opencv2/opencv.hpp>
+#include <opencv2/core/mat.hpp>
+#include <opencv2/videoio.hpp>
 
 #ifdef STEREO
 #include "pgrAviFile.h"
@@ -128,10 +129,10 @@ public:
     bool isImageSequence() const;
     bool isCameraLiveStream() const;
 
-    enum Camera getCamera();
-    void        setCamera(enum Camera);
-    int         getFirstFrameSec() const;
-    int         getFirstFrameMicroSec() const;
+    Camera getCamera();
+    void   setCamera(Camera);
+    int    getFirstFrameSec() const;
+    int    getFirstFrameMicroSec() const;
 
     QString   getFileBase();
     QFileInfo getFileInfo();

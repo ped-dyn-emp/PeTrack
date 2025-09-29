@@ -64,7 +64,7 @@ public:
     void init(cv::Mat &viewImg);
 
     void    preprocess();
-    cv::Mat getRectified(enum Camera camera = cameraRight);
+    cv::Mat getRectified(Camera camera = Camera::cameraRight);
     cv::Mat getDisparity(bool *dispNew = nullptr);
 
     // von person.cpp benoetigt, um frame nummer zu erhalten

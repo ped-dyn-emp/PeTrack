@@ -198,22 +198,22 @@ void pet::StereoContext::init(Mat &viewImg) //  = NULL
     TriclopsError triclopsError;
 
 
-    if(!viewImg.empty() && (mAnimation->getCaptureStereo()->getCamera() == cameraLeft))
+    if(!viewImg.empty() && (mAnimation->getCaptureStereo()->getCamera() == Camera::cameraLeft))
     {
         leftImg        = cv::Mat(viewImg.size(), viewImg.type());
         cv::Mat tmpImg = viewImg;
         tmpImg.copyTo(leftImg);
     }
     else
-        leftImg = mAnimation->getCaptureStereo()->getFrame(cameraLeft);
-    if(!viewImg.empty() && (mAnimation->getCaptureStereo()->getCamera() == cameraRight))
+        leftImg = mAnimation->getCaptureStereo()->getFrame(Camera::cameraLeft);
+    if(!viewImg.empty() && (mAnimation->getCaptureStereo()->getCamera() == Camera::cameraRight))
     {
         rightImg       = cv::Mat(viewImg.size(), viewImg.type());
         cv::Mat tmpImg = viewImg;
         tmpImg.copyTo(rightImg);
     }
     else
-        rightImg = mAnimation->getCaptureStereo()->getFrame(cameraRight);
+        rightImg = mAnimation->getCaptureStereo()->getFrame(Camera::cameraRight);
 
     // Background subtraction
     //        if (brightContrastChanged || borderChanged || calibChanged)
@@ -298,14 +298,14 @@ void pet::StereoContext::preprocess()
 }
 
 // cameraRight is default, da disp mit diesem identisch
-cv::Mat pet::StereoContext::getRectified(enum Camera camera)
+cv::Mat pet::StereoContext::getRectified(Camera camera)
 {
 #ifdef TIME_MEASUREMENT
     //        "==========: "
     debout << "in rectify: " << getElapsedTime() << endl;
 #endif
 
-    if((camera != cameraRight) && (camera != cameraLeft))
+    if((camera != Camera::cameraRight) && (camera != Camera::cameraLeft))
         camera = mAnimation->getCaptureStereo()->getCamera();
 
     if(mStatus & preprocessed)
@@ -313,7 +313,7 @@ cv::Mat pet::StereoContext::getRectified(enum Camera camera)
 #ifdef STEREO
         TriclopsError triclopsError;
 
-        if(camera == cameraLeft)
+        if(camera == Camera::cameraLeft)
         {
             triclopsError = triclopsGetImage(mTriclopsContext, TriImg_RECTIFIED, TriCam_LEFT, &mTriRectLeft);
             if(triclopsError != TriclopsErrorOk)
@@ -367,7 +367,7 @@ cv::Mat pet::StereoContext::getRectified(enum Camera camera)
 
             return mRectLeft;
         }
-        else if(camera == cameraRight)
+        else if(camera == Camera::cameraRight)
         {
             triclopsError = triclopsGetImage(mTriclopsContext, TriImg_RECTIFIED, TriCam_RIGHT, &mTriRectRight);
             if(triclopsError != TriclopsErrorOk)
@@ -785,7 +785,7 @@ cv::Mat pet::StereoContext::getDisparity(bool *dispNew)
             //
             //            cv::StereoBM::compute(getRectified(cameraRight),getRectified(cameraLeft),mBMdisparity16);
 
-            mBMState->compute(getRectified(cameraLeft), getRectified(cameraRight), mBMdisparity16);
+            mBMState->compute(getRectified(Camera::cameraLeft), getRectified(Camera::cameraRight), mBMdisparity16);
 
             //            cvMinMaxLoc(mBMdisparity16, &dMin, &dMax);
             //            debout << (mBMState->minDisparity-1)*16 << " " << dMin << " " << dMax <<endl;
@@ -898,8 +898,8 @@ cv::Mat pet::StereoContext::getDisparity(bool *dispNew)
             }
 
 
-            cv::Mat MR(getRectified(cameraRight));
-            cv::Mat ML(getRectified(cameraLeft));
+            cv::Mat MR(getRectified(Camera::cameraRight));
+            cv::Mat ML(getRectified(Camera::cameraLeft));
             mSgbm->compute(ML, MR, mBMdisparity16);
 
             // exchange/replace value in mBMdisparity16 so that the error value is the same like in pointgrey
@@ -1390,7 +1390,7 @@ bool pet::StereoContext::exportPointCloud([[maybe_unused]] QString dest) // defa
                 int             i, j, k = 0;
                 int             nPoints = 0;
                 unsigned char   c;
-                unsigned char  *iD = (unsigned char *) getRectified(cameraRight).data;
+                unsigned char  *iD = (unsigned char *) getRectified(Camera::cameraRight).data;
 
                 for(i = 0; i < mDisparity.rows; ++i)
                 {
