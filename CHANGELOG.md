@@ -1,3 +1,7 @@
+# 1.2
+
+- Fix roi not shown on startup
+
 # 1.1
 
 - Export trajectories and metadata to hdf5. For file format infos see [here](https://ped.fz-juelich.de/dataarchive/doku.php?id=info)

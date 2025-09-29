@@ -256,6 +256,7 @@ Control::Control(
 
 
     trackRoiItem.setFixed(mUi->trackRoiFix->isChecked());
+    trackRoiItem.setVisible(mUi->trackRoiShow->isChecked());
     connect(mUi->trackRoiFix, &QCheckBox::checkStateChanged, &trackRoiItem, &RoiItem::setFixed);
     connect(mUi->recoRoiToFullImageSize, &QPushButton::clicked, &recoRoiItem, &RoiItem::setToFullImageSize);
     connect(
@@ -265,6 +266,7 @@ Control::Control(
         [&recoRoiItem, &trackRoiItem]() { recoRoiItem.adjustToOtherROI(trackRoiItem, std::minus<>()); });
 
     recoRoiItem.setFixed(mUi->roiFix->isChecked());
+    recoRoiItem.setVisible(mUi->roiShow->isChecked());
     connect(mUi->roiFix, &QCheckBox::checkStateChanged, &recoRoiItem, &RoiItem::setFixed);
     connect(mUi->trackRoiToFullImageSize, &QPushButton::clicked, &trackRoiItem, &RoiItem::setToFullImageSize);
     connect(

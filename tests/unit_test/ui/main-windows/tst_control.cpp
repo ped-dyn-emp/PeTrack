@@ -435,6 +435,8 @@ TEST_CASE("Control: ROI show default set to true for reco and tracking")
     Control *control = pet.getControlWidget();
     CHECK(control->getRecoRoiShow());
     CHECK(control->getTrackRoiShow());
+    CHECK(pet.getRecoRoiItem()->isVisible());
+    CHECK(pet.getTrackRoiItem()->isVisible());
 }
 
 TEST_CASE("Calibration tab is open per default")
