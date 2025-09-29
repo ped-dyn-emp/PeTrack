@@ -23,7 +23,7 @@
 #include <QKeyEvent>
 #include <QMainWindow>
 #include <QMouseEvent>
-#include <opencv2/opencv.hpp>
+#include <opencv2/core/mat.hpp>
 #include <optional>
 
 #ifdef STEREO

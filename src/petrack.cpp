@@ -486,7 +486,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     int         onlyPeopleNr     = 1;
     QString     onlyPeopleNrList = "1";
     int         zoom = 250, rotate = 0, hScroll = 0, vScroll = 0;
-    enum Camera cam = cameraUnset;
+    Camera      cam = Camera::cameraUnset;
     setLoading(true);
     auto petVersion = root.attribute("VERSION");
 
@@ -583,7 +583,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
             QTextStream in(&matStr);
             in >> zoom >> rotate >> hScroll >> vScroll;
 
-            cam = (enum Camera) readInt(elem, "CAMERA", static_cast<int>(cameraUnset));
+            cam = (Camera) readInt(elem, "CAMERA", static_cast<int>(Camera::cameraUnset));
             loadBoolValue(elem, "HIDE_CONTROLS", mHideControlsAct, false);
         }
         else if(elem.tagName() == "AUTO_TRACK")
@@ -674,11 +674,11 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     mControlWidget->setTrackShowOnlyNr(onlyPeopleNr);
     mControlWidget->trackShowOnlyNrList()->setText(onlyPeopleNrList);
 
-    if(cam == cameraLeft)
+    if(cam == Camera::cameraLeft)
     {
         mCameraLeftViewAct->setChecked(true);
     }
-    else if(cam == cameraRight)
+    else if(cam == Camera::cameraRight)
     {
         mCameraRightViewAct->setChecked(true);
     }
@@ -878,7 +878,7 @@ void Petrack::saveXml(QDomDocument &doc)
             .arg(mViewWidget->getRotateLevel())
             .arg(mView->horizontalScrollBar()->value())
             .arg(mView->verticalScrollBar()->value()));
-    elem.setAttribute("CAMERA", mAnimation.getCamera());
+    elem.setAttribute("CAMERA", static_cast<int>(mAnimation.getCamera()));
     elem.setAttribute("HIDE_CONTROLS", mHideControlsAct->isChecked());
     root.appendChild(elem);
 
@@ -1854,21 +1854,21 @@ void Petrack::setCamera()
 {
     if(mCameraLeftViewAct->isChecked())
     {
-        if((mAnimation.getCamera()) != cameraLeft)
-            mAnimation.setCamera(cameraLeft); // war: hier wird direkt bei Umstellung neu gelesen
+        if((mAnimation.getCamera()) != Camera::cameraLeft)
+            mAnimation.setCamera(Camera::cameraLeft); // war: hier wird direkt bei Umstellung neu gelesen
         else
             return;
     }
     else if(mCameraRightViewAct->isChecked())
     {
-        if((mAnimation.getCamera()) != cameraRight)
-            mAnimation.setCamera(cameraRight); // war: hier wird direkt bei Umstellung neu gelesen
+        if((mAnimation.getCamera()) != Camera::cameraRight)
+            mAnimation.setCamera(Camera::cameraRight); // war: hier wird direkt bei Umstellung neu gelesen
         else
             return;
     }
     else // kann eigentlich nicht vorkommen
     {
-        mAnimation.setCamera(cameraUnset);
+        mAnimation.setCamera(Camera::cameraUnset);
         return;
     }
     updateImage(mAnimation.getFrameAtIndex(

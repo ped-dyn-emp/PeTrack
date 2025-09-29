@@ -16,120 +16,45 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef STEREO_DISABLED
 #ifndef STEREOAVIFILE_H
 #define STEREOAVIFILE_H
-#undef UNICODE
 
-//=============================================================================
-// System Includes
-//=============================================================================
+#include "logger.h"
 
+#include <opencv2/core/mat.hpp>
+#include <stdexcept>
 
-//=============================================================================
-// Project Includes
-//=============================================================================
-
-//#include <cv.h>
-//#include <highgui.h>
-#include "opencv2/opencv.hpp"
-
-enum Camera
+enum class Camera
 {
     cameraLeft,
     cameraRight,
     cameraUnset
 };
 
-/**
- * A simple wrapper for the .AVI file interface.
- *
- */
-
+/// Stub for Point Grey avi file in case PeTrack is compiled without triclops support
 class StereoAviFile
 {
 public:
-    /** Default constructor. */
-    StereoAviFile();
+    int  m_iRows;
+    int  m_iCols;
+    bool open(const char *, cv::Mat &, cv::Mat &)
+    {
+        SPDLOG_ERROR("Version was not compiled with triclops support!");
+        return false;
+    }
 
-    /** Default destructor. */
-    virtual ~StereoAviFile();
+    cv::Mat getFrame(Camera) { throw std::runtime_error("Version was not compiled with triclops support!"); }
 
-    /** Open an .avi file for reading. */
-    bool open(const char *pszFilename, cv::Mat &stereoImgLeft, cv::Mat &stereoImgRight);
+    cv::Mat readFrame(int) { throw std::runtime_error("Version was not compiled with triclops support!"); }
 
-    //   /**
-    //    * Read the next frame from the avi stream.  File must have been opened for
-    //    * reading.
-    //    *
-    //    * @return false if read error, or last frame, true on success.
-    //    * @bug Need a better return value.
-    //    */
-    //   bool readNextFrame();
 
-    cv::Mat getFrame(enum Camera camera);
+    bool close() { throw std::runtime_error("Version was not compiled with triclops support!"); }
 
-    // return iplImage for using in openCV
-    cv::Mat readFrame(int index);
 
-    /** Close the .avi file.  This is also done by the destructor. */
-    bool close();
+    Camera getCamera() { throw std::runtime_error("Version was not compiled with triclops support!"); }
 
-    //   /*
-    //    * Converts the error to a string a posts a message.
-    //    *
-    //    * @param   hrErr      The resulting error.
-    //    */
-    //   void errorToString( HRESULT hrErr );
 
-    enum Camera getCamera();
-
-    void setCamera(enum Camera);
-
-    // from here up the var were protected before
-
-    /** Height, in pixels, of each frame in the .avi. */
-    int m_iRows;
-
-    /** Width, in pixels, of each frame in the .avi. */
-    int m_iCols;
-
-    /** Bits per pixel of the .avi. */
-    int m_iBPP;
-
-protected:
-    enum Camera mCamera;
-
-    /** Row increment, in bytes. */
-    int m_iRowInc;
-
-    /** Image size in bytes. */
-    int m_iSize;
-
-    /** Time index for current frame. */
-    int m_iTimeIndex;
-
-    /** Temporary image buffer. */
-    unsigned char *m_pTempBuffer;
-
-    // IplImage* mImage;
-    cv::Mat mImageLeft;
-    cv::Mat mImageRight;
-    //   /** Temporary buffer for saving .bmps. */
-    //
-    //   /** Our bitmapinfo structure */
-    //   BITMAPINFO* m_pBitmapInfo;
-
-    //   /** avi file name */
-
-private:
-    /** Read the opened AVI-File */
-    // VideoCapture m_vcReader;
-    cv::VideoCapture m_vcReader;
-
-    /** Writes to the opened AVI-File */
-    // VideoWriter m_vcWriter;
+    void setCamera(Camera) { throw std::runtime_error("Version was not compiled with triclops support!"); }
 };
 
 #endif // STEREOAVIFILE_H
-#endif // STEREO_DISABLED
