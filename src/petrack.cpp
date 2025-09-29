@@ -2653,7 +2653,6 @@ void Petrack::importTracker(QString dest) // default = ""
         if(dest.endsWith(".trc", Qt::CaseInsensitive))
         {
             QFile file(dest);
-            int   i, sz;
 
             if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
             {
@@ -2665,14 +2664,28 @@ void Petrack::importTracker(QString dest) // default = ""
             setTrackChanged(true); // flag changes of track parameters
             mTracker->reset();
 
+            // read all lines at once
             QTextStream in(&file);
-            QString     comment;
+            QStringList allLines;
+            while(!in.atEnd())
+            {
+                allLines.append(in.readLine());
+            }
+            file.close();
+            if(allLines.isEmpty())
+            {
+                PCritical(this, tr("PeTrack"), tr("File %1 is empty").arg(dest));
+                return;
+            }
+            int currentLineIndex = 0;
+            // Parse header
+            QString firstLine = allLines[currentLineIndex++];
+            bool    ok;
+            int     sz = firstLine.toInt(&ok);
 
-            bool    ok; // shows if int stands in first line - that was in the first version of trc file
-            QString firstLine = in.readLine();
-            sz                = firstLine.toInt(&ok);
             if(!ok)
             {
+                // Parse version header
                 if(firstLine.contains("version 4", Qt::CaseInsensitive))
                 {
                     trcVersion = 4;
@@ -2694,21 +2707,62 @@ void Petrack::importTracker(QString dest) // default = ""
                         tr("Could not import tracker:\nNot supported trc version in file: %1.").arg(dest));
                     return;
                 }
-                in >> sz;
+
+                // Read size from next line
+                if(currentLineIndex >= allLines.size())
+                {
+                    PCritical(this, tr("PeTrack"), tr("Expected size after version header but reached end of file"));
+                    return;
+                }
+
+                sz = allLines[currentLineIndex++].toInt(&ok);
+                if(!ok)
+                {
+                    PCritical(
+                        this,
+                        tr("PeTrack"),
+                        tr("Expected valid number of persons but found: %1").arg(allLines[currentLineIndex - 1]));
+                    return;
+                }
             }
             else
             {
                 trcVersion = 1;
             }
 
+            // Validate size
+            if(sz < 0)
+            {
+                PCritical(this, tr("PeTrack"), tr("Invalid number of persons: %1").arg(sz));
+                return;
+            }
+
             if((sz > 0) && (mPersonStorage.nbPersons() != 0))
             {
                 SPDLOG_WARN("overlapping trajectories will be joined not until tracking adds new TrackPoints.");
             }
-            for(i = 0; i < sz; ++i)
+            for(int i = 0; i < sz; ++i)
             {
-                TrackPerson tp = fromTrc(in);
+                TrackPerson tp;
+                ParseResult result = parseTrackPerson(allLines, currentLineIndex, tp);
+                if(!result.success)
+                {
+                    QString errorMsg =
+                        tr("Error parsing person %1 of %2:\n%3").arg(i + 1).arg(sz).arg(result.errorMessage);
+                    if(result.lineNumber > 0)
+                    {
+                        errorMsg += tr("\nAt line %1").arg(result.lineNumber);
+                    }
+                    PCritical(this, tr("PeTrack"), errorMsg);
+                    return;
+                }
                 mPersonStorage.addPerson(tp);
+                ++currentLineIndex; // skip the empty line after a person finish
+            }
+            // Verify we got all expected data
+            if(currentLineIndex < allLines.size())
+            {
+                SPDLOG_WARN("File contains {} extra lines after expected data", allLines.size() - currentLineIndex);
             }
 
             mControlWidget->setTrackNumberAll(QString("%1").arg(mPersonStorage.nbPersons()));
@@ -2716,7 +2770,6 @@ void Petrack::importTracker(QString dest) // default = ""
             mControlWidget->setTrackNumberVisible(
                 QString("%1").arg(mPersonStorage.visible(mAnimation.getCurrentFrameNum())));
             mControlWidget->replotColorplot();
-            file.close();
             SPDLOG_INFO("import {} ({} person(s), file version {})", dest, sz, trcVersion);
             mTrcFileName =
                 dest; // fuer Project-File, dann koennte track path direkt mitgeladen werden, wenn er noch da ist
