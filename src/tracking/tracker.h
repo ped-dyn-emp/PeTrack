@@ -22,6 +22,7 @@
 #include "annotationGrouping.h"
 #include "intervalList.h"
 #include "recognition.h"
+#include "trcparser.h"
 #include "vector.h"
 
 #include <QColor>
@@ -103,7 +104,7 @@ public:
     [[nodiscard]] bool   isDetection() const;
 };
 
-QTextStream  &operator>>(QTextStream &s, TrackPoint &tp);
+ParseResult   parseTrackPoint(QStringView line, int lineNumber, TrackPoint &trackPoint);
 QTextStream  &operator<<(QTextStream &s, const TrackPoint &tp);
 std::ostream &operator<<(std::ostream &s, const TrackPoint &tp);
 
@@ -147,6 +148,7 @@ private:
     IntervalList<int> mGroups{annotationGroups::NO_GROUP.id};
 
 public:
+    TrackPerson() = default;
     TrackPerson(int nr, int frame, const TrackPoint &p);
 
     TrackPerson(int nr, int frame, const TrackPoint &p, int markerID);
@@ -233,7 +235,7 @@ QTextStream &operator<<(QTextStream &s, const TrackPerson &tp);
 
 std::ostream &operator<<(std::ostream &s, const TrackPerson &tp);
 
-TrackPerson fromTrc(QTextStream &stream);
+ParseResult parseTrackPerson(const QStringList &lines, int &currentLineIndex, TrackPerson &trackPerson);
 
 //----------------------------------------------------------------------------
 

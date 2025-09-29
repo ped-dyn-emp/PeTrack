@@ -5,4 +5,6 @@ target_sources(petrack_core PRIVATE
     tracker.h      
     trackerReal.cpp
     trackerReal.h  
+    trcparser.cpp
+    trcparser.h
 )

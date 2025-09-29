@@ -1561,44 +1561,117 @@ void TrackPerson::removeFramesBetween(int startFrame, int endFrame)
     }
 }
 
-QTextStream &operator>>(QTextStream &s, TrackPoint &tp)
+ParseResult parseTrackPoint(QStringView line, int lineNumber, TrackPoint &trackPoint)
 {
-    double d;
-    Vec2F  p;
-    Vec3F  sp;
-    QColor col;
-    int    qual;
-    int    markerID;
-
-    s >> d;
-    tp.setX(d);
-    s >> d;
-    tp.setY(d);
+    TrcLineParser parser(line, lineNumber);
+    int           expectedTokens = 8; // base: x, y, color(r,g,b), qual, colPointX, colPointY
     if(Petrack::trcVersion > 1)
     {
-        s >> d;
-        sp.setX(d);
-        s >> d;
-        sp.setY(d);
-        s >> d;
-        sp.setZ(d);
-        tp.setSp(sp);
-    }
-    s >> qual;
-    tp.setQual(qual);
-    s >> d;
-    p.setX(d);
-    s >> d;
-    p.setY(d);
-    tp.setColPoint(p);
-    s >> col;
-    tp.setColor(col);
+        expectedTokens += 3;
+    }; // stereo point x, y, z
     if(Petrack::trcVersion > 2)
     {
-        s >> markerID;
-        tp.setMarkerID(markerID);
+        expectedTokens += 1;
+    }; // markerID
+    auto result = parser.validateTokenCount(expectedTokens);
+    if(!result.success)
+    {
+        return result;
     }
-    return s;
+
+    // parse coordinates
+    double x, y;
+    result = parser.parseDouble(x);
+    if(!result.success)
+    {
+        return result;
+    }
+    trackPoint.setX(x);
+
+    result = parser.parseDouble(y);
+    if(!result.success)
+    {
+        return result;
+    }
+    trackPoint.setY(y);
+
+    // parse stereoPoint
+    if(Petrack::trcVersion > 1)
+    {
+        Vec3F  sp;
+        double spX, spY, spZ;
+        result = parser.parseDouble(spX);
+        if(!result.success)
+        {
+            return result;
+        }
+        sp.setX(spX);
+
+        result = parser.parseDouble(spY);
+        if(!result.success)
+        {
+            return result;
+        }
+        sp.setY(spY);
+
+        result = parser.parseDouble(spZ);
+        if(!result.success)
+        {
+            return result;
+        }
+        sp.setZ(spZ);
+
+        trackPoint.setSp(sp);
+    }
+    // parse quality
+    int qual;
+    result = parser.parseInt(qual);
+    if(!result.success)
+    {
+        return result;
+    }
+    trackPoint.setQual(qual);
+
+    // parse colorPoint
+    Vec2F  colorPoint;
+    double colX, colY;
+    result = parser.parseDouble(colX);
+    if(!result.success)
+    {
+        return result;
+    }
+    colorPoint.setX(colX);
+
+    result = parser.parseDouble(colY);
+    if(!result.success)
+    {
+        return result;
+    }
+    colorPoint.setY(colY);
+
+    // parse color
+    QColor col;
+    result = parser.parseColor(col);
+    if(!result.success)
+    {
+        return result;
+    }
+    trackPoint.setColor(col);
+
+    // parse markerID
+    if(Petrack::trcVersion > 2)
+    {
+        int markerID;
+        result = parser.parseInt(markerID);
+        if(!result.success)
+        {
+            return result;
+        }
+        trackPoint.setMarkerID(markerID);
+    }
+
+    // everything successfull
+    return {};
 }
 
 QTextStream &operator<<(QTextStream &s, const TrackPoint &tp)
@@ -1643,69 +1716,146 @@ std::ostream &operator<<(std::ostream &s, const TrackPoint &tp)
     return s;
 }
 
-TrackPerson fromTrc(QTextStream &stream)
+ParseResult parseTrackPerson(const QStringList &lines, int &currentLineIndex, TrackPerson &trackPerson)
 {
-    stream.skipWhiteSpace();
-    QString str = stream.readLine();
-
-    QTextStream trjInfoLine(&str);
-
-    int nr;
-    trjInfoLine >> nr;
-
-    double height;
-    trjInfoLine >> height;
-
-    int firstFrame;
-    trjInfoLine >> firstFrame;
-
-    int lastFrame;
-    trjInfoLine >> lastFrame;
-
-    int colorCount;
-    trjInfoLine >> colorCount;
-
-    QColor color;
-    trjInfoLine >> color;
-
-    int markerID = -1;
+    if(currentLineIndex >= lines.size())
+    {
+        return {"Unexpected end of file while reading track person header"};
+    }
+    // parse header
+    QStringView   headerLine = lines[currentLineIndex];
+    TrcLineParser headerParser(headerLine, currentLineIndex + 1);
+    int           expectedHeaderTokens = 9; // nr, height, firstFrame, lastFrame, colorCount, color(r,g,b), frameAmount
     if(Petrack::trcVersion > 3)
     {
-        trjInfoLine >> markerID;
+        ++expectedHeaderTokens; // markerID
     }
-
-    int n;
-    trjInfoLine >> n; // size of list, not used
-
-    QString comment;
-    if(Petrack::trcVersion > 2) // Reading the comment line
+    auto result = headerParser.validateTokenCount(expectedHeaderTokens);
+    if(!result.success)
     {
-        str     = stream.readLine();
-        comment = str.replace(QRegularExpression("<br>"), "\n");
+        return result;
+    }
+    // parse header fields
+
+    int    nr, firstFrame, lastFrame, colorCount, n, markerID = -1;
+    double height;
+    QColor col;
+
+    result = headerParser.parseInt(nr);
+    if(!result.success)
+    {
+        return result;
     }
 
-    // Read first frame seperately
-    TrackPoint trackPoint;
-    stream >> trackPoint;
+    result = headerParser.parseDouble(height);
+    if(!result.success)
+    {
+        return result;
+    }
 
-    TrackPerson trackPerson(nr, firstFrame, trackPoint);
+    result = headerParser.parseInt(firstFrame);
+    if(!result.success)
+    {
+        return result;
+    }
+
+    result = headerParser.parseInt(lastFrame);
+    if(!result.success)
+    {
+        return result;
+    }
+
+    result = headerParser.parseInt(colorCount);
+    if(!result.success)
+    {
+        return result;
+    }
+
+    result = headerParser.parseColor(col);
+    if(!result.success)
+    {
+        return result;
+    }
+
+    if(Petrack::trcVersion > 3)
+    {
+        result = headerParser.parseInt(markerID);
+        if(!result.success)
+        {
+            return result;
+        }
+    }
+
+    result = headerParser.parseInt(n);
+    if(!result.success)
+    {
+        return result;
+    }
+
+    if(n <= 0)
+    {
+        return {QString("Invalid trackPoint count: %1").arg(n), currentLineIndex + 1};
+    }
+
+    ++currentLineIndex;
+
+    // Parse comment line if version > 2
+    QString comment;
+    if(Petrack::trcVersion > 2)
+    {
+        if(currentLineIndex >= lines.size())
+        {
+            return {"Expected comment line but reached end of file"};
+        }
+        comment = lines[currentLineIndex];
+        comment.replace(QRegularExpression("<br>"), "\n");
+        ++currentLineIndex;
+    }
+
+    // Parse first track point
+    if(currentLineIndex >= lines.size())
+    {
+        return {"Expected first track point but reached end of file"};
+    }
+
+    TrackPoint firstPoint;
+    result = parseTrackPoint(lines[currentLineIndex], currentLineIndex + 1, firstPoint);
+    if(!result.success)
+    {
+        return result;
+    }
+    ++currentLineIndex;
+
+    // Create TrackPerson
+    trackPerson = TrackPerson(nr, firstFrame, firstPoint, markerID);
     trackPerson.setHeight(height);
     trackPerson.setColCount(colorCount);
-    trackPerson.setColor(color);
-    trackPerson.setMarkerID(markerID);
-
+    trackPerson.setColor(col);
     if(!comment.isEmpty())
     {
         trackPerson.setComment(comment);
     }
 
+    // Parse remaining track points
     for(int i = 1; i < n; ++i)
     {
-        stream >> trackPoint;
+        if(currentLineIndex >= lines.size())
+        {
+            return {QString("Expected track point %1 of %2 but reached end of file").arg(i + 1).arg(n)};
+        }
+
+        TrackPoint trackPoint;
+        result = parseTrackPoint(lines[currentLineIndex], currentLineIndex + 1, trackPoint);
+        if(!result.success)
+        {
+            return result;
+        }
+
         trackPerson.append(trackPoint);
+        ++currentLineIndex;
     }
 
-    return trackPerson;
+    return {};
 }
 
 QTextStream &operator<<(QTextStream &s, const TrackPerson &tp)
