@@ -189,7 +189,8 @@ make_release_windows:
   script:
     - cd build
     - winInst=$(echo petrack-installer-*)
-    - curl -k -T $winInst -u "${SCIEBO_WIN_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$winInst --fail-with-body
+    - curl -X DELETE -k -u "${SCIEBO_WIN_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$winInst # ignore return value
+    - curl -X PUT -k -T $winInst -u "${SCIEBO_WIN_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$winInst --fail-with-body
 
 ###############################################################################
 # MacOS CI
@@ -264,5 +265,6 @@ make_release_macos:
   script:
     - cd build
     - macosInst=$(echo petrack-installer-*)
-    - curl -k -T $macosInst -u "${SCIEBO_MACOS_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$macosInst --fail-with-body
+    - curl -X DELETE -k -u "${SCIEBO_MACOS_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$macosInst # ignore return value
+    - curl -X PUT -k -T $macosInst -u "${SCIEBO_MACOS_INSTALLER_PATH}:" https://fz-juelich.sciebo.de/public.php/webdav/$macosInst --fail-with-body
   dependencies: ["build_macos"]
