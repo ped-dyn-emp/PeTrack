@@ -1648,6 +1648,7 @@ ParseResult parseTrackPoint(QStringView line, int lineNumber, TrackPoint &trackP
         return result;
     }
     colorPoint.setY(colY);
+    trackPoint.setColPoint(colorPoint);
 
     // parse color
     QColor col;
