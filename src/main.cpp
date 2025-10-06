@@ -86,6 +86,7 @@ int main(int argc, char *argv[])
     bool        autoSaveTracker = false;
     bool        autoExportView  = false;
     QString     exportViewFile;
+    bool        didAutosave = false;
 
     for(int i = 1; i < arg.size(); ++i) // i=0 ist Programmname
     {
@@ -109,6 +110,7 @@ int main(int argc, char *argv[])
         {
             autoSave     = true;
             autoSaveDest = arg.at(++i);
+            didAutosave  = true;
         }
         else if((arg.at(i) == "-autoTrack") || (arg.at(i) == "-autotrack"))
         {
@@ -151,6 +153,7 @@ int main(int argc, char *argv[])
             // given, both files will be created
             autoSaveTracker     = true;
             autoSaveTrackerFile = arg.at(++i);
+            didAutosave         = true;
         }
         else if((arg.at(i) == "-autointrinsic") || (arg.at(i) == "-autoIntrinsic"))
         {
@@ -166,6 +169,7 @@ int main(int argc, char *argv[])
         {
             autoExportView = true;
             exportViewFile = arg.at(++i);
+            didAutosave    = true;
         }
         else
         {
@@ -353,6 +357,11 @@ int main(int argc, char *argv[])
     if(autoSave && (autoSaveDest.endsWith(".pet", Qt::CaseInsensitive)))
     {
         petrack.saveProject(autoSaveDest);
+        return EXIT_SUCCESS;
+    }
+
+    if(didAutosave)
+    {
         return EXIT_SUCCESS;
     }
 
