@@ -706,7 +706,7 @@ void MarkerJapanList::toCrossList(QList<TrackPoint> *crossList, bool ignoreWitho
             {
                 v1 = at(i).getCenter();
                 v2 = at(i).getColorSpot().center();
-                crossList->append(TrackPoint(v1, 100, v2, at(i).color())); // 100 beste qualitaet
+                crossList->append(TrackPoint::createJapanTrackPoint(v1, TrackPoint::BEST_DETECTION_QUAL, v2));
             }
         }
     }

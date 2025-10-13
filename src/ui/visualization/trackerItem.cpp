@@ -88,7 +88,7 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             {
                 dist = person.trackPointAt(frame).distanceToPoint(p);
                 if((dist < mMainWindow->getHeadSize(nullptr, static_cast<int>(i), frame) / 2.) ||
-                   ((person.trackPointAt(frame).distanceToPoint(p.colPoint()) <
+                   ((person.trackPointAt(frame).distanceToPoint(*p.getColorPointForOrientation()) <
                      mMainWindow->getHeadSize(nullptr, static_cast<int>(i), frame) / 2.)))
                 {
                     if(found)
@@ -465,13 +465,21 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 if(mControlWidget->isTrackShowColorMarkerChecked())
                 {
                     // farbe des trackpoints
-                    if(tp.color().isValid())
+                    auto color      = tp.getColorForHeightMap();
+                    auto colorPoint = tp.getColorPointForOrientation();
+                    if(!colorPoint && color) // its a multicolor point instead
+                    {
+                        colorPoint = tp.getMultiColorMarker()->mColorPoint;
+                    }
+                    if(colorPoint)
                     {
                         painter->setBrush(Qt::NoBrush);
-                        ellipsePen.setColor(tp.color());
+                        // we don't save a specific color for japan marker since they all have the same color, however
+                        // we still want to be able to see the colorpoint
+                        ellipsePen.setColor(color ? *color : JapanMarker::COLOR);
                         ellipsePen.setWidth(mControlWidget->getTrackColorMarkerLineWidth());
                         painter->setPen(ellipsePen);
-                        rect.setRect(tp.colPoint().x() - pSM / 2., tp.colPoint().y() - pSM / 2., pSM, pSM);
+                        rect.setRect(colorPoint->x() - pSM / 2., colorPoint->y() - pSM / 2., pSM, pSM);
                         painter->drawEllipse(rect);
                     }
                 }
@@ -481,16 +489,17 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                    (mControlWidget->isTrackShowNumberChecked()) ||
                    ((mControlWidget->isTrackShowColColorChecked()) &&
                     ((person.height() > MIN_HEIGHT) ||
-                     ((tp.sp().z() > 0.) &&
+                     (tp.getStereoMarker() &&
                       (mControlWidget
                            ->isTrackShowHeightIndividualChecked()))))) //  Hoehe kann auf Treppen auch negativ werden,
                                                                        //  wenn koord weiter oben angesetzt wird
                 {
-                    if(tp.color().isValid())
+                    if(auto colorPoint = tp.getColorPointForOrientation())
                     {
-                        normalVector = (tp - tp.colPoint()).normal();
+                        normalVector = (tp.pixelPoint() - *colorPoint).normal();
                         normalVector.normalize();
-                        if(normalVector.length() < .001) // wenn to und colpoint aufeinander liegen z bei colorMarker!
+                        if(normalVector.length() <
+                           .001) // if orientation color point is very close to pixelpoint of trackpoint
                         {
                             normalVector.set(1., 0.);
                         }
@@ -502,9 +511,9 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         // den vorherigen trackpoint finden, wo reco farbe erzeugt hat und somit colpoint vorliegt
                         for(int j = curFrame - person.firstFrame(); j > -1; --j)
                         {
-                            if(person.at(j).color().isValid())
+                            if(auto colorPoint = person.at(j).getColorPointForOrientation())
                             {
-                                normalVector = (person.at(j) - person.at(j).colPoint()).normal();
+                                normalVector = (person.at(j).pixelPoint() - *colorPoint).normal();
                                 normalVector.normalize();
                                 break;
                             }
@@ -515,9 +524,9 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         {
                             for(int j = curFrame - person.firstFrame() + 1; j < person.size(); ++j)
                             {
-                                if(person.at(j).color().isValid())
+                                if(auto colorPoint = person.at(j).getColorPointForOrientation())
                                 {
-                                    normalVector = (person.at(j) - person.at(j).colPoint()).normal();
+                                    normalVector = (person.at(j).pixelPoint() - *colorPoint).normal();
                                     normalVector.normalize();
                                     break;
                                 }
@@ -538,7 +547,8 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     if(person.getMarkerID() > 0)
                     {
                         QPen markerIDPen;
-                        markerIDPen.setColor(tp.getMarkerID() < 0 ? Qt::blue : Qt::green);
+                        auto codeMarker = tp.getCodeMarker();
+                        markerIDPen.setColor(codeMarker && codeMarker->mMarkerId >= 0 ? Qt::green : Qt::blue);
                         painter->setPen(markerIDPen);
                         painter->drawText(QPointF{tp.x(), tp.y()}, QString("id=%1").arg(person.getMarkerID()));
                     }
@@ -558,15 +568,15 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 else if(
                     (mControlWidget->isTrackShowColColorChecked()) &&
                     ((height > MIN_HEIGHT) ||
-                     ((tp.sp().z() > 0.) &&
+                     ((tp.getStereoMarker()) &&
                       (mControlWidget
                            ->isTrackShowHeightIndividualChecked())))) // Hoehe  && (person.height() > 0.) Hoehe
                                                                       // kann auf Treppen auch negativ werden,
                                                                       // wenn koord weiter oben angesetzt wird
                 {
                     painter->setFont(heightFont);
-                    if((mControlWidget->isTrackShowHeightIndividualChecked()) &&
-                       (tp.sp().z() > 0.)) // Hoehe incl individual fuer jeden trackpoint
+                    if(mControlWidget->isTrackShowHeightIndividualChecked() &&
+                       tp.getStereoMarker()) // Hoehe incl individual fuer jeden trackpoint
                     {
                         painter->setPen(numberPen);
                         painter->setBrush(Qt::NoBrush);
@@ -583,14 +593,22 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                     rect,
                                     Qt::AlignHCenter,
                                     QString("-\n%2").arg(
-                                        -mControlWidget->getExtrinsicParameters().trans3 - tp.sp().z(), 6, 'f', 1));
+                                        -mControlWidget->getExtrinsicParameters().trans3 -
+                                            tp.stereoGetStereoPoint().z(),
+                                        6,
+                                        'f',
+                                        1));
                             }
                             else
                             {
                                 painter->drawText(
                                     rect,
                                     Qt::AlignHCenter,
-                                    QString("-\n%2").arg(mControlWidget->getCameraAltitude() - tp.sp().z(), 6, 'f', 1));
+                                    QString("-\n%2").arg(
+                                        mControlWidget->getCameraAltitude() - tp.stereoGetStereoPoint().z(),
+                                        6,
+                                        'f',
+                                        1));
                             }
                         }
                         else
@@ -603,7 +621,11 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                     QString("%1\n%2")
                                         .arg(height, 6, 'f', 1)
                                         .arg(
-                                            -mControlWidget->getExtrinsicParameters().trans3 - tp.sp().z(), 6, 'f', 1));
+                                            -mControlWidget->getExtrinsicParameters().trans3 -
+                                                tp.stereoGetStereoPoint().z(),
+                                            6,
+                                            'f',
+                                            1));
                             }
                             else
                             {
@@ -612,7 +634,11 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                     Qt::AlignHCenter,
                                     QString("%1\n%2")
                                         .arg(height, 6, 'f', 1)
-                                        .arg(mControlWidget->getCameraAltitude() - tp.sp().z(), 6, 'f', 1));
+                                        .arg(
+                                            mControlWidget->getCameraAltitude() - tp.stereoGetStereoPoint().z(),
+                                            6,
+                                            'f',
+                                            1));
                             }
                         }
                     }
@@ -657,11 +683,11 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         }
                         else
                         {
-                            if(tp.sp().z() > 0)
+                            if(tp.getStereoMarker())
                             {
                                 p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(
                                     cv::Point2f(tp.x(), tp.y()),
-                                    -mControlWidget->getExtrinsicParameters().trans3 - tp.sp().z());
+                                    -mControlWidget->getExtrinsicParameters().trans3 - tp.stereoGetStereoPoint().z());
                             }
                             else
                             {
@@ -701,11 +727,11 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         }
                         else
                         {
-                            if(tp.sp().z() > 0)
+                            if(tp.getStereoMarker())
                             {
                                 p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(
                                     cv::Point2f(tp.x(), tp.y()),
-                                    -mControlWidget->getExtrinsicParameters().trans3 - tp.sp().z());
+                                    -mControlWidget->getExtrinsicParameters().trans3 - tp.stereoGetStereoPoint().z());
                             }
                             else
                             {
@@ -771,14 +797,17 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
 
                             // nur Linie zeichnen, wenn x oder y sich unterscheidet, sonst Punkt
                             // die Unterscheidung ist noetig, da Qt sonst grosses quadrat beim ranzoomen zeichnet
-                            if((person.at(j - 1).toQPointF().x() != person.at(j).toQPointF().x()) ||
-                               (person.at(j - 1).toQPointF().y() != person.at(j).toQPointF().y()))
+                            if((person.at(j - 1).pixelPoint().toQPointF().x() !=
+                                person.at(j).pixelPoint().toQPointF().x()) ||
+                               (person.at(j - 1).pixelPoint().toQPointF().y() !=
+                                person.at(j).pixelPoint().toQPointF().y()))
                             {
-                                painter->drawLine(person.at(j - 1).toQPointF(), person.at(j).toQPointF());
+                                painter->drawLine(
+                                    person.at(j - 1).pixelPoint().toQPointF(), person.at(j).pixelPoint().toQPointF());
                             }
                             else
                             {
-                                painter->drawPoint(person.at(j - 1).toQPointF());
+                                painter->drawPoint(person.at(j - 1).pixelPoint().toQPointF());
                             }
                         }
                     }
@@ -804,15 +833,16 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                 }
                                 else
                                 {
-                                    if(person.at(j - 1).sp().z() > 0 && person.at(j).sp().z() > 0)
+                                    if(person.at(j - 1).getStereoMarker() && person.at(j).getStereoMarker())
                                     {
                                         p3d_height_p1 = mMainWindow->getExtrCalibration()->get3DPoint(
                                             cv::Point2f(person.at(j - 1).x(), person.at(j - 1).y()),
                                             -mControlWidget->getExtrinsicParameters().trans3 -
-                                                person.at(j - 1).sp().z());
+                                                person.at(j - 1).stereoGetStereoPoint().z());
                                         p3d_height_p2 = mMainWindow->getExtrCalibration()->get3DPoint(
                                             cv::Point2f(person.at(j).x(), person.at(j).y()),
-                                            -mControlWidget->getExtrinsicParameters().trans3 - person.at(j).sp().z());
+                                            -mControlWidget->getExtrinsicParameters().trans3 -
+                                                person.at(j).stereoGetStereoPoint().z());
                                     }
                                     else
                                     {
@@ -851,12 +881,15 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     {
                         if(person.firstFrame() + j != curFrame)
                         {
-                            if((mControlWidget->isTrackShowPointsColoredChecked()) && (person.at(j).color().isValid()))
+                            if(mControlWidget->isTrackShowPointsColoredChecked())
                             {
-                                painter->setPen(Qt::NoPen);
-                                painter->setBrush(QBrush(person.at(j).color()));
-                                rect.setRect(person.at(j).x() - pS / 2., person.at(j).y() - pS / 2., pS,
-                                             pS); // 7
+                                if(auto color = person.at(j).getColorForHeightMap())
+                                {
+                                    painter->setPen(Qt::NoPen);
+                                    painter->setBrush(QBrush(*color));
+                                    rect.setRect(person.at(j).x() - pS / 2., person.at(j).y() - pS / 2., pS,
+                                                 pS); // 7
+                                }
                             }
                             else
                             {
@@ -1003,7 +1036,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 }
                 else
                 {
-                    ifacet2D.push_back(QPointF(point2D.x, point2D.y));
+                    ifacet2D.emplace_back(point2D.x, point2D.y);
                     area += (facets3D.at(i).at(j).x * facets3D.at(i).at((j + 1) % facets3D[i].size()).y);
                     area -= (facets3D.at(i).at((j + 1) % facets3D[i].size()).x * facets3D.at(i).at(j).y);
                 }

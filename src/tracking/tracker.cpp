@@ -45,43 +45,6 @@ inline float errorToQual(float error)
     return 80.F - error / 20.F;
 }
 
-TrackPoint::TrackPoint() : mQual(0), mMarkerID(-1), mSp(-1., -1., -1.) {}
-TrackPoint::TrackPoint(const Vec2F &p) : Vec2F(p), mQual(0), mMarkerID(-1), mSp(-1., -1., -1.) {}
-TrackPoint::TrackPoint(const Vec2F &p, int qual) : Vec2F(p), mQual(qual), mMarkerID(-1), mSp(-1., -1., -1.) {}
-TrackPoint::TrackPoint(const Vec2F &p, int qual, int markerID) :
-    Vec2F(p), mQual(qual), mMarkerID(markerID), mSp(-1., -1., -1.)
-{
-}
-TrackPoint::TrackPoint(const Vec2F &p, int qual, const QColor &col) :
-    Vec2F(p), mCol(col), mQual(qual), mMarkerID(-1), mSp(-1., -1., -1.)
-{
-}
-
-TrackPoint::TrackPoint(const Vec2F &p, int qual, const Vec2F &colPoint, const QColor &col) :
-    Vec2F(p), mColPoint(colPoint), mCol(col), mQual(qual), mMarkerID(-1), mSp(-1., -1., -1.)
-{
-}
-
-const TrackPoint &TrackPoint::operator=(const Vec2F &v)
-{
-    Vec2F::operator=(v);
-    return *this;
-}
-
-const TrackPoint &TrackPoint::operator+=(const Vec2F &v)
-{
-    Vec2F::operator+=(v);
-    return *this;
-}
-const TrackPoint TrackPoint::operator+(const Vec2F &v) const
-{
-    return TrackPoint(*this) += v; // Vec2F(mX + v.mX, mY + v.mY);
-}
-
-bool TrackPoint::isDetection() const
-{
-    return mQual > minDetectionQual;
-}
 
 //--------------------------------------------------------------------------
 TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p) :
@@ -91,10 +54,13 @@ TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p) :
     mHeightCount(0),
     mFirstFrame(frame),
     mNewReco(true),
-    mColor(p.color()),
     mComment(),
     mColorCount(1)
 {
+    if(auto color = p.getColorForHeightMap())
+    {
+        mColor = *color;
+    }
     mData.append(p);
 }
 
@@ -105,10 +71,13 @@ TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p, int markerID) :
     mHeightCount(0),
     mFirstFrame(frame),
     mNewReco(true),
-    mColor(p.color()),
     mComment(),
     mColorCount(1)
 {
+    if(auto color = p.getColorForHeightMap())
+    {
+        mColor = *color;
+    }
     mData.append(p);
 }
 
@@ -126,7 +95,7 @@ void TrackPerson::addColor(const QColor &col)
 }
 
 /**
- * @brief optimize average color
+ * @brief optimize average color for casern marker
  */
 void TrackPerson::optimizeColor()
 {
@@ -139,22 +108,23 @@ void TrackPerson::optimizeColor()
     // den ersten farbpunkt suchen und vBefore initial setzen
     for(i = 0; i < mData.size(); ++i)
     {
-        if(mData.at(i).color().isValid())
+        if(auto marker = mData.at(i).getCasernMarker())
         {
-            vBefore = mData.at(i).colPoint() - mData.at(i);
+            vBefore = marker->mColorPoint - mData.at(i).pixelPoint();
             break;
         }
     }
-    if(mData.at(i).color().isValid())
+    if(mData.at(i).getCasernMarker())
     {
         ++anz1;
     }
     // testen, auf welcher seit der farbmarker haeufiger gesehen wird
     for(j = i + 1; j < mData.size(); ++j)
     {
-        if(mData.at(j).color().isValid())
+        if(auto marker = mData.at(j).getCasernMarker())
         {
-            v = mData.at(j).colPoint() - mData.at(j);
+            auto colorPoint = marker->mColorPoint;
+            v               = colorPoint - mData.at(j).pixelPoint();
             if((v * vBefore) < 0)
             {
                 swap = !swap;
@@ -172,21 +142,21 @@ void TrackPerson::optimizeColor()
         }
     }
     swap = false;
-    if(mData.at(i).color().isValid())
+    if(auto colorPoint = mData.at(i).getColorPointForOrientation())
     {
-        vBefore = mData.at(i).colPoint() - mData.at(i);
+        vBefore = *colorPoint - mData.at(i).pixelPoint();
     }
     // farben mit geringerer anzahl loeschen
-    QColor colInvalid;
     if(anz2 > anz1)
     {
-        mData[i].setColor(colInvalid);
+        mData[i].deleteColorMarkers();
     }
     for(j = i + 1; j < mData.size(); ++j)
     {
-        if(mData.at(j).color().isValid())
+        if(auto marker = mData.at(j).getCasernMarker())
         {
-            v = mData.at(j).colPoint() - mData.at(j);
+            auto colorPoint = marker->mColorPoint;
+            v               = colorPoint - mData.at(j).pixelPoint();
             if((v * vBefore) < 0)
             {
                 swap = !swap;
@@ -196,14 +166,14 @@ void TrackPerson::optimizeColor()
             {
                 if(anz1 > anz2)
                 {
-                    mData[j].setColor(colInvalid);
+                    mData[j].deleteColorMarkers();
                 }
             }
             else
             {
                 if(anz2 > anz1)
                 {
-                    mData[j].setColor(colInvalid);
+                    mData[j].deleteColorMarkers();
                 }
             }
             vBefore = v;
@@ -216,17 +186,17 @@ void TrackPerson::optimizeColor()
     QList<int> b;
     for(i = 0; i < mData.size(); ++i)
     {
-        if(mData.at(i).color().isValid())
+        if(auto marker = mData.at(i).getCasernMarker())
         {
-            r.append(mData.at(i).color().red());
-            g.append(mData.at(i).color().green());
-            b.append(mData.at(i).color().blue());
+            r.append(marker->mColor.red());
+            g.append(marker->mColor.green());
+            b.append(marker->mColor.blue());
         }
     }
     std::sort(r.begin(), r.end());
     std::sort(g.begin(), g.end());
     std::sort(b.begin(), b.end());
-    if(r.size() > 0 && g.size() > 0 && b.size() > 0) // kann eigentlich nicht vorkommen
+    if(r.size() > 0 && g.size() > 0 && b.size() > 0)
     {
         setColor(QColor(r[(r.size() - 1) / 2], g[(g.size() - 1) / 2], b[(b.size() - 1) / 2]));
     }
@@ -234,20 +204,18 @@ void TrackPerson::optimizeColor()
 
 void TrackPerson::recalcHeight(float altitude)
 {
-    double z = 0;
     // median statt mittelwert nehmen (bei gerader anzahl an werten den kleiner als mitte)
     QList<double> zList;
 
     resetHeight();
 
-    for(int i = 0; i < mData.size(); ++i)
+    for(const auto &trackPoint : mData)
     {
-        z = mData.at(i).sp().z();
-        if(z >= 0)
+        if(auto stereoMarker = trackPoint.getStereoMarker())
         {
             ++mHeightCount;
             // h += z;
-            zList.append(z);
+            zList.append(stereoMarker->mStereoPoint.z());
         }
     }
     if(mHeightCount > 0)
@@ -267,23 +235,25 @@ double TrackPerson::getNearestZ(int i, int *extrapolated) const
     {
         return -1.;
     }
-    if(mData.at(i).sp().z() >= 0)
+    if(auto stereoMarker = mData.at(i).getStereoMarker())
     {
-        return mData.at(i).sp().z();
+        return stereoMarker->mStereoPoint.z();
     }
     else // -1 an aktueller hoehe
     {
         int nrFor = 1;
         int nrRew = 1;
         while((i + nrFor < mData.size()) &&
-              (mData.at(i + nrFor).sp().z() < 0)) // nach && wird nur ausgefuehrt, wenn erstes true == size() also nicht
+              (!mData.at(i + nrFor)
+                    .getStereoMarker())) // nach && wird nur ausgefuehrt, wenn erstes true == size() also nicht
         {
-            nrFor++;
+            ++nrFor;
         }
         while((i - nrRew >= 0) &&
-              (mData.at(i - nrRew).sp().z() < 0)) // nach && wird nur ausgefuehrt, wenn erstes true == size() also nicht
+              (!mData.at(i - nrRew)
+                    .getStereoMarker())) // nach && wird nur ausgefuehrt, wenn erstes true == size() also nicht
         {
-            nrRew++;
+            ++nrRew;
         }
         if((i + nrFor == mData.size()) && (i - nrRew < 0)) // gar keine Hoeheninfo in trj gefunden
         {
@@ -292,18 +262,20 @@ double TrackPerson::getNearestZ(int i, int *extrapolated) const
         else if(i + nrFor == mData.size()) // nur in Vergangenheit hoeheninfo gefunden
         {
             *extrapolated = 2;
-            return mData.at(i - nrRew).sp().z();
+            return mData.at(i - nrRew).stereoGetStereoPoint().z();
         }
         else if(i - nrRew < 0) // nur in der zukunft hoeheninfo gefunden
         {
             *extrapolated = 1;
-            return mData.at(i + nrFor).sp().z();
+            return mData.at(i + nrFor).stereoGetStereoPoint().z();
         }
         else // in beiden richtungen hoeheninfo gefunden - INTERPOLATION, NICHT EXTRAPOLATION
         {
-            return mData.at(i - nrRew).sp().z() + nrRew *
-                                                      (mData.at(i + nrFor).sp().z() - mData.at(i - nrRew).sp().z()) /
-                                                      (nrFor + nrRew); // lineare interpolation
+            return mData.at(i - nrRew).stereoGetStereoPoint().z() +
+                   nrRew *
+                       (mData.at(i + nrFor).stereoGetStereoPoint().z() -
+                        mData.at(i - nrRew).stereoGetStereoPoint().z()) /
+                       (nrFor + nrRew); // lineare interpolation
         }
     }
 }
@@ -355,7 +327,8 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
         }
         else if(extrapolate && ((lastFrame() - mFirstFrame) > 0)) // mind. 2 trackpoints sind in liste!
         {
-            tmp = mData.last() - mData.at(mData.size() - 2); // vektor zw letztem und vorletztem pkt
+            tmp = mData.last().pixelPoint() -
+                  mData.at(mData.size() - 2).pixelPoint(); // vektor zw letztem und vorletztem pkt
             // der Abstand zum extrapoliertem Ziel darf nicht groesser als 2x so gross sein, wie die entfernung
             // vorheriger trackpoints eine mindestbewegung wird vorausgesetzt, da sonst bewegungen aus dem "stillstand"
             // immer als fehler angesehen werden
@@ -418,12 +391,13 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
         }
         else if(extrapolate && ((lastFrame() - mFirstFrame) > 0)) // mind. 2 trackpoints sind in liste!
         {
-            tmp = mData.at(0) - mData.at(1); // vektor zw letztem und vorletztem pkt
+            tmp = mData.at(0).pixelPoint() - mData.at(1).pixelPoint(); // vektor zw letztem und vorletztem pkt
             // der Abstand zum extrapoliertem Ziel darf nicht groesser als 2x so gross sein, wie die entfernung
             // vorheriger trackpoints eine mindestbewegung wird vorausgesetzt, da sonst bewegungen aus dem "stillstand"
             // immer als fehler angesehen werden
             //   am besten waere eine fehlerbetrachtung in abhaengigkeit von der geschwindigkeit - nicht gemacht!
-            if(((distance = (mData.at(0) + tmp).distanceToPoint(point)) > EXTRAPOLATE_FACTOR * tmp.length()) &&
+            if(((distance = (mData.at(0).pixelPoint() + tmp).distanceToPoint(point.pixelPoint())) >
+                EXTRAPOLATE_FACTOR * tmp.length()) &&
                (distance > 3))
             {
                 if(!((mData.at(0).qual() == 0) &&
@@ -467,7 +441,7 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
         // draufgesetzt wird!!!
 
         tp = point;
-        if(point.qual() < TrackPoint::bestDetectionQual &&
+        if(point.qual() < TrackPoint::BEST_DETECTION_QUAL &&
            point.isDetection()) // erkannte Person aber ohne strukturmarker
         {
             // wenn in angrenzenden Frames qual groesse 90 (100 oder durch vorheriges verschieben entstanden), dann
@@ -475,8 +449,10 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
             if(trackPointExist(frame - 1) && trackPointAt(frame - 1).qual() > 90)
             {
                 tp.setQual(95);
-                tmp = point + (trackPointAt(frame - 1) - trackPointAt(frame - 1).colPoint());
-                tp.set(tmp.x(), tmp.y());
+                tmp = point.pixelPoint() +
+                      (trackPointAt(frame - 1).pixelPoint() - *trackPointAt(frame - 1).getColorPointForOrientation());
+                tp.setX(tmp.x());
+                tp.setY(tmp.y());
                 SPDLOG_WARN(
                     "move TrackPoint according to last distance of structure marker and color marker of person {}:",
                     persNr + 1);
@@ -485,8 +461,10 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
             else if(trackPointExist(frame + 1) && trackPointAt(frame + 1).qual() > 90)
             {
                 tp.setQual(95);
-                tmp = point + (trackPointAt(frame + 1) - trackPointAt(frame + 1).colPoint());
-                tp.set(tmp.x(), tmp.y());
+                tmp = point.pixelPoint() +
+                      (trackPointAt(frame + 1).pixelPoint() - *trackPointAt(frame + 1).getColorPointForOrientation());
+                tp.setX(tmp.x());
+                tp.setY(tmp.y());
                 SPDLOG_WARN(
                     "move TrackPoint according to last distance of structure marker and color marker of person {}:",
                     persNr + 1);
@@ -500,14 +478,15 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
             // warnung ausgeben, wenn replacement (fuer gewoehnlich von reco) den pfadverlauf abrupt aendert
             if(trackPointExist(frame - 1))
             {
-                tmp = trackPointAt(frame) - trackPointAt(frame - 1);
+                tmp = trackPointAt(frame).pixelPoint() - trackPointAt(frame - 1).pixelPoint();
             }
             else if(trackPointExist(frame + 1))
             {
-                tmp = trackPointAt(frame + 1) - trackPointAt(frame);
+                tmp = trackPointAt(frame + 1).pixelPoint() - trackPointAt(frame).pixelPoint();
             }
             if((trackPointExist(frame - 1) || trackPointExist(frame + 1)) &&
-               ((distance = (trackPointAt(frame).distanceToPoint(tp))) > 1.5 * tmp.length()) && (distance > 3))
+               ((distance = (trackPointAt(frame).distanceToPoint(tp.pixelPoint()))) > 1.5 * tmp.length()) &&
+               (distance > 3))
             {
                 int anz;
                 SPDLOG_WARN(
@@ -541,9 +520,9 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
 
             mData.replace(frame - mFirstFrame, tp);
 
-            if(tp.qual() > TrackPoint::bestDetectionQual) // manual add // after inserting, because point ist const
+            if(tp.qual() > TrackPoint::BEST_DETECTION_QUAL) // manual add // after inserting, because point ist const
             {
-                mData[frame - mFirstFrame].setQual(TrackPoint::bestDetectionQual); // so moving of a point is possible
+                mData[frame - mFirstFrame].setQual(TrackPoint::BEST_DETECTION_QUAL); // so moving of a point is possible
             }
         }
         else
@@ -727,7 +706,7 @@ size_t Tracker::calcPrevFeaturePoints(
             }
 
 
-            Vec2F prevPoint = person.at(prevFrame - person.firstFrame());
+            Vec2F prevPoint = person.at(prevFrame - person.firstFrame()).pixelPoint();
             prevPoint += Vec2F(borderSize, borderSize);
             cv::Point2f p2f = prevPoint.toPoint2f();
             if(rect.contains(p2f))
@@ -835,7 +814,7 @@ int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int bord
                                 mMainWindow->getStereoContext()->getMedianXYZaround(
                                     (int) v.x(), (int) v.y(), &x, &y, &z);
                                 {
-                                    v.setSp(x, y, z);
+                                    v.setStereoMarker({{x, y, z}});
                                 }
                             }
                             // wenn bei punkten, die nicht am rand liegen, der fehler gross ist,
@@ -1212,12 +1191,16 @@ void Tracker::refineViaColorPointLK(int level, float errorScale)
         const auto &person = mPersonStorage.at(mPrevFeaturePointsIdx[i]);
         // wenn fehler zu gross, dann Farbmarkerelement nehmen // fuer multicolor marker / farbiger hut mit
         // schwarzem punkt
-        if(useColor && mTrackError[i] > errorScale * 150.F &&
-           person.at(mPrevFrame - person.firstFrame()).color().isValid())
+        if(useColor && mTrackError[i] > errorScale * 150.F)
         {
-            float prevPointX = static_cast<float>(person.at(mPrevFrame - person.firstFrame()).colPoint().x());
-            float prevPointY = static_cast<float>(person.at(mPrevFrame - person.firstFrame()).colPoint().y());
-            prevColorFeaturePoint.push_back(cv::Point2f(prevPointX, prevPointY));
+            auto colorPoint = person.at(mPrevFrame - person.firstFrame()).getColorPointForOrientation();
+            if(!colorPoint)
+            {
+                continue;
+            }
+            auto prevPointX = static_cast<float>(colorPoint->x());
+            auto prevPointY = static_cast<float>(colorPoint->y());
+            prevColorFeaturePoint.emplace_back(prevPointX, prevPointY);
             winSize = mMainWindow->winSize(nullptr, mPrevFeaturePointsIdx[i], mPrevFrame, level);
 
             cv::calcOpticalFlowPyrLK(
@@ -1438,7 +1421,8 @@ void TrackPerson::syncTrackPersonMarkerID(int markerID)
         }
         if(mMarkerID != tpMarkerID)
         {
-            SPDLOG_ERROR("Two MarkerIDs were found for one trajectory.");
+            SPDLOG_ERROR(
+                "Two MarkerIDs were found for one trajectory. (trackpoint: {}, person: {})", tpMarkerID, mMarkerID);
         }
     }
 }
@@ -1513,12 +1497,16 @@ void TrackPerson::replaceTrackPoint(int frame, TrackPoint trackPoint)
 
 void TrackPerson::updateStereoPoint(int frame, Vec3F stereoPoint)
 {
-    mData[frame - mFirstFrame].setSp(stereoPoint);
+    auto marker          = mData[frame - mFirstFrame].getStereoMarker();
+    marker->mStereoPoint = stereoPoint;
+    mData[frame - mFirstFrame].setStereoMarker(*marker);
 }
 
 void TrackPerson::updateMarkerID(int frame, int markerID)
 {
-    mData[frame - mFirstFrame].setMarkerID(markerID);
+    auto marker       = mData[frame - mFirstFrame].getCodeMarker();
+    marker->mMarkerId = markerID;
+    mData[frame - mFirstFrame].setCodeMarker(*marker);
 }
 
 /**
@@ -1561,163 +1549,12 @@ void TrackPerson::removeFramesBetween(int startFrame, int endFrame)
     }
 }
 
-ParseResult parseTrackPoint(QStringView line, int lineNumber, TrackPoint &trackPoint)
-{
-    TrcLineParser parser(line, lineNumber);
-    int           expectedTokens = 8; // base: x, y, color(r,g,b), qual, colPointX, colPointY
-    if(Petrack::trcVersion > 1)
-    {
-        expectedTokens += 3;
-    }; // stereo point x, y, z
-    if(Petrack::trcVersion > 2)
-    {
-        expectedTokens += 1;
-    }; // markerID
-    auto result = parser.validateTokenCount(expectedTokens);
-    if(!result.success)
-    {
-        return result;
-    }
 
-    // parse coordinates
-    double x, y;
-    result = parser.parseDouble(x);
-    if(!result.success)
-    {
-        return result;
-    }
-    trackPoint.setX(x);
-
-    result = parser.parseDouble(y);
-    if(!result.success)
-    {
-        return result;
-    }
-    trackPoint.setY(y);
-
-    // parse stereoPoint
-    if(Petrack::trcVersion > 1)
-    {
-        Vec3F  sp;
-        double spX, spY, spZ;
-        result = parser.parseDouble(spX);
-        if(!result.success)
-        {
-            return result;
-        }
-        sp.setX(spX);
-
-        result = parser.parseDouble(spY);
-        if(!result.success)
-        {
-            return result;
-        }
-        sp.setY(spY);
-
-        result = parser.parseDouble(spZ);
-        if(!result.success)
-        {
-            return result;
-        }
-        sp.setZ(spZ);
-
-        trackPoint.setSp(sp);
-    }
-    // parse quality
-    int qual;
-    result = parser.parseInt(qual);
-    if(!result.success)
-    {
-        return result;
-    }
-    trackPoint.setQual(qual);
-
-    // parse colorPoint
-    Vec2F  colorPoint;
-    double colX, colY;
-    result = parser.parseDouble(colX);
-    if(!result.success)
-    {
-        return result;
-    }
-    colorPoint.setX(colX);
-
-    result = parser.parseDouble(colY);
-    if(!result.success)
-    {
-        return result;
-    }
-    colorPoint.setY(colY);
-    trackPoint.setColPoint(colorPoint);
-
-    // parse color
-    QColor col;
-    result = parser.parseColor(col);
-    if(!result.success)
-    {
-        return result;
-    }
-    trackPoint.setColor(col);
-
-    // parse markerID
-    if(Petrack::trcVersion > 2)
-    {
-        int markerID;
-        result = parser.parseInt(markerID);
-        if(!result.success)
-        {
-            return result;
-        }
-        trackPoint.setMarkerID(markerID);
-    }
-
-    // everything successfull
-    return {};
-}
-
-QTextStream &operator<<(QTextStream &s, const TrackPoint &tp)
-{
-    if(Petrack::trcVersion > 2)
-    {
-        s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " "
-          << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color() << " "
-          << tp.getMarkerID();
-    }
-    else if(Petrack::trcVersion == 2)
-    {
-        s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " "
-          << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color();
-    }
-    else
-    {
-        s << tp.x() << " " << tp.y() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " "
-          << tp.color();
-    }
-    return s;
-}
-
-std::ostream &operator<<(std::ostream &s, const TrackPoint &tp)
-{
-    if(Petrack::trcVersion > 2)
-    {
-        s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " "
-          << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color() << " "
-          << tp.getMarkerID();
-    }
-    else if(Petrack::trcVersion > 1)
-    {
-        s << tp.x() << " " << tp.y() << " " << tp.sp().x() << " " << tp.sp().y() << " " << tp.sp().z() << " "
-          << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " " << tp.color();
-    }
-    else
-    {
-        s << tp.x() << " " << tp.y() << " " << tp.qual() << " " << tp.colPoint().x() << " " << tp.colPoint().y() << " "
-          << tp.color();
-    }
-    return s;
-}
-
-ParseResult parseTrackPerson(const QStringList &lines, int &currentLineIndex, TrackPerson &trackPerson)
+ParseResult parseTrackPerson(
+    const QStringList      &lines,
+    int                    &currentLineIndex,
+    TrackPerson            &trackPerson,
+    reco::RecognitionMethod recoMethod)
 {
     if(currentLineIndex >= lines.size())
     {
@@ -1820,7 +1657,7 @@ ParseResult parseTrackPerson(const QStringList &lines, int &currentLineIndex, Tr
     }
 
     TrackPoint firstPoint;
-    result = parseTrackPoint(lines[currentLineIndex], currentLineIndex + 1, firstPoint);
+    result = parseTrackPoint(lines[currentLineIndex], currentLineIndex + 1, firstPoint, recoMethod);
     if(!result.success)
     {
         return result;
@@ -1846,7 +1683,7 @@ ParseResult parseTrackPerson(const QStringList &lines, int &currentLineIndex, Tr
         }
 
         TrackPoint trackPoint;
-        result = parseTrackPoint(lines[currentLineIndex], currentLineIndex + 1, trackPoint);
+        result = parseTrackPoint(lines[currentLineIndex], currentLineIndex + 1, trackPoint, recoMethod);
         if(!result.success)
         {
             return result;

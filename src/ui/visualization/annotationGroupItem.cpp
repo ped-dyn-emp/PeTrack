@@ -82,7 +82,7 @@ void AnnotationGroupItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
                 unsigned int radius = mGroupManager.getVisualizationRadius();
                 painter->setPen(pen);
                 painter->setBrush(brush);
-                painter->drawEllipse(trajectory.trackPointAt(currentFrame).toQPointF(), radius, radius);
+                painter->drawEllipse(trajectory.trackPointAt(currentFrame).pixelPoint().toQPointF(), radius, radius);
             }
         }
     }

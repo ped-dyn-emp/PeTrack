@@ -32,9 +32,8 @@ TEST_CASE("import GroupConfiguration", "[grouping]")
     Petrack                petrack{"grouping Test"};
     AnnotationGroupManager manager{petrack, *petrack.getAnimation(), petrack.getPersonStorage()};
 
-
-    petrack.getPersonStorage().addPerson({0, 0, {{0, 0}}});
-    petrack.getPersonStorage().addPerson({1, 0, {{0, 0}}});
+    petrack.getPersonStorage().addPerson({0, 0, TrackPoint{{0, 0}}});
+    petrack.getPersonStorage().addPerson({1, 0, TrackPoint{{0, 0}}});
 
     const std::vector<Group> groups = {
         {1, "one", "type", 0}, {2, "two", "type", 0}, {3, "three", "type", 0}, {5, "four", "type", 1}};
@@ -219,11 +218,11 @@ TEST_CASE("group trajectory assignment operations", "[grouping]")
 
     auto &personStorage = petrack.getPersonStorage();
     // create sample trajectories
-    TrackPerson tp1(1, 0, {{0., 0.}});
-    REQUIRE(tp1.insertAtFrame(10, {{10., 10.}}, 0, true));
+    TrackPerson tp1(1, 0, TrackPoint{{0., 0.}});
+    REQUIRE(tp1.insertAtFrame(10, TrackPoint{{10., 10.}}, 0, true));
 
-    TrackPerson tp2(2, 0, {{10, 10}});
-    REQUIRE(tp2.insertAtFrame(10, {{15, 15}}, 2, true));
+    TrackPerson tp2(2, 0, TrackPoint{{10, 10}});
+    REQUIRE(tp2.insertAtFrame(10, TrackPoint{{15, 15}}, 2, true));
 
     personStorage.addPerson(tp1);
     personStorage.addPerson(tp2);
@@ -303,8 +302,8 @@ TEST_CASE("deleting group cleans up assignments", "[grouping]")
     auto groupOne   = manager.getGroup(groupOneId);
     manager.addGroupToTopLevelGroup(groupOne, 0);
 
-    TrackPerson tp1(1, 0, {{0, 0}});
-    tp1.insertAtFrame(10, {{10, 10}}, 1, true);
+    TrackPerson tp1(1, 0, TrackPoint{{0, 0}});
+    tp1.insertAtFrame(10, TrackPoint{{10, 10}}, 1, true);
     petrack.getPersonStorage().addPerson(tp1);
 
     manager.addTrajectoryToGroup(0, groupOneId, 0);

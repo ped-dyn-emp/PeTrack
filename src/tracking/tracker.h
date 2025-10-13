@@ -22,6 +22,8 @@
 #include "annotationGrouping.h"
 #include "intervalList.h"
 #include "recognition.h"
+#include "trackPoint.h"
+#include "trackerConstants.h"
 #include "trcparser.h"
 #include "vector.h"
 
@@ -35,92 +37,6 @@
 class PersonStorage;
 class Petrack;
 
-// war 1.5, aber bei bildauslassungen kann es ungewollt zuschlagen (bei 3 ist ein ausgelassener frame mgl, bei 2 wieder
-// ein problem)
-inline constexpr double EXTRAPOLATE_FACTOR = 3.;
-
-// maximale anzahl an gleichzeitig getrackten personen
-inline constexpr int MAX_COUNT = 1500;
-
-// maximale zahl an frames zwischen denen noch getrackt wird
-inline constexpr int MAX_STEP_TRACK = 5;
-
-// maximaler fehler beim tracken, so das noch punkt hinzugefuegt wird
-// um am ende des tracking nicht am bildrand herumzukrakseln!
-inline constexpr float MAX_TRACK_ERROR = 200.F;
-
-// minimale Personengroesse zur Identifizierung, dass Hoehe nicht gesetz, war -1, was aber an Treppen schlecht war
-inline constexpr double MIN_HEIGHT = -100'000.;
-
-
-class TrackPoint : public Vec2F // Vec2F is pixel point in picture
-{
-private:
-    Vec2F  mColPoint; // center of color marker
-    QColor mCol;      // color of corresponding marker
-    int    mQual;     // quality 0 (worst) .. 100 (best)
-    int    mMarkerID; // ID of detected Marker
-    Vec3F mSp; // measured 3d point with stereo // mZdistanceToCam; // distance in z direction to camera - measured with
-               // stereo
-    cv::Vec3d
-        mOrientation; // orientation of marker i. e. head direction if the marker is placed facing that way (aruco)
-
-public:
-    TrackPoint();
-    TrackPoint(const Vec2F &p);
-    TrackPoint(const Vec2F &p, int qual);
-    TrackPoint(const Vec2F &p, int qual, int markerID);
-    TrackPoint(const Vec2F &p, int qual, const QColor &col);
-    TrackPoint(const Vec2F &p, int qual, const Vec2F &colPoint, const QColor &col);
-
-    inline const Vec2F     &colPoint() const { return mColPoint; }
-    inline void             setColPoint(Vec2F &cp) { mColPoint = cp; }
-    inline const QColor    &color() const { return mCol; }
-    inline void             setColor(QColor &col) { mCol = col; }
-    inline void             setColPoint(const Vec2F &colPoint) { mColPoint = colPoint; }
-    inline void             setCol(const QColor &col) { mCol = col; }
-    inline int              qual() const { return mQual; }
-    inline void             setQual(int qual) { mQual = qual; }
-    inline int              getMarkerID() const { return mMarkerID; }
-    inline void             setMarkerID(int markerID) { mMarkerID = markerID; }
-    inline const cv::Vec3d &getOrientation() const { return mOrientation; }
-    inline void             setOrientation(const cv::Vec3d &orientation) { mOrientation = orientation; }
-
-    inline const Vec3F &sp() const { return mSp; }
-    inline void         setSp(const Vec3F &sp) { mSp = sp; }
-    inline void         setSp(float x, float y, float z)
-    {
-        mSp.setX(x);
-        mSp.setY(y);
-        mSp.setZ(z);
-    }
-
-    const TrackPoint &operator=(const Vec2F &v);
-    const TrackPoint &operator+=(const Vec2F &v);
-    const TrackPoint  operator+(const Vec2F &v) const;
-
-    static constexpr int minDetectionQual  = 80;
-    static constexpr int bestDetectionQual = 100;
-    [[nodiscard]] bool   isDetection() const;
-};
-
-ParseResult   parseTrackPoint(QStringView line, int lineNumber, TrackPoint &trackPoint);
-QTextStream  &operator<<(QTextStream &s, const TrackPoint &tp);
-std::ostream &operator<<(std::ostream &s, const TrackPoint &tp);
-
-template <>
-struct fmt::formatter<TrackPoint>
-{
-    constexpr auto parse(format_parse_context &ctx) -> decltype(ctx.begin()) { return ctx.end(); }
-
-    template <typename FormatContext>
-    auto format(const TrackPoint &input, FormatContext &ctx) const -> decltype(ctx.out())
-    {
-        std::stringstream stream;
-        stream << input;
-        return format_to(ctx.out(), "{}", stream.str());
-    }
-};
 
 /**
  * @brief Stores all tracking information for a whole trajectory, as markerID, color, comment and also the
@@ -176,8 +92,12 @@ public:
     void   recalcHeight(float altitude);
     double getNearestZ(int i, int *extrapolated) const;
 
-    inline int           getMarkerID() const { return mMarkerID; }
-    inline void          setMarkerID(const int markerID) { mMarkerID = markerID; }
+    inline int  getMarkerID() const { return mMarkerID; }
+    inline void setMarkerID(const int markerID)
+    {
+        SPDLOG_INFO("Set person marker id to {}", markerID);
+        mMarkerID = markerID;
+    }
     inline const QColor &color() const { return mColor; }
     inline void          setColor(const QColor &col) { mColor = col; }
     inline bool          newReco() const { return mNewReco; }
@@ -235,7 +155,11 @@ QTextStream &operator<<(QTextStream &s, const TrackPerson &tp);
 
 std::ostream &operator<<(std::ostream &s, const TrackPerson &tp);
 
-ParseResult parseTrackPerson(const QStringList &lines, int &currentLineIndex, TrackPerson &trackPerson);
+ParseResult parseTrackPerson(
+    const QStringList      &lines,
+    int                    &currentLineIndex,
+    TrackPerson            &trackPerson,
+    reco::RecognitionMethod recoMethod);
 
 //----------------------------------------------------------------------------
 

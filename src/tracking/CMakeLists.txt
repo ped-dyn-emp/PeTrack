@@ -1,10 +1,13 @@
 target_include_directories(petrack_core PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 target_sources(petrack_core PRIVATE
-    tracker.cpp    
-    tracker.h      
+    trackerConstants.h
+    trackPoint.cpp
+    trackPoint.h
+    tracker.cpp
+    tracker.h
     trackerReal.cpp
-    trackerReal.h  
+    trackerReal.h
     trcparser.cpp
     trcparser.h
 )

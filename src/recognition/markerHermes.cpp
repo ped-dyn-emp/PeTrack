@@ -465,13 +465,13 @@ void MarkerHermesList::toCrossList(QList<TrackPoint> *crossList, bool ignoreWith
                 if(!ignoreWithoutMarker)
                 {
                     v1 = at(i).head().center();
-                    crossList->append(TrackPoint(v1, 0)); // 0 schlechteste qualitaet
+                    crossList->append(TrackPoint::createHermesTrackPoint(v1, 0)); // 0 schlechteste qualitaet
                 }
             }
             else
             {
                 v1 = at(i).getCenterSpot().center();
-                crossList->append(TrackPoint(v1, 100)); // 100 beste qualitaet
+                crossList->append(TrackPoint::createHermesTrackPoint(v1, TrackPoint::BEST_DETECTION_QUAL));
             }
         }
     }

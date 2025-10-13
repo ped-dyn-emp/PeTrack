@@ -1,6 +1,7 @@
 # 1.2
 
 - Fix roi not shown on startup
+- Not exporting colorpoint for an invalid color anymore due to internal change of trackpoints
 
 # 1.1
 
