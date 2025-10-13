@@ -72,7 +72,8 @@ TEST_CASE("TrackPerson ranges can be removed", "[TrackPerson]")
 
         for(int i = 0; i < trackPerson.size(); ++i)
         {
-            REQUIRE(trackPerson.trackPointAt(newStartFrame + i) == trackPoints[i + startOffset]);
+            REQUIRE(
+                trackPerson.trackPointAt(newStartFrame + i).pixelPoint() == trackPoints[i + startOffset].pixelPoint());
         }
 
         REQUIRE(trackPerson.firstFrame() == newStartFrame);
@@ -89,7 +90,7 @@ TEST_CASE("TrackPerson ranges can be removed", "[TrackPerson]")
 
         for(int i = 0; i < trackPerson.size(); ++i)
         {
-            REQUIRE(trackPerson.trackPointAt(startFrame + i) == trackPoints[i]);
+            REQUIRE(trackPerson.trackPointAt(startFrame + i).pixelPoint() == trackPoints[i].pixelPoint());
         }
 
         REQUIRE(trackPerson.firstFrame() == startFrame);
@@ -139,7 +140,7 @@ TEST_CASE("TrackPerson insertion, [TrackPerson]")
                 REQUIRE(person.trackPointExist(8));
                 REQUIRE(person.trackPointExist(9));
                 REQUIRE(person.trackPointExist(10));
-                REQUIRE(person.at(10) == endpoint);
+                REQUIRE(person.at(10).pixelPoint() == endpoint.pixelPoint());
             }
         }
         GIVEN("Insert in front with interpolation")
@@ -163,7 +164,7 @@ TEST_CASE("TrackPerson insertion, [TrackPerson]")
                 REQUIRE(person.trackPointExist(8));
                 REQUIRE(person.trackPointExist(9));
                 REQUIRE(person.trackPointExist(10));
-                REQUIRE(person.at(0) == endpoint);
+                REQUIRE(person.at(0).pixelPoint() == endpoint.pixelPoint());
             }
         }
     }

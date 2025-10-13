@@ -482,7 +482,7 @@ bool PersonStorage::addPoint(
     reco::RecognitionMethod method,
     int                    *pers)
 {
-    if(point.qual() > TrackPoint::bestDetectionQual)
+    if(point.qual() > TrackPoint::BEST_DETECTION_QUAL)
     {
         // manually added point
         onManualAction();
@@ -505,7 +505,7 @@ bool PersonStorage::addPoint(
                (int) point.x(), (int) point.y(), &x, &y, &z)) // nicht myRound, da pixel 0 von 0..0.99 in double geht
         {
             // statt altitude koennte hier irgendwann die berechnete Bodenhoehe einfliessen
-            point.setSp(x, y, z); // setZdistanceToCam(z);
+            point.setStereoMarker({{x, y, z}}); // setZdistanceToCam(z);
         }
         // cout << " " << point.x()<< " " << point.y() << " " << x << " " << y << " " << z <<endl;
         // if (i == 10)
@@ -534,19 +534,20 @@ bool PersonStorage::addPoint(
         {
             dist = mPersons.at(i).trackPointAt(frame).distanceToPoint(point);
 
-            bool useTrackpointSize = point.qual() > TrackPoint::bestDetectionQual &&
+            bool useTrackpointSize = point.qual() > TrackPoint::BEST_DETECTION_QUAL &&
                                      !mMainWindow.getControlWidget()->isTrackHeadSizedChecked();
             double headSize =
                 useTrackpointSize ?
                     trackPointSize :
                     mMainWindow.getHeadSize(nullptr, i, frame); // manually added trackpoint affected by *visible* track
                                                                 // point size; more intuitive and adaptable
+            const auto multiColorMarker = point.getMultiColorMarker();
             if((dist < scaleHead * headSize / 2.) ||
                // fuer multifarbmarker mit schwarzem punkt wird nur farbmarker zur Abstandbetrachtung herangezogen
                // at(i).trackPointAt(frame).colPoint() existiert nicht an dieser stelle, da bisher nur getrackt
                // wurde!!!!
-               (multiColorWithDot && point.color().isValid() &&
-                (mPersons.at(i).trackPointAt(frame).distanceToPoint(point.colPoint()) < headSize / 2.)))
+               (multiColorWithDot && multiColorMarker &&
+                (mPersons.at(i).trackPointAt(frame).distanceToPoint(multiColorMarker->mColorPoint) < headSize / 2.)))
             {
                 if(found)
                 {
@@ -582,15 +583,18 @@ bool PersonStorage::addPoint(
         // qualitaet aber aktuell nicht
         // vorliegender farbe die ermittelte farbe einzutragen - kommt nicht vor!
         {
-            // Synchronize TrackPerson.markerID with TrackPoint.markerID
-            mPersons[iNearest].syncTrackPersonMarkerID(point.getMarkerID());
+            // Synchronize TrackPerson.markerID with TrackPoints code marker markerID
+            if(auto codeMarker = point.getCodeMarker())
+            {
+                mPersons[iNearest].syncTrackPersonMarkerID(codeMarker->mMarkerId);
+            }
 
             // set/add color
-            if(point.color().isValid()) // not valid for manual, than old color is used
+            if(auto color = point.getColorForHeightMap()) // not valid for manual, than old color is used
             {
                 // if (at(i).trackPointAt(frame).color().isValid()) man koennte alte farbe abziehen - aber nicht noetig,
                 // kommt nicht vor
-                mPersons[iNearest].addColor(point.color());
+                mPersons[iNearest].addColor(*color);
             }
         }
 
@@ -606,12 +610,16 @@ bool PersonStorage::addPoint(
     {
         iNearest = static_cast<int>(mPersons.size());
 
-        if(point.qual() > TrackPoint::bestDetectionQual) // manual add
+        if(point.qual() > TrackPoint::BEST_DETECTION_QUAL) // manual add
         {
-            point.setQual(TrackPoint::bestDetectionQual);
+            point.setQual(TrackPoint::BEST_DETECTION_QUAL);
         }
+        auto codeMarker = point.getCodeMarker();
         mPersons.emplace_back(
-            0, frame, point, point.getMarkerID()); // 0 is person number/markerID; newReco is set to true by default
+            0,
+            frame,
+            point,
+            codeMarker ? codeMarker->mMarkerId : -1); // 0 is person number/markerID; newReco is set to true by default
     }
     if((z > 0) && ((onlyVisible.empty()) || found))
     {
@@ -878,11 +886,10 @@ void PersonStorage::setMarkerHeights(const std::unordered_map<int, float> &heigh
     {
         for(const auto &point : person) // over TrackPoints
         {
-            // markerID of current person at current TrackPoint:
-            int markerID = point.getMarkerID();
-
-            if(markerID != -1) // when a real markerID is found (not -1)
+            if(auto codeMarker = point.getCodeMarker())
             {
+                // markerID of current person at current TrackPoint:
+                int markerID = codeMarker->mMarkerId;
                 // find index of mID within List of MarkerIDs that were read from txt-file:
                 if(heights.find(markerID) != std::end(heights))
                 {
@@ -1020,31 +1027,35 @@ void PersonStorage::smoothHeight(size_t i, int j)
     int  tsize      = mPersons[i].size();
     auto firstFrame = mPersons[i].firstFrame();
 
-    if(mPersons[i].at(j).sp().z() != -1)
+    if(mPersons[i].at(j).getStereoMarker())
     {
         int nrFor = 1; // anzahl der ztrackpoint ohne hoeheninfo
         int nrRew = 1;
 
         // nach && wird nur ausgefuehrt, wenn erstes true == size() also nicht
-        while((j + nrFor < tsize) && (mPersons[i].at(j + nrFor).sp().z() < 0))
+        while((j + nrFor < tsize) && (!mPersons[i].at(j + nrFor).getStereoMarker()))
         {
-            nrFor++;
+            ++nrFor;
         }
 
         // nach && wird nur ausgefuehrt, wenn erstes true == size() also nicht
-        while((j - nrRew >= 0) && (mPersons[i].at(j - nrRew).sp().z() < 0))
+        while((j - nrRew >= 0) && (!mPersons[i].at(j - nrRew).getStereoMarker()))
         {
-            nrRew++;
+            ++nrRew;
         }
 
         // nur oder eher in Vergangenheit hoeheninfo gefunden
         if(((j - nrRew >= 0) && (j + nrFor == tsize)) || ((j - nrRew >= 0) && (nrRew < nrFor)))
         {
-            if(fabs(mPersons[i].at(j - nrRew).sp().z() - mPersons[i].at(j).sp().z()) > nrRew * 40.) // 40cm
+            if(fabs(
+                   mPersons[i].at(j - nrRew).stereoGetStereoPoint().z() -
+                   mPersons[i].at(j).stereoGetStereoPoint().z()) > nrRew * 40.) // 40cm
             {
                 mPersons[i].updateStereoPoint(
                     j + mPersons[i].firstFrame(),
-                    {mPersons[i].at(j).sp().x(), mPersons[i].at(j).sp().y(), mPersons[i].at(j - nrRew).sp().z()});
+                    {mPersons[i].at(j).stereoGetStereoPoint().x(),
+                     mPersons[i].at(j).stereoGetStereoPoint().y(),
+                     mPersons[i].at(j - nrRew).stereoGetStereoPoint().z()});
                 SPDLOG_WARN(
                     "Trackpoint smoothed height at the end or next to unknown height in the future for trajectory {} "
                     "in frame {}.",
@@ -1056,11 +1067,15 @@ void PersonStorage::smoothHeight(size_t i, int j)
             ((j + nrFor != tsize) && (j - nrRew < 0)) ||
             ((j + nrFor != tsize) && (nrFor < nrRew))) // nur oder eher in der zukunft hoeheninfo gefunden
         {
-            if(fabs(mPersons[i].at(j + nrFor).sp().z() - mPersons[i].at(j).sp().z()) > nrFor * 40.) // 40cm
+            if(fabs(
+                   mPersons[i].at(j + nrFor).stereoGetStereoPoint().z() -
+                   mPersons[i].at(j).stereoGetStereoPoint().z()) > nrFor * 40.) // 40cm
             {
                 mPersons[i].updateStereoPoint(
                     j + mPersons[i].firstFrame(),
-                    {mPersons[i].at(j).sp().x(), mPersons[i].at(j).sp().y(), mPersons[i].at(j + nrFor).sp().z()});
+                    {mPersons[i].at(j).stereoGetStereoPoint().x(),
+                     mPersons[i].at(j).stereoGetStereoPoint().y(),
+                     mPersons[i].at(j + nrFor).stereoGetStereoPoint().z()});
                 SPDLOG_WARN(
                     "TrackPoint smoothed height at the beginning or next to unknown height in the past for trajectory "
                     "{} in frame {}.",
@@ -1074,12 +1089,17 @@ void PersonStorage::smoothHeight(size_t i, int j)
             // median genommen um zwei fehlmessungen nebeneinander nicht dazu fuehren zu lassen, dass
             // bessere daten veraendert werden
             auto zMedian = getMedianOf3(
-                mPersons[i].at(j).sp().z(), mPersons[i].at(j - nrRew).sp().z(), mPersons[i].at(j + nrFor).sp().z());
+                mPersons[i].at(j).stereoGetStereoPoint().z(),
+                mPersons[i].at(j - nrRew).stereoGetStereoPoint().z(),
+                mPersons[i].at(j + nrFor).stereoGetStereoPoint().z());
             // lineare interpolation
-            if(fabs(zMedian - mPersons[i].at(j).sp().z()) > 20. * (nrFor + nrRew)) // 20cm
+            if(fabs(zMedian - mPersons[i].at(j).stereoGetStereoPoint().z()) > 20. * (nrFor + nrRew)) // 20cm
             {
                 mPersons[i].updateStereoPoint(
-                    j + mPersons[i].firstFrame(), {mPersons[i].at(j).sp().x(), mPersons[i].at(j).sp().y(), zMedian});
+                    j + mPersons[i].firstFrame(),
+                    {mPersons[i].at(j).stereoGetStereoPoint().x(),
+                     mPersons[i].at(j).stereoGetStereoPoint().y(),
+                     zMedian});
                 SPDLOG_WARN("Trackpoint smoothed height inside for trajectory {} in frame {}.", i + 1, j + firstFrame);
             }
         }

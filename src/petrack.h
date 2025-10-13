@@ -105,8 +105,8 @@ class Petrack : public QMainWindow
 public:
     Petrack(QString petrackVersion);
     ~Petrack();
-    static int         trcVersion; // version number for writing TRC-Trajectorie files
-    static std::string hdf5FileVersion;
+    inline static int         trcVersion      = 0; // version number for writing TRC-Trajectorie files
+    inline static std::string hdf5FileVersion = "3.0.0";
 
 protected:
     void closeEvent(QCloseEvent *event);

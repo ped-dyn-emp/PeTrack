@@ -560,28 +560,27 @@ void detail::refineWithBlackDot(
 
         if(minGrey < 260) // mit gefundenem schwarzem punkt
         {
-            crossList.append(
-                TrackPoint(subCenter, 100, Vec2F(box.center.x, box.center.y), blob.color)); // 100 beste qualitaet
+            crossList.append(TrackPoint::createMultiColorTrackPoint(
+                subCenter, TrackPoint::BEST_DETECTION_QUAL, Vec2F(box.center.x, box.center.y), blob.color));
         }
         else if(!ignoreWithoutMarker)
         {
             if(autoCorrect && !autoCorrectOnlyExport)
             {
                 Vec2F moveDir = autoCorrectColorMarker(blob.imageCenter, controlWidget);
-
-                crossList.append(TrackPoint(
+                crossList.append(TrackPoint::createMultiColorTrackPoint(
                     Vec2F(box.center.x, box.center.y) + moveDir,
-                    100,
+                    TrackPoint::BEST_DETECTION_QUAL,
                     Vec2F(box.center.x, box.center.y),
-                    blob.color)); // 100 beste qualitaet
+                    blob.color));
             }
             else
             {
-                crossList.append(TrackPoint(
+                crossList.append(TrackPoint::createMultiColorTrackPoint(
                     Vec2F(box.center.x, box.center.y),
                     90,
                     Vec2F(box.center.x, box.center.y),
-                    blob.color)); // 100 beste qualitaet
+                    blob.color)); // worse quality
             }
         }
     }
@@ -600,7 +599,7 @@ detail::filterCodesByBoundingRect(const QList<TrackPoint> &codes, const cv::Rect
 
     for(const auto &code : codes)
     {
-        if((code + offset).toCvPoint().inside(bound))
+        if((code + offset).pixelPoint().toCvPoint().inside(bound))
         {
             pointsInside.append(code);
         }
@@ -625,7 +624,7 @@ TrackPoint detail::resolveMoreThanOneCandidateCode(QList<TrackPoint> &codes, con
         codes.begin(),
         codes.end(),
         [&](const TrackPoint &a, const TrackPoint &b)
-        { return reference.distanceToPoint(a) < reference.distanceToPoint(b); });
+        { return reference.distanceToPoint(a.pixelPoint()) < reference.distanceToPoint(b.pixelPoint()); });
 }
 
 /**
@@ -717,15 +716,15 @@ void detail::refineWithAruco(
         if(!addedCodes.empty())
         {
             // the aruco detection first adds detected codes followed by candidates
-            bool isDetected = addedCodes.first().getMarkerID() >= 0;
+            TrackPoint code       = std::move(addedCodes.first());
+            auto       codeMarker = code.getCodeMarker();
+            bool       isDetected = codeMarker && codeMarker->mMarkerId >= 0;
 
             if(isDetected)
             {
                 // codes are already filtered to be inside bounding rect, so just take the first
-                auto code = addedCodes.at(0);
-
-                code.setCol(blob.color);
-                code = code + Vec2F(cropRect.x, cropRect.y) + moveDir;
+                code.setMultiColorMarker({{box.center.x, box.center.y}, blob.color});
+                code += Vec2F(cropRect.x, cropRect.y) + moveDir;
                 crossList.append(code);
                 // if a code was fully detected we are done
                 continue;
@@ -733,12 +732,13 @@ void detail::refineWithAruco(
 
             // reference center point of blob
             Vec2F      referencePosition(box.center.x, box.center.y);
-            TrackPoint trackPoint(referencePosition + moveDir, 90, Vec2F(box.center.x, box.center.y), blob.color);
+            TrackPoint trackPoint = TrackPoint::createMultiColorTrackPoint(
+                referencePosition + moveDir, 90, Vec2F(box.center.x, box.center.y), blob.color);
 
             auto resolvedCode = resolveMoreThanOneCandidateCode(addedCodes, referencePosition - offsetCropRect2Roi);
 
-            resolvedCode.setQual(TrackPoint::bestDetectionQual);
-            resolvedCode.setCol(blob.color);
+            resolvedCode.setQual(TrackPoint::BEST_DETECTION_QUAL);
+            resolvedCode.setMultiColorMarker({{box.center.x, box.center.y}, blob.color});
             resolvedCode = resolvedCode + Vec2F(cropRect.x, cropRect.y) + moveDir;
             crossList.append(resolvedCode);
             continue;
@@ -748,7 +748,7 @@ void detail::refineWithAruco(
         if(addedCodes.empty() && !ignoreWithoutMarker)
         {
             // set to zero as coordinates are directly used from cropRect
-            crossList.append(TrackPoint(
+            crossList.append(TrackPoint::createMultiColorTrackPoint(
                 Vec2F(box.center.x, box.center.y) + moveDir, 90, Vec2F(box.center.x, box.center.y), blob.color));
             continue;
         }
@@ -885,19 +885,19 @@ void findMultiColorMarker(
                 {
                     moveDir = autoCorrectColorMarker(blob.imageCenter, controlWidget);
 
-                    crossList.append(TrackPoint(
+                    crossList.append(TrackPoint::createMultiColorTrackPoint(
                         Vec2F(blob.box.center.x, blob.box.center.y) + moveDir,
-                        100,
+                        TrackPoint::BEST_DETECTION_QUAL,
                         Vec2F(blob.box.center.x, blob.box.center.y),
-                        blob.color)); // 100 beste qualitaet
+                        blob.color));
                 }
                 else
                 {
-                    crossList.append(TrackPoint(
+                    crossList.append(TrackPoint::createMultiColorTrackPoint(
                         Vec2F(blob.box.center.x, blob.box.center.y),
-                        100,
+                        TrackPoint::BEST_DETECTION_QUAL,
                         Vec2F(blob.box.center.x, blob.box.center.y),
-                        blob.color)); // 100 beste qualitaet
+                        blob.color));
                 }
             }
         }
@@ -1005,8 +1005,11 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *contro
         {
             // eine mittelung waere ggf sinnvoll, aber am rand aufpassen
             col.setRgb(getValue(img, myRound(box.center.x), myRound(box.center.y)).rgb());
-            crossList.append(TrackPoint(
-                Vec2F(box.center.x, box.center.y), 100, Vec2F(box.center.x, box.center.y), col)); // 100 beste qualitaet
+            crossList.append(TrackPoint::createMultiColorTrackPoint(
+                Vec2F(box.center.x, box.center.y),
+                TrackPoint::BEST_DETECTION_QUAL,
+                Vec2F(box.center.x, box.center.y),
+                col));
         }
 
         // take the next contour
@@ -1239,15 +1242,16 @@ QList<TrackPoint> detail::findCodeMarker(
 
 
         // use best quality for code markers, even for candidates
-        TrackPoint trackPoint(Vec2F(codeX, codeY), TrackPoint::bestDetectionQual);
+        TrackPoint trackPoint(Vec2F(codeX, codeY), TrackPoint::BEST_DETECTION_QUAL);
+        CodeMarker codeMarker{-1, orientation};
 
         // overwrite qual and ID if not candidate
         if(i < ids.size())
         {
             // code marker should have the best possible quality i.e. 100
-            trackPoint.setMarkerID(ids.at(i));
+            codeMarker.mMarkerId = ids.at(i);
         }
-        trackPoint.setOrientation(orientation);
+        trackPoint.setCodeMarker(codeMarker);
 
         trackPoints.append(trackPoint);
     }
@@ -1536,7 +1540,7 @@ QList<TrackPoint> postProcessYOLO(
     {
         cv::Rect box = boxes[idx];
         crossList.append(
-            TrackPoint(Vec2F(box.x + box.width / 2, box.y + box.height / 2), TrackPoint::bestDetectionQual));
+            TrackPoint(Vec2F(box.x + box.width / 2, box.y + box.height / 2), TrackPoint::BEST_DETECTION_QUAL));
     }
     return crossList;
 }
@@ -1671,8 +1675,7 @@ QList<TrackPoint> Recognizer::getMarkerPos(
         // set cross position relative to original image size
         for(auto &point : crossList)
         {
-            point += v;
-            point.setColPoint(point.colPoint() + v);
+            point.shift(v);
         }
     }
     else
@@ -1685,8 +1688,7 @@ QList<TrackPoint> Recognizer::getMarkerPos(
             if(rect.contains(cv::Point(point.x(), point.y())))
             {
                 // take border offset into account
-                point += offset;
-                point.setColPoint(point.colPoint() + offset);
+                point.shift(offset);
                 crossListTmp.append(point);
             }
         }

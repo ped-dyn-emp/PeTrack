@@ -79,9 +79,6 @@
 #include <opencv2/opencv.hpp>
 
 
-int         Petrack::trcVersion      = 0;
-std::string Petrack::hdf5FileVersion = "3.0.0";
-
 // Reihenfolge des anlegens der objekte ist sehr wichtig
 Petrack::Petrack(QString petrackVersion) :
     mExtrCalibration(mPersonStorage),
@@ -2686,7 +2683,11 @@ void Petrack::importTracker(QString dest) // default = ""
             if(!ok)
             {
                 // Parse version header
-                if(firstLine.contains("version 4", Qt::CaseInsensitive))
+                if(firstLine.contains("version 5", Qt::CaseInsensitive))
+                {
+                    trcVersion = 5;
+                }
+                else if(firstLine.contains("version 4", Qt::CaseInsensitive))
                 {
                     trcVersion = 4;
                 }
@@ -2744,7 +2745,7 @@ void Petrack::importTracker(QString dest) // default = ""
             for(int i = 0; i < sz; ++i)
             {
                 TrackPerson tp;
-                ParseResult result = parseTrackPerson(allLines, currentLineIndex, tp);
+                ParseResult result = parseTrackPerson(allLines, currentLineIndex, tp, mReco.getRecoMethod());
                 if(!result.success)
                 {
                     QString errorMsg =
@@ -2879,11 +2880,11 @@ void Petrack::importTracker(QString dest) // default = ""
                     }
 
                     TrackPoint trackPoint(Vec2F(p2d.x, p2d.y), 100);
-                    trackPoint.setSp(
-                        realWorldCoordinates.x(),
-                        realWorldCoordinates.y(),
-                        -mControlWidget->getExtrinsicParameters().trans3 -
-                            realWorldCoordinates.z()); // distance to camera as with stereo cameras
+                    trackPoint.setStereoMarker(
+                        {{realWorldCoordinates.x(),
+                          realWorldCoordinates.y(),
+                          -mControlWidget->getExtrinsicParameters().trans3 -
+                              realWorldCoordinates.z()}}); // distance to camera as with stereo cameras
                     pixelPoints.push_back(trackPoint);
                 }
 
@@ -3007,7 +3008,7 @@ void Petrack::exportTracker(QString dest) // default = ""
 
             qApp->processEvents();
 
-            trcVersion = 4;
+            trcVersion = 5;
 
             SPDLOG_INFO(
                 "export tracking data to {} ({} person(s), file version {})",
@@ -3992,10 +3993,10 @@ double Petrack::getHeadSize(QPointF *pos, int pers, int frame)
         }
         else
         {
-            z = mPersonStorage.at(pers).trackPointAt(frame).sp().z();
             h = mPersonStorage.at(pers).height();
-            if(z > 0)
+            if(auto stereoMarker = mPersonStorage.at(pers).trackPointAt(frame).getStereoMarker())
             {
+                z = stereoMarker->mStereoPoint.z();
                 return (HEAD_SIZE * mControlWidget->getCameraAltitude() / z) /
                        mWorldImageCorrespondence->getCmPerPixel();
             }

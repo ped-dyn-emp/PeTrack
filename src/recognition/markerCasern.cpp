@@ -20,10 +20,10 @@
 #include <opencv2/highgui.hpp>
 
 // fuer Aussentreppen, sehr gross, oben
-//#define HEAD_SIZE_MIN 30
-//#define HEAD_SIZE_MAX 45
-//#define SPOT_SIZE_MIN 5
-//#define SPOT_SIZE_MAX 12
+// #define HEAD_SIZE_MIN 30
+// #define HEAD_SIZE_MAX 45
+// #define SPOT_SIZE_MIN 5
+// #define SPOT_SIZE_MAX 12
 
 // fuer Arena Kessel, Treppen:
 #define HEAD_SIZE_MIN 13
@@ -752,7 +752,8 @@ void MarkerCasernList::toCrossList(QList<TrackPoint> *crossList, bool ignoreWith
             {
                 v1 = at(i).getCenterSpot().center();
                 v2 = at(i).getColorSpot().center();
-                crossList->append(TrackPoint(v1, 100, v2, at(i).color())); // 100 beste qualitaet
+                crossList->append(
+                    TrackPoint::createCasernTrackPoint(v1, TrackPoint::BEST_DETECTION_QUAL, v2, at(i).color()));
             }
         }
     }
