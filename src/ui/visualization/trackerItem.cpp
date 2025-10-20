@@ -86,10 +86,11 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             const auto &person = persons[i];
             if(((onlyVisible.empty()) || (onlyVisible.contains(i))) && person.trackPointExist(frame))
             {
-                dist = person.trackPointAt(frame).distanceToPoint(p);
+                dist                       = person.trackPointAt(frame).distanceToPoint(p);
+                auto orientationColorPoint = p.getColorPointForOrientation();
                 if((dist < mMainWindow->getHeadSize(nullptr, static_cast<int>(i), frame) / 2.) ||
-                   ((person.trackPointAt(frame).distanceToPoint(*p.getColorPointForOrientation()) <
-                     mMainWindow->getHeadSize(nullptr, static_cast<int>(i), frame) / 2.)))
+                   (orientationColorPoint && person.trackPointAt(frame).distanceToPoint(*orientationColorPoint) <
+                                                 mMainWindow->getHeadSize(nullptr, static_cast<int>(i), frame) / 2.))
                 {
                     if(found)
                     {
