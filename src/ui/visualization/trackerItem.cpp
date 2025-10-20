@@ -544,7 +544,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     rect.setRect(tp.x() + 10, tp.y() + 10, 15 * pSC, 10 * pSC);
                     painter->drawText(rect, person.comment());
 
-                    if(person.getMarkerID() > 0)
+                    if(person.getMarkerID() >= 0)
                     {
                         QPen markerIDPen;
                         auto codeMarker = tp.getCodeMarker();

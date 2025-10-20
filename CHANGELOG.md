@@ -2,6 +2,7 @@
 
 - Fix roi not shown on startup
 - Not exporting colorpoint for an invalid color anymore due to internal change of trackpoints
+- Fix: code marker ID 0 was not displayed
 
 # 1.1
 
