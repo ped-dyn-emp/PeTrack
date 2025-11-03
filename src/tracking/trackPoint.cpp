@@ -239,14 +239,6 @@ void TrackPoint::copyAllMarkersFromTrackPoint(const TrackPoint &trackPoint)
     }
 }
 
-Vec3F TrackPoint::stereoGetStereoPoint() const
-{
-    if(const auto marker = getStereoMarker())
-    {
-        return marker->mStereoPoint;
-    }
-    throw std::runtime_error("TrackPoint does not have a stereo marker attached");
-}
 
 TrackPoint &TrackPoint::operator=(const Vec2F &vec)
 {

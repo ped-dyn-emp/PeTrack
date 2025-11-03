@@ -129,9 +129,6 @@ public:
     std::optional<QColor> getColorForHeightMap() const;
     std::optional<Vec2F>  getColorPointForOrientation() const;
 
-    // getters for specific attributes of the marker (throw if the trackpoint does not have that marker attached)
-    Vec3F stereoGetStereoPoint() const;
-
 
     void copyAllMarkersFromTrackPoint(const TrackPoint &trackPoint);
 

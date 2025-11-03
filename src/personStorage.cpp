@@ -1027,7 +1027,7 @@ void PersonStorage::smoothHeight(size_t i, int j)
     int  tsize      = mPersons[i].size();
     auto firstFrame = mPersons[i].firstFrame();
 
-    if(mPersons[i].at(j).getStereoMarker())
+    if(auto stereoMarker = mPersons[i].at(j).getStereoMarker())
     {
         int nrFor = 1; // anzahl der ztrackpoint ohne hoeheninfo
         int nrRew = 1;
@@ -1037,25 +1037,25 @@ void PersonStorage::smoothHeight(size_t i, int j)
         {
             ++nrFor;
         }
+        std::optional<StereoMarker> nrForStereoMarker = mPersons[i].at(j + nrFor).getStereoMarker();
 
         // nach && wird nur ausgefuehrt, wenn erstes true == size() also nicht
         while((j - nrRew >= 0) && (!mPersons[i].at(j - nrRew).getStereoMarker()))
         {
             ++nrRew;
         }
+        std::optional<StereoMarker> nrRewStereoMarker = mPersons[i].at(j - nrRew).getStereoMarker();
 
         // nur oder eher in Vergangenheit hoeheninfo gefunden
         if(((j - nrRew >= 0) && (j + nrFor == tsize)) || ((j - nrRew >= 0) && (nrRew < nrFor)))
         {
-            if(fabs(
-                   mPersons[i].at(j - nrRew).stereoGetStereoPoint().z() -
-                   mPersons[i].at(j).stereoGetStereoPoint().z()) > nrRew * 40.) // 40cm
+            if(fabs(nrRewStereoMarker->mStereoPoint.z() - stereoMarker->mStereoPoint.z()) > nrRew * 40.) // 40cm
             {
                 mPersons[i].updateStereoPoint(
                     j + mPersons[i].firstFrame(),
-                    {mPersons[i].at(j).stereoGetStereoPoint().x(),
-                     mPersons[i].at(j).stereoGetStereoPoint().y(),
-                     mPersons[i].at(j - nrRew).stereoGetStereoPoint().z()});
+                    {stereoMarker->mStereoPoint.x(),
+                     stereoMarker->mStereoPoint.y(),
+                     nrRewStereoMarker->mStereoPoint.z()});
                 SPDLOG_WARN(
                     "Trackpoint smoothed height at the end or next to unknown height in the future for trajectory {} "
                     "in frame {}.",
@@ -1067,15 +1067,13 @@ void PersonStorage::smoothHeight(size_t i, int j)
             ((j + nrFor != tsize) && (j - nrRew < 0)) ||
             ((j + nrFor != tsize) && (nrFor < nrRew))) // nur oder eher in der zukunft hoeheninfo gefunden
         {
-            if(fabs(
-                   mPersons[i].at(j + nrFor).stereoGetStereoPoint().z() -
-                   mPersons[i].at(j).stereoGetStereoPoint().z()) > nrFor * 40.) // 40cm
+            if(fabs(nrForStereoMarker->mStereoPoint.z() - stereoMarker->mStereoPoint.z()) > nrFor * 40.) // 40cm
             {
                 mPersons[i].updateStereoPoint(
                     j + mPersons[i].firstFrame(),
-                    {mPersons[i].at(j).stereoGetStereoPoint().x(),
-                     mPersons[i].at(j).stereoGetStereoPoint().y(),
-                     mPersons[i].at(j + nrFor).stereoGetStereoPoint().z()});
+                    {stereoMarker->mStereoPoint.x(),
+                     stereoMarker->mStereoPoint.y(),
+                     nrForStereoMarker->mStereoPoint.z()});
                 SPDLOG_WARN(
                     "TrackPoint smoothed height at the beginning or next to unknown height in the past for trajectory "
                     "{} in frame {}.",
@@ -1089,17 +1087,15 @@ void PersonStorage::smoothHeight(size_t i, int j)
             // median genommen um zwei fehlmessungen nebeneinander nicht dazu fuehren zu lassen, dass
             // bessere daten veraendert werden
             auto zMedian = getMedianOf3(
-                mPersons[i].at(j).stereoGetStereoPoint().z(),
-                mPersons[i].at(j - nrRew).stereoGetStereoPoint().z(),
-                mPersons[i].at(j + nrFor).stereoGetStereoPoint().z());
+                stereoMarker->mStereoPoint.z(),
+                nrRewStereoMarker->mStereoPoint.z(),
+                nrForStereoMarker->mStereoPoint.z());
             // lineare interpolation
-            if(fabs(zMedian - mPersons[i].at(j).stereoGetStereoPoint().z()) > 20. * (nrFor + nrRew)) // 20cm
+            if(fabs(zMedian - stereoMarker->mStereoPoint.z()) > 20. * (nrFor + nrRew)) // 20cm
             {
                 mPersons[i].updateStereoPoint(
                     j + mPersons[i].firstFrame(),
-                    {mPersons[i].at(j).stereoGetStereoPoint().x(),
-                     mPersons[i].at(j).stereoGetStereoPoint().y(),
-                     zMedian});
+                    {stereoMarker->mStereoPoint.x(), stereoMarker->mStereoPoint.y(), zMedian});
                 SPDLOG_WARN("Trackpoint smoothed height inside for trajectory {} in frame {}.", i + 1, j + firstFrame);
             }
         }

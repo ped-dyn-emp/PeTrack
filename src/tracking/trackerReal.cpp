@@ -410,14 +410,17 @@ int TrackerReal::calculate(
                         anz = tmpMissingListAnz.takeFirst(); // anzahl
                         if(useTrackpoints)
                         {
+                            auto stereoMarker     = person.at(j).getStereoMarker();
+                            auto nextStereoMarker = person.at(j + 1).getStereoMarker();
+                            if(!stereoMarker || !nextStereoMarker)
+                            {
+                                continue;
+                            }
                             // border unberuecksichtigt
                             for(f = 1; f <= anz; ++f)
                             {
-                                sp =
-                                    person.at(j).stereoGetStereoPoint() + f *
-                                                                              (person.at(j + 1).stereoGetStereoPoint() -
-                                                                               person.at(j).stereoGetStereoPoint()) /
-                                                                              (anz + 1);
+                                sp = stereoMarker->mStereoPoint +
+                                     f * (nextStereoMarker->mStereoPoint - stereoMarker->mStereoPoint) / (anz + 1);
                                 if(useCalibrationCenter)
                                 {
                                     trackPersonReal.addEnd(
