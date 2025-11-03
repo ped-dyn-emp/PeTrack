@@ -95,6 +95,7 @@ public:
 
     void       toggleShowOnly();
     QLineEdit *trackShowOnlyNrList();
+    QLineEdit *trackShowMarkerIDsNrList();
     void       setTrackNumberNow(const QString &val);
     void       setTrackShowOnlyNr(int val);
     int        getTrackShowOnlyNr() const;
@@ -104,6 +105,7 @@ public:
     bool       isTrackShowOnlyChecked() const;
     bool       isTrackShowOnlyListChecked() const;
     void       setTrackShowOnlyListChecked(bool checked);
+    bool       isTrackShowMarkerIDsListChecked() const;
     void       setTrackNumberVisible(const QString &value);
     bool       isTrackOnlySelectedChecked() const;
     int        getTrackShowBefore() const;
@@ -459,6 +461,8 @@ private slots:
 
     void onTrackShowOnlyStateChanged(int arg1);
     void onTrackShowOnlyListStateChanged(int arg1);
+
+    void onTrackShowMarkerIDsStateChanged(int arg1);
 
     void onTrackRoiShowStateChanged(int arg1);
 
