@@ -24,6 +24,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(helper_functions)
+include(FindOrBuildHDF5)
 
 # Set default build type to release
 set(default_build_type "Release")
@@ -124,14 +125,7 @@ target_compile_options(ezc3d PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/w>)
 set(BUILD_SHARED_LIBS ${DUMMY})
 
 # HDF5
-set(HDF5_BUILD_CPP_LIB ON CACHE BOOL "Build HDF5 C++ Library" FORCE)
-set(HDF5_BUILD_TOOLS OFF CACHE BOOL "Build HDF5 tools")
-set(HDF5_BUILD_EXAMPLES OFF CACHE BOOL "Build HDF5 examples")
-set(HDF5_TEST OFF CACHE BOOL "Build HDF5 tests")
-set(HDF5_ENABLE_HL OFF CACHE BOOL "Enable HDF5 High-Level library")
-set(HDF5_ENABLE_Z_LIB_SUPPORT OFF CACHE BOOL "Enable Zlib support")
-set(HDF5_ENABLE_SZIP_SUPPORT OFF CACHE BOOL "Enable SZIP support")
-add_subdirectory(deps/hdf5 EXCLUDE_FROM_ALL)
+find_or_build_hdf5()
 # if win32 and mingw use in 3rd party
 if (USE_3RD_PARTY)
   # Setting path to OpenCV

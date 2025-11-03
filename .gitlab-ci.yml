@@ -64,10 +64,18 @@ pre-build-checks:
 build_linux:
   image: ${CI_REGISTRY_IMAGE}:${DOCKER_TAG}
   stage: build
+  cache:
+    key:
+      files:
+        - deps/hdf5/CMakeLists.txt
+      prefix: "hdf5-linux"
+    paths:
+      - build/deps/hdf5/
+    policy: pull-push
   script:
-    - mkdir build
+    - mkdir -p build
     - cd build
-    - cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -DFAIL_ON_WARNINGS=ON -G Ninja
+    - cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -DFAIL_ON_WARNINGS=ON -DUSE_CACHED_HDF5=ON -G Ninja
     - cmake --build .
   artifacts:
     paths:
@@ -112,12 +120,20 @@ build_windows:
   stage: build
   tags:
     - windows
+  cache:
+    key:
+      files:
+        - deps/hdf5/CMakeLists.txt
+      prefix: "hdf5-windows"
+    paths:
+      - build/deps/hdf5
+    policy: pull-push
   script:
     - mkdir -Force build
     - $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
     - $env:Path += ";C:\Program Files\CMake\bin"
     - cd build
-    - cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -DUSE_3RD_PARTY=ON -DFAIL_ON_WARNINGS=ON ..
+    - cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_UNIT_TESTS=ON -DUSE_3RD_PARTY=ON -DFAIL_ON_WARNINGS=ON -DUSE_CACHED_HDF5=ON ..
     - cmake --build . -- -j6
   artifacts:
     paths:
@@ -200,8 +216,17 @@ build_macos:
   stage: build
   tags:
     - macos
+  cache:
+    key:
+      files:
+        - deps/hdf5/CMakeLists.txt
+      prefix: "hdf5-macos"
+    paths:
+      - build/deps/hdf5
+    policy: pull-push
+
   script:
-    - mkdir build
+    - mkdir -p build
     - cd build
     - cmake -G Ninja ..
       -DBUILD_BUNDLE=ON
@@ -212,6 +237,7 @@ build_macos:
       -DCatch2_DIR=$Catch2_DIR
       -Dtrompeloeil_DIR=$trompeloeil_DIR
       -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+      -DUSE_CACHED_HDF5=ON
     - cmake --build .
     - cpack -C Release -G DragNDrop --verbose
     - rm -r petrack.app
