@@ -313,11 +313,14 @@ Control::Control(
     connect(mUi->trackShowOnly, &QCheckBox::checkStateChanged, this, &Control::onTrackShowOnlyStateChanged);
     connect(mUi->trackShowOnlyList, &QCheckBox::checkStateChanged, this, &Control::onTrackShowOnlyListStateChanged);
     connect(
+        mUi->trackShowMarkerIDsList, &QCheckBox::checkStateChanged, this, &Control::onTrackShowMarkerIDsStateChanged);
+    connect(
         mUi->trackShowOnlyNr,
         QOverload<int>::of(&PSpinBox::valueChanged),
         this,
         &Control::onTrackShowOnlyNrValueChanged);
     connect(mUi->trackShowOnlyNrList, &QLineEdit::textChanged, this, &Control::onTrackShowOnlyNrListTextChanged);
+    connect(mUi->trackShowMarkerIDsNrList, &QLineEdit::textChanged, this, &Control::onTrackShowOnlyNrListTextChanged);
     connect(mUi->trackShowOnlyListButton, &QPushButton::clicked, this, &Control::onTrackShowOnlyListButtonClicked);
     connect(
         mUi->trackShowOnlyVisible, &QCheckBox::checkStateChanged, this, &Control::onTrackShowOnlyVisibleStateChanged);
@@ -585,6 +588,11 @@ QLineEdit *Control::trackShowOnlyNrList()
     return mUi->trackShowOnlyNrList;
 }
 
+QLineEdit *Control::trackShowMarkerIDsNrList()
+{
+    return mUi->trackShowMarkerIDsNrList;
+}
+
 void Control::setTrackNumberNow(const QString &val)
 {
     mUi->trackNumberNow->setText(val);
@@ -623,6 +631,11 @@ bool Control::isTrackShowOnlyChecked() const
 bool Control::isTrackShowOnlyListChecked() const
 {
     return mUi->trackShowOnlyList->isChecked();
+}
+
+bool Control::isTrackShowMarkerIDsListChecked() const
+{
+    return mUi->trackShowMarkerIDsList->isChecked();
 }
 
 void Control::setTrackShowOnlyListChecked(bool checked)
@@ -1253,6 +1266,11 @@ void Control::onTrackShowOnlyStateChanged(int i)
         mUi->trackShowOnlyList->setChecked(false);
     }
 
+    if(i > 0 && mUi->trackShowMarkerIDsList->checkState() == Qt::Checked)
+    {
+        mUi->trackShowMarkerIDsList->setChecked(false);
+    }
+
     if(!isLoading())
     {
         mScene->update();
@@ -1268,6 +1286,21 @@ void Control::onTrackShowOnlyListStateChanged(int i)
 
     mUi->trackShowOnlyListButton->setEnabled(i);
     mUi->trackShowOnlyNrList->setEnabled(i);
+
+    if(!isLoading())
+    {
+        mScene->update();
+    }
+}
+
+void Control::onTrackShowMarkerIDsStateChanged(int i)
+{
+    if(i > 0 && mUi->trackShowOnly->checkState() == Qt::Checked)
+    {
+        mUi->trackShowOnly->setChecked(false);
+    }
+
+    mUi->trackShowMarkerIDsNrList->setEnabled(i);
 
     if(!isLoading())
     {
@@ -2157,6 +2190,8 @@ void Control::setXml(QDomElement &elem)
     subSubElem.setAttribute("ONLY_PEOPLE_NR", mUi->trackShowOnlyNr->value());
     subSubElem.setAttribute("ONLY_PEOPLE_NR_LIST", mUi->trackShowOnlyNrList->text());
     subSubElem.setAttribute("SHOW_COMPLETE", mUi->trackShowComplPath->isChecked());
+    subSubElem.setAttribute("ONLY_MARKER_ID_LIST", mUi->trackShowMarkerIDsList->isChecked());
+    subSubElem.setAttribute("ONLY_MARKER_ID_NR_LIST", mUi->trackShowMarkerIDsNrList->text());
 
     subSubElem.setAttribute("SHOW_CURRENT_POINT", mUi->trackShowCurrentPoint->isChecked());
     subSubElem.setAttribute("SHOW_POINTS", mUi->trackShowPoints->isChecked());
@@ -2581,6 +2616,7 @@ void Control::getXml(const QDomElement &elem, const QString &version)
                     loadBoolValue(subSubElem, "ONLY_VISIBLE", mUi->trackShowOnlyVisible, false);
                     loadBoolValue(subSubElem, "ONLY_PEOPLE", mUi->trackShowOnly, false);
                     loadBoolValue(subSubElem, "ONLY_PEOPLE_LIST", mUi->trackShowOnlyList, false);
+                    loadBoolValue(subSubElem, "ONLY_MARKER_ID_LIST", mUi->trackShowMarkerIDsList, false);
                     // IMPORTANT: reading ONLY_PEOPLE_NR is done in petrack.cpp, as the trajectories need to be
                     // loaded before!
                     loadBoolValue(subSubElem, "SHOW_CURRENT_POINT", mUi->trackShowCurrentPoint, true);

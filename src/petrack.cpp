@@ -482,6 +482,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     double      oldFps           = -1;
     int         onlyPeopleNr     = 1;
     QString     onlyPeopleNrList = "1";
+    QString     markerIDsNrList  = "1";
     int         zoom = 250, rotate = 0, hScroll = 0, vScroll = 0;
     Camera      cam = Camera::cameraUnset;
     setLoading(true);
@@ -555,6 +556,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
             QDomElement tmpElem = (elem.firstChildElement("TRACKING")).firstChildElement("PATH");
             onlyPeopleNr        = readInt(tmpElem, "ONLY_PEOPLE_NR", 1);
             onlyPeopleNrList    = readQString(tmpElem, "ONLY_PEOPLE_NR_LIST", "");
+            markerIDsNrList     = readQString(tmpElem, "ONLY_MARKER_ID_NR_LIST", "");
         }
         else if(elem.tagName() == "EXTR_CALIBRATION")
         {
@@ -670,6 +672,7 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
 
     mControlWidget->setTrackShowOnlyNr(onlyPeopleNr);
     mControlWidget->trackShowOnlyNrList()->setText(onlyPeopleNrList);
+    mControlWidget->trackShowMarkerIDsNrList()->setText(markerIDsNrList);
 
     if(cam == Camera::cameraLeft)
     {
@@ -4061,26 +4064,59 @@ QSet<size_t> Petrack::getPedestrianUserSelection()
         onlyVisible.insert(mControlWidget->getTrackShowOnlyNr() - 1);
         return onlyVisible;
     }
+
+    QSet<size_t> selectedIDs{};
     if(mControlWidget->isTrackShowOnlyListChecked())
     {
         auto enteredIDs = util::splitStringToInt(mControlWidget->trackShowOnlyNrList()->text());
+
         if(enteredIDs.has_value())
         {
-            QSet<size_t> selectedIDs;
+            mControlWidget->trackShowOnlyNrList()->setStyleSheet("");
             for(auto id : enteredIDs.value())
             {
                 // subtraction needed as in UI ID start at 1 and internally at 0
                 selectedIDs.insert(id - 1);
             }
-            mControlWidget->trackShowOnlyNrList()->setStyleSheet("");
-            return selectedIDs;
         }
-        else
+        else if(!mControlWidget->trackShowOnlyNrList()->text().trimmed().isEmpty())
         {
             mControlWidget->trackShowOnlyNrList()->setStyleSheet("border: 1px solid red");
         }
     }
-    return QSet<size_t>();
+
+    if(mControlWidget->isTrackShowMarkerIDsListChecked())
+    {
+        auto additionalMarkerIDs = util::splitStringToInt(mControlWidget->trackShowMarkerIDsNrList()->text());
+        if(additionalMarkerIDs.has_value())
+        {
+            mControlWidget->trackShowMarkerIDsNrList()->setStyleSheet("");
+            std::unordered_map<int, std::vector<size_t>> markerToPerson;
+            const auto                                  &trackPersons = mPersonStorage.getPersons();
+            for(size_t i = 0; i < trackPersons.size(); ++i)
+            {
+                markerToPerson[trackPersons.at(i).getMarkerID()].emplace_back(i);
+            }
+
+            for(auto markerID : additionalMarkerIDs.value())
+            {
+                auto it = markerToPerson.find(markerID);
+                if(it != markerToPerson.end())
+                {
+                    for(size_t id : it->second)
+                    {
+                        selectedIDs.insert(id);
+                    }
+                }
+            }
+        }
+        else
+        {
+            mControlWidget->trackShowMarkerIDsNrList()->setStyleSheet("border: 1px solid red");
+        }
+    }
+
+    return selectedIDs;
 }
 
 /**
