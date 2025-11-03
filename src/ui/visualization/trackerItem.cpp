@@ -576,8 +576,9 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                                                       // wenn koord weiter oben angesetzt wird
                 {
                     painter->setFont(heightFont);
+                    auto stereoMarker = tp.getStereoMarker();
                     if(mControlWidget->isTrackShowHeightIndividualChecked() &&
-                       tp.getStereoMarker()) // Hoehe incl individual fuer jeden trackpoint
+                       stereoMarker) // Hoehe incl individual fuer jeden trackpoint
                     {
                         painter->setPen(numberPen);
                         painter->setBrush(Qt::NoBrush);
@@ -595,7 +596,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                     Qt::AlignHCenter,
                                     QString("-\n%2").arg(
                                         -mControlWidget->getExtrinsicParameters().trans3 -
-                                            tp.stereoGetStereoPoint().z(),
+                                            stereoMarker->mStereoPoint.z(),
                                         6,
                                         'f',
                                         1));
@@ -606,7 +607,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                     rect,
                                     Qt::AlignHCenter,
                                     QString("-\n%2").arg(
-                                        mControlWidget->getCameraAltitude() - tp.stereoGetStereoPoint().z(),
+                                        mControlWidget->getCameraAltitude() - stereoMarker->mStereoPoint.z(),
                                         6,
                                         'f',
                                         1));
@@ -623,7 +624,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                         .arg(height, 6, 'f', 1)
                                         .arg(
                                             -mControlWidget->getExtrinsicParameters().trans3 -
-                                                tp.stereoGetStereoPoint().z(),
+                                                stereoMarker->mStereoPoint.z(),
                                             6,
                                             'f',
                                             1));
@@ -636,7 +637,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                     QString("%1\n%2")
                                         .arg(height, 6, 'f', 1)
                                         .arg(
-                                            mControlWidget->getCameraAltitude() - tp.stereoGetStereoPoint().z(),
+                                            mControlWidget->getCameraAltitude() - stereoMarker->mStereoPoint.z(),
                                             6,
                                             'f',
                                             1));
@@ -684,11 +685,11 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         }
                         else
                         {
-                            if(tp.getStereoMarker())
+                            if(auto stereoMarker = tp.getStereoMarker())
                             {
                                 p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(
                                     cv::Point2f(tp.x(), tp.y()),
-                                    -mControlWidget->getExtrinsicParameters().trans3 - tp.stereoGetStereoPoint().z());
+                                    -mControlWidget->getExtrinsicParameters().trans3 - stereoMarker->mStereoPoint.z());
                             }
                             else
                             {
@@ -728,11 +729,11 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                         }
                         else
                         {
-                            if(tp.getStereoMarker())
+                            if(auto stereoMarker = tp.getStereoMarker())
                             {
                                 p3d_height = mMainWindow->getExtrCalibration()->get3DPoint(
                                     cv::Point2f(tp.x(), tp.y()),
-                                    -mControlWidget->getExtrinsicParameters().trans3 - tp.stereoGetStereoPoint().z());
+                                    -mControlWidget->getExtrinsicParameters().trans3 - stereoMarker->mStereoPoint.z());
                             }
                             else
                             {
@@ -834,16 +835,18 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                 }
                                 else
                                 {
-                                    if(person.at(j - 1).getStereoMarker() && person.at(j).getStereoMarker())
+                                    auto stereoMarker     = person.at(j).getStereoMarker();
+                                    auto stereoMarkerPrev = person.at(j - 1).getStereoMarker();
+                                    if(stereoMarkerPrev && stereoMarker)
                                     {
                                         p3d_height_p1 = mMainWindow->getExtrCalibration()->get3DPoint(
                                             cv::Point2f(person.at(j - 1).x(), person.at(j - 1).y()),
                                             -mControlWidget->getExtrinsicParameters().trans3 -
-                                                person.at(j - 1).stereoGetStereoPoint().z());
+                                                stereoMarkerPrev->mStereoPoint.z());
                                         p3d_height_p2 = mMainWindow->getExtrCalibration()->get3DPoint(
                                             cv::Point2f(person.at(j).x(), person.at(j).y()),
                                             -mControlWidget->getExtrinsicParameters().trans3 -
-                                                person.at(j).stereoGetStereoPoint().z());
+                                                stereoMarker->mStereoPoint.z());
                                     }
                                     else
                                     {

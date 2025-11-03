@@ -249,12 +249,17 @@ double TrackPerson::getNearestZ(int i, int *extrapolated) const
         {
             ++nrFor;
         }
+        std::optional<StereoMarker> nrForStereoMarker = mData.at(i + nrFor).getStereoMarker();
+
         while((i - nrRew >= 0) &&
               (!mData.at(i - nrRew)
                     .getStereoMarker())) // nach && wird nur ausgefuehrt, wenn erstes true == size() also nicht
         {
             ++nrRew;
         }
+
+        std::optional<StereoMarker> nrRewStereoMarker = mData.at(i - nrRew).getStereoMarker();
+
         if((i + nrFor == mData.size()) && (i - nrRew < 0)) // gar keine Hoeheninfo in trj gefunden
         {
             return -1.;
@@ -262,20 +267,18 @@ double TrackPerson::getNearestZ(int i, int *extrapolated) const
         else if(i + nrFor == mData.size()) // nur in Vergangenheit hoeheninfo gefunden
         {
             *extrapolated = 2;
-            return mData.at(i - nrRew).stereoGetStereoPoint().z();
+            return nrRewStereoMarker->mStereoPoint.z();
         }
         else if(i - nrRew < 0) // nur in der zukunft hoeheninfo gefunden
         {
             *extrapolated = 1;
-            return mData.at(i + nrFor).stereoGetStereoPoint().z();
+            return nrForStereoMarker->mStereoPoint.z();
         }
         else // in beiden richtungen hoeheninfo gefunden - INTERPOLATION, NICHT EXTRAPOLATION
         {
-            return mData.at(i - nrRew).stereoGetStereoPoint().z() +
-                   nrRew *
-                       (mData.at(i + nrFor).stereoGetStereoPoint().z() -
-                        mData.at(i - nrRew).stereoGetStereoPoint().z()) /
-                       (nrFor + nrRew); // lineare interpolation
+            return nrRewStereoMarker->mStereoPoint.z() +
+                   (nrRew * (nrForStereoMarker->mStereoPoint.z() - nrRewStereoMarker->mStereoPoint.z()) /
+                    (nrFor + nrRew)); // lineare interpolation
         }
     }
 }
@@ -448,27 +451,33 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
             // verschieben
             if(trackPointExist(frame - 1) && trackPointAt(frame - 1).qual() > 90)
             {
-                tp.setQual(95);
-                tmp = point.pixelPoint() +
-                      (trackPointAt(frame - 1).pixelPoint() - *trackPointAt(frame - 1).getColorPointForOrientation());
-                tp.setX(tmp.x());
-                tp.setY(tmp.y());
-                SPDLOG_WARN(
-                    "move TrackPoint according to last distance of structure marker and color marker of person {}:",
-                    persNr + 1);
-                SPDLOG_WARN("         {} -> {}", point, tp);
+                auto orientationPoint = trackPointAt(frame - 1).getColorPointForOrientation();
+                if(orientationPoint)
+                {
+                    tp.setQual(95);
+                    tmp = point.pixelPoint() + (trackPointAt(frame - 1).pixelPoint() - *orientationPoint);
+                    tp.setX(tmp.x());
+                    tp.setY(tmp.y());
+                    SPDLOG_WARN(
+                        "move TrackPoint according to last distance of structure marker and color marker of person {}:",
+                        persNr + 1);
+                    SPDLOG_WARN("         {} -> {}", point, tp);
+                }
             }
             else if(trackPointExist(frame + 1) && trackPointAt(frame + 1).qual() > 90)
             {
-                tp.setQual(95);
-                tmp = point.pixelPoint() +
-                      (trackPointAt(frame + 1).pixelPoint() - *trackPointAt(frame + 1).getColorPointForOrientation());
-                tp.setX(tmp.x());
-                tp.setY(tmp.y());
-                SPDLOG_WARN(
-                    "move TrackPoint according to last distance of structure marker and color marker of person {}:",
-                    persNr + 1);
-                SPDLOG_WARN("         {} -> {}", point, tp);
+                auto orientationPoint = trackPointAt(frame + 1).getColorPointForOrientation();
+                if(orientationPoint)
+                {
+                    tp.setQual(95);
+                    tmp = point.pixelPoint() + (trackPointAt(frame + 1).pixelPoint() - *orientationPoint);
+                    tp.setX(tmp.x());
+                    tp.setY(tmp.y());
+                    SPDLOG_WARN(
+                        "move TrackPoint according to last distance of structure marker and color marker of person {}:",
+                        persNr + 1);
+                    SPDLOG_WARN("         {} -> {}", point, tp);
+                }
             }
         }
 
@@ -1497,16 +1506,23 @@ void TrackPerson::replaceTrackPoint(int frame, TrackPoint trackPoint)
 
 void TrackPerson::updateStereoPoint(int frame, Vec3F stereoPoint)
 {
-    auto marker          = mData[frame - mFirstFrame].getStereoMarker();
-    marker->mStereoPoint = stereoPoint;
-    mData[frame - mFirstFrame].setStereoMarker(*marker);
+    StereoMarker newStereo{stereoPoint};
+    mData[frame - mFirstFrame].setStereoMarker(newStereo);
 }
 
 void TrackPerson::updateMarkerID(int frame, int markerID)
 {
-    auto marker       = mData[frame - mFirstFrame].getCodeMarker();
-    marker->mMarkerId = markerID;
-    mData[frame - mFirstFrame].setCodeMarker(*marker);
+    auto marker = mData[frame - mFirstFrame].getCodeMarker();
+    if(marker)
+    {
+        marker->mMarkerId = markerID;
+        mData[frame - mFirstFrame].setCodeMarker(*marker);
+    }
+    else
+    {
+        CodeMarker newCode{markerID};
+        mData[frame - mFirstFrame].setCodeMarker(newCode);
+    }
 }
 
 /**
