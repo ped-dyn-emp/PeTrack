@@ -885,15 +885,13 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     {
                         if(person.firstFrame() + j != curFrame)
                         {
-                            if(mControlWidget->isTrackShowPointsColoredChecked())
+                            auto color = person.at(j).getColorForHeightMap();
+                            if(mControlWidget->isTrackShowPointsColoredChecked() && color)
                             {
-                                if(auto color = person.at(j).getColorForHeightMap())
-                                {
-                                    painter->setPen(Qt::NoPen);
-                                    painter->setBrush(QBrush(*color));
-                                    rect.setRect(person.at(j).x() - pS / 2., person.at(j).y() - pS / 2., pS,
-                                                 pS); // 7
-                                }
+                                painter->setPen(Qt::NoPen);
+                                painter->setBrush(QBrush(*color));
+                                rect.setRect(person.at(j).x() - pS / 2., person.at(j).y() - pS / 2., pS,
+                                             pS); // 7
                             }
                             else
                             {
