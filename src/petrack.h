@@ -26,7 +26,7 @@
 #include <opencv2/core/mat.hpp>
 #include <optional>
 
-#ifdef STEREO
+#ifdef TRICLOPS
 #include "calibStereoFilter.h"
 #include "stereoContext.h"
 #endif
