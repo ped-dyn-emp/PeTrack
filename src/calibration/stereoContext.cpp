@@ -30,12 +30,12 @@
 
 #include <QDir>
 
-#ifdef STEREO
+#ifdef TRICLOPS
 
-//#define TMP_STEREO_SEQ // Stereo Bildsequenz einer Virtuelle Szene
-//#define TMP_STEREO_SEQ_DISP // neben der Einzelbildfolge soll auch das berechnete Hoehenfeld eingelesen werden
-//#define STEREO_SEQ_FILEBASE "D:/diss/personModel/ownPerson/movie/one/one_"
-//#define STEREO_SEQ_FILEBASE "D:/diss/personModel/ownPerson/movie/withHermesMarker/more_"
+// #define TMP_STEREO_SEQ // Stereo Bildsequenz einer Virtuelle Szene
+// #define TMP_STEREO_SEQ_DISP // neben der Einzelbildfolge soll auch das berechnete Hoehenfeld eingelesen werden
+// #define STEREO_SEQ_FILEBASE "D:/diss/personModel/ownPerson/movie/one/one_"
+// #define STEREO_SEQ_FILEBASE "D:/diss/personModel/ownPerson/movie/withHermesMarker/more_"
 #define STEREO_SEQ_FILEBASE        "D:/diss/personModel/ownPerson/movie/schraeg/d1/d1.0_"
 #define STEREO_SEQ_FIRST_FRAME     1   // 18
 #define STEREO_SEQ_LAST_FRAME      132 // maximal 127 bei kleiner stereo-datein 165
@@ -107,7 +107,7 @@ pet::StereoContext::StereoContext(Petrack *main)
         return;
     }
     SPDLOG_INFO("Using {} ({}) for calibration.", calFile.toStdString(), version.toStdString());
-#ifdef STEREO
+#ifdef TRICLOPS
     TriclopsError triclopsError;
     triclopsError =
         triclopsGetDefaultContextFromFile(&mTriclopsContext, static_cast<char *>(calFile.toLatin1().data()));
@@ -171,7 +171,7 @@ pet::StereoContext::StereoContext(Petrack *main)
 
 pet::StereoContext::~StereoContext()
 {
-#ifdef STEREO
+#ifdef TRICLOPS
     if(mTriclopsContext)
         triclopsDestroyContext(mTriclopsContext);
 #endif
@@ -194,7 +194,7 @@ void pet::StereoContext::init(Mat &viewImg) //  = NULL
 
     cv::Mat leftImg, rightImg;
 
-#ifdef STEREO
+#ifdef TRICLOPS
     TriclopsError triclopsError;
 
 
@@ -230,10 +230,10 @@ void pet::StereoContext::init(Mat &viewImg) //  = NULL
 
     //// um ptgrey die schon entzerrten virtuellen Bilder unterzuschieben
     //// dazu muesste zudem 2x der bereich um triclopsGetImage auskommentiert werden
-    //#ifdef TMP_STEREO_SEQ
-    //            // temporaere code um stereo-einzelbildfolge einzulesen:
-    //            if (tempLeftImg != NULL)
-    //                cvReleaseImage(&tempLeftImg);
+    // #ifdef TMP_STEREO_SEQ
+    //             // temporaere code um stereo-einzelbildfolge einzulesen:
+    //             if (tempLeftImg != NULL)
+    //                 cvReleaseImage(&tempLeftImg);
 
     //            QString fn = QString(STEREO_SEQ_FILEBASE) +
     //            QString("left_%1.png").arg(mAnimation->getCurrentFrameNum()%(STEREO_SEQ_LAST_FRAME-STEREO_SEQ_FIRST_FRAME+1)
@@ -248,7 +248,7 @@ void pet::StereoContext::init(Mat &viewImg) //  = NULL
     //            QString("right_%1.png").arg(mAnimation->getCurrentFrameNum()%(STEREO_SEQ_LAST_FRAME-STEREO_SEQ_FIRST_FRAME+1)
     //            + STEREO_SEQ_FIRST_FRAME, 3, 10, QChar('0')); // [2,159] rightImg=cvLoadImage((char *)
     //            fn.toAscii().data(), CV_LOAD_IMAGE_GRAYSCALE); //-1);
-    //#endif
+    // #endif
 
 
     triclopsError = triclopsBuildRGBTriclopsInput(
@@ -275,7 +275,7 @@ void pet::StereoContext::preprocess()
 {
     if(mStatus & buildInput)
     {
-#ifdef STEREO
+#ifdef TRICLOPS
         TriclopsError triclopsError;
 
         triclopsError = triclopsSetEdgeCorrelation(mTriclopsContext, mMain->getStereoWidget()->useEdge->isChecked());
@@ -310,7 +310,7 @@ cv::Mat pet::StereoContext::getRectified(Camera camera)
 
     if(mStatus & preprocessed)
     {
-#ifdef STEREO
+#ifdef TRICLOPS
         TriclopsError triclopsError;
 
         if(camera == Camera::cameraLeft)
@@ -464,7 +464,7 @@ cv::Mat pet::StereoContext::getDisparity(bool *dispNew)
         *dispNew = false;
     if((mStatus & preprocessed) && !(mStatus & genDisparity))
     {
-#ifdef STEREO
+#ifdef TRICLOPS
         TriclopsError triclopsError;
 #endif
         if(mMain->getStereoWidget()->minDisparity->value() >= mMain->getStereoWidget()->maxDisparity->value())
@@ -699,7 +699,7 @@ cv::Mat pet::StereoContext::getDisparity(bool *dispNew)
             //    unsigned short*   data;
             //
             // } TriclopsImage16;
-#ifdef STEREO
+#ifdef TRICLOPS
 
             // set values for stereo processing
             triclopsError = triclopsSetDisparity(
@@ -1023,7 +1023,7 @@ cv::Mat pet::StereoContext::getDisparity(bool *dispNew)
 // gibt die cm pro pixel in der entfernung von z Metern von der Kamera zurueck
 double pet::StereoContext::getCmPerPixel([[maybe_unused]] float z)
 {
-#ifdef STEREO
+#ifdef TRICLOPS
 
     float row1, row2;
     float col;
@@ -1086,7 +1086,7 @@ bool pet::StereoContext::getXYZ(int col, int row, float *x, float *y, float *z)
 
         if(dispValueValid(disp))
         {
-#ifdef STEREO
+#ifdef TRICLOPS
             triclopsRCD16ToXYZ(mTriclopsContext, row, col, disp, x, y, z);
 #endif
             *x *= 100.;
@@ -1107,7 +1107,7 @@ bool pet::StereoContext::getXYZ(int col, int row, float *x, float *y, float *z)
 // die Entfernung ist fuer jedes Pixel gleich (hier 0,0 genommen)
 float pet::StereoContext::getZfromDisp([[maybe_unused]] unsigned short int disp)
 {
-#ifdef STEREO
+#ifdef TRICLOPS
     float x;
     float y;
     float z;
@@ -1160,7 +1160,7 @@ bool pet::StereoContext::getMedianXYZaround(int col, int row, float *x, float *y
             std::sort(values.begin(), values.begin() + nr); // sort first nr elements in values
 
             // debout << row+2 << " " << col+2 << " " << nr << " "<< values[nr/2] << endl;
-#ifdef STEREO
+#ifdef TRICLOPS
             triclopsRCD16ToXYZ(mTriclopsContext, row + 2, col + 2, values[nr / 2], x, y, z);
 #endif
             *x *= 100.;
@@ -1191,7 +1191,7 @@ cv::Mat pet::StereoContext::getPointCloud()
 
     if(mStatus & genDisparity)
     {
-#ifdef STEREO
+#ifdef TRICLOPS
 
         if(mPointCloud.empty()) // Speicherplatz anlegen
         {
@@ -1276,7 +1276,7 @@ cv::Mat pet::StereoContext::getPointCloud()
             pcData = (pcyData += mPointCloud->step / sizeof(float));
         }
 #endif // TMP_STEREO_SEQ_DISP
-#endif // STEREO
+#endif // TRICLOPS
 
         return mPointCloud;
     }
@@ -1344,7 +1344,7 @@ cv::Mat pet::StereoContext::getPointCloud()
 // return shows, if export was sucessfull
 bool pet::StereoContext::exportPointCloud([[maybe_unused]] QString dest) // default = ""
 {
-#ifndef STEREO
+#ifndef TRICLOPS
     PCritical(nullptr, "No stereo support", "This version of PeTrack was compiled without stereo support.");
     return false;
 #else
@@ -1464,5 +1464,5 @@ bool pet::StereoContext::exportPointCloud([[maybe_unused]] QString dest) // defa
             QObject::tr("Cannot export point cloud, because disparity has not been generated."));
         return false;
     }
-#endif // STEREO defined
+#endif // TRICLOPS defined
 }

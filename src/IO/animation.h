@@ -30,7 +30,7 @@
 #include <opencv2/core/mat.hpp>
 #include <opencv2/videoio.hpp>
 
-#ifdef STEREO
+#ifdef TRICLOPS
 #include "pgrAviFile.h"
 #else
 #include "stereoAviFile.h"
@@ -138,7 +138,7 @@ public:
     QFileInfo getFileInfo();
 
     // used to get access of both frames only with calibStereoFilter
-#ifdef STEREO
+#ifdef TRICLOPS
     PgrAviFile *getCaptureStereo();
 #else
     StereoAviFile *getCaptureStereo();
@@ -251,7 +251,7 @@ private:
 
 
     // Capture structure from pgrAviFile for Stereo Videos
-#ifdef STEREO
+#ifdef TRICLOPS
     PgrAviFile *mCaptureStereo;
 #else
     StereoAviFile *mCaptureStereo;

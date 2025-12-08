@@ -53,8 +53,8 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 ################################################################################
 # Optional features
 ################################################################################
-option(STEREO "Use Point Grey's Triclops SDK and enable stereo support" OFF)
-print_var(STEREO)
+option(TRICLOPS "Use Point Grey's Triclops SDK and enable stereo support" OFF)
+print_var(TRICLOPS)
 
 option(BUILD_UNIT_TESTS "Build catch2 unit tests" OFF)
 print_var(BUILD_UNIT_TESTS)
@@ -102,7 +102,7 @@ if (USE_3RD_PARTY AND NOT (WIN32 AND MINGW))
 endif()
 
 ## Stero currently only allowed on windows
-if (STEREO AND NOT WIN32)
+if (TRICLOPS AND NOT WIN32)
   message(FATAL_ERROR "Currently the stereo feature is only supported on windows.")
 endif()
 
@@ -297,9 +297,9 @@ target_sources(petrack PRIVATE
   icons/icons.qrc
 )
 
-if(STEREO)
+if(TRICLOPS)
   message("Stereo enabled! (PGR)")
-  target_compile_definitions(petrack_core PRIVATE STEREO)
+  target_compile_definitions(petrack_core PRIVATE TRICLOPS)
 
   target_link_libraries(petrack_core PUBLIC avifil32 msvfw32 pnmutils_v100)
   target_link_libraries(petrack_core PUBLIC triclops_v100)

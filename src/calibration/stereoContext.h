@@ -21,11 +21,11 @@
 
 #include <QString>
 
-#ifdef STEREO
+#ifdef TRICLOPS
 #include <triclops.h>
 #endif
 
-#ifdef STEREO
+#ifdef TRICLOPS
 #include "opencv2/calib3d.hpp"
 #include "opencv2/calib3d/calib3d_c.h"
 #include "pgrAviFile.h"
@@ -88,7 +88,7 @@ public:
     bool dispValueValid(unsigned short int disp);
 
     // ---------------------------------------------------
-#ifdef STEREO
+#ifdef TRICLOPS
     inline TriclopsContext getContext()
     {
         return mTriclopsContext;
@@ -132,7 +132,7 @@ public:
 protected:
     Animation *mAnimation;
     Petrack   *mMain;
-#ifdef STEREO
+#ifdef TRICLOPS
     TriclopsContext mTriclopsContext;
     TriclopsInput   mTriclopsInput;
     TriclopsImage   mTriRectLeft;

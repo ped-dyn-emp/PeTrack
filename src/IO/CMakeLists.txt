@@ -15,7 +15,7 @@ target_sources(petrack_core PRIVATE
     skeletonTreeFactory.h  
 )
 
-if(NOT STEREO)
+if(NOT TRICLOPS)
     target_sources(petrack_core PRIVATE 
         stereoAviFile.h   
     )

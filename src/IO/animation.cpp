@@ -860,7 +860,7 @@ void Animation::freePhoto()
 /**********************************************************************/
 
 // used to get access of both frames only with calibStereoFilter
-#ifdef STEREO
+#ifdef TRICLOPS
 PgrAviFile *Animation::getCaptureStereo()
 #else
 StereoAviFile *Animation::getCaptureStereo()
@@ -876,7 +876,7 @@ StereoAviFile *Animation::getCaptureStereo()
 // fileNumber indicates the number of the successive files splited while writing
 bool Animation::openAnimationStereoVideo(int fileNumber, cv::Mat &stereoImgLeft, cv::Mat &stereoImgRight)
 {
-#ifdef STEREO
+#ifdef TRICLOPS
     PgrAviFile *captureStereo = new PgrAviFile;
 #else
     StereoAviFile *captureStereo = new StereoAviFile;
@@ -971,7 +971,7 @@ bool Animation::openAnimationVideo(QString fileName)
     // Check if it was created succesfully
     if(!mVideoCapture.isOpened())
     {
-#if STEREO
+#if TRICLOPS
 
 
         // untersuchen, ob Stereodaten von Arena/Messe-Versuchen
