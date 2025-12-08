@@ -21,7 +21,7 @@ For using `PeTrack` following tools and libraries are needed:
 - CMake (>= 3.16)
 - Qt (>= 6.8.3)
 - OpenCV (== 4.10)
-- Qwt (>= 6.2, linked with Qt6)
+- Qwt (>= 6.3.0, linked with Qt6)
 
 When developing `PeTrack` and using the test framework following additional tools and libraries are used, they are provided as submodules by `PeTrack`:
 
@@ -68,7 +68,7 @@ After getting the source code, you need to switch to the newly created directory
 Next steps is to load the third-party dependencies specified directly as submodules. This can be done with:
 
 ```
-[/home/dev/petrack] $ git submodule update --init deps/Catch2 deps/spdlog deps/ezc3d deps/trompeloeil
+[/home/dev/petrack] $ git submodule update --init deps/*
 ```
 
 Next you need to create a build directory in which CMake will create all the files needed for compiling `PeTrack`. It can also be used to have different executable for different versions of `PeTrack`. Also we need to move into the build directory.
@@ -139,11 +139,9 @@ We extended the options with our own, which allow better configuration of the pr
 ### Known issues
 
 - CMake fails when searching one of the needed libraries.
-
   - Possible solution: Check if the libraries are installed to your `PATH` or use `-DCMAKE_PREFIX_PATH` CMake option
 
 - Change of CMake option seem to have no influence
-
   - Possible solution: It may be necessary to delete the CMakeCache and run CMake again with the new options.
 
 - When compiling OpenCV yourself, make sure you have `ffmpeg` installed, or you won't be able to load any videos.
