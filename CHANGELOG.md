@@ -3,6 +3,7 @@
 - Feature: Add the option to show specific markerIDs
 - Fix roi not shown on startup
 - Not exporting colorpoint for an invalid color anymore due to internal change of trackpoints
+- Fix: wrong margin for some UI boxes
 - Fix: code marker ID 0 was not displayed
 
 # 1.1

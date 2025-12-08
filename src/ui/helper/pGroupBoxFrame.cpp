@@ -42,10 +42,5 @@ void PGroupBoxFrame::paintEvent(QPaintEvent * /*event*/)
     QStyleOptionFrame opt;
     opt.initFrom(this);
     QPainter p(this);
-
-    // since normal GroupBox includes its title, a top margin is applied
-    // we need to counteract this (may be slighly off for other styles than fusion)
-    int topMargin = qMax(style()->pixelMetric(QStyle::PM_ExclusiveIndicatorHeight), opt.fontMetrics.height()) + 3;
-    opt.rect.adjust(0, -topMargin, 0, 0);
-    style()->drawPrimitive(QStyle::PE_FrameGroupBox, &opt, &p, dynamic_cast<QWidget *>(this->parent()));
+    style()->drawPrimitive(QStyle::PE_FrameGroupBox, &opt, &p, this);
 }
