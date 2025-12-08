@@ -94,8 +94,8 @@ public:
     void        setZoomLevelBlocked(int l);
 
 public slots:
-    void zoomIn(int i = 1);
-    void zoomOut(int i = 1);
+    void zoomIn();
+    void zoomOut();
 
 private slots:
     void setupMatrix();

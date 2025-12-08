@@ -360,14 +360,14 @@ void ViewWidget::setupMatrix()
     mGraphicsView->setTransform(matrix);
 }
 
-void ViewWidget::zoomIn(int i) // default i = 1
+void ViewWidget::zoomIn()
 {
-    mZoomSlider->setValue(mZoomSlider->value() + i);
+    mZoomSlider->setValue(mZoomSlider->value() + 1);
 }
 
-void ViewWidget::zoomOut(int i) // default i = 1
+void ViewWidget::zoomOut()
 {
-    mZoomSlider->setValue(mZoomSlider->value() - i);
+    mZoomSlider->setValue(mZoomSlider->value() - 1);
 }
 
 void ViewWidget::rotateLeft()
