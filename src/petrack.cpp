@@ -221,6 +221,7 @@ Petrack::Petrack(QString petrackVersion) :
     mView->setFrameShape(QFrame::NoFrame);
 
     mView->setScene(mScene);
+    connect(mView, &GraphicsView::dropped, this, &Petrack::dropEvent);
     connect(mView, &GraphicsView::mouseShiftDoubleClick, this, &Petrack::addManualTrackPointOnlyVisible);
     connect(mView, &GraphicsView::mouseShiftControlDoubleClick, this, &Petrack::splitTrackPerson);
     connect(mView, &GraphicsView::mouseControlDoubleClick, this, &Petrack::addOrMoveManualTrackPoint);

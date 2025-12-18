@@ -30,6 +30,7 @@ GraphicsView::GraphicsView(ViewWidget *viewWidget) : QGraphicsView()
 {
     mViewWidget = viewWidget;
 
+    setAcceptDrops(true);
     setTransformationAnchor(AnchorUnderMouse); // for wheel
     setResizeAnchor(AnchorUnderMouse);         // for scroll?
 }
@@ -220,6 +221,22 @@ void GraphicsView::mouseMoveEvent(QMouseEvent *event)
         QGraphicsView::mouseMoveEvent(event);
     }
 }
+
+
+void GraphicsView::dragEnterEvent(QDragEnterEvent *event)
+{
+    if(event->mimeData()->hasUrls())
+    {
+        event->acceptProposedAction();
+    }
+}
+
+
+void GraphicsView::dragMoveEvent(QDragMoveEvent *event)
+{
+    event->acceptProposedAction(); // already validated in dragEnter
+}
+
 
 //---------------------------------------------------------------------
 
