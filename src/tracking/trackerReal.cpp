@@ -910,15 +910,22 @@ void TrackerReal::exportHdf5(
         createGroupHdf5Attribute(optionalDataset, "fps", fps);
         createHdf5Attribute(optionalDataset, "id", "unique identifier for pedestrian");
         createHdf5Attribute(optionalDataset, "frame", "frame number");
-        createHdf5Attribute(
-            optionalDataset, "view_dir_x", "x component of view direction unit vector [(0, 0) if not present]");
-        createHdf5Attribute(
-            optionalDataset, "view_dir_y", "y component of view direction unit vector [(0, 0) if not present]");
-        createHdf5Attribute(
-            optionalDataset,
-            "view_angle",
-            "angle [rad] between the line from the camera to the point and the line from the camera perpendicularly to "
-            "the ground");
+        if(exportViewingDirection)
+        {
+            createHdf5Attribute(
+                optionalDataset, "view_dir_x", "x component of view direction unit vector [(0, 0) if not present]");
+            createHdf5Attribute(
+                optionalDataset, "view_dir_y", "y component of view direction unit vector [(0, 0) if not present]");
+        }
+        if(exportAngleOfView)
+        {
+            createHdf5Attribute(
+                optionalDataset,
+                "view_angle",
+                "angle [rad] between the line from the camera to the point and the line from the camera "
+                "perpendicularly to "
+                "the ground");
+        }
 
         optionalDataset.write(optionalData.data(), optionalDatatype);
 
@@ -940,9 +947,15 @@ void TrackerReal::exportHdf5(
         H5::DataSet   personalDataset = file.createDataSet("personal_details", personalDatatype, personalDataspace);
 
         createHdf5Attribute(personalDataset, "id", "unique identifier for pedestrian");
-        createHdf5Attribute(personalDataset, "marker_id", "marker identifier for pedestrian");
+        if(exportMarkerID)
+        {
+            createHdf5Attribute(personalDataset, "marker_id", "marker identifier for pedestrian");
+        }
         createHdf5Attribute(personalDataset, "height", "pedestrian height (meter[m])");
-        createHdf5Attribute(personalDataset, "comment", "comment about pedestrian");
+        if(exportComment)
+        {
+            createHdf5Attribute(personalDataset, "comment", "comment about pedestrian");
+        }
 
         personalDataset.write(personalDetailsData.data(), personalDatatype);
 
