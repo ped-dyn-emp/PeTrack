@@ -37,7 +37,7 @@ struct OffsetMarker
     std::vector<cv::Point2f> corners;
     Vec2F                    offset;
 
-    OffsetMarker(std::vector<cv::Point2f> corn, Vec2F off) : corners(corn), offset(off){};
+    OffsetMarker(std::vector<cv::Point2f> corn, Vec2F off) : corners(corn), offset(off) {};
 };
 
 class CodeMarkerItem : public QGraphicsItem

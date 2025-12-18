@@ -107,7 +107,7 @@ inline double getMedianOf3(double a, double b, double c)
 
 // d darf keine seiteneffekte haben!!!
 // myround genommen, da round manchmal in math.h existiert, aber nicht immer
-#define myRound(d)          (static_cast<int>(((d) < 0 ? (d) -.5 : (d) + .5)))
+#define myRound(d)          (static_cast<int>(((d) < 0 ? (d) - .5 : (d) + .5)))
 #define myClip(d, min, max) (((d) < min) ? (min) : (((d) > max) ? (max) : (d)))
 
 // get image color from 3-channel-images with values 0..255

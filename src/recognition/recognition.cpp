@@ -560,27 +560,30 @@ void detail::refineWithBlackDot(
 
         if(minGrey < 260) // mit gefundenem schwarzem punkt
         {
-            crossList.append(TrackPoint::createMultiColorTrackPoint(
-                subCenter, TrackPoint::BEST_DETECTION_QUAL, Vec2F(box.center.x, box.center.y), blob.color));
+            crossList.append(
+                TrackPoint::createMultiColorTrackPoint(
+                    subCenter, TrackPoint::BEST_DETECTION_QUAL, Vec2F(box.center.x, box.center.y), blob.color));
         }
         else if(!ignoreWithoutMarker)
         {
             if(autoCorrect && !autoCorrectOnlyExport)
             {
                 Vec2F moveDir = autoCorrectColorMarker(blob.imageCenter, controlWidget);
-                crossList.append(TrackPoint::createMultiColorTrackPoint(
-                    Vec2F(box.center.x, box.center.y) + moveDir,
-                    TrackPoint::BEST_DETECTION_QUAL,
-                    Vec2F(box.center.x, box.center.y),
-                    blob.color));
+                crossList.append(
+                    TrackPoint::createMultiColorTrackPoint(
+                        Vec2F(box.center.x, box.center.y) + moveDir,
+                        TrackPoint::BEST_DETECTION_QUAL,
+                        Vec2F(box.center.x, box.center.y),
+                        blob.color));
             }
             else
             {
-                crossList.append(TrackPoint::createMultiColorTrackPoint(
-                    Vec2F(box.center.x, box.center.y),
-                    90,
-                    Vec2F(box.center.x, box.center.y),
-                    blob.color)); // worse quality
+                crossList.append(
+                    TrackPoint::createMultiColorTrackPoint(
+                        Vec2F(box.center.x, box.center.y),
+                        90,
+                        Vec2F(box.center.x, box.center.y),
+                        blob.color)); // worse quality
             }
         }
     }
@@ -748,8 +751,9 @@ void detail::refineWithAruco(
         if(addedCodes.empty() && !ignoreWithoutMarker)
         {
             // set to zero as coordinates are directly used from cropRect
-            crossList.append(TrackPoint::createMultiColorTrackPoint(
-                Vec2F(box.center.x, box.center.y) + moveDir, 90, Vec2F(box.center.x, box.center.y), blob.color));
+            crossList.append(
+                TrackPoint::createMultiColorTrackPoint(
+                    Vec2F(box.center.x, box.center.y) + moveDir, 90, Vec2F(box.center.x, box.center.y), blob.color));
             continue;
         }
 
@@ -885,19 +889,21 @@ void findMultiColorMarker(
                 {
                     moveDir = autoCorrectColorMarker(blob.imageCenter, controlWidget);
 
-                    crossList.append(TrackPoint::createMultiColorTrackPoint(
-                        Vec2F(blob.box.center.x, blob.box.center.y) + moveDir,
-                        TrackPoint::BEST_DETECTION_QUAL,
-                        Vec2F(blob.box.center.x, blob.box.center.y),
-                        blob.color));
+                    crossList.append(
+                        TrackPoint::createMultiColorTrackPoint(
+                            Vec2F(blob.box.center.x, blob.box.center.y) + moveDir,
+                            TrackPoint::BEST_DETECTION_QUAL,
+                            Vec2F(blob.box.center.x, blob.box.center.y),
+                            blob.color));
                 }
                 else
                 {
-                    crossList.append(TrackPoint::createMultiColorTrackPoint(
-                        Vec2F(blob.box.center.x, blob.box.center.y),
-                        TrackPoint::BEST_DETECTION_QUAL,
-                        Vec2F(blob.box.center.x, blob.box.center.y),
-                        blob.color));
+                    crossList.append(
+                        TrackPoint::createMultiColorTrackPoint(
+                            Vec2F(blob.box.center.x, blob.box.center.y),
+                            TrackPoint::BEST_DETECTION_QUAL,
+                            Vec2F(blob.box.center.x, blob.box.center.y),
+                            blob.color));
                 }
             }
         }
@@ -1005,11 +1011,12 @@ void findColorMarker(cv::Mat &img, QList<TrackPoint> &crossList, Control *contro
         {
             // eine mittelung waere ggf sinnvoll, aber am rand aufpassen
             col.setRgb(getValue(img, myRound(box.center.x), myRound(box.center.y)).rgb());
-            crossList.append(TrackPoint::createMultiColorTrackPoint(
-                Vec2F(box.center.x, box.center.y),
-                TrackPoint::BEST_DETECTION_QUAL,
-                Vec2F(box.center.x, box.center.y),
-                col));
+            crossList.append(
+                TrackPoint::createMultiColorTrackPoint(
+                    Vec2F(box.center.x, box.center.y),
+                    TrackPoint::BEST_DETECTION_QUAL,
+                    Vec2F(box.center.x, box.center.y),
+                    col));
         }
 
         // take the next contour

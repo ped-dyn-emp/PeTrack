@@ -278,9 +278,10 @@ void ExtrCalibration::loadExtrCalibFile()
         PCritical(
             mMainWindow,
             QObject::tr("PeTrack"),
-            QObject::tr("Error: Not enough points given: %1 (minimum 4 (coplanar) or 6 (not coplanar) "
-                        "needed!). Please check your extrinsic "
-                        "calibration file!")
+            QObject::tr(
+                "Error: Not enough points given: %1 (minimum 4 (coplanar) or 6 (not coplanar) "
+                "needed!). Please check your extrinsic "
+                "calibration file!")
                 .arg(points3D_tmp.size()));
         return;
     }
@@ -291,9 +292,10 @@ void ExtrCalibration::loadExtrCalibFile()
         PCritical(
             mMainWindow,
             QObject::tr("PeTrack"),
-            QObject::tr("Error: Not enough points given: %1 (minimum 4 (coplanar) or 6 (not coplanar) "
-                        "needed!). Please check your extrinsic "
-                        "calibration file!")
+            QObject::tr(
+                "Error: Not enough points given: %1 (minimum 4 (coplanar) or 6 (not coplanar) "
+                "needed!). Please check your extrinsic "
+                "calibration file!")
                 .arg(points3D_tmp.size()));
         return;
     }
@@ -318,8 +320,9 @@ void ExtrCalibration::loadExtrCalibFile()
         int result = PWarning(
             mMainWindow,
             QObject::tr("PeTrack"),
-            QObject::tr("Number of 3D points (%1) disagree with number of stored 2D points (%2)!<br />The 2D "
-                        "points will be deleted! You have to fetch new ones from the image!")
+            QObject::tr(
+                "Number of 3D points (%1) disagree with number of stored 2D points (%2)!<br />The 2D "
+                "points will be deleted! You have to fetch new ones from the image!")
                 .arg(points3D_tmp.size())
                 .arg(points2D.size()),
             PMessageBox::StandardButton::Ok | PMessageBox::StandardButton::Abort);
@@ -556,8 +559,9 @@ std::optional<ExtrinsicParameters> ExtrCalibration::calibExtrParams()
         PCritical(
             mMainWindow,
             QObject::tr("Petrack"),
-            QObject::tr("Error: Could not calculate extrinsic calibration. Please select other 2D/3D point "
-                        "correspondences for extrinsic calibration!"));
+            QObject::tr(
+                "Error: Could not calculate extrinsic calibration. Please select other 2D/3D point "
+                "correspondences for extrinsic calibration!"));
         return results;
     }
 

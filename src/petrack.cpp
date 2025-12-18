@@ -3746,8 +3746,7 @@ bool Petrack::updateImage(bool imageChanged)
         if(!mutex.tryLock())
         {
             // add the call to the event queue to make sure no valid update is skipped
-            QMetaObject::invokeMethod(
-                this, [this, imageChanged] { updateImage(imageChanged); }, Qt::QueuedConnection);
+            QMetaObject::invokeMethod(this, [this, imageChanged] { updateImage(imageChanged); }, Qt::QueuedConnection);
             return false;
         }
 

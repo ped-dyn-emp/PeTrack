@@ -781,8 +781,9 @@ cv::Mat Animation::getFramePhoto(int index)
             PCritical(
                 nullptr,
                 "An error has occurred!",
-                QString("The size of the images in the selected image sequence does not agree."
-                        "<br /><br />[0]:  %1  (%2x%3 pixel)<br />[%4]:   %5  (%6x%7 pixel)")
+                QString(
+                    "The size of the images in the selected image sequence does not agree."
+                    "<br /><br />[0]:  %1  (%2x%3 pixel)<br />[%4]:   %5  (%6x%7 pixel)")
                     .arg(mImgFilesList.at(0))
                     .arg(mSize.width())
                     .arg(mSize.height())
@@ -890,8 +891,9 @@ bool Animation::openAnimationStereoVideo(int fileNumber, cv::Mat &stereoImgLeft,
         if(!((captureStereo->m_iRows == 960) && (captureStereo->m_iCols == 1280)))
         {
             // 16 bits per pixel is just assumed (old impl. using Windows AVI API checked the file)
-            SPDLOG_ERROR("Only stereo videos from Hermes experiments with 1280x960 pixel, 16 bits per pixel anf 16 "
-                         "frames per second are supported!");
+            SPDLOG_ERROR(
+                "Only stereo videos from Hermes experiments with 1280x960 pixel, 16 bits per pixel anf 16 "
+                "frames per second are supported!");
             delete captureStereo;
             return false;
         }

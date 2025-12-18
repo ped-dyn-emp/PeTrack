@@ -105,11 +105,10 @@ void MoCapController::transformPersonSkeleton(
 
     for(const auto &pair : projectedPairs)
     {
-        renderData.push_back(
-            {/*.mLine =*/QLine(pair.first.x, pair.first.y, pair.second.x, pair.second.y),
-             /*.mColor =*/mColor,
-             /*.mThickness =*/mThickness,
-             /*.mDirected =*/false});
+        renderData.push_back({/*.mLine =*/QLine(pair.first.x, pair.first.y, pair.second.x, pair.second.y),
+                              /*.mColor =*/mColor,
+                              /*.mThickness =*/mThickness,
+                              /*.mDirected =*/false});
     }
 
     // Head Direction Arrow
@@ -123,11 +122,10 @@ void MoCapController::transformPersonSkeleton(
     cv::Point2f arrowHead   = mExtrCalib.getImagePoint(arrowBase + headDir);
     auto        arrowBase2D = mExtrCalib.getImagePoint(arrowBase);
 
-    renderData.push_back(
-        {/*.mLine =*/QLine(arrowBase2D.x, arrowBase2D.y, arrowHead.x, arrowHead.y),
-         /*.mColor =*/mColor,
-         /*.mThickness =*/mThickness,
-         /*.mDirected =*/true});
+    renderData.push_back({/*.mLine =*/QLine(arrowBase2D.x, arrowBase2D.y, arrowHead.x, arrowHead.y),
+                          /*.mColor =*/mColor,
+                          /*.mThickness =*/mThickness,
+                          /*.mDirected =*/true});
 }
 
 std::vector<SegmentRenderData> MoCapController::getRenderData(int currentFrame, double framerate) const
@@ -155,11 +153,10 @@ std::vector<SkeletonLine> MoCapController::interpolate(
 
     for(size_t i = 0; i < prePairs.size(); ++i)
     {
-        interpolatedPairs.push_back(
-            {/*.start =*/prePairs[i].start * (1 - weight) + postPairs[i].start * weight,
-             /*.start_id =*/prePairs[i].start_id,
-             /*.end =*/prePairs[i].end * (1 - weight) + postPairs[i].end * weight,
-             /*.end_id =*/prePairs[i].end_id});
+        interpolatedPairs.push_back({/*.start =*/prePairs[i].start * (1 - weight) + postPairs[i].start * weight,
+                                     /*.start_id =*/prePairs[i].start_id,
+                                     /*.end =*/prePairs[i].end * (1 - weight) + postPairs[i].end * weight,
+                                     /*.end_id =*/prePairs[i].end_id});
     }
     return interpolatedPairs;
 }

@@ -310,7 +310,7 @@ void QtColorTriangle::mouseMoveEvent(QMouseEvent *e)
             am += TWOPI;
         }
 
-        curHue = 360 - (int) (((am) *360.0) / TWOPI);
+        curHue = 360 - (int) (((am) * 360.0) / TWOPI);
         int h, s, v;
         curColor.getHsv(&h, &s, &v);
 

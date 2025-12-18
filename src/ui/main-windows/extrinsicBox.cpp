@@ -166,19 +166,20 @@ void ExtrinsicBox::onExtrCalibShowErrorClicked()
     }
     else
     {
-        out                    = QString("<table>"
-                                         "<tr><th></th>"
-                                         "<th>average   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>"
-                                         "<th>std. deviation                          &nbsp;</th>"
-                                         "<th>variance  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>"
-                                         "<th>max       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th></tr>"
-                                         "<tr><td>Point   height: &nbsp;&nbsp;            </td><td> %0 cm</td><td> %1 cm</td><td> %2 "
-                                         "cm</td><td> %3 cm</td></tr>"
-                                         "<tr><td>Default height: <small>[%12 cm]</small> </td><td> %4 cm</td><td> %5 cm</td><td> %6 "
-                                         "cm</td><td> %7 cm</td></tr>"
-                                         "<tr><td>Pixel    error: &nbsp;&nbsp;            </td><td> %8 px</td><td> %9 px</td><td> %10 "
-                                         "px</td><td> %11 px</td></tr>"
-                                         "</table>");
+        out = QString(
+            "<table>"
+            "<tr><th></th>"
+            "<th>average   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>"
+            "<th>std. deviation                          &nbsp;</th>"
+            "<th>variance  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>"
+            "<th>max       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th></tr>"
+            "<tr><td>Point   height: &nbsp;&nbsp;            </td><td> %0 cm</td><td> %1 cm</td><td> %2 "
+            "cm</td><td> %3 cm</td></tr>"
+            "<tr><td>Default height: <small>[%12 cm]</small> </td><td> %4 cm</td><td> %5 cm</td><td> %6 "
+            "cm</td><td> %7 cm</td></tr>"
+            "<tr><td>Pixel    error: &nbsp;&nbsp;            </td><td> %8 px</td><td> %9 px</td><td> %10 "
+            "px</td><td> %11 px</td></tr>"
+            "</table>");
         const auto &reproError = mExtrCalibration.getReprojectionError().getData();
         for(double value : reproError)
         {

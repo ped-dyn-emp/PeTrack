@@ -57,8 +57,9 @@ QString annotationGroups::getFilename(const QString &lastDirectory, bool saving)
         nullptr,
         QString("Select file for %1 Grouping data").arg(saving ? "exporting" : "importing"),
         lastDirectory,
-        QString("Petrack groups (*.json);;Text (*.txt);;All supported types (*.txt *.json);;All files "
-                "(*.*)"));
+        QString(
+            "Petrack groups (*.json);;Text (*.txt);;All supported types (*.txt *.json);;All files "
+            "(*.*)"));
     fileDialog.setAcceptMode(saving ? QFileDialog::AcceptSave : QFileDialog::AcceptOpen);
     fileDialog.setFileMode(QFileDialog::AnyFile);
     fileDialog.setDefaultSuffix("json");

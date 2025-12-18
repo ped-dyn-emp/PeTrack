@@ -256,10 +256,7 @@ public:
     bool isAnaMarkActChecked() const;
     int  getAnaStep() const;
 
-    inline Petrack *getMainWindow() const
-    {
-        return mMainWindow;
-    }
+    inline Petrack *getMainWindow() const { return mMainWindow; }
 
     void        resetCorrection();
     void        onTrackGotoStartNrClicked();
@@ -272,10 +269,7 @@ public:
     }
 
 private:
-    void onTrackShowOnlyVisibleStateChanged()
-    {
-        updateUi();
-    }
+    void onTrackShowOnlyVisibleStateChanged() { updateUi(); }
 private slots:
     void onAnaCalculateClicked();
     void onAnaStepValueChanged();
@@ -329,112 +323,40 @@ private slots:
     void onTrackShowSearchSizeStateChanged();
 
 
-    void onTrackShowCurrentPointStateChanged()
-    {
-        updateUi();
-    }
+    void onTrackShowCurrentPointStateChanged() { updateUi(); }
     void onTrackGotoNrClicked();
     void onTrackGotoEndNrClicked();
 
     void onTrackHeadSizedStateChanged(int i);
 
 
-    void onTrackShowPointsStateChanged()
-    {
-        updateUi();
-    }
-    void onTrackShowPointsColoredStateChanged()
-    {
-        updateUi();
-    }
-    void onTrackShowPathStateChanged()
-    {
-        updateUi();
-    }
-    void onTrackShowColColorStateChanged()
-    {
-        updateUi();
-    }
-    void onTrackShowColorMarkerStateChanged()
-    {
-        updateUi();
-    }
-    void onTrackShowNumberStateChanged()
-    {
-        updateUi();
-    }
-    void onTrackShowGroundPositionStateChanged()
-    {
-        updateUi();
-    }
-    void onTrackShowGroundPathStateChanged()
-    {
-        updateUi();
-    }
-    void onTrackShowHeightIndividualStateChanged()
-    {
-        updateUi();
-    }
-    void onTrackNumberBoldStateChanged()
-    {
-        updateUi();
-    }
+    void onTrackShowPointsStateChanged() { updateUi(); }
+    void onTrackShowPointsColoredStateChanged() { updateUi(); }
+    void onTrackShowPathStateChanged() { updateUi(); }
+    void onTrackShowColColorStateChanged() { updateUi(); }
+    void onTrackShowColorMarkerStateChanged() { updateUi(); }
+    void onTrackShowNumberStateChanged() { updateUi(); }
+    void onTrackShowGroundPositionStateChanged() { updateUi(); }
+    void onTrackShowGroundPathStateChanged() { updateUi(); }
+    void onTrackShowHeightIndividualStateChanged() { updateUi(); }
+    void onTrackNumberBoldStateChanged() { updateUi(); }
     void onShowMoCapStateChanged(int i);
 
-    void onTrackCurrentPointSizeValueChanged()
-    {
-        updateUi();
-    }
-    void onTrackCurrentPointLineWidthValueChanged()
-    {
-        updateUi();
-    }
+    void onTrackCurrentPointSizeValueChanged() { updateUi(); }
+    void onTrackCurrentPointLineWidthValueChanged() { updateUi(); }
 
-    void onTrackPointSizeValueChanged()
-    {
-        updateUi();
-    }
-    void onTrackShowPointsLineWidthValueChanged()
-    {
-        updateUi();
-    }
+    void onTrackPointSizeValueChanged() { updateUi(); }
+    void onTrackShowPointsLineWidthValueChanged() { updateUi(); }
 
-    void onTrackPathWidthValueChanged()
-    {
-        updateUi();
-    }
-    void onTrackColColorSizeValueChanged()
-    {
-        updateUi();
-    }
-    void onTrackColorMarkerSizeValueChanged()
-    {
-        updateUi();
-    }
-    void onTrackColorMarkerLineWidthValueChanged()
-    {
-        updateUi();
-    }
-    void onTrackNumberSizeValueChanged()
-    {
-        updateUi();
-    }
-    void onTrackGroundPositionSizeValueChanged()
-    {
-        updateUi();
-    }
-    void onTrackGroundPathSizeValueChanged()
-    {
-        updateUi();
-    }
-    void onTrackShowBeforeValueChanged()
-    {
-        updateUi();
-    }
-    void onTrackShowAfterValueChanged()
-    {
-        updateUi();
-    }
+    void onTrackPathWidthValueChanged() { updateUi(); }
+    void onTrackColColorSizeValueChanged() { updateUi(); }
+    void onTrackColorMarkerSizeValueChanged() { updateUi(); }
+    void onTrackColorMarkerLineWidthValueChanged() { updateUi(); }
+    void onTrackNumberSizeValueChanged() { updateUi(); }
+    void onTrackGroundPositionSizeValueChanged() { updateUi(); }
+    void onTrackGroundPathSizeValueChanged() { updateUi(); }
+    void onTrackShowBeforeValueChanged() { updateUi(); }
+    void onTrackShowAfterValueChanged() { updateUi(); }
     void onMoCapSizeValueChanged(int i);
 
     void onRecoMethodCurrentIndexChanged();
