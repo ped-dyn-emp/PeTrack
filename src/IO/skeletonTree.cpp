@@ -66,11 +66,12 @@ void SkeletonTree::recurseSkeleton(const SkeletonNode &node, std::vector<Skeleto
 {
     for(const SkeletonNode &child : node.getChildren())
     {
-        lines.push_back({/*Direct initialization of SkeletonLine struct*/
-                         /*.start =*/node.getPos(),
-                         /*.start_id =*/node.getId(),
-                         /*.end =*/child.getPos(),
-                         /*.end_id =*/child.getId()});
+        lines.push_back(
+            {/*Direct initialization of SkeletonLine struct*/
+             /*.start =*/node.getPos(),
+             /*.start_id =*/node.getId(),
+             /*.end =*/child.getPos(),
+             /*.end_id =*/child.getId()});
         recurseSkeleton(child, lines);
     }
 }

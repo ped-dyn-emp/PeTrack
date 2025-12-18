@@ -242,36 +242,39 @@ void TrackerItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
                 if(height_set_by_user)
                 {
-                    out = QString("<table>"
-                                  "<tr><td>height:</td><td>%0 cm (edited by user)</td></tr>"
-                                  "<tr><td>frames:</td><td>[%1...%2]</td></tr>"
-                                  "<tr><td>color:</td><td><font "
-                                  "style='display:inline;background:%3;color:#fff;'>%4</font></td></tr>"
-                                  "<tr><td>group:</td><td>%18</td></tr>"
-                                  "<tr><td>comment:</td><td>%5</td></tr>"
-                                  "<tr><td></td><td></td></tr>");
+                    out = QString(
+                        "<table>"
+                        "<tr><td>height:</td><td>%0 cm (edited by user)</td></tr>"
+                        "<tr><td>frames:</td><td>[%1...%2]</td></tr>"
+                        "<tr><td>color:</td><td><font "
+                        "style='display:inline;background:%3;color:#fff;'>%4</font></td></tr>"
+                        "<tr><td>group:</td><td>%18</td></tr>"
+                        "<tr><td>comment:</td><td>%5</td></tr>"
+                        "<tr><td></td><td></td></tr>");
                 }
                 else
                 {
-                    out = QString("<table>"
-                                  "<tr><td>height:</td><td>%0 cm</td></tr>"
-                                  "<tr><td>frames:</td><td>[%1...%2]</td></tr>"
-                                  "<tr><td>color:</td><td><font "
-                                  "style='display:inline;background:%3;color:#fff;'>%4</font></td></tr>"
-                                  "<tr><td>group:</td><td>%18</td></tr>"
-                                  "<tr><td>comment:</td><td>%5</td></tr>"
-                                  "<tr><td></td><td></td></tr>");
+                    out = QString(
+                        "<table>"
+                        "<tr><td>height:</td><td>%0 cm</td></tr>"
+                        "<tr><td>frames:</td><td>[%1...%2]</td></tr>"
+                        "<tr><td>color:</td><td><font "
+                        "style='display:inline;background:%3;color:#fff;'>%4</font></td></tr>"
+                        "<tr><td>group:</td><td>%18</td></tr>"
+                        "<tr><td>comment:</td><td>%5</td></tr>"
+                        "<tr><td></td><td></td></tr>");
                 }
                 TrackPerson tp = persons[i];
                 if(tp.lastFrame() - tp.firstFrame() > 5)
                 {
-                    out.append(QString("<tr><td>frame [%6]:</td><td>[%7, %8]</td></tr>"
-                                       "<tr><td>frame [%9]:</td><td>[%10, %11]</td></tr>"
-                                       "<tr><td colspan='2'>...</td></tr>"
-                                       "<tr><td colspan='2'>...</td></tr>"
-                                       "<tr><td>frame [%12]:</td><td>[%13, %14]</td></tr>"
-                                       "<tr><td>frame [%15]:</td><td>[%16, %17]]</td></tr>"
-                                       "</table>")
+                    out.append(QString(
+                                   "<tr><td>frame [%6]:</td><td>[%7, %8]</td></tr>"
+                                   "<tr><td>frame [%9]:</td><td>[%10, %11]</td></tr>"
+                                   "<tr><td colspan='2'>...</td></tr>"
+                                   "<tr><td colspan='2'>...</td></tr>"
+                                   "<tr><td>frame [%12]:</td><td>[%13, %14]</td></tr>"
+                                   "<tr><td>frame [%15]:</td><td>[%16, %17]]</td></tr>"
+                                   "</table>")
                                    .toLatin1());
                     msgBox.setInformativeText(out.arg(height)
                                                   .arg(tp.firstFrame())
@@ -744,10 +747,11 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
 
                         SPDLOG_INFO("insert P({}, {}) to subdiv", p3d_height.x + x_offset, p3d_height.y + y_offset);
 
-                        subdiv.insert(cv::Point2f(
-                            x_switch > 0 ? x_switch - p3d_height.x + x_offset : p3d_height.x + x_offset,
-                            y_switch > 0 ? y_switch - p3d_height.y + y_offset :
-                                           p3d_height.y + y_offset)); // p2d_ground);
+                        subdiv.insert(
+                            cv::Point2f(
+                                x_switch > 0 ? x_switch - p3d_height.x + x_offset : p3d_height.x + x_offset,
+                                y_switch > 0 ? y_switch - p3d_height.y + y_offset :
+                                               p3d_height.y + y_offset)); // p2d_ground);
                     }
                 }
             }

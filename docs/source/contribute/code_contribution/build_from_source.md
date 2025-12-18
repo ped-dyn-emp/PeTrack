@@ -11,7 +11,7 @@ In order to compile `PeTrack` it is necessary to first install the required libr
 Any compiler with support for C++ 17 should work. At the moment the following compilers are tested:
 
 - MinGW 8.1 on Windows
-- clang++-14 on Linux (Ubuntu)
+- clang++-21 on Linux (Ubuntu)
 
 ### Required tools and libraries
 

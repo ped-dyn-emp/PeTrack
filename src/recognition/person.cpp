@@ -22,11 +22,11 @@
 #include "helper.h"
 #include "logger.h"
 
-//#define SHOWELLIPSES // gibt die einzelnen schritte der personen detektion pyramide graphisch aus
-//#define SAVEELLIPSES // ob alle ellips in datei geschrieben werden sollen
-//#define PRINT_ERASE_REASON // zeigt an, ob ausgegeben werden soll, aus welchem Grund eine ellipse geloescht wurde
-//#define SAVE_IMG_DETECTION_STEPS // setzen, wenn die gezeigten Bilder (SHOWELLIPSES) auch als Bildsequenz
-// weggeschrieben werden soll #define SAVE_IMG_FILEBASE "D:/diss/personModel/ownPerson/petrack/density/d4.5_"
+// #define SHOWELLIPSES // gibt die einzelnen schritte der personen detektion pyramide graphisch aus
+// #define SAVEELLIPSES // ob alle ellips in datei geschrieben werden sollen
+// #define PRINT_ERASE_REASON // zeigt an, ob ausgegeben werden soll, aus welchem Grund eine ellipse geloescht wurde
+// #define SAVE_IMG_DETECTION_STEPS // setzen, wenn die gezeigten Bilder (SHOWELLIPSES) auch als Bildsequenz
+//  weggeschrieben werden soll #define SAVE_IMG_FILEBASE "D:/diss/personModel/ownPerson/petrack/density/d4.5_"
 
 using namespace ::cv;
 
@@ -227,7 +227,7 @@ void PersonList::searchEllipses(pet::StereoContext *sc, QRect &roi, BackgroundFi
 
                 // IN OPENCV2.1 liefert cvContourArea KEIN VORZEICHEN ZUM ERKENNEN DER DREHRICHTUNG!!!! es ist ein
                 // optionaler paramter hinzugefuegt worden!!!!
-#if((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 1)))
+#if ((CV_MAJOR_VERSION < 2) || ((CV_MAJOR_VERSION == 2) && (CV_MINOR_VERSION < 1)))
                 contourArea = cvContourArea(contours, CV_WHOLE_SEQ);
 #else
                 contourArea = cv::contourArea(contour, true);
@@ -696,10 +696,10 @@ void PersonList::optimize()
         //        gebilde wie gehobenen arm auszuschliessen
         //        {
         //                    //debout << minPyrLevel-1<<" " << r2Min<<endl;
-        //#ifdef PRINT_ERASE_REASON
+        // #ifdef PRINT_ERASE_REASON
         //            debout << "Eliminate pyramide because of too small third ellipse, with top ellipse: " <<
         //            at(i).at(0).center().x() << " " << at(i).at(0).center().y() << endl;
-        //#endif
+        // #endif
         //            removeAt(i);
         //            --i;
         //        }
@@ -709,10 +709,10 @@ void PersonList::optimize()
         //        unterste und mittlere ellips muessen sich unterscheiden, so dass objekte die nur in der hoehe aber
         //        nicht weiter nach unten gehen zu eleminieren; gesehen bei fehldetektion des hintergrundes an waenden
         //        {
-        //#ifdef PRINT_ERASE_REASON
+        // #ifdef PRINT_ERASE_REASON
         //            debout << "Eliminate pyramide because of equal big ellipses, with top ellipse: " <<
         //            at(i).at(0).center().x() << " " << at(i).at(0).center().y() << endl;
-        //#endif
+        // #endif
         //            removeAt(i);
         //            --i;
         //        }

@@ -1537,13 +1537,14 @@ void TrackPerson::removeFramesBetween(int startFrame, int endFrame)
 {
     if((startFrame < mFirstFrame) || (endFrame > lastFrame()))
     {
-        throw std::out_of_range(fmt::format(
-            "The supplied range of frames [{},{}] to delete includes frames which this person (firstFrame: {}, "
-            "lastFrame: {}) does not have.",
-            startFrame,
-            endFrame,
-            firstFrame(),
-            lastFrame()));
+        throw std::out_of_range(
+            fmt::format(
+                "The supplied range of frames [{},{}] to delete includes frames which this person (firstFrame: {}, "
+                "lastFrame: {}) does not have.",
+                startFrame,
+                endFrame,
+                firstFrame(),
+                lastFrame()));
     }
 
     if((startFrame != mFirstFrame) && (endFrame != lastFrame()))

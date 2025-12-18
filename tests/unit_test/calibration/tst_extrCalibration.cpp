@@ -148,12 +148,13 @@ TEST_CASE("src/extrCalibration/loadExtrCalibFile", "[extrCalibration]")
     QFile   testExtrCalib("testExtrCalib.txt");
     GIVEN("I have a .3dc file with whitespaces and tabs at the end of a line")
     {
-        QString text = QString("-200 100 0 2175.49 877.495  \n"
-                               "-200 100 200 2374.94 456.997\t\n"
-                               "0 100 0 2181.07 1564.47\n"
-                               "0 100 200 2390.02 1591.7\n"
-                               "200 100 0 2188.53 2256.36\n"
-                               "200 100 200 2401.54 2738.47\n");
+        QString text = QString(
+            "-200 100 0 2175.49 877.495  \n"
+            "-200 100 200 2374.94 456.997\t\n"
+            "0 100 0 2181.07 1564.47\n"
+            "0 100 200 2390.02 1591.7\n"
+            "200 100 0 2188.53 2256.36\n"
+            "200 100 200 2401.54 2738.47\n");
 
         if(testExtrCalib.open(QIODevice::WriteOnly | QIODevice::Text))
         {

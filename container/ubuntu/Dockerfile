@@ -3,10 +3,10 @@ FROM ubuntu:22.04
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Update the repositories
-RUN apt-get update && apt-get -y install tzdata
+RUN apt-get update && apt-get -y install ca-certificates tzdata
 
 # Install the needed tools
-RUN echo "deb [trusted=yes] http://apt.llvm.org/jammy/ llvm-toolchain-jammy-14 main" | tee /etc/apt/sources.list.d/clang.list
+RUN echo "deb [trusted=yes] http://apt.llvm.org/jammy/ llvm-toolchain-jammy-21 main" | tee /etc/apt/sources.list.d/clang.list
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -18,8 +18,8 @@ RUN apt-get update && \
     g++ \
     gdb \
     clang \
-    clang-14 \
-    clang-format-14 \
+    clang-21 \
+    clang-format-21 \
     make \
     ninja-build \
     cmake \
@@ -43,9 +43,9 @@ RUN apt-get update && \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Set clang-14 as default compiler
-RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-14 100 &&\
-    update-alternatives --install /usr/bin/cc cc /usr/bin/clang-14 100
+# Set clang-21 as default compiler
+RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-21 100 &&\
+    update-alternatives --install /usr/bin/cc cc /usr/bin/clang-21 100
 
 # Install OpenCV 4.10
 ARG OPENCV_VERSION=4.10.0 

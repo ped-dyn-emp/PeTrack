@@ -438,8 +438,9 @@ int TrackerReal::calculate(
                             if(alternateHeight) // personenhoehe variiert ueber trajektorie (unebene versuche);
                                                 // berechnung durch mich und nicht pointgrey nutzen
                             {
-                                SPDLOG_WARN("no interpolation is done, because alternate height is enabled - has to be "
-                                            "implemented!");
+                                SPDLOG_WARN(
+                                    "no interpolation is done, because alternate height is enabled - has to be "
+                                    "implemented!");
                             }
                             else
                             {
@@ -525,8 +526,9 @@ int TrackerReal::calculate(
     }
     else
     {
-        SPDLOG_WARN("no real tracking data calculated, because of missing tracking data, image reference or "
-                    "color map!");
+        SPDLOG_WARN(
+            "no real tracking data calculated, because of missing tracking data, image reference or "
+            "color map!");
         return -1;
     }
 }

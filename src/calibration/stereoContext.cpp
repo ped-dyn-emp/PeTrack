@@ -1136,9 +1136,8 @@ bool pet::StereoContext::getMedianXYZaround(int col, int row, float *x, float *y
         row = ((row < 2) ? 0 : ((row > mDisparity.rows - 3) ? mDisparity.rows - 5 : row - 2));
         col = ((col < 2) ? 0 : ((col > mDisparity.cols - 3) ? mDisparity.cols - 5 : col - 2));
 
-        unsigned short *data =
-            (unsigned short
-                 *) (((unsigned short *) mDisparity.data) + mDisparity.step1() * row + col); // mDisparity.imageData;
+        unsigned short *data  = (unsigned short *) (((unsigned short *) mDisparity.data) + mDisparity.step1() * row +
+                                                   col); // mDisparity.imageData;
         unsigned short *yData = data;
         int             i, j, nr = 0; // nr zeigt anzahl der gefundenen disp an
 

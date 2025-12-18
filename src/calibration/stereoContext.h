@@ -89,41 +89,20 @@ public:
 
     // ---------------------------------------------------
 #ifdef TRICLOPS
-    inline TriclopsContext getContext()
-    {
-        return mTriclopsContext;
-    }
+    inline TriclopsContext getContext() { return mTriclopsContext; }
 #endif
-    inline unsigned char getSurfaceValue() const
-    {
-        return mSurfaceValue;
-    }
-    inline unsigned char getBackForthValue() const
-    {
-        return mBackForthValue;
-    }
+    inline unsigned char getSurfaceValue() const { return mSurfaceValue; }
+    inline unsigned char getBackForthValue() const { return mBackForthValue; }
 
-    inline unsigned short int getMin() const
-    {
-        return mMin;
-    }
-    inline unsigned short int getMax() const
-    {
-        return mMax;
-    }
+    inline unsigned short int getMin() const { return mMin; }
+    inline unsigned short int getMax() const { return mMax; }
 
-    inline void addStatus(enum stereoStatus s)
-    {
-        mStatus |= s;
-    }
+    inline void addStatus(enum stereoStatus s) { mStatus |= s; }
     inline void setStatus(enum stereoStatus s) // set status up to this level
     {
         mStatus = s * 2 - 1;
     }
-    inline void resetStatus()
-    {
-        mStatus = clean;
-    }
+    inline void resetStatus() { mStatus = clean; }
 
     cv::Mat getPointCloud();
 

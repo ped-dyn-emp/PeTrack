@@ -25,7 +25,7 @@ class PSpinBox : public QSpinBox
 {
     Q_OBJECT
 public:
-    PSpinBox(QWidget *parent) : QSpinBox(parent){};
+    PSpinBox(QWidget *parent) : QSpinBox(parent) {};
 
 protected:
     void wheelEvent(QWheelEvent *event) override;

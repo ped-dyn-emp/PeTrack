@@ -32,8 +32,7 @@ std::string versionString(int major, int minor, int patch)
 
 // Taken from:
 // https://sourceforge.net/p/predef/wiki/Compilers/
-constexpr const char *COMPILER_ID
-{
+constexpr const char *COMPILER_ID{
 #ifdef __clang__
     "clang++"
 #elif defined(__GNUC__)

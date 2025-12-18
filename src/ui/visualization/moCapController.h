@@ -51,7 +51,7 @@ class MoCapController : public QObject
 {
     Q_OBJECT
 public:
-    MoCapController(MoCapStorage &storage, ExtrCalibration &extrCalib) : mStorage(storage), mExtrCalib(extrCalib){};
+    MoCapController(MoCapStorage &storage, ExtrCalibration &extrCalib) : mStorage(storage), mExtrCalib(extrCalib) {};
 
     void transformPersonSkeleton(
         const MoCapPerson              &person,

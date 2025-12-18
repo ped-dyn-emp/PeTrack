@@ -783,8 +783,9 @@ int AutoCalib::runCalibration(
         std::vector<cv::Point3f> points_3d;
         for(int i = 0; i < board_size.width * board_size.height; i++)
         {
-            points_3d.push_back(cv::Point3f(
-                float((i / board_size.width) * square_size), float((i % board_size.width) * square_size), 0));
+            points_3d.push_back(
+                cv::Point3f(
+                    float((i / board_size.width) * square_size), float((i % board_size.width) * square_size), 0));
         }
         object_points.push_back(points_3d);
     }

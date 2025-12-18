@@ -48,8 +48,9 @@ KeybindingDialog::KeybindingDialog(QWidget *parent, std::vector<KeyBindingGroup>
         }
         addLine();
     }
-    addRow(new QLabel("<p>Beside the space bar and Ctrl+z all bindings only work with focus on the video/sequence.<br>"
-                      "You can find further key bindings next to the entries of the menus.</p>"));
+    addRow(new QLabel(
+        "<p>Beside the space bar and Ctrl+z all bindings only work with focus on the video/sequence.<br>"
+        "You can find further key bindings next to the entries of the menus.</p>"));
 
     auto scrollBarWidth = mUi->scrollArea->verticalScrollBar()->width();
     auto frameWidth     = 2 * mUi->scrollArea->frameWidth();
