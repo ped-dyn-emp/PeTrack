@@ -7,7 +7,7 @@ corresponding images.
 ## Image & Point File Preparation
 
 If you decided on a [3D calibration](/planning/calibration.md) where you place e.g. a pole on each point on the ground,
- you need to create one image where all the points are visible at once. For this, it is helpful to combine cutouts of
+you need to create one image where all the points are visible at once. For this, it is helpful to combine cutouts of
 the processed points inside one image (Figure 1). To create such an image, a free programme as e.g. [Gimp](https://gimp.org) can be helpful.
 
 :::{figure-md} extrinsic_all_enlarged
@@ -16,10 +16,10 @@ the processed points inside one image (Figure 1). To create such an image, a fre
 Figure 1: Combined image of all calibration points being processed during the experiments.
 :::
 
-Once the combined image has been created you have to write down the coordinates for each point assigned during the experiment. You can take the coordinates from the sketch that you created during the preparation of the extrinsic calibration on scene. 
-These coordinates need to be collected in a text editor and saved as a `.3dc` file. It does not matter where the point 
-(0,0) is, however, the relations of the point to one another should be represented correctly. 
-The first line of the file contains the total number of coordinates points in the file. Starting from the second row, 
+Once the combined image has been created you have to write down the coordinates for each point assigned during the experiment. You can take the coordinates from the sketch that you created during the preparation of the extrinsic calibration on scene.
+These coordinates need to be collected in a text editor and saved as a `.3dc` file. It does not matter where the point
+(0,0) is, however, the relations of the point to one another should be represented correctly.
+The first line of the file contains the total number of coordinates points in the file. Starting from the second row,
 all coordinates should be listed in centimeter according to their X, Y and Z coordinates. You can view an example of
 our coordinate system and the corresponding points in Figure 2.
 <br>
@@ -45,7 +45,7 @@ into PeTrack.
 
 With the combined image of all coordinate points and the point file created, you can now perform the extrinsic calibration
 in PeTrack. For that, open the image of all combined coordinate points (Figure 1) in PeTrack or drag and drop it into the
-[tab view](/user_interface/user_interface.md).
+[tab view or video view](/user_interface/user_interface.md).
 
 ::: {Tip}
 To avoid shifting the coordinate system while clicking and dragging the mouse in the [video tab](/user_interface/user_interface.md) it is
@@ -53,12 +53,12 @@ recommended to check the `fix` checkbox in the `coordinate system` and in the `a
 at the bottom of the `calibration tab`.
 :::
 
-Now all coordinate points that are listed in the points file need to be selected in the combined image. 
+Now all coordinate points that are listed in the points file need to be selected in the combined image.
 <br>
 You need to select the points **in the same order** as they appear in the points file!
 <br>
 You can select the points with `Ctrl + double click left mouse button`. Select the points as accurate as possible
-by zooming into the image. If two of your calibration points are close to one another in the image,  `Ctrl + double click left mouse button` might move one of the points instead of adding a new one. In this case, you can create the new calibration point further away and move it to the desired place using `Alt + holding left mouse button`.
+by zooming into the image. If two of your calibration points are close to one another in the image, `Ctrl + double click left mouse button` might move one of the points instead of adding a new one. In this case, you can create the new calibration point further away and move it to the desired place using `Alt + holding left mouse button`.
 
 In case you are unhappy with the selected point you can unselect it by
 `Ctrl + double click right mouse button`.
@@ -70,8 +70,8 @@ to the right of `show current point` and now you are able to enter a smaller val
 represents the size of the green circles.
 :::
 
-Once you have selected all points in the same order as your points file, your chosen points should look similar to 
-the example in Figure 3. 
+Once you have selected all points in the same order as your points file, your chosen points should look similar to
+the example in Figure 3.
 
 :::{figure-md} extrinsic_select_points
 ![extrinsic_select_points](images/extrinsic_select_points_new.jpg){width=950}
@@ -86,7 +86,7 @@ screen to the real-world coordinates written down in the `points.3dc` file.
 You will also note that once you click on `fetch` your selected points on the screen will disappear.
 Then, click on `calc` to perform the extrinsic calibration, which involves calculating the extrinsic parameters and saving them afterward.
 <br>
-Now you have the option to view the error of your extrinsic calibration by clicking `error`. This will give you an idea 
+Now you have the option to view the error of your extrinsic calibration by clicking `error`. This will give you an idea
 of e.g. how well you prepared your coordinate system and the accuracy of your point selection in PeTrack. If you are happy
 with the results you can click `save` and the pixel coordinates that were matched to the real-world coordinates will also
 be saved in the `points.3dc` file.
@@ -101,7 +101,7 @@ section. If you notice a point that is particularly bad in alignment with the ca
 this point. This will minimize your error for the extrinsic calibration.
 :::
 
-To check the resulting origin of the coordinate system (0,0,0) you can `show` the `coordinate system` found in the calibration tab. 
+To check the resulting origin of the coordinate system (0,0,0) you can `show` the `coordinate system` found in the calibration tab.
 
 After you are finished with the calibration steps it is recommended that you save the PeTrack project with the current calibration
 status (intrinsic & extrinsic calibration). In case something goes wrong during the following steps, you have a project

@@ -5,6 +5,7 @@
 - Not exporting colorpoint for an invalid color anymore due to internal change of trackpoints
 - Fix: wrong margin for some UI boxes
 - Fix: code marker ID 0 was not displayed
+- Dropping down elements now also works over the view area
 - Fix: zoom buttons not working
 
 # 1.1
