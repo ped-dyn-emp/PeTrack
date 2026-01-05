@@ -116,20 +116,8 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mFrameNum->setFont(f);
     connect(mFrameNum, &QLineEdit::editingFinished, this, static_cast<bool (Player::*)()>(&Player::skipToFrame));
 
-    // frame number
-    mFpsNum = new QLineEdit(QString::number(DEFAULT_FPS));
-    mFpsNum->setMaxLength(8);     // bedeutet maxminal 999,99
-    mFpsNum->setMaximumWidth(62); // 5*sz.width()
-    mFpsNum->setAlignment(Qt::AlignRight);
-    mFpsNumValidator = new QDoubleValidator(0.0, 999.99, 2, this);
-    mFpsNum->setValidator(mFpsNumValidator);
-    mFpsNum->setFont(f);
-    mFpsNum->setToolTip("Current playback fps");
-    connect(mFpsNum, &QLineEdit::editingFinished, this, [this] { setPlaybackFPS(mFpsNum->text().toDouble()); });
 
     QFont f2("Courier", 12, QFont::Normal); // Times Helvetica, Normal
-    mAtLabel = new QLabel("@");
-    mAtLabel->setFont(f2);
 
     mSourceInLabel = new QLabel("In:");
     mSourceInLabel->setFont(f2);
@@ -137,9 +125,6 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mSourceOutLabel = new QLabel("Out:");
     mSourceOutLabel->setFont(f2);
 
-    mFpsLabel = new QLabel("fps");
-    mFpsLabel->setFont(f2);
-    mFpsLabel->setToolTip("Current playback fps");
     // default value
     mPlayerSpeedLimited = false;
 
@@ -156,9 +141,6 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mPlayerLayout->addWidget(mFrameOutNum);
     mPlayerLayout->addWidget(mSlider);
     mPlayerLayout->addWidget(mFrameNum);
-    mPlayerLayout->addWidget(mAtLabel);
-    mPlayerLayout->addWidget(mFpsNum);
-    mPlayerLayout->addWidget(mFpsLabel);
     mPlayerLayout->setContentsMargins(0, 0, 0, 0);
 
     mMainWindow = (class Petrack *) parent;
@@ -173,11 +155,11 @@ void Player::setPlaybackFPS(double fps) // default: double fps=-1.
 {
     if(fps != -1)
     {
-        mFpsNum->setText(QString::number(fps));
+        mMainWindow->getFpsNum()->setText(QString::number(fps));
         mFrameForwardButton->setAutoRepeatInterval(1000. / fps);  // for 1000 ms / 25 fps
         mFrameBackwardButton->setAutoRepeatInterval(1000. / fps); // for 1000 ms / 25 fps
     }
-    mAnimation->setPlaybackFPS(mFpsNum->text().toDouble());
+    mAnimation->setPlaybackFPS(mMainWindow->getFpsNum()->text().toDouble());
 }
 void Player::setPlayerSpeedLimited(bool fixed)
 {
