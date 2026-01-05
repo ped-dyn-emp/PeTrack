@@ -44,6 +44,7 @@ signals:
 public:
     PSlider(QWidget *parent = nullptr);
     void setThrottleInterval(int interval);
+    void throttle();
     int  throttleInterval() const;
     void directEmit(int value);
 
@@ -58,5 +59,7 @@ private slots:
 private:
     QTimer mThrottleTimer;
     QPoint mLastMousePos;
+
+    static constexpr int DEFAULT_THROTTLE_INTERVAL = 100;
 };
 #endif // PSLIDER_H

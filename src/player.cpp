@@ -83,7 +83,7 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mSlider->setOrientation(Qt::Horizontal);
     mSlider->setTickPosition(QSlider::TicksAbove);
     mSlider->setMinimumWidth(100);
-    mSlider->setThrottleInterval(100);
+    mSlider->throttle();
     connect(mSlider, &PSlider::throttledValueChanged, this, [this](int val) { skipToFrame(val); });
 
     // frame number

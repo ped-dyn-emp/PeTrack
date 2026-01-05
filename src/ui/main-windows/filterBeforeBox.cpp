@@ -53,6 +53,7 @@ FilterBeforeBox::FilterBeforeBox(
     // FocusPolicy: TabFocus and first ui-element as proxy are needed for tab order
     setFocusProxy(mUi->filterBrightContrast);
 
+    mUi->filterBorderParamSize->throttle();
     connect(
         mUi->filterBrightContrast,
         &QCheckBox::checkStateChanged,
@@ -64,7 +65,7 @@ FilterBeforeBox::FilterBeforeBox(
     connect(mUi->filterBorder, &QCheckBox::checkStateChanged, this, &FilterBeforeBox::onFilterBorderStateChanged);
     connect(
         mUi->filterBorderParamSize,
-        &PSlider::valueChanged,
+        &PSlider::throttledValueChanged,
         this,
         &FilterBeforeBox::onFilterBorderParamSizeValueChanged);
     connect(mUi->filterBorderParamCol, &QPushButton::clicked, this, &FilterBeforeBox::onFilterBorderParamColClicked);
