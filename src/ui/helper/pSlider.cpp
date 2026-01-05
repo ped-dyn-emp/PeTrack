@@ -51,6 +51,11 @@ void PSlider::setThrottleInterval(int interval)
     }
 }
 
+void PSlider::throttle()
+{
+    setThrottleInterval(DEFAULT_THROTTLE_INTERVAL);
+}
+
 int PSlider::throttleInterval() const
 {
     return mThrottleTimer.interval();

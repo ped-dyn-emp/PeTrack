@@ -1,11 +1,12 @@
 # 1.2
 
 - Feature: Add the option to show specific markerIDs
-- Fix roi not shown on startup
 - Not exporting colorpoint for an invalid color anymore due to internal change of trackpoints
+- Dropping down elements now also works over the view area
+- Fix: roi not shown on startup
 - Fix: wrong margin for some UI boxes
 - Fix: code marker ID 0 was not displayed
-- Dropping down elements now also works over the view area
+- Fix: border size slider freezed PeTrack
 - Fix: zoom buttons not working
 
 # 1.1
