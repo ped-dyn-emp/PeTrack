@@ -83,9 +83,9 @@ public:
     void setScene(QGraphicsScene *sc);
     int  getCurrentTab() const;
 
-    void toggleOnlineTracking();
-    bool isOnlineTrackingChecked() const;
-    void setOnlineTrackingChecked(bool checked);
+    void toggleTrackActive();
+    bool isTrackActiveChecked() const;
+    void setTrackActiveChecked(bool checked);
     int  getTrackRegionLevels() const;
     bool isTrackRepeatChecked() const;
     int  getTrackRepeatQual() const;
@@ -146,8 +146,8 @@ public:
 
     QColor getMoCapColor() const;
 
-    bool isPerformRecognitionChecked() const;
-    void setPerformRecognitionChecked(bool checked);
+    bool isRecoActiveChecked() const;
+    void setRecoActiveChecked(bool checked);
     void toggleRecognition();
     void setRecoNumberNow(const QString &val);
     int  getRecoStep() const;
@@ -363,7 +363,7 @@ private slots:
     void onRecoMethodChanged(reco::RecognitionMethod method);
     void onMlMethodCurrentIndexChanged();
     void onMlMethodChanged(reco::MlMethod method);
-    void onPerformRecognitionStateChanged(int i);
+    void onRecoActiveStateChanged(int i);
     void onMarkerBrightnessValueChanged();
     void onMarkerIgnoreWithoutStateChanged();
     void onRoiShowStateChanged(int i);

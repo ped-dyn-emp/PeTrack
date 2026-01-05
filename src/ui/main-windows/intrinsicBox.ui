@@ -59,9 +59,9 @@
       <number>4</number>
      </property>
      <item row="0" column="0">
-      <widget class="QCheckBox" name="apply">
+      <widget class="QCheckBox" name="intrActive">
        <property name="text">
-        <string>apply</string>
+        <string>active</string>
        </property>
       </widget>
      </item>
@@ -783,12 +783,12 @@
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QPushButton" name="autoCalib">
+      <widget class="QPushButton" name="intrCalc">
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>auto</string>
+        <string>calc</string>
        </property>
       </widget>
      </item>
@@ -816,7 +816,7 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>apply</tabstop>
+  <tabstop>intrActive</tabstop>
   <tabstop>fx</tabstop>
   <tabstop>fy</tabstop>
   <tabstop>cx</tabstop>
@@ -842,7 +842,7 @@
   <tabstop>boardSizeX</tabstop>
   <tabstop>boardSizeY</tabstop>
   <tabstop>squareSize</tabstop>
-  <tabstop>autoCalib</tabstop>
+  <tabstop>intrCalc</tabstop>
   <tabstop>calibVideo</tabstop>
   <tabstop>calibFiles</tabstop>
  </tabstops>

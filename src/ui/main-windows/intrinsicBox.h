@@ -117,7 +117,7 @@ private slots:
     void onSquareSizeValueChanged(double s);
     void onCalibFilesClicked();
     void onCalibVideoClicked();
-    void onApplyStateChanged(int i);
+    void onIntrActiveStateChanged(int i);
 
 public slots:
     void runAutoCalib();

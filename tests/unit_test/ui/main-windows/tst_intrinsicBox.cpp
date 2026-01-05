@@ -202,7 +202,7 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
     // spliting, because changing some of these also changes the intrinsic params
     WHEN("We change non-calculated values")
     {
-        ui->apply->setChecked(!ui->apply->isChecked());
+        ui->intrActive->setChecked(!ui->intrActive->isChecked());
         ui->boardSizeX->setValue(ui->boardSizeX->value() + 1);
         ui->boardSizeY->setValue(ui->boardSizeY->value() + 1);
         ui->squareSize->setValue(ui->squareSize->value() + 1);
@@ -236,7 +236,7 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
 
 
                 INFO(nodeToString(elem).toStdString());
-                CHECK(newUi->apply->isChecked() == ui->apply->isChecked());
+                CHECK(newUi->intrActive->isChecked() == ui->intrActive->isChecked());
                 CHECK(newUi->boardSizeX->value() == ui->boardSizeX->value());
                 CHECK(newUi->boardSizeY->value() == ui->boardSizeY->value());
                 CHECK(newUi->squareSize->value() == Catch::Approx(ui->squareSize->value()));

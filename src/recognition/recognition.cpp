@@ -1664,7 +1664,7 @@ QList<TrackPoint> Recognizer::getMarkerPos(
             }
             catch(std::invalid_argument &e)
             {
-                controlWidget->setPerformRecognitionChecked(false);
+                controlWidget->setRecoActiveChecked(false);
                 PCritical(controlWidget->getMainWindow(), "Error during recognition", e.what());
             }
     }

@@ -3,6 +3,7 @@
 - Feature: Add the option to show specific markerIDs
 - Not exporting colorpoint for an invalid color anymore due to internal change of trackpoints
 - Dropping down elements now also works over the view area
+- More uniform button naming
 - Fix: roi not shown on startup
 - Fix: wrong margin for some UI boxes
 - Fix: code marker ID 0 was not displayed

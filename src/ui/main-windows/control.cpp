@@ -298,7 +298,7 @@ Control::Control(
     connect(mUi->anaConsiderRev, &QCheckBox::checkStateChanged, this, &Control::onAnaConsiderRevStateChanged);
     connect(mUi->showVoronoiCells, &QCheckBox::checkStateChanged, this, &Control::onShowVoronoiCellsStateChanged);
     connect(mUi->trackShow, &QCheckBox::checkStateChanged, this, &Control::onTrackShowStateChanged);
-    connect(mUi->trackOnlineCalc, &QCheckBox::checkStateChanged, this, &Control::onTrackOnlineCalcStateChanged);
+    connect(mUi->trackActive, &QCheckBox::checkStateChanged, this, &Control::onTrackOnlineCalcStateChanged);
     connect(mUi->trackCalc, &QPushButton::clicked, this, &Control::onTrackCalcClicked);
     connect(mUi->trackReset, &QPushButton::clicked, this, &Control::onTrackResetClicked);
     connect(mUi->trackExport, &QPushButton::clicked, this, &Control::onTrackExportClicked);
@@ -455,7 +455,7 @@ Control::Control(
         QOverload<double>::of(&PDoubleSpinBox::valueChanged),
         this,
         &Control::onMapDefaultHeightValueChanged);
-    connect(mUi->performRecognition, &QCheckBox::checkStateChanged, this, &Control::onPerformRecognitionStateChanged);
+    connect(mUi->recoActive, &QCheckBox::checkStateChanged, this, &Control::onRecoActiveStateChanged);
     connect(mUi->markerBrightness, &PSlider::valueChanged, this, &Control::onMarkerBrightnessValueChanged);
     connect(mUi->markerIgnoreWithout, &QCheckBox::checkStateChanged, this, &Control::onMarkerIgnoreWithoutStateChanged);
     // ROI connections
@@ -512,19 +512,19 @@ int Control::getCurrentTab() const
     return mUi->tabs->currentIndex();
 }
 
-void Control::toggleOnlineTracking()
+void Control::toggleTrackActive()
 {
-    mUi->trackOnlineCalc->toggle();
+    mUi->trackActive->toggle();
 }
 
-bool Control::isOnlineTrackingChecked() const
+bool Control::isTrackActiveChecked() const
 {
-    return mUi->trackOnlineCalc->isChecked();
+    return mUi->trackActive->isChecked();
 }
 
-void Control::setOnlineTrackingChecked(bool checked)
+void Control::setTrackActiveChecked(bool checked)
 {
-    mUi->trackOnlineCalc->setChecked(checked);
+    mUi->trackActive->setChecked(checked);
 }
 
 int Control::getTrackRegionLevels() const
@@ -833,19 +833,19 @@ QColor Control::getMoCapColor() const
     return mUi->moCapColorButton->palette().color(QPalette::Button);
 }
 
-bool Control::isPerformRecognitionChecked() const
+bool Control::isRecoActiveChecked() const
 {
-    return mUi->performRecognition->isChecked();
+    return mUi->recoActive->isChecked();
 }
 
-void Control::setPerformRecognitionChecked(bool checked)
+void Control::setRecoActiveChecked(bool checked)
 {
-    mUi->performRecognition->setChecked(checked);
+    mUi->recoActive->setChecked(checked);
 }
 
 void Control::toggleRecognition()
 {
-    mUi->performRecognition->toggle();
+    mUi->recoActive->toggle();
 }
 
 void Control::setRecoNumberNow(const QString &val)
@@ -1836,7 +1836,7 @@ void Control::onMapReadMarkerIDClicked()
     mScene->update();
 }
 
-void Control::onPerformRecognitionStateChanged(int i)
+void Control::onRecoActiveStateChanged(int i)
 {
     if(i == Qt::Checked && getRecoMethod() == reco::RecognitionMethod::MachineLearning)
     {
@@ -1847,7 +1847,7 @@ void Control::onPerformRecognitionStateChanged(int i)
         catch(std::invalid_argument &e)
         {
             PCritical(mMainWindow, "Could not perform recognition", e.what());
-            mUi->performRecognition->setCheckState(Qt::Unchecked);
+            mUi->recoActive->setCheckState(Qt::Unchecked);
             return;
         }
     }
@@ -1870,7 +1870,7 @@ void Control::onRecoMethodChanged(reco::RecognitionMethod method)
     if(method == reco::RecognitionMethod::MachineLearning)
     {
         mUi->mlMethod->show();
-        if(isPerformRecognitionChecked())
+        if(isRecoActiveChecked())
         {
             try
             {
@@ -1879,7 +1879,7 @@ void Control::onRecoMethodChanged(reco::RecognitionMethod method)
             catch(std::invalid_argument &e)
             {
                 PCritical(mMainWindow, "Could not perform recognition", e.what());
-                mUi->performRecognition->setCheckState(Qt::Unchecked);
+                mUi->recoActive->setCheckState(Qt::Unchecked);
             }
         }
     }
@@ -2009,7 +2009,7 @@ void Control::setXml(QDomElement &elem)
     elem.appendChild(subElem);
 
     subSubElem = (elem.ownerDocument()).createElement("PERFORM");
-    subSubElem.setAttribute("ENABLED", mUi->performRecognition->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->recoActive->isChecked());
     subSubElem.setAttribute(
         "METHOD",
         static_cast<int>(mUi->recoMethod->itemData(mUi->recoMethod->currentIndex()).value<reco::RecognitionMethod>()));
@@ -2090,7 +2090,7 @@ void Control::setXml(QDomElement &elem)
     elem.appendChild(subElem);
 
     subSubElem = (elem.ownerDocument()).createElement("ONLINE_CALCULATION");
-    subSubElem.setAttribute("ENABLED", mUi->trackOnlineCalc->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->trackActive->isChecked());
     subElem.appendChild(subSubElem);
 
     subSubElem = (elem.ownerDocument()).createElement("REPEAT_BELOW");
@@ -2321,7 +2321,7 @@ void Control::getXml(const QDomElement &elem, const QString &version)
             {
                 if(subSubElem.tagName() == "PERFORM")
                 {
-                    loadBoolValue(subSubElem, "ENABLED", mUi->performRecognition);
+                    loadBoolValue(subSubElem, "ENABLED", mUi->recoActive);
 
                     auto recognitionMethod = static_cast<reco::RecognitionMethod>(
                         readInt(subSubElem, "METHOD", static_cast<int>(reco::RecognitionMethod::MultiColor)));
@@ -2495,7 +2495,7 @@ void Control::getXml(const QDomElement &elem, const QString &version)
             {
                 if(subSubElem.tagName() == "ONLINE_CALCULATION")
                 {
-                    loadBoolValue(subSubElem, "ENABLED", mUi->trackOnlineCalc);
+                    loadBoolValue(subSubElem, "ENABLED", mUi->trackActive);
                 }
                 else if(subSubElem.tagName() == "REPEAT_BELOW")
                 {

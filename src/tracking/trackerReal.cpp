@@ -1127,11 +1127,11 @@ std::vector<MissingFrame> TrackerReal::computeDroppedFrames(Petrack *petrack)
     }
 
     // Save current state
-    auto recognitionState = petrack->getControlWidget()->isPerformRecognitionChecked();
-    petrack->getControlWidget()->setPerformRecognitionChecked(false);
+    auto recognitionState = petrack->getControlWidget()->isRecoActiveChecked();
+    petrack->getControlWidget()->setRecoActiveChecked(false);
 
-    auto trackingState = petrack->getControlWidget()->isOnlineTrackingChecked();
-    petrack->getControlWidget()->setOnlineTrackingChecked(false);
+    auto trackingState = petrack->getControlWidget()->isTrackActiveChecked();
+    petrack->getControlWidget()->setTrackActiveChecked(false);
 
     int currentFrameNum = petrack->getPlayer()->getPos();
 
@@ -1160,8 +1160,8 @@ std::vector<MissingFrame> TrackerReal::computeDroppedFrames(Petrack *petrack)
 
 
     petrack->getPlayer()->skipToFrame(currentFrameNum);
-    petrack->getControlWidget()->setPerformRecognitionChecked(recognitionState);
-    petrack->getControlWidget()->setOnlineTrackingChecked(trackingState);
+    petrack->getControlWidget()->setRecoActiveChecked(recognitionState);
+    petrack->getControlWidget()->setTrackActiveChecked(trackingState);
 
     return missingFrames;
 }
