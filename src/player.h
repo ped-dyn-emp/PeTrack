@@ -108,15 +108,11 @@ private:
     QLineEdit     *mFrameNum;
     QLineEdit     *mFrameInNum;
     QLineEdit     *mFrameOutNum;
-    QLineEdit     *mFpsNum;
-    QLabel        *mAtLabel;
     QLabel        *mSourceInLabel;
     QLabel        *mSourceOutLabel;
-    QLabel        *mFpsLabel;
     QIntValidator *mFrameNumValidator;
     QIntValidator *mFrameInNumValidator;
     QIntValidator *mFrameOutNumValidator;
-    QDoubleValidator *mFpsNumValidator;
 };
 
 #endif

@@ -2199,11 +2199,40 @@ void Petrack::createMenus()
  */
 void Petrack::createStatusBar()
 {
-    QFont f("Courier", 12, QFont::Bold); // Times Helvetica, Normal
+    QFont         f("Courier", 12, QFont::Bold);    // Times Helvetica, Normal
+    QFont         f2("Courier", 12, QFont::Normal); // Times Helvetica, Normal
+    QFontMetricsF fm2(f2);
+
     statusBar()->setMaximumHeight(28);
     statusBar()->showMessage(tr("Ready"));
     statusBar()->addPermanentWidget(mStatusLabelStereo = new QLabel(" "));
     statusBar()->addPermanentWidget(mStatusLabelTime = new QLabel(" "));
+
+    mFpsLabel = new QLabel("fps");
+    mFpsLabel->setFont(f2);
+    mFpsLabel->setToolTip("Current playback fps");
+
+    mFpsNum = new QLineEdit(QString::number(DEFAULT_FPS));
+    mFpsNum->setMaxLength(8); // max 999,99
+    QString maxText(mFpsNum->maxLength(), '9');
+
+    mFpsNum->setMaximumWidth(
+        static_cast<int>(fm2.horizontalAdvance(maxText) + 1)); // make sure it doesnt get rounded down
+
+    mFpsNum->setAlignment(Qt::AlignRight);
+    mFpsNumValidator = new QDoubleValidator(0.0, 999.99, 2, this);
+    mFpsNumValidator->setNotation(QDoubleValidator::StandardNotation);
+    mFpsNum->setValidator(mFpsNumValidator);
+    mFpsNum->setFont(f);
+    mFpsNum->setToolTip("Current playback fps");
+    connect(
+        mFpsNum,
+        &QLineEdit::editingFinished,
+        this,
+        [this] { mPlayerWidget->setPlaybackFPS(mFpsNum->text().toDouble()); });
+
+    statusBar()->addPermanentWidget(mFpsNum);
+    statusBar()->addPermanentWidget(mFpsLabel);
     statusBar()->addPermanentWidget(mStatusLabelFPS = new QLabel(" "));
     statusBar()->addPermanentWidget(mStatusPosRealHeight = new QDoubleSpinBox());
     connect(

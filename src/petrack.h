@@ -72,6 +72,8 @@ class QXmlStreamWriter;
 class QSplitter;
 class QDoubleSpinBox;
 class QFrame;
+class QLineEdit;
+class QDoubleValidator;
 
 class CoordItem;
 class ImageItem;
@@ -203,6 +205,8 @@ public:
     double       getCmPerPixel() const;
     void         setHeadSize(double hS = -1);
     double       getHeadSize(QPointF *pos = nullptr, int pers = -1, int frame = -1);
+
+    QLineEdit *getFpsNum() { return mFpsNum; }
 
     //------------------------------
     // inline function
@@ -457,13 +461,16 @@ private:
     MoCapItem            *mMoCapItem;
     AnnotationGroupItem  *mActionGroupItem;
 
-    QDoubleSpinBox *mStatusPosRealHeight;
-    QLabel         *mStatusLabelStereo;
-    QLabel         *mStatusLabelTime;
-    QLabel         *mStatusLabelFPS;
-    QLabel         *mStatusLabelPosReal;
-    QLabel         *mStatusLabelPos;
-    QLabel         *mStatusLabelColor;
+    QDoubleSpinBox   *mStatusPosRealHeight;
+    QLabel           *mStatusLabelStereo;
+    QLabel           *mStatusLabelTime;
+    QLabel           *mFpsLabel;
+    QLineEdit        *mFpsNum;
+    QDoubleValidator *mFpsNumValidator;
+    QLabel           *mStatusLabelFPS;
+    QLabel           *mStatusLabelPosReal;
+    QLabel           *mStatusLabelPos;
+    QLabel           *mStatusLabelColor;
 
     QPointF mMousePosOnImage;
 
