@@ -74,7 +74,7 @@
       <enum>Qt::LayoutDirection::LeftToRight</enum>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <property name="tabsClosable">
       <bool>false</bool>
@@ -140,7 +140,7 @@
             <x>0</x>
             <y>0</y>
             <width>1446</width>
-            <height>1097</height>
+            <height>1095</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -203,7 +203,7 @@
             <x>0</x>
             <y>0</y>
             <width>1446</width>
-            <height>1097</height>
+            <height>1095</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -236,12 +236,12 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="QCheckBox" name="performRecognition">
+                <widget class="QCheckBox" name="recoActive">
                  <property name="enabled">
                   <bool>true</bool>
                  </property>
                  <property name="text">
-                  <string>perform</string>
+                  <string>active</string>
                  </property>
                  <property name="checked">
                   <bool>false</bool>
@@ -1592,7 +1592,7 @@
             <x>0</x>
             <y>0</y>
             <width>1432</width>
-            <height>1320</height>
+            <height>1434</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1620,7 +1620,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QCheckBox" name="trackOnlineCalc">
+              <widget class="QCheckBox" name="trackActive">
                <property name="maximumSize">
                 <size>
                  <width>999</width>
@@ -1628,7 +1628,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>online calculation</string>
+                <string>active</string>
                </property>
                <property name="checked">
                 <bool>false</bool>
@@ -4077,7 +4077,7 @@
             <x>0</x>
             <y>0</y>
             <width>1446</width>
-            <height>1097</height>
+            <height>1095</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -4277,7 +4277,7 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>performRecognition</tabstop>
+  <tabstop>recoActive</tabstop>
   <tabstop>recoStep</tabstop>
   <tabstop>recoMethod</tabstop>
   <tabstop>recoStereoShow</tabstop>
@@ -4321,7 +4321,7 @@
   <tabstop>mapResetPos</tabstop>
   <tabstop>mapReadHeights</tabstop>
   <tabstop>mapReadMarkerID</tabstop>
-  <tabstop>trackOnlineCalc</tabstop>
+  <tabstop>trackActive</tabstop>
   <tabstop>trackRepeat</tabstop>
   <tabstop>trackRepeatQual</tabstop>
   <tabstop>trackExtrapolation</tabstop>

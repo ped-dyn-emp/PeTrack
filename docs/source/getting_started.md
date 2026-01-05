@@ -1,4 +1,4 @@
-# Getting Started 
+# Getting Started
 
 This page goes through an exemplary project. You can download this example project [here (~200MB)](https://go.fzj.de/petrack-demo-download).
 
@@ -8,13 +8,14 @@ Before PeTrack is used, experiments need to be planned (see [](/planning/plannin
 
 ## Using PeTrack
 
-The usage and some settings will be explained with the provided demo project ('demo' folder), the folder contains all necessary files to set up a PeTrack project. 
+The usage and some settings will be explained with the provided demo project ('demo' folder), the folder contains all necessary files to set up a PeTrack project.
 
 ### Calibration
 
 The first step to setup a PeTrack project is the calibration of the camera, which mainly consists of two parts [intrinsic](intrinsic_calib) and [extrinsic](extr_calib) calibration. Additionally some color correction and the addition of borders can be set up here.
 
 (intrinsic_calib)=
+
 #### Intrinsic calibration
 
 <!--![]()
@@ -26,15 +27,16 @@ An embedded video with a caption!
 
 1. Open PeTrack. The program should automatically open in the calibration tab.
 2. Click on “files” and browse to the snapshots out of the video for intrinsic calibration (chessboard), select ALL of those snapshots (for multi-selection hold `⌃ Ctrl/⌘ Cmd` and sequentially click on the files). The snapshots for the demo are located in: `demo/00_files/calibration/intrinsic`.
-3. Click on “auto” to start intrinsic calibration
+3. Click on `calc` to start intrinsic calibration
 4. See how the parameters in the "intrinsic calibration" section have changed
-5. Check “apply” and save the project to save your progress so far
+5. Check `active` and save the project to save your progress so far
 
 ![Video of the intrinsic calibration procedure in PeTrack](/images/intrinsic.mp4)
 
 _`demo/01_calibration/01_intrinsic.pet` is the resulting PeTrack project file after these steps._
 
 (extr_calib)=
+
 #### Extrinsic Calibration
 
 For the extrinsic calibration, we need to create a `.3dc` file based on the points from our sketch of the experimental setup (see [](/calibration/extrinsic_calibration.md) for more detail). Create the file in the following format:
@@ -49,11 +51,9 @@ The first line is the total number of points. Starting from the second line, all
 
 ![Video of the extrinsic calibration procedure in PeTrack](/images/extrinsic.mp4)
 
-_`demo/01_calibration/02_extrinsic.pet` is the resulting PeTrack project file after these steps._ 
-
+_`demo/01_calibration/02_extrinsic.pet` is the resulting PeTrack project file after these steps._
 
 ### Recognition
-
 
 After the calibration is done, load the video file via `File/Open Sequence`. The next step is to set up the recognition. Switch to the tab “Recognition” and check “show”. Press (`⌃ Ctrl/⌘ Cmd` + `1`) to adjust view. (Alternatively, you can use the menu-bar, View > Fit in region of interest)
 
@@ -64,9 +64,9 @@ After the calibration is done, load the video file via `File/Open Sequence`. The
 5. "open radius" and "close radius" should be deactivated when selecting colors, as the image mask does not accurately depict the selected color. To see which color range currently is detected, select "mask" and set "opacity" to 50. Then close the parameter window.
 6. In the "map" section color and corresponding height of the marker can be defined:
    1. Clicking on "color range" opens a dialog where you can choose the range of colors for the currently selected group.
-   2. Check "perform" to see the areas, which are included in the color range.
+   2. Check "active" to see the areas, which are included in the color range.
    3. The "height" in the "map" section represents the height that is assumed for all participants with hats in the selected color region. [See here](/recognition/setting-up.md#height-based-options) for more info on different options to get the pedestrian height.
-7. Go back to the "parameter"-window. Now adjust the "open radius" and "close radius" as well as other parameters to your needs. For details, see [](/recognition/multicolor.md). 
+7. Go back to the "parameter"-window. Now adjust the "open radius" and "close radius" as well as other parameters to your needs. For details, see [](/recognition/multicolor.md).
 8. In our case, since we are using the additional code marker, check "use code marker" and open the "parameter" box via the button to its right. Select the correct dictionary (in our demo case "DICT_6X6_1000") and adjust the parameter to your needs. For details, see [](/recognition/aruco.md).
 9. Close the parameter window of the code marker. Then deselect the mask and close the parameter window of the multicolor marker as well. Make sure to save your progress by saving the project.
 
@@ -80,7 +80,7 @@ After recognition is done, go to the "tracking" tab in PeTrack.
 
 1. In the section "region of interest" check "show". You can automatically adjust the tracking region of interest (blue line) by clicking "adjust automatically" or manually adjust the lines via click and drag. If you manually adjust make sure that the tracking ROI is larger than the recognition ROI.
 2. In the section "search region" adjust the parameters to your needs. For more details, see [](/tracking/setting-up.md).
-3. Now start the tracking by either clicking `calculate all` which runs the tracking forward and backwards over the complete video. Or by checking `online calculation` and pressing play.
+3. Now start the tracking by either clicking `calculate all` which runs the tracking forward and backwards over the complete video. Or by checking `active` and pressing play.
 4. After the tracking is complete, make sure to save your progress in a new project file `.pet` and also save your tracked trajectories in a [`.trc` file](/export/trajectory.md).
 
 ![Video of tracking procedure in PeTrack](/images/tracking.mp4)
@@ -89,7 +89,7 @@ After recognition is done, go to the "tracking" tab in PeTrack.
 
 After the tracking is complete you should manually check and correct the resulting trajectories.
 
-1. Make sure to uncheck "perform" (recognition) and "online calculation" (tracking) to not overwrite manual changes.  
+1. Make sure to uncheck "active" for recognition and tracking to not overwrite manual changes.
 2. Adjust the visualization of trajectories by the different settings in the "path" section. For a detailed description of the options, see [](/user_interface/visualization.md).
 3. There are different ways for correcting trajectories, [see here](/correction/correction.md) for a detailed description.
-4. To save your progress during correction, export the trajectories as `.trc` file (the internal file format of PeTrack). Once you are finished with the correction, additionally export a [`.txt` file](/export/trajectory.md). 
+4. To save your progress during correction, export the trajectories as `.trc` file (the internal file format of PeTrack). Once you are finished with the correction, additionally export a [`.txt` file](/export/trajectory.md).

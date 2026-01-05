@@ -360,7 +360,7 @@ void Player::playVideo()
         }
         else
         {
-            if(mLooping && mMainWindow->getControlWidget()->isOnlineTrackingChecked())
+            if(mLooping && mMainWindow->getControlWidget()->isTrackActiveChecked())
             {
                 PWarning(
                     this,

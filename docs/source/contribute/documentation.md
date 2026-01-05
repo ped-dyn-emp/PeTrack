@@ -43,3 +43,4 @@ syntax, see e.g. the [MyST Cheat
 Sheet](https://jupyterbook.org/en/stable/reference/cheatsheet.html) of the
 jupyterbook project. Of course, you can also look at the existing pages to check
 how the syntax for some part of the documentation looks like.
+

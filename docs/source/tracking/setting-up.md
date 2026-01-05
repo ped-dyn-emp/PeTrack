@@ -7,7 +7,7 @@ settings of tracking. In the end you have two
 options to
 apply the tracking to your project.
 
-online calculation
+active
 : Enables the tracking, but you manually have to navigate
 though the video.
 
@@ -115,7 +115,7 @@ levels of color which are essential to the Lukas-Kanade method.
 :::
 
 **After you have set all of these settings, you can
-run the tracking with either `online calculation` or
+run the tracking with either `active` or
 `calculate all` as mentioned on top of this page.**
 
 :::{Important}
@@ -148,4 +148,3 @@ In that case, the combined trajectories of all specified persons will be shown.
 frames before/after actual position
 : Number of frames before/after the actual position for which
 the trajectories should be visible.
-

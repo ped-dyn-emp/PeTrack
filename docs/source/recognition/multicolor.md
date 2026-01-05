@@ -73,7 +73,7 @@ opacity
 
 ## Color Selection
 
-You need to activate `perform` to see updates on changed settings!
+You need to activate `active` to see updates on changed settings!
 
 :::{figure-md} color-selection
 ![Color Selection part of recognition tab](images/color_selection.png)
@@ -113,7 +113,7 @@ Activate the `mask` from the multicolor parameters and set the opacity to ca. 50
 
 ### Color Picker
 
-When pressing the `color picker` button, the color picker modus is activated. In this modus, one can `shift + left mouse click` on a pixel to start a color selection and then expand this selection with a normal `left click`. 
+When pressing the `color picker` button, the color picker modus is activated. In this modus, one can `shift + left mouse click` on a pixel to start a color selection and then expand this selection with a normal `left click`.
 
 :::{figure-md}
 ![color picker usage example](images/color_picker_example.webp)
@@ -132,7 +132,7 @@ When you click on `color range`, a color selection dialog appears:
 :::{figure-md} color-range-dialog
 ![color range dialog](images/color_range_dialog.png)
 
-Color range dialog: The dialogue allows selecting the lower bound and upper bound color via a hsv color picker. 
+Color range dialog: The dialogue allows selecting the lower bound and upper bound color via a hsv color picker.
 :::
 
 The color detection works in the HSV (Hue, Saturation, Value) color space. Hue is the "color", i.e. redness or greenness of the color. Saturation how saturated it is. And value, how bright it is. The dialog allows you to select to colors from this space. All colors that lie "in between" your selected colors are then part of your selection. It is noteworthy that the hue part is a value in degrees from 0° to 360°, with red being around zero degree. To allow the selection of red-ish colors as well, there is an option `inverse hue`, which changes the direction of this difference. That is we select colors with hue $h$ such that $h_{min} < h < h_{max}$ if `inverse hue` is not selected and colors with $h < h_{min} \lor h > h_{max}$ if `inverse hue` is selected.
@@ -153,4 +153,3 @@ Example usage of color range dialog. With the mask enabled and perform
 activated, one can interactively see which colors in the frame are selected and
 which are not.
 :::
-

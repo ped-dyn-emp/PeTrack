@@ -353,7 +353,7 @@ Petrack::Petrack(QString petrackVersion) :
 
 
     auto *toggleOnlineTracking = new QShortcut{QKeySequence("Shift+t"), this};
-    connect(toggleOnlineTracking, &QShortcut::activated, this, [=]() { mControlWidget->toggleOnlineTracking(); });
+    connect(toggleOnlineTracking, &QShortcut::activated, this, [=]() { mControlWidget->toggleTrackActive(); });
 
     auto *toggleRecognition = new QShortcut{QKeySequence("Shift+r"), this};
     connect(toggleRecognition, &QShortcut::activated, this, [=]() { mControlWidget->toggleRecognition(); });
@@ -1779,7 +1779,7 @@ void Petrack::keyBindings()
         "general",
         {{"Ctrl + z", "Undo the last manual action on\ntrajectories (e.g. moving point)"},
          {"Ctrl + Shift + z", "Redo the last action that was reverted\nvia Ctrl + z"},
-         {"Shift + t", "toggles tracking online calculation"},
+         {"Shift + t", "toggles tracking active"},
          {"Shift + r", "toggles recognition"},
          {"Shift + e", "export trajectories"},
          {"Shift + a", "toggles \"show only\" or \"show only list\""},
@@ -3451,11 +3451,11 @@ void Petrack::trackAll()
 {
     int  memPos        = mPlayerWidget->getPos();
     int  progVal       = 0;
-    bool memCheckState = mControlWidget->isOnlineTrackingChecked();
-    bool memRecoState  = mControlWidget->isPerformRecognitionChecked();
+    bool memCheckState = mControlWidget->isTrackActiveChecked();
+    bool memRecoState  = mControlWidget->isRecoActiveChecked();
 
-    mControlWidget->setOnlineTrackingChecked(true);
-    mControlWidget->setPerformRecognitionChecked(true);
+    mControlWidget->setTrackActiveChecked(true);
+    mControlWidget->setRecoActiveChecked(true);
 
     QProgressDialog progress(
         "Tracking pedestrians through all frames...",
@@ -3480,9 +3480,9 @@ void Petrack::trackAll()
     {
         // zuruecksprinegn an die stelle, wo der letzte trackPath nicht vollstaendig
         // etwas spaeter, da erste punkte in reco path meist nur ellipse ohne markererkennung
-        mControlWidget->setOnlineTrackingChecked(false);
+        mControlWidget->setTrackActiveChecked(false);
         mPlayerWidget->skipToFrame(mPersonStorage.largestFirstFrame() + 5);
-        mControlWidget->setOnlineTrackingChecked(true);
+        mControlWidget->setTrackActiveChecked(true);
         // progVal = 2mAnimation.getNumFrames()-memPos-mPlayerWidget->getPos();
         progVal += mAnimation.getNumFrames() - mPlayerWidget->getPos();
         progress.setValue(progVal); // mPlayerWidget->getPos()
@@ -3490,7 +3490,7 @@ void Petrack::trackAll()
         // recognition abstellen, bis an die stelle, wo trackAll begann
         // UEBERPRUEFEN, OB TRACKPATH NICHT RECOGNITION PUNKTE UEBERSCHREIBT!!!!!!!!!!
         // repeate und repaetQual koennte temporaer umgestellt werden
-        mControlWidget->setPerformRecognitionChecked(false);
+        mControlWidget->setRecoActiveChecked(false);
 
         // rueckwaertslaufen
         do
@@ -3506,7 +3506,7 @@ void Petrack::trackAll()
             }
             if(mPlayerWidget->getPos() == memPos + 1)
             {
-                mControlWidget->setPerformRecognitionChecked(true);
+                mControlWidget->setRecoActiveChecked(true);
             }
         } while(mPlayerWidget->frameBackward());
 
@@ -3519,10 +3519,10 @@ void Petrack::trackAll()
         mPersonStorage.optimizeColor();
     }
 
-    mControlWidget->setPerformRecognitionChecked(memRecoState);
-    mControlWidget->setOnlineTrackingChecked(false);
+    mControlWidget->setRecoActiveChecked(memRecoState);
+    mControlWidget->setTrackActiveChecked(false);
     mPlayerWidget->skipToFrame(memPos);
-    mControlWidget->setOnlineTrackingChecked(memCheckState);
+    mControlWidget->setTrackActiveChecked(memCheckState);
 }
 
 // default: (QPointF *pos=NULL, int pers=-1, int frame=-1);
@@ -3703,7 +3703,7 @@ void Petrack::performRecognition()
         mStereoContext->getDisparity();
     }
 
-    if(mControlWidget->isPerformRecognitionChecked())
+    if(mControlWidget->isRecoActiveChecked())
     {
         QRect rect(
             myRound(mRecognitionRoiItem->rect().x() + getImageBorderSize()),
@@ -3817,7 +3817,7 @@ bool Petrack::updateImage(bool imageChanged)
             borderChangedForTracking = true;
         }
         // tracking before recognition, because new recognized points are checked to match with already tracked ones
-        if((trackChanged() || imageChanged) && (mControlWidget->isOnlineTrackingChecked()))
+        if((trackChanged() || imageChanged) && (mControlWidget->isTrackActiveChecked()))
         {
             if(borderChangedForTracking)
             {

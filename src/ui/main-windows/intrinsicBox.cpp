@@ -60,7 +60,7 @@ IntrinsicBox::IntrinsicBox(
     connect(mUi->quadAspectRatio, &QCheckBox::checkStateChanged, this, &IntrinsicBox::onQuadAspectRatioStateChanged);
     connect(mUi->fixCenter, &QCheckBox::checkStateChanged, this, &IntrinsicBox::onFixCenterStateChanged);
     connect(mUi->tangDist, &QCheckBox::checkStateChanged, this, &IntrinsicBox::onTangDistStateChanged);
-    connect(mUi->apply, &QCheckBox::checkStateChanged, this, &IntrinsicBox::onApplyStateChanged);
+    connect(mUi->intrActive, &QCheckBox::checkStateChanged, this, &IntrinsicBox::onIntrActiveStateChanged);
     connect(mUi->fx, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onFxValueChanged);
     connect(mUi->fy, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onFyValueChanged);
     connect(mUi->cx, QOverload<double>::of(&PDoubleSpinBox::valueChanged), this, &IntrinsicBox::onCxValueChanged);
@@ -90,16 +90,16 @@ IntrinsicBox::IntrinsicBox(
         mUi->boardSizeY, QOverload<int>::of(&QSpinBox::valueChanged), this, &IntrinsicBox::onBoardSizeYValueChanged);
     connect(mUi->calibFiles, &QPushButton::clicked, this, &IntrinsicBox::onCalibFilesClicked);
     connect(mUi->calibVideo, &QPushButton::clicked, this, &IntrinsicBox::onCalibVideoClicked);
-    connect(mUi->autoCalib, &QPushButton::clicked, this, &IntrinsicBox::runAutoCalib);
+    connect(mUi->intrCalc, &QPushButton::clicked, this, &IntrinsicBox::runAutoCalib);
     // apply intrinsic
-    mUi->apply->setCheckState(mCalibFilter.getEnabled() ? Qt::Checked : Qt::Unchecked);
+    mUi->intrActive->setCheckState(mCalibFilter.getEnabled() ? Qt::Checked : Qt::Unchecked);
 
     mModelsParams.oldModelParams = IntrinsicCameraParams{};
     mModelsParams.extModelParams = IntrinsicCameraParams{};
     applyCurrentModelParamsToUi();
     setCalibSettings();
     // FocusPolicy: TabFocus and first ui-element as proxy are needed for tab order
-    setFocusProxy(mUi->apply);
+    setFocusProxy(mUi->intrActive);
 }
 
 IntrinsicBox::~IntrinsicBox()
@@ -219,7 +219,7 @@ void IntrinsicBox::loadCalibFiles(QDomElement &subSubElem)
         mAutoCalib.setCalibFiles(fl);
         if(!fl.isEmpty())
         {
-            mUi->autoCalib->setEnabled(true);
+            mUi->intrCalc->setEnabled(true);
         }
     }
     mAutoCalib.setCalibVideo(getExistingFile(readQString(subSubElem, "CALIB_VIDEO", "")));
@@ -235,7 +235,7 @@ bool IntrinsicBox::getXml(QDomElement &subSubElem)
     }
     else if(subSubElem.tagName() == "INTRINSIC_PARAMETERS")
     {
-        loadBoolValue(subSubElem, "ENABLED", mUi->apply, false);
+        loadBoolValue(subSubElem, "ENABLED", mUi->intrActive, false);
         // signals are supposed to change model values; but since we read them in
         // from a valid file, no changes are neccessary -> can safely block signals
         loadBoolValue(subSubElem, "QUAD_ASPECT_RATIO", mUi->quadAspectRatio, false);
@@ -347,7 +347,7 @@ void IntrinsicBox::setXml(QDomElement &subElem) const
     subElem.appendChild(subSubElem);
 
     subSubElem = (subElem.ownerDocument()).createElement("INTRINSIC_PARAMETERS");
-    subSubElem.setAttribute("ENABLED", mUi->apply->isChecked());
+    subSubElem.setAttribute("ENABLED", mUi->intrActive->isChecked());
 
     auto subSubSubElem = (subSubElem.ownerDocument()).createElement("OLD_MODEL");
     subSubSubElem.setAttribute("FX", mModelsParams.oldModelParams.getFx());
@@ -647,7 +647,7 @@ void IntrinsicBox::onCalibFilesClicked()
 {
     if(mAutoCalib.openCalibFiles())
     {
-        mUi->autoCalib->setEnabled(true);
+        mUi->intrCalc->setEnabled(true);
     }
 }
 
@@ -655,7 +655,7 @@ void IntrinsicBox::onCalibVideoClicked()
 {
     if(mAutoCalib.openCalibVideo())
     {
-        mUi->autoCalib->setEnabled(true);
+        mUi->intrCalc->setEnabled(true);
     }
 }
 
@@ -792,7 +792,7 @@ void IntrinsicBox::onTangDistStateChanged()
     mUi->ty->setEnabled(checked);
 }
 
-void IntrinsicBox::onApplyStateChanged(int i)
+void IntrinsicBox::onIntrActiveStateChanged(int i)
 {
     if(i == Qt::Checked)
     {
