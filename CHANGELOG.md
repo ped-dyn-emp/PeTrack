@@ -7,6 +7,7 @@
 - Fix: roi not shown on startup
 - Fix: wrong margin for some UI boxes
 - Fix: code marker ID 0 was not displayed
+- Saving player loop + fix playback speed option in pet file
 - Fix: border size slider freezed PeTrack
 - Fix: zoom buttons not working
 

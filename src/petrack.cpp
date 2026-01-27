@@ -487,7 +487,9 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
     int         zoom = 250, rotate = 0, hScroll = 0, vScroll = 0;
     Camera      cam = Camera::cameraUnset;
     setLoading(true);
-    auto petVersion = root.attribute("VERSION");
+    auto petVersion       = root.attribute("VERSION");
+    bool playerLooping    = false;
+    bool playerSpeedFixed = false;
 
     for(QDomElement elem = root.firstChildElement(); !elem.isNull(); elem = elem.nextSiblingElement())
     {
@@ -567,12 +569,18 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
         {
             frame = readInt(elem, "FRAME", -1);
             // handle old projects (prior to 0.10.2), which don't differentiate between sequence fps and playback fps
-            oldFps         = readDouble(elem, "FPS", -1);
-            sequenceFps    = readDouble(elem, "SEQUENCE_FPS", -1);
-            playbackFps    = readDouble(elem, "PLAYBACK_FPS", -1);
-            sourceFrameIn  = readInt(elem, "SOURCE_FRAME_IN", -1);
-            sourceFrameOut = readInt(elem, "SOURCE_FRAME_OUT", -1);
-            mPlayerWidget->setPlayerSpeedLimited(readBool(elem, "PLAYER_SPEED_FIXED", false));
+            oldFps           = readDouble(elem, "FPS", -1);
+            sequenceFps      = readDouble(elem, "SEQUENCE_FPS", -1);
+            playbackFps      = readDouble(elem, "PLAYBACK_FPS", -1);
+            sourceFrameIn    = readInt(elem, "SOURCE_FRAME_IN", -1);
+            sourceFrameOut   = readInt(elem, "SOURCE_FRAME_OUT", -1);
+            playerLooping    = readBool(elem, "LOOP", false);
+            playerSpeedFixed = readBool(elem, "PLAYER_SPEED_FIXED", false);
+            mPlayerWidget->setPlayerSpeedLimited(readBool(elem, "PLAYER_SPEED_LIMITED", false));
+            mPlayerWidget->setPlayerSpeedFixed(playerSpeedFixed);
+            mPlayerLooping->setChecked(playerLooping);
+            mFixPlaybackSpeed->setChecked(playerSpeedFixed);
+            mPlayerWidget->setLooping(playerLooping);
         }
         else if(elem.tagName() == "VIEW")
         {
@@ -863,7 +871,9 @@ void Petrack::saveXml(QDomDocument &doc)
     elem.setAttribute("PLAYBACK_FPS", mAnimation.getPlaybackFPS());
     elem.setAttribute("SOURCE_FRAME_IN", mPlayerWidget->getFrameInNum());
     elem.setAttribute("SOURCE_FRAME_OUT", mPlayerWidget->getFrameOutNum());
-    elem.setAttribute("PLAYER_SPEED_FIXED", mPlayerWidget->getPlayerSpeedLimited());
+    elem.setAttribute("PLAYER_SPEED_LIMITED", mPlayerWidget->getPlayerSpeedLimited());
+    elem.setAttribute("PLAYER_SPEED_FIXED", mPlayerWidget->getPlayerSpeedFixed());
+    elem.setAttribute("LOOP", mPlayerWidget->getLooping());
 
     root.appendChild(elem);
 
@@ -2018,10 +2028,7 @@ void Petrack::createActions()
     // Not checkable like Fix since this is also controlled through clicking on FPS and syncing currently would be
     // bothersome
     connect(
-        mLimitPlaybackSpeed,
-        &QAction::triggered,
-        mPlayerWidget,
-        [&]() { mPlayerWidget->setPlayerSpeedLimited(!mPlayerWidget->getPlayerSpeedLimited()); });
+        mLimitPlaybackSpeed, &QAction::triggered, mPlayerWidget, [&]() { mPlayerWidget->togglePlayerSpeedLimited(); });
     mFixPlaybackSpeed = new QAction(tr("&Fix playback speed"));
     mFixPlaybackSpeed->setCheckable(true);
     connect(mFixPlaybackSpeed, &QAction::toggled, mPlayerWidget, &Player::setPlayerSpeedFixed);

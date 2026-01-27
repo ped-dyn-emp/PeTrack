@@ -71,6 +71,7 @@ public:
     int  getFrameInNum();
     int  getFrameOutNum();
     int  getPos();
+    bool getLooping() const;
 
 public slots:
     bool frameForward();
