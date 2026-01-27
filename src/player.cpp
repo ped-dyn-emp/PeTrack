@@ -190,6 +190,11 @@ void Player::setLooping(bool looping)
     mLooping = looping;
 }
 
+bool Player::getLooping() const
+{
+    return mLooping;
+}
+
 void Player::setSpeedRelativeToRealtime(double factor)
 {
     setPlaybackFPS(mAnimation->getSequenceFPS() * factor);
