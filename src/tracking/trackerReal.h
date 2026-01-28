@@ -55,10 +55,10 @@ struct TrackPointOptionalInfoHdf5
 
 struct PersonalDetailsHdf5
 {
-    int         id;
-    int         markerId;
-    float       height;
-    std::string comment;
+    int   id;
+    int   markerId;
+    float height;
+    char *comment;
 };
 
 struct MissingFrame
@@ -258,6 +258,7 @@ public:
         bool           exportAngleOfView,
         bool           exportMarkerID,
         bool           exportComment);
+
     void createHdf5Attribute(H5::H5Object &obj, const std::string &name, const std::string &description);
     template <typename T>
     void createGroupHdf5Attribute(H5::H5Object &object, const std::string &name, const T &value) const;

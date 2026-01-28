@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <H5Cpp.h>
 #include <QMutex>
 #include <QSignalMapper>
 #include <QtOpenGL>
@@ -2682,7 +2683,7 @@ void Petrack::importTracker(QString dest) // default = ""
             this,
             tr("Select file for importing tracking pathes"),
             lastFile,
-            tr("PeTrack tracker (*.trc *.txt);;All files (*.*)"));
+            tr("PeTrack tracker (*.trc *.txt *.h5);;All files (*.*)"));
     }
 
     if(!dest.isEmpty())
@@ -2948,6 +2949,175 @@ void Petrack::importTracker(QString dest) // default = ""
             file.close();
             SPDLOG_INFO("import {} ({} person(s))", dest, numberImportedPersons);
             mTrcFileName = dest;
+        }
+        else if(dest.endsWith(".h5", Qt::CaseInsensitive))
+        {
+            try
+            {
+                PWarning(
+                    this,
+                    tr("PeTrack"),
+                    tr("Are you sure you want to import 3D data from HDF5-File? You have to make sure that the "
+                       "coordinate "
+                       "system now is exactly at the same position and orientation than at export time!"));
+
+
+                H5::Exception::dontPrint();
+                H5::H5File file(dest.toStdString(), H5F_ACC_RDONLY);
+
+                // read trajectory data
+                H5::DataSet   trajectoryDataset = file.openDataSet("trajectory");
+                H5::DataSpace trajectorySpace   = trajectoryDataset.getSpace();
+                hsize_t       dims[1];
+                trajectorySpace.getSimpleExtentDims(dims);
+
+                H5::CompType trajectoryType = trajectoryDataset.getCompType();
+
+                std::vector<TrackPointInfoHdf5> trajectoryData(dims[0]);
+                trajectoryDataset.read(trajectoryData.data(), trajectoryType);
+
+                // read personal info data
+                H5::DataSet   personalDataset = file.openDataSet("personal_details");
+                H5::DataSpace personalSpace   = personalDataset.getSpace();
+                hsize_t       personalDims[1];
+                personalSpace.getSimpleExtentDims(personalDims);
+
+                H5::CompType                     personalType = personalDataset.getCompType();
+                std::vector<PersonalDetailsHdf5> personalData(personalDims[0]);
+                personalDataset.read(personalData.data(), personalType);
+
+                auto hasMember = [&](const char *name) -> bool
+                {
+                    int numMembers = personalType.getNmembers();
+                    for(int i = 0; i < numMembers; ++i)
+                    {
+                        if(personalType.getMemberName(i) == name)
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                };
+
+                const bool hasMarkerId = hasMember("marker_id");
+                const bool hasComment  = hasMember("comment");
+
+
+                setTrackChanged(true);
+                mTracker->reset();
+
+                // hdf5 data is in meters
+                constexpr float conversionFactorToCM = 100.0F;
+
+                std::map<int, PersonalDetailsHdf5> personalDetailsMap;
+                for(const auto &details : personalData)
+                {
+                    personalDetailsMap[details.id] = details;
+                }
+
+                std::map<int, std::map<int, TrackPointInfoHdf5>> personTrajectoryData;
+
+                for(const auto &point : trajectoryData)
+                {
+                    personTrajectoryData[point.id][point.frame] = point;
+                }
+                int numberImportedPersons = 0;
+
+                for(auto &[persId, frameData] : personTrajectoryData)
+                {
+                    std::deque<TrackPoint> pixelPoints;
+
+                    for(auto &[frameNr, trackData] : frameData)
+                    {
+                        float x = trackData.x * conversionFactorToCM;
+                        float y = trackData.y * conversionFactorToCM;
+                        float z = trackData.z * conversionFactorToCM;
+
+                        cv::Point2f p2d;
+
+                        if(mControlWidget->getCalibCoordDimension() == 0)
+                        {
+                            // compute image point from 3d calibration
+                            p2d = mExtrCalibration.getImagePoint(cv::Point3f(x, y, z));
+                        }
+                        else
+                        {
+                            // compute image point from 2d calibration
+                            QPointF pos = mWorldImageCorrespondence->getPosImage(QPointF(x, y), z);
+                            p2d.x       = pos.x();
+                            p2d.y       = pos.y();
+                        }
+
+                        TrackPoint trackPoint(Vec2F(p2d.x, p2d.y), 100);
+                        trackPoint.setStereoMarker(
+                            {{x, y, -mControlWidget->getExtrinsicParameters().trans3 - z}}); // distance to camera
+
+                        pixelPoints.push_back(trackPoint);
+                    }
+
+                    int         firstFrame = frameData.begin()->first;
+                    TrackPerson trackPerson(persId, firstFrame, pixelPoints.front());
+
+                    if(personalDetailsMap.find(persId) != personalDetailsMap.end())
+                    {
+                        const PersonalDetailsHdf5 &details = personalDetailsMap[persId];
+                        trackPerson.setHeight(details.height * conversionFactorToCM);
+                        if(hasMarkerId)
+                        {
+                            trackPerson.setMarkerID(details.markerId);
+                        }
+                        if(hasComment)
+                        {
+                            trackPerson.setComment(QString::fromUtf8(details.comment));
+                        }
+                    }
+                    else
+                    {
+                        trackPerson.setHeight(frameData.begin()->second.z * conversionFactorToCM);
+                    }
+
+
+                    pixelPoints.pop_front();
+
+                    for(const auto &trackPoint : pixelPoints)
+                    {
+                        trackPerson.append(trackPoint);
+                    }
+
+                    mPersonStorage.addPerson(trackPerson);
+                    ++numberImportedPersons;
+                }
+                H5::DataSet::vlenReclaim(personalData.data(), personalType, personalSpace);
+
+                mControlWidget->setTrackNumberAll(QString("%1").arg(mPersonStorage.nbPersons()));
+                mControlWidget->setTrackShowOnlyNr(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
+                mControlWidget->setTrackNumberVisible(
+                    QString("%1").arg(mPersonStorage.visible(mAnimation.getCurrentFrameNum())));
+                mControlWidget->replotColorplot();
+
+                SPDLOG_INFO("import {} ({} person(s))", dest, numberImportedPersons);
+                mTrcFileName = dest;
+            }
+            catch(const H5::FileIException &e)
+            {
+                PCritical(this, tr("PeTrack"), tr("HDF5 File error: %1").arg(e.getCDetailMsg()));
+                return;
+            }
+            catch(const H5::DataSetIException &e)
+            {
+                PCritical(this, tr("PeTrack"), tr("HDF5 Dataset error: %1").arg(e.getCDetailMsg()));
+                return;
+            }
+            catch(const H5::DataSpaceIException &e)
+            {
+                PCritical(this, tr("PeTrack"), tr("HDF5 Dataspace error: %1").arg(e.getCDetailMsg()));
+                return;
+            }
+            catch(const H5::Exception &e)
+            {
+                PCritical(this, tr("PeTrack"), tr("HDF5 Error: %1").arg(e.getCDetailMsg()));
+                return;
+            }
         }
         else
         {

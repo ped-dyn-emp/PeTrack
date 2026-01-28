@@ -820,16 +820,22 @@ void TrackerReal::exportHdf5(
 
             // personal details
             PersonalDetailsHdf5 details;
-            details.id       = i + 1;
-            details.markerId = person.getMarkerID();
-            details.height   = person.height() * scale;
-            details.comment  = person.getComment().toStdString();
+            details.id         = i + 1;
+            details.markerId   = person.getMarkerID();
+            details.height     = person.height() * scale;
+            QByteArray byteArr = person.getComment().toUtf8();
+            details.comment =
+                new char[byteArr.size() + 1]; // because of the lack of std::string support in hdf5 beyond scalar
+                                              // variables we have to use a char * for the comment for now. There is
+                                              // probably a workaround but it would get really messy.
+            std::strncpy(details.comment, byteArr.constData(), byteArr.size());
+            details.comment[byteArr.size()] = '\0'; // strncpy does not guarantee null-termination
             personalDetailsData.push_back(details);
         }
         H5::Exception::dontPrint();
         H5::H5File  file(filename.toStdString(), H5F_ACC_TRUNC);
-        H5::StrType var_str_type(H5::PredType::C_S1, H5T_VARIABLE);
-        var_str_type.setCset(H5T_CSET_UTF8);
+        H5::StrType varStrType(H5::PredType::C_S1, H5T_VARIABLE);
+        varStrType.setCset(H5T_CSET_UTF8);
 
         createGroupHdf5Attribute(file, "file_version", Petrack::hdf5FileVersion);
         createGroupHdf5Attribute(file, "source", mMainWindow->getProFileName().toStdString());
@@ -865,17 +871,16 @@ void TrackerReal::exportHdf5(
 
         createGroupHdf5Attribute(file, "petrack_metadata", jsonString.toStdString());
 
-        H5::CompType datatype(sizeof(TrackPointInfoHdf5));
-        datatype.insertMember("id", HOFFSET(TrackPointInfoHdf5, id), H5::PredType::NATIVE_INT);
-        datatype.insertMember("frame", HOFFSET(TrackPointInfoHdf5, frame), H5::PredType::NATIVE_INT);
-        datatype.insertMember("x", HOFFSET(TrackPointInfoHdf5, x), H5::PredType::NATIVE_FLOAT);
-        datatype.insertMember("y", HOFFSET(TrackPointInfoHdf5, y), H5::PredType::NATIVE_FLOAT);
-        datatype.insertMember("z", HOFFSET(TrackPointInfoHdf5, z), H5::PredType::NATIVE_FLOAT);
-
+        H5::CompType trajectoryDatatype(sizeof(TrackPointInfoHdf5));
+        trajectoryDatatype.insertMember("id", HOFFSET(TrackPointInfoHdf5, id), H5::PredType::NATIVE_INT);
+        trajectoryDatatype.insertMember("frame", HOFFSET(TrackPointInfoHdf5, frame), H5::PredType::NATIVE_INT);
+        trajectoryDatatype.insertMember("x", HOFFSET(TrackPointInfoHdf5, x), H5::PredType::NATIVE_FLOAT);
+        trajectoryDatatype.insertMember("y", HOFFSET(TrackPointInfoHdf5, y), H5::PredType::NATIVE_FLOAT);
+        trajectoryDatatype.insertMember("z", HOFFSET(TrackPointInfoHdf5, z), H5::PredType::NATIVE_FLOAT);
 
         hsize_t       dims[1] = {data.size()};
         H5::DataSpace dataspace(1, dims);
-        H5::DataSet   dataset = file.createDataSet("trajectory", datatype, dataspace);
+        H5::DataSet   dataset = file.createDataSet("trajectory", trajectoryDatatype, dataspace);
 
         createGroupHdf5Attribute(dataset, "fps", fps);
         createHdf5Attribute(dataset, "id", "unique identifier for pedestrian");
@@ -884,7 +889,7 @@ void TrackerReal::exportHdf5(
         createHdf5Attribute(dataset, "y", "pedestrian y-coordinate (meter [m])");
         createHdf5Attribute(dataset, "z", "pedestrian z-coordinate (meter [m])");
 
-        dataset.write(data.data(), datatype);
+        dataset.write(data.data(), trajectoryDatatype);
 
         // optional trackpoint info dataset
         H5::CompType optionalDatatype(sizeof(TrackPointOptionalInfoHdf5));
@@ -940,7 +945,7 @@ void TrackerReal::exportHdf5(
         personalDatatype.insertMember("height", HOFFSET(PersonalDetailsHdf5, height), H5::PredType::NATIVE_FLOAT);
         if(exportComment)
         {
-            personalDatatype.insertMember("comment", HOFFSET(PersonalDetailsHdf5, comment), var_str_type);
+            personalDatatype.insertMember("comment", HOFFSET(PersonalDetailsHdf5, comment), varStrType);
         }
         hsize_t       personalDims[1] = {personalDetailsData.size()};
         H5::DataSpace personalDataspace(1, personalDims);
@@ -958,6 +963,12 @@ void TrackerReal::exportHdf5(
         }
 
         personalDataset.write(personalDetailsData.data(), personalDatatype);
+
+        // Clean up allocated strings
+        for(auto &details : personalDetailsData)
+        {
+            delete[] details.comment;
+        }
 
         SPDLOG_INFO("Finished");
     }
