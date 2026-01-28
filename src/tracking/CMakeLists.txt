@@ -4,6 +4,8 @@ target_sources(petrack_core PRIVATE
     trackerConstants.h
     trackPoint.cpp
     trackPoint.h
+    trackPerson.cpp
+    trackPerson.h
     tracker.cpp
     tracker.h
     trackerReal.cpp
