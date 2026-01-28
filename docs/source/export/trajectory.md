@@ -2,7 +2,6 @@
 
 PeTrack supports a few custom trajectory formats. These formats can be exported from PeTrack as well as re-imported into PeTrack.
 
-
 ## TRC-File
 
 The `.trc` files are the internal trajectory file format from PeTrack. They are not meant for consumption by any other program but PeTrack and no guarantees on the stability of the format are made.
@@ -15,9 +14,9 @@ When a `.trc` file is exported, its project associated itself with it. If PeTrac
 Export options do not apply to `.trc` files.
 :::
 
-## TXT-File
+## World-Coordinate File Formats
 
-### File Format
+### TXT-File
 
 The `.txt` file is the current main export target for external consumption of the trajectories (e.g. for analysis). The basic format of a `.txt` file is the following:
 
@@ -41,9 +40,16 @@ That is followed by all values, each data point being in one line and containing
 
 The information you see in the example above is part of any exported `.txt` file. Depending on the used marker, you can enable even more data to be added to the `.txt` file.
 
+### HDF5-File
+
+HDF5 is the next-gen file format for exporting trajectories for external comsumption (e.g. for analysis with [PedPy](https://pedpy.readthedocs.io/stable/)).
+It exports the trajectories along with PeTrack metadata as a `.h5` file. Look at the [HDF5 format documentation](https://ped.fz-juelich.de/da/doku.php?id=info)
+for further information on the data format.
+
 ### Export Options
 
 PeTrack has a lot of export options. They either add output to the exported file or perform some additional calculation on export.
+The export options only apply for world-coordinate file formats.
 
 insert miss. frames
 : When this option is enabled, PeTrack uses an algorithm to detect frame drops. These dropped frames are then inserted into the export. The position on these dropped frames is linearly interpolated. If this has already been calculated once, the checkbox `calculated` in the section `missing frames` will be checked. These missing frames are going to be reused in the next export. If you want the missing frames to be re-computed on export, you can press reset there.
@@ -55,7 +61,7 @@ The calculation of missing/dropped frames is expensive. If you know there are no
 recalc. height
 : This option is only relevant for projects using a **stereo** camera. This recalculates the height of the pedestrian using the median height of the measured 3D points.
 
-alt. height 
+alt. height
 : This options allows `z` to alternate. This is relevant when alternating height information is available (e.g. when using stereo) and the pedestrians are not at the same height for the whole recording. This could be the case e.g. at staircases. If disabled all `z` coordinates are just the height of the pedestrian.
 
 elim. tp. wo. hgt.
