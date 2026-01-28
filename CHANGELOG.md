@@ -1,5 +1,6 @@
 # 1.2
 
+- Added the option to import hdf5 files
 - Feature: Add the option to show specific markerIDs
 - Not exporting colorpoint for an invalid color anymore due to internal change of trackpoints
 - Dropping down elements now also works over the view area
