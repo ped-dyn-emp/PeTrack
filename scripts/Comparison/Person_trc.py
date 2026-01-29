@@ -3,7 +3,7 @@ from typing import List
 
 
 @dataclass
-class Point():
+class Point:
     x: float
     y: float
     stereo_x: float
@@ -16,7 +16,18 @@ class Point():
     markerID: int
 
     def __hash__(self) -> int:
-        return hash((self.x,self.y,self.markerID,self.stereo_x,self.stereo_y,self.color,self.qual))
+        return hash(
+            (
+                self.x,
+                self.y,
+                self.markerID,
+                self.stereo_x,
+                self.stereo_y,
+                self.color,
+                self.qual,
+            )
+        )
+
 
 # TODO Hash Funktion vereinfachen; performance
 class Person:
@@ -25,7 +36,7 @@ class Person:
         self.points: List[Point] = []
 
         # Version 4, sonst nichts unterstützt
-        person_values = person_str.split(' ')
+        person_values = person_str.split(" ")
         self.nr = int(person_values[0])
         self.height = float(person_values[1])
         self.first_frame = int(person_values[2])
@@ -40,7 +51,7 @@ class Person:
 
         points_str = points_str.split("\n")
         for line in points_str:
-            point_values = line.split(' ')
+            point_values = line.split(" ")
             x = float(point_values[0])
             y = float(point_values[1])
             stereo_x = float(point_values[2])
@@ -51,10 +62,34 @@ class Person:
             col_y = float(point_values[7])
             color = point_values[8] + " " + point_values[9] + " " + point_values[10]
             markerID = int(point_values[11])
-            self.points.append(Point(x,y,stereo_x,stereo_y,stereo_z,qual,col_x,col_y,color,markerID))
+            self.points.append(
+                Point(
+                    x,
+                    y,
+                    stereo_x,
+                    stereo_y,
+                    stereo_z,
+                    qual,
+                    col_x,
+                    col_y,
+                    color,
+                    markerID,
+                )
+            )
 
     def __hash__(self) -> int:
-        return hash((self.id, self.nr, self.height, self.first_frame, self.last_frame, self.colCount, self.color, self.numTrackedPoints))
+        return hash(
+            (
+                self.id,
+                self.nr,
+                self.height,
+                self.first_frame,
+                self.last_frame,
+                self.colCount,
+                self.color,
+                self.numTrackedPoints,
+            )
+        )
 
     def __str__(self) -> str:
         return "ID: " + str(self.id)
