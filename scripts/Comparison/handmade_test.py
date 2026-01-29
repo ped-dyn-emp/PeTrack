@@ -1,22 +1,21 @@
 import argparse
-import queue
+import re
 from copy import deepcopy
 from typing import List, Tuple
 from statistics import mean, median
 from math import sqrt
 from Person_trc import Person, Point
+import matplotlib.pyplot as plt
+from scipy.optimize import linear_sum_assignment
+import numpy as np
 
 args = None
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Compare two trc files and generate an error report."
     )
-    parser.add_argument(
-        "truth_filename", type=str, action="store", help="The path to the truth trc"
-    )
-    parser.add_argument(
-        "test_filename", type=str, action="store", help="The path to the test trc"
-    )
+    parser.add_argument("truth_filename", type=str, help="The path to the truth trc")
+    parser.add_argument("test_filename", type=str, help="The path to the test trc")
     parser.add_argument(
         "--epsilon",
         type=float,
@@ -47,40 +46,120 @@ if __name__ == "__main__":
         default=False,
         help="Check if every trajectory has a counterpart in the other file",
     )
+    parser.add_argument(
+        "--plot",
+        action="store_true",
+        default=False,
+        help="Show trajectory plot of truth vs test data",
+    )
     args = parser.parse_args()
 
-EPSILON = (
-    1 if args is None else args.eps
-)  # in pixels # default value 1, can be changed in CLI
+EPSILON = args.eps if args is not None else 1
 error_message = []
-MAX_DIFF = 20  # in pixels
-MIN_DIFF_START = 0.01  # Should this be a CLI parameter as well?
-DIFF_STEP = 0.01  # Should this be a CLI parameter as well?
+MAX_DIFF = 20
+MIN_DIFF_START = 0.01
+DIFF_STEP = 0.01
+
+
+# Version 1-3: 9 fields (no markerID)
+# Version 4+:  10 fields (with markerID)
+HEADER_RE = re.compile(
+    r"^"
+    r"(\d+)"  # Person number (nr)
+    r"\s+"
+    r"(-?\d+(?:\.\d+)?)"  # Height (can be negative)
+    r"\s+"
+    r"(\d+)"  # First frame
+    r"\s+"
+    r"(\d+)"  # Last frame
+    r"\s+"
+    r"(\d+)"  # Color count (colCount)
+    r"\s+"
+    r"(-?\d+)"  # Color R
+    r"\s+"
+    r"(-?\d+)"  # Color G
+    r"\s+"
+    r"(-?\d+)"  # Color B
+    r"(?:\s+(-?\d+))?"  # Marker ID (optional, version 4+)
+    r"\s+"
+    r"(\d+)"  # Size (number of trackpoints)
+    r"$",
+    re.MULTILINE,
+)
+
+# Version 1:   8 fields  (x y qual colorX colorY r g b)
+# Version 2:   11 fields (+ stereoX stereoY stereoZ)
+# Version 3+:  12 fields (+ markerID)
+POINT_RE = re.compile(
+    r"^"
+    r"(-?\d+(?:\.\d+)?)"  # x coordinate
+    r"\s+"
+    r"(-?\d+(?:\.\d+)?)"  # y coordinate
+    r"\s+"
+    r"(?:(-?\d+(?:\.\d+)?)\s+)?"  # stereoPoint.x (optional, v2+)
+    r"(?:(-?\d+(?:\.\d+)?)\s+)?"  # stereoPoint.y (optional, v2+)
+    r"(?:(-?\d+(?:\.\d+)?)\s+)?"  # stereoPoint.z (optional, v2+)
+    r"(-?\d+(?:\.\d+)?)"  # Quality value
+    r"\s+"
+    r"(-?\d+(?:\.\d+)?)"  # colorPoint.x
+    r"\s+"
+    r"(-?\d+(?:\.\d+)?)"  # colorPoint.y
+    r"\s+"
+    r"(-?\d+)"  # Color R
+    r"\s+"
+    r"(-?\d+)"  # Color G
+    r"\s+"
+    r"(-?\d+)"  # Color B
+    r"(?:\s+(-?\d+))?"  # Marker ID (optional, v3+)
+    r"$",
+    re.MULTILINE,
+)
 
 
 def parse_trc(filename: str) -> List[Person]:
-    # NOTE assumes Version 4 of trc; Should be fractored into a factory outside of constructor
-    content: List[Person] = []
+    persons = []
     id = 0
 
-    with open(filename) as file:
-        version = int(file.readline()[-2])  # Read header
-        file.readline()  # Read header
-        file = file.read()
-        file = file.split("\n\n")
-        file = file[:-1]  # empty line at the end of file
+    with open(filename) as f:
+        version = int(f.readline()[-2])
+        f.readline()
+        lines = [l.rstrip() for l in f.readlines()]
 
-    it = iter(file)
-    for person_str in it:
-        points_str = next(it)
-        person = Person(person_str, points_str, id, version)
+    cleaned = []
+    for line in lines:
+        # skip garbage lines like "2"
+        if line.strip() == "":
+            cleaned.append("")
+            continue
+
+        if HEADER_RE.match(line):
+            cleaned.append(line)
+            continue
+
+        if POINT_RE.match(line):
+            cleaned.append(line)
+            continue
+
+        cleaned.append("")
+
+    blocks = "\n".join(cleaned).split("\n\n")
+
+    for i in range(0, len(blocks) - 1, 2):
+        header = blocks[i].strip()
+        points = blocks[i + 1].strip()
+
+        if header == "" or points == "":
+            continue
+
+        person = Person(header, points, id, version)
         id += 1
         if len(person.points) != person.numTrackedPoints:
             print(f"Error when parsing trc-file {filename}.")
             exit(1)
-        content.append(person)
 
-    return content
+        persons.append(person)
+
+    return persons
 
 
 def calc_diff(test: List[Point], truth: List[Point]) -> float:
@@ -96,10 +175,9 @@ def calc_diff(test: List[Point], truth: List[Point]) -> float:
     :return: sum of point distances in common frames
     :rtype: float
     """
-    # Assumes the persons already are cropped to have the same starting frame
-    # Zip then crops to the same ending frame
+
     diff = 0
-    num_common_points = len(test) if len(test) < len(truth) else len(truth)
+    num_common_points = min(len(test), len(truth))
     for test_point, truth_point in zip(test, truth):
         diff += sqrt(
             (test_point.x - truth_point.x) ** 2 + (test_point.y - truth_point.y) ** 2
@@ -122,8 +200,13 @@ class HandmadeComparison:
         self.check_counterpart = check_counterpart
         self.truth_filename = truth_filename
         self.test_filename = test_filename
-
+        self.truth_point_count = 0
         self.output: List[str] = []
+        self.indices: List[Tuple[int, int]] = (
+            []
+        )  # which truth person index corresponds to which test person index
+        self.truth_persons: List[Person] = []
+        self.test_persons: List[Person] = []
 
     def compare_person(self, test: Person, truth: Person):
         """Crops persons to common frames and calcs the diff
@@ -138,7 +221,7 @@ class HandmadeComparison:
         :param truth: Person from truth trc
         :type truth: Person
         """
-        first_frame: int
+
         if test.first_frame > truth.first_frame:
             first_frame = test.first_frame
             frame_diff = test.first_frame - truth.first_frame
@@ -168,137 +251,172 @@ class HandmadeComparison:
                 (test_point.x - truth_point.x) ** 2
                 + (test_point.y - truth_point.y) ** 2
             )
-            self.point_diffs.append(diff)  # save for overall statistics
+            self.point_diffs.append(diff)
             if self.warn_pointwise and diff > EPSILON:
                 self.output.append(
-                    f"Diff of {diff} between test({test.id+1}) and truth({truth.id+1}) in frame {first_frame+i}"
+                    f"Diff of {diff}px between test({test.id+1}) and truth({truth.id+1}) in frame {first_frame+i}"
                 )
 
-    def compare_files(
-        self, test: List[Person], truth: List[Person], indices: List[Tuple[int, int]]
-    ):
-        for truth_id, test_id in indices:
-            self.compare_person(test[test_id], truth[truth_id])
+    def compare_files(self):
+        for truth_id, test_id in self.indices:
+            self.compare_person(
+                self.test_persons[test_id], self.truth_persons[truth_id]
+            )
 
-    # NOTE: Maybe use an established algorithm for bipartite graph matching instead
-    def associate_trajectories(
-        self, test: List[Person], truth: List[Person]
-    ) -> List[Tuple[int, int]]:
-        """Finds pairs of the 'same' trajectories in both files
+    def associate_trajectories(self):
+        """Finds the 'best' (continous) pairs of the 'same' trajectories in both files using bipartite graph matching (see linear_sum_assignment from scipy)"""
+        n_truth = len(self.truth_persons)
+        n_test = len(self.truth_persons)
 
-        This function iterated over all trajectories in truth as long as there are trajectories left
-        in either truth or test and and tries to find the associated trajectory. For this it compares
-        all each truth_trajectory with all left test trajectories, when trimmed to a common start and end
-        frame. If the best match has an error lower than the current threshold, the two trajectories
-        are a match and the trajectories are not evaluated anymore. If the best match has still a
-        difference higher than the current theshold, it is cached.
+        cost = np.full((n_truth, n_test), 1e6, dtype=float)
 
-        Each time every queued truth_trajectory has been tested, the threshold for the maximum allowed
-        difference is increased. This ensures that a test trajectory is matches with the best fitting
-        truth trajectory, not with the first fitting one.
+        for i, t_person in enumerate(self.truth_persons):
+            for j, s_person in enumerate(self.test_persons):
 
-        :param test: List of Persons in the test trc (is changed; give a deep copy)
-        :type test: List[Person]
-        :param truth: List of Persons in the truth trc
-        :type truth: List[Person]
-        :return: List of tuples with the indices of the pairs in their respective list (truth_idx, test_idx)
-        :rtype: List[Tuple[int,int]]
-        """
+                if s_person.last_frame < t_person.first_frame:
+                    continue
+                if s_person.first_frame > t_person.last_frame:
+                    continue
+
+                if s_person.first_frame > t_person.first_frame:
+                    frame_diff = s_person.first_frame - t_person.first_frame
+                    diff = calc_diff(s_person.points, t_person.points[frame_diff:])
+                elif s_person.first_frame < t_person.first_frame:
+                    frame_diff = t_person.first_frame - s_person.first_frame
+                    diff = calc_diff(s_person.points[frame_diff:], t_person.points)
+                else:
+                    diff = calc_diff(s_person.points, t_person.points)
+
+                cost[i, j] = diff
+
+        row_idx, col_idx = linear_sum_assignment(cost)
+
         result = []
-        truth_queue: queue.SimpleQueue[Person] = queue.SimpleQueue()
-        for person in truth:
-            truth_queue.put(person)
+        for r, c in zip(row_idx, col_idx):
+            if cost[r, c] < 1e6:
+                result.append((self.truth_persons[r].id, self.test_persons[c].id))
 
-        min_diff = MIN_DIFF_START
-        cache = {}
-        queue_size = truth_queue.qsize()
-        i = 0
-        while (not truth_queue.empty()) and (not (len(test) == 0)):
-            # One iteration through the queue/truth candidates?
-            i += 1
-            if i > queue_size:
-                queue_size = truth_queue.qsize()
-                min_diff += DIFF_STEP
-                i = 1
-
-            truth_person = truth_queue.get()
-            best_fit_diff = MAX_DIFF
-            done = False
-
-            # First test cached match; most of the time this already is the real one
-            old_match = cache.get(truth_person)
-            if old_match != None:
-                if old_match[1] < min_diff:
-                    if old_match[0] in test:
-                        result.append((truth_person.id, old_match[0].id))
-                        test.remove(old_match[0])
-                        done = True
-                        continue
-                    elif (
-                        old_match[1] == -1
-                    ):  # Was this trajctory already closest to a deleted/already matched person last time?
-                        continue
-                    else:
-                        cache.update({truth_person: (None, -1)})
-                else:
-                    truth_queue.put(truth_person)
-                    continue
-
-            for test_person in test:
-                # Calculate difference with common start frame
-                # Zip in compare_persons ends at common end frame
-                if (
-                    test_person.last_frame < truth_person.first_frame
-                    or test_person.first_frame > truth_person.last_frame
-                ):
-                    continue
-                if test_person.first_frame > truth_person.first_frame:
-                    frame_diff = test_person.first_frame - truth_person.first_frame
-                    diff = calc_diff(
-                        test_person.points, truth_person.points[frame_diff:]
-                    )
-                elif test_person.first_frame < truth_person.first_frame:
-                    frame_diff = truth_person.first_frame - test_person.first_frame
-                    diff = calc_diff(
-                        test_person.points[frame_diff:], truth_person.points
-                    )
-                else:
-                    diff = calc_diff(test_person.points, truth_person.points)
-
-                if diff < min_diff:
-                    result.append((truth_person.id, test_person.id))
-                    test.remove(test_person)
-                    done = True
-                    break
-                elif diff < best_fit_diff:
-                    best_fit_diff = diff
-                    cache.update({truth_person: (test_person, diff)})
-            if not done:
-                if best_fit_diff >= MAX_DIFF:
-                    self.output.append(
-                        f"The person {truth_person.id + 1} in the truth file has no counterpart in test!"
-                    )
-                    continue
-                truth_queue.put(truth_person)
-
-            # TODO mitschreiben fuer die grobe Statistik
         if self.check_counterpart:
-            for person in test:
-                self.output.append(
-                    f"The person {person.id +1} in the test file has no counterpart in truth!"
-                )
-            while not truth_queue.empty():
-                self.output.append(
-                    f"The person {truth_queue.get().id +1} in the truth file has no counterpart in test!"
-                )
+            matched_truth = {a for a, _ in result}
+            matched_test = {b for _, b in result}
+
+            for i, p in enumerate(self.truth_persons):
+                if p.id not in matched_truth:
+                    self.output.append(
+                        f"The person {p.id + 1} in the truth file has no counterpart in test!"
+                    )
+
+            for j, p in enumerate(self.test_persons):
+                if p.id not in matched_test:
+                    self.output.append(
+                        f"The person {p.id + 1} in the test file has no counterpart in truth!"
+                    )
+
         return result
 
+    def visualize(self):
+
+        fig, ax = plt.subplots()
+        plt.title("Press → or ← to navigate between persons, 'd' for drift view")
+        plt.rcParams.update(
+            {"font.size": 16, "savefig.bbox": "tight", "savefig.pad_inches": 0.05}
+        )
+
+        idx = 0
+        drift_mode = False
+
+        def compute_drift(truth_person, test_person):
+            gt_start = truth_person.first_frame
+            gt_end = truth_person.last_frame
+
+            test_start = test_person.first_frame
+            test_end = test_person.last_frame
+            frames = list(range(gt_start, gt_end + 1))
+            errors = []
+            for f in frames:
+                if test_start <= f <= test_end:
+                    tr = truth_person.points[f - gt_start]
+                    tp = test_person.points[f - test_start]
+                    err = sqrt((tp.x - tr.x) ** 2 + (tp.y - tr.y) ** 2)
+                    errors.append(err)
+                else:
+                    errors.append(None)
+            return frames, errors
+
+        def draw_person(i):
+            ax.clear()
+            truth_person = self.truth_persons[self.indices[i][0]]
+            test_person = self.test_persons[self.indices[i][1]]
+
+            if not drift_mode:
+                # Trajectory view
+                truth_x = [p.x for p in truth_person.points]
+                truth_y = [p.y for p in truth_person.points]
+                test_x = [p.x for p in test_person.points]
+                test_y = [p.y for p in test_person.points]
+
+                ax.plot(truth_x, truth_y, "g-", label="Truth")
+                ax.plot(test_x, test_y, "r--", label="Test")
+                ax.legend()
+                ax.set_xlabel("X")
+                ax.set_ylabel("Y")
+                ax.set_title(f"Person {i+1}/{len(self.indices)} — Trajectory View")
+
+                x_min, x_max = min(truth_x), max(truth_x)
+                y_min, y_max = min(truth_y), max(truth_y)
+
+                x_margin = (x_max - x_min) * 0.05
+                y_margin = 500  # account for label
+
+                ax.set_xlim(x_min - x_margin, x_max + x_margin)
+                ax.set_ylim(y_min - y_margin, y_max + y_margin)
+                ax.set_aspect("equal", adjustable="box")
+            else:
+                # Drift (error over time)
+                frames, errors = compute_drift(truth_person, test_person)
+                ax.set_ylim(-20, 300)
+
+                person_first_frame = truth_person.first_frame
+                person_last_frame = truth_person.last_frame
+                ax.set_xlim(person_first_frame, person_last_frame)
+                ax.set_aspect("auto")
+                ax.autoscale(False)
+                ax.plot(frames, errors, "b-", linewidth=1.5)
+                ax.set_xlabel("Frame")
+                ax.set_ylabel("Local Error (px)")
+                ax.set_title(f"Person {i+1}/{len(self.indices)} — Drift")
+
+            ax.grid(True)
+            fig.canvas.draw_idle()
+
+        def on_key(event):
+            nonlocal idx, drift_mode
+            if event.key == "right":
+                idx = (idx + 1) % len(self.indices)
+                draw_person(idx)
+            elif event.key == "left":
+                idx = (idx - 1) % len(self.indices)
+                draw_person(idx)
+            elif event.key == "d":
+                drift_mode = not drift_mode
+                draw_person(idx)
+            elif event.key == "s":
+                fig.savefig("output.png")
+
+        fig.canvas.mpl_connect("key_press_event", on_key)
+        draw_person(idx)
+        plt.show()
+
     def run(self):
-        truth = parse_trc(self.truth_filename)
-        test = parse_trc(self.test_filename)
-        indices = self.associate_trajectories(deepcopy(test), truth)
-        indices = sorted(indices, key=lambda x: x[0])
-        self.compare_files(test, truth, indices)
+        self.output.clear()
+        self.truth_persons = parse_trc(self.truth_filename)
+        self.truth_point_count = sum(
+            len(person.points) for person in self.truth_persons
+        )
+        self.test_persons = parse_trc(self.test_filename)
+        indices = self.associate_trajectories()
+        self.indices = sorted(indices, key=lambda x: x[0])
+        self.compare_files()
 
         self.output.append(
             "\nThe mean difference in point coordinates is: "
@@ -308,13 +426,24 @@ class HandmadeComparison:
             "The median difference in point coordinates is: "
             + str(median(self.point_diffs))
         )
-        point_diffs = list(filter(lambda x: x != 0, self.point_diffs))
+        self.output.append(
+            "The max difference in point coordinates is: " + str(max(self.point_diffs))
+        )
+        self.output.append(
+            f"Total matched points: {len(self.point_diffs)} / {self.truth_point_count}"
+        )
+
+        self.output.append(
+            f"num_persons_test / num_persons_truth: {len(self.test_persons)} / {len(self.truth_persons)}"
+        )
+
+        point_diffs = [x for x in self.point_diffs if x != 0]
         if len(point_diffs) > 0:
             self.output.append(
-                "The mean difference with 0s filtered out is: " + str(mean(point_diffs))
+                "The mean difference (nonzero only): " + str(mean(point_diffs))
             )
             self.output.append(
-                "The median with 0s filtered out is: " + str(median(point_diffs))
+                "The median difference (nonzero only): " + str(median(point_diffs))
             )
 
         return self.output
@@ -330,3 +459,7 @@ if __name__ == "__main__":
     )
     out = comp.run()
     print("\n".join(out))
+
+    # Visualization (if requested)
+    if args.plot:
+        comp.visualize()

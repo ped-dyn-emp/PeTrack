@@ -446,7 +446,7 @@ class ComparisonVideoPlayer:
             r"The person (\d+) in the ([^\s]+) file has no counterpart in \w+!"
         )
         point_difference = re.compile(
-            r"Diff of \d*\.\d* between test\((\d+)\) and truth\((\d+)\) in frame \d+"
+            r"Diff of \d*\.\d*px between test\((\d+)\) and truth\((\d+)\) in frame \d+"
         )
         # Pairing is characterized by truth-countperpart's index
         displayed_pairing: Set[int] = set()
