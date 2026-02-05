@@ -266,7 +266,7 @@ class HandmadeComparison:
     def associate_trajectories(self):
         """Finds the 'best' (continous) pairs of the 'same' trajectories in both files using bipartite graph matching (see linear_sum_assignment from scipy)"""
         n_truth = len(self.truth_persons)
-        n_test = len(self.truth_persons)
+        n_test = len(self.test_persons)
 
         cost = np.full((n_truth, n_test), 1e6, dtype=float)
 
