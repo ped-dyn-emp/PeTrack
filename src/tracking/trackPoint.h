@@ -151,9 +151,10 @@ public:
     TrackPoint  operator-(const Vec2F &vec) const;
     TrackPoint  operator-(const TrackPoint &other) const;
 
-    static constexpr int         MIN_DETECTION_QUAL  = 80;
-    static constexpr int         BEST_DETECTION_QUAL = 100;
-    static constexpr std::size_t SENTINEL            = std::numeric_limits<std::size_t>::max();
+    static constexpr int         MIN_DETECTION_QUAL   = 80;
+    static constexpr int         BEST_DETECTION_QUAL  = 100;
+    static constexpr int         COLOR_DETECTION_QUAL = 90;
+    static constexpr std::size_t SENTINEL             = std::numeric_limits<std::size_t>::max();
     [[nodiscard]] bool           isDetection() const;
 
 
