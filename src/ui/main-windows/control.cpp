@@ -46,6 +46,7 @@
 #include "trackerItem.h"
 #include "ui_control.h"
 #include "view.h"
+#include "wheelIgnoreFilter.h"
 #include "worldImageCorrespondence.h"
 
 #include <QDomElement>
@@ -236,6 +237,8 @@ Control::Control(
     mUi->recoMethod->addItem(
         QString::fromStdString(reco::getRecoMethodName(reco::RecognitionMethod::MachineLearning)),
         QVariant::fromValue(reco::RecognitionMethod::MachineLearning));
+
+    mUi->recoMethod->installEventFilter(new WheelIgnoreFilter(mUi->recoMethod));
 
     connect(&recognizer, &reco::Recognizer::recoMethodChanged, this, &Control::onRecoMethodChanged);
     connect(this, &Control::userChangedRecoMethod, &recognizer, &reco::Recognizer::userChangedRecoMethod);
