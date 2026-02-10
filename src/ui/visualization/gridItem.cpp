@@ -20,7 +20,7 @@
 
 #include "alignmentGridBox.h"
 #include "coordinateSystemBox.h"
-#include "logger.h"
+#include "penUtils.h"
 #include "petrack.h"
 #include "view.h"
 
@@ -174,7 +174,7 @@ void GridItem::draw2DGrid(QPainter *painter, const Grid2D &params, int imageHeig
         matrixPaint.rotate(angle);
         painter->setWorldTransform(matrixPaint,
                                    true); // true means relative not absolute transform
-        painter->setPen(Qt::red);
+        painter->setPen(scaledPen(Qt::red));
 
         int maxExp = imageHeight > imageWidth ? imageHeight : imageWidth;
         for(int i = (int) -((maxExp + 100) / scale); i < 2 * (maxExp / scale); i++)
@@ -258,7 +258,7 @@ void GridItem::draw3DGrid(
             minY = y < minY ? y : minY;
         }
 
-        painter->setPen(Qt::red);
+        painter->setPen(scaledPen(Qt::red));
 
         const auto &swap       = mCoordSys->getSwap3D();
         const auto  coordTrans = mCoordSys->getCoordTrans3D();
@@ -367,22 +367,22 @@ void GridItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*optio
         ////////////////////////////////
         if(mCoordSys->getCalibExtrVanishPointsShow())
         {
-            painter->setPen(Qt::yellow);
+            painter->setPen(scaledPen(Qt::yellow));
             painter->drawLine(
                 QPointF(vanishPointY.x - 10, vanishPointY.y - 10), QPointF(vanishPointY.x + 10, vanishPointY.y + 10));
             painter->drawLine(
                 QPointF(vanishPointY.x - 10, vanishPointY.y + 10), QPointF(vanishPointY.x + 10, vanishPointY.y - 10));
-            painter->setPen(Qt::red);
+            painter->setPen(scaledPen(Qt::red));
             painter->drawPoint(vanishPointY.x, vanishPointY.y);
             painter->drawText(vanishPointY.x - 20, vanishPointY.y - 10, "Vanishing Point (y)");
 
-            painter->setPen(Qt::yellow);
+            painter->setPen(scaledPen(Qt::yellow));
             painter->drawLine(
                 QPointF(vanishPointX.x - 10, vanishPointX.y - 10), QPointF(vanishPointX.x + 10, vanishPointX.y + 10));
             painter->drawLine(
                 QPointF(vanishPointX.x - 10, vanishPointX.y + 10), QPointF(vanishPointX.x + 10, vanishPointX.y - 10));
 
-            painter->setPen(Qt::red);
+            painter->setPen(scaledPen(Qt::red));
             painter->drawPoint(vanishPointX.x, vanishPointX.y);
             painter->drawText(vanishPointX.x - 20, vanishPointX.y - 10, "Vanishing Point (x)");
         }

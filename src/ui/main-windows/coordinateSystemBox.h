@@ -47,6 +47,7 @@ struct CoordItemState
     cv::Point3f x3D;
     cv::Point3f y3D;
     cv::Point3f z3D;
+    int         lineWidth;
 };
 
 class CoordinateSystemBox : public QWidget, public WorldImageCorrespondence

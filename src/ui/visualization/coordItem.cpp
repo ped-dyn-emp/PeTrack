@@ -21,6 +21,7 @@
 #include "control.h"
 #include "coordinateSystemBox.h"
 #include "extrCalibration.h"
+#include "penUtils.h"
 #include "petrack.h"
 
 #include <QtWidgets>
@@ -167,9 +168,10 @@ void CoordItem::updateData()
     }
 
     setTransform(state.matrix);
-    x3D = state.x3D;
-    y3D = state.y3D;
-    z3D = state.z3D;
+    x3D                 = state.x3D;
+    y3D                 = state.y3D;
+    z3D                 = state.z3D;
+    mCoordLineThickness = state.lineWidth;
 
     if(!mMainWindow->isLoading())
     {
@@ -193,21 +195,22 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
 
             for(size_t i = 0; i < extCalib->get2DList().size(); i++)
             {
-                painter->setPen(Qt::red);
+                QPen textPen = scaledPen(Qt::red, mCoordLineThickness);
+                painter->setPen(textPen);
                 painter->setBrush(Qt::NoBrush);
                 // Original 2D-Pixel-Points
                 cv::Point2f p2 = extCalib->get2DList().at(i);
                 painter->drawEllipse(p2.x - 8, p2.y - 8, 16, 16);
 
                 // Show point number
-                painter->setPen(Qt::black);
+                painter->setPen(scaledPen(Qt::black, mCoordLineThickness));
                 painter->setBrush(Qt::black);
                 painter->drawText(QPointF(p2.x + 10, p2.y + font.pixelSize()), QObject::tr("%1").arg((i + 1)));
 
                 if(i < extCalib->get3DList().size())
                 {
                     // general configuration
-                    painter->setPen(Qt::blue);
+                    painter->setPen(scaledPen(Qt::blue, mCoordLineThickness));
                     painter->setBrush(Qt::blue);
                     // Projected 3D-Points
                     cv::Point3f p3d   = extCalib->get3DList().at(i);
@@ -233,7 +236,7 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
     if(mCoordSys->getCalibCoordShow())
     {
         // general configuration
-        painter->setPen(Qt::blue);
+        painter->setPen(scaledPen(Qt::blue, mCoordLineThickness));
         painter->setBrush(QBrush(Qt::blue, Qt::SolidPattern));
 
         if(mCoordSys->getCalibCoordDimension() == 1) // 2D
@@ -242,7 +245,7 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
             // 2D Coordinate-System //
             //////////////////////////
 
-            painter->setPen(QPen(QBrush(Qt::blue), 0));
+            painter->setPen(scaledPen(Qt::blue, mCoordLineThickness));
 
             // Koordinatenachsen
             painter->drawLine(QPoint{-10, 0}, QPoint{100, 0});
@@ -275,7 +278,6 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
         {
             double axeLen = mCoordSys->getCoord3DAxeLen();
 
-            qreal coordLineWidth = 2.0;
 
             if(extCalib->isSetExtrCalib())
             {
@@ -290,7 +292,7 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 // Drawing the X,Y,Z - Axis //
                 //////////////////////////////
 
-                painter->setPen(QPen(QBrush(Qt::blue), coordLineWidth));
+                painter->setPen(scaledPen(Qt::blue, mCoordLineThickness));
                 painter->drawLine(getImgPoint({0, 0, 0}), getImgPoint(x3D));
                 painter->drawLine(getImgPoint({0, 0, 0}), getImgPoint(y3D));
                 painter->drawLine(getImgPoint({0, 0, 0}), getImgPoint(z3D));
@@ -299,7 +301,7 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 // Drawing the X,Y,Z - Symbols //
                 /////////////////////////////////
 
-                painter->setPen(QPen(QBrush(Qt::black), coordLineWidth));
+                painter->setPen(scaledPen(Qt::black, mCoordLineThickness));
                 painter->setFont(QFont("Arial", 15));
 
                 const QPointF labelOffset{-5, 5};
@@ -315,7 +317,7 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 //////////////////////////////
 
                 int tickLength = AXIS_MARKERS_LENGTH;
-                painter->setPen(QPen(QBrush(Qt::blue), coordLineWidth));
+                painter->setPen(scaledPen(Qt::blue, mCoordLineThickness));
 
                 // Start bei 100cm bis Achsen-Laenge-Pfeilspitzenlaenge alle 100cm
                 for(int i = 100; i < axeLen - tickLength; i += 100)
@@ -352,7 +354,7 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
                 //////////////////////////////////////////////
 
                 constexpr int peakSize = AXIS_MARKERS_LENGTH;
-                painter->setPen(QPen(QBrush(Qt::blue), coordLineWidth));
+                painter->setPen(scaledPen(Qt::blue, mCoordLineThickness));
                 painter->setBrush(Qt::NoBrush); // don't fill polygons
 
                 ///////

@@ -5,6 +5,7 @@
 - Not exporting colorpoint for an invalid color anymore due to internal change of trackpoints
 - Dropping down elements now also works over the view area
 - More uniform button naming
+- Better scaling of lines (ROI, alginment grid etc.)
 - The marker box in recognition now no longer reacts to mouse wheel scrolling
 - Fix: roi not shown on startup
 - Fix: wrong margin for some UI boxes

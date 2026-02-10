@@ -15,6 +15,7 @@ target_sources(petrack_core PRIVATE
         polygonSelection.cpp
         polygonSelection.h
         colorList.h
+        penUtils.h
         wheelIgnoreFilter.cpp
         wheelIgnoreFilter.h
 )
