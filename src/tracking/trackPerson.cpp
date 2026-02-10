@@ -20,6 +20,8 @@
 
 #include "petrack.h"
 
+#include <opencv2/video/tracking.hpp>
+
 
 TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p) :
     mNr(nr),
@@ -29,13 +31,15 @@ TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p) :
     mFirstFrame(frame),
     mNewReco(true),
     mComment(),
-    mColorCount(1)
+    mColorCount(1),
+    mKalmanFilter(4, 2, 0)
 {
     if(auto color = p.getColorForHeightMap())
     {
         mColor = *color;
     }
     mData.append(p);
+    initKalmanFilter(p);
 }
 
 TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p, int markerID) :
@@ -46,13 +50,92 @@ TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p, int markerID) :
     mFirstFrame(frame),
     mNewReco(true),
     mComment(),
-    mColorCount(1)
+    mColorCount(1),
+    mKalmanFilter(4, 2, 0)
 {
     if(auto color = p.getColorForHeightMap())
     {
         mColor = *color;
     }
     mData.append(p);
+    initKalmanFilter(p);
+}
+
+
+void TrackPerson::initKalmanFilter(const TrackPoint &firstPoint)
+{
+    constexpr float dt      = 1.F; // frame difference
+    constexpr float sigmaA  = KalmanFilterParams::SIGMA_A;
+    constexpr float sigmaA2 = sigmaA * sigmaA;
+
+    mKalmanFilter.init(4, 2);
+    // Constant velocity model
+    // State: [x, y, vx, vy]^T
+    // Transition matrix for dt (x(t + 1) = x(t) + vx*dt, y(t + 1) = y(t) + vy*dt)
+
+    // clang-format off
+    mKalmanFilter.transitionMatrix =
+        (cv::Mat_<float>(4, 4) <<
+        1.F, 0.F, dt, 0.F,
+        0.F, 1.F, 0.F, dt,
+        0.F, 0.F, 1.F, 0.F,
+        0.F, 0.F, 0.F, 1.F
+    );
+
+    mKalmanFilter.measurementMatrix = (cv::Mat_<float>(2, 4) <<
+        1.F, 0.F, 0.F, 0.F,
+        0.F, 1.F, 0.F, 0.F
+    );
+    // clang-format on
+
+    // Q
+    // 1D block for dt:
+    float q11 = sigmaA2 * (dt * dt * dt * dt) / 4.F; // dt^4/4 * sigma^2
+    float q12 = sigmaA2 * (dt * dt * dt) / 2.F;      // dt^3/2 * sigma^2
+    float q22 = sigmaA2 * (dt * dt);                 // dt^2 * sigma^2
+
+    // clang-format off
+    mKalmanFilter.processNoiseCov =
+        (cv::Mat_<float>(4, 4) <<
+        q11, 0.F, q12, 0.F,
+        0.F, q11, 0.F, q12,
+        q12, 0.F, q22, 0.F,
+        0.F, q12, 0.F, q22
+    );
+    // clang-format on
+
+    // Measurement noise covariance R (initial)
+    mKalmanFilter.measurementNoiseCov = cv::Mat::zeros(2, 2, CV_32F);
+
+    // Posteriori covariance P_post
+    float pPos = KalmanFilterParams::INIT_POS_VAR;
+    float pVel = KalmanFilterParams::INIT_VEL_VAR;
+
+    // clang-format off
+    mKalmanFilter.errorCovPost =
+        (cv::Mat_<float>(4, 4) <<
+        pPos, 0.F, 0.F, 0.F,
+        0.F, pPos, 0.F, 0.F,
+        0.F, 0.F, pVel, 0.F,
+        0.F, 0.F, 0.F, pVel
+    );
+    // clang-format on
+
+    // Initialize state with measurement (px, py) and velocity
+    cv::Point2f pos         = firstPoint.pixelPoint().toPoint2f();
+    mKalmanFilter.statePost = (cv::Mat_<float>(4, 1) << pos.x, pos.y, 0.F, 0.F);
+
+    mKalmanInitialized = true;
+}
+
+void TrackPerson::initKalmanFilter(const TrackPoint &firstPoint, const TrackPoint &secondPoint)
+{
+    initKalmanFilter(firstPoint);
+    // Initialize state with measurement (px, py) and velocity
+    cv::Point2f pos         = secondPoint.pixelPoint().toPoint2f();
+    cv::Point2f vel         = secondPoint.pixelPoint().toPoint2f() - firstPoint.pixelPoint().toPoint2f();
+    mKalmanFilter.statePost = (cv::Mat_<float>(4, 1) << pos.x, pos.y, vel.x, vel.y);
+    mKalmanFilter.statePre  = mKalmanFilter.statePost;
 }
 
 /**
@@ -281,7 +364,7 @@ double TrackPerson::getNearestZ(int i, int *extrapolated) const
  * @param extrapolate extrapolate with huge differences
  * @return true if point was added
  */
-bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, bool extrapolate)
+bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, bool useKalmanFilter, bool extrapolate)
 {
     Vec2F      tmp; // ua. zur linearen Interpolation
     TrackPoint tp;  // default: 0 = ist schlechteste qualitaet
@@ -501,6 +584,14 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
                 }
             }
 
+            if(useKalmanFilter && mKalmanInitialized)
+            {
+                mKalmanFilter.measurementNoiseCov = cv::Mat::zeros(2, 2, CV_32F);
+
+                cv::Mat measurement = (cv::Mat_<float>(2, 1) << tp.x(), tp.y());
+                mKalmanFilter.correct(measurement);
+            }
+
             mData.replace(frame - mFirstFrame, tp);
 
             if(tp.qual() > TrackPoint::BEST_DETECTION_QUAL) // manual add // after inserting, because point ist const
@@ -515,6 +606,7 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
     }
     return true;
 }
+
 
 /**
  * Checks, if a TrackPoint for the frame exist
@@ -554,31 +646,6 @@ double TrackPerson::distanceToNextFrame(int frame) const
     }
 }
 
-/**
- * @brief TrackPerson::syncTrackPersonMarkerID Synchronize TrackPoint.mMarkerID with TrackPerson.mMarkerID
- *
- * 1. Function sets PersonMarkerID from TrackPointMarkerID if MarkerID == -1
- * 2. checks if not other ID was detected and triggers a warning otherwise
- *
- * @param markerID integer representing ArucoCodeMarker for currently handled TrackPoint
- */
-void TrackPerson::syncTrackPersonMarkerID(int markerID)
-{
-    int tpMarkerID = markerID; // MarkerID of currently handled trackpoint
-
-    if(tpMarkerID != -1) // CodeMarker was recognized
-    {
-        if(mMarkerID == -1) // first time a Person is found TrackPerson.mMarkerID is -1 by initialisation
-        {
-            setMarkerID(tpMarkerID); // set TrackPerson MarkerID equal to TrackPoint MarkerID
-        }
-        if(mMarkerID != tpMarkerID)
-        {
-            SPDLOG_ERROR(
-                "Two MarkerIDs were found for one trajectory. (trackpoint: {}, person: {})", tpMarkerID, mMarkerID);
-        }
-    }
-}
 
 /**
  * @brief Get the i-th TrackPoint of the TrackPerson
@@ -889,4 +956,31 @@ std::ostream &operator<<(std::ostream &s, const TrackPerson &tp)
         s << tp.at(i) << std::endl;
     }
     return s;
+}
+
+
+/**
+ * @brief TrackPerson::syncTrackPersonMarkerID Synchronize TrackPoint.mMarkerID with TrackPerson.mMarkerID
+ *
+ * 1. Function sets PersonMarkerID from TrackPointMarkerID if MarkerID == -1
+ * 2. checks if not other ID was detected and triggers a warning otherwise
+ *
+ * @param markerID integer representing ArucoCodeMarker for currently handled TrackPoint
+ */
+void TrackPerson::syncTrackPersonMarkerID(int markerID)
+{
+    int tpMarkerID = markerID; // MarkerID of currently handled trackpoint
+
+    if(tpMarkerID != -1) // CodeMarker was recognized
+    {
+        if(mMarkerID == -1) // first time a Person is found TrackPerson.mMarkerID is -1 by initialisation
+        {
+            setMarkerID(tpMarkerID); // set TrackPerson MarkerID equal to TrackPoint MarkerID
+        }
+        if(mMarkerID != tpMarkerID)
+        {
+            SPDLOG_ERROR(
+                "Two MarkerIDs were found for one trajectory. (trackpoint: {}, person: {})", tpMarkerID, mMarkerID);
+        }
+    }
 }

@@ -1684,6 +1684,19 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_5">
              <item>
+              <widget class="QCheckBox" name="trackUseKalman">
+               <property name="toolTip">
+                <string>Use kalman filtering for (in most cases) more stable and accurate tracking.</string>
+               </property>
+               <property name="text">
+                <string>use kalman filter</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QCheckBox" name="trackExtrapolation">
                <property name="maximumSize">
                 <size>
@@ -4324,6 +4337,7 @@
   <tabstop>trackActive</tabstop>
   <tabstop>trackRepeat</tabstop>
   <tabstop>trackRepeatQual</tabstop>
+  <tabstop>trackUseKalman</tabstop>
   <tabstop>trackExtrapolation</tabstop>
   <tabstop>trackMerge</tabstop>
   <tabstop>trackOnlySelected</tabstop>

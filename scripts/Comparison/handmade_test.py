@@ -1,6 +1,5 @@
 import argparse
 import re
-from copy import deepcopy
 from typing import List, Tuple
 from statistics import mean, median
 from math import sqrt

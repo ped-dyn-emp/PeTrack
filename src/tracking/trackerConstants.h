@@ -33,6 +33,8 @@ inline constexpr int MAX_STEP_TRACK = 5;
 // um am ende des tracking nicht am bildrand herumzukrakseln!
 inline constexpr float MAX_TRACK_ERROR = 200.F;
 
+inline constexpr float MAX_BACKTRACK_DIST = 20.f;
+
 // minimale Personengroesse zur Identifizierung, dass Hoehe nicht gesetz, war -1, was aber an Treppen schlecht war
 inline constexpr double MIN_HEIGHT = -100'000.;
 

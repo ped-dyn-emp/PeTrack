@@ -23,6 +23,9 @@ when running the video backwards, after running it forwards), tracking is only
 repeated if this is checked and the quality is below the threshold. Otherwise,
 the existing point is not overwritten.
 
+use kalman filter
+: Use kalman filtering for (in most cases) more stable and accurate tracking.
+
 extrapolation for big diff.
 : If there is a huge difference in speed from one
 frame to another, discard the value and instead extrapolate. Note that

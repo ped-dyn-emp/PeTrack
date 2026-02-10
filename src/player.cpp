@@ -284,14 +284,25 @@ bool Player::backward()
  */
 void Player::play(PlayerState state)
 {
-    if(mState == PlayerState::PAUSE)
+    const bool wasPaused          = (mState == PlayerState::PAUSE);
+    const bool validPrevDirection = (mPrevDirection != PlayerState::PAUSE);
+    const bool directionChange    = (state != mPrevDirection);
+
+    // detect direction change
+    if(state != PlayerState::PAUSE && validPrevDirection && directionChange)
     {
-        mState = state;
-        playVideo();
+        mMainWindow->getPersonStorage().resetKalmanFilters();
     }
-    else
+    mState = state;
+
+    if(state != PlayerState::PAUSE)
     {
-        mState = state;
+        mPrevDirection = state;
+    }
+
+    if(wasPaused)
+    {
+        playVideo();
     }
 }
 
@@ -438,6 +449,7 @@ bool Player::skipToFrame(int f, bool pauseBefore) // [0..mAnimation->getNumFrame
     {
         pause();
     }
+    mMainWindow->getPersonStorage().resetKalmanFilters();
     mImg = mAnimation->getFrameAtIndex(f);
     return updateImage();
 }

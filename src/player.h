@@ -94,7 +94,8 @@ private:
 
     Animation     *mAnimation;
     QTemporaryFile mTmpFile;
-    PlayerState    mState = PlayerState::PAUSE;
+    PlayerState    mState         = PlayerState::PAUSE;
+    PlayerState    mPrevDirection = PlayerState::PAUSE;
     bool           mPlayerSpeedLimited;
     bool           mPlayerSpeedFixed   = false;
     bool           mLooping            = false;

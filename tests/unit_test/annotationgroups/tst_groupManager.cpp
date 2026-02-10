@@ -219,10 +219,10 @@ TEST_CASE("group trajectory assignment operations", "[grouping]")
     auto &personStorage = petrack.getPersonStorage();
     // create sample trajectories
     TrackPerson tp1(1, 0, TrackPoint{{0., 0.}});
-    REQUIRE(tp1.insertAtFrame(10, TrackPoint{{10., 10.}}, 0, true));
+    REQUIRE(tp1.insertAtFrame(10, TrackPoint{{10., 10.}}, 0, true, true));
 
     TrackPerson tp2(2, 0, TrackPoint{{10, 10}});
-    REQUIRE(tp2.insertAtFrame(10, TrackPoint{{15, 15}}, 2, true));
+    REQUIRE(tp2.insertAtFrame(10, TrackPoint{{15, 15}}, 2, true, true));
 
     personStorage.addPerson(tp1);
     personStorage.addPerson(tp2);
@@ -303,7 +303,7 @@ TEST_CASE("deleting group cleans up assignments", "[grouping]")
     manager.addGroupToTopLevelGroup(groupOne, 0);
 
     TrackPerson tp1(1, 0, TrackPoint{{0, 0}});
-    tp1.insertAtFrame(10, TrackPoint{{10, 10}}, 1, true);
+    tp1.insertAtFrame(10, TrackPoint{{10, 10}}, 1, true, true);
     petrack.getPersonStorage().addPerson(tp1);
 
     manager.addTrajectoryToGroup(0, groupOneId, 0);
