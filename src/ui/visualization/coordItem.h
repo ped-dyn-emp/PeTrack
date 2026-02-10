@@ -41,6 +41,7 @@ private:
     float                mouse_x, mouse_y;
     int                  coordTrans_x, coordTrans_y;
     int                  coordDimension;
+    int                  mCoordLineThickness = 1;
 
 public:
     inline void setCoordDimension(int dim) { this->coordDimension = dim; }

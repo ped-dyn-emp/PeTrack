@@ -91,6 +91,7 @@ CoordinateSystemBox::CoordinateSystemBox(
     connect(mUi->coordTab, &QTabWidget::currentChanged, this, &CoordinateSystemBox::onCoordTabCurrentChanged);
     connect(mUi->coordShow, &QCheckBox::checkStateChanged, this, &CoordinateSystemBox::onCoordShowStateChanged);
     connect(mUi->coordFix, &QCheckBox::checkStateChanged, this, &CoordinateSystemBox::onCoordFixStateChanged);
+    connect(mUi->coordSystemThicknessSlider, &PSlider::valueChanged, this, &CoordinateSystemBox::updateCoordItem);
 
     // 2D coordinates
     connect(mUi->coordRotate, &PSlider::valueChanged, this, &CoordinateSystemBox::onCoordRotateValueChanged);
@@ -459,6 +460,7 @@ bool CoordinateSystemBox::getXml(const QDomElement &subSubElem)
         loadBoolValue(subSubElem, "COORD3D_SWAP_X", mUi->coord3DSwapX, false);
         loadBoolValue(subSubElem, "COORD3D_SWAP_Y", mUi->coord3DSwapY, false);
         loadBoolValue(subSubElem, "COORD3D_SWAP_Z", mUi->coord3DSwapZ, false);
+        loadIntValue(subSubElem, "COORD_LINE_THICKNESS", mUi->coordSystemThicknessSlider, 1);
 
         if(subSubElem.hasAttribute("IMMUTABLE_COORD_BOX"))
         {
@@ -500,6 +502,7 @@ void CoordinateSystemBox::setXml(QDomElement &subSubElem) const
     subSubElem.setAttribute("COORD3D_SWAP_X", mUi->coord3DSwapX->isChecked());
     subSubElem.setAttribute("COORD3D_SWAP_Y", mUi->coord3DSwapY->isChecked());
     subSubElem.setAttribute("COORD3D_SWAP_Z", mUi->coord3DSwapZ->isChecked());
+    subSubElem.setAttribute("COORD_LINE_THICKNESS", mUi->coordSystemThicknessSlider->value());
 
     if(this->parent())
     {
@@ -534,6 +537,7 @@ CoordItemState CoordinateSystemBox::getCoordItemState()
 {
     CoordItemState state;
     state.isMovable = !mUi->coordFix->isChecked();
+    state.lineWidth = mUi->coordSystemThicknessSlider->value();
 
 
     state.coordDimension = getCalibCoordDimension();

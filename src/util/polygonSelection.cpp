@@ -18,6 +18,8 @@
 
 #include "polygonSelection.h"
 
+#include "penUtils.h"
+
 #include <QObject>
 #include <QPainterPath>
 #include <QVector2D>
@@ -27,7 +29,7 @@ void PolygonSelection::paint(QPainter &painter)
 {
     QPen pen;
     pen.setColor(QColor(255, 0, 255));
-    painter.setPen(pen);
+    painter.setPen(scaledPen(pen));
     if(completed)
     {
         QBrush brush;
@@ -50,7 +52,7 @@ void PolygonSelection::paint(QPainter &painter)
         painter.drawEllipse(points.at(i + 1), 5, 5);
     }
     pen.setColor(QColor(0, 255, 0));
-    painter.setPen(pen);
+    painter.setPen(scaledPen(pen));
     painter.drawEllipse(points.front(), this->completionDist, this->completionDist);
 }
 

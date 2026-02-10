@@ -18,6 +18,7 @@
 
 #include "roiItem.h"
 
+#include "penUtils.h"
 #include "petrack.h"
 
 #include <QGraphicsSceneMouseEvent>
@@ -27,7 +28,7 @@ RoiItem::RoiItem(QWidget *wParent, const QColor &color) : QObject(wParent)
     mMainWindow = dynamic_cast<class Petrack *>(wParent);
     setRect(0, 0, 0, 0);
     QPen pen(color);
-    setPen(pen);
+    setPen(scaledPen(pen));
     setAcceptHoverEvents(!mIsFixed);
     setFlag(ItemIsMovable, !mIsFixed);
     hide(); // default in control
