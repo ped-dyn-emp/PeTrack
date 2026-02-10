@@ -20,7 +20,6 @@
 
 #include "animation.h"
 #include "control.h"
-#include "logger.h"
 #include "personStorage.h"
 #include "petrack.h"
 #include "roiItem.h"

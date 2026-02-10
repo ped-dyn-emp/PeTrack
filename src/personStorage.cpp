@@ -182,6 +182,20 @@ void PersonStorage::delPointAll(TrajectorySegment direction, int frame)
 
 
 /**
+ * @brief deletes the persons from index start to end
+ */
+void PersonStorage::deletePersonRange(int start, int end)
+{
+    onManualAction();
+
+    for(int pers = end; pers >= start; --pers) // iterate backwards because of index shifting
+    {
+        deletePerson(pers);
+    }
+}
+
+
+/**
  * @brief deletes points of a trajectrory, which are inside ROI
  *
  * 1 trajectory can end in 0, 1 or multiple trajectories!!!!!!!!
