@@ -48,6 +48,7 @@
 #include "gridItem.h"
 #include "imageItem.h"
 #include "importHelper.h"
+#include "integerRangeDialog.h"
 #include "intrinsicBox.h"
 #include "keybindingDialog.h"
 #include "logger.h"
@@ -2102,6 +2103,9 @@ void Petrack::createActions()
     mDelPartRoiAct = new QAction(tr("Delete part of trj. inside &ROI"), this);
     connect(mDelPartRoiAct, &QAction::triggered, this, &Petrack::deleteTrackPointInsideROI);
 
+    mDelPersonRangeAct = new QAction(tr("Delete person range"), this);
+    connect(mDelPersonRangeAct, &QAction::triggered, this, &Petrack::deletePersonRange);
+
     // -------------------------------------------------------------------------------------------------------
 
     mCommandAct = new QAction(tr("&Command line options"), this);
@@ -2154,6 +2158,7 @@ void Petrack::createMenus()
     mEditMenu->addAction(mDelFutureAct);
     mEditMenu->addAction(mDelAllRoiAct);
     mEditMenu->addAction(mDelPartRoiAct);
+    mEditMenu->addAction(mDelPersonRangeAct);
 
 
     mViewMenu = new QMenu(tr("&View"), this);
@@ -4496,6 +4501,25 @@ void Petrack::deleteTrackPointInsideROI()
     getPersonStorage().delPointInsideROI();
     updateControlWidget();
     mScene->update();
+}
+
+void Petrack::deletePersonRange()
+{
+    const int numPersons = static_cast<int>(mPersonStorage.nbPersons());
+    if(numPersons == 0)
+    {
+        PCritical(nullptr, "An error has occured!", "You need at least one person to delete a range of persons.");
+    }
+    else
+    {
+        IntegerRangeDialog dlg(1, numPersons, "select a range of persons (PeTrack ids) to be deleted");
+        if(dlg.exec() == QDialog::Accepted)
+        {
+            const int start = dlg.min();
+            const int end   = dlg.max();
+            mPersonStorage.deletePersonRange(start - 1, end - 1);
+        }
+    }
 }
 
 void Petrack::moveTrackPoint(QPointF pos)

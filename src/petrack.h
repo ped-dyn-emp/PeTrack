@@ -156,6 +156,7 @@ public slots:
     void deleteTrackPointAll(PersonStorage::TrajectorySegment direction);
     void deleteTrackPointROI();
     void deleteTrackPointInsideROI();
+    void deletePersonRange();
     void moveTrackPoint(QPointF pos);
     void selectPersonForMoveTrackPoint(QPointF pos);
     void releaseTrackPoint();
@@ -413,6 +414,7 @@ private:
     QAction      *mDelFutureAct;
     QAction      *mDelAllRoiAct;
     QAction      *mDelPartRoiAct;
+    QAction      *mDelPersonRangeAct;
     QAction      *mCommandAct;
     QAction      *mKeyAct;
     QAction      *mShowLogWindowAct;

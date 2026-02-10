@@ -53,6 +53,7 @@ public:
     bool delPointOf(int pers, TrajectorySegment direction, int frame);
     bool delPoint(const Vec2F &p, TrajectorySegment direction, int frame, const QSet<size_t> &onlyVisible);
     void delPointAll(TrajectorySegment direction, int frame);
+    void deletePersonRange(int start, int end);
     void delPointROI();
     void delPointInsideROI();
     bool editTrackPersonComment(const Vec2F &p, int frame, const QSet<size_t> &onlyVisible);

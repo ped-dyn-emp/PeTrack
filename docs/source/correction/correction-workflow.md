@@ -89,6 +89,9 @@ Delete trj. moving through ROI
 Delete part of trj. inside ROI
 : Deletes the part of a trajectory which is inside the recognition ROI. Accessible through the `Edit-menu`.
 
+Delete person range
+: Deletes the persons (and their trajectories) whose PeTrack IDs fall within the specified range. Accessible through the `Edit-menu`.
+
 <!-- already in User Interface
 ### Visualization options:
 - jump to frame of track point under curser

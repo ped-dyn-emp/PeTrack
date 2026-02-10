@@ -52,4 +52,6 @@ target_sources(petrack_core PRIVATE
         YOLOMarkerWidget.cpp
         YOLOMarkerWidget.h
         YOLOMarkerWidget.ui
+        integerRangeDialog.cpp
+        integerRangeDialog.h
 )
