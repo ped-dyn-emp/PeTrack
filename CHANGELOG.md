@@ -7,7 +7,9 @@
 - Dropping down elements now also works over the view area
 - More uniform button naming
 - Better scaling of lines (ROI, alginment grid etc.)
+- Accidental scrolling on image rotation slider without focus is not longer possible
 - The marker box in recognition now no longer reacts to mouse wheel scrolling
+  > > > > > > > master
 - Fix: roi not shown on startup
 - Fix: wrong margin for some UI boxes
 - Fix: code marker ID 0 was not displayed

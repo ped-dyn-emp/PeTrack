@@ -19,6 +19,7 @@
 #ifndef VIEW_H
 #define VIEW_H
 
+#include "pSlider.h"
 #include "personStorage.h"
 
 #include <QFrame>
@@ -112,8 +113,8 @@ private:
     Petrack      *mMainWindow;
     GraphicsView *mGraphicsView;
     QToolButton  *hideShowControlsButton;
-    QSlider      *mZoomSlider;
-    QSlider      *mRotateSlider;
+    PSlider      *mZoomSlider;
+    PSlider      *mRotateSlider;
 };
 
 #endif
