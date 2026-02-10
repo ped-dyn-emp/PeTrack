@@ -19,10 +19,6 @@
 #ifndef PSLIDER_H
 #define PSLIDER_H
 
-#include <QKeyEvent>
-#include <QMouseEvent>
-#include <QPoint>
-#include <QScrollEvent>
 #include <QSlider>
 #include <QTimer>
 
@@ -58,7 +54,7 @@ private slots:
 
 private:
     QTimer mThrottleTimer;
-    QPoint mLastMousePos;
+    int    mLastMouseVal;
 
     static constexpr int DEFAULT_THROTTLE_INTERVAL = 100;
 };

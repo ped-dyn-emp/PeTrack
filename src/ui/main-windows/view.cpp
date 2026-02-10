@@ -273,7 +273,7 @@ ViewWidget::ViewWidget(QWidget *parent) : QFrame(parent)
     rotateRightIcon->setAutoRepeatDelay(100); // damit kurzes drucken nicht sofort mehrmals anschlaegt
     rotateRightIcon->setIcon(QPixmap(":/rotright"));
     rotateRightIcon->setIconSize(iconSize);
-    mRotateSlider = new QSlider;
+    mRotateSlider = new PSlider;
     mRotateSlider->setMinimum(-180); //-360
     mRotateSlider->setMaximum(180);  // 360
     mRotateSlider->setValue(0);
@@ -297,7 +297,7 @@ ViewWidget::ViewWidget(QWidget *parent) : QFrame(parent)
     zoomOutIcon->setAutoRepeatDelay(100);
     zoomOutIcon->setIcon(QPixmap(":/zoomout"));
     zoomOutIcon->setIconSize(iconSize);
-    mZoomSlider = new QSlider;
+    mZoomSlider = new PSlider;
     mZoomSlider->setMinimum(0);
     mZoomSlider->setMaximum(500);
     mZoomSlider->setValue(250);
@@ -315,8 +315,8 @@ ViewWidget::ViewWidget(QWidget *parent) : QFrame(parent)
     topLayout->addLayout(sliderLayout, 0, 1);
     setLayout(topLayout);
 
-    connect(mZoomSlider, &QSlider::valueChanged, this, &ViewWidget::setupMatrix);
-    connect(mRotateSlider, &QSlider::valueChanged, this, &ViewWidget::setupMatrix);
+    connect(mZoomSlider, &PSlider::valueChanged, this, &ViewWidget::setupMatrix);
+    connect(mRotateSlider, &PSlider::valueChanged, this, &ViewWidget::setupMatrix);
     connect(hideShowControlsButton, &QToolButton::clicked, this, &ViewWidget::hideShowControls);
     connect(rotateLeftIcon, &QToolButton::clicked, this, &ViewWidget::rotateLeft);
     connect(rotateRightIcon, &QToolButton::clicked, this, &ViewWidget::rotateRight);

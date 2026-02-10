@@ -22,6 +22,7 @@
 
 PSlider::PSlider(QWidget *parent) : QSlider(parent)
 {
+    mThrottleTimer.setSingleShot(true);
     mThrottleTimer.setInterval(0);
     connect(&mThrottleTimer, &QTimer::timeout, this, &PSlider::onThrottleTimerTimeout);
 
@@ -98,8 +99,10 @@ void PSlider::mousePressEvent(QMouseEvent *event)
             int val = QStyle::sliderValueFromPosition(
                 minimum(),
                 maximum(),
-                orientation() == Qt::Horizontal ? event->pos().x() : event->pos().y(),
+                orientation() == Qt::Horizontal ? event->pos().x() : height() - event->pos().y(),
                 orientation() == Qt::Horizontal ? width() : height());
+
+            mLastMouseVal = val;
 
             // emit directly
             directEmit(val);
@@ -113,15 +116,10 @@ void PSlider::mouseReleaseEvent(QMouseEvent *event)
 {
     mThrottleTimer.stop();
     QSlider::mouseReleaseEvent(event);
-
-    int val = QStyle::sliderValueFromPosition(
-        minimum(),
-        maximum(),
-        orientation() == Qt::Horizontal ? event->pos().x() : event->pos().y(),
-        orientation() == Qt::Horizontal ? width() : height());
+    mLastMouseVal = value();
 
     // Ensure final value is emitted
-    directEmit(val);
+    directEmit(mLastMouseVal);
 }
 
 void PSlider::mouseMoveEvent(QMouseEvent *event)
@@ -130,14 +128,8 @@ void PSlider::mouseMoveEvent(QMouseEvent *event)
     {
         mThrottleTimer.start();
     }
-    mLastMousePos = event->pos();
-    int val       = QStyle::sliderValueFromPosition(
-        minimum(),
-        maximum(),
-        orientation() == Qt::Horizontal ? mLastMousePos.x() : mLastMousePos.y(),
-        orientation() == Qt::Horizontal ? width() : height());
-    QSlider::setValue(val);
     QSlider::mouseMoveEvent(event);
+    mLastMouseVal = value();
 }
 
 
@@ -149,12 +141,7 @@ void PSlider::onThrottleTimerTimeout()
         return;
     }
 
-    int val = QStyle::sliderValueFromPosition(
-        minimum(),
-        maximum(),
-        orientation() == Qt::Horizontal ? mLastMousePos.x() : mLastMousePos.y(),
-        orientation() == Qt::Horizontal ? width() : height());
-    directEmit(val);
+    emit throttledValueChanged(mLastMouseVal);
 }
 
 
