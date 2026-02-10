@@ -2,6 +2,7 @@
 
 - Added the option to import hdf5 files
 - Feature: Add the option to show specific markerIDs
+- Improvements to Tracking (Kalman Filter)
 - Not exporting colorpoint for an invalid color anymore due to internal change of trackpoints
 - Dropping down elements now also works over the view area
 - More uniform button naming

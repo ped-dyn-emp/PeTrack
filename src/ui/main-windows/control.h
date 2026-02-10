@@ -91,6 +91,7 @@ public:
     int  getTrackRepeatQual() const;
     int  getTrackRegionScale() const;
     bool isTrackMergeChecked() const;
+    bool isTrackUseKalmanChecked() const;
     bool isTrackExtrapolationChecked() const;
 
     void       toggleShowOnly();

@@ -59,9 +59,16 @@ public:
     bool setTrackPersonHeight(const Vec2F &p, int frame, const QSet<size_t> &onlyVisible);
     bool resetTrackPersonHeight(const Vec2F &p, int frame, const QSet<size_t> &onlyVisible);
     void moveTrackPoint(int personID, int frame, const Vec2F &newPosition);
+    void resetKalmanFilters();
 
-    size_t                          nbPersons() const { return mPersons.size(); }
-    const TrackPerson              &at(size_t i) const { return mPersons.at(i); }
+    size_t             nbPersons() const { return mPersons.size(); }
+    const TrackPerson &at(size_t i) const { return mPersons.at(i); }
+    cv::KalmanFilter  &getKalmanFilterOf(size_t i) { return mPersons.at(i).getKalmanFilter(); }
+    bool isKalmanFilterOfPersonInitialized(size_t i) const { return mPersons.at(i).isKalmanInitialized(); }
+    void initKalmanFilterOfPerson(size_t i, const TrackPoint &firstPoint, const TrackPoint &secondPoint)
+    {
+        mPersons.at(i).initKalmanFilter(firstPoint, secondPoint);
+    }
     void                            addPerson(const TrackPerson &person) { mPersons.push_back(person); }
     const std::vector<TrackPerson> &getPersons() const { return mPersons; }
 
@@ -102,6 +109,7 @@ public:
         int               frame,
         const TrackPoint &point,
         int               persNr,
+        bool              useKalmanFilter,
         bool              extrapolate,
         float             z,
         float             height);

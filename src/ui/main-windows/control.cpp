@@ -555,6 +555,11 @@ bool Control::isTrackMergeChecked() const
     return mUi->trackMerge->isChecked();
 }
 
+bool Control::isTrackUseKalmanChecked() const
+{
+    return mUi->trackUseKalman->isChecked();
+}
+
 bool Control::isTrackExtrapolationChecked() const
 {
     return mUi->trackExtrapolation->isChecked();
@@ -2101,6 +2106,10 @@ void Control::setXml(QDomElement &elem)
     subSubElem.setAttribute("QUALITY", getTrackRepeatQual());
     subElem.appendChild(subSubElem);
 
+    subSubElem = (elem.ownerDocument()).createElement("KALMAN");
+    subSubElem.setAttribute("ENABLED", mUi->trackUseKalman->isChecked());
+    subElem.appendChild(subSubElem);
+
     subSubElem = (elem.ownerDocument()).createElement("EXTRAPOLATION");
     subSubElem.setAttribute("ENABLED", mUi->trackExtrapolation->isChecked());
     subElem.appendChild(subSubElem);
@@ -2493,6 +2502,7 @@ void Control::getXml(const QDomElement &elem, const QString &version)
         }
         else if(subElem.tagName() == "TRACKING")
         {
+            bool foundKalmanOption = false;
             for(subSubElem = subElem.firstChildElement(); !subSubElem.isNull();
                 subSubElem = subSubElem.nextSiblingElement())
             {
@@ -2504,6 +2514,11 @@ void Control::getXml(const QDomElement &elem, const QString &version)
                 {
                     loadBoolValue(subSubElem, "ENABLED", mUi->trackRepeat);
                     loadIntValue(subSubElem, "QUALITY", mUi->trackRepeatQual);
+                }
+                else if(subSubElem.tagName() == "KALMAN")
+                {
+                    loadBoolValue(subSubElem, "ENABLED", mUi->trackUseKalman);
+                    foundKalmanOption = true;
                 }
                 else if(subSubElem.tagName() == "EXTRAPOLATION")
                 {
@@ -2655,6 +2670,10 @@ void Control::getXml(const QDomElement &elem, const QString &version)
                 {
                     SPDLOG_WARN("Unknown TRACKING tag: {}", subSubElem.tagName());
                 }
+            }
+            if(!foundKalmanOption)
+            {
+                mUi->trackUseKalman->setChecked(false);
             }
         }
         else if(subElem.tagName() == "ANALYSIS")

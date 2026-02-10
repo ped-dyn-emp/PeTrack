@@ -95,6 +95,7 @@ bool PersonStorage::splitPersonAt(const Vec2F &point, int frame, const QSet<size
 bool PersonStorage::delPointOf(int pers, TrajectorySegment direction, int frame)
 {
     onManualAction();
+    mPersons[pers].resetKalmanFilter();
 
     if(direction == TrajectorySegment::Previous)
     {
@@ -150,6 +151,7 @@ bool PersonStorage::delPoint(
 void PersonStorage::delPointAll(TrajectorySegment direction, int frame)
 {
     onManualAction();
+    resetKalmanFilters();
 
     for(size_t i = 0; i < mPersons.size(); ++i) // ueber TrackPerson
     {
@@ -412,6 +414,15 @@ void PersonStorage::moveTrackPoint(int personID, int frame, const Vec2F &newPosi
     }
 }
 
+void PersonStorage::resetKalmanFilters()
+{
+    for(auto &person : mPersons)
+    {
+        person.resetKalmanFilter();
+    }
+}
+
+
 // used for calculation of 3D point for all points in frame
 // returns number of found points or -1 if no stereoContext available (also points without disp found are counted)
 int PersonStorage::calcPosition(int frame)
@@ -577,8 +588,9 @@ bool PersonStorage::addPoint(
                frame,
                point,
                iNearest,
-               (mMainWindow.getControlWidget()
-                    ->isTrackExtrapolationChecked()))) // wenn eingefuegt wurde (bessere qualitaet)
+               mMainWindow.getControlWidget()->isTrackUseKalmanChecked(),
+               mMainWindow.getControlWidget()
+                   ->isTrackExtrapolationChecked())) // wenn eingefuegt wurde (bessere qualitaet)
         //|| !at(i).trackPointAt(frame).color().isValid() moeglich, um auch bei schlechterer
         // qualitaet aber aktuell nicht
         // vorliegender farbe die ermittelte farbe einzutragen - kommt nicht vor!
@@ -1117,11 +1129,12 @@ void PersonStorage::insertFeaturePoint(
     int               frame,
     const TrackPoint &point,
     int               persNr,
+    bool              useKalmanFilter,
     bool              extrapolate,
     float             z,
     float             height)
 {
-    if(mPersons.at(person).insertAtFrame(frame, point, persNr, extrapolate) && z > -1)
+    if(mPersons.at(person).insertAtFrame(frame, point, persNr, useKalmanFilter, extrapolate) && z > -1)
     {
         mPersons[person].setHeight(z, height);
     }
@@ -1137,9 +1150,10 @@ int PersonStorage::merge(int pers1, int pers2)
 {
     onManualAction();
 
-    auto      &person      = mPersons.at(pers1);
-    auto      &other       = mPersons.at(pers2);
-    const bool extrapolate = mMainWindow.getControlWidget()->isTrackExtrapolationChecked();
+    auto      &person          = mPersons.at(pers1);
+    auto      &other           = mPersons.at(pers2);
+    const bool extrapolate     = mMainWindow.getControlWidget()->isTrackExtrapolationChecked();
+    const bool useKalmanFilter = mMainWindow.getControlWidget()->isTrackUseKalmanChecked();
     int        deleteIndex;
     int        keepIndex;
     if(other.firstFrame() < person.firstFrame() && other.lastFrame() > person.lastFrame())
@@ -1147,7 +1161,7 @@ int PersonStorage::merge(int pers1, int pers2)
         for(int k = 0; k < person.size(); ++k)
         {
             // bei insertAtFrame wird qual beruecksichtigt, ob vorheriger besser
-            other.insertAtFrame(person.firstFrame() + k, person.at(k), pers2, extrapolate);
+            other.insertAtFrame(person.firstFrame() + k, person.at(k), pers2, useKalmanFilter, extrapolate);
         }
         deleteIndex = pers1;
         keepIndex   = pers2;
@@ -1157,7 +1171,7 @@ int PersonStorage::merge(int pers1, int pers2)
         for(int k = other.size() - 1; k > -1; --k)
         {
             // bei insertAtFrame wird qual beruecksichtigt, ob vorheriger besser
-            person.insertAtFrame(other.firstFrame() + k, other.at(k), pers1, extrapolate);
+            person.insertAtFrame(other.firstFrame() + k, other.at(k), pers1, useKalmanFilter, extrapolate);
         }
         deleteIndex = pers2;
         keepIndex   = pers1;
@@ -1167,7 +1181,7 @@ int PersonStorage::merge(int pers1, int pers2)
         for(int k = 0; k < other.size(); ++k)
         {
             // bei insertAtFrame wird qual beruecksichtigt, ob vorheriger besser
-            person.insertAtFrame(other.firstFrame() + k, other.at(k), pers1, extrapolate);
+            person.insertAtFrame(other.firstFrame() + k, other.at(k), pers1, useKalmanFilter, extrapolate);
         }
         deleteIndex = pers2;
         keepIndex   = pers1;

@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef TRACKPERSON_H
 #define TRACKPERSON_H
 
@@ -38,6 +37,16 @@
 
 class PersonStorage;
 class Petrack;
+
+namespace KalmanFilterParams
+{
+constexpr static float SIGMA_A = 0.2F;
+
+// Initial posterior covariance
+constexpr static float INIT_POS_VAR = 1.0F;
+constexpr static float INIT_VEL_VAR = 1.0F;
+} // namespace KalmanFilterParams
+
 
 /**
  * @brief Stores all tracking information for a whole trajectory, as markerID, color, comment and also the
@@ -63,6 +72,8 @@ private:
     int               mColorCount;    //< number of colors where mColor is average from
     QList<TrackPoint> mData{};        //< TrackPoints from mFirstFrame to mLastFrame;;
     IntervalList<int> mGroups{annotationGroups::NO_GROUP.id};
+    cv::KalmanFilter  mKalmanFilter;
+    bool              mKalmanInitialized = false;
 
 public:
     TrackPerson() = default;
@@ -70,7 +81,12 @@ public:
 
     TrackPerson(int nr, int frame, const TrackPoint &p, int markerID);
 
-    bool insertAtFrame(int frame, const TrackPoint &p, int persNr, bool extrapolate);
+
+    void initKalmanFilter(const TrackPoint &firstPoint);
+    void initKalmanFilter(const TrackPoint &firstPoint, const TrackPoint &secondPoint);
+    void resetKalmanFilter() { mKalmanInitialized = false; }
+    bool isKalmanInitialized() const { return mKalmanInitialized; }
+    bool insertAtFrame(int frame, const TrackPoint &p, int persNr, bool useKalmanFilter, bool extrapolate);
 
     inline int  nrInBg() const { return mNrInBg; }
     inline void setNrInBg(int n) { mNrInBg = n; }
@@ -147,11 +163,11 @@ public:
     void                            removeFramesBetween(int startFrame, int endFrame);
     inline IntervalList<int>       &getGroups() { return mGroups; }
     inline const IntervalList<int> &getGroups() const { return mGroups; }
+    cv::KalmanFilter               &getKalmanFilter() { return mKalmanFilter; }
 };
 
-// mHeightCount wird nicht e3xportiert und auch nicht wieder eingelesen -> nach import auf 0 obwohl auf height ein wert
-// steht, daher immer mheight auf -1 testen!!!
-// keine Konsistenzueberpruefung
+// mHeightCount wird nicht e3xportiert und auch nicht wieder eingelesen -> nach import auf 0 obwohl auf height ein
+// wert steht, daher immer mheight auf -1 testen!!! keine Konsistenzueberpruefung
 QTextStream &operator<<(QTextStream &s, const TrackPerson &tp);
 
 std::ostream &operator<<(std::ostream &s, const TrackPerson &tp);

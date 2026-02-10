@@ -21,16 +21,14 @@
 #include "animation.h"
 #include "control.h"
 #include "helper.h"
-#include "logger.h"
 #include "multiColorMarkerWidget.h"
-#include "pMessageBox.h"
 #include "personStorage.h"
 #include "petrack.h"
 #include "roiItem.h"
 #include "stereoWidget.h"
 
+#include <algorithm>
 #include <ctime>
-#include <iomanip>
 #include <opencv2/opencv.hpp>
 
 #define MIN_WIN_SIZE 3.
@@ -324,7 +322,8 @@ int Tracker::insertFeaturePoints(int frame, size_t count, cv::Mat &img, int bord
                                     frame,
                                     v,
                                     mPrevFeaturePointsIdx[i],
-                                    (mMainWindow->getControlWidget()->isTrackExtrapolationChecked()),
+                                    mMainWindow->getControlWidget()->isTrackUseKalmanChecked(),
+                                    mMainWindow->getControlWidget()->isTrackExtrapolationChecked(),
                                     z,
                                     mMainWindow->getControlWidget()->getCameraAltitude());
                             }
@@ -594,53 +593,186 @@ void Tracker::trackFeaturePointsLK(int level, bool adaptive)
     mFeaturePoints.resize(numOfPeople);
     mStatus.resize(numOfPeople);
     mTrackError.resize(numOfPeople);
+
     std::vector<uchar> localStatus;
+    std::vector<uchar> localStatusKalman;
     std::vector<float> localTrackError;
+    std::vector<float> localTrackErrorKalman;
+
+    const int  bS              = mMainWindow->getImageBorderSize();
+    const bool useKalmanFilter = mMainWindow->getControlWidget()->isTrackUseKalmanChecked();
 
     for(size_t i = 0; i < numOfPeople; ++i)
     {
-        int l       = level;
-        int winSize = 0;
+        cv::KalmanFilter &kf     = mPersonStorage.getKalmanFilterOf(mPrevFeaturePointsIdx[i]);
+        bool isKalmanInitialized = mPersonStorage.isKalmanFilterOfPersonInitialized(mPrevFeaturePointsIdx[i]);
+
+        cv::Mat     prediction = kf.predict();
+        cv::Point2f predictedPt(prediction.at<float>(0) + bS, prediction.at<float>(1) + bS);
+
+        int   l       = level;
+        int   winSize = 0;
+        bool  tracked = false;
+        float dx      = 9999.f;
+        float dy      = 9999.f;
 
         do
         {
             if(l < level)
-            {
                 SPDLOG_WARN("try tracking person {} with pyramid level {}", mPrevFeaturePointsIdx[i], l);
-            }
 
-            winSize = mMainWindow->winSize(nullptr, mPrevFeaturePointsIdx[i], mPrevFrame, l);
-            if(winSize < MIN_WIN_SIZE)
+            winSize = std::max(
+                static_cast<double>(mMainWindow->winSize(nullptr, mPrevFeaturePointsIdx[i], mPrevFrame, l)),
+                MIN_WIN_SIZE);
+
+            // kalman-guided lk
+            bool        kalmanTracked   = false;
+            float       dxKalman        = 9999.f;
+            float       dyKalman        = 9999.f;
+            cv::Point2f bestKalmanPoint = mPrevFeaturePoints[i];
+            float       bestKalmanErr   = FLT_MAX;
+
+            if(useKalmanFilter && isKalmanInitialized)
             {
-                winSize = MIN_WIN_SIZE;
-                SPDLOG_WARN(
-                    "set search region to the minimum size of {} for person {}!",
-                    MIN_WIN_SIZE,
-                    mPrevFeaturePointsIdx[i] + 1);
+                std::vector<cv::Point2f> prevPt{mPrevFeaturePoints[i]};
+                std::vector<cv::Point2f> nextPt{predictedPt};
+
+                localStatusKalman.clear();
+                localTrackErrorKalman.clear();
+
+                cv::calcOpticalFlowPyrLK(
+                    mPrevPyr,
+                    mCurrentPyr,
+                    prevPt,
+                    nextPt,
+                    localStatusKalman,
+                    localTrackErrorKalman,
+                    cv::Size(winSize, winSize),
+                    l,
+                    mTermCriteria,
+                    cv::OPTFLOW_USE_INITIAL_FLOW);
+
+                kalmanTracked = (localStatusKalman[0] != 0);
+
+                if(kalmanTracked)
+                {
+                    // backward check
+                    prevPt = {nextPt[0]};
+                    std::vector<cv::Point2f> backPt{mPrevFeaturePoints[i]};
+                    std::vector<uchar>       dummyStatus;
+                    std::vector<float>       dummyErr;
+
+                    cv::calcOpticalFlowPyrLK(
+                        mCurrentPyr,
+                        mPrevPyr,
+                        prevPt,
+                        backPt,
+                        dummyStatus,
+                        dummyErr,
+                        cv::Size(winSize, winSize),
+                        l,
+                        mTermCriteria,
+                        cv::OPTFLOW_USE_INITIAL_FLOW);
+
+                    dxKalman        = mPrevFeaturePoints[i].x - backPt[0].x;
+                    dyKalman        = mPrevFeaturePoints[i].y - backPt[0].y;
+                    bestKalmanPoint = nextPt[0];
+                    bestKalmanErr   = localTrackErrorKalman[0];
+                }
             }
 
-            std::vector<cv::Point2f> prevFeaturePoint{mPrevFeaturePoints[i]};
-            std::vector<cv::Point2f> nextFeaturePoint{};
+            // normal lk
+            std::vector<cv::Point2f> prevPt{mPrevFeaturePoints[i]};
+            std::vector<cv::Point2f> nextPt{};
             localStatus.clear();
             localTrackError.clear();
 
             cv::calcOpticalFlowPyrLK(
                 mPrevPyr,
                 mCurrentPyr,
-                prevFeaturePoint,
-                nextFeaturePoint,
+                prevPt,
+                nextPt,
                 localStatus,
                 localTrackError,
                 cv::Size(winSize, winSize),
                 l,
-                mTermCriteria);
+                mTermCriteria,
+                0);
 
-            mFeaturePoints[i] = nextFeaturePoint[0];
-            mTrackError[i]    = localTrackError[0] * 10.F / winSize;
+            bool normalTracked = (localStatus[0] != 0);
 
-        } while(adaptive && localStatus[0] == 0 && (l--) > 0);
-        // status from OpenCV: 0 -> not tracked, 1 -> tracked
-        mStatus[i] = localStatus[0] ? TrackStatus::Tracked : TrackStatus::NotTracked;
+            float dxNormal = 9999.f;
+            float dyNormal = 9999.f;
+            if(normalTracked)
+            {
+                prevPt = {nextPt[0]};
+                std::vector<cv::Point2f> backPt{mPrevFeaturePoints[i]};
+                std::vector<uchar>       dummyStatus;
+                std::vector<float>       dummyErr;
+
+                cv::calcOpticalFlowPyrLK(
+                    mCurrentPyr,
+                    mPrevPyr,
+                    prevPt,
+                    backPt,
+                    dummyStatus,
+                    dummyErr,
+                    cv::Size(winSize, winSize),
+                    l,
+                    mTermCriteria,
+                    cv::OPTFLOW_USE_INITIAL_FLOW);
+
+                dxNormal = mPrevFeaturePoints[i].x - backPt[0].x;
+                dyNormal = mPrevFeaturePoints[i].y - backPt[0].y;
+            }
+
+            // select better result
+            if((kalmanTracked && !normalTracked) ||
+               (kalmanTracked && normalTracked &&
+                (dxKalman * dxKalman + dyKalman * dyKalman) < (dxNormal * dxNormal + dyNormal * dyNormal)))
+            {
+                tracked           = true;
+                mFeaturePoints[i] = bestKalmanPoint;
+                mTrackError[i]    = bestKalmanErr * 10.f / winSize;
+
+                dx = dxKalman;
+                dy = dyKalman;
+            }
+            else if(normalTracked)
+            {
+                tracked           = true;
+                mFeaturePoints[i] = nextPt[0];
+                mTrackError[i]    = localTrackError[0] * 10.f / winSize;
+                dx                = dxNormal;
+                dy                = dyNormal;
+            }
+            else
+            {
+                tracked = false;
+            }
+
+        } while(adaptive && !tracked && (l--) > 0);
+
+        mStatus[i] = tracked ? TrackStatus::Tracked : TrackStatus::NotTracked;
+
+        if(useKalmanFilter && tracked && isKalmanInitialized)
+        {
+            kf.measurementNoiseCov.at<float>(0, 0) = dx * dx;
+            kf.measurementNoiseCov.at<float>(1, 1) = dy * dy;
+
+            cv::Mat meas      = (cv::Mat_<float>(2, 1) << mFeaturePoints[i].x - bS, mFeaturePoints[i].y - bS);
+            cv::Mat corr      = kf.correct(meas);
+            mFeaturePoints[i] = {corr.at<float>(0) + bS, corr.at<float>(1) + bS};
+        }
+        else if(useKalmanFilter && tracked && !isKalmanInitialized)
+        {
+            // Initialize with velocity
+            TrackPoint first{{mPrevFeaturePoints[i].x - bS, mPrevFeaturePoints[i].y - bS}};
+            TrackPoint second{{mFeaturePoints[i].x - bS, mFeaturePoints[i].y - bS}};
+            mPersonStorage.initKalmanFilterOfPerson(mPrevFeaturePointsIdx[i], first, second);
+            kf.measurementNoiseCov.at<float>(0, 0) = dx * dx;
+            kf.measurementNoiseCov.at<float>(1, 1) = dy * dy;
+        }
     }
 }
 

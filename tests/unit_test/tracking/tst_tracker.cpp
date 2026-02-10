@@ -123,7 +123,7 @@ TEST_CASE("TrackPerson insertion, [TrackPerson]")
         {
             TrackPerson person(1, 0, TrackPoint({0.0, 0.0}));
             TrackPoint  endpoint({10., 10.});
-            REQUIRE(person.insertAtFrame(10, endpoint, 1, false));
+            REQUIRE(person.insertAtFrame(10, endpoint, 1, true, false));
             THEN("All frames in between are present")
             {
                 REQUIRE(person.firstFrame() == 0);
@@ -147,7 +147,7 @@ TEST_CASE("TrackPerson insertion, [TrackPerson]")
         {
             TrackPerson person(1, 10, TrackPoint({10., 10.}));
             TrackPoint  endpoint({0., 0.});
-            REQUIRE(person.insertAtFrame(0, endpoint, 1, false));
+            REQUIRE(person.insertAtFrame(0, endpoint, 1, true, false));
             THEN("Points for all frames are inserted")
             {
                 REQUIRE(person.firstFrame() == 0);
