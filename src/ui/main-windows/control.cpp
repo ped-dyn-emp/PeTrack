@@ -278,10 +278,6 @@ Control::Control(
         this,
         [&recoRoiItem, &trackRoiItem]() { trackRoiItem.adjustToOtherROI(recoRoiItem, std::plus<>()); });
 
-    connect(mUi->roiFix, &QCheckBox::checkStateChanged, this, &Control::toggleRecoROIButtons);
-    connect(mUi->roiShow, &QCheckBox::checkStateChanged, this, &Control::toggleRecoROIButtons);
-    connect(mUi->trackRoiFix, &QCheckBox::checkStateChanged, this, &Control::toggleTrackROIButtons);
-    connect(mUi->trackRoiShow, &QCheckBox::checkStateChanged, this, &Control::toggleTrackROIButtons);
     connect(
         mUi->recoMethod,
         QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -3257,22 +3253,34 @@ void Control::expandRange(QColor &fromColor, QColor &toColor, const QColor &clic
 
 void Control::toggleRecoROIButtons()
 {
-    if(!mUi->roiShow->isChecked())
+    const bool show = mUi->roiShow->isChecked();
+    if(!show)
     {
         mUi->roiFix->setChecked(true);
+        mUi->roiFix->setEnabled(false);
     }
-    bool enabled = (!mUi->roiFix->isChecked()) && mUi->roiShow->isChecked();
+    else
+    {
+        mUi->roiFix->setEnabled(true);
+    }
+    bool enabled = (!mUi->roiFix->isChecked()) && show;
     mUi->recoRoiAdjustAutomatically->setEnabled(enabled);
     mUi->recoRoiToFullImageSize->setEnabled(enabled);
 }
 
 void Control::toggleTrackROIButtons()
 {
-    if(!mUi->trackRoiShow->isChecked())
+    const bool show = mUi->trackRoiShow->isChecked();
+    if(!show)
     {
         mUi->trackRoiFix->setChecked(true);
+        mUi->trackRoiFix->setEnabled(false);
     }
-    bool enabled = (!mUi->trackRoiFix->isChecked()) && mUi->trackRoiShow->isChecked();
+    else
+    {
+        mUi->trackRoiFix->setEnabled(true);
+    }
+    bool enabled = (!mUi->trackRoiFix->isChecked()) && show;
     mUi->trackRoiAdjustAutomatically->setEnabled(enabled);
     mUi->trackRoiToFullImageSize->setEnabled(enabled);
 }
