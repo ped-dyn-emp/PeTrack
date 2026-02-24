@@ -366,6 +366,9 @@ Petrack::Petrack(QString petrackVersion) :
     auto *goToStart = new QShortcut{QKeySequence("Shift+s"), this};
     connect(goToStart, &QShortcut::activated, this, [=]() { mControlWidget->onTrackGotoStartNrClicked(); });
 
+    auto *goToEnd = new QShortcut{QKeySequence("Shift+d"), this};
+    connect(goToEnd, &QShortcut::activated, this, [=]() { mControlWidget->onTrackGotoEndNrClicked(); });
+
     // TODO delete once we get Options to be value only (i.e. no Pointer/Ref anymore)
     mReco.getCodeMarkerOptions().setControlWidget(mControlWidget);
     mReco.getCodeMarkerOptions().setCodeMarkerItem(mCodeMarkerItem);
@@ -1778,6 +1781,7 @@ void Petrack::keyBindings()
         {{"Space bar", "toggles between pause and last play direction"},
          {"Ctrl + Alt + double-click left mouse button", "jumps to frame of trajectory point under cursor"},
          {"Shift + s", "jumps to start of selected trajectory"},
+         {"Shift + d", "jumps to end/\"destination\" of selected trajectory"},
          {"Mouse scroll wheel",
           "zooms in and out to or from the pixel of the image\nat the position of the mouse pointer"},
          {"Shift + mouse scroll wheel", "plays forwards or backwards frame by frame"},

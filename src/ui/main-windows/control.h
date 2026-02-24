@@ -261,6 +261,7 @@ public:
 
     void        resetCorrection();
     void        onTrackGotoStartNrClicked();
+    void        onTrackGotoEndNrClicked();
     inline void updateUi()
     {
         if(!isLoading())
@@ -326,7 +327,6 @@ private slots:
 
     void onTrackShowCurrentPointStateChanged() { updateUi(); }
     void onTrackGotoNrClicked();
-    void onTrackGotoEndNrClicked();
 
     void onTrackHeadSizedStateChanged(int i);
 
