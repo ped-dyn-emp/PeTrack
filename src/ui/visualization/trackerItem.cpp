@@ -898,7 +898,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                             }
                             else
                             {
-                                trackPointLineWidthPen.setColor(Qt::red);
+                                trackPointLineWidthPen.setColor(pTPC);
                                 trackPointLineWidthPen.setWidth(mControlWidget->getTrackShowPointsLineWidth());
                                 painter->setPen(trackPointLineWidthPen);
 
