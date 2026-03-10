@@ -28,6 +28,7 @@ class PSlider;
 class QToolButton;
 class QHBoxLayout;
 class QLineEdit;
+class QPushButton;
 class QIntValidator;
 class QDoubleValidator;
 
@@ -84,6 +85,12 @@ public slots:
     void setPlayerSpeedFixed(bool fixed);
     void setLooping(bool looping);
     void play(PlayerState state);
+    void setCurrentFrameAsIn();
+    void setCurrentFrameAsOut();
+    void resetSourceIn();
+    void resetSourceOut();
+    void onFrameInNumEditingFinished();
+    void onFrameOutNumEditingFinsished();
 
 private:
     void setSliderMax(int max);
@@ -110,8 +117,8 @@ private:
     QLineEdit     *mFrameNum;
     QLineEdit     *mFrameInNum;
     QLineEdit     *mFrameOutNum;
-    QLabel        *mSourceInLabel;
-    QLabel        *mSourceOutLabel;
+    QPushButton   *mSourceInBtn;
+    QPushButton   *mSourceOutBtn;
     QIntValidator *mFrameNumValidator;
     QIntValidator *mFrameInNumValidator;
     QIntValidator *mFrameOutNumValidator;

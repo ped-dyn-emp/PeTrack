@@ -4,6 +4,7 @@
 - Feature: Add the option to show specific markerIDs
 - Improvements to Tracking (Kalman Filter)
 - Feature: Add option to delete a range of persons
+- The labels `In` and `Out` from the video player are now clickable, making you able to set the current frame as `In` or `Out`. Also added shortcuts for set and reset of `In` and `Out`
 - Add shortcut shift+d to jump to end of trajectory
 - Not exporting colorpoint for an invalid color anymore due to internal change of trackpoints
 - Dropping down elements now also works over the view area

@@ -1787,7 +1787,9 @@ void Petrack::keyBindings()
          {"Shift + mouse scroll wheel", "plays forwards or backwards frame by frame"},
          {"Holding left mouse button", "moves image"},
          {"Arrow left/Arrow right", "frame back/forward"},
-         {"j/l", "jump back/forward"}
+         {"j/l", "jump back/forward"},
+         {",/.", "Set current frame as 'In'/'Out'"},
+         {"Shift + ,/.", "Reset 'In'/'Out'"}
 
         }};
 
