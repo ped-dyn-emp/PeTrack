@@ -20,16 +20,16 @@
 
 #include "animation.h"
 #include "control.h"
-#include "logger.h"
 #include "pMessageBox.h"
 #include "pSlider.h"
 #include "petrack.h"
 
 #include <QApplication>
 #include <QIntValidator>
-#include <QLabel>
 #include <QLineEdit>
 #include <QPixmap>
+#include <QPushButton>
+#include <QShortcut>
 #include <QSlider>
 #include <QStyle>
 #include <QToolButton>
@@ -96,17 +96,15 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mFrameInNum->setMaxLength(6);
     mFrameInNum->setMaximumWidth(75);
     mFrameInNum->setAlignment(Qt::AlignRight);
-    mFrameInNum->setValidator(mFrameInNumValidator);
     mFrameInNum->setFont(f);
-    connect(mFrameInNum, &QLineEdit::editingFinished, this, &Player::update);
+    connect(mFrameInNum, &QLineEdit::editingFinished, this, &Player::onFrameInNumEditingFinished);
 
     mFrameOutNum = new QLineEdit("");
     mFrameOutNum->setMaxLength(8);
     mFrameOutNum->setMaximumWidth(75);
     mFrameOutNum->setAlignment(Qt::AlignRight);
-    mFrameOutNum->setValidator(mFrameOutNumValidator);
     mFrameOutNum->setFont(f);
-    connect(mFrameOutNum, &QLineEdit::editingFinished, this, &Player::update);
+    connect(mFrameOutNum, &QLineEdit::editingFinished, this, &Player::onFrameOutNumEditingFinsished);
 
     mFrameNum = new QLineEdit("0");
     mFrameNum->setMaxLength(8);     // bedeutet maxminal 1,1 stunden
@@ -119,11 +117,30 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
 
     QFont f2("Courier", 12, QFont::Normal); // Times Helvetica, Normal
 
-    mSourceInLabel = new QLabel("In:");
-    mSourceInLabel->setFont(f2);
+    mSourceInBtn = new QPushButton("In:");
+    mSourceInBtn->setToolTip("First frame to be processed by PeTrack. Click to set to current frame.");
+    mSourceInBtn->setFlat(true);
+    mSourceInBtn->setFont(f2);
+    connect(mSourceInBtn, &QPushButton::clicked, this, &Player::setCurrentFrameAsIn);
 
-    mSourceOutLabel = new QLabel("Out:");
-    mSourceOutLabel->setFont(f2);
+    mSourceOutBtn = new QPushButton("Out:");
+    mSourceOutBtn->setToolTip("Last frame to be processed by PeTrack. Click to set to current frame.");
+    mSourceOutBtn->setFlat(true);
+    mSourceOutBtn->setFont(f2);
+    connect(mSourceOutBtn, &QPushButton::clicked, this, &Player::setCurrentFrameAsOut);
+
+    // shortcuts
+    auto *setSourceInShortcut = new QShortcut(QKeySequence(","), this);
+    connect(setSourceInShortcut, &QShortcut::activated, this, &Player::setCurrentFrameAsIn);
+
+    auto *setSourceOutShortcut = new QShortcut(QKeySequence("."), this);
+    connect(setSourceOutShortcut, &QShortcut::activated, this, &Player::setCurrentFrameAsOut);
+
+    auto *resetSourceInShortcut = new QShortcut(QKeySequence("Shift+,"), this);
+    connect(resetSourceInShortcut, &QShortcut::activated, this, &Player::resetSourceIn);
+
+    auto *resetSourceOutShortcut = new QShortcut(QKeySequence("Shift+."), this);
+    connect(resetSourceOutShortcut, &QShortcut::activated, this, &Player::resetSourceOut);
 
     // default value
     mPlayerSpeedLimited = false;
@@ -135,9 +152,9 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mPlayerLayout->addWidget(mPauseButton);
     mPlayerLayout->addWidget(mFrameForwardButton);
     mPlayerLayout->addWidget(mPlayForwardButton);
-    mPlayerLayout->addWidget(mSourceInLabel);
+    mPlayerLayout->addWidget(mSourceInBtn);
     mPlayerLayout->addWidget(mFrameInNum);
-    mPlayerLayout->addWidget(mSourceOutLabel);
+    mPlayerLayout->addWidget(mSourceOutBtn);
     mPlayerLayout->addWidget(mFrameOutNum);
     mPlayerLayout->addWidget(mSlider);
     mPlayerLayout->addWidget(mFrameNum);
@@ -426,17 +443,31 @@ void Player::pause()
  */
 void Player::togglePlayPause()
 {
-    static PlayerState lastState;
-
     if(mState != PlayerState::PAUSE)
     {
-        lastState = mState;
         pause();
+        return;
     }
-    else if(updateImage()) // only play the video again if there are no pending image updates
+    // we want to play the video
+
+    // makes you able to resume again if you hit the end of the video and
+    // f.ex. extended the out frame
+    if(mImg.empty() && mAnimation->getSourceInFrameNum() <= mAnimation->getCurrentFrameNum() &&
+       mAnimation->getCurrentFrameNum() <= mAnimation->getSourceOutFrameNum())
     {
-        play(lastState);
+        mImg = mAnimation->getCurrentFrame();
     }
+    if(!updateImage()) // only play the video again if there are no pending image updates
+    {
+        return;
+    }
+    // fallback, mPrevDirection is PAUSE at initialization and if we want to
+    // togglePlayPause (both mState and mPrevDirection is PAUSE) then we would'nt do anything
+    if(mPrevDirection == PlayerState::PAUSE)
+    {
+        mPrevDirection = PlayerState::FORWARD;
+    }
+    play(mPrevDirection);
 }
 
 bool Player::skipToFrame(int f, bool pauseBefore) // [0..mAnimation->getNumFrames()-1]
@@ -521,6 +552,7 @@ void Player::update()
         mSlider->setMaximum(getFrameOutNum());
 
         mFrameInNumValidator->setTop(getFrameOutNum() - 1);
+        mFrameOutNumValidator->setBottom(getFrameInNum() + 1);
         mFrameNumValidator->setBottom(getFrameInNum());
         mFrameNumValidator->setTop(getFrameOutNum());
 
@@ -578,6 +610,58 @@ void Player::setFrameOutNum(int out)
 int Player::getPos()
 {
     return mAnimation->getCurrentFrameNum();
+}
+
+void Player::setCurrentFrameAsIn()
+{
+    setFrameInNum(getPos());
+    update();
+}
+
+void Player::setCurrentFrameAsOut()
+{
+    setFrameOutNum(getPos());
+    update();
+}
+
+void Player::resetSourceIn()
+{
+    setFrameInNum(0);
+    update();
+}
+
+void Player::resetSourceOut()
+{
+    setFrameOutNum(mAnimation->getMaxFrames());
+    update();
+}
+
+void Player::onFrameInNumEditingFinished()
+{
+    bool      ok       = false;
+    const int curInput = mFrameInNum->text().toInt(&ok);
+    if(!ok)
+    {
+        mFrameInNum->setText(QString::number(mAnimation->getSourceInFrameNum()));
+        return;
+    }
+    const int clampedInput = std::clamp(curInput, mFrameInNumValidator->bottom(), mFrameInNumValidator->top());
+    mFrameInNum->setText(QString::number(clampedInput));
+    update();
+}
+
+void Player::onFrameOutNumEditingFinsished()
+{
+    bool      ok       = false;
+    const int curInput = mFrameOutNum->text().toInt(&ok);
+    if(!ok)
+    {
+        mFrameOutNum->setText(QString::number(mAnimation->getSourceOutFrameNum()));
+        return;
+    }
+    const int clampedInput = std::clamp(curInput, mFrameOutNumValidator->bottom(), mFrameOutNumValidator->top());
+    mFrameOutNum->setText(QString::number(clampedInput));
+    update();
 }
 
 #include "moc_player.cpp"
