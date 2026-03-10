@@ -4522,6 +4522,7 @@ void Petrack::deletePersonRange()
             const int start = dlg.min();
             const int end   = dlg.max();
             mPersonStorage.deletePersonRange(start - 1, end - 1);
+            updateImage();
         }
     }
 }
