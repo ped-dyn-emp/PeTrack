@@ -23,8 +23,7 @@
 #include "intrinsicCameraParams.h"
 #include "recognition.h"
 
-#include <Qt>
-#include <QtWidgets>
+#include <QWidget>
 
 class Petrack;
 class Correction;
@@ -43,6 +42,8 @@ class AnalysePlot;
 class MissingFrames;
 class WorldImageCorrespondence;
 class AlignmentGridBox;
+class QLineEdit;
+class QScrollArea;
 
 namespace Ui
 {
@@ -259,16 +260,10 @@ public:
 
     inline Petrack *getMainWindow() const { return mMainWindow; }
 
-    void        resetCorrection();
-    void        onTrackGotoStartNrClicked();
-    void        onTrackGotoEndNrClicked();
-    inline void updateUi()
-    {
-        if(!isLoading())
-        {
-            mScene->update();
-        }
-    }
+    void resetCorrection();
+    void onTrackGotoStartNrClicked();
+    void onTrackGotoEndNrClicked();
+    void updateUi();
 
 private:
     void onTrackShowOnlyVisibleStateChanged() { updateUi(); }

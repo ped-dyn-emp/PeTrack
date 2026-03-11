@@ -19,8 +19,7 @@
 #ifndef COORDITEM_H
 #define COORDITEM_H
 
-#include <QGraphicsItem>
-#include <QtWidgets>
+#include <QGraphicsObject>
 #include <opencv2/core/types.hpp>
 
 class Petrack;

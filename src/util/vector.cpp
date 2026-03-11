@@ -22,6 +22,7 @@
 
 #include <QPoint>
 #include <QPointF>
+#include <QTextStream>
 #include <limits>
 #include <opencv2/opencv.hpp>
 
@@ -383,4 +384,22 @@ double Vec2F::angleBetweenVec(const Vec2F &v) const
 Vec2F Vec2F::fromAngle(double angle)
 {
     return Vec2F(cos(angle), sin(angle));
+}
+
+
+QTextStream &operator<<(QTextStream &s, const Vec2F &v)
+{
+    s << v.x() << " " << v.y(); // ohne (,) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    return s;
+}
+
+
+QTextStream &operator>>(QTextStream &s, Vec2F &v)
+{
+    double d;
+    s >> d;
+    v.setX(d);
+    s >> d;
+    v.setY(d);
+    return s;
 }

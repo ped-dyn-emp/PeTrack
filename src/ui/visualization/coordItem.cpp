@@ -24,7 +24,8 @@
 #include "penUtils.h"
 #include "petrack.h"
 
-#include <QtWidgets>
+#include <QGraphicsSceneMouseEvent>
+#include <QPainter>
 #include <cmath>
 
 // in x und y gleichermassen skaliertes koordinatensystem,

@@ -48,8 +48,8 @@
 
 #ifndef QTCOLORTRIANGLE_H
 #define QTCOLORTRIANGLE_H
+#include <QWidget>
 #include <QtGui/QImage>
-#include <QtWidgets>
 
 class QPointF;
 struct Vertex;

@@ -63,7 +63,7 @@
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QToolTip>
 #include <QtWidgets/QVBoxLayout>
-#include <math.h>
+#include <cmath>
 
 #define PENDIV 20.
 #define ELLDIV 12.

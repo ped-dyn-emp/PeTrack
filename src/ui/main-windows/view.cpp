@@ -23,7 +23,10 @@
 #include "petrack.h"
 #include "vector.h"
 
-#include <QtWidgets>
+#include <QHBoxLayout>
+#include <QMimeData>
+#include <QStyle>
+#include <QToolButton>
 #include <cmath>
 
 GraphicsView::GraphicsView(ViewWidget *viewWidget) : QGraphicsView()

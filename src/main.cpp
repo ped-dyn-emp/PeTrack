@@ -25,12 +25,10 @@
 #include "tracker.h"
 
 #include <QApplication>
+#include <QDir>
 #include <QMessageBox>
 #include <QStyleFactory>
-#include <QtWidgets>
 #include <csignal>
-#include <cstdio>
-#include <sstream>
 #include <string>
 
 // Aufrufbeispiel:

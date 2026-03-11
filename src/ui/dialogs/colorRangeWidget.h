@@ -22,7 +22,7 @@
 #include "colorPlot.h"
 #include "ui_colorRange.h"
 
-#include <QtWidgets>
+#include <QWidget>
 
 class Petrack;
 

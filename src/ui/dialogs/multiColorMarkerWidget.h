@@ -23,9 +23,9 @@
 #include "imageItem.h"
 #include "multiColorMarkerItem.h"
 #include "ui_multiColorMarker.h"
-#include "worldImageCorrespondence.h"
 
-#include <QtWidgets>
+#include <QWidget>
+
 class Petrack;
 
 class MultiColorMarkerWidget : public QWidget, public Ui::MultiColorMarker

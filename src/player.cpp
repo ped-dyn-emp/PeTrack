@@ -25,6 +25,7 @@
 #include "petrack.h"
 
 #include <QApplication>
+#include <QElapsedTimer>
 #include <QIntValidator>
 #include <QLineEdit>
 #include <QPixmap>

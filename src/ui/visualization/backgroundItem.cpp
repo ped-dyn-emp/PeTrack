@@ -22,7 +22,6 @@
 #include "petrack.h"
 #include "view.h"
 
-#include <QtWidgets>
 
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,

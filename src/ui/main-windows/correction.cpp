@@ -30,6 +30,10 @@
 #include <QByteArray>
 #include <QFile>
 #include <QFrame>
+#include <QLineEdit>
+#include <QMenu>
+#include <QProgressDialog>
+#include <QTableWidget>
 #include <QVector>
 #include <regex>
 #include <string>

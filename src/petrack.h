@@ -20,9 +20,7 @@
 #define PETRACK_H
 
 #include <QDomDocument>
-#include <QKeyEvent>
 #include <QMainWindow>
-#include <QMouseEvent>
 #include <opencv2/core/mat.hpp>
 #include <optional>
 
@@ -74,6 +72,8 @@ class QDoubleSpinBox;
 class QFrame;
 class QLineEdit;
 class QDoubleValidator;
+class QKeyEvent;
+class QMouseEvent;
 
 class CoordItem;
 class ImageItem;

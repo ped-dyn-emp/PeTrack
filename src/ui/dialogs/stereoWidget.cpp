@@ -19,10 +19,10 @@
 #include "stereoWidget.h"
 
 #include "importHelper.h"
-#include "logger.h"
 #include "petrack.h"
 #include "stereoItem.h"
 
+#include <QGraphicsScene>
 
 StereoWidget::StereoWidget(QWidget *parent) : QWidget(parent)
 {

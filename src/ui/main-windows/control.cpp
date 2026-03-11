@@ -49,8 +49,14 @@
 #include "wheelIgnoreFilter.h"
 #include "worldImageCorrespondence.h"
 
+#include <QColorDialog>
 #include <QDomElement>
-#include <iomanip>
+#include <QFileDialog>
+#include <QGraphicsScene>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QScrollBar>
+#include <QSplitter>
 #define DEFAULT_HEIGHT 180.0
 
 Control::Control(
@@ -3288,6 +3294,14 @@ void Control::toggleTrackROIButtons()
 void Control::resetCorrection()
 {
     mCorrectionWidget->clear();
+}
+
+void Control::updateUi()
+{
+    if(!isLoading())
+    {
+        mScene->update();
+    }
 }
 
 #include "moc_control.cpp"

@@ -21,7 +21,6 @@
 #include <QSignalMapper>
 #include <QtOpenGL>
 #include <QtOpenGLWidgets/QOpenGLWidget>
-#include <QtWidgets>
 
 // Added for Qt5 support
 #include "YOLOMarkerWidget.h"
@@ -72,12 +71,22 @@
 #include "view.h"
 #include "worldImageCorrespondence.h"
 
+#include <QFileDialog>
+#include <QFontDialog>
+#include <QInputDialog>
+#include <QLineEdit>
+#include <QMenu>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QProgressDialog>
+#include <QScrollBar>
+#include <QSplitter>
+#include <QStatusBar>
 #include <QtPrintSupport/QPrintDialog>
 #include <QtPrintSupport/QPrinter>
 #include <cmath>
 #include <ctime>
 #include <deque>
-#include <iomanip>
 #include <opencv2/opencv.hpp>
 
 
