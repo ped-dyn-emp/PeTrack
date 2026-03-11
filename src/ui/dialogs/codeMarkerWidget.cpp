@@ -24,6 +24,8 @@
 #include "recognition.h"
 #include "ui_codeMarker.h"
 
+#include <QDesktopServices>
+#include <QGraphicsScene>
 #include <opencv2/core/version.hpp>
 
 CodeMarkerWidget::CodeMarkerWidget(QWidget *parent, reco::CodeMarkerOptions &codeMarkerOpt, Ui::CodeMarker *ui) :

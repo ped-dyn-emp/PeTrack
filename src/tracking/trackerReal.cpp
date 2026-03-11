@@ -19,10 +19,8 @@
 #include "trackerReal.h"
 
 #include "animation.h"
-#include "calibFilter.h"
 #include "control.h"
 #include "helper.h"
-#include "logger.h"
 #include "personStorage.h"
 #include "petrack.h"
 #include "player.h"
@@ -32,8 +30,8 @@
 #include <H5Cpp.h>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QProgressDialog>
 #include <QVariantMap>
-#include <fstream>
 #include <opencv2/highgui.hpp>
 
 TrackPointReal::TrackPointReal(const Vec3F &p, int frameNum) : Vec3F(p), mFrameNum(frameNum)

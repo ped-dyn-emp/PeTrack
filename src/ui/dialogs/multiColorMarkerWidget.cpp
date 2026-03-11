@@ -21,6 +21,9 @@
 #include "control.h"
 #include "importHelper.h"
 #include "petrack.h"
+#include "worldImageCorrespondence.h"
+
+#include <QGraphicsScene>
 
 MultiColorMarkerWidget::MultiColorMarkerWidget(QWidget *parent) : QWidget(parent)
 {

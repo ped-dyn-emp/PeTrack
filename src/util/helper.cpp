@@ -20,6 +20,11 @@
 
 #include "logger.h"
 
+#include <QColor>
+#include <QDir>
+#include <QFileInfo>
+#include <QImage>
+#include <QRect>
 #include <algorithm>
 #include <opencv2/opencv.hpp>
 #include <regex>
@@ -308,4 +313,158 @@ std::set<int> splitCompactString(const std::string &input)
     }
 
     return result;
+}
+
+cv::Scalar qcolor2scalar(QColor color)
+{
+    int r, g, b;
+    color.getRgb(&r, &g, &b);
+    return cv::Scalar(b, g, r); // swap RGB-->BGR
+}
+
+QColor scalar2qcolor(cv::Scalar color)
+{
+    QColor ret;
+    ret.setHsv(0, 0, color[0]);
+    return ret; // swap RGB-->BGR
+}
+
+QColor getValue(const cv::Mat &img, int x, int y)
+{
+    QColor     ret;
+    cv::Scalar scalar;
+    cv::Vec3b  val;
+    switch(img.channels())
+    {
+        case 1:
+            scalar = img.at<uchar>(cv::Point(x, y));
+            ret    = scalar2qcolor(scalar);
+            break;
+        case 3:
+        case 4:
+            val = img.at<cv::Vec3b>(cv::Point(x, y));
+            ret.setRgb(val.val[2], val.val[1], val.val[0]);
+            break;
+        default:;
+    }
+    return ret;
+}
+
+
+std::ostream &operator<<(std::ostream &s, const QColor &col)
+{
+    if(col.isValid())
+    {
+        s << col.red() << " " << col.green() << " " << col.blue();
+    }
+    else
+    {
+        s << -1 << " " << -1 << " " << -1;
+    }
+    return s;
+}
+
+
+QTextStream &operator<<(QTextStream &s, const QColor &col)
+{
+    if(col.isValid())
+    {
+        s << col.red() << " " << col.green() << " " << col.blue();
+    }
+    else
+    {
+        s << -1 << " " << -1 << " " << -1;
+    }
+    return s;
+}
+
+
+QTextStream &operator>>(QTextStream &s, QColor &col)
+{
+    int i;
+    // leave invalid, if one number is -1
+    s >> i;
+    if(i != -1)
+    {
+        col.setRed(i);
+        s >> i;
+        col.setGreen(i);
+        s >> i;
+        col.setBlue(i);
+    }
+    else
+    {
+        s >> i >> i;
+    }
+    return s;
+}
+
+/**
+ * @brief checks the ;-separated file names for existence and returns the first
+ *
+ * Interesting for working with absolute <em>and</em> relative paths.
+ *
+ * @param fileList
+ * @param relToFileName
+ * @return first file to exist
+ */
+QString getExistingFile(const QString &fileList, const QString &relToFileName)
+{
+    QStringList list;
+    list = fileList.split(";", Qt::SkipEmptyParts);
+    for(int i = 0; i < list.size(); ++i)
+    {
+        if(auto f = QFileInfo(list.at(i)); f.exists() && f.isFile())
+        {
+            return list.at(i);
+        }
+        if(auto f = QFileInfo(list.at(i).trimmed()); f.exists() && f.isFile())
+        {
+            return list.at(i).trimmed();
+        }
+        if(auto f = QFileInfo(QFileInfo(relToFileName).absolutePath() + "/" + list.at(i).trimmed());
+           f.exists() && f.isFile())
+        {
+            return QFileInfo(relToFileName).absolutePath() + "/" + list.at(i).trimmed();
+        }
+    }
+    return ""; // wenn keine der Dateien existiert
+}
+
+QString getFileList(const QString &file, const QString &originOfRelativePath)
+{
+    QString absolutePathToFileName = QFileInfo(file).absoluteFilePath();
+    QString relativePathToFileNameFromPet =
+        QDir(QFileInfo(originOfRelativePath).absolutePath()).relativeFilePath(absolutePathToFileName);
+
+    // for a non-existing file we can not create a filelist
+    if(!QFileInfo(file).exists())
+    {
+        return file;
+    }
+
+    if(QFileInfo(file).isRelative())
+    {
+        if(file == relativePathToFileNameFromPet)
+        {
+            return file + ";" + absolutePathToFileName;
+        }
+        else // if file relative to working directory
+        {
+            return file + ";" + absolutePathToFileName + ";" + relativePathToFileNameFromPet;
+        }
+    }
+    else
+    {
+        return file + ";" + relativePathToFileNameFromPet;
+    }
+}
+
+clock_t getElapsedTime()
+{
+    static clock_t lastTime = clock();
+    static clock_t diffTime; // fuer performance
+    diffTime = clock() - lastTime;
+    lastTime = clock();
+    return diffTime;
 }

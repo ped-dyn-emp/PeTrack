@@ -20,6 +20,7 @@
 
 #include "petrack.h"
 
+#include <QDir>
 #include <QTimer>
 
 Autosave::Autosave(Petrack &petrack) : mPetrack(petrack)

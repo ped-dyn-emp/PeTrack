@@ -22,6 +22,9 @@
 #include "importHelper.h"
 #include "petrack.h"
 
+#include <QColorDialog>
+#include <QGraphicsScene>
+
 
 ColorMarkerWidget::ColorMarkerWidget(QWidget *parent) : QWidget(parent)
 {

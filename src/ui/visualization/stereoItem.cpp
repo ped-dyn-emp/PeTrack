@@ -24,7 +24,7 @@
 #include "tracker.h"
 #include "view.h"
 
-#include <QtWidgets>
+#include <QGraphicsSceneHoverEvent>
 
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,

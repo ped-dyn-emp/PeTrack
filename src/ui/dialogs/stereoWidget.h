@@ -21,7 +21,7 @@
 
 #include "ui_stereo.h"
 
-#include <QtWidgets>
+#include <QWidget>
 class Petrack;
 class QDomElement;
 

@@ -20,14 +20,14 @@
 #define VECTOR_H
 
 
-#include <QTextStream>
-#include <QVector3D>
 #include <opencv2/core/types_c.h>
+#include <stdexcept>
 
 struct CvPoint;
 struct CvPoint2D32f;
 class QPointF;
 class QPoint;
+class QTextStream;
 
 
 class Vec3F
@@ -210,11 +210,8 @@ inline std::ostream &operator<<(std::ostream &s, const Vec2F &v)
 }
 
 // only for combine programm, not for petrack
-inline QTextStream &operator<<(QTextStream &s, const Vec2F &v)
-{
-    s << v.x() << " " << v.y(); // ohne (,) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    return s;
-}
+QTextStream &operator<<(QTextStream &s, const Vec2F &v);
+
 inline std::istream &operator>>(std::istream &s, Vec2F &v)
 {
     double d;
@@ -224,14 +221,6 @@ inline std::istream &operator>>(std::istream &s, Vec2F &v)
     v.setY(d);
     return s;
 }
-inline QTextStream &operator>>(QTextStream &s, Vec2F &v)
-{
-    double d;
-    s >> d;
-    v.setX(d);
-    s >> d;
-    v.setY(d);
-    return s;
-}
+QTextStream &operator>>(QTextStream &s, Vec2F &v);
 
 #endif

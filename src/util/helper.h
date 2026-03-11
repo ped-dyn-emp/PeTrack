@@ -19,16 +19,17 @@
 #ifndef HELPER_H
 #define HELPER_H
 
-#include <QFileInfo>
-#include <QRect>
 #include <QString>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/core/types.hpp>
-#include <opencv2/opencv.hpp>
 #include <set>
-#include <sstream>
 #include <string>
 #include <vector>
+
+class QImage;
+class QRect;
+class QColor;
+class QTextStream;
 
 extern const QString commandLineOptionsString;
 extern QString       proFileName; ///< Path to the project (.pet) file; defined in helper.cpp
@@ -65,7 +66,6 @@ inline constexpr double PI = 3.141592654;
 //    > cvImage->imageData = (char *)qtImage.bits();
 // Static function that converts an iplImg in a qImg.
 // If the images are not the same size, a new qImg will be created with the same size as the iplImg.
-#include <QImage>
 void copyToQImage(QImage &qImg, cv::Mat &img);
 
 cv::Rect qRectToCvRect(const QRect &roi, const cv::Mat &img, bool evenPixelNumber = true);
@@ -118,95 +118,20 @@ inline double getMedianOf3(double a, double b, double c)
 // get image grey value from grey-images with values 0..255 (may be also 3 channels???)
 #define getGrey(img, x, y) ((int) *(uchar *) ((img)->imageData + (img)->widthStep * (y) + (x)))
 
-inline cv::Scalar qcolor2scalar(QColor color)
-{
-    int r, g, b;
-    color.getRgb(&r, &g, &b);
-    return cv::Scalar(b, g, r); // swap RGB-->BGR
-}
+cv::Scalar qcolor2scalar(QColor color);
 
-inline QColor scalar2qcolor(cv::Scalar color)
-{
-    QColor ret;
-    ret.setHsv(0, 0, color[0]);
-    return ret; // swap RGB-->BGR
-}
+QColor scalar2qcolor(cv::Scalar color);
 
-inline QColor getValue(const cv::Mat &img, int x, int y)
-{
-    QColor     ret;
-    cv::Scalar scalar;
-    cv::Vec3b  val;
-    switch(img.channels())
-    {
-        case 1:
-            scalar = img.at<uchar>(cv::Point(x, y));
-            ret    = scalar2qcolor(scalar);
-            break;
-        case 3:
-        case 4:
-            val = img.at<cv::Vec3b>(cv::Point(x, y));
-            ret.setRgb(val.val[2], val.val[1], val.val[0]);
-            break;
-        default:;
-    }
-    return ret;
-}
-#include <QColor>
-#include <QTextStream>
-#include <iostream>
-inline std::ostream &operator<<(std::ostream &s, const QColor &col)
-{
-    if(col.isValid())
-    {
-        s << col.red() << " " << col.green() << " " << col.blue();
-    }
-    else
-    {
-        s << -1 << " " << -1 << " " << -1;
-    }
-    return s;
-}
+QColor getValue(const cv::Mat &img, int x, int y);
+
+std::ostream &operator<<(std::ostream &s, const QColor &col);
 
 
-inline QTextStream &operator<<(QTextStream &s, const QColor &col)
-{
-    if(col.isValid())
-    {
-        s << col.red() << " " << col.green() << " " << col.blue();
-    }
-    else
-    {
-        s << -1 << " " << -1 << " " << -1;
-    }
-    return s;
-}
+QTextStream &operator<<(QTextStream &s, const QColor &col);
 
 
-inline QTextStream &operator>>(QTextStream &s, QColor &col)
-{
-    int i;
-    // leave invalid, if one number is -1
-    s >> i;
-    if(i != -1)
-    {
-        col.setRed(i);
-        s >> i;
-        col.setGreen(i);
-        s >> i;
-        col.setBlue(i);
-    }
-    else
-    {
-        s >> i >> i;
-    }
-    return s;
-}
+QTextStream &operator>>(QTextStream &s, QColor &col);
 
-#include <QFile>
-#include <QFileInfo>
-#include <QString>
-#include <QStringList>
 /**
  * @brief checks the ;-separated file names for existence and returns the first
  *
@@ -216,70 +141,12 @@ inline QTextStream &operator>>(QTextStream &s, QColor &col)
  * @param relToFileName
  * @return first file to exist
  */
-inline QString getExistingFile(const QString &fileList, const QString &relToFileName = proFileName)
-{
-    QStringList list;
-    list = fileList.split(";", Qt::SkipEmptyParts);
-    for(int i = 0; i < list.size(); ++i)
-    {
-        if(auto f = QFileInfo(list.at(i)); f.exists() && f.isFile())
-        {
-            return list.at(i);
-        }
-        if(auto f = QFileInfo(list.at(i).trimmed()); f.exists() && f.isFile())
-        {
-            return list.at(i).trimmed();
-        }
-        if(auto f = QFileInfo(QFileInfo(relToFileName).absolutePath() + "/" + list.at(i).trimmed());
-           f.exists() && f.isFile())
-        {
-            return QFileInfo(relToFileName).absolutePath() + "/" + list.at(i).trimmed();
-        }
-    }
-    return ""; // wenn keine der Dateien existiert
-}
+QString getExistingFile(const QString &fileList, const QString &relToFileName = proFileName);
 
-#include <QDir>
-#include <QFileInfo>
-inline QString getFileList(const QString &file, const QString &originOfRelativePath = proFileName)
-{
-    QString absolutePathToFileName = QFileInfo(file).absoluteFilePath();
-    QString relativePathToFileNameFromPet =
-        QDir(QFileInfo(originOfRelativePath).absolutePath()).relativeFilePath(absolutePathToFileName);
+QString getFileList(const QString &file, const QString &originOfRelativePath = proFileName);
 
-    // for a non-existing file we can not create a filelist
-    if(!QFileInfo(file).exists())
-    {
-        return file;
-    }
-
-    if(QFileInfo(file).isRelative())
-    {
-        if(file == relativePathToFileNameFromPet)
-        {
-            return file + ";" + absolutePathToFileName;
-        }
-        else // if file relative to working directory
-        {
-            return file + ";" + absolutePathToFileName + ";" + relativePathToFileNameFromPet;
-        }
-    }
-    else
-    {
-        return file + ";" + relativePathToFileNameFromPet;
-    }
-}
-
-#include <ctime>
-inline clock_t getElapsedTime()
-{
-    static clock_t lastTime = clock();
-    static clock_t diffTime; // fuer performance
-    diffTime = clock() - lastTime;
-    lastTime = clock();
-    return diffTime;
-}
-bool newerThanVersion(const QString &q1, const QString &q2);
+clock_t getElapsedTime();
+bool    newerThanVersion(const QString &q1, const QString &q2);
 
 /**
  * Computes the median of the values in a given vector.

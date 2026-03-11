@@ -27,8 +27,10 @@
 #include "view.h"
 #include "worldImageCorrespondence.h"
 
+#include <QGraphicsSceneContextMenuEvent>
 #include <QInputDialog>
-#include <QtWidgets>
+#include <QMenu>
+#include <QMessageBox>
 
 // in x und y gleichermassen skaliertes koordinatensystem,
 // da von einer vorherigen intrinsischen kamerakalibrierung ausgegenagen wird,

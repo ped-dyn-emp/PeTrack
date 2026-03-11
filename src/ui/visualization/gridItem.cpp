@@ -24,7 +24,7 @@
 #include "petrack.h"
 #include "view.h"
 
-#include <QtWidgets>
+#include <QGraphicsSceneMouseEvent>
 #include <cmath>
 
 // this is a helper to write a visitor for std::visit using multiple lambdas (or other functors for that matter)

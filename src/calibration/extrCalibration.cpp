@@ -24,8 +24,10 @@
 #include "pMessageBox.h"
 #include "petrack.h"
 
+#include <QApplication>
 #include <QFileDialog>
-#include <QtWidgets>
+#include <QGraphicsScene>
+#include <QStyle>
 #include <optional>
 
 #define MAX_AV_ERROR 20

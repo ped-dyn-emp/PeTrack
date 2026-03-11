@@ -23,7 +23,7 @@
 #include "recognition.h"
 
 #include <QDomElement>
-#include <QtWidgets>
+#include <QWidget>
 
 namespace Ui
 {

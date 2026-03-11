@@ -29,6 +29,8 @@
 #include "roiItem.h"
 #include "stereoWidget.h"
 
+#include <QMessageBox>
+
 /**
  * @brief split trajectorie pers before frame frame
  * @param pers index of person
