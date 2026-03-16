@@ -17,4 +17,8 @@ target_sources(petrack_core PRIVATE
     qtColorTriangle.h
     pInputDialog.h
     pInputDialog.cpp
+    pTabWidget.h
+    pTabWidget.cpp
+    pTabBar.h
+    pTabBar.cpp
 )
