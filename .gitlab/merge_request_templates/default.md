@@ -21,4 +21,5 @@
 - [ ] new elements are also saved and loaded from pet-file
 - [ ] check if tab order is still correct
 - [ ] all new SpinBoxes are promoted
+- [ ] all new TabWidgets are promoted
 - [ ] new keybindings added to `Petrack::keyBindings()`

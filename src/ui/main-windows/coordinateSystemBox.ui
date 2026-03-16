@@ -109,7 +109,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QTabWidget" name="coordTab">
+    <widget class="PTabWidget" name="coordTab">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -1177,6 +1177,12 @@
    <class>PDoubleSpinBox</class>
    <extends>QDoubleSpinBox</extends>
    <header>pdoublespinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PTabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>pTabWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>
