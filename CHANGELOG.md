@@ -13,7 +13,7 @@
 - Accidental scrolling on image rotation slider without focus is not longer possible
 - The marker box in recognition now no longer reacts to mouse wheel scrolling
 - The tabs now no longer react to scrolling
-- ROI `show` set to false now makes the `fix` ROI button unable to toggle
+- `show` set to false now makes the `fix` button unable to toggle
 - The trackpoint visualization now follows the color of the track path
 - Fix: roi not shown on startup
 - Fix: wrong margin for some UI boxes

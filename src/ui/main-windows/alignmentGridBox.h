@@ -54,10 +54,11 @@ public:
     ~AlignmentGridBox();
 
     Grid getGridParameters();
-    bool isShow();
+    bool isShow() const;
     void setShow(bool b);
-    bool isFix();
+    bool isFix() const;
     void setFix(bool b);
+    bool getGridFixEnabled() const;
 
     void setTrans3DX(double x);
     void setTrans3DY(double y);
@@ -76,8 +77,7 @@ signals:
     void gridChanged();
 
 private slots:
-    void onGridShowStateChanged();
-    void onGridFixStateChanged();
+    void toggleShowFix();
     void onGridRotateValueChanged();
     void onGridTransXValueChanged();
     void onGridTransYValueChanged();

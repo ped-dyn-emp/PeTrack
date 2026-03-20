@@ -89,8 +89,8 @@ CoordinateSystemBox::CoordinateSystemBox(
     mPose2D.position[1] = mUi->coordTransY->value();
 
     connect(mUi->coordTab, &QTabWidget::currentChanged, this, &CoordinateSystemBox::onCoordTabCurrentChanged);
-    connect(mUi->coordShow, &QCheckBox::checkStateChanged, this, &CoordinateSystemBox::onCoordShowStateChanged);
-    connect(mUi->coordFix, &QCheckBox::checkStateChanged, this, &CoordinateSystemBox::onCoordFixStateChanged);
+    connect(mUi->coordShow, &QCheckBox::checkStateChanged, this, &CoordinateSystemBox::toggleShowFix);
+    connect(mUi->coordFix, &QCheckBox::checkStateChanged, this, &CoordinateSystemBox::toggleShowFix);
     connect(mUi->coordSystemThicknessSlider, &PSlider::valueChanged, this, &CoordinateSystemBox::updateCoordItem);
 
     // 2D coordinates
@@ -475,6 +475,7 @@ bool CoordinateSystemBox::getXml(const QDomElement &subSubElem)
         }
 
 
+        toggleShowFix();
         return true;
     }
     return false;
@@ -642,20 +643,21 @@ void CoordinateSystemBox::onCoordTabCurrentChanged(int index)
     updateCoordItem();
 }
 
-void CoordinateSystemBox::onCoordShowStateChanged()
+void CoordinateSystemBox::toggleShowFix()
 {
-    if(!mUi->coordShow->isChecked())
+    const bool show = mUi->coordShow->isChecked();
+    if(!show)
     {
         mUi->coordFix->setChecked(true);
+        mUi->coordFix->setEnabled(false);
+    }
+    else
+    {
+        mUi->coordFix->setEnabled(true);
     }
     updateCoordItem();
     setMeasuredAltitude(); // measured isn't updated, when scale is moved and show deactivated
                            // and would have lead to a false value in the coord system when activating
-}
-
-void CoordinateSystemBox::onCoordFixStateChanged()
-{
-    updateCoordItem();
 }
 
 void CoordinateSystemBox::onCoordRotateValueChanged(int newAngle)

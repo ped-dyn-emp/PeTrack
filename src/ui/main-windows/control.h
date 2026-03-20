@@ -156,6 +156,7 @@ public:
     bool getRecoRoiShow() const;
     void setRecoRoiShow(bool b);
     bool getRecoRoiFix() const;
+    bool getRecoRoiEnabled() const;
     void setRecoRoiFix(bool b);
 
 
@@ -165,6 +166,7 @@ public:
     bool getTrackRoiShow() const;
     void setTrackRoiShow(bool b);
     bool getTrackRoiFix() const;
+    bool getTrackRoiEnabled() const;
     void setTrackRoiFix(bool b);
 
     bool getAdaptiveLevel() const;

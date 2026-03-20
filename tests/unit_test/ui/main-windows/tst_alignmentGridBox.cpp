@@ -26,12 +26,13 @@ TEST_CASE("AlignmentGridBox: UI logic")
     Petrack          petrack{"Unkown"};
     AlignmentGridBox alignGridBox{&petrack};
 
-    SECTION("Setting show to false should imply fixing the alignment grid")
+    SECTION("Setting show to false should imply fixing the alignment grid and making fix unable to toggle")
     {
         // ensure show is checked and fix is unchecked
         alignGridBox.setShow(true);
         alignGridBox.setFix(false);
         alignGridBox.setShow(false);
         CHECK(alignGridBox.isFix());
+        CHECK(!alignGridBox.getGridFixEnabled());
     }
 }
