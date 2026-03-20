@@ -437,7 +437,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 if(mControlWidget->isTrackShowCurrentPointChecked())
                 {
                     painter->setBrush(Qt::NoBrush);
-                    if(person.newReco())
+                    if(tp.isDetection())
                     {
                         currentPointLineWidthPen.setColor(Qt::green);
                     }

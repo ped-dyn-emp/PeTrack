@@ -630,8 +630,6 @@ bool PersonStorage::addPoint(
         {
             *pers = iNearest;
         }
-
-        mPersons[iNearest].setNewReco(true);
     }
 
     if((onlyVisible.empty()) && !found)
@@ -685,12 +683,6 @@ bool PersonStorage::addPoint(
  */
 void PersonStorage::addPoints(QList<TrackPoint> &pL, int frame, reco::RecognitionMethod method)
 {
-    // reset newReco
-    for(auto &person : mPersons)
-    {
-        person.setNewReco(false);
-    }
-
     // ueberprufen ob identisch mit einem Punkt in liste
     for(auto &point : pL) // ueber PointList
     {

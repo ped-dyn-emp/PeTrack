@@ -65,7 +65,6 @@ private:
     double            mHeight;        //< height of the person
     int               mHeightCount;   //< number of colors where mHeight is averaged
     int               mFirstFrame;    //< frame where the person was tracked the first time
-    bool              mNewReco;       //< true if person was just recognized
     QColor            mColor;         //< average color of person
     QString           mComment;       //< comment for person
     int               mNrInBg;        //< number of successive frames in the background
@@ -117,8 +116,6 @@ public:
     }
     inline const QColor &color() const { return mColor; }
     inline void          setColor(const QColor &col) { mColor = col; }
-    inline bool          newReco() const { return mNewReco; }
-    inline void          setNewReco(bool b) { mNewReco = b; }
     inline int           firstFrame() const { return mFirstFrame; }
     inline int           lastFrame() const { return mFirstFrame + mData.size() - 1; }
     inline int           nr() const { return mNr; }
