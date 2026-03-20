@@ -414,18 +414,20 @@ TEST_CASE("Control: ROI fixed synchronized")
         control->setRecoRoiFix(!control->getRecoRoiFix());
         CHECK(control->getRecoRoiFix() == recoROI->isFixed());
     }
-    SECTION("Setting show to false should imply fixing the ROI objects")
+    SECTION("Setting show to false should imply fixing the ROI objects and making fix unable to toggle")
     {
         // reco ROI
         control->setRecoRoiShow(true);
         control->setRecoRoiFix(false);
         control->setRecoRoiShow(false);
         CHECK(control->getRecoRoiFix());
+        CHECK(!control->getRecoRoiEnabled());
         // track ROI
         control->setTrackRoiShow(true);
         control->setTrackRoiFix(false);
         control->setTrackRoiShow(false);
         CHECK(control->getTrackRoiFix());
+        CHECK(!control->getTrackRoiEnabled());
     }
 }
 

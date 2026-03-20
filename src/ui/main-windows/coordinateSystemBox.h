@@ -126,8 +126,7 @@ public slots:
 private slots:
     // selection
     void onCoordTabCurrentChanged(int index);
-    void onCoordShowStateChanged();
-    void onCoordFixStateChanged();
+    void toggleShowFix();
 
     // 2D
     void onCoordRotateValueChanged(int newAngle);

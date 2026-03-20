@@ -924,6 +924,11 @@ bool Control::getRecoRoiFix() const
     return mUi->roiFix->isChecked();
 }
 
+bool Control::getRecoRoiEnabled() const
+{
+    return mUi->roiFix->isEnabled();
+}
+
 void Control::setRecoRoiFix(bool b)
 {
     mUi->roiFix->setChecked(b);
@@ -942,6 +947,11 @@ void Control::setTrackRoiShow(bool b)
 bool Control::getTrackRoiFix() const
 {
     return mUi->trackRoiFix->isChecked();
+}
+
+bool Control::getTrackRoiEnabled() const
+{
+    return mUi->trackRoiFix->isEnabled();
 }
 
 void Control::setTrackRoiFix(bool b)

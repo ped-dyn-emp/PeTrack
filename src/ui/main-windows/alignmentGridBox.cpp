@@ -30,8 +30,8 @@ AlignmentGridBox::AlignmentGridBox(QWidget *parent) : QWidget(parent), mUi(new U
 
     setFocusProxy(mUi->gridShow);
 
-    connect(mUi->gridShow, &QCheckBox::checkStateChanged, this, &AlignmentGridBox::onGridShowStateChanged);
-    connect(mUi->gridFix, &QCheckBox::checkStateChanged, this, &AlignmentGridBox::onGridFixStateChanged);
+    connect(mUi->gridShow, &QCheckBox::checkStateChanged, this, &AlignmentGridBox::toggleShowFix);
+    connect(mUi->gridFix, &QCheckBox::checkStateChanged, this, &AlignmentGridBox::toggleShowFix);
     connect(mUi->gridRotate, &PSlider::valueChanged, this, &AlignmentGridBox::onGridRotateValueChanged);
     connect(mUi->gridTransX, &PSlider::valueChanged, this, &AlignmentGridBox::onGridTransXValueChanged);
     connect(mUi->gridTransY, &PSlider::valueChanged, this, &AlignmentGridBox::onGridTransYValueChanged);
@@ -53,7 +53,7 @@ Grid AlignmentGridBox::getGridParameters()
     return assembleGrid();
 }
 
-bool AlignmentGridBox::isShow()
+bool AlignmentGridBox::isShow() const
 {
     return mUi->gridShow->isChecked();
 }
@@ -63,9 +63,14 @@ void AlignmentGridBox::setShow(bool b)
     mUi->gridShow->setChecked(b);
 }
 
-bool AlignmentGridBox::isFix()
+bool AlignmentGridBox::isFix() const
 {
     return mUi->gridFix->isChecked();
+}
+
+bool AlignmentGridBox::getGridFixEnabled() const
+{
+    return mUi->gridFix->isEnabled();
 }
 
 void AlignmentGridBox::setFix(bool b)
@@ -195,17 +200,18 @@ void AlignmentGridBox::onGridTabCurrentChanged()
     emit gridChanged();
 }
 
-void AlignmentGridBox::onGridShowStateChanged()
+void AlignmentGridBox::toggleShowFix()
 {
-    if(!isShow())
+    const bool show = mUi->gridShow->isChecked();
+    if(!show)
     {
-        setFix(true);
+        mUi->gridFix->setChecked(true);
+        mUi->gridFix->setEnabled(false);
     }
-    emit gridChanged();
-}
-
-void AlignmentGridBox::onGridFixStateChanged()
-{
+    else
+    {
+        mUi->gridFix->setEnabled(true);
+    }
     emit gridChanged();
 }
 

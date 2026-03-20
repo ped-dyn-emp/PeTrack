@@ -15,7 +15,7 @@
 # Project setup
 ################################################################################
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
-project(petrack LANGUAGES CXX VERSION 1.1.4)
+project(petrack LANGUAGES CXX VERSION 1.1.5)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
