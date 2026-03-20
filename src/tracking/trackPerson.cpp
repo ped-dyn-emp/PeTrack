@@ -29,7 +29,6 @@ TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p) :
     mHeight(MIN_HEIGHT),
     mHeightCount(0),
     mFirstFrame(frame),
-    mNewReco(true),
     mComment(),
     mColorCount(1),
     mKalmanFilter(4, 2, 0)
@@ -48,7 +47,6 @@ TrackPerson::TrackPerson(int nr, int frame, const TrackPoint &p, int markerID) :
     mHeight(MIN_HEIGHT),
     mHeightCount(0),
     mFirstFrame(frame),
-    mNewReco(true),
     mComment(),
     mColorCount(1),
     mKalmanFilter(4, 2, 0)

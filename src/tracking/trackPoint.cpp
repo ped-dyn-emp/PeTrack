@@ -309,7 +309,7 @@ TrackPoint TrackPoint::operator-(const TrackPoint &other) const
 
 bool TrackPoint::isDetection() const
 {
-    return mQuality > MIN_DETECTION_QUAL;
+    return mQuality > MAX_TRACKING_QUAL;
 }
 
 ParseResult

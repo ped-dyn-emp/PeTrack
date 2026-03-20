@@ -21,6 +21,7 @@
 - Saving player loop + fix playback speed option in pet file
 - Fix: border size slider freezed PeTrack
 - Fix: zoom buttons not working
+- Fix: incorrect drawing of trackpoint color when recognition is not active
 
 # 1.1
 
