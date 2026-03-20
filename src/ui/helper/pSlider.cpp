@@ -88,6 +88,8 @@ void PSlider::mousePressEvent(QMouseEvent *event)
         {
             mThrottleTimer.start();
         }
+        mLastMouseVal = value();
+
         QStyleOptionSlider opt;
         initStyleOption(&opt);
 
