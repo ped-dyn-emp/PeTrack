@@ -37,6 +37,7 @@ if (WIN32)
 
 elseif(APPLE)
     set_target_properties(petrack PROPERTIES
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/macos/Info.plist.in
         MACOSX_BUNDLE_BUNDLE_VERSION       "${PROJECT_VERSION}"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
     )

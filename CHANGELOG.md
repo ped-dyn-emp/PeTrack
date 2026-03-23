@@ -15,6 +15,8 @@
 - The tabs now no longer react to scrolling
 - `show` set to false now makes the `fix` button unable to toggle
 - The trackpoint visualization now follows the color of the track path
+- PeTrack will now load the project if you open `pet` files via double-click on MacOS
+- `pet` files now appear with the PeTrack icon on MacOS
 - Fix: roi not shown on startup
 - Fix: wrong margin for some UI boxes
 - Fix: code marker ID 0 was not displayed
