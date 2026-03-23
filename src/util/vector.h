@@ -93,8 +93,7 @@ public:
 
     double operator*(const Vec3F &v) const; // dot product
 
-    bool operator==(const Vec3F &v) const;
-    bool operator!=(const Vec3F &v) const;
+    bool operator==(const Vec3F &v) const = default;
 
     double length() const;
     Vec3F  unit() const;
@@ -176,8 +175,7 @@ public:
 
     double operator*(const Vec2F &v) const; // dot product
 
-    bool operator==(const Vec2F &v) const;
-    bool operator!=(const Vec2F &v) const;
+    bool operator==(const Vec2F &v) const = default;
 
     double length() const;
 

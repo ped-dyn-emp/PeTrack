@@ -880,7 +880,7 @@ bool PersonStorage::printHeightDistribution()
     for(j = dict.constBegin(); j != dict.constEnd(); ++j)
     {
         SPDLOG_INFO(
-            "height {:1.5f} - {:1.5f} : number {:.3f} ({:4.f}%)",
+            FMT_STRING("height {:1.5f} - {:1.5f} : number {:3d} ({:4.1f}%)"),
             j.key(),
             j.key() + heightStep,
             j.value(),

@@ -34,9 +34,9 @@
 namespace logger
 {
 // Note: when changing this, also adapt messageBoxLogFormat accordingly!
-const std::string LOG_FORMAT              = "[%s:%#:%!][%l] %v";
-const std::string MESSAGE_BOX_LOGGER_NAME = "pMessageBox";
-const std::string MESSAGE_BOX_LOG_FORMAT  = "[{}:{}:{}][{}] {}";
+constexpr auto LOG_FORMAT              = "[%s:%#:%!][%l] %v";
+constexpr auto MESSAGE_BOX_LOGGER_NAME = "pMessageBox";
+constexpr auto MESSAGE_BOX_LOG_FORMAT  = "[{}:{}:{}][{}] {}";
 
 inline void setupLogger()
 {

@@ -27,6 +27,8 @@ struct CoordPose2D
     double angle;
     double scale;
     double unit;
+
+    friend bool operator==(const CoordPose2D &lhs, const CoordPose2D &rhs) = default;
 };
 
 struct SwapAxis
@@ -34,12 +36,10 @@ struct SwapAxis
     bool x;
     bool y;
     bool z;
+
+    friend bool operator==(const SwapAxis &lhs, const SwapAxis &rhs) = default;
 };
 
-inline bool operator==(const SwapAxis &lhs, const SwapAxis &rhs)
-{
-    return (lhs.x == rhs.x) && (lhs.y == rhs.y) && (lhs.z == rhs.z);
-}
 
 struct CoordPose3D
 {

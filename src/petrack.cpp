@@ -128,11 +128,11 @@ Petrack::Petrack(QString petrackVersion) :
     mScene = new QGraphicsScene(this);
 
     mTrackingRoiItem = new RoiItem(this, Qt::blue);
-    connect(mTrackingRoiItem, &RoiItem::changed, this, [=]() { this->setTrackChanged(true); });
+    connect(mTrackingRoiItem, &RoiItem::changed, this, [this]() { setTrackChanged(true); });
     mTrackingRoiItem->setZValue(4); // groesser heisst weiter oben
 
     mRecognitionRoiItem = new RoiItem(this, Qt::green);
-    connect(mRecognitionRoiItem, &RoiItem::changed, this, [=]() { this->setRecognitionChanged(true); });
+    connect(mRecognitionRoiItem, &RoiItem::changed, this, [this]() { setRecognitionChanged(true); });
     mRecognitionRoiItem->setZValue(5); // groesser heisst weiter oben
 
 
@@ -360,23 +360,23 @@ Petrack::Petrack(QString petrackVersion) :
     createStatusBar();
 
     auto *exportShortCut = new QShortcut{QKeySequence("Shift+e"), this};
-    connect(exportShortCut, &QShortcut::activated, this, [=]() { exportTracker(); });
+    connect(exportShortCut, &QShortcut::activated, this, [this]() { exportTracker(); });
 
 
     auto *toggleOnlineTracking = new QShortcut{QKeySequence("Shift+t"), this};
-    connect(toggleOnlineTracking, &QShortcut::activated, this, [=]() { mControlWidget->toggleTrackActive(); });
+    connect(toggleOnlineTracking, &QShortcut::activated, this, [this]() { mControlWidget->toggleTrackActive(); });
 
     auto *toggleRecognition = new QShortcut{QKeySequence("Shift+r"), this};
-    connect(toggleRecognition, &QShortcut::activated, this, [=]() { mControlWidget->toggleRecognition(); });
+    connect(toggleRecognition, &QShortcut::activated, this, [this]() { mControlWidget->toggleRecognition(); });
 
     auto *toggleShowOnly = new QShortcut{QKeySequence("Shift+a"), this};
-    connect(toggleShowOnly, &QShortcut::activated, this, [=]() { mControlWidget->toggleShowOnly(); });
+    connect(toggleShowOnly, &QShortcut::activated, this, [this]() { mControlWidget->toggleShowOnly(); });
 
     auto *goToStart = new QShortcut{QKeySequence("Shift+s"), this};
-    connect(goToStart, &QShortcut::activated, this, [=]() { mControlWidget->onTrackGotoStartNrClicked(); });
+    connect(goToStart, &QShortcut::activated, this, [this]() { mControlWidget->onTrackGotoStartNrClicked(); });
 
     auto *goToEnd = new QShortcut{QKeySequence("Shift+d"), this};
-    connect(goToEnd, &QShortcut::activated, this, [=]() { mControlWidget->onTrackGotoEndNrClicked(); });
+    connect(goToEnd, &QShortcut::activated, this, [this]() { mControlWidget->onTrackGotoEndNrClicked(); });
 
     // TODO delete once we get Options to be value only (i.e. no Pointer/Ref anymore)
     mReco.getCodeMarkerOptions().setControlWidget(mControlWidget);
