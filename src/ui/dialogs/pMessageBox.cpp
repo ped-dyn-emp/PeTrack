@@ -102,10 +102,10 @@ PMessageBox::PMessageBox(
         buttonBox,
         &QDialogButtonBox::clicked,
         this,
-        [=](QAbstractButton *button)
+        [buttonBox, this](QAbstractButton *button)
         {
             int ret = buttonBox->standardButton(button);
-            this->done(ret);
+            done(ret);
         });
 
     layout->setSpacing(20);
@@ -205,10 +205,10 @@ PMessageBox::PMessageBox(
         buttonBox,
         &QDialogButtonBox::clicked,
         this,
-        [=](QAbstractButton *button)
+        [buttonBox, this](QAbstractButton *button)
         {
             int ret = buttonBox->buttons().indexOf(button);
-            this->done(ret);
+            done(ret);
         });
     layout->setSpacing(20);
 

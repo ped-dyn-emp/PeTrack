@@ -28,11 +28,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-bool operator==(const CoordPose2D &lhs, const CoordPose2D &rhs)
-{
-    return lhs.angle == rhs.angle && lhs.position == rhs.position && lhs.scale == rhs.scale && lhs.unit == rhs.unit;
-}
-
 TEST_CASE("CoordinateSystemBox: display of values in UI")
 {
     Petrack             petrack{"Unkown"};

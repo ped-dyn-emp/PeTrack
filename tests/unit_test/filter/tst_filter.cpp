@@ -23,9 +23,9 @@
 
 struct MyTestStruct
 {
-    int  state = 0;
-    bool operator==(const MyTestStruct &rhs) const { return state == rhs.state; }
-    bool operator!=(const MyTestStruct &rhs) const { return state != rhs.state; }
+    int state = 0;
+
+    bool operator==(const MyTestStruct &rhs) const = default;
 };
 
 class SimpleFilter : public Filter

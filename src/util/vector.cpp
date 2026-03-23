@@ -128,16 +128,6 @@ double Vec3F::operator*(const Vec3F &v) const
     return mX * v.mX + mY * v.mY;
 }
 
-bool Vec3F::operator==(const Vec3F &v) const
-{
-    return mX == v.mX && mY == v.mY && mZ == v.mZ;
-}
-
-bool Vec3F::operator!=(const Vec3F &v) const
-{
-    return !(*this == v);
-}
-
 double Vec3F::length() const
 {
     return sqrt(mX * mX + mY * mY + mZ * mZ);
@@ -291,16 +281,6 @@ Vec2F Vec2F::operator/(double n) const
 double Vec2F::operator*(const Vec2F &v) const
 {
     return mX * v.mX + mY * v.mY;
-}
-
-bool Vec2F::operator==(const Vec2F &v) const
-{
-    return mX == v.mX && mY == v.mY;
-}
-
-bool Vec2F::operator!=(const Vec2F &v) const
-{
-    return !(*this == v);
 }
 
 double Vec2F::length() const

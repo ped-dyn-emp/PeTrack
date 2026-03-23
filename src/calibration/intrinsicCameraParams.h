@@ -167,12 +167,7 @@ struct IntrinsicModelsParameters
     IntrinsicCameraParams oldModelParams;
     IntrinsicCameraParams extModelParams;
 
-    friend bool operator==(const IntrinsicModelsParameters &lhs, const IntrinsicModelsParameters &rhs)
-    {
-        bool eqOldModel = lhs.oldModelParams == rhs.oldModelParams;
-        bool eqExtModel = lhs.extModelParams == rhs.extModelParams;
-        return eqOldModel && eqExtModel;
-    }
+    friend bool operator==(const IntrinsicModelsParameters &lhs, const IntrinsicModelsParameters &rhs) = default;
 
     friend bool operator!=(const IntrinsicModelsParameters &lhs, const IntrinsicModelsParameters &rhs)
     {

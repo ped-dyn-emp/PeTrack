@@ -86,34 +86,8 @@ class ArucoCodeParams
     double errorCorrectionRate                   = 0.6;
 
 public:
-    friend inline constexpr bool operator==(const ArucoCodeParams &lhs, const ArucoCodeParams &rhs) noexcept
-    {
-        return (lhs.minMarkerPerimeter == rhs.minMarkerPerimeter) &&
-               ((lhs.maxMarkerPerimeter == rhs.maxMarkerPerimeter) &&
-                ((lhs.minCornerDistance == rhs.minCornerDistance) &&
-                 ((lhs.minMarkerDistance == rhs.minMarkerDistance) &&
-                  ((lhs.adaptiveThreshWinSizeMin == rhs.adaptiveThreshWinSizeMin) &&
-                   ((lhs.adaptiveThreshWinSizeMax == rhs.adaptiveThreshWinSizeMax) &&
-                    ((lhs.adaptiveThreshWinSizeStep == rhs.adaptiveThreshWinSizeStep) &&
-                     ((lhs.adaptiveThreshConstant == rhs.adaptiveThreshConstant) &&
-                      ((lhs.polygonalApproxAccuracyRate == rhs.polygonalApproxAccuracyRate) &&
-                       ((lhs.minDistanceToBorder == rhs.minDistanceToBorder) &&
-                        ((static_cast<int>(lhs.doCornerRefinement) == static_cast<int>(rhs.doCornerRefinement)) &&
-                         ((lhs.cornerRefinementWinSize == rhs.cornerRefinementWinSize) &&
-                          ((lhs.cornerRefinementMaxIterations == rhs.cornerRefinementMaxIterations) &&
-                           ((lhs.cornerRefinementMinAccuracy == rhs.cornerRefinementMinAccuracy) &&
-                            ((lhs.markerBorderBits == rhs.markerBorderBits) &&
-                             ((lhs.perspectiveRemovePixelPerCell == rhs.perspectiveRemovePixelPerCell) &&
-                              ((lhs.perspectiveRemoveIgnoredMarginPerCell ==
-                                rhs.perspectiveRemoveIgnoredMarginPerCell) &&
-                               ((lhs.maxErroneousBitsInBorderRate == rhs.maxErroneousBitsInBorderRate) &&
-                                ((lhs.minOtsuStdDev == rhs.minOtsuStdDev) &&
-                                 (lhs.errorCorrectionRate == rhs.errorCorrectionRate)))))))))))))))))));
-    }
-    friend inline constexpr bool operator!=(const ArucoCodeParams &lhs, const ArucoCodeParams &rhs)
-    {
-        return !(lhs == rhs);
-    }
+    friend constexpr bool operator==(const ArucoCodeParams &lhs, const ArucoCodeParams &rhs) = default;
+
     double getMinMarkerPerimeter() const;
     void   setMinMarkerPerimeter(double newMinMarkerPerimeter);
     double getMaxMarkerPerimeter() const;

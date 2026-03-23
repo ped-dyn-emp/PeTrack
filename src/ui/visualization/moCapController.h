@@ -36,9 +36,10 @@ public:
     QColor mColor;
     int    mThickness;
     bool   mDirected;
+
+    friend bool operator==(const SegmentRenderData &lhs, const SegmentRenderData &rhs) = default;
 };
 
-bool operator==(const SegmentRenderData &lhs, const SegmentRenderData &rhs);
 
 /**
  * @brief The MoCapController class controls the visualisation of MoCap data.

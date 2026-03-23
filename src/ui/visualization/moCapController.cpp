@@ -29,12 +29,6 @@
 #include <opencv2/opencv.hpp>
 
 
-bool operator==(const SegmentRenderData &lhs, const SegmentRenderData &rhs)
-{
-    return lhs.mColor == rhs.mColor && lhs.mDirected == rhs.mDirected && lhs.mLine == rhs.mLine &&
-           lhs.mThickness == rhs.mThickness;
-}
-
 /**
  * @brief Transforms the skeleton of a given Person into SegmentRenderData
  *

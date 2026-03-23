@@ -676,7 +676,8 @@ bool ColorPlot::printDistribution() const
     j = dict.constBegin();
     while(j != dict.constEnd())
     {
-        SPDLOG_INFO("height: {:5.1f} - number {:3d} ({:4d}%)", j.key(), j.value(), (100. * j.value()) / anz);
+        SPDLOG_INFO(
+            FMT_STRING("height: {:5.1f} - number {:3d} ({:4.1f}%)"), j.key(), j.value(), (100. * j.value()) / anz);
         ++j;
     }
     return true;
