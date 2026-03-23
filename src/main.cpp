@@ -22,9 +22,9 @@
 #include "logger.h"
 #include "pIO.h"
 #include "petrack.h"
+#include "petrackApplication.h"
 #include "tracker.h"
 
-#include <QApplication>
 #include <QDir>
 #include <QMessageBox>
 #include <QStyleFactory>
@@ -34,8 +34,8 @@
 // Aufrufbeispiel:
 // release/petrack.exe -sequence ../../einzelbilder/wert0001.png -autoSave dir|ttt.avi
 
-static QApplication *gApp = nullptr;
-void                 quit(int sig_number)
+static PetrackApplication *gApp = nullptr;
+void                       quit(int sig_number)
 {
     gApp->quit();
 }
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
     Q_INIT_RESOURCE(icons);
 
-    QApplication app(argc, argv);
+    PetrackApplication app(argc, argv);
 
     // Reihenfolge beim Beenden von Petrack (signal abouttoquit() von qapplication nicht hinbekommen):
     // - petrack:closeevent()
@@ -188,6 +188,17 @@ int main(int argc, char *argv[])
     Petrack petrack(PETRACK_VERSION);
     petrack.setGitInformation(GIT_COMMIT_HASH, GIT_COMMIT_DATE, GIT_BRANCH);
     petrack.setCompileInformation(COMPILE_OS, COMPILE_TIMESTAMP, COMPILER_ID, COMPILER_VERSION);
+
+    QObject::connect(
+        &app,
+        &PetrackApplication::fileOpened,
+        [&petrack](const QString &file)
+        {
+            if(file.endsWith(".pet", Qt::CaseInsensitive))
+            {
+                petrack.openProject(file);
+            }
+        });
 
     petrack.show(); // damit bei reiner Hilfe nicht angezeigt wird, erst hier der aufruf
 

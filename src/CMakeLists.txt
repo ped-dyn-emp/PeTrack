@@ -12,6 +12,8 @@ target_sources(petrack_core PRIVATE
     plausibility.cpp
     player.cpp
     player.h
+    petrackApplication.h
+    petrackApplication.cpp
 )
 
 add_subdirectory(calibration)
