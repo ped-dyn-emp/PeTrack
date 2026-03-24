@@ -14,6 +14,8 @@
 - The marker box in recognition now no longer reacts to mouse wheel scrolling
 - The tabs now no longer react to scrolling
 - `show` set to false now makes the `fix` button unable to toggle
+- The recognition and tracking tabs now show a red dot when active
+- The information about the amount of recognized, visible persons and currently tracked persons have been moved to the status bar, replacing the status messages
 - The trackpoint visualization now follows the color of the track path
 - PeTrack will now load the project if you open `pet` files via double-click on MacOS
 - `pet` files now appear with the PeTrack icon on MacOS

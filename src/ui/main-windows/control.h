@@ -311,7 +311,7 @@ private slots:
 
 
     void onTrackShowStateChanged(int i);
-    void onTrackOnlineCalcStateChanged(int i);
+    void onTrackActiveStateChanged(int i);
     void onTrackCalcClicked();
     void onTrackResetClicked();
     void onTrackExportClicked();

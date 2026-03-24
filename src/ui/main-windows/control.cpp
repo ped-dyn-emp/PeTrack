@@ -38,6 +38,7 @@
 #include "pGroupBox.h"
 #include "pIO.h"
 #include "pMessageBox.h"
+#include "penUtils.h"
 #include "petrack.h"
 #include "player.h"
 #include "roiItem.h"
@@ -303,7 +304,7 @@ Control::Control(
     connect(mUi->anaConsiderRev, &QCheckBox::checkStateChanged, this, &Control::onAnaConsiderRevStateChanged);
     connect(mUi->showVoronoiCells, &QCheckBox::checkStateChanged, this, &Control::onShowVoronoiCellsStateChanged);
     connect(mUi->trackShow, &QCheckBox::checkStateChanged, this, &Control::onTrackShowStateChanged);
-    connect(mUi->trackActive, &QCheckBox::checkStateChanged, this, &Control::onTrackOnlineCalcStateChanged);
+    connect(mUi->trackActive, &QCheckBox::checkStateChanged, this, &Control::onTrackActiveStateChanged);
     connect(mUi->trackCalc, &QPushButton::clicked, this, &Control::onTrackCalcClicked);
     connect(mUi->trackReset, &QPushButton::clicked, this, &Control::onTrackResetClicked);
     connect(mUi->trackExport, &QPushButton::clicked, this, &Control::onTrackExportClicked);
@@ -603,10 +604,6 @@ QLineEdit *Control::trackShowMarkerIDsNrList()
     return mUi->trackShowMarkerIDsNrList;
 }
 
-void Control::setTrackNumberNow(const QString &val)
-{
-    mUi->trackNumberNow->setText(val);
-}
 
 void Control::setTrackShowOnlyNr(int val)
 {
@@ -616,11 +613,6 @@ void Control::setTrackShowOnlyNr(int val)
 int Control::getTrackShowOnlyNr() const
 {
     return mUi->trackShowOnlyNr->value();
-}
-
-void Control::setTrackNumberAll(const QString &number)
-{
-    mUi->trackNumberAll->setText(number);
 }
 
 void Control::setTrackShowOnlyNrMaximum(int max)
@@ -651,11 +643,6 @@ bool Control::isTrackShowMarkerIDsListChecked() const
 void Control::setTrackShowOnlyListChecked(bool checked)
 {
     mUi->trackShowOnlyList->setChecked(checked);
-}
-
-void Control::setTrackNumberVisible(const QString &value)
-{
-    mUi->trackNumberVisible->setText(value);
 }
 
 bool Control::isTrackOnlySelectedChecked() const
@@ -1169,9 +1156,13 @@ void Control::onTrackShowStateChanged(int i)
     }
 }
 
-void Control::onTrackOnlineCalcStateChanged(int i)
+void Control::onTrackActiveStateChanged(int i)
 {
-    if(i == Qt::Checked)
+    const bool checked  = i == Qt::Checked;
+    const int  iconSize = mUi->tabs->fontMetrics().height();
+    mUi->tabs->setTabIcon(mUi->tabs->indexOf(mUi->track), checked ? getRedDotIcon(iconSize) : QIcon());
+
+    if(checked)
     {
         mMainWindow->setTrackChanged(true); // flag changes of track parameters
         mMainWindow->getTracker()->reset();
@@ -1858,7 +1849,8 @@ void Control::onMapReadMarkerIDClicked()
 
 void Control::onRecoActiveStateChanged(int i)
 {
-    if(i == Qt::Checked && getRecoMethod() == reco::RecognitionMethod::MachineLearning)
+    const bool checked = i == Qt::Checked;
+    if(checked && getRecoMethod() == reco::RecognitionMethod::MachineLearning)
     {
         try
         {
@@ -1871,6 +1863,8 @@ void Control::onRecoActiveStateChanged(int i)
             return;
         }
     }
+    const int iconSize = mUi->tabs->fontMetrics().height();
+    mUi->tabs->setTabIcon(mUi->tabs->indexOf(mUi->rec), checked ? getRedDotIcon(iconSize) : QIcon());
 
     mMainWindow->setRecognitionChanged(true); // flag changes of recognition parameters
     if(!mMainWindow->isLoading())

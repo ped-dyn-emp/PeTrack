@@ -186,6 +186,7 @@ public:
     void         setStatusFPS();
     void         setShowFPS(double fps);
     void         updateShowFPS(bool skipped = false);
+    void         updateStatusBarMsg();
     void         setStatusPosReal(const QPointF &pos);
     void         setStatusPos(const QPoint &pos);
     void         setStatusColor(const QRgb &col);
@@ -469,6 +470,7 @@ private:
     QLabel           *mFpsLabel;
     QLineEdit        *mFpsNum;
     QDoubleValidator *mFpsNumValidator;
+    QLabel           *mStatusPersons;
     QLabel           *mStatusLabelFPS;
     QLabel           *mStatusLabelPosReal;
     QLabel           *mStatusLabelPos;

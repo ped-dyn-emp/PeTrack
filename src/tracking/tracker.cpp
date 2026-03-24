@@ -79,7 +79,18 @@ void Tracker::init(cv::Size size)
 // damit neu aufgesetzt werden kann
 void Tracker::reset()
 {
-    mPrevFrame = -1; // das vorherige Bild ist zu ignorieren oder existiert nicht
+    mPrevFrame        = -1; // das vorherige Bild ist zu ignorieren oder existiert nicht
+    mCurrentlyTracked = 0;
+}
+
+void Tracker::resetCurrentlyTracked()
+{
+    mCurrentlyTracked = 0;
+}
+
+int Tracker::getCurrentlyTracked() const
+{
+    return mCurrentlyTracked;
 }
 
 void Tracker::resize(cv::Size size)
@@ -422,9 +433,8 @@ bool Tracker::tryMergeTrajectories(const TrackPoint &v, size_t i, int frame)
  * @param level level of Gauss-Pyramid that is used with Lucas-Kanade
  * @param onlyVisible Set of trajectories which should be evaluated; @see Petrack::getPedestriansToTrack
  * @param errorScaleExponent errorScale is 1.5^errorScaleExponent
- * @return Number of tracked points
  */
-int Tracker::track(
+void Tracker::track(
     cv::Mat                &img,
     cv::Rect               &rect,
     cv::Mat                 map1,
@@ -443,13 +453,15 @@ int Tracker::track(
     if(mGrey.empty())
     {
         SPDLOG_ERROR("you have to initialize tracking before using tracker!");
-        return -1;
+        resetCurrentlyTracked();
+        return;
     }
 
     if(img.empty())
     {
         SPDLOG_ERROR("no NULL image allowed for tracking!!");
-        return -1;
+        resetCurrentlyTracked();
+        return;
     }
 
     if((mPrevFrame != -1) && (abs(frame - mPrevFrame) > MAX_STEP_TRACK))
@@ -460,7 +472,8 @@ int Tracker::track(
     if(abs(frame - mPrevFrame) == 0)
     {
         SPDLOG_ERROR("Frame has not changed. There is nothing to track!");
-        return -1;
+        resetCurrentlyTracked();
+        return;
     }
 
     if(img.channels() == 3)
@@ -474,11 +487,12 @@ int Tracker::track(
     else
     {
         SPDLOG_ERROR("wrong number of channels: {}", img.channels());
-        return -1;
+        resetCurrentlyTracked();
+        return;
     }
-
     size_t numOfPeopleToTrack =
         calcPrevFeaturePoints(mPrevFrame, rect, frame, reTrack, reQual, borderSize, onlyVisible);
+    mCurrentlyTracked = static_cast<int>(numOfPeopleToTrack);
 
     if(numOfPeopleToTrack > 0)
     {
@@ -539,10 +553,6 @@ int Tracker::track(
     {
         mPersonStorage.delPointOf(trjToDel[i], PersonStorage::TrajectorySegment::Whole, -1);
     }
-
-    // numOfPeopleToTrack kann trotz nicht retrack > 0 sein auch bei alten pfaden
-    // da am bildrand pfade keinen nachfolger haben und somit dort immer neu bestimmt werden!
-    return static_cast<int>(numOfPeopleToTrack);
 }
 
 
