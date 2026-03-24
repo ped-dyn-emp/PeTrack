@@ -988,7 +988,6 @@ bool Petrack::saveProject(QString fileName) // default fileName=""
     file.write(byteArray);
     file.close(); // also flushes the file
 
-    statusBar()->showMessage(tr("Saved project to %1.").arg(fileName), 5000);
     SPDLOG_INFO("save project to {}", fileName);
 
     updateWindowTitle();
@@ -2227,12 +2226,22 @@ void Petrack::createMenus()
  */
 void Petrack::createStatusBar()
 {
-    QFont         f("Courier", 12, QFont::Bold);    // Times Helvetica, Normal
-    QFont         f2("Courier", 12, QFont::Normal); // Times Helvetica, Normal
+    QFont f("Courier", 12, QFont::Bold);    // Times Helvetica, Normal
+    QFont f2("Courier", 12, QFont::Normal); // Times Helvetica, Normal
+    QFont fMono("Monospace");
+    fMono.setStyleHint(QFont::TypeWriter);
     QFontMetricsF fm2(f2);
+    QFontMetricsF fmMono(fMono);
 
     statusBar()->setMaximumHeight(28);
-    statusBar()->showMessage(tr("Ready"));
+
+    mStatusPersons = new QLabel(" ");
+    mStatusPersons->setFont(fMono);
+    mStatusPersons->setMinimumWidth(
+        static_cast<int>(
+            fmMono.horizontalAdvance("number of people: recognized:9999 / visible:9999 / currently tracked:9999") + 1));
+    statusBar()->addWidget(mStatusPersons);
+
     statusBar()->addPermanentWidget(mStatusLabelStereo = new QLabel(" "));
     statusBar()->addPermanentWidget(mStatusLabelTime = new QLabel(" "));
 
@@ -2411,6 +2420,25 @@ void Petrack::updateShowFPS(bool skipped)
         }
         lastTime.start();
     }
+}
+
+/**
+ * @brief Updates the message in the status bar regarding people recognized, visible and currently tracked
+ */
+void Petrack::updateStatusBarMsg()
+{
+    const int recognized       = static_cast<int>(mPersonStorage.nbPersons());
+    const int visible          = mPersonStorage.visible(mAnimation.getCurrentFrameNum());
+    const int currentlyTracked = mTracker->getCurrentlyTracked();
+
+    auto fmt = [](int n)
+    { return QString("%1").arg(n, 4, 10, QChar(' ')); }; // formats the number to 4 digits base 10 and filled with blank
+
+    const QString text = QString("number of people: recognized:%1 / visible:%2 / currently tracked:%3")
+                             .arg(fmt(recognized))
+                             .arg(fmt(visible))
+                             .arg(fmt(currentlyTracked));
+    mStatusPersons->setText(text);
 }
 
 // ohne neue positionsangabe, sinnvoll, wenn berechnungsweise sich in getPosReal geaendert hat
@@ -2827,10 +2855,8 @@ void Petrack::importTracker(QString dest) // default = ""
                 SPDLOG_WARN("File contains {} extra lines after expected data", allLines.size() - currentLineIndex);
             }
 
-            mControlWidget->setTrackNumberAll(QString("%1").arg(mPersonStorage.nbPersons()));
             mControlWidget->setTrackShowOnlyNr(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
-            mControlWidget->setTrackNumberVisible(
-                QString("%1").arg(mPersonStorage.visible(mAnimation.getCurrentFrameNum())));
+            updateStatusBarMsg();
             mControlWidget->replotColorplot();
             SPDLOG_INFO("import {} ({} person(s), file version {})", dest, sz, trcVersion);
             mTrcFileName =
@@ -2961,10 +2987,8 @@ void Petrack::importTracker(QString dest) // default = ""
                 numberImportedPersons++;
             }
 
-            mControlWidget->setTrackNumberAll(QString("%1").arg(mPersonStorage.nbPersons()));
             mControlWidget->setTrackShowOnlyNr(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
-            mControlWidget->setTrackNumberVisible(
-                QString("%1").arg(mPersonStorage.visible(mAnimation.getCurrentFrameNum())));
+            updateStatusBarMsg();
             mControlWidget->replotColorplot();
             file.close();
             SPDLOG_INFO("import {} ({} person(s))", dest, numberImportedPersons);
@@ -3109,10 +3133,8 @@ void Petrack::importTracker(QString dest) // default = ""
                 }
                 H5::DataSet::vlenReclaim(personalData.data(), personalType, personalSpace);
 
-                mControlWidget->setTrackNumberAll(QString("%1").arg(mPersonStorage.nbPersons()));
                 mControlWidget->setTrackShowOnlyNr(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
-                mControlWidget->setTrackNumberVisible(
-                    QString("%1").arg(mPersonStorage.visible(mAnimation.getCurrentFrameNum())));
+                updateStatusBarMsg();
                 mControlWidget->replotColorplot();
 
                 SPDLOG_INFO("import {} ({} person(s))", dest, numberImportedPersons);
@@ -3276,10 +3298,6 @@ void Petrack::exportTracker(QString dest) // default = ""
                     tr("Could not export tracking data.\n"
                        "Please try again!"));
             }
-            else
-            {
-                statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
-            }
 
             progress.setValue(static_cast<int>(mPersonStorage.nbPersons() + 1));
 
@@ -3390,10 +3408,6 @@ void Petrack::exportTracker(QString dest) // default = ""
                     tr("PeTrack"),
                     tr("Could not export tracking data.\n"
                        "Please try again!"));
-            }
-            else
-            {
-                statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
             }
 
             SPDLOG_INFO("finished");
@@ -3507,10 +3521,6 @@ void Petrack::exportTracker(QString dest) // default = ""
                     tr("Could not export tracking data.\n"
                        "Please try again!"));
             }
-            else
-            {
-                statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
-            }
 
             SPDLOG_INFO("finished");
         }
@@ -3589,10 +3599,6 @@ void Petrack::exportTracker(QString dest) // default = ""
                     tr("PeTrack"),
                     tr("Could not export tracking data.\n"
                        "Please try again!"));
-            }
-            else
-            {
-                statusBar()->showMessage(tr("Saved tracking data to %1.").arg(dest), 5000);
             }
 
             SPDLOG_INFO("finished");
@@ -3866,7 +3872,7 @@ void Petrack::performTracking()
     cv::Rect rect = qRectToCvRect(roi, mImgFiltered);
 
     cv::Mat map1 = mCalibFilter.getMap1();
-    int     anz  = mTracker->track(
+    mTracker->track(
         mImgFiltered,
         rect,
         map1,
@@ -3878,7 +3884,7 @@ void Petrack::performTracking()
         mControlWidget->getTrackRegionLevels(),
         getPedestriansToTrack());
 
-    mControlWidget->setTrackNumberNow(QString("%1").arg(anz));
+    updateStatusBarMsg();
     mTrackChanged = false;
 }
 
@@ -4031,7 +4037,7 @@ bool Petrack::updateImage(bool imageChanged)
         }
         else
         {
-            mControlWidget->setTrackNumberNow(QString("0"));
+            mTracker->resetCurrentlyTracked();
         }
 
         bool recoFrameCondition =
@@ -4055,11 +4061,9 @@ bool Petrack::updateImage(bool imageChanged)
             mControlWidget->setRecoNumberNow(QString("0"));
         }
 
-        // these might change due to reco or tracking
-        mControlWidget->setTrackNumberAll(QString("%1").arg(mPersonStorage.nbPersons()));
+        // sync ui with current state from reco/tracking (person count may change due to recognition/tracking updates)
         mControlWidget->setTrackShowOnlyNrMaximum(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
-        mControlWidget->setTrackNumberVisible(QString("%1").arg(mPersonStorage.visible(frameNum)));
-
+        updateStatusBarMsg();
         copyToQImage(*mImage, mImgFiltered);
 
         if(borderChanged)
@@ -4437,9 +4441,8 @@ void Petrack::addManualTrackPointOnlyVisible(const QPointF &pos)
 
 void Petrack::updateControlWidget()
 {
-    mControlWidget->setTrackNumberAll(QString("%1").arg(mPersonStorage.nbPersons()));
     mControlWidget->setTrackShowOnlyNrMaximum(static_cast<int>(MAX(mPersonStorage.nbPersons(), 1)));
-    mControlWidget->setTrackNumberVisible(QString("%1").arg(mPersonStorage.visible(mAnimation.getCurrentFrameNum())));
+    updateStatusBarMsg();
 }
 
 void Petrack::splitTrackPerson(QPointF pos)

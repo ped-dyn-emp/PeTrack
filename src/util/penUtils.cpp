@@ -16,25 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef PENUTILS_H
-#define PENUTILS_H
+#include "penUtils.h"
 
-#include <QPen>
+#include <QIcon>
+#include <QPainter>
+#include <QPixmap>
 
-class QIcon;
 
-inline QPen scaledPen(QPen pen)
+QIcon getRedDotIcon(int size)
 {
-    pen.setCosmetic(true); // make lines always the same thickness
-    return pen;
+    QPixmap pixmap(size, size);
+    pixmap.fill(Qt::transparent);
+
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setBrush(Qt::red);
+    painter.setPen(Qt::NoPen);
+    painter.drawEllipse(0, 0, size, size);
+    return {pixmap};
 }
-
-inline QPen scaledPen(const QColor &color, int width = 1)
-{
-    QPen pen(color, width);
-    return scaledPen(pen);
-}
-
-QIcon getRedDotIcon(int size);
-
-#endif

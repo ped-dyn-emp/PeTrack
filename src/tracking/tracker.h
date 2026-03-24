@@ -64,6 +64,7 @@ private:
     std::vector<cv::Point2f> mPrevFeaturePoints, mFeaturePoints;
     std::vector<TrackStatus> mStatus;
     int                      mPrevFrame;
+    int                      mCurrentlyTracked;
     std::vector<int>         mPrevFeaturePointsIdx;
     std::vector<float>       mTrackError;
     cv::TermCriteria         mTermCriteria;
@@ -76,6 +77,8 @@ public:
     void init(cv::Size size);
 
     void reset();
+    void resetCurrentlyTracked();
+    int  getCurrentlyTracked() const;
 
     void resize(cv::Size size);
 
@@ -91,7 +94,7 @@ public:
     int insertFeaturePoints(int frame, size_t count, cv::Mat &img, int borderSize, cv::Mat map1, float errorScale);
 
     // frame ist frame fuer naechsten prev frame
-    int track(
+    void track(
         cv::Mat                &img,
         cv::Rect               &rect,
         cv::Mat                 map1,
