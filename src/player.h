@@ -89,11 +89,11 @@ public slots:
     void setCurrentFrameAsOut();
     void resetSourceIn();
     void resetSourceOut();
+    void onFrameNumEditingFinished();
     void onFrameInNumEditingFinished();
     void onFrameOutNumEditingFinsished();
 
 private:
-    void setSliderMax(int max);
     bool updateImage();
     bool forward();
     bool backward();
@@ -119,7 +119,6 @@ private:
     QLineEdit     *mFrameOutNum;
     QPushButton   *mSourceInBtn;
     QPushButton   *mSourceOutBtn;
-    QIntValidator *mFrameNumValidator;
     QIntValidator *mFrameInNumValidator;
     QIntValidator *mFrameOutNumValidator;
 };

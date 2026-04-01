@@ -89,7 +89,6 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
 
     // frame number
     QFont f("Courier", 12, QFont::Bold); // Times Helvetica, Normal
-    mFrameNumValidator    = new QIntValidator(0, 999999, this);
     mFrameInNumValidator  = new QIntValidator(0, 999999, this);
     mFrameOutNumValidator = new QIntValidator(0, 999999, this);
 
@@ -111,9 +110,8 @@ Player::Player(Animation *anim, QWidget *parent) : QWidget(parent)
     mFrameNum->setMaxLength(8);     // bedeutet maxminal 1,1 stunden
     mFrameNum->setMaximumWidth(75); // 5*sz.width() //62
     mFrameNum->setAlignment(Qt::AlignRight);
-    mFrameNum->setValidator(mFrameNumValidator);
     mFrameNum->setFont(f);
-    connect(mFrameNum, &QLineEdit::editingFinished, this, static_cast<bool (Player::*)()>(&Player::skipToFrame));
+    connect(mFrameNum, &QLineEdit::editingFinished, this, &Player::onFrameNumEditingFinished);
 
 
     QFont f2("Courier", 12, QFont::Normal); // Times Helvetica, Normal
@@ -223,10 +221,10 @@ void Player::setAnim(Animation *anim)
     if(anim)
     {
         pause();
-        mAnimation = anim;
-        int max    = anim->getNumFrames() > 1 ? anim->getNumFrames() - 1 : 0;
-        setSliderMax(max);
-        mFrameNumValidator->setTop(max);
+        mAnimation    = anim;
+        const int max = anim->getNumFrames() > 1 ? anim->getNumFrames() - 1 : 0;
+        mSlider->setMinimum(0);
+        mSlider->setMaximum(max);
         mFrameInNumValidator->setTop(anim->getSourceOutFrameNum());
         mFrameOutNumValidator->setTop(anim->getMaxFrames());
     }
@@ -235,12 +233,6 @@ void Player::setAnim(Animation *anim)
 bool Player::getPaused() const
 {
     return mState == PlayerState::PAUSE;
-}
-
-
-void Player::setSliderMax(int max)
-{
-    mSlider->setMaximum(max);
 }
 
 /**
@@ -554,8 +546,6 @@ void Player::update()
 
         mFrameInNumValidator->setTop(getFrameOutNum() - 1);
         mFrameOutNumValidator->setBottom(getFrameInNum() + 1);
-        mFrameNumValidator->setBottom(getFrameInNum());
-        mFrameNumValidator->setTop(getFrameOutNum());
 
         mAnimation->updateSourceInFrameNum(mFrameInNum->text().toInt());
         mAnimation->updateSourceOutFrameNum(mFrameOutNum->text().toInt());
@@ -582,8 +572,6 @@ void Player::setFrameInNum(int in)
     mFrameInNum->setText(QString::number(in));
 
     mFrameInNumValidator->setTop(getFrameOutNum() - 1);
-    mFrameNumValidator->setBottom(getFrameInNum());
-    mFrameNumValidator->setTop(getFrameOutNum());
 }
 int Player::getFrameOutNum()
 {
@@ -604,8 +592,6 @@ void Player::setFrameOutNum(int out)
     mFrameOutNum->setText(QString::number(out));
 
     mFrameInNumValidator->setTop(/*out*/ getFrameOutNum() - 1);
-    mFrameNumValidator->setBottom(getFrameInNum());
-    mFrameNumValidator->setTop(/*out*/ getFrameOutNum());
 }
 
 int Player::getPos()
@@ -635,6 +621,20 @@ void Player::resetSourceOut()
 {
     setFrameOutNum(mAnimation->getMaxFrames());
     update();
+}
+
+void Player::onFrameNumEditingFinished()
+{
+    bool      ok       = false;
+    const int curInput = mFrameNum->text().toInt(&ok);
+    if(!ok)
+    {
+        mFrameNum->setText(QString::number(mAnimation->getCurrentFrameNum()));
+        return;
+    }
+    const int clampedInput = std::clamp(curInput, getFrameInNum(), getFrameOutNum());
+    mFrameNum->setText(QString::number(clampedInput));
+    skipToFrame(clampedInput);
 }
 
 void Player::onFrameInNumEditingFinished()
