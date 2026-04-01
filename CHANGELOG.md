@@ -5,6 +5,7 @@
 - Improvements to Tracking (Kalman Filter)
 - Feature: Add option to delete a range of persons
 - The labels `In` and `Out` from the video player are now clickable, making you able to set the current frame as `In` or `Out`. Also added shortcuts for set and reset of `In` and `Out`
+- Clamped the frame num line edit to `In` and `Out`
 - Add shortcut shift+d to jump to end of trajectory
 - Not exporting colorpoint for an invalid color anymore due to internal change of trackpoints
 - Dropping down elements now also works over the view area
@@ -27,6 +28,7 @@
 - Fix: zoom buttons not working
 - Fix: slider jumping to wrong position sometimes
 - Fix: incorrect drawing of trackpoint color when recognition is not active
+- Fix: player slider minimum not resetting after opening a new sequence
 
 # 1.1
 
