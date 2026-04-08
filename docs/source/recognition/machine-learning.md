@@ -16,7 +16,7 @@ Model version selection
 :::
 
 After selecting machine learning as your preferred method for recognition, you have to choose which pretrained model your model is based on.
-Currently supported are YOLOv5 and YOLOv8-YOLOv11.
+Currently supported are YOLOv5 and YOLOv8 to YOLOv11.
 
 ## Machine learning parameter window
 :::{figure-md} machine-learning-parameter-window
@@ -45,7 +45,7 @@ image width
 
 model
 : Here you can upload your preferred model for recognition. The default models can be found in the [Downloads](#downloads) section. 
-The model has to be in the `.onnx` format and either be trained on YOLOv5 or YOLOv8.
+The model has to be in the `.onnx` format and either be trained on YOLOv5 or YOLOv8 to YOLOv11.
 
 class names
 : Here you can upload a `.names` file that lists all the used classes line by line, if you have more than one. When using the default model,
