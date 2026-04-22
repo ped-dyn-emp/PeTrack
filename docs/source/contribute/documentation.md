@@ -11,7 +11,7 @@ is needed.
 First of all, you need to have cloned the repository (for how to do that, see the section [Get the code](../contribute/code_contribution/build_from_source.md#get-the-code) of the source code contribution documentation). Note that you **do not
 need to build PeTrack**, you just need the repository for the documentation
 files. Then you can edit the markdown files in the `docs/source/` directory. Any
-texteditor can be used for this. If you do not have an preferred text editor, we
+texteditor can be used for this. If you do not have a preferred text editor, we
 recommend VSCode (note that VSCode has a MyST-Markdown extension).
 
 To be able to build the documentation locally to see how the resulting webpage
@@ -25,8 +25,8 @@ building the documentation with the by changing the directory in the shell to
 `docs` and running `pip install -r requirements.txt`. Now you can compile the
 documentation by running `make.bat html` on Windows, or `make html` on Linux or
 MacOS. For a smoother local developement experience, you can install
-`sphinx-build` via the command `pip install sphinx-build`. `sphinx-build` can be
-executed as `sphinx-build ./source ./build/_html`. This will open a webpage
+`sphinx-autobuild` via the command `pip install sphinx-autobuild`. `sphinx-autobuild` can be
+executed as `sphinx-autobuild ./source ./build/_html`. This will open a webpage
 which is accessible at `http://127.0.0.1:8000` and which is automatically
 updated when you change a file.
 
