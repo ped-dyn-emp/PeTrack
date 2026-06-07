@@ -20,11 +20,11 @@
 #define VECTOR_H
 
 
-#include <opencv2/core/types_c.h>
+#include <istream>
+#include <opencv2/core/types.hpp>
+#include <ostream>
 #include <stdexcept>
 
-struct CvPoint;
-struct CvPoint2D32f;
 class QPointF;
 class QPoint;
 class QTextStream;
@@ -127,19 +127,16 @@ public:
     Vec2F(double x, double y);
     Vec2F(const QPointF &v);
     Vec2F(const cv::Point2f &p);
-    Vec2F(const CvPoint *v);
-    Vec2F(const CvPoint2D32f *v);
     Vec2F(const Vec2F &c)            = default;
     Vec2F(Vec2F &&c)                 = default;
     Vec2F &operator=(const Vec2F &c) = default;
     Vec2F &operator=(Vec2F &&c)      = default;
     ~Vec2F()                         = default;
 
-    cv::Point    toCvPoint() const;
-    CvPoint2D32f toCvPoint2D32f() const;
-    QPoint       toQPoint() const;
-    QPointF      toQPointF() const;
-    cv::Point2f  toPoint2f() const;
+    cv::Point   toCvPoint() const;
+    QPoint      toQPoint() const;
+    QPointF     toQPointF() const;
+    cv::Point2f toPoint2f() const;
 
     double  x() const;
     double  y() const;
@@ -161,8 +158,6 @@ public:
             throw std::runtime_error("Out-of-range index for Vec2F");
         }
     }
-
-    Vec2F &operator=(const CvPoint *v);
 
     Vec2F &operator+=(const Vec2F &v);
     Vec2F  operator+(const Vec2F &v) const;

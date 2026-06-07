@@ -33,7 +33,6 @@
 #include "stereoAviFile.h"
 #endif
 #include "opencv2/calib3d.hpp"
-#include "opencv2/calib3d/calib3d_c.h"
 
 class Petrack;
 class Animation;
