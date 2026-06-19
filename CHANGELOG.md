@@ -1,5 +1,6 @@
 # 1.2
 
+- Add shortcut shift+n/shift+b to delete furure/past part of current trajectory
 - Added the option to import hdf5 files
 - Feature: Add the option to show specific markerIDs
 - Improvements to Tracking (Kalman Filter)
