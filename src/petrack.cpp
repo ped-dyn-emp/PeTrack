@@ -1781,8 +1781,8 @@ void Petrack::keyBindings()
     KeyBindingGroup traj_deletion{
         "trajectory deletion",
         {{"Ctrl + double-click right mouse button", "deletes a trajectory"},
-         {"Shift + double-click right mouse button", "deletes the past part of a trajectory"},
-         {"Alt + double-click right mouse button", "deletes the future part of a trajectory"}}};
+         {"Shift + double-click right mouse button or shift + b", "deletes the past part of a trajectory"},
+         {"Alt + double-click right mouse button or shift + n", "deletes the future part of a trajectory"}}};
 
     KeyBindingGroup video_navigation{
         "video navigation",
@@ -2112,6 +2112,22 @@ void Petrack::createActions()
         this,
         [this]() { this->deleteTrackPointAll(PersonStorage::TrajectorySegment::Following); });
 
+    mDeleteFuturePartOfCurTrjAct = new QAction(tr("Delete &future trj of current person"), this);
+    mDeleteFuturePartOfCurTrjAct->setShortcut(QKeySequence("Shift+n"));
+    connect(
+        mDeleteFuturePartOfCurTrjAct,
+        &QAction::triggered,
+        this,
+        [this]() { this->deletePartOfCurrentTrj(PersonStorage::TrajectorySegment::Following); });
+
+    mDeletePastPartOfCurTrjAct = new QAction(tr("Delete &past trj of current person"), this);
+    mDeletePastPartOfCurTrjAct->setShortcut(QKeySequence("Shift+b"));
+    connect(
+        mDeletePastPartOfCurTrjAct,
+        &QAction::triggered,
+        this,
+        [this]() { this->deletePartOfCurrentTrj(PersonStorage::TrajectorySegment::Previous); });
+
     mDelAllRoiAct = new QAction(tr("Delete &trj. moving through ROI"), this);
     connect(mDelAllRoiAct, &QAction::triggered, this, &Petrack::deleteTrackPointROI);
     mDelPartRoiAct = new QAction(tr("Delete part of trj. inside &ROI"), this);
@@ -2170,6 +2186,8 @@ void Petrack::createMenus()
     mEditMenu->addAction(mRedoAct);
     mEditMenu->addAction(mDelPastAct);
     mEditMenu->addAction(mDelFutureAct);
+    mEditMenu->addAction(mDeleteFuturePartOfCurTrjAct);
+    mEditMenu->addAction(mDeletePastPartOfCurTrjAct);
     mEditMenu->addAction(mDelAllRoiAct);
     mEditMenu->addAction(mDelPartRoiAct);
     mEditMenu->addAction(mDelPersonRangeAct);
@@ -4505,6 +4523,22 @@ void Petrack::deleteTrackPointAll(PersonStorage::TrajectorySegment direction) //
 {
     mPersonStorage.delPointAll(direction, mAnimation.getCurrentFrameNum());
     updateControlWidget();
+}
+
+void Petrack::deletePartOfCurrentTrj(PersonStorage::TrajectorySegment direction)
+{
+    if(!mControlWidget->isTrackShowOnlyChecked())
+    {
+        PWarning(
+            this,
+            tr("Too many trajectories for delete action selected"),
+            tr("PeTrack can't determine which trajectory you meant. Choose only one!"));
+        return;
+    }
+    int idx = mControlWidget->getTrackShowOnlyNr() - 1;
+    mPersonStorage.delPointOf(idx, direction, mAnimation.getCurrentFrameNum());
+    updateControlWidget();
+    updateImage();
 }
 
 void Petrack::deleteTrackPointROI()
