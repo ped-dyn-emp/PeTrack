@@ -182,7 +182,6 @@ void PersonStorage::delPointAll(TrajectorySegment direction, int frame)
     }
 }
 
-
 /**
  * @brief deletes the persons from index start to end
  */
