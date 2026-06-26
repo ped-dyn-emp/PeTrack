@@ -5,7 +5,7 @@ PeTrack (**Pe**destrian **Track**ing) is a software to extract the trajectories 
 The software supports various types of data input (image sequences, videos, stereo videos) and can even handle visibly distorted videos correctly.
 PeTrack utilizes different kinds of markers (e.g. with height information, head direction, individual code). When using a marker with an individual code trajectories from PeTrack can be connected to other data sources, such as questionnaires. 
 
-An executable of `PeTrack` is available [here](https://go.fzj.de/petrack-download).
+An executable of `PeTrack` is available [here](https://go.fzj.de/petrack-download). To stay informed about `PeTrack` and other tools and data for empirical research on pedestrian dynamics at Forschungszentrum Jülich you can subscribe to the mailing list [ped-empiricism](https://www.listserv.dfn.de/sympa/subscribe/ped-empiricism). 
 
 ![Flowchart of PeTrack Workflow](/images/PeTrack-Flowchart.png)
 
