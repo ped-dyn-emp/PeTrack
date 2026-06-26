@@ -16,6 +16,8 @@ For the understanding of the dynamics inside crowds reliable empirical data are 
 The program deals with wide angle lenses and a high density of pedestrians. Lens distortion and perspective view are taken into account. The procedure includes calibration, recognition, tracking and height detection.
 Different kinds of markers (e.g. with height information, head direction, individual code) are implemented. With a stereo camera more accurate height measurements and also markerless tracking is possible.
 
+To stay informed about PeTrack and other tools and data for empirical research on pedestrian dynamics at Forschungszentrum Jülich you can subscribe to the mailing list [ped-empiricism](https://www.listserv.dfn.de/sympa/subscribe/ped-empiricism).
+
 ## Download & installation:
 
 We publish installers for windows. To get the latest installer, visit this
