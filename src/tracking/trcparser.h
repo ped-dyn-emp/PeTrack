@@ -16,6 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#ifndef TRC_PARSER_H
+#define TRC_PARSER_H
 #include <QColor>
 #include <QList>
 #include <QStringView>
@@ -52,3 +54,5 @@ public:
 
     ParseResult validateTokenCount(int expected) const;
 };
+
+#endif
