@@ -1,9 +1,15 @@
 # 1.2
 
-- Add shortcut shift+n/shift+b to delete furure/past part of current trajectory
-- Added the option to import hdf5 files
-- Feature: Add the option to show specific markerIDs
+## Headline Features
+
+- Feature: Add `walk area` section in calibration tab to draw walkable area and obstacles in the calibrated view, including WKT import/export for PedPy workflows.
 - Improvements to Tracking (Kalman Filter)
+- Added the option to import hdf5 files
+
+## Changes
+
+- Add shortcut shift+n/shift+b to delete furure/past part of current trajectory
+- Feature: Add the option to show specific markerIDs
 - Feature: Add option to delete a range of persons
 - The labels `In` and `Out` from the video player are now clickable, making you able to set the current frame as `In` or `Out`. Also added shortcuts for set and reset of `In` and `Out`
 - Clamped the frame num line edit to `In` and `Out`

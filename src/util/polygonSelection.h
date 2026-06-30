@@ -19,35 +19,42 @@
 #ifndef PETRACK_POLYGONSELECTION_H
 #define PETRACK_POLYGONSELECTION_H
 
-#include "logger.h"
-
-#include <QGraphicsSceneMouseEvent>
 #include <QObject>
-#include <QPainter>
 #include <QPoint>
-#include <QWidget>
+#include <utility>
+
+class QGraphicsSceneMouseEvent;
+class QPainter;
 
 class PolygonSelection : public QObject
 {
     Q_OBJECT
 private:
-    QVector<QPointF>                      points;
-    std::function<void(QVector<QPointF>)> completionCallback = [=](QVector<QPointF>) {};
+    QVector<QPointF>                      mPoints;
+    QPointF                               mCurrentMousePos;
+    bool                                  mShowCurMousePos    = false;
+    std::function<void(QVector<QPointF>)> mCompletionCallback = [=](const QVector<QPointF> &) {};
 
-    float completionDist = 10;
-    bool  completed      = false;
+    static constexpr float COMPLETION_DIST = 20;
+    bool                   mCompleted      = false;
 
     void setCompleted(bool comp);
 
 public:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void setCurrentMousePos(const QPointF &pos) { mCurrentMousePos = pos; }
     void paint(QPainter &painter);
-    bool isCompleted() { return completed; }
+    bool isCompleted() const { return mCompleted; }
+    void setShowCurMousePos(bool show) { mShowCurMousePos = show; }
 
     void reset();
-    void setCompletionCallback(std::function<void(QVector<QPointF>)> callback) { completionCallback = callback; }
+    void setCompletionCallback(std::function<void(QVector<QPointF>)> callback)
+    {
+        mCompletionCallback = std::move(callback);
+    }
 
-    const QVector<QPointF> &getPoints() const { return points; }
+    const QVector<QPointF> &getPoints() const { return mPoints; }
+    void                    removeLastPoint();
 
 signals:
 

@@ -47,6 +47,7 @@
 #include "trackerItem.h"
 #include "ui_control.h"
 #include "view.h"
+#include "walkAreaWidget.h"
 #include "wheelIgnoreFilter.h"
 #include "worldImageCorrespondence.h"
 
@@ -71,7 +72,8 @@ Control::Control(
     IntrinsicBox        *intrinsicBox,
     ExtrinsicBox        *extrinsicBox,
     CoordinateSystemBox *coordSysBox,
-    AlignmentGridBox    *gridBox) :
+    AlignmentGridBox    *gridBox,
+    WalkAreaWidget      *walkArea) :
     Control(
         parent,
         scene,
@@ -84,7 +86,8 @@ Control::Control(
         intrinsicBox,
         extrinsicBox,
         coordSysBox,
-        gridBox)
+        gridBox,
+        walkArea)
 {
 }
 
@@ -100,7 +103,8 @@ Control::Control(
     IntrinsicBox        *intrinsicBox,
     ExtrinsicBox        *extrinsicBox,
     CoordinateSystemBox *coordSysBox,
-    AlignmentGridBox    *gridBox) :
+    AlignmentGridBox    *gridBox,
+    WalkAreaWidget      *walkArea) :
     QWidget(&parent), mUi(ui), mFilterBefore(filterBefore)
 {
     setAccessibleName("Control");
@@ -109,6 +113,7 @@ Control::Control(
     mLoading    = false;
     // beim erzeugen von new colorplot absturz!!!!
     mUi->setupUi(this);
+
 
     // Observers for moCapShow, moCapSize and moCapColor in moCapController;
     // updates UI value when changed.
@@ -158,11 +163,20 @@ Control::Control(
     auto *gridPBox = new PGroupBox(this, "alignment grid", mGrid);
     ui->verticalLayout_13->insertWidget(4, gridPBox);
 
+    // Setup Walk Area Widget
+    mWalkArea = walkArea;
+    mWalkArea->setMainWindow(mMainWindow);
+    mWalkArea->setManager(mMainWindow->getWalkAreaManager());
+
+    auto *walkAreaPBox = new PGroupBox(this, "walk area", mWalkArea);
+    ui->verticalLayout_13->insertWidget(5, walkAreaPBox);
+
     // integrate new widgets in tabbing order
     QWidget::setTabOrder(mFilterBefore, mIntr);
     QWidget::setTabOrder(mIntr, mExtr);
     QWidget::setTabOrder(mExtr, mCoordSys);
     QWidget::setTabOrder(mCoordSys, mGrid);
+    QWidget::setTabOrder(mGrid, mWalkArea);
 
     connect(mExtr, &ExtrinsicBox::extrinsicChanged, mCoordSys, &CoordinateSystemBox::updateCoordItem);
     connect(mIntr, &IntrinsicBox::paramsChanged, this, &Control::onIntrinsicParamsChanged);

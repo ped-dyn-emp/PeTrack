@@ -19,4 +19,8 @@ target_sources(petrack_core PRIVATE
         penUtils.h
         wheelIgnoreFilter.cpp
         wheelIgnoreFilter.h
+        polygon.cpp
+        polygon.h
+        wktParser.cpp
+        wktParser.h
 )

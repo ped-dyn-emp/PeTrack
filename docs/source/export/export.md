@@ -8,4 +8,5 @@ PeTrack works with a variety of files in different formats. This section of the 
 :maxdepth: 1
 trajectory
 video
+walk_area
 ```

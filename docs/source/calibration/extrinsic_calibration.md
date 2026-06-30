@@ -107,6 +107,9 @@ After you are finished with the calibration steps it is recommended that you sav
 status (intrinsic & extrinsic calibration). In case something goes wrong during the following steps, you have a project
 you can return to and do not have to redo everything from the start.
 
+After this step, you can directly define the walkable area and obstacle polygons in the calibrated view.
+See [](/export/walk_area.md) for the complete workflow.
+
 :::{Tip}
 To avoid scrolling through the numbers in the `calibration tab` you can check the `immutable` checkbox on the top right
 of all the sections on the page. This can save you a lot of trouble going forward!

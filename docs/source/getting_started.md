@@ -53,6 +53,23 @@ The first line is the total number of points. Starting from the second line, all
 
 _`demo/01_calibration/02_extrinsic.pet` is the resulting PeTrack project file after these steps._
 
+#### Walk area and obstacles
+
+After intrinsic and extrinsic calibration you can define the walkable area and obstacles in the calibrated view.
+For details, see [](/export/walk_area.md).
+
+1. Stay in the calibration tab and open the `walk area` section.
+2. Check `enable editing-mode` to get started. Disabling it again stops any interaction of the feature with other components. 
+3. Select `add walkarea` and create the outer walkable polygon with `double left click` per point. Close the polygon by double-clicking near the first point.
+4. Select `add obstacles` and draw all obstacle polygons in the same way.
+5. Use the polygon table to set height values, enable/disable polygons, and remove polygons if needed.
+6. Check the status line: invalid polygons are highlighted in red and must be corrected before export.
+7. If needed, use `export wkt-string` / `import wkt-string` in the `walkarea input/output` section.
+
+:::{Tip}
+In edit mode, `Backspace` removes the last point and `Escape` clears the polygon currently being drawn.
+:::
+
 ### Recognition
 
 After the calibration is done, load the video file via `File/Open Sequence`. The next step is to set up the recognition. Switch to the tab “Recognition” and check “show”. Press (`⌃ Ctrl/⌘ Cmd` + `1`) to adjust view. (Alternatively, you can use the menu-bar, View > Fit in region of interest)
