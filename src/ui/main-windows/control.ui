@@ -3897,8 +3897,8 @@
               </item>
              </layout>
             </widget>
-           </item>
-           <item>
+            </item>
+            <item>
             <spacer name="verticalSpacer_4">
              <property name="orientation">
               <enum>Qt::Orientation::Vertical</enum>

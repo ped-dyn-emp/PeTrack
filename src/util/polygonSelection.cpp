@@ -18,88 +18,117 @@
 
 #include "polygonSelection.h"
 
+#include "logger.h"
 #include "penUtils.h"
 
-#include <QObject>
-#include <QPainterPath>
+#include <QGraphicsSceneMouseEvent>
+#include <QPainter>
 #include <QVector2D>
 
 
 void PolygonSelection::paint(QPainter &painter)
 {
     QPen pen;
+    pen = scaledPen(pen);
     pen.setColor(QColor(255, 0, 255));
-    painter.setPen(scaledPen(pen));
-    if(completed)
+    painter.setPen(pen);
+    if(mCompleted)
     {
         QBrush brush;
         brush.setStyle(Qt::SolidPattern);
         brush.setColor(QColor(255, 0, 255, 100));
         pen.setBrush(brush);
         painter.setBrush(brush);
-        QPolygonF polygon(points);
+        QPolygonF polygon(mPoints);
         painter.drawPolygon(polygon, Qt::FillRule::WindingFill);
         return;
     }
-    if(points.empty())
+    if(mPoints.empty())
     {
         return;
     }
-    for(int i = 0; i < (points.size() - 1); i++)
+    // draw all lines
+    if(mPoints.size() > 0)
     {
-        painter.drawEllipse(points.at(i), 5, 5);
-        painter.drawLine(points.at(i), points.at(i + 1));
-        painter.drawEllipse(points.at(i + 1), 5, 5);
+        for(int i = 0; i < mPoints.size() - 1; ++i)
+        {
+            painter.drawLine(mPoints.at(i), mPoints.at(i + 1));
+        }
     }
+    // draw mouse tracking line
+    if(!mCompleted && mShowCurMousePos)
+    {
+        const QPointF nextPoint =
+            QVector2D(mPoints.front()).distanceToPoint(QVector2D(mCurrentMousePos)) <= COMPLETION_DIST ?
+                mPoints.front() :
+                mCurrentMousePos;
+
+        painter.drawLine(mPoints.back(), nextPoint);
+    }
+    // draw each ellipse
+    for(const QPointF &point : mPoints)
+    {
+        painter.drawEllipse(point, 5, 5);
+    }
+
     pen.setColor(QColor(0, 255, 0));
-    painter.setPen(scaledPen(pen));
-    painter.drawEllipse(points.front(), this->completionDist, this->completionDist);
+    painter.setPen(pen);
+    painter.drawEllipse(mPoints.front(), COMPLETION_DIST, COMPLETION_DIST);
 }
 
 void PolygonSelection::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(completed)
+    if(mCompleted)
     {
         return;
     }
     QPointF position = event->pos();
-    if(points.empty())
+    if(mPoints.empty())
     {
-        points.push_back(position);
+        mPoints.push_back(position);
         return;
     }
-    points.push_back(position);
+    mPoints.push_back(position);
 
     // detect finished drawing
-    auto first = points.front();
+    auto first = mPoints.front();
     auto v1    = QVector2D(position);
     auto v2    = QVector2D(first);
 
-    if(v1.distanceToPoint(v2) <= this->completionDist)
+    if(v1.distanceToPoint(v2) <= COMPLETION_DIST)
     {
         // replace last for perfect match
-        points.pop_back();
-        points.push_back(first);
+        mPoints.pop_back();
+        mPoints.push_back(first);
         setCompleted(true);
-        this->completionCallback(points);
+        mCompletionCallback(mPoints);
         return;
     }
 }
 
 void PolygonSelection::reset()
 {
-    points.clear();
+    mPoints.clear();
     setCompleted(false);
 }
 
 
-void PolygonSelection::setCompleted(bool value)
+void PolygonSelection::setCompleted(bool comp)
 {
-    if(value == this->completed)
+    if(comp == mCompleted)
     {
         return;
     }
     SPDLOG_DEBUG("state changed");
-    this->completed = value;
-    emit completionStatusChanged(value);
+    mCompleted = comp;
+    emit completionStatusChanged(comp);
+}
+
+void PolygonSelection::removeLastPoint()
+{
+    if(!mPoints.isEmpty())
+    {
+        mPoints.removeLast();
+        SPDLOG_INFO("Removed last point. Points remaining: {}", mPoints.size());
+    }
 }

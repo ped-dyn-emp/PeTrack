@@ -31,4 +31,6 @@ target_sources(petrack_core PRIVATE
         trackerItem.h
         annotationGroupItem.cpp
         annotationGroupItem.h
+        walkAreaItem.cpp
+        walkAreaItem.h
 )

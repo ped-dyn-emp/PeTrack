@@ -69,6 +69,8 @@
 #include "trackerItem.h"
 #include "trackerReal.h"
 #include "view.h"
+#include "walkAreaManager.h"
+#include "walkAreaWidget.h"
 #include "worldImageCorrespondence.h"
 
 #include <QFileDialog>
@@ -172,6 +174,9 @@ Petrack::Petrack(QString petrackVersion) :
         mExtrCalibration);
     auto *gridBox = new AlignmentGridBox(this);
 
+    auto *walkArea   = new WalkAreaWidget(this);
+    mWalkAreaManager = new WalkAreaManager(walkArea);
+
     mControlWidget = new Control(
         *this,
         *mScene,
@@ -183,7 +188,8 @@ Petrack::Petrack(QString petrackVersion) :
         intrinsicBox,
         extrinsicBox,
         coordSysBox,
-        gridBox);
+        gridBox,
+        walkArea);
 
     connect(mImageItem, &ImageItem::imageChanged, mControlWidget, &Control::imageSizeChanged);
 
@@ -206,7 +212,6 @@ Petrack::Petrack(QString petrackVersion) :
     mCodeMarkerWidget = new CodeMarkerWidget(this, mReco.getCodeMarkerOptions(), nullptr);
     mCodeMarkerWidget->setWindowFlags(Qt::Window);
     mCodeMarkerWidget->setWindowTitle("Code marker parameter");
-
 
     mMultiColorMarkerWidget = new MultiColorMarkerWidget(this);
     mMultiColorMarkerWidget->setWindowFlags(Qt::Window);
@@ -311,6 +316,13 @@ Petrack::Petrack(QString petrackVersion) :
     mMoCapItem = new MoCapItem(*this, mAnimation, mMoCapController);
     mMoCapItem->setZValue(3); // um so groesser um so hoeher um so eher zu sehen
 
+    //---------------------------
+
+    mWalkAreaItem = new WalkAreaItem(this, mWalkAreaManager);
+    mWalkAreaItem->setZValue(4);
+    mWalkAreaItem->setVisible(false);
+    connect(mWalkAreaManager, &WalkAreaManager::imageUpdate, this, [this]() { updateImage(); });
+
     /// Add Items
     mScene->addItem(mImageItem);
     mScene->addItem(mLogoItem);
@@ -326,6 +338,7 @@ Petrack::Petrack(QString petrackVersion) :
     mScene->addItem(mMultiColorMarkerItem);
     mScene->addItem(mBackgroundItem);
     mScene->addItem(mMoCapItem);
+    mScene->addItem(mWalkAreaItem);
 
     //---------------------------
 
@@ -578,6 +591,10 @@ void Petrack::openXml(QDomDocument &doc, bool openSeq)
         else if(elem.tagName() == "EXTR_CALIBRATION")
         {
             mExtrCalibration.getXml(elem);
+        }
+        else if(elem.tagName() == "WALK_AREA")
+        {
+            mWalkAreaManager->getXml(elem);
         }
         else if(elem.tagName() == "PLAYER")
         {
@@ -871,6 +888,11 @@ void Petrack::saveXml(QDomDocument &doc)
     // Reprojection error extrinsic calib
     elem = doc.createElement("EXTR_CALIBRATION");
     mExtrCalibration.setXml(elem);
+    root.appendChild(elem);
+
+    // Walk area settings
+    elem = doc.createElement("WALK_AREA");
+    mWalkAreaManager->setXml(elem);
     root.appendChild(elem);
 
     // settings for MoCap-Visualization
@@ -4290,9 +4312,14 @@ void Petrack::setProFileName(const QString &fileName)
     updateWindowTitle();
 }
 
-const WorldImageCorrespondence &Petrack::getWorldImageCorrespondence()
+const WorldImageCorrespondence &Petrack::getWorldImageCorrespondence() const
 {
     return *mWorldImageCorrespondence;
+}
+
+const WorldImageCorrespondence *Petrack::getWorldImageCorrespondencePtr() const
+{
+    return mWorldImageCorrespondence;
 }
 
 /**

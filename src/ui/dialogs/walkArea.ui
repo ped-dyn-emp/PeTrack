@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WalkAreaWidget</class>
+ <widget class="QWidget" name="WalkAreaWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>584</width>
+    <height>417</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::FocusPolicy::TabFocus</enum>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="settingsBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
+     </property>
+     <property name="title">
+      <string>walkarea setup</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QGroupBox" name="leftColumn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string/>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QCheckBox" name="mVisibility">
+           <property name="font">
+            <font>
+             <italic>false</italic>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>show/hide completely</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="mWalkareaVisibilityToggle">
+           <property name="font">
+            <font>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>show walkarea</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="mObstacleVisibilityToggle">
+           <property name="font">
+            <font>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>show obstacles</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="rightColumn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string/>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QCheckBox" name="mEditModeToggle">
+           <property name="font">
+            <font>
+             <italic>false</italic>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>enable editing-mode</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="mObstacleRadio">
+           <property name="font">
+            <font>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>add obstacles</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="mWalkareaRadio">
+           <property name="font">
+            <font>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>add walkarea</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="exportBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::TabFocus</enum>
+     </property>
+     <property name="title">
+      <string>walkarea input/output</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QPushButton" name="mImportButton">
+        <property name="text">
+         <string>import wkt-string</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="mExportButton">
+        <property name="text">
+         <string>export wkt-string</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="mStatusLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <italic>false</italic>
+      </font>
+     </property>
+     <property name="text">
+      <string>&lt;validation status&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="mPolygonTable">
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+     </property>
+     <property name="columnCount">
+      <number>5</number>
+     </property>
+     <attribute name="horizontalHeaderVisible">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>id</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>type</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>height (m)</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>enabled</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string/>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>mVisibility</tabstop>
+  <tabstop>mWalkareaVisibilityToggle</tabstop>
+  <tabstop>mObstacleVisibilityToggle</tabstop>
+  <tabstop>mEditModeToggle</tabstop>
+  <tabstop>mImportButton</tabstop>
+  <tabstop>mExportButton</tabstop>
+  <tabstop>mPolygonTable</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

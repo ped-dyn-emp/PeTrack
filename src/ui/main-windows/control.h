@@ -42,6 +42,7 @@ class AnalysePlot;
 class MissingFrames;
 class WorldImageCorrespondence;
 class AlignmentGridBox;
+class WalkAreaWidget;
 class QLineEdit;
 class QScrollArea;
 
@@ -66,7 +67,8 @@ public:
         IntrinsicBox        *intrinsicBox,
         ExtrinsicBox        *extrinsicBox,
         CoordinateSystemBox *coordSysBox,
-        AlignmentGridBox    *gridBox);
+        AlignmentGridBox    *gridBox,
+        WalkAreaWidget      *walkArea);
     Control(
         QWidget             &parent,
         QGraphicsScene      &scene,
@@ -79,7 +81,8 @@ public:
         IntrinsicBox        *intrinsicBox,
         ExtrinsicBox        *extrinsicBox,
         CoordinateSystemBox *coordSysBox,
-        AlignmentGridBox    *gridBox);
+        AlignmentGridBox    *gridBox,
+        WalkAreaWidget      *walkArea);
 
     void setScene(QGraphicsScene *sc);
     int  getCurrentTab() const;
@@ -409,6 +412,7 @@ private:
     ExtrinsicBox        *mExtr;
     CoordinateSystemBox *mCoordSys;
     AlignmentGridBox    *mGrid;
+    WalkAreaWidget      *mWalkArea;
     QGraphicsScene      *mScene;
     Correction          *mCorrectionWidget;
 

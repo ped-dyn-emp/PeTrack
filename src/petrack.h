@@ -44,12 +44,14 @@
 #include "personStorage.h"
 #include "swapFilter.h"
 #include "trackerReal.h"
+#include "walkAreaItem.h"
 
 class RoiItem;
 class RecognitionRoiItem;
 class GridItem;
 class WorldImageCorrespondence;
 class AnnotationGroupWidget;
+class WalkAreaWidget;
 
 
 // durchschnittliche Kopflaenge in cm (Kopf 21x14)
@@ -259,9 +261,10 @@ public:
     inline RoiItem                *getRecoRoiItem() { return mRecognitionRoiItem; }
     inline RoiItem                *getTrackRoiItem() { return mTrackingRoiItem; }
 
-    inline TrackerItem *getTrackerItem() { return mTrackerItem; }
-    inline Animation   *getAnimation() { return &mAnimation; }
-    inline Player      *getPlayer() { return mPlayerWidget; }
+    inline TrackerItem     *getTrackerItem() { return mTrackerItem; }
+    inline Animation       *getAnimation() { return &mAnimation; }
+    inline Player          *getPlayer() { return mPlayerWidget; }
+    inline WalkAreaManager *getWalkAreaManager() { return mWalkAreaManager; }
 
     inline QPointF getMousePosOnImage() { return mMousePosOnImage; }
 
@@ -296,7 +299,8 @@ public:
 
     inline AutoCalib               *getAutoCalib() { return &mAutoCalib; }
     inline ExtrCalibration         *getExtrCalibration() { return &mExtrCalibration; }
-    const WorldImageCorrespondence &getWorldImageCorrespondence();
+    const WorldImageCorrespondence &getWorldImageCorrespondence() const;
+    const WorldImageCorrespondence *getWorldImageCorrespondencePtr() const;
     inline double                   getStatusFPS() const { return mShowFPS; }
     inline MoCapController         &getMoCapController() { return mMoCapController; }
 
@@ -466,6 +470,8 @@ private:
     BackgroundItem       *mBackgroundItem;
     MoCapItem            *mMoCapItem;
     AnnotationGroupItem  *mActionGroupItem;
+    WalkAreaManager      *mWalkAreaManager;
+    WalkAreaItem         *mWalkAreaItem;
 
     QDoubleSpinBox   *mStatusPosRealHeight;
     QLabel           *mStatusLabelStereo;

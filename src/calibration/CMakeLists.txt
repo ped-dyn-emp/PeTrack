@@ -11,4 +11,6 @@ target_sources(petrack_core PRIVATE
     stereoContext.h
     stereoContext.cpp
     worldImageCorrespondence.h
+    walkAreaManager.cpp
+    walkAreaManager.h
 )
