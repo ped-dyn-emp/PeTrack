@@ -79,13 +79,14 @@ Software Version:
 <details><summary>BibTeX for current version</summary>
 
 ```
-@software{boltes_2025_17076320,
+@software{boltes_2026_21106722,
   author       = {Boltes, Maik and
                   Kilic, Deniz and
                   Schrödter, Tobias and
                   Arens, Tobias and
                   Dreßen, Luke and
                   Hermanns, Simon and
+                  Kleinholz, Ben and
                   Adrian, Juliane and
                   Boomers, Ann Katrin and
                   Kandler, Alica and
@@ -93,17 +94,18 @@ Software Version:
                   Graf, Arne and
                   Salden, Daniel and
                   Brualla, Ricardo Martin and
+                  Henry Paegel and
                   Häger, Paul and
                   Hillebrand, Daniel and
                   Lieberenz, Paul and
                   Klein, Janine},
   title        = {PeTrack},
-  month        = sep,
-  year         = 2025,
+  month        = jul,
+  year         = 2026,
   publisher    = {Zenodo},
-  version      = {v1.1},
-  doi          = {10.5281/zenodo.17076320},
-  url          = {https://doi.org/10.5281/zenodo.17076320},
+  version      = {v1.2},
+  doi          = {10.5281/zenodo.21106722},
+  url          = {https://doi.org/10.5281/zenodo.21106722},
 }
 ```
 
