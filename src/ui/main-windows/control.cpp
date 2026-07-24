@@ -509,6 +509,10 @@ Control::Control(
 }
 void Control::setScrollAreaMinimumWidth(QScrollArea *scrollArea, QWidget *scrollAreaWidgetContents)
 {
+    // Activate the layout so sizeHint() reflects the content. When called from the
+    // constructor, the layout hasn't run yet, so sizeHint() would return a stale, too-small width.
+    scrollAreaWidgetContents->layout()->activate();
+
     int frameWidth             = scrollArea->frameWidth();
     int verticalScrollBarWidth = scrollArea->verticalScrollBar()->sizeHint().width();
     int leftMargin             = scrollAreaWidgetContents->layout()->contentsMargins().left();
