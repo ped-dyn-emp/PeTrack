@@ -1,3 +1,9 @@
+# 1.3
+
+## Changes
+
+- Fix: tab width calculation
+
 # 1.2
 
 ## Headline Features
