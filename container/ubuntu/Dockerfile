@@ -1,12 +1,17 @@
-FROM ubuntu:22.04
+FROM ubuntu:26.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Update the repositories
-RUN apt-get update && apt-get -y install ca-certificates tzdata
+RUN apt-get update && apt-get -y install ca-certificates tzdata locales && \
+    locale-gen en_US.UTF-8
+
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
 
 # Install the needed tools
-RUN echo "deb [trusted=yes] http://apt.llvm.org/jammy/ llvm-toolchain-jammy-21 main" | tee /etc/apt/sources.list.d/clang.list
+RUN echo "deb [trusted=yes] http://apt.llvm.org/plucky/ llvm-toolchain-plucky-21 main" | tee /etc/apt/sources.list.d/clang.list
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -20,6 +25,7 @@ RUN apt-get update && \
     clang \
     clang-21 \
     clang-format-21 \
+    clangd-21 \
     make \
     ninja-build \
     cmake \
@@ -39,6 +45,7 @@ RUN apt-get update && \
     python3 \
     python3-pip \
     python3-dev \
+    python3-venv \
     unzip \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -48,7 +55,7 @@ RUN update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-21 100 &&\
     update-alternatives --install /usr/bin/cc cc /usr/bin/clang-21 100
 
 # Install OpenCV 4.10
-ARG OPENCV_VERSION=4.10.0 
+ARG OPENCV_VERSION=5.0.0
 RUN cd /opt && \
     wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip && \
     unzip ${OPENCV_VERSION}.zip && \
@@ -76,9 +83,11 @@ RUN cd /opt && \
     rm -rf /opt/opencv-${OPENCV_VERSION}
 
 # Install Qt 6.8.3
-RUN pip install pytest numpy aqtinstall && aqt install-qt linux desktop 6.8.3 -O /opt/qt6 && \
+RUN python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install pytest numpy aqtinstall && \
+    /opt/venv/bin/aqt install-qt linux desktop 6.8.3 -O /opt/qt6 && \
     rm -rf /root/.cache/pip
-ENV PATH="/opt/qt6/6.8.3/gcc_64/bin:${PATH}"
+ENV PATH="/opt/venv/bin:/opt/qt6/6.8.3/gcc_64/bin:${PATH}"
 
 # Install Qwt
 ARG QWT_VERSION=6.3.0

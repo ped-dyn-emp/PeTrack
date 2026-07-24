@@ -439,7 +439,7 @@ void AutoCalib::findGoodCalibrationSamplesFromVideo(cv::Size boardSize)
                     sample.corners,
                     cv::Size(11, 11),
                     cv::Size(-1, -1),
-                    cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+                    cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 30, 0.1));
                 goodSamples.push_back(sample);
                 totalCovered = mergeCoverages(totalCovered, sample.coverage);
 
@@ -583,13 +583,13 @@ std::optional<IntrinsicModelsParameters> AutoCalib::autoCalib(bool quadAspectRat
                     corners,
                     cv::Size(11, 11),
                     cv::Size(-1, -1),
-                    cv::TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+                    cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 30, 0.1));
 
                 image_points.push_back(corners);
                 drawChessboardCorners(view, board_size, corners, found);
 
 #ifndef SHOW_CALIB_MAINWINDOW
-                namedWindow("img", CV_WINDOW_AUTOSIZE); // 0 wenn skalierbar sein soll
+                namedWindow("img", cv::WINDOW_AUTOSIZE); // 0 wenn skalierbar sein soll
                 imShow("img", view);
                 // cvWaitKey( 0 ); // zahl statt null, wenn nach bestimmter zeit weitergegangen werden soll
 #endif
@@ -619,16 +619,16 @@ std::optional<IntrinsicModelsParameters> AutoCalib::autoCalib(bool quadAspectRat
         // set flags for calibration
         if(quadAspectRatio)
         {
-            flags |= CV_CALIB_FIX_ASPECT_RATIO; // durch setzen von aspect_ratio kann fix ascpect anders als 1:1
-                                                // eingestellt werden
+            flags |= cv::CALIB_FIX_ASPECT_RATIO; // durch setzen von aspect_ratio kann fix ascpect anders als 1:1
+                                                 // eingestellt werden
         }
         if(fixCenter)
         {
-            flags |= CV_CALIB_FIX_PRINCIPAL_POINT;
+            flags |= cv::CALIB_FIX_PRINCIPAL_POINT;
         }
         if(!tangDist)
         {
-            flags |= CV_CALIB_ZERO_TANGENT_DIST;
+            flags |= cv::CALIB_ZERO_TANGENT_DIST;
         }
 
         bool ok = runCalibration(
@@ -672,7 +672,7 @@ std::optional<IntrinsicModelsParameters> AutoCalib::autoCalib(bool quadAspectRat
         SPDLOG_INFO("taux: {} tauy: {}", distortion_coeffs.at<double>(0, 12), distortion_coeffs.at<double>(0, 13));
 
 
-        flags |= CV_CALIB_RATIONAL_MODEL + CV_CALIB_THIN_PRISM_MODEL + CV_CALIB_TILTED_MODEL;
+        flags |= cv::CALIB_RATIONAL_MODEL + cv::CALIB_THIN_PRISM_MODEL + cv::CALIB_TILTED_MODEL;
 
         bool ok_ext = runCalibration(
             image_points,
@@ -792,7 +792,7 @@ int AutoCalib::runCalibration(
 
     std::vector<cv::Mat> rot_vects, trans_vects;
 
-    if(flags & CV_CALIB_FIX_ASPECT_RATIO)
+    if(flags & cv::CALIB_FIX_ASPECT_RATIO)
     {
         camera_matrix.ptr<double>(0)[0] = aspect_ratio;
         camera_matrix.ptr<double>(1)[1] = 1.;
