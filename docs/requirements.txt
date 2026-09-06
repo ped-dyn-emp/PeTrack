@@ -6,3 +6,7 @@ sphinx-notfound-page==1.0.0
 myst-parser==2.0.0
 sphinx-tippy==0.4.1
 sphinx-copybutton==0.5.2
+
+# Citation information is fetched from Zenodo at build time.
+# Pinned to a branch until the tool is released to PyPI.
+zenodo-bibtex-exporter @ git+https://github.com/schroedtert/zenodo-bibtex-exporter.git@create-zenodo-bibtex-exporter
