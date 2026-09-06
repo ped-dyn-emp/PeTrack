@@ -90,10 +90,15 @@ jobs:
             echo "USED_SHA=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
           fi
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: "${{ env.USED_SHA }}"
           persist-credentials: false
+          # Required since checkout v7 to check out fork-PR code from a
+          # pull_request_target workflow. Mirroring the PR head is the very
+          # purpose of this workflow; it is gated by the 'gitlab-mirror' label
+          # and the write-permission check in the check_permission job.
+          allow-unsafe-pr-checkout: true
       - name: Mirror to GitLab
         uses: jakob-fritz/github2lab_action@main
         env:
