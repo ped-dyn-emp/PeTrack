@@ -1,54 +1,52 @@
 #!/usr/bin/env python3
+"""Print the citation information for PeTrack, fetched from Zenodo.
 
-import time
-import warnings
+Invoked by ``conf.py``, which captures stdout and embeds it in the docs.
 
-import requests
+The record is looked up by *concept id*, the identifier that stays the same
+across all releases, rather than by searching for the project name. A name
+search matches titles, descriptions and author names, so it can return an
+unrelated record: the top text match for "PeTrack" is currently a paper by an
+author of that surname, not this software.
 
-search_query = "PeTrack"
-record_id = None
+Zenodo being briefly unreachable must not fail the documentation build, so this
+always prints something and always exits successfully.
+"""
+
+import logging
+import sys
+
+from zenodo_bibtex_exporter import ZenodoBibtexError, get_bibtex
+
+logger = logging.getLogger(__name__)
+
+#: PeTrack on Zenodo. This is the concept id, which never changes between releases.
+CONCEPT_ID = "5078176"
+
+CONCEPT_DOI_URL = f"https://doi.org/10.5281/zenodo.{CONCEPT_ID}"
 
 
-def fetch_data_with_retries(
-    url, params=None, headers=None, max_retries=10, wait_time=2
-):
-    for attempt in range(max_retries):
-        try:
-            response = requests.get(url, params=params, headers=headers)
-            response.raise_for_status()
-            return response
-        except requests.RequestException as e:
-            warnings.warn(f"Attempt {attempt + 1} failed: {e}")
-            time.sleep(wait_time)
-    raise RuntimeError("All attempts to fetch data failed.")
+def get_latest_petrack_bibtex() -> str:
+    """Return the BibTeX entry for the most recent release.
 
-
-def get_latest_petrack_bibtex():
+    Returns:
+        A BibTeX entry, or a comment explaining why there is none.
+    """
     try:
-        response = fetch_data_with_retries(
-            "https://zenodo.org/api/records",
-            params={"q": search_query, "all_versions": True, "sort": "mostrecent"},
+        entry = get_bibtex(CONCEPT_ID)
+    except ZenodoBibtexError as error:
+        logger.warning("No citation information available: %s", error)
+        return (
+            f"% Citation information could not be retrieved from Zenodo.\n"
+            f"% It is available at {CONCEPT_DOI_URL}\n"
         )
-        records = response.json()["hits"]["hits"]
-
-        if not records:
-            raise RuntimeError("No records found for PeTrack.")
-
-        latest_record_id = records[0]["id"]
-        headers = {"accept": "application/x-bibtex"}
-        response = fetch_data_with_retries(
-            f"https://zenodo.org/api/records/{latest_record_id}", headers=headers
-        )
-        response.encoding = "utf-8"
-
-        if response.status_code == 200:
-            return response.text
-        else:
-            raise RuntimeError("Not found")
-    except Exception as e:
-        warnings.warn(f"An error occurred: {e}")
+    else:
+        return entry
 
 
 if __name__ == "__main__":
-    petrack_bibtex = get_latest_petrack_bibtex()
-    print(petrack_bibtex)
+    logging.basicConfig(
+        level=logging.INFO, format="%(levelname)s: %(message)s", stream=sys.stderr
+    )
+    # conf.py captures stdout, so diagnostics must not go there.
+    print(get_latest_petrack_bibtex(), end="")
