@@ -21,6 +21,7 @@
 #include "animation.h"
 #include "control.h"
 #include "helper.h"
+#include "pMessageBox.h"
 #include "personStorage.h"
 #include "petrack.h"
 #include "player.h"
@@ -179,6 +180,22 @@ int TrackerReal::calculate(
 
         // fps ist nicht aussagekraeftig, da sie mgl von ausgelassenen herruehren - besser immer 25,01 fps annehmen
 
+        QPointF center;
+        if(useCalibrationCenter)
+        {
+            if(!mMainWindow->getImage())
+            {
+                PCritical(
+                    mMainWindow,
+                    "PeTrack",
+                    "Cannot use the calibration center without a loaded image or video.\n"
+                    "Disable 'use calib center' in the stereo marker options or load the sequence.");
+                return -1;
+            }
+            const auto imgSize = mMainWindow->getImage()->size();
+            center             = worldImageCorr->getPosReal(QPointF(imgSize.width() / 2., imgSize.height() / 2.), 0.);
+        }
+
         double          height; // groesse in cm
         int             firstFrame, addFrames, anz;
         Vec2F           br(imageBorderSize, imageBorderSize);
@@ -186,8 +203,6 @@ int TrackerReal::calculate(
         QList<int>      tmpMissingList;    // frame nr
         QList<int>      tmpMissingListAnz; // anzahl frames
         TrackPersonReal trackPersonReal;
-        auto            imgRect = mMainWindow->getImage()->size();
-        QPointF         center  = worldImageCorr->getPosReal(QPointF(imgRect.width() / 2., imgRect.height() / 2.), 0.);
         Vec3F           sp;
         int             tsize;
         int             extrapolated;

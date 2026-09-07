@@ -3249,8 +3249,6 @@ void Petrack::exportTracker(QString dest) // default = ""
         {
             return;
         }
-
-
         // if no destination file or folder is given
         if(dest.isEmpty())
         {
