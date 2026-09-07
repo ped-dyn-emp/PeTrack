@@ -3,6 +3,7 @@
 ## Changes
 
 - Fix: tab width calculation
+- Fix: catch crash when exporting file without viedeo
 
 # 1.2
 
