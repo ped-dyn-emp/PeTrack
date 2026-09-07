@@ -25,19 +25,9 @@ def fetch_data_with_retries(
 
 def get_latest_petrack_bibtex():
     try:
-        response = fetch_data_with_retries(
-            "https://zenodo.org/api/records",
-            params={"q": search_query, "all_versions": True, "sort": "mostrecent"},
-        )
-        records = response.json()["hits"]["hits"]
-
-        if not records:
-            raise RuntimeError("No records found for PeTrack.")
-
-        latest_record_id = records[0]["id"]
         headers = {"accept": "application/x-bibtex"}
         response = fetch_data_with_retries(
-            f"https://zenodo.org/api/records/{latest_record_id}", headers=headers
+            "https://zenodo.org/api/records/5078176", headers=headers
         )
         response.encoding = "utf-8"
 
