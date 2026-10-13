@@ -112,6 +112,7 @@ inline std::ostream &operator<<(std::ostream &s, const Vec3F &v)
     s << "(" << v.x() << ", " << v.y() << ", " << v.z() << ")";
     return s;
 }
+QTextStream &operator<<(QTextStream &s, const Vec3F &v);
 
 //-------------------------------------------------------------------------------
 

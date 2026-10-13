@@ -324,7 +324,11 @@ parseTrackPoint(QStringView line, int lineNumber, TrackPoint &trackPoint, reco::
     if(Petrack::trcVersion > 2)
     {
         expectedTokens += 1;
-    }; // markerID
+    } // markerID
+    if(Petrack::trcVersion > 5)
+    {
+        expectedTokens += 3; // viewDir
+    }
     auto result = parser.validateTokenCount(expectedTokens);
     if(!result.success)
     {
@@ -429,6 +433,24 @@ parseTrackPoint(QStringView line, int lineNumber, TrackPoint &trackPoint, reco::
         if(!result.success)
         {
             return result;
+        }
+        if(Petrack::trcVersion > 5)
+        {
+            result = parser.parseDouble(codeMarker.mOrientation[0]);
+            if(!result.success)
+            {
+                return result;
+            }
+            result = parser.parseDouble(codeMarker.mOrientation[1]);
+            if(!result.success)
+            {
+                return result;
+            }
+            result = parser.parseDouble(codeMarker.mOrientation[2]);
+            if(!result.success)
+            {
+                return result;
+            }
         }
         trackPoint.setCodeMarker(codeMarker);
     }

@@ -2812,7 +2812,11 @@ void Petrack::importTracker(QString dest) // default = ""
             if(!ok)
             {
                 // Parse version header
-                if(firstLine.contains("version 5", Qt::CaseInsensitive))
+                if(firstLine.contains("version 6", Qt::CaseInsensitive))
+                {
+                    trcVersion = 6;
+                }
+                else if(firstLine.contains("version 5", Qt::CaseInsensitive))
                 {
                     trcVersion = 5;
                 }
@@ -2834,7 +2838,7 @@ void Petrack::importTracker(QString dest) // default = ""
                     QMessageBox::critical(
                         this,
                         tr("PeTrack"),
-                        tr("Could not import tracker:\nNot supported trc version in file: %1.").arg(dest));
+                        tr("Could not import tracker:\nUnsupported trc version in file: %1.").arg(dest));
                     return;
                 }
 
@@ -3298,7 +3302,7 @@ void Petrack::exportTracker(QString dest) // default = ""
 
             qApp->processEvents();
 
-            trcVersion = 5;
+            trcVersion = 6;
 
             SPDLOG_INFO(
                 "export tracking data to {} ({} person(s), file version {})",

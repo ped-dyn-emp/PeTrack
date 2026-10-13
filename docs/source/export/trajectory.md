@@ -78,7 +78,7 @@ The `smooth` option changes the trajectories in-place! That is, when trajectorie
 :::
 
 add head direction
-: Adds the head direction to the `.txt` file. Head directions can be extracted for different markers. From the currently recommended markers, the code marker as well as the combined multicolor and code marker support this export option. The head direction is saved as a vector with the entires: `viewDirX` and `viewDirY`
+: Adds the head direction to the `.txt` file. Head directions can be extracted for different markers. From the currently recommended markers, the code marker as well as the combined multicolor and code marker support this export option. The head direction is saved as a vector with the entires: `viewDirX`, `viewDirY` and `viewDirZ`. If no viewDir value is present the default is (0, 0, 0).
 
 add angle of view
 : Adds the angle between the line from the camera to the point and the line from the camera perpendicularly to the ground in radians

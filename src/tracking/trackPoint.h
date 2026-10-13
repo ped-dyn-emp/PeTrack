@@ -210,14 +210,26 @@ public:
             colorPoint = japanMarker->mColorPoint;
         }
 
-        int markerId = -1;
+        int    markerId = -1;
+        double viewDirX = -1;
+        double viewDirY = -1;
+        double viewDirZ = -1;
         if(auto codeMarker = trackPoint.getCodeMarker())
         {
             markerId = codeMarker->mMarkerId;
+            viewDirX = codeMarker->mOrientation[0];
+            viewDirY = codeMarker->mOrientation[1];
+            viewDirZ = codeMarker->mOrientation[2];
         }
 
 
-        if(trcVersion > 2)
+        if(trcVersion > 5)
+        {
+            stream << trackPoint.x() << " " << trackPoint.y() << " " << stereoPoint.x() << " " << stereoPoint.y() << " "
+                   << stereoPoint.z() << " " << trackPoint.qual() << " " << colorPoint.x() << " " << colorPoint.y()
+                   << " " << color << " " << markerId << " " << viewDirX << " " << viewDirY << " " << viewDirZ;
+        }
+        else if(trcVersion > 2)
         {
             stream << trackPoint.x() << " " << trackPoint.y() << " " << stereoPoint.x() << " " << stereoPoint.y() << " "
                    << stereoPoint.z() << " " << trackPoint.qual() << " " << colorPoint.x() << " " << colorPoint.y()
