@@ -50,6 +50,7 @@ struct TrackPointOptionalInfoHdf5
     int   frame;
     float viewDirX;
     float viewDirY;
+    float viewDirZ;
     float viewAngle;
 };
 
@@ -106,22 +107,21 @@ class TrackPointReal : public Vec3F
 {
 private:
     int   mFrameNum; // frame number in animation sequence possibly with missing frames
-    Vec2F mViewDir;
+    Vec3F mViewDir;
     float mAngleOfView; // angle of view of camera to point
     int   mMarkerID;
 
 public:
     TrackPointReal(const Vec3F &p, int frameNum);
-    TrackPointReal(const Vec3F &p, int frameNum, const Vec2F &d);
 
     inline int   frameNum() const { return mFrameNum; }
     inline void  setFrameNum(int frameNum) { mFrameNum = frameNum; }
-    inline Vec2F viewDir() const { return mViewDir; }
+    inline Vec3F viewDir() const { return mViewDir; }
     inline float angleOfView() const { return mAngleOfView; }
     inline void  setAngleOfView(float a) { mAngleOfView = a; }
     inline int   getMarkerID() const { return mMarkerID; }
     inline void  setMarkerID(int markerID) { mMarkerID = markerID; }
-    inline void  setViewDirection(const Vec2F &dir) { mViewDir = dir; }
+    inline void  setViewDirection(const Vec3F &dir) { mViewDir = dir; }
 };
 
 inline QTextStream &operator<<(QTextStream &s, const TrackPointReal &tp)
@@ -163,7 +163,6 @@ public:
     void    init(int firstFrame, double height, int markerID, const QString &comment);
     void    addEnd(const QPointF &pos, int frame);
     void    addEnd(const Vec3F &pos, int frame);
-    void    addEnd(const QPointF &pos, int frame, const QPointF &dir);
     QString getComment() const { return mComment; }
 };
 

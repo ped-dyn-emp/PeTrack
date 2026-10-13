@@ -383,3 +383,9 @@ QTextStream &operator>>(QTextStream &s, Vec2F &v)
     v.setY(d);
     return s;
 }
+
+QTextStream &operator<<(QTextStream &s, const Vec3F &v)
+{
+    s << v.x() << " " << v.y() << " " << v.z();
+    return s;
+}

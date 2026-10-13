@@ -41,13 +41,6 @@ TrackPointReal::TrackPointReal(const Vec3F &p, int frameNum) : Vec3F(p), mFrameN
     mMarkerID    = -1;
 }
 
-TrackPointReal::TrackPointReal(const Vec3F &p, int frameNum, const Vec2F &d) :
-    Vec3F(p), mFrameNum(frameNum), mViewDir(d)
-{
-    mAngleOfView = -1;
-    mMarkerID    = -1;
-}
-
 //--------------------------------------------------------------------------
 
 // the list index is the frame number plus mFirstFrame 0..mLastFrame-mFirstFrame
@@ -108,15 +101,6 @@ void TrackPersonReal::addEnd(const Vec3F &pos, int frame)
 {
     ++mLastFrame;
     append(TrackPointReal(pos, frame));
-}
-
-void TrackPersonReal::addEnd(const QPointF &pos, int frame, const QPointF &dir)
-{
-    Vec3F point(pos.x(), pos.y(), -1.);
-    Vec2F viewDirection(dir.x(), dir.y());
-    ++mLastFrame;
-    viewDirection.normalize();
-    append(TrackPointReal(point, frame, viewDirection));
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------
@@ -399,8 +383,12 @@ int TrackerReal::calculate(
                        codeMarker)
                     {
                         auto orientation = codeMarker->mOrientation;
-                        orientation      = petrack->getExtrCalibration()->camToWorldRotation(orientation);
-                        trackPersonReal.last().setViewDirection(Vec2F(orientation[0], orientation[1]).unit());
+                        if(orientation != cv::Vec3d{-1, -1, -1})
+                        {
+                            orientation = petrack->getExtrCalibration()->camToWorldRotation(orientation);
+                            orientation = orientation / norm(orientation);
+                        }
+                        trackPersonReal.last().setViewDirection(Vec3F(orientation[0], orientation[1], orientation[2]));
                     }
                     else if(auto colorPoint = person.at(j).getColorPointForOrientation())
                     {
@@ -411,7 +399,8 @@ int TrackerReal::calculate(
                         // trackPersonReal.init(firstFrame+addFrames, height) oder aber innerhalb des trackink path
                         // mit for schleife ueber f
                         colPos = worldImageCorr->getPosReal((*colorPoint + moveDir + br).toQPointF(), height);
-                        trackPersonReal.last().setViewDirection(colPos - pos);
+                        const QPointF viewDir = colPos - pos;
+                        trackPersonReal.last().setViewDirection(Vec3F(viewDir.x(), viewDir.y(), 0.));
                     }
                 }
 
@@ -637,7 +626,7 @@ void TrackerReal::exportTxt(
     out << "# z: can be 3d position or height of person (alternating or not)" << Qt::endl;
     if(exportViewingDirection)
     {
-        out << "# viewDirX viewDirY: vector of direction of head of person" << Qt::endl;
+        out << "# viewDirX viewDirY viewDirZ: vector of direction of head of person" << Qt::endl;
     }
     if(exportAngleOfView)
     {
@@ -653,7 +642,7 @@ void TrackerReal::exportTxt(
     }
     if(exportViewingDirection)
     {
-        out << " viewDirX viewDirY";
+        out << " viewDirX viewDirY viewDirZ";
     }
     if(exportAngleOfView)
     {
@@ -822,6 +811,7 @@ void TrackerReal::exportHdf5(
                 {
                     optionalInfo.viewDirX = person.at(j).viewDir().x();
                     optionalInfo.viewDirY = person.at(j).viewDir().y();
+                    optionalInfo.viewDirZ = person.at(j).viewDir().z();
                 }
                 if(exportAngleOfView)
                 {
@@ -914,6 +904,8 @@ void TrackerReal::exportHdf5(
                 "view_dir_x", HOFFSET(TrackPointOptionalInfoHdf5, viewDirX), H5::PredType::NATIVE_FLOAT);
             optionalDatatype.insertMember(
                 "view_dir_y", HOFFSET(TrackPointOptionalInfoHdf5, viewDirY), H5::PredType::NATIVE_FLOAT);
+            optionalDatatype.insertMember(
+                "view_dir_z", HOFFSET(TrackPointOptionalInfoHdf5, viewDirZ), H5::PredType::NATIVE_FLOAT);
         }
         if(exportAngleOfView)
         {
@@ -931,9 +923,11 @@ void TrackerReal::exportHdf5(
         if(exportViewingDirection)
         {
             createHdf5Attribute(
-                optionalDataset, "view_dir_x", "x component of view direction unit vector [(0, 0) if not present]");
+                optionalDataset, "view_dir_x", "x component of view direction unit vector [(0, 0, 0) if not present]");
             createHdf5Attribute(
-                optionalDataset, "view_dir_y", "y component of view direction unit vector [(0, 0) if not present]");
+                optionalDataset, "view_dir_y", "y component of view direction unit vector [(0, 0, 0) if not present]");
+            createHdf5Attribute(
+                optionalDataset, "view_dir_z", "z component of view direction unit vector [(0, 0, 0) if not present]");
         }
         if(exportAngleOfView)
         {

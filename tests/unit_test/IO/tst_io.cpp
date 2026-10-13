@@ -18,7 +18,10 @@
 
 #include "moCapPerson.h"
 #include "pIO.h"
+#include "petrack.h"
+#include "trackPoint.h"
 
+#include <QTextStream>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <catch2/matchers/catch_matchers_vector.hpp>
@@ -617,6 +620,88 @@ SCENARIO("I want to read a XSens c3d file", "[io]")
                 REQUIRE(root.getPos() == cv::Point3f{0, 0, 0});                    // pSacrum point[7]
                 REQUIRE(root.getChildById(1).getPos() == cv::Point3f(15, 15, 15)); // pC7SpinalProcess point[15]
             }
+        }
+    }
+}
+
+struct TrcVersion
+{
+    explicit TrcVersion(int version) { Petrack::trcVersion = version; }
+    ~TrcVersion() { Petrack::trcVersion = 0; }
+};
+
+QString toTrcLine(const TrackPoint &trackPoint)
+{
+    std::string input_Line;
+    input_Line = fmt::format("{}", trackPoint);
+
+    return QString::fromStdString(input_Line);
+}
+
+TEST_CASE("testing cases with CodeMarker", "[TrackPoint]")
+{
+    TrcVersion version{6};
+
+    TrackPoint trackPoint =
+        TrackPoint::createMultiColorTrackPoint(Vec2F{100., 100.}, 100, Vec2F{100., 100.}, QColor(10, 20, 30));
+
+    SECTION("a known view direction is written")
+    {
+        trackPoint.setCodeMarker(CodeMarker{42, cv::Vec3d{0.5, -0.25, 0.75}});
+
+        auto tokens = toTrcLine(trackPoint).split(' ');
+        REQUIRE(tokens.size() == 15);
+
+        REQUIRE(tokens.at(12) == "0.5");
+        REQUIRE(tokens.at(13) == "-0.25");
+        REQUIRE(tokens.at(14) == "0.75");
+    }
+
+    SECTION("default (-1, -1, -1) for a missing view direction")
+    {
+        trackPoint.setCodeMarker(CodeMarker{42, cv::Vec3d{-1., -1., -1.}});
+        auto tokens = toTrcLine(trackPoint).split(' ');
+
+        REQUIRE(tokens.size() == 15);
+
+        REQUIRE(tokens.at(12) == "-1");
+        REQUIRE(tokens.at(13) == "-1");
+        REQUIRE(tokens.at(14) == "-1");
+    }
+
+    SECTION("a trackPoint without code marker has neither marker id nor view direction")
+    {
+        auto tokens = toTrcLine(trackPoint).split(' ');
+
+        REQUIRE(tokens.size() == 15);
+
+        REQUIRE(tokens.at(11) == "-1");
+        REQUIRE(tokens.at(12) == "-1");
+        REQUIRE(tokens.at(13) == "-1");
+        REQUIRE(tokens.at(14) == "-1");
+    }
+}
+
+TEST_CASE("testing if the version fits the size", "[TrackPoint]")
+{
+    TrackPoint trackPoint =
+        TrackPoint::createMultiColorTrackPoint(Vec2F{100., 100.}, 100, Vec2F{100., 100.}, QColor(10, 20, 30));
+    trackPoint.setCodeMarker(CodeMarker{42, cv::Vec3d{0.5, -0.25, 0.75}});
+
+    SECTION("trc version 6 contains the view direction")
+    {
+        TrcVersion version{6};
+
+        REQUIRE(toTrcLine(trackPoint).split(' ').size() == 15);
+    }
+
+
+    SECTION("trc versions <6 do not contain the view direction")
+    {
+        for(int trcVersion : {3, 4, 5})
+        {
+            TrcVersion version{trcVersion};
+            REQUIRE(toTrcLine(trackPoint).split(' ').size() == 12);
         }
     }
 }
