@@ -24,6 +24,7 @@
 
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <ranges>
 
 WalkAreaItem::WalkAreaItem(Petrack *mw, WalkAreaManager *mgr, QGraphicsItem *parent) :
     QGraphicsObject(parent), mMainWindow(mw), mManager(mgr)
@@ -87,6 +88,16 @@ void WalkAreaItem::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget 
         p->setPen(scaledPen(pen));
         p->setBrush(QBrush(fill));
         p->drawPolygon(poly, Qt::WindingFill);
+
+        if(mManager->isEditMode())
+        {
+            p->setBrush(pen.color());
+            for(const QPointF &vertex :
+                poly | std::views::take(poly.size() - 1)) // last point = first point so iterate until size - 1
+            {
+                p->drawEllipse(vertex, HANDLE_RADIUS, HANDLE_RADIUS);
+            }
+        }
     };
 
     // Draw walkable area
@@ -106,6 +117,26 @@ void WalkAreaItem::paint(QPainter *p, const QStyleOptionGraphicsItem *, QWidget 
     QColor     fill      = nextIsObs ? QColor(220, 80, 80, 90) : QColor(60, 160, 240, 90);
     p->setBrush(QBrush(fill));
     mManager->selection().paint(*p);
+}
+
+void WalkAreaItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(mManager->startVertexDrag(event->pos(), HANDLE_RADIUS))
+    {
+        return;
+    }
+    QGraphicsObject::mousePressEvent(event);
+}
+
+void WalkAreaItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    mManager->moveDraggedVertex(event->pos());
+}
+
+void WalkAreaItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    mManager->finishVertexDrag();
+    QGraphicsObject::mouseReleaseEvent(event);
 }
 
 void WalkAreaItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)

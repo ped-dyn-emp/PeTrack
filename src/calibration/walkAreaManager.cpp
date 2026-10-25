@@ -26,6 +26,9 @@
 #include "walkAreaWidget.h"
 
 #include <QDomDocument>
+#include <QLineF>
+#include <ranges>
+#include <utility>
 
 WalkAreaManager::WalkAreaManager(WalkAreaWidget *parent) : mParent(parent)
 {
@@ -106,7 +109,7 @@ void WalkAreaManager::setDrawingType(walkarea::PolygonType t)
 void WalkAreaManager::ensureNextObstacleIdFree()
 {
     // make sure nextId is not presend in map of obstacles
-    while(mObstacles.find(mNextObstacleId) != mObstacles.end())
+    while(mObstacles.contains(mNextObstacleId))
     {
         ++mNextObstacleId;
     }
@@ -152,7 +155,7 @@ void WalkAreaManager::removePolygon(int id)
         SPDLOG_INFO("Walk area: walkable area removed");
         setDrawingType(walkarea::PolygonType::Walkable);
     }
-    else if(mObstacles.find(id) != mObstacles.end())
+    else if(mObstacles.contains(id))
     {
         mObstacles.erase(id);
         SPDLOG_INFO("Walk area: obstacle {} removed", id);
@@ -173,6 +176,7 @@ void WalkAreaManager::reset()
     mObstacles.clear();
     mNextObstacleId = 1;
     mEdit           = false;
+    mDraggedVertex.reset();
     setDrawingType(walkarea::PolygonType::Walkable);
     validatePolygons();
     emit geometryChanged();
@@ -188,7 +192,7 @@ void WalkAreaManager::updatePolygon(const walkarea::Polygon &poly, bool validate
         mWalkableArea = poly;
         emit imageUpdate();
     }
-    else if(mObstacles.find(poly.id()) != mObstacles.end())
+    else if(mObstacles.contains(poly.id()))
     {
         mObstacles[poly.id()] = poly;
         emit imageUpdate();
@@ -198,6 +202,90 @@ void WalkAreaManager::updatePolygon(const walkarea::Polygon &poly, bool validate
     {
         validatePolygons();
     }
+}
+
+walkarea::Polygon *WalkAreaManager::findPolygon(int id)
+{
+    if(mWalkableArea.has_value() && mWalkableArea->id() == id)
+    {
+        return &*mWalkableArea;
+    }
+    auto it = mObstacles.find(id);
+    return it != mObstacles.end() ? &it->second : nullptr;
+}
+
+void WalkAreaManager::setVertex(const VertexRef &vertex, const QPointF &pos)
+{
+    auto *poly = findPolygon(vertex.polygonId);
+    if(!poly)
+    {
+        return;
+    }
+    (*poly)[vertex.index] = pos;
+    if(vertex.index == 0)
+    {
+        poly->back() = pos; // keep the polygon closed
+    }
+    emit imageUpdate();
+}
+
+bool WalkAreaManager::startVertexDrag(const QPointF &pos, double radius)
+{
+    mDraggedVertex.reset();
+    if(!mEdit || !mSelection.getPoints().isEmpty())
+    {
+        return false;
+    }
+    auto consider = [&](const walkarea::Polygon &poly, bool visible)
+    {
+        // the last vertex duplicates the first one
+        for(qsizetype i = 0; visible && !poly.disabled() && i < poly.size() - 1; ++i)
+        {
+            if(const double dist = QLineF(pos, poly[i]).length(); dist < radius)
+            {
+                radius         = dist;
+                mDraggedVertex = VertexRef{.polygonId = poly.id(), .index = i, .originalVal = poly[i]};
+            }
+        }
+    };
+    for(const auto &obstacle : mObstacles | std::views::values)
+    {
+        consider(obstacle, mObstacleVisible);
+    }
+    if(mWalkableArea)
+    {
+        consider(*mWalkableArea, mWalkableVisible);
+    }
+    return isDraggingVertex();
+}
+
+void WalkAreaManager::moveDraggedVertex(const QPointF &pos)
+{
+    if(mDraggedVertex.has_value())
+    {
+        setVertex(*mDraggedVertex, pos);
+    }
+}
+
+void WalkAreaManager::finishVertexDrag()
+{
+    const auto vertex = std::exchange(mDraggedVertex, std::nullopt);
+    if(const auto *poly = vertex ? findPolygon(vertex->polygonId) : nullptr;
+       poly && poly->at(vertex->index) != vertex->originalVal)
+    {
+        validatePolygons();
+        emit geometryChanged();
+    }
+}
+
+void WalkAreaManager::cancelVertexDrag()
+{
+    if(!mDraggedVertex.has_value())
+    {
+        return;
+    }
+    setVertex(*mDraggedVertex, mDraggedVertex->originalVal);
+    mDraggedVertex.reset();
 }
 
 void WalkAreaManager::validatePolygons()

@@ -98,7 +98,8 @@ void WalkAreaWidget::setManager(WalkAreaManager *mgr)
         [this](bool v)
         {
             mUi->mEditModeToggle->setChecked(v);
-            mUi->mStatusLabel->setText(v ? "edit mode: double-click to add points" : "paused: not in edit mode");
+            mUi->mStatusLabel->setText(
+                v ? "edit mode: double-click to add points or drag points to move them" : "paused: not in edit mode");
         });
     connect(mManager, &WalkAreaManager::drawingTypeChanged, this, &WalkAreaWidget::onDrawingTypeChanged);
 
@@ -619,6 +620,11 @@ bool WalkAreaWidget::eventFilter(QObject *obj, QEvent *event)
                 return true;
 
             case Qt::Key_Escape:
+                if(mManager->isDraggingVertex())
+                {
+                    mManager->cancelVertexDrag();
+                    return true;
+                }
                 mManager->selection().reset();
                 mMainWindow->updateImage();
                 return true;

@@ -55,6 +55,12 @@ public:
     void reset();
     void updatePolygon(const walkarea::Polygon &poly, bool validate = false);
 
+    bool startVertexDrag(const QPointF &pos, double radius);
+    void moveDraggedVertex(const QPointF &pos);
+    void finishVertexDrag();
+    void cancelVertexDrag();
+    bool isDraggingVertex() const { return mDraggedVertex.has_value(); }
+
     bool                                    hasWalkableArea() const { return mWalkableArea.has_value(); }
     std::optional<walkarea::Polygon>        getWalkableArea() const { return mWalkableArea; }
     const std::map<int, walkarea::Polygon> &getObstacles() const { return mObstacles; }
@@ -76,8 +82,17 @@ signals:
     void validationChanged();
 
 private:
-    void ensureNextObstacleIdFree();
-    void validatePolygons();
+    struct VertexRef
+    {
+        int       polygonId;
+        qsizetype index;
+        QPointF   originalVal;
+    };
+
+    void               ensureNextObstacleIdFree();
+    void               validatePolygons();
+    walkarea::Polygon *findPolygon(int id);
+    void               setVertex(const VertexRef &vertex, const QPointF &pos);
 
     WalkAreaWidget       *mParent;
     bool                  mVisible         = false;
@@ -93,5 +108,7 @@ private:
 
     std::set<int> mInvalidObstacleIds;
     bool          mIsValid = true;
+
+    std::optional<VertexRef> mDraggedVertex;
 };
 #endif
