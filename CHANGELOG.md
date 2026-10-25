@@ -2,6 +2,7 @@
 
 ## Changes
 
+- WKT geometry is now editable in the view
 - Fix: tab width calculation
 - Fix: catch crash when exporting file without viedeo
 - Add: added export of head orientation z + serialization in trc of orientation

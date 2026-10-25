@@ -31,6 +31,8 @@ First, enable:
 - `show/hide completely` to display polygons in the calibrated view
 - `enable editing-mode` to start drawing
 
+Disabling `enable editing-mode` turns off all drawing and editing, so clicks in the video view no longer affect the polygons.
+
 You can switch between drawing modes using:
 
 - `add walkarea`
@@ -50,7 +52,23 @@ While editing:
 - `Backspace` removes the last placed point
 - `Escape` cancels the polygon currently being drawn
 
-### 3. Manage polygons in the table
+### 3. Move polygon vertices
+
+In edit mode, every vertex (corner point) of the existing polygons is shown as a small filled dot in the polygon's color. These dots are the handles you can grab to move a vertex.
+In the screenshot below, the arrows point at the handles of the walkable area (blue) and of two obstacles (red).
+
+:::{image} images/walk_area_vertex_handles.png
+:width: 60%
+:::
+
+Click on a vertex and drag it with the left mouse button held down to move it to a new position. This works for the walkable area as well as for obstacles, including polygons that were imported from a wkt-string.
+Press `Escape` while dragging to cancel the move and put the vertex back where it was.
+
+Only visible and enabled polygons can be edited this way, and only while no new polygon is being drawn.
+
+The polygons are validated again after a vertex has been moved.
+
+### 4. Manage polygons in the table
 
 Each polygon is listed with:
 
@@ -62,10 +80,10 @@ Each polygon is listed with:
 You can adjust the height of each polygon and temporarily disable polygons without deleting them.
 Use the `delete` button to remove a polygon.
 
-### 4. Validate geometry
+### 5. Validate geometry
 
 PeTrack validates enabled polygons automatically.
-Invalid obstacle rows are highlighted in red.
+Invalid obstacle rows are highlighted in red, and the status line above the table describes the problem.
 
 Typical validation errors are:
 
@@ -75,7 +93,7 @@ Typical validation errors are:
 
 Export is only possible while validation is successful.
 
-### 5. Import/Export WKT
+### 6. Import/Export WKT
 
 Use the `walkarea input/output` section for exchanging polygons:
 
