@@ -2653,13 +2653,13 @@
                   <property name="verticalSpacing">
                    <number>0</number>
                   </property>
-                  <item row="6" column="1">
+                  <item row="7" column="1">
                    <widget class="QLabel" name="label_41">
-                    <property name="maximumSize">
-                     <size>
-                      <width>30</width>
-                      <height>16777215</height>
-                     </size>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
                     <property name="text">
                      <string>size:</string>
@@ -2668,12 +2668,18 @@
                   </item>
                   <item row="3" column="1">
                    <widget class="QLabel" name="label_70">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="text">
                      <string>line width:</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="10" column="0">
+                  <item row="11" column="0">
                    <widget class="QCheckBox" name="trackShowGroundPath">
                     <property name="maximumSize">
                      <size>
@@ -2689,7 +2695,7 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="9" column="0">
+                  <item row="10" column="0">
                    <widget class="QCheckBox" name="trackShowGroundPosition">
                     <property name="maximumSize">
                      <size>
@@ -2705,7 +2711,7 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="6" column="0">
+                  <item row="7" column="0">
                    <widget class="QCheckBox" name="trackShowColorMarker">
                     <property name="maximumSize">
                      <size>
@@ -2721,40 +2727,40 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="10" column="1">
+                  <item row="11" column="1">
                    <widget class="QLabel" name="label_68">
-                    <property name="maximumSize">
-                     <size>
-                      <width>30</width>
-                      <height>16777215</height>
-                     </size>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
                     <property name="text">
                      <string>size:</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="7" column="2">
+                  <item row="8" column="2">
                    <widget class="PSpinBox" name="trackColorMarkerLineWidth" native="true">
                     <property name="minimum" stdset="0">
                      <number>1</number>
                     </property>
                    </widget>
                   </item>
-                  <item row="8" column="1">
+                  <item row="9" column="1">
                    <widget class="QLabel" name="label_48">
-                    <property name="maximumSize">
-                     <size>
-                      <width>30</width>
-                      <height>16777215</height>
-                     </size>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
                     <property name="text">
                      <string>size:</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="9" column="2">
+                  <item row="10" column="2">
                    <widget class="PSpinBox" name="trackGroundPositionSize" native="true">
                     <property name="minimum" stdset="0">
                      <number>1</number>
@@ -2773,19 +2779,19 @@
                   </item>
                   <item row="5" column="1">
                    <widget class="QLabel" name="label_36">
-                    <property name="maximumSize">
-                     <size>
-                      <width>30</width>
-                      <height>16777215</height>
-                     </size>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
                     <property name="text">
                      <string>size:</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="8" column="2">
-                   <widget class="PSpinBox" name="trackNumberSize" native="true">
+                  <item row="9" column="2">
+                   <widget class="PSpinBox" name="trackPersonNumberSize" native="true">
                     <property name="minimum" stdset="0">
                      <number>2</number>
                     </property>
@@ -2825,7 +2831,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>show height/col. color/marker ID</string>
+                     <string>show height/col. color</string>
                     </property>
                     <property name="checked">
                      <bool>true</bool>
@@ -2848,14 +2854,20 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="7" column="1">
+                  <item row="8" column="1">
                    <widget class="QLabel" name="label_69">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="text">
-                     <string>line width</string>
+                     <string>line width:</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="10" column="3">
+                  <item row="11" column="3">
                    <widget class="QPushButton" name="trackGroundPathColorButton">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -3143,8 +3155,75 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="8" column="3">
-                   <widget class="QCheckBox" name="trackNumberBold">
+                  <item row="6" column="1">
+                   <widget class="QLabel" name="labelTrackMarkerIDSize">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="toolTip">
+                     <string>Text size of the marker ID</string>
+                    </property>
+                    <property name="text">
+                     <string>size:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="0">
+                   <widget class="QCheckBox" name="trackShowMarkerID">
+                    <property name="maximumSize">
+                     <size>
+                      <width>999</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Shows the ID of the detected code marker</string>
+                    </property>
+                    <property name="text">
+                     <string>show marker ID</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="2">
+                   <widget class="PSpinBox" name="trackMarkerIDSize" native="true">
+                    <property name="toolTip">
+                     <string>Text size of the marker ID</string>
+                    </property>
+                    <property name="minimum" stdset="0">
+                     <number>2</number>
+                    </property>
+                    <property name="value" stdset="0">
+                     <number>14</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="3">
+                   <widget class="QCheckBox" name="trackMarkerIDBold">
+                    <property name="maximumSize">
+                     <size>
+                      <width>999</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Shows the marker ID in bold</string>
+                    </property>
+                    <property name="text">
+                     <string>bold</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="9" column="3">
+                   <widget class="QCheckBox" name="trackPersonNumberBold">
                     <property name="maximumSize">
                      <size>
                       <width>999</width>
@@ -3523,11 +3602,11 @@
                   </item>
                   <item row="0" column="1">
                    <widget class="QLabel" name="label_47">
-                    <property name="maximumSize">
-                     <size>
-                      <width>30</width>
-                      <height>16777215</height>
-                     </size>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
                     <property name="text">
                      <string>size:</string>
@@ -3536,11 +3615,11 @@
                   </item>
                   <item row="2" column="1">
                    <widget class="QLabel" name="label_13">
-                    <property name="maximumSize">
-                     <size>
-                      <width>30</width>
-                      <height>16777215</height>
-                     </size>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
                     <property name="text">
                      <string>size:</string>
@@ -3563,7 +3642,7 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="10" column="2">
+                  <item row="11" column="2">
                    <widget class="PSpinBox" name="trackGroundPathSize" native="true">
                     <property name="minimum" stdset="0">
                      <number>1</number>
@@ -3592,8 +3671,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="8" column="0">
-                   <widget class="QCheckBox" name="trackShowNumber">
+                  <item row="9" column="0">
+                   <widget class="QCheckBox" name="trackShowPersonNumber">
                     <property name="maximumSize">
                      <size>
                       <width>999</width>
@@ -3601,7 +3680,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>show number</string>
+                     <string>show person number</string>
                     </property>
                     <property name="checked">
                      <bool>true</bool>
@@ -3610,25 +3689,31 @@
                   </item>
                   <item row="1" column="1">
                    <widget class="QLabel" name="label_24">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="text">
-                     <string>line width</string>
+                     <string>line width:</string>
                     </property>
                    </widget>
                   </item>
                   <item row="4" column="1">
                    <widget class="QLabel" name="label_25">
-                    <property name="maximumSize">
-                     <size>
-                      <width>30</width>
-                      <height>16777215</height>
-                     </size>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
                     <property name="text">
                      <string>size:</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="6" column="2">
+                  <item row="7" column="2">
                    <widget class="PSpinBox" name="trackColorMarkerSize" native="true">
                     <property name="minimum" stdset="0">
                      <number>1</number>
@@ -3638,13 +3723,13 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="9" column="1">
+                  <item row="10" column="1">
                    <widget class="QLabel" name="label_67">
-                    <property name="maximumSize">
-                     <size>
-                      <width>30</width>
-                      <height>16777215</height>
-                     </size>
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
                     </property>
                     <property name="text">
                      <string>size:</string>
@@ -4263,12 +4348,15 @@
   <tabstop>trackShowColColor</tabstop>
   <tabstop>trackColColorSize</tabstop>
   <tabstop>trackShowHeightIndividual</tabstop>
+  <tabstop>trackShowMarkerID</tabstop>
+  <tabstop>trackMarkerIDSize</tabstop>
+  <tabstop>trackMarkerIDBold</tabstop>
   <tabstop>trackShowColorMarker</tabstop>
   <tabstop>trackColorMarkerSize</tabstop>
   <tabstop>trackColorMarkerLineWidth</tabstop>
-  <tabstop>trackShowNumber</tabstop>
-  <tabstop>trackNumberSize</tabstop>
-  <tabstop>trackNumberBold</tabstop>
+  <tabstop>trackShowPersonNumber</tabstop>
+  <tabstop>trackPersonNumberSize</tabstop>
+  <tabstop>trackPersonNumberBold</tabstop>
   <tabstop>trackShowGroundPosition</tabstop>
   <tabstop>trackGroundPositionSize</tabstop>
   <tabstop>trackShowGroundPath</tabstop>

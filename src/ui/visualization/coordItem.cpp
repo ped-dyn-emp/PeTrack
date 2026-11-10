@@ -190,8 +190,8 @@ void CoordItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*opti
         if(extCalib->isSetExtrCalib())
         {
             QFont font;
-            font.setBold(mControlWidget->isTrackNumberBoldChecked());
-            font.setPixelSize(mControlWidget->getTrackNumberSize());
+            font.setBold(mControlWidget->isTrackPersonNumberBoldChecked());
+            font.setPixelSize(mControlWidget->getTrackPersonNumberSize());
             painter->setFont(font);
 
             for(size_t i = 0; i < extCalib->get2DList().size(); i++)

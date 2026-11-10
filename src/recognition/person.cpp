@@ -788,7 +788,7 @@ void PersonList::calcPersonPos(
     if (false)
     {
     int x, y, i, j, *sRow, sCol;
-    int frameSize=mMain->getControlWidget()->trackNumberSize->value(); // war 24
+    int frameSize=mMain->getControlWidget()->trackPersonNumberSize->value(); // war 24
     unsigned short* data = (unsigned short*) mDisparity.imageData+frameSize/2; //war 500; // char*
     unsigned short* yData = data+(mDisparity.width*frameSize/2); //war 300);
     unsigned short* sData;

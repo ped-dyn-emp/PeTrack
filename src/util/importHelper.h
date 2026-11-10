@@ -21,6 +21,7 @@
 
 #include <QDomElement>
 #include <QFileInfo>
+#include <QStringList>
 #include <QTextStream>
 #include <optional>
 #include <sstream>
@@ -45,26 +46,81 @@ QString readQString(const QDomElement &elem, const QString &name);
 bool    readBool(const QDomElement &elem, const QString &name, const bool &defaultVal);
 bool    readBool(const QDomElement &elem, const QString &name);
 
+// Overloads for renamed attributes: if name is not present, the previousNames are tried in order before falling
+// back to defaultVal (allows loading project files written with older attribute names).
+QString resolveAttributeName(const QDomElement &elem, const QString &name, const QStringList &previousNames);
+double
+readDouble(const QDomElement &elem, const QString &name, const QStringList &previousNames, const double &defaultVal);
+int readInt(const QDomElement &elem, const QString &name, const QStringList &previousNames, const int defaultVal);
+QString
+readQString(const QDomElement &elem, const QString &name, const QStringList &previousNames, const QString &defaultVal);
+bool readBool(const QDomElement &elem, const QString &name, const QStringList &previousNames, const bool &defaultVal);
+
 template <typename T>
 void loadIntValue(const QDomElement &elem, const QString &name, T widget, const int defaultVal);
 template <typename T>
 void loadIntValue(const QDomElement &elem, const QString &name, T widget);
 template <typename T>
+void loadIntValue(
+    const QDomElement &elem,
+    const QString     &name,
+    const QStringList &previousNames,
+    T                  widget,
+    const int          defaultVal);
+template <typename T>
 void loadDoubleValue(const QDomElement &elem, const QString &name, T widget, const double defaultVal);
 template <typename T>
 void loadDoubleValue(const QDomElement &elem, const QString &name, T widget);
 template <typename T>
-void loadBoolValue(const QDomElement &elem, const QString &name, T widget);
+void loadDoubleValue(
+    const QDomElement &elem,
+    const QString     &name,
+    const QStringList &previousNames,
+    T                  widget,
+    const double       defaultVal);
+template <typename T>
+void loadBoolValue(const QDomElement &elem, const QString &name, T widget, bool defaultVal);
 template <typename T>
 void loadBoolValue(const QDomElement &elem, const QString &name, T widget);
+template <typename T>
+void loadBoolValue(
+    const QDomElement &elem,
+    const QString     &name,
+    const QStringList &previousNames,
+    T                  widget,
+    bool               defaultVal);
 void loadBoolValue(const QDomElement &elem, const QString &name, QGroupBox *widget, bool defaultVal);
 void loadBoolValue(const QDomElement &elem, const QString &name, QGroupBox *widget);
+void loadBoolValue(
+    const QDomElement &elem,
+    const QString     &name,
+    const QStringList &previousNames,
+    QGroupBox         *widget,
+    bool               defaultVal);
 void loadBoolValue(const QDomElement &elem, const QString &name, QAction *widget, bool defaultVal);
 void loadBoolValue(const QDomElement &elem, const QString &name, QAction *widget);
+void loadBoolValue(
+    const QDomElement &elem,
+    const QString     &name,
+    const QStringList &previousNames,
+    QAction           *widget,
+    bool               defaultVal);
 void loadActiveIndex(const QDomElement &elem, const QString &name, QComboBox *widget, const int defaultVal);
 void loadActiveIndex(const QDomElement &elem, const QString &name, QComboBox *widget);
+void loadActiveIndex(
+    const QDomElement &elem,
+    const QString     &name,
+    const QStringList &previousNames,
+    QComboBox         *widget,
+    const int          defaultVal);
 void loadActiveIndex(const QDomElement &elem, const QString &name, QTabWidget *widget, const int defaultVal);
 void loadActiveIndex(const QDomElement &elem, const QString &name, QTabWidget *widget);
+void loadActiveIndex(
+    const QDomElement &elem,
+    const QString     &name,
+    const QStringList &previousNames,
+    QTabWidget        *widget,
+    const int          defaultVal);
 
 template <typename T>
 void setValueBlocked(T widget, double value);
@@ -104,6 +160,17 @@ void loadIntValue(const QDomElement &elem, const QString &name, T widget)
 }
 
 template <typename T>
+void loadIntValue(
+    const QDomElement &elem,
+    const QString     &name,
+    const QStringList &previousNames,
+    T                  widget,
+    const int          defaultVal)
+{
+    setValue(widget, readInt(elem, name, previousNames, defaultVal));
+}
+
+template <typename T>
 void loadDoubleValue(const QDomElement &elem, const QString &name, T widget, const double defaultVal)
 {
     setValue(widget, readDouble(elem, name, defaultVal));
@@ -116,6 +183,17 @@ void loadDoubleValue(const QDomElement &elem, const QString &name, T widget)
 }
 
 template <typename T>
+void loadDoubleValue(
+    const QDomElement &elem,
+    const QString     &name,
+    const QStringList &previousNames,
+    T                  widget,
+    const double       defaultVal)
+{
+    setValue(widget, readDouble(elem, name, previousNames, defaultVal));
+}
+
+template <typename T>
 void loadBoolValue(const QDomElement &elem, const QString &name, T widget, bool defaultVal)
 {
     setValue(widget, readBool(elem, name, defaultVal));
@@ -125,6 +203,17 @@ template <typename T>
 void loadBoolValue(const QDomElement &elem, const QString &name, T widget)
 {
     setValue(widget, readBool(elem, name));
+}
+
+template <typename T>
+void loadBoolValue(
+    const QDomElement &elem,
+    const QString     &name,
+    const QStringList &previousNames,
+    T                  widget,
+    bool               defaultVal)
+{
+    setValue(widget, readBool(elem, name, previousNames, defaultVal));
 }
 
 template <typename T>

@@ -128,18 +128,21 @@ public:
     int        getTrackColColorSize() const;
     int        getTrackColorMarkerSize() const;
     int        getTrackColorMarkerLineWidth() const;
-    int        getTrackNumberSize() const;
+    int        getTrackPersonNumberSize() const;
+    int        getTrackMarkerIDSize() const;
     int        getTrackGroundPositionSize() const;
     int        getTrackGroundPathSize() const;
     int        getTrackPathWidth() const;
-    bool       isTrackNumberBoldChecked() const;
+    bool       isTrackPersonNumberBoldChecked() const;
+    bool       isTrackMarkerIDBoldChecked() const;
     bool       isShowVoronoiCellsChecked() const;
     bool       isTrackHeadSizedChecked() const;
     bool       isTrackShowCurrentPointChecked() const;
     bool       isTrackShowSearchSizeChecked() const;
     bool       isTrackShowColorMarkerChecked() const;
     bool       isTrackShowColColorChecked() const;
-    bool       isTrackShowNumberChecked() const;
+    bool       isTrackShowMarkerIDChecked() const;
+    bool       isTrackShowPersonNumberChecked() const;
     bool       isTrackShowHeightIndividualChecked() const;
     bool       isTrackShowPointsChecked() const;
     bool       isTrackShowPathChecked() const;
@@ -336,11 +339,13 @@ private slots:
     void onTrackShowPathStateChanged() { updateUi(); }
     void onTrackShowColColorStateChanged() { updateUi(); }
     void onTrackShowColorMarkerStateChanged() { updateUi(); }
-    void onTrackShowNumberStateChanged() { updateUi(); }
+    void onTrackShowMarkerIDStateChanged() { updateUi(); }
+    void onTrackShowPersonNumberStateChanged() { updateUi(); }
     void onTrackShowGroundPositionStateChanged() { updateUi(); }
     void onTrackShowGroundPathStateChanged() { updateUi(); }
     void onTrackShowHeightIndividualStateChanged() { updateUi(); }
-    void onTrackNumberBoldStateChanged() { updateUi(); }
+    void onTrackPersonNumberBoldStateChanged() { updateUi(); }
+    void onTrackMarkerIDBoldStateChanged() { updateUi(); }
     void onShowMoCapStateChanged(int i);
 
     void onTrackCurrentPointSizeValueChanged() { updateUi(); }
@@ -353,7 +358,8 @@ private slots:
     void onTrackColColorSizeValueChanged() { updateUi(); }
     void onTrackColorMarkerSizeValueChanged() { updateUi(); }
     void onTrackColorMarkerLineWidthValueChanged() { updateUi(); }
-    void onTrackNumberSizeValueChanged() { updateUi(); }
+    void onTrackMarkerIDSizeValueChanged() { updateUi(); }
+    void onTrackPersonNumberSizeValueChanged() { updateUi(); }
     void onTrackGroundPositionSizeValueChanged() { updateUi(); }
     void onTrackGroundPathSizeValueChanged() { updateUi(); }
     void onTrackShowBeforeValueChanged() { updateUi(); }
