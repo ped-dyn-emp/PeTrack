@@ -6,6 +6,8 @@
 - Fix: tab width calculation
 - Fix: catch crash when exporting file without viedeo
 - Add: added export of head orientation z + serialization in trc of orientation
+- Add: separate `show marker ID` option with its own size and bold setting in the tracking tab (previously part of `show height/col. color/marker ID`)
+- Renamed `show number` to `show person number`
 
 # 1.2
 

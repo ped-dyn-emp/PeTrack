@@ -362,7 +362,9 @@ Control::Control(
     connect(mUi->trackShowColColor, &QCheckBox::checkStateChanged, this, &Control::onTrackShowColColorStateChanged);
     connect(
         mUi->trackShowColorMarker, &QCheckBox::checkStateChanged, this, &Control::onTrackShowColorMarkerStateChanged);
-    connect(mUi->trackShowNumber, &QCheckBox::checkStateChanged, this, &Control::onTrackShowNumberStateChanged);
+    connect(mUi->trackShowMarkerID, &QCheckBox::checkStateChanged, this, &Control::onTrackShowMarkerIDStateChanged);
+    connect(
+        mUi->trackShowPersonNumber, &QCheckBox::checkStateChanged, this, &Control::onTrackShowPersonNumberStateChanged);
     connect(
         mUi->trackShowGroundPosition,
         &QCheckBox::checkStateChanged,
@@ -374,7 +376,9 @@ Control::Control(
         &QCheckBox::checkStateChanged,
         this,
         &Control::onTrackShowHeightIndividualStateChanged);
-    connect(mUi->trackNumberBold, &QCheckBox::checkStateChanged, this, &Control::onTrackNumberBoldStateChanged);
+    connect(
+        mUi->trackPersonNumberBold, &QCheckBox::checkStateChanged, this, &Control::onTrackPersonNumberBoldStateChanged);
+    connect(mUi->trackMarkerIDBold, &QCheckBox::checkStateChanged, this, &Control::onTrackMarkerIDBoldStateChanged);
     connect(
         mUi->trackCurrentPointSize,
         QOverload<int>::of(&PSpinBox::valueChanged),
@@ -410,10 +414,15 @@ Control::Control(
         this,
         &Control::onTrackColorMarkerLineWidthValueChanged);
     connect(
-        mUi->trackNumberSize,
+        mUi->trackPersonNumberSize,
         QOverload<int>::of(&PSpinBox::valueChanged),
         this,
-        &Control::onTrackNumberSizeValueChanged);
+        &Control::onTrackPersonNumberSizeValueChanged);
+    connect(
+        mUi->trackMarkerIDSize,
+        QOverload<int>::of(&PSpinBox::valueChanged),
+        this,
+        &Control::onTrackMarkerIDSizeValueChanged);
     connect(
         mUi->trackGroundPositionSize,
         QOverload<int>::of(&PSpinBox::valueChanged),
@@ -739,9 +748,13 @@ int Control::getTrackColorMarkerLineWidth() const
 {
     return mUi->trackColorMarkerLineWidth->value();
 }
-int Control::getTrackNumberSize() const
+int Control::getTrackMarkerIDSize() const
 {
-    return mUi->trackNumberSize->value();
+    return mUi->trackMarkerIDSize->value();
+}
+int Control::getTrackPersonNumberSize() const
+{
+    return mUi->trackPersonNumberSize->value();
 }
 
 int Control::getTrackGroundPositionSize() const
@@ -759,9 +772,14 @@ int Control::getTrackPathWidth() const
     return mUi->trackPathWidth->value();
 }
 
-bool Control::isTrackNumberBoldChecked() const
+bool Control::isTrackPersonNumberBoldChecked() const
 {
-    return mUi->trackNumberBold->isChecked();
+    return mUi->trackPersonNumberBold->isChecked();
+}
+
+bool Control::isTrackMarkerIDBoldChecked() const
+{
+    return mUi->trackMarkerIDBold->isChecked();
 }
 
 bool Control::isShowVoronoiCellsChecked() const
@@ -794,9 +812,14 @@ bool Control::isTrackShowColColorChecked() const
     return mUi->trackShowColColor->isChecked();
 }
 
-bool Control::isTrackShowNumberChecked() const
+bool Control::isTrackShowMarkerIDChecked() const
 {
-    return mUi->trackShowNumber->isChecked();
+    return mUi->trackShowMarkerID->isChecked();
+}
+
+bool Control::isTrackShowPersonNumberChecked() const
+{
+    return mUi->trackShowPersonNumber->isChecked();
 }
 
 bool Control::isTrackShowHeightIndividualChecked() const
@@ -2234,7 +2257,8 @@ void Control::setXml(QDomElement &elem)
     subSubElem.setAttribute("SHOW_PATH", mUi->trackShowPath->isChecked());
     subSubElem.setAttribute("SHOW_COLLECTIVE_COLOR", mUi->trackShowColColor->isChecked());
     subSubElem.setAttribute("SHOW_COLOR_MARKER", mUi->trackShowColorMarker->isChecked());
-    subSubElem.setAttribute("SHOW_NUMBER", mUi->trackShowNumber->isChecked());
+    subSubElem.setAttribute("SHOW_MARKER_ID", mUi->trackShowMarkerID->isChecked());
+    subSubElem.setAttribute("SHOW_PERSON_NUMBER", mUi->trackShowPersonNumber->isChecked());
     subSubElem.setAttribute("SHOW_GROUND_POSITION", mUi->trackShowGroundPosition->isChecked());
     subSubElem.setAttribute("SHOW_GROUND_PATH", mUi->trackShowGroundPath->isChecked());
 
@@ -2248,13 +2272,15 @@ void Control::setXml(QDomElement &elem)
     subSubElem.setAttribute("COLLECTIVE_COLOR_SIZE", mUi->trackColColorSize->value());
     subSubElem.setAttribute("COLOR_MARKER_SIZE", mUi->trackColorMarkerSize->value());
     subSubElem.setAttribute("COLOR_MARKER_LINE_WIDTH", mUi->trackColorMarkerLineWidth->value());
-    subSubElem.setAttribute("NUMBER_SIZE", mUi->trackNumberSize->value());
+    subSubElem.setAttribute("PERSON_NUMBER_SIZE", mUi->trackPersonNumberSize->value());
+    subSubElem.setAttribute("MARKER_ID_SIZE", mUi->trackMarkerIDSize->value());
     subSubElem.setAttribute("GROUND_POSITION_SIZE", mUi->trackGroundPositionSize->value());
     subSubElem.setAttribute("GROUND_PATH_SIZE", mUi->trackGroundPathSize->value());
 
     subSubElem.setAttribute("HEAD_SIZE", mUi->trackHeadSized->isChecked());
     subSubElem.setAttribute("POINTS_COLORED", mUi->trackShowPointsColored->isChecked());
-    subSubElem.setAttribute("NUMBER_BOLD", mUi->trackNumberBold->isChecked());
+    subSubElem.setAttribute("PERSON_NUMBER_BOLD", mUi->trackPersonNumberBold->isChecked());
+    subSubElem.setAttribute("MARKER_ID_BOLD", mUi->trackMarkerIDBold->isChecked());
 
     subSubElem.setAttribute("BEFORE", mUi->trackShowBefore->value());
     subSubElem.setAttribute("AFTER", mUi->trackShowAfter->value());
@@ -2666,7 +2692,10 @@ void Control::getXml(const QDomElement &elem, const QString &version)
                     loadBoolValue(subSubElem, "SHOW_PATH", mUi->trackShowPath, true);
                     loadBoolValue(subSubElem, "SHOW_COLLECTIVE_COLOR", mUi->trackShowColColor, true);
                     loadBoolValue(subSubElem, "SHOW_COLOR_MARKER", mUi->trackShowColorMarker, true);
-                    loadBoolValue(subSubElem, "SHOW_NUMBER", mUi->trackShowNumber, true);
+                    // marker ID was previously shown together with height/collective color
+                    loadBoolValue(
+                        subSubElem, "SHOW_MARKER_ID", {"SHOW_COLLECTIVE_COLOR"}, mUi->trackShowMarkerID, true);
+                    loadBoolValue(subSubElem, "SHOW_PERSON_NUMBER", {"SHOW_NUMBER"}, mUi->trackShowPersonNumber, true);
                     loadBoolValue(subSubElem, "SHOW_GROUND_POSITION", mUi->trackShowGroundPosition, false);
                     loadBoolValue(subSubElem, "SHOW_GROUND_PATH", mUi->trackShowGroundPath, false);
 
@@ -2682,11 +2711,15 @@ void Control::getXml(const QDomElement &elem, const QString &version)
                     loadIntValue(subSubElem, "COLLECTIVE_COLOR_SIZE", mUi->trackColColorSize, 11);
                     loadIntValue(subSubElem, "COLOR_MARKER_SIZE", mUi->trackColorMarkerSize, 14);
                     loadIntValue(subSubElem, "COLOR_MARKER_LINE_WIDTH", mUi->trackColorMarkerLineWidth, 1);
-                    loadIntValue(subSubElem, "NUMBER_SIZE", mUi->trackNumberSize, 14);
+                    loadIntValue(subSubElem, "PERSON_NUMBER_SIZE", {"NUMBER_SIZE"}, mUi->trackPersonNumberSize, 14);
+                    // marker ID previously used the size of the person number
+                    loadIntValue(subSubElem, "MARKER_ID_SIZE", {"NUMBER_SIZE"}, mUi->trackMarkerIDSize, 14);
                     loadIntValue(subSubElem, "GROUND_POSITION_SIZE", mUi->trackGroundPositionSize, 1);
                     loadIntValue(subSubElem, "GROUND_PATH_SIZE", mUi->trackGroundPathSize, 1);
                     loadBoolValue(subSubElem, "POINTS_COLORED", mUi->trackShowPointsColored, true);
-                    loadBoolValue(subSubElem, "NUMBER_BOLD", mUi->trackNumberBold, true);
+                    loadBoolValue(subSubElem, "PERSON_NUMBER_BOLD", {"NUMBER_BOLD"}, mUi->trackPersonNumberBold, true);
+                    // marker ID previously used the boldness of the person number
+                    loadBoolValue(subSubElem, "MARKER_ID_BOLD", {"NUMBER_BOLD"}, mUi->trackMarkerIDBold, true);
                     loadIntValue(subSubElem, "BEFORE", mUi->trackShowBefore, 15);
                     loadIntValue(subSubElem, "AFTER", mUi->trackShowAfter, 15);
                 }

@@ -204,6 +204,44 @@ bool readBool(const QDomElement &elem, const QString &name)
     throw std::domain_error(QString("Required parameter %1 is missing in the .pet-file.").arg(name).toStdString());
 }
 
+QString resolveAttributeName(const QDomElement &elem, const QString &name, const QStringList &previousNames)
+{
+    if(elem.hasAttribute(name))
+    {
+        return name;
+    }
+    for(const auto &previousName : previousNames)
+    {
+        if(elem.hasAttribute(previousName))
+        {
+            return previousName;
+        }
+    }
+    return name;
+}
+
+double
+readDouble(const QDomElement &elem, const QString &name, const QStringList &previousNames, const double &defaultVal)
+{
+    return readDouble(elem, resolveAttributeName(elem, name, previousNames), defaultVal);
+}
+
+int readInt(const QDomElement &elem, const QString &name, const QStringList &previousNames, const int defaultVal)
+{
+    return readInt(elem, resolveAttributeName(elem, name, previousNames), defaultVal);
+}
+
+QString
+readQString(const QDomElement &elem, const QString &name, const QStringList &previousNames, const QString &defaultVal)
+{
+    return readQString(elem, resolveAttributeName(elem, name, previousNames), defaultVal);
+}
+
+bool readBool(const QDomElement &elem, const QString &name, const QStringList &previousNames, const bool &defaultVal)
+{
+    return readBool(elem, resolveAttributeName(elem, name, previousNames), defaultVal);
+}
+
 void setValueBlocked(QCheckBox *widget, bool value)
 {
     QSignalBlocker blocker(widget);
@@ -225,6 +263,16 @@ void loadActiveIndex(const QDomElement &elem, const QString &name, QComboBox *wi
     widget->setCurrentIndex(readInt(elem, name));
 }
 
+void loadActiveIndex(
+    const QDomElement &elem,
+    const QString     &name,
+    const QStringList &previousNames,
+    QComboBox         *widget,
+    const int          defaultVal)
+{
+    widget->setCurrentIndex(readInt(elem, name, previousNames, defaultVal));
+}
+
 void loadActiveIndex(const QDomElement &elem, const QString &name, QTabWidget *widget, const int defaultVal)
 {
     widget->setCurrentIndex(readInt(elem, name, defaultVal));
@@ -233,6 +281,16 @@ void loadActiveIndex(const QDomElement &elem, const QString &name, QTabWidget *w
 void loadActiveIndex(const QDomElement &elem, const QString &name, QTabWidget *widget)
 {
     widget->setCurrentIndex(readInt(elem, name));
+}
+
+void loadActiveIndex(
+    const QDomElement &elem,
+    const QString     &name,
+    const QStringList &previousNames,
+    QTabWidget        *widget,
+    const int          defaultVal)
+{
+    widget->setCurrentIndex(readInt(elem, name, previousNames, defaultVal));
 }
 
 void loadBoolValue(const QDomElement &elem, const QString &name, QGroupBox *widget, const bool defaultVal)
@@ -245,6 +303,16 @@ void loadBoolValue(const QDomElement &elem, const QString &name, QGroupBox *widg
     widget->setChecked(readBool(elem, name));
 }
 
+void loadBoolValue(
+    const QDomElement &elem,
+    const QString     &name,
+    const QStringList &previousNames,
+    QGroupBox         *widget,
+    const bool         defaultVal)
+{
+    widget->setChecked(readBool(elem, name, previousNames, defaultVal));
+}
+
 void loadBoolValue(const QDomElement &elem, const QString &name, QAction *widget, const bool defaultVal)
 {
     widget->setChecked(readBool(elem, name, defaultVal));
@@ -252,4 +320,14 @@ void loadBoolValue(const QDomElement &elem, const QString &name, QAction *widget
 void loadBoolValue(const QDomElement &elem, const QString &name, QAction *widget)
 {
     widget->setChecked(readBool(elem, name));
+}
+
+void loadBoolValue(
+    const QDomElement &elem,
+    const QString     &name,
+    const QStringList &previousNames,
+    QAction           *widget,
+    const bool         defaultVal)
+{
+    widget->setChecked(readBool(elem, name, previousNames, defaultVal));
 }

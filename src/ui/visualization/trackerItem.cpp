@@ -353,7 +353,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     double       pS   = (double) mControlWidget->getTrackPointSize();
     double       pSC  = (double) mControlWidget->getTrackColColorSize();
     double       pSM  = (double) mControlWidget->getTrackColorMarkerSize();
-    double       pSN  = (double) mControlWidget->getTrackNumberSize();
+    double       pSN  = (double) mControlWidget->getTrackPersonNumberSize();
     double       pSG  = (double) mControlWidget->getTrackGroundPositionSize();
     double       pSGP = (double) mControlWidget->getTrackGroundPathSize();
 
@@ -371,7 +371,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
 
     ellipsePen.setWidth(3);
     currentPointLineWidthPen.setWidth(mControlWidget->getTrackCurrentPointLineWidth());
-    if(mControlWidget->isTrackNumberBoldChecked())
+    if(mControlWidget->isTrackPersonNumberBoldChecked())
     {
         font.setBold(true);
     }
@@ -379,8 +379,11 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     {
         font.setBold(false);
     }
-    font.setPixelSize(mControlWidget->getTrackNumberSize());
+    font.setPixelSize(mControlWidget->getTrackPersonNumberSize());
     heightFont.setPixelSize(mControlWidget->getTrackColColorSize());
+    QFont markerIDFont;
+    markerIDFont.setPixelSize(mControlWidget->getTrackMarkerIDSize());
+    markerIDFont.setBold(mControlWidget->isTrackMarkerIDBoldChecked());
     painter->setFont(font);
     numberPen.setColor(Qt::red);
     groundPositionPen.setColor(Qt::green);
@@ -491,7 +494,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
 
                 // berechnung der normalen, die zur positionierung der nummerieung und der gesamtfarbe dient
                 if(((mControlWidget->isTrackShowColColorChecked()) && (person.color().isValid())) ||
-                   (mControlWidget->isTrackShowNumberChecked()) ||
+                   (mControlWidget->isTrackShowPersonNumberChecked()) ||
                    ((mControlWidget->isTrackShowColColorChecked()) &&
                     ((person.height() > MIN_HEIGHT) ||
                      (tp.getStereoMarker() &&
@@ -548,15 +551,17 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     painter->setBrush(Qt::NoBrush);
                     rect.setRect(tp.x() + 10, tp.y() + 10, 15 * pSC, 10 * pSC);
                     painter->drawText(rect, person.comment());
+                }
 
-                    if(person.getMarkerID() >= 0)
-                    {
-                        QPen markerIDPen;
-                        auto codeMarker = tp.getCodeMarker();
-                        markerIDPen.setColor(codeMarker && codeMarker->mMarkerId >= 0 ? Qt::green : Qt::blue);
-                        painter->setPen(markerIDPen);
-                        painter->drawText(QPointF{tp.x(), tp.y()}, QString("id=%1").arg(person.getMarkerID()));
-                    }
+                if(mControlWidget->isTrackShowMarkerIDChecked() && person.getMarkerID() >= 0)
+                {
+                    QPen markerIDPen;
+                    auto codeMarker = tp.getCodeMarker();
+                    markerIDPen.setColor(codeMarker && codeMarker->mMarkerId >= 0 ? Qt::green : Qt::blue);
+                    painter->setPen(markerIDPen);
+                    painter->setFont(markerIDFont);
+                    painter->drawText(QPointF{tp.x(), tp.y()}, QString("id=%1").arg(person.getMarkerID()));
+                    painter->setFont(font);
                 }
 
                 if((mControlWidget->isTrackShowColColorChecked()) && (person.color().isValid()))
@@ -661,7 +666,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                     }
                     painter->setFont(font);
                 }
-                if(mControlWidget->isTrackShowNumberChecked())
+                if(mControlWidget->isTrackShowPersonNumberChecked())
                 {
                     // listennummer
                     painter->setPen(numberPen);
