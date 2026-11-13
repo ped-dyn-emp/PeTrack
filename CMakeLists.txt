@@ -129,7 +129,7 @@ find_or_build_hdf5()
 # if win32 and mingw use in 3rd party
 if (USE_3RD_PARTY)
   # Setting path to OpenCV
-  set(OpenCV_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv-4.10.0")
+  set(OpenCV_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows/opencv-5.0.0")
 
   # Setting path to QWT
   set(QWT_ROOT_DIR "${CMAKE_SOURCE_DIR}/3rdparty/windows/Qwt-6.3.0")
@@ -147,8 +147,8 @@ message("Building with Qt${QT_DEFAULT_MAJOR_VERSION} (${Qt6Core_VERSION_STRING})
 
 # OpenCV
 find_package(
-        OpenCV 4.10
-        COMPONENTS core calib3d video videoio highgui imgproc objdetect
+        OpenCV 5
+        COMPONENTS core calib geometry stereo video videoio highgui imgproc objdetect
         REQUIRED
 )
 message("Building with OpenCV${OpenCV_VERSION_MAJOR} (${OpenCV_VERSION})")

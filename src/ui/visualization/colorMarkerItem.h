@@ -22,6 +22,7 @@
 #include "vector.h"
 
 #include <QGraphicsItem>
+#include <opencv2/core.hpp>
 
 class Petrack;
 class Control;

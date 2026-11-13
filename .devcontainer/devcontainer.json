@@ -1,0 +1,28 @@
+{
+  "name": "PeTrack",
+  "build": {
+    "dockerfile": "../container/ubuntu/Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "root",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cmake-tools",
+        "ms-vscode.cpptools",
+        "llvm-vs-code-extensions.vscode-clangd",
+        "ms-python.python",
+        "lextudio.restructuredtext",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "C_Cpp.intelliSenseEngine": "disabled",
+        "cmake.configureSettings": {
+          "CMAKE_PREFIX_PATH": "/opt/qt6/6.8.3/gcc_64"
+        },
+        "cmake.generator": "Ninja",
+        "cmake.buildDirectory": "${workspaceFolder}/build"
+      }
+    }
+  }
+}
