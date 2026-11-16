@@ -29,6 +29,7 @@
 #include "stereoWidget.h"
 
 #include <QDir>
+#include <QFileDialog>
 
 #ifdef TRICLOPS
 
