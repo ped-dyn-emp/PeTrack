@@ -68,6 +68,12 @@ print_var(BUILD_BUNDLE)
 option(FAIL_ON_WARNINGS "Handle compiler warnings as error (for CI use)" OFF)
 print_var(FAIL_ON_WARNINGS)
 
+option(USE_PCH "Use precompiled headers to speed up compilation" ON)
+print_var(USE_PCH)
+
+option(USE_LLD "Use the lld linker if it is installed (faster linking)" ON)
+print_var(USE_LLD)
+
 ################################################################################
 # Compilation flags
 ################################################################################
@@ -89,6 +95,63 @@ list(APPEND COMMON_COMPILE_OPTIONS
     $<$<CXX_COMPILER_ID:MSVC>:/EHsc>
     $<$<CXX_COMPILER_ID:MSVC>:/permissive->
     $<$<AND:$<BOOL:${FAIL_ON_WARNINGS}>,$<CXX_COMPILER_ID:MSVC>>:/WX>
+)
+
+################################################################################
+# Linker
+################################################################################
+# lld links faster than GNU ld. Use only if installed. Otherwise the default 
+# linker is used.
+# Note: Result is cached, delete LLD_AVAILABLE from the cache after
+#       installing lld.
+set(PETRACK_LINK_OPTIONS "")
+if(USE_LLD AND NOT MSVC AND NOT APPLE)
+  include(CheckLinkerFlag)
+  check_linker_flag(CXX "-fuse-ld=lld" LLD_AVAILABLE)
+  if(LLD_AVAILABLE)
+    list(APPEND PETRACK_LINK_OPTIONS "-fuse-ld=lld")
+    message(STATUS "Linking with lld")
+  else()
+    message(STATUS "lld not found, linking with the default linker")
+  endif()
+endif()
+
+################################################################################
+# Precompiled headers
+################################################################################
+# Only (rarely changing) third-party headers belong here, otherwise every change
+# to a listed header triggers a full rebuild. logger.h is the exception: it only
+# includes third-party headers and has to define SPDLOG_ACTIVE_LEVEL before
+# spdlog is included.
+list(APPEND PETRACK_PCH_HEADERS
+    <QApplication>
+    <QColor>
+    <QDomDocument>
+    <QDomElement>
+    <QFileInfo>
+    <QGraphicsItem>
+    <QGraphicsObject>
+    <QImage>
+    <QList>
+    <QMainWindow>
+    <QObject>
+    <QPainter>
+    <QPen>
+    <QPixmap>
+    <QRegularExpression>
+    <QString>
+    <QTextStream>
+    <QWidget>
+    <opencv2/opencv.hpp>
+    <ezc3d_all.h>
+    <qwt_plot.h>
+    "${CMAKE_SOURCE_DIR}/src/util/logger.h"
+    <cmath>
+    <memory>
+    <optional>
+    <string>
+    <utility>
+    <vector>
 )
 
 ################################################################################
@@ -198,9 +261,13 @@ endif()
 target_link_libraries(petrack PRIVATE petrack_core git-info)
 target_compile_definitions(petrack PUBLIC PETRACK_VERSION="${PROJECT_VERSION}")
 target_compile_definitions(petrack PUBLIC COMPILE_OS="${CMAKE_SYSTEM_NAME}")
+target_link_options(petrack PRIVATE ${PETRACK_LINK_OPTIONS})
 
 target_compile_options(petrack_core PRIVATE ${COMMON_COMPILE_OPTIONS})
 target_compile_definitions(petrack_core PUBLIC COMPILE_OS="${CMAKE_SYSTEM_NAME}")
+if(USE_PCH)
+  target_precompile_headers(petrack_core PRIVATE ${PETRACK_PCH_HEADERS})
+endif()
 
 #**********************************************************
 # Linking Qt                                              *
@@ -273,18 +340,25 @@ if(BUILD_UNIT_TESTS)
     add_subdirectory("${CMAKE_SOURCE_DIR}/deps/trompeloeil")
 
     add_subdirectory(${CMAKE_SOURCE_DIR}/tests/unit_test)
-    target_link_libraries(petrack_tests PRIVATE petrack_core git-info)
+    # Note: no git-info here, the tests do not use it and its definitions
+    #       change with every commit, triggering a rebuild of all tests
+    target_link_libraries(petrack_tests PRIVATE petrack_core)
 
     target_compile_definitions(petrack_tests PUBLIC PETRACK_VERSION="${PROJECT_VERSION}")
 
     target_link_libraries(petrack_tests PRIVATE Catch2::Catch2WithMain Qt6::Test trompeloeil::trompeloeil)
     target_include_directories(petrack_tests PRIVATE
       "${CMAKE_CURRENT_BINARY_DIR}/petrack_core_autogen/include")
+    target_link_options(petrack_tests PRIVATE ${PETRACK_LINK_OPTIONS})
 
-    if(BUILD_UNIT_TESTS_WITH_LLD)
-        target_compile_options(petrack_tests PRIVATE "-fuse-ld=lld")
-        target_link_options(petrack_tests PRIVATE "-fuse-ld=lld")
-    endif(BUILD_UNIT_TESTS_WITH_LLD)
+    # Separate PCH as the compile flags differ from petrack_core (no REUSE_FROM)
+    if(USE_PCH)
+      target_precompile_headers(petrack_tests PRIVATE
+        ${PETRACK_PCH_HEADERS}
+        <catch2/catch_test_macros.hpp>
+        <catch2/catch_approx.hpp>
+      )
+    endif()
 endif(BUILD_UNIT_TESTS)
 
 #**************************************************************
