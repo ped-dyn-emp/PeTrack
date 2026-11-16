@@ -16,8 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "colorSettingsDialog.h"
 #include "control.h"
 #include "imageItem.h"
+#include "moCapController.h"
 #include "petrack.h"
 #include "roiItem.h"
 #include "ui_control.h"
@@ -299,6 +301,71 @@ TEST_CASE("Loading from and saving to XML node", "[config]")
             pet.openXml(doc, false);
             REQUIRE(control->trackShowOnlyNrList()->text() == testValue);
         }
+    }
+}
+
+TEST_CASE("Track colors are saved to and loaded from XML", "[config]")
+{
+    QString  versionString{PETRACK_VERSION};
+    Petrack  pet{versionString};
+    Control *control = pet.getControlWidget();
+
+    SECTION("Defaults are correct")
+    {
+        REQUIRE(control->getTrackRecognizedColor() == ColorSettingsDialog::DEFAULT_RECOGNIZED_COLOR);
+        REQUIRE(control->getTrackTrackedColor() == ColorSettingsDialog::DEFAULT_TRACKED_COLOR);
+        REQUIRE(control->getTrackPersonNumberColor() == ColorSettingsDialog::DEFAULT_PERSON_NUMBER_COLOR);
+        REQUIRE(control->getMoCapColor() == MoCapController::DEFAULT_COLOR);
+    }
+
+    SECTION("Changed colors survive a save/load round trip")
+    {
+        control->setTrackPathColor(QColor("#123456"));
+        control->setTrackGroundPathColor(QColor("#234567"));
+        control->setTrackRecognizedColor(QColor("#345678"));
+        control->setTrackTrackedColor(QColor("#456789"));
+        control->setTrackPersonNumberColor(QColor("#56789a"));
+        pet.getMoCapController().setColor(QColor("#6789ab"));
+
+        QDomDocument doc;
+        pet.saveXml(doc);
+        QDomElement pathNode = doc.elementsByTagName("PATH").at(0).toElement();
+        REQUIRE(pathNode.attribute("RECOGNIZED_COLOR") == "#345678");
+        REQUIRE(pathNode.attribute("TRACKED_COLOR") == "#456789");
+        REQUIRE(pathNode.attribute("PERSON_NUMBER_COLOR") == "#56789a");
+        REQUIRE(doc.elementsByTagName("MOCAP").at(0).toElement().attribute("COLOR") == "#6789ab");
+
+        Petrack loadedPet{"Unknown"};
+        loadedPet.openXml(doc, false);
+        Control *loaded = loadedPet.getControlWidget();
+        REQUIRE(loaded->getTrackPathColor() == QColor("#123456"));
+        REQUIRE(loaded->getTrackGroundPathColor() == QColor("#234567"));
+        REQUIRE(loaded->getTrackRecognizedColor() == QColor("#345678"));
+        REQUIRE(loaded->getTrackTrackedColor() == QColor("#456789"));
+        REQUIRE(loaded->getTrackPersonNumberColor() == QColor("#56789a"));
+        REQUIRE(loaded->getMoCapColor() == QColor("#6789ab"));
+    }
+
+    SECTION("Old project files without the new attributes load the defaults")
+    {
+        control->setTrackRecognizedColor(QColor("#345678"));
+        control->setTrackTrackedColor(QColor("#456789"));
+        control->setTrackPersonNumberColor(QColor("#56789a"));
+        pet.getMoCapController().setColor(QColor("#6789ab"));
+
+        QDomDocument doc;
+        pet.saveXml(doc);
+        QDomElement pathNode = doc.elementsByTagName("PATH").at(0).toElement();
+        pathNode.removeAttribute("RECOGNIZED_COLOR");
+        pathNode.removeAttribute("TRACKED_COLOR");
+        pathNode.removeAttribute("PERSON_NUMBER_COLOR");
+        doc.elementsByTagName("MOCAP").at(0).toElement().removeAttribute("COLOR");
+
+        pet.openXml(doc, false);
+        REQUIRE(control->getTrackRecognizedColor() == ColorSettingsDialog::DEFAULT_RECOGNIZED_COLOR);
+        REQUIRE(control->getTrackTrackedColor() == ColorSettingsDialog::DEFAULT_TRACKED_COLOR);
+        REQUIRE(control->getTrackPersonNumberColor() == ColorSettingsDialog::DEFAULT_PERSON_NUMBER_COLOR);
+        REQUIRE(control->getMoCapColor() == MoCapController::DEFAULT_COLOR);
     }
 }
 

@@ -52,6 +52,8 @@ class MoCapController : public QObject
 {
     Q_OBJECT
 public:
+    static constexpr QColor DEFAULT_COLOR{255, 255, 55}; // yellow
+
     MoCapController(MoCapStorage &storage, ExtrCalibration &extrCalib) : mStorage(storage), mExtrCalib(extrCalib) {};
 
     void transformPersonSkeleton(
@@ -83,7 +85,7 @@ private:
 
     MoCapStorage    &mStorage;
     bool             mShowMoCap = false;
-    QColor           mColor     = QColor(255, 255, 55);
+    QColor           mColor     = DEFAULT_COLOR;
     int              mThickness = 2;
     ExtrCalibration &mExtrCalib;
 };

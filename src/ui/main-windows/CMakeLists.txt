@@ -11,6 +11,9 @@ target_sources(petrack_core PRIVATE
     analysePlot.h          
     colorPlot.cpp          
     colorPlot.h            
+    colorSettingsDialog.cpp
+    colorSettingsDialog.h
+    colorSettingsDialog.ui
     control.cpp            
     control.h              
     control.ui             
