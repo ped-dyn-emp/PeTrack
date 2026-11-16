@@ -44,6 +44,7 @@ class WorldImageCorrespondence;
 class AlignmentGridBox;
 class WalkAreaWidget;
 class QLineEdit;
+class ColorSettingsDialog;
 class QScrollArea;
 
 namespace Ui
@@ -121,6 +122,12 @@ public:
     void       setTrackPathColor(QColor col);
     QColor     getTrackGroundPathColor() const;
     void       setTrackGroundPathColor(QColor col);
+    QColor     getTrackRecognizedColor() const;
+    void       setTrackRecognizedColor(QColor col);
+    QColor     getTrackTrackedColor() const;
+    void       setTrackTrackedColor(QColor col);
+    QColor     getTrackPersonNumberColor() const;
+    void       setTrackPersonNumberColor(QColor col);
     int        getTrackCurrentPointSize() const;
     int        getTrackCurrentPointLineWidth() const;
     int        getTrackPointSize() const;
@@ -377,9 +384,8 @@ private slots:
 
     void onIntrinsicParamsChanged(IntrinsicCameraParams params);
 
-    void onTrackPathColorButtonClicked();
-    void onTrackGroundPathColorButtonClicked();
-    void onMoCapColorButtonClicked();
+    void onTrackColorsButtonClicked();
+    void onColorSettingsChanged();
 
     void onShowVoronoiCellsStateChanged();
 
@@ -421,6 +427,7 @@ private:
     WalkAreaWidget      *mWalkArea;
     QGraphicsScene      *mScene;
     Correction          *mCorrectionWidget;
+    ColorSettingsDialog *mColorSettings;
 
     bool mColorChanging;
     bool mIndexChanging; // shows, if the index of the color model is really changing; nor while constructor (initialer

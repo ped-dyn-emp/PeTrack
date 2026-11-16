@@ -13,6 +13,9 @@ If you want to use PeTrack visualizations in your publication export the view of
 show
 : Enables or disabled all of the following visualizations
 
+colors...
+: Opens a window in which all colors of the visualization can be changed in one place: the path, the ground path, the person number (also used for comments and heights), the recognized/tracked colors and the MoCap visualization. The `recognized` color (default green) is used if a person was recognized or set manually in the current frame, the `tracked only` color (default blue) if it is only the result of tracking. These colors are used e.g. for the current point and the marker ID.
+
 ### Trajectory visualizations
 
 Trajectory visualizations are visualizations that show not only information about the current point, but also about the future and past trajectory.
@@ -59,7 +62,7 @@ If the `colored` checkbox is checked, the color of the TrackPoint is used to fil
 Point visualizations only visualize information about the currently displayed frame.
 
 show current point
-: Shows the point from the currently displayed frame. The line is colored green, if the point was created as the result of recognition or manually. It is colored blue if the point is the result of tracking only.
+: Shows the point from the currently displayed frame. The line is colored green (or the chosen `recognized` color), if the point was created as the result of recognition or manually. It is colored blue (or the chosen `tracked only` color) if the point is the result of tracking only.
 
 Checking `head size` will set the size of the point heuristically to the avg. head size of a person.
 

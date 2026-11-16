@@ -357,8 +357,12 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     double       pSG  = (double) mControlWidget->getTrackGroundPositionSize();
     double       pSGP = (double) mControlWidget->getTrackGroundPathSize();
 
-    QColor pGPC = mControlWidget->getTrackGroundPathColor();
-    QColor pTPC = mControlWidget->getTrackPathColor();
+    QColor       pGPC              = mControlWidget->getTrackGroundPathColor();
+    QColor       pTPC              = mControlWidget->getTrackPathColor();
+    const QColor recognizedColor   = mControlWidget->getTrackRecognizedColor();
+    const QColor trackedColor      = mControlWidget->getTrackTrackedColor();
+    const QColor personNumberColor = mControlWidget->getTrackPersonNumberColor();
+
     QFont  font, heightFont;
     float  x_offset = 0, y_offset = 0;
     float  y_switch = 0, x_switch = 0;
@@ -385,7 +389,7 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
     markerIDFont.setPixelSize(mControlWidget->getTrackMarkerIDSize());
     markerIDFont.setBold(mControlWidget->isTrackMarkerIDBoldChecked());
     painter->setFont(font);
-    numberPen.setColor(Qt::red);
+    numberPen.setColor(personNumberColor);
     groundPositionPen.setColor(Qt::green);
     groundPositionPen.setWidth(pSG);
     groundPathPen.setColor(pGPC);
@@ -424,6 +428,20 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
 
     auto        pedestrianToPaint = mMainWindow->getPedestrianUserSelection();
     const auto &persons           = mPersonStorage.getPersons();
+    // current points, color dots and all labels (comment, height, person number, marker ID) are drawn after all
+    // persons, so that no trajectory is drawn over them
+    std::vector<std::pair<QRectF, QColor>>  currentPoints;
+    std::vector<std::pair<QRectF, QColor>>  colorDots;
+    std::vector<std::pair<QRectF, QString>> comments;
+    std::vector<std::pair<QRectF, QString>> heights;
+    std::vector<std::pair<QRectF, QString>> personNumbers;
+    struct MarkerIDLabel
+    {
+        QPointF pos;
+        QString text;
+        QColor  color;
+    };
+    std::vector<MarkerIDLabel> markerIDs;
     for(size_t i = 0; i < persons.size(); ++i) // ueber TrackPerson
     {
         const auto &person = persons[i];
@@ -439,18 +457,9 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 const TrackPoint &tp = person.trackPointAt(curFrame);
                 if(mControlWidget->isTrackShowCurrentPointChecked())
                 {
-                    painter->setBrush(Qt::NoBrush);
-                    if(tp.isDetection())
-                    {
-                        currentPointLineWidthPen.setColor(Qt::green);
-                    }
-                    else
-                    {
-                        currentPointLineWidthPen.setColor(Qt::blue);
-                    }
-                    painter->setPen(currentPointLineWidthPen);
-                    rect.setRect(tp.x() - pSP / 2., tp.y() - pSP / 2., pSP, pSP);
-                    painter->drawEllipse(rect); // direkt waere nur int erlaubt tp.x()-5., tp.y()-5., 10., 10.
+                    currentPoints.emplace_back(
+                        QRectF(tp.x() - pSP / 2., tp.y() - pSP / 2., pSP, pSP),
+                        tp.isDetection() ? recognizedColor : trackedColor);
                 }
 
                 if(mControlWidget->isTrackShowSearchSizeChecked())
@@ -547,33 +556,27 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                 double height = person.height();
                 if(mControlWidget->isTrackShowColColorChecked())
                 {
-                    painter->setPen(numberPen);
-                    painter->setBrush(Qt::NoBrush);
-                    rect.setRect(tp.x() + 10, tp.y() + 10, 15 * pSC, 10 * pSC);
-                    painter->drawText(rect, person.comment());
+                    comments.emplace_back(QRectF(tp.x() + 10, tp.y() + 10, 15 * pSC, 10 * pSC), person.comment());
                 }
 
                 if(mControlWidget->isTrackShowMarkerIDChecked() && person.getMarkerID() >= 0)
                 {
-                    QPen markerIDPen;
                     auto codeMarker = tp.getCodeMarker();
-                    markerIDPen.setColor(codeMarker && codeMarker->mMarkerId >= 0 ? Qt::green : Qt::blue);
-                    painter->setPen(markerIDPen);
-                    painter->setFont(markerIDFont);
-                    painter->drawText(QPointF{tp.x(), tp.y()}, QString("id=%1").arg(person.getMarkerID()));
-                    painter->setFont(font);
+                    markerIDs.push_back(
+                        {QPointF{tp.x(), tp.y()},
+                         QString("id=%1").arg(person.getMarkerID()),
+                         codeMarker && codeMarker->mMarkerId >= 0 ? recognizedColor : trackedColor});
                 }
 
                 if((mControlWidget->isTrackShowColColorChecked()) && (person.color().isValid()))
                 {
-                    painter->setPen(Qt::NoPen);
-                    painter->setBrush(QBrush(person.color()));
-                    rect.setRect(
-                        tp.x() + (pSP + pSC) * 0.6 * normalVector.x() - pSC / 2.,
-                        tp.y() + (pSP + pSC) * 0.6 * normalVector.y() - pSC / 2.,
-                        pSC,
-                        pSC); // 11
-                    painter->drawEllipse(rect);
+                    colorDots.emplace_back(
+                        QRectF(
+                            tp.x() + (pSP + pSC) * 0.6 * normalVector.x() - pSC / 2.,
+                            tp.y() + (pSP + pSC) * 0.6 * normalVector.y() - pSC / 2.,
+                            pSC,
+                            pSC),
+                        person.color());
                 }
                 else if(
                     (mControlWidget->isTrackShowColColorChecked()) &&
@@ -584,99 +587,40 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
                                                                       // kann auf Treppen auch negativ werden,
                                                                       // wenn koord weiter oben angesetzt wird
                 {
-                    painter->setFont(heightFont);
+                    const QRectF heightRect(
+                        tp.x() + (pSP + pSC) * 0.6 * normalVector.x() - pSC / 2.,
+                        tp.y() + (pSP + pSC) * 0.6 * normalVector.y() - pSC / 2.,
+                        3 * pSC,
+                        2 * pSC);
                     auto stereoMarker = tp.getStereoMarker();
                     if(mControlWidget->isTrackShowHeightIndividualChecked() &&
                        stereoMarker) // Hoehe incl individual fuer jeden trackpoint
                     {
-                        painter->setPen(numberPen);
-                        painter->setBrush(Qt::NoBrush);
-                        rect.setRect(
-                            tp.x() + (pSP + pSC) * 0.6 * normalVector.x() - pSC / 2.,
-                            tp.y() + (pSP + pSC) * 0.6 * normalVector.y() - pSC / 2.,
-                            3 * pSC,
-                            2.5 * pSC); // 11
-                        if(height < MIN_HEIGHT + 1)
-                        {
-                            if(mControlWidget->getCalibCoordDimension() == 0) // 3D
-                            {
-                                painter->drawText(
-                                    rect,
-                                    Qt::AlignHCenter,
-                                    QString("-\n%2").arg(
-                                        -mControlWidget->getExtrinsicParameters().trans3 -
-                                            stereoMarker->mStereoPoint.z(),
-                                        6,
-                                        'f',
-                                        1));
-                            }
-                            else
-                            {
-                                painter->drawText(
-                                    rect,
-                                    Qt::AlignHCenter,
-                                    QString("-\n%2").arg(
-                                        mControlWidget->getCameraAltitude() - stereoMarker->mStereoPoint.z(),
-                                        6,
-                                        'f',
-                                        1));
-                            }
-                        }
-                        else
-                        {
-                            if(mControlWidget->getCalibCoordDimension() == 0) // 3D
-                            {
-                                painter->drawText(
-                                    rect,
-                                    Qt::AlignHCenter,
-                                    QString("%1\n%2")
-                                        .arg(height, 6, 'f', 1)
-                                        .arg(
-                                            -mControlWidget->getExtrinsicParameters().trans3 -
-                                                stereoMarker->mStereoPoint.z(),
-                                            6,
-                                            'f',
-                                            1));
-                            }
-                            else
-                            {
-                                painter->drawText(
-                                    rect,
-                                    Qt::AlignHCenter,
-                                    QString("%1\n%2")
-                                        .arg(height, 6, 'f', 1)
-                                        .arg(
-                                            mControlWidget->getCameraAltitude() - stereoMarker->mStereoPoint.z(),
-                                            6,
-                                            'f',
-                                            1));
-                            }
-                        }
+                        const double individualHeight =
+                            mControlWidget->getCalibCoordDimension() == 0 // 3D
+                                ?
+                                -mControlWidget->getExtrinsicParameters().trans3 - stereoMarker->mStereoPoint.z() :
+                                mControlWidget->getCameraAltitude() - stereoMarker->mStereoPoint.z();
+                        const QString personHeight =
+                            height < MIN_HEIGHT + 1 ? QString("-") : QString("%1").arg(height, 6, 'f', 1);
+                        heights.emplace_back(
+                            heightRect.adjusted(0, 0, 0, 0.5 * pSC),
+                            QString("%1\n%2").arg(personHeight).arg(individualHeight, 6, 'f', 1));
                     }
                     else
                     {
-                        painter->setPen(numberPen);
-                        painter->setBrush(Qt::NoBrush);
-                        rect.setRect(
-                            tp.x() + (pSP + pSC) * 0.6 * normalVector.x() - pSC / 2.,
-                            tp.y() + (pSP + pSC) * 0.6 * normalVector.y() - pSC / 2.,
-                            3 * pSC,
-                            2 * pSC); // 11
-                        painter->drawText(rect, Qt::AlignHCenter, QString("%1").arg(height, 6, 'f', 1));
+                        heights.emplace_back(heightRect, QString("%1").arg(height, 6, 'f', 1));
                     }
-                    painter->setFont(font);
                 }
                 if(mControlWidget->isTrackShowPersonNumberChecked())
                 {
                     // listennummer
-                    painter->setPen(numberPen);
-                    painter->setBrush(Qt::NoBrush);
                     rect.setRect(
                         tp.x() - (pSP + pSN) * 0.6 * normalVector.x() - pSN,
                         tp.y() - (pSP + pSN) * 0.6 * normalVector.y() - pSN / 2.,
                         2. * pSN,
                         pSN); // 11
-                    painter->drawText(rect, Qt::AlignHCenter, QString("%1").arg(i + 1));
+                    personNumbers.emplace_back(rect, QString("%1").arg(i + 1));
                 }
                 if(mControlWidget->isTrackShowGroundPositionChecked())
                 {
@@ -919,6 +863,45 @@ void TrackerItem::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*op
             }
         }
     }
+
+    // draw the things that should be over the ground path
+    painter->setBrush(Qt::NoBrush);
+    for(const auto &[pointRect, color] : currentPoints)
+    {
+        currentPointLineWidthPen.setColor(color);
+        painter->setPen(currentPointLineWidthPen);
+        painter->drawEllipse(pointRect);
+    }
+    painter->setPen(Qt::NoPen);
+    for(const auto &[dotRect, color] : colorDots)
+    {
+        painter->setBrush(color);
+        painter->drawEllipse(dotRect);
+    }
+    painter->setBrush(Qt::NoBrush);
+    painter->setPen(numberPen);
+    painter->setFont(font);
+    for(const auto &[commentRect, comment] : comments)
+    {
+        painter->drawText(commentRect, comment);
+    }
+    painter->setFont(heightFont);
+    for(const auto &[heightRect, heightText] : heights)
+    {
+        painter->drawText(heightRect, Qt::AlignHCenter, heightText);
+    }
+    painter->setFont(font);
+    for(const auto &[numberRect, number] : personNumbers)
+    {
+        painter->drawText(numberRect, Qt::AlignHCenter, number);
+    }
+    painter->setFont(markerIDFont);
+    for(const auto &markerID : markerIDs)
+    {
+        painter->setPen(markerID.color);
+        painter->drawText(markerID.pos, markerID.text);
+    }
+    painter->setFont(font);
 
     // Mat& img, Subdiv2D& subdiv )
     if(mControlWidget->isShowVoronoiCellsChecked() && !mPersonStorage.getPersons().empty())

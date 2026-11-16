@@ -26,6 +26,7 @@
 #include "colorMarkerWidget.h"
 #include "colorPlot.h"
 #include "colorRangeWidget.h"
+#include "colorSettingsDialog.h"
 #include "coordinateSystemBox.h"
 #include "correction.h"
 #include "extrinsicBox.h"
@@ -51,7 +52,6 @@
 #include "wheelIgnoreFilter.h"
 #include "worldImageCorrespondence.h"
 
-#include <QColorDialog>
 #include <QDomElement>
 #include <QFileDialog>
 #include <QGraphicsScene>
@@ -114,6 +114,7 @@ Control::Control(
     // beim erzeugen von new colorplot absturz!!!!
     mUi->setupUi(this);
 
+    mColorSettings = new ColorSettingsDialog(this);
 
     // Observers for moCapShow, moCapSize and moCapColor in moCapController;
     // updates UI value when changed.
@@ -323,10 +324,17 @@ Control::Control(
     connect(mUi->trackReset, &QPushButton::clicked, this, &Control::onTrackResetClicked);
     connect(mUi->trackExport, &QPushButton::clicked, this, &Control::onTrackExportClicked);
     connect(mUi->trackImport, &QPushButton::clicked, this, &Control::onTrackImportClicked);
-    connect(mUi->trackPathColorButton, &QPushButton::clicked, this, &Control::onTrackPathColorButtonClicked);
+    connect(mUi->trackColorsButton, &QPushButton::clicked, this, &Control::onTrackColorsButtonClicked);
+    connect(mColorSettings, &ColorSettingsDialog::colorChanged, this, &Control::onColorSettingsChanged);
     connect(
-        mUi->trackGroundPathColorButton, &QPushButton::clicked, this, &Control::onTrackGroundPathColorButtonClicked);
-    connect(mUi->moCapColorButton, &QPushButton::clicked, this, &Control::onMoCapColorButtonClicked);
+        mColorSettings,
+        &ColorSettingsDialog::moCapColorSelected,
+        this,
+        [this](const QColor &col)
+        {
+            mMainWindow->getMoCapController().setColor(col);
+            onColorSettingsChanged();
+        });
     connect(mUi->trackRegionScale, &PSlider::valueChanged, this, &Control::onTrackRegionScaleValueChanged);
     connect(mUi->trackRegionLevels, &PSlider::valueChanged, this, &Control::onTrackRegionLevelsValueChanged);
     connect(mUi->trackShowSearchSize, &QCheckBox::checkStateChanged, this, &Control::onTrackShowSearchSizeStateChanged);
@@ -698,26 +706,52 @@ void Control::setTrackShow(bool b)
 
 QColor Control::getTrackPathColor() const
 {
-    return mUi->trackPathColorButton->palette().color(QPalette::Button);
+    return mColorSettings->getTrackPathColor();
 }
 
 void Control::setTrackPathColor(QColor col)
 {
-    QPalette pal = mUi->trackPathColorButton->palette();
-    pal.setColor(QPalette::Button, col);
-    mUi->trackPathColorButton->setPalette(pal);
+    mColorSettings->setTrackPathColor(col);
 }
 
 QColor Control::getTrackGroundPathColor() const
 {
-    return mUi->trackGroundPathColorButton->palette().color(QPalette::Button);
+    return mColorSettings->getTrackGroundPathColor();
 }
 
 void Control::setTrackGroundPathColor(QColor col)
 {
-    QPalette pal = mUi->trackGroundPathColorButton->palette();
-    pal.setColor(QPalette::Button, col);
-    mUi->trackGroundPathColorButton->setPalette(pal);
+    mColorSettings->setTrackGroundPathColor(col);
+}
+
+QColor Control::getTrackRecognizedColor() const
+{
+    return mColorSettings->getTrackRecognizedColor();
+}
+
+void Control::setTrackRecognizedColor(QColor col)
+{
+    mColorSettings->setTrackRecognizedColor(col);
+}
+
+QColor Control::getTrackTrackedColor() const
+{
+    return mColorSettings->getTrackTrackedColor();
+}
+
+void Control::setTrackTrackedColor(QColor col)
+{
+    mColorSettings->setTrackTrackedColor(col);
+}
+
+QColor Control::getTrackPersonNumberColor() const
+{
+    return mColorSettings->getTrackPersonNumberColor();
+}
+
+void Control::setTrackPersonNumberColor(QColor col)
+{
+    mColorSettings->setTrackPersonNumberColor(col);
 }
 
 int Control::getTrackCurrentPointSize() const
@@ -868,7 +902,7 @@ bool Control::isTrackShowComplPathChecked() const
  * */
 QColor Control::getMoCapColor() const
 {
-    return mUi->moCapColorButton->palette().color(QPalette::Button);
+    return mColorSettings->getMoCapColor();
 }
 
 bool Control::isRecoActiveChecked() const
@@ -916,12 +950,7 @@ void Control::setMoCapShow(bool visibility)
  * */
 void Control::setMoCapColor(QColor col)
 {
-    if(getMoCapColor() != col)
-    {
-        QPalette pal = mUi->moCapColorButton->palette();
-        pal.setColor(QPalette::Button, col);
-        mUi->moCapColorButton->setPalette(pal);
-    }
+    mColorSettings->setMoCapColor(col);
 }
 
 /**
@@ -1246,39 +1275,15 @@ void Control::onTrackImportClicked()
     mMainWindow->importTracker();
 }
 
-void Control::onTrackPathColorButtonClicked()
+void Control::onTrackColorsButtonClicked()
 {
-    QColor col = QColorDialog::getColor(getTrackPathColor(), this);
-    if(col.isValid())
-    {
-        setTrackPathColor(col);
-    }
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
+    mColorSettings->show();
+    mColorSettings->raise();
+    mColorSettings->activateWindow();
 }
 
-void Control::onTrackGroundPathColorButtonClicked()
+void Control::onColorSettingsChanged()
 {
-    QColor col = QColorDialog::getColor(getTrackGroundPathColor(), this);
-    if(col.isValid())
-    {
-        setTrackGroundPathColor(col);
-    }
-    if(!mMainWindow->isLoading())
-    {
-        mMainWindow->updateImage();
-    }
-}
-
-void Control::onMoCapColorButtonClicked()
-{
-    QColor col = QColorDialog::getColor(getMoCapColor(), this);
-    if(col.isValid())
-    {
-        mMainWindow->getMoCapController().setColor(col);
-    }
     mScene->update();
     if(!mMainWindow->isLoading())
     {
@@ -2264,6 +2269,9 @@ void Control::setXml(QDomElement &elem)
 
     subSubElem.setAttribute("TRACK_GROUND_PATH_COLOR", getTrackGroundPathColor().name());
     subSubElem.setAttribute("TRACK_PATH_COLOR", getTrackPathColor().name());
+    subSubElem.setAttribute("RECOGNIZED_COLOR", getTrackRecognizedColor().name());
+    subSubElem.setAttribute("TRACKED_COLOR", getTrackTrackedColor().name());
+    subSubElem.setAttribute("PERSON_NUMBER_COLOR", getTrackPersonNumberColor().name());
     subSubElem.setAttribute("CURRENT_POINT_SIZE", mUi->trackCurrentPointSize->value());
     subSubElem.setAttribute("CURRENT_POINT_LINE_WIDTH", mUi->trackCurrentPointLineWidth->value());
     subSubElem.setAttribute("POINTS_SIZE", mUi->trackPointSize->value());
@@ -2699,8 +2707,16 @@ void Control::getXml(const QDomElement &elem, const QString &version)
                     loadBoolValue(subSubElem, "SHOW_GROUND_POSITION", mUi->trackShowGroundPosition, false);
                     loadBoolValue(subSubElem, "SHOW_GROUND_PATH", mUi->trackShowGroundPath, false);
 
-                    setTrackPathColor(readQString(subSubElem, "TRACK_PATH_COLOR", "#ff0000"));
-                    setTrackGroundPathColor(readQString(subSubElem, "TRACK_GROUND_PATH_COLOR", "#00ff00"));
+                    setTrackPathColor(readQString(
+                        subSubElem, "TRACK_PATH_COLOR", ColorSettingsDialog::DEFAULT_TRACK_PATH_COLOR.name()));
+                    setTrackGroundPathColor(readQString(
+                        subSubElem, "TRACK_GROUND_PATH_COLOR", ColorSettingsDialog::DEFAULT_GROUND_PATH_COLOR.name()));
+                    setTrackRecognizedColor(readQString(
+                        subSubElem, "RECOGNIZED_COLOR", ColorSettingsDialog::DEFAULT_RECOGNIZED_COLOR.name()));
+                    setTrackTrackedColor(
+                        readQString(subSubElem, "TRACKED_COLOR", ColorSettingsDialog::DEFAULT_TRACKED_COLOR.name()));
+                    setTrackPersonNumberColor(readQString(
+                        subSubElem, "PERSON_NUMBER_COLOR", ColorSettingsDialog::DEFAULT_PERSON_NUMBER_COLOR.name()));
 
                     loadBoolValue(subSubElem, "HEAD_SIZE", mUi->trackHeadSized, true);
                     loadIntValue(subSubElem, "CURRENT_POINT_SIZE", mUi->trackCurrentPointSize, 60);

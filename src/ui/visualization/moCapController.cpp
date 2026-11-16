@@ -276,7 +276,7 @@ void MoCapController::readMoCapFiles(const std::vector<MoCapPersonMetadata> &new
  * child-nodes.
  *
  * Results in the following Structure:
- *     <MOCAP SHOW="1" SIZE="2" COLOR="#ff0000" >
+ *     <MOCAP SHOW="1" SIZE="2" COLOR="#ffff37" >
  *         <PERSON FILE="/example.c3d" SAMPLE_RATE="60" TIME_OFFSET="0.5" SYSTEM="0" />
  *         ...
  *     </MOCAP>
@@ -311,7 +311,7 @@ void MoCapController::getXml(const QDomElement &elem)
     // NOTE: Maybe only load the c3d-files once show is activated
 
     setShowMoCap(readBool(elem, "SHOW"));
-    setColor(readQString(elem, "COLOR"));
+    setColor(readQString(elem, "COLOR", DEFAULT_COLOR.name()));
     setThickness(readInt(elem, "SIZE"));
 
     std::vector<MoCapPersonMetadata> savedMetadata;

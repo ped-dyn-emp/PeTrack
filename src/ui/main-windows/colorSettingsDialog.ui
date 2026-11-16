@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ColorSettingsDialog</class>
+ <widget class="QDialog" name="ColorSettingsDialog">
+  <property name="windowTitle">
+   <string>Colors</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="trackGroup">
+     <property name="title">
+      <string>trajectories</string>
+     </property>
+     <layout class="QFormLayout" name="trackGroupLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="trackPathLabel">
+        <property name="text">
+         <string>path:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="trackPathButton">
+        <property name="toolTip">
+         <string>Color of the trajectory in the image</string>
+        </property>
+        <property name="text">
+         <string>color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="trackGroundPathLabel">
+        <property name="text">
+         <string>ground path:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="trackGroundPathButton">
+        <property name="toolTip">
+         <string>Color of the trajectory on the ground</string>
+        </property>
+        <property name="text">
+         <string>color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="trackPersonNumberLabel">
+        <property name="text">
+         <string>person number:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="trackPersonNumberButton">
+        <property name="toolTip">
+         <string>Color of the person number, the comment and the height of a person</string>
+        </property>
+        <property name="text">
+         <string>color</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="recognitionGroup">
+     <property name="title">
+      <string>recognized / tracked</string>
+     </property>
+     <layout class="QFormLayout" name="recognitionGroupLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="trackRecognizedLabel">
+        <property name="text">
+         <string>recognized:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="trackRecognizedButton">
+        <property name="toolTip">
+         <string>Color used if a person was recognized (or set manually) in the current frame</string>
+        </property>
+        <property name="text">
+         <string>color</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="trackTrackedLabel">
+        <property name="text">
+         <string>tracked only:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="trackTrackedButton">
+        <property name="toolTip">
+         <string>Color used if a person is only the result of tracking in the current frame</string>
+        </property>
+        <property name="text">
+         <string>color</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="moCapGroup">
+     <property name="title">
+      <string>MoCap</string>
+     </property>
+     <layout class="QFormLayout" name="moCapGroupLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="moCapLabel">
+        <property name="text">
+         <string>MoCap:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="moCapButton">
+        <property name="toolTip">
+         <string>Color of the MoCap visualization</string>
+        </property>
+        <property name="text">
+         <string>color</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>ColorSettingsDialog</receiver>
+   <slot>reject()</slot>
+  </connection>
+ </connections>
+</ui>
