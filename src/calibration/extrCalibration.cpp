@@ -28,6 +28,7 @@
 #include <QFileDialog>
 #include <QGraphicsScene>
 #include <QStyle>
+#include <cmath>
 #include <optional>
 
 #define MAX_AV_ERROR 20
@@ -847,7 +848,8 @@ cv::Point3f ExtrCalibration::get3DPoint(const cv::Point2f &p2d, double h, const 
     // Transform the rotation vector into a rotation matrix with opencvs rodrigues method
     cv::Matx<double, 3, 3> rot_inv;
     cv::Matx<double, 3, 3> rot_mat(3, 3, CV_64F);
-    const cv::Mat          rvec = (cv::Mat_<double>(3, 1) << extrParams.rot1, extrParams.rot2, extrParams.rot3);
+    const cv::Vec3d        rvec{extrParams.rot1, extrParams.rot2, extrParams.rot3};
+
     Rodrigues(rvec, rot_mat);
     rot_inv = rot_mat.inv(cv::DECOMP_LU, nullptr);
 
@@ -939,11 +941,7 @@ bool ExtrCalibration::isOutsideImage(cv::Point2f p2d) const
     int bS = mMainWindow->getImage() ? mMainWindow->getImageBorderSize() : 0;
     if(mMainWindow->getImage())
     {
-        if(!isnormal(p2d.x) || !isnormal(p2d.y) || !isnormal(p2d.x) || !isnormal(p2d.y))
-        {
-            return true;
-        }
-        if(isnan(p2d.x) || isnan(p2d.y) || isinf(p2d.x) || isinf(p2d.y))
+        if(!std::isfinite(p2d.x) || !std::isfinite(p2d.y))
         {
             return true;
         }
