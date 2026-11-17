@@ -72,18 +72,17 @@ void TrackPerson::initKalmanFilter(const TrackPoint &firstPoint)
     // Transition matrix for dt (x(t + 1) = x(t) + vx*dt, y(t + 1) = y(t) + vy*dt)
 
     // clang-format off
-    mKalmanFilter.transitionMatrix =
-        (cv::Mat_<float>(4, 4) <<
+    mKalmanFilter.transitionMatrix = cv::Mat(cv::Matx44f{
         1.F, 0.F, dt, 0.F,
         0.F, 1.F, 0.F, dt,
         0.F, 0.F, 1.F, 0.F,
         0.F, 0.F, 0.F, 1.F
-    );
+    });
 
-    mKalmanFilter.measurementMatrix = (cv::Mat_<float>(2, 4) <<
+    mKalmanFilter.measurementMatrix = cv::Mat(cv::Matx<float, 2, 4>{
         1.F, 0.F, 0.F, 0.F,
         0.F, 1.F, 0.F, 0.F
-    );
+    });
     // clang-format on
 
     // Q
@@ -93,13 +92,12 @@ void TrackPerson::initKalmanFilter(const TrackPoint &firstPoint)
     float q22 = sigmaA2 * (dt * dt);                 // dt^2 * sigma^2
 
     // clang-format off
-    mKalmanFilter.processNoiseCov =
-        (cv::Mat_<float>(4, 4) <<
+    mKalmanFilter.processNoiseCov = cv::Mat(cv::Matx44f{
         q11, 0.F, q12, 0.F,
         0.F, q11, 0.F, q12,
         q12, 0.F, q22, 0.F,
         0.F, q12, 0.F, q22
-    );
+    });
     // clang-format on
 
     // Measurement noise covariance R (initial)
@@ -110,18 +108,17 @@ void TrackPerson::initKalmanFilter(const TrackPoint &firstPoint)
     float pVel = KalmanFilterParams::INIT_VEL_VAR;
 
     // clang-format off
-    mKalmanFilter.errorCovPost =
-        (cv::Mat_<float>(4, 4) <<
+    mKalmanFilter.errorCovPost = cv::Mat(cv::Matx44f{
         pPos, 0.F, 0.F, 0.F,
         0.F, pPos, 0.F, 0.F,
         0.F, 0.F, pVel, 0.F,
         0.F, 0.F, 0.F, pVel
-    );
+    });
     // clang-format on
 
     // Initialize state with measurement (px, py) and velocity
     cv::Point2f pos         = firstPoint.pixelPoint().toPoint2f();
-    mKalmanFilter.statePost = (cv::Mat_<float>(4, 1) << pos.x, pos.y, 0.F, 0.F);
+    mKalmanFilter.statePost = cv::Mat(cv::Matx41f{pos.x, pos.y, 0.F, 0.F});
 
     mKalmanInitialized = true;
 }
@@ -132,7 +129,7 @@ void TrackPerson::initKalmanFilter(const TrackPoint &firstPoint, const TrackPoin
     // Initialize state with measurement (px, py) and velocity
     cv::Point2f pos         = secondPoint.pixelPoint().toPoint2f();
     cv::Point2f vel         = secondPoint.pixelPoint().toPoint2f() - firstPoint.pixelPoint().toPoint2f();
-    mKalmanFilter.statePost = (cv::Mat_<float>(4, 1) << pos.x, pos.y, vel.x, vel.y);
+    mKalmanFilter.statePost = cv::Mat(cv::Matx41f{pos.x, pos.y, vel.x, vel.y});
     mKalmanFilter.statePre  = mKalmanFilter.statePost;
 }
 
@@ -586,7 +583,7 @@ bool TrackPerson::insertAtFrame(int frame, const TrackPoint &point, int persNr, 
             {
                 mKalmanFilter.measurementNoiseCov = cv::Mat::zeros(2, 2, CV_32F);
 
-                cv::Mat measurement = (cv::Mat_<float>(2, 1) << tp.x(), tp.y());
+                cv::Mat measurement{cv::Matx21f{static_cast<float>(tp.x()), static_cast<float>(tp.y())}};
                 mKalmanFilter.correct(measurement);
             }
 

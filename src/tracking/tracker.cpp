@@ -770,7 +770,7 @@ void Tracker::trackFeaturePointsLK(int level, bool adaptive)
             kf.measurementNoiseCov.at<float>(0, 0) = dx * dx;
             kf.measurementNoiseCov.at<float>(1, 1) = dy * dy;
 
-            cv::Mat meas      = (cv::Mat_<float>(2, 1) << mFeaturePoints[i].x - bS, mFeaturePoints[i].y - bS);
+            cv::Mat meas{cv::Matx21f{mFeaturePoints[i].x - bS, mFeaturePoints[i].y - bS}};
             cv::Mat corr      = kf.correct(meas);
             mFeaturePoints[i] = {corr.at<float>(0) + bS, corr.at<float>(1) + bS};
         }

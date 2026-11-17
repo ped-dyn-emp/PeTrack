@@ -18,6 +18,7 @@
 #include "moCapPersonMetadata.h"
 
 #include <QFileInfo>
+#include <opencv2/geometry/2d.hpp>
 
 MoCapPersonMetadata::MoCapPersonMetadata(
     std::string filepath,

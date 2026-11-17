@@ -94,17 +94,17 @@ TEST_CASE("IntrinsicCameraParams values")
     IntrinsicModelsParameters params;
     WHEN("I set the values of the IntrinsicParameters (via the setter)")
     {
-        params.oldModelParams.cameraMatrix = (cv::Mat_<double>(3, 3) << 800, 2, 3, 4, 900, 6, 7, 8, 9);
+        params.oldModelParams.cameraMatrix = cv::Mat(cv::Matx33d{800, 2, 3, 4, 900, 6, 7, 8, 9});
         // values need to be in valid range -5 to 5
         params.oldModelParams.distortionCoeffs =
-            (cv::Mat_<float>(1, 14) << -4.5, -4, -3.5, -3, -2.5, -2, -1.5, -1, 1, 1.5, 2, 2.5, 3, 3.5);
+            cv::Mat(cv::Matx<float, 1, 14>{-4.5, -4, -3.5, -3, -2.5, -2, -1.5, -1, 1, 1.5, 2, 2.5, 3, 3.5});
 
         params.oldModelParams.reprojectionError = 42;
 
-        params.extModelParams.cameraMatrix = (cv::Mat_<double>(3, 3) << 600, 2, 3, 4, 800, 6, 7, 8, 9);
+        params.extModelParams.cameraMatrix = cv::Mat(cv::Matx33d{600, 2, 3, 4, 800, 6, 7, 8, 9});
         // values need to be in valid range -5 to 5
         params.extModelParams.distortionCoeffs =
-            (cv::Mat_<float>(1, 14) << 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, -1, -1.5, -2, -2.5, -3, -3.5);
+            cv::Mat(cv::Matx<float, 1, 14>{4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, -1, -1.5, -2, -2.5, -3, -3.5});
         params.extModelParams.reprojectionError = 187;
 
         intrBox.setIntrinsicCameraParams(params);
@@ -303,16 +303,16 @@ TEST_CASE("IntrinsicBox: reading/writing xml")
     {
         // set different parameters:
         IntrinsicModelsParameters params;
-        params.oldModelParams.cameraMatrix = (cv::Mat_<double>(3, 3) << 800, 0, 5, 0, 900, 7, 0, 0, 1);
+        params.oldModelParams.cameraMatrix = cv::Mat(cv::Matx33d{800, 0, 5, 0, 900, 7, 0, 0, 1});
         // values need to be in valid range -5 to 5
         params.oldModelParams.distortionCoeffs =
-            (cv::Mat_<float>(1, 14) << -4.5, -4, -3.5, -3, -2.5, -2, -1.5, -1, 1, 1.5, 2, 2.5, 3, 3.5);
+            cv::Mat(cv::Matx<float, 1, 14>{-4.5, -4, -3.5, -3, -2.5, -2, -1.5, -1, 1, 1.5, 2, 2.5, 3, 3.5});
         params.oldModelParams.reprojectionError = 0.5;
 
-        params.extModelParams.cameraMatrix = (cv::Mat_<double>(3, 3) << 600, 0, 5, 0, 800, 7, 0, 0, 1);
+        params.extModelParams.cameraMatrix = cv::Mat(cv::Matx33d{600, 0, 5, 0, 800, 7, 0, 0, 1});
         // values need to be in valid range -5 to 5
         params.extModelParams.distortionCoeffs =
-            (cv::Mat_<float>(1, 14) << 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, -1, -1.5, -2, -2.5, -3, -3.5);
+            cv::Mat(cv::Matx<float, 1, 14>{4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, -1, -1.5, -2, -2.5, -3, -3.5});
         params.extModelParams.reprojectionError = 78.5;
         intrBox.setIntrinsicCameraParams(params);
 

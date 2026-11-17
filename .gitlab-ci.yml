@@ -28,7 +28,7 @@ stages:
 # only cache local items. Also set the current docker tag.
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  DOCKER_TAG: "v3"
+  DOCKER_TAG: "v4"
 
 cache:
   paths:

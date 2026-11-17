@@ -18,9 +18,9 @@ Any compiler with support for C++ 23 should work. At the moment the following co
 For using `PeTrack` following tools and libraries are needed:
 
 - git
-- CMake (>= 3.16)
+- CMake (>= 3.26)
 - Qt (>= 6.8.3)
-- OpenCV (== 4.10)
+- OpenCV (== 5.1)
 - Qwt (>= 6.3.0, linked with Qt6)
 
 When developing `PeTrack` and using the test framework following additional tools and libraries are used, they are provided as submodules by `PeTrack`:

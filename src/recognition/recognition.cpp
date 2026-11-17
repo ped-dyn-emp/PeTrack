@@ -424,7 +424,7 @@ cv::Mat detail::customBgr2Gray(const cv::Mat &subImg, const QColor &midHue)
     scaleR /= scaleSum;
     scaleG /= scaleSum;
     scaleB /= scaleSum;
-    cv::Mat bgrToGray = (cv::Mat_<double>(1, 3) << scaleB, scaleG, scaleR);
+    cv::Matx13d bgrToGray{scaleB, scaleG, scaleR};
 
     // Performs the matrix-vector multiplication MxN for each pixel of subImg, where M is bgrToGray
     // and N is a vector of all channels of a pixel, the result will be saved in subGray.
