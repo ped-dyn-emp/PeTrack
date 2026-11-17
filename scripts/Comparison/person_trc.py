@@ -14,6 +14,10 @@ class Point:
     col_y: float
     color: str
     markerID: int
+    # Orientation of the code marker (trc version 6+), -1 if not available
+    view_dir_x: float = -1
+    view_dir_y: float = -1
+    view_dir_z: float = -1
 
     def __hash__(self) -> int:
         return hash(
@@ -35,7 +39,7 @@ class Person:
         self.id = int(id)
         self.points: List[Point] = []
 
-        # Version 4, sonst nichts unterstützt
+        # Version 4+; earlier not supported
         person_values = person_str.split(" ")
         self.nr = int(person_values[0])
         self.height = float(person_values[1])
@@ -62,6 +66,11 @@ class Person:
             col_y = float(point_values[7])
             color = point_values[8] + " " + point_values[9] + " " + point_values[10]
             markerID = int(point_values[11])
+            view_dir_x = view_dir_y = view_dir_z = -1.0
+            if trc_version >= 6:
+                view_dir_x = float(point_values[12])
+                view_dir_y = float(point_values[13])
+                view_dir_z = float(point_values[14])
             self.points.append(
                 Point(
                     x,
@@ -74,6 +83,9 @@ class Person:
                     col_y,
                     color,
                     markerID,
+                    view_dir_x,
+                    view_dir_y,
+                    view_dir_z,
                 )
             )
 

@@ -6,7 +6,7 @@ try:
 except ImportError:
     print("You need to install OpenCV for Python (e.g. pip install opencv-python)")
     exit(1)
-from Person_trc import Person
+from person_trc import Person
 import xml.etree.ElementTree as ET
 import numpy as np
 import math

@@ -3,7 +3,7 @@ import re
 from typing import List, Tuple
 from statistics import mean, median
 from math import sqrt
-from Person_trc import Person, Point
+from person_trc import Person, Point
 import matplotlib.pyplot as plt
 from scipy.optimize import linear_sum_assignment
 import numpy as np
@@ -88,7 +88,8 @@ HEADER_RE = re.compile(
 
 # Version 1:   8 fields  (x y qual colorX colorY r g b)
 # Version 2:   11 fields (+ stereoX stereoY stereoZ)
-# Version 3+:  12 fields (+ markerID)
+# Version 3-5: 12 fields (+ markerID)
+# Version 6+:  15 fields (+ viewDirX viewDirY viewDirZ)
 POINT_RE = re.compile(
     r"^"
     r"(-?\d+(?:\.\d+)?)"  # x coordinate
@@ -110,6 +111,15 @@ POINT_RE = re.compile(
     r"\s+"
     r"(-?\d+)"  # Color B
     r"(?:\s+(-?\d+))?"  # Marker ID (optional, v3+)
+    # viewDir x/y/z (optional, v6+); may be written in scientific notation
+    r"(?:"
+        r"\s+"
+        r"(-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)"  # viewDir x
+        r"\s+"
+        r"(-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)"  # viewDir y
+        r"\s+"
+        r"(-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?)"  # viewDir z
+    r")?"
     r"$",
     re.MULTILINE,
 )
