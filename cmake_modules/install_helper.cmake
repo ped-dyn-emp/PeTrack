@@ -23,9 +23,7 @@ if (WIN32)
     install(DIRECTORY "${Qt6Core_DIR}/../../../../../Licenses" DESTINATION "Licenses/Qt_Licenses")
     install(DIRECTORY "${OpenCV_DIR}/etc/licenses" DESTINATION "Licenses/OpenCV_Licenses")
     install(FILES "${OpenCV_DIR}/LICENSE/" DESTINATION "Licenses/OpenCV_Licenses")
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/deps/ezc3d/LICENSE" DESTINATION "Licenses/ezc3d_license/")
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/deps/spdlog/LICENSE" DESTINATION "Licenses/spdlog_license/")
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/deps/hdf5/LICENSE" DESTINATION "Licenses/hdf5_license/")
+    install(FILES "${QWT_ROOT_DIR}/COPYING" DESTINATION "Licenses/qwt_license/")
     install(FILES "${CMAKE_SOURCE_DIR}/.zenodo.json" DESTINATION "bin")
     install(FILES "${OFFSCREEN_PLUGIN}" DESTINATION "bin/platforms")
 
@@ -48,6 +46,12 @@ elseif(APPLE)
 
     install(FILES "${OpenCV_DIR}/../../libopencv_videoio_ffmpeg.so" DESTINATION "petrack.app/Contents/Frameworks")
 
+    # Qwt is linked statically, so it is not bundled as a library and the license loop below never sees it.
+    # setup-deps-macos.sh copies its COPYING into the Qwt install prefix.
+    get_filename_component(_qwt_prefix "${QWT_LIBRARY}" DIRECTORY)
+    get_filename_component(_qwt_prefix "${_qwt_prefix}" DIRECTORY)
+    install(FILES "${_qwt_prefix}/COPYING" DESTINATION "Licenses/qwt_license/")
+
     install(CODE [[
         include(BundleUtilities)
 
@@ -59,16 +63,47 @@ elseif(APPLE)
         file(INSTALL DESTINATION "${_outdir}"
             TYPE FILE FILES "$<TARGET_FILE:Qt6::QCocoaIntegrationPlugin>" "$<TARGET_FILE:Qt6::QOffscreenIntegrationPlugin>")
 
-        fixup_bundle(
-            "${_appdir}/Contents/MacOS/petrack"
-            "${_outdir}/$<TARGET_FILE_NAME:Qt6::QCocoaIntegrationPlugin>;${_outdir}/$<TARGET_FILE_NAME:Qt6::QOffscreenIntegrationPlugin>"
-            ""
-        )
+        set (_exe "${_appdir}/Contents/MacOS/petrack")
+        set (_libs "${_outdir}/$<TARGET_FILE_NAME:Qt6::QCocoaIntegrationPlugin>;${_outdir}/$<TARGET_FILE_NAME:Qt6::QOffscreenIntegrationPlugin>;${_appdir}/Contents/Frameworks/libopencv_videoio_ffmpeg.so")
+
+        # Ship the licenses of all libraries fixup_bundle copies into the bundle, taken from the library's install
+        # prefix or up to two of its parents (Qt's are in <qt-root>/Licenses, next to <version>/macos, see setup-deps-macos.sh).
+        get_bundle_keys("${_exe}" "${_libs}" "" _keys)
+        foreach(_key IN LISTS _keys)
+            if(NOT "${${_key}_COPYFLAG}" STREQUAL "1")
+                continue()
+            endif()
+            get_filename_component(_lib "${${_key}_RESOLVED_ITEM}" REALPATH)
+            string(REGEX REPLACE "/lib/.*" "" _dir "${_lib}")
+            foreach(_level RANGE 2)
+                file(GLOB _licenses
+                    "${_dir}/LICENSE*" "${_dir}/LICENCE*" "${_dir}/COPYING*" "${_dir}/NOTICE*"
+                    "${_dir}/LICENSES" "${_dir}/Licenses" "${_dir}/share/licenses/*")
+                if(_licenses)
+                    break()
+                endif()
+                get_filename_component(_dir "${_dir}" DIRECTORY)
+            endforeach()
+            if(NOT _licenses)
+                message(FATAL_ERROR "No license files found for ${_lib}, which would be bundled into petrack.app.")
+            endif()
+            if(_dir MATCHES "/Cellar/([^/]+)/[^/]+$")
+                set(_name "${CMAKE_MATCH_1}")
+            else()
+                get_filename_component(_name "${_dir}" NAME)
+            endif()
+            file(COPY ${_licenses} DESTINATION "${CMAKE_INSTALL_PREFIX}/Licenses/${_name}")
+        endforeach()
+
+        fixup_bundle("${_exe}" "${_libs}" "")
     ]] COMPONENT Runtime)
 
 endif()
 
 install(FILES "${CMAKE_SOURCE_DIR}/ReadMe.md" "${CMAKE_SOURCE_DIR}/LICENSE" DESTINATION ".")
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/deps/ezc3d/LICENSE" DESTINATION "Licenses/ezc3d_license/")
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/deps/spdlog/LICENSE" DESTINATION "Licenses/spdlog_license/")
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/deps/hdf5/LICENSE" DESTINATION "Licenses/hdf5_license/")
 
 ##################################################################
 #                         PACKAGE                                #
@@ -129,7 +164,8 @@ elseif(APPLE)
     set(CPACK_GENERATOR "DragNDrop" CACHE STRING "Generator used by CPack")
 
     SET(MACOSX_BUNDLE_ICON_FILE petrack.icns)
-    SET(MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2015-2021 Forschungszentrum Juelich. All rights reserved.")
+    string(TIMESTAMP _year "%Y")
+    SET(MACOSX_BUNDLE_COPYRIGHT "Copyright (c) 2015-${_year} Forschungszentrum Juelich GmbH. Licensed under the GNU GPL v3 or later.")
     SET(MACOSX_BUNDLE_INFO_STRING "PeTrack is a software for the automated extraction of pedestrian trajectories from videos.")
     SET(MACOSX_BUNDLE_BUNDLE_NAME "PeTrack")
     SET(MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}")
