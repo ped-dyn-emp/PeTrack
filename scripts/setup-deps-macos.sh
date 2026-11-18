@@ -46,6 +46,9 @@ function setup_qt {
     source qt_venv/bin/activate
     python3 -m pip install aqtinstall
     python3 -m aqt install-qt mac desktop ${qt_version} --outputdir "${install_path}"/qt-${qt_version}
+    # aqt does not install the license texts, take them from the qtbase sources
+    python3 -m aqt install-src mac ${qt_version} --archives qtbase --outputdir qt_src
+    cp -R qt_src/${qt_version}/Src/qtbase/LICENSES "${install_path}"/qt-${qt_version}/Licenses
     deactivate
 
 
@@ -78,6 +81,8 @@ function setup_qwt {
     cat qwtconfig.pri
     $qmake qwt.pro
     make install -j "${CPUS}"
+
+    cp COPYING "${install_path}"/qwt-${qwt_version}/
 
     cd "${root}"
     rm -rf "${temp_folder}"
@@ -120,6 +125,8 @@ function setup_opencv {
 
     cmake --build . --config Release --parallel
     cmake --install .
+    # add OpenCV's own license
+    cp ../LICENSE "${install_path}/opencv-${opencv_version}/"
 
     cd "${root}"
     rm -rf "${temp_folder}"
@@ -137,26 +144,22 @@ function setup_ffmpeg {
       --prefix="${install_path}"/ffmpeg-${ffmpeg_version} \
       --extra-libs="-lpthread -lm" \
       --enable-shared \
-      --enable-gpl \
-      --enable-gnutls \
-      --enable-libass \
-      --enable-libfreetype \
-      --enable-libopus \
-      --enable-libvpx \
-      --enable-libx264 \
-      --enable-libx265
+      --disable-autodetect \
+      --enable-pthreads \
+      --enable-videotoolbox \
+      --enable-audiotoolbox \
+      --enable-zlib \
+      --enable-bzlib
     make install -j"${CPUS}"
+
+    cp COPYING.* LICENSE.md "${install_path}"/ffmpeg-${ffmpeg_version}/
     export PKG_CONFIG_PATH="${install_path}"/ffmpeg-${ffmpeg_version}/lib/pkgconfig/
 
     cd "${root}"
     rm -rf "${temp_folder}"
 }
 
-# was manually installed using online installer
-# setup_qt
-
-
-#setup_qwt
-
+setup_qt
+setup_qwt
 setup_ffmpeg
 setup_opencv
