@@ -9,6 +9,7 @@
 - Add: separate `show marker ID` option with its own size and bold setting in the tracking tab (previously part of `show height/col. color/marker ID`)
 - Renamed `show number` to `show person number`
 - Add: `colors...` window in the tracking tab to change all visualization colors in one place, incl. new colors for recognized/tracked/person number
+- Fix: `start`/`middle`/`end` buttons and shortcuts shift+s/shift+d no longer jump when `show only person` is unchecked or the person number does not exist
 
 # 1.2
 

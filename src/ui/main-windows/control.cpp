@@ -1377,31 +1377,37 @@ void Control::onTrackShowOnlyNrListTextChanged()
 
 void Control::onTrackGotoNrClicked()
 {
-    if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= mUi->trackShowOnlyNr->value())
+    if(!isTrackShowOnlyChecked() ||
+       mUi->trackShowOnlyNr->value() > static_cast<int>(mMainWindow->getPersonStorage().nbPersons()))
     {
-        int idx        = mUi->trackShowOnlyNr->value() - 1;
-        int firstFrame = mMainWindow->getPersonStorage().at(idx).firstFrame();
-        int lastFrame  = mMainWindow->getPersonStorage().at(idx).lastFrame();
-        mMainWindow->getPlayer()->skipToFrame((lastFrame + firstFrame) / 2);
+        return;
     }
+    int idx        = mUi->trackShowOnlyNr->value() - 1;
+    int firstFrame = mMainWindow->getPersonStorage().at(idx).firstFrame();
+    int lastFrame  = mMainWindow->getPersonStorage().at(idx).lastFrame();
+    mMainWindow->getPlayer()->skipToFrame((lastFrame + firstFrame) / 2);
 }
 
 void Control::onTrackGotoStartNrClicked()
 {
-    if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= mUi->trackShowOnlyNr->value())
+    if(!isTrackShowOnlyChecked() ||
+       mUi->trackShowOnlyNr->value() > static_cast<int>(mMainWindow->getPersonStorage().nbPersons()))
     {
-        int idx = mUi->trackShowOnlyNr->value() - 1;
-        mMainWindow->getPlayer()->skipToFrame(mMainWindow->getPersonStorage().at(idx).firstFrame());
+        return;
     }
+    int idx = mUi->trackShowOnlyNr->value() - 1;
+    mMainWindow->getPlayer()->skipToFrame(mMainWindow->getPersonStorage().at(idx).firstFrame());
 }
 
 void Control::onTrackGotoEndNrClicked()
 {
-    if(static_cast<int>(mMainWindow->getPersonStorage().nbPersons()) >= mUi->trackShowOnlyNr->value())
+    if(!isTrackShowOnlyChecked() ||
+       mUi->trackShowOnlyNr->value() > static_cast<int>(mMainWindow->getPersonStorage().nbPersons()))
     {
-        int idx = mUi->trackShowOnlyNr->value() - 1;
-        mMainWindow->getPlayer()->skipToFrame(mMainWindow->getPersonStorage().at(idx).lastFrame());
+        return;
     }
+    int idx = mUi->trackShowOnlyNr->value() - 1;
+    mMainWindow->getPlayer()->skipToFrame(mMainWindow->getPersonStorage().at(idx).lastFrame());
 }
 
 void Control::onTrackShowOnlyListButtonClicked()
